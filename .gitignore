@@ -10,7 +10,6 @@
 !.pylintrc
 !.travis*
 !.eslintrc.json
-*.css
 *.log
 *.pot
 *.pyc
