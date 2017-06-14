@@ -1,0 +1,43 @@
+{% if attributes %} 
+{% load i18n %}
+
+<!-- search count -->  
+  {% if search_count %} 
+  <div class="text-center content-text-muted content-divider">
+  <span class="pt-10 pb-10">
+   {{ search_count }} results of {{ productAttribute_count  }}
+   </span>  
+   </div>
+  {% endif %}
+<div class="row ">
+      {% for pk, name, values in attributes %}        
+          <a class="list-item-name" href="{% url 'dashboard:product-attribute-update' pk=pk %}">
+          <div class="col-md-4 equalize">
+            <div class="panel panel-body border-top-warning text-center">
+              <h6 class="no-margin text-semibold">{{ name }}</h6>
+              <p class="content-group-sm text-muted">
+                {% for value in values %}
+                {{ value }}
+                {% if not forloop.last %}, {% endif %}
+              {% endfor %}
+              </p>
+
+              <ul class="fab-menu">
+                <li>
+                  <a href="{% url 'dashboard:product-attribute-update' pk=pk %}" class="fab-menu-btn btn bg-blue btn-float btn-rounded btn-icon">
+                    <i class="fab-icon-open icon-pencil"></i>
+                   
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>           
+          </a>
+        
+      {% endfor %}
+    </div>  
+{% else %}
+ <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>
+{% endif %}
+{% load static %}
+ <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>

@@ -1,0 +1,14 @@
+{% extends "order/payment/details.html" %}
+{% load bootstrap_form from bootstrap3 %}
+{% load i18n %}
+
+{% block forms %}
+  <form id="payment-form" method="{{ form.method }}"{% if form.action %} action="{{ form.action }}"{% endif %} novalidate>
+      {% csrf_token %}
+      {{ form.media }}
+      {% bootstrap_form form %}
+      <button type="submit" class="btn primary">
+          {% trans "Save changes" context "Payment form primary action" %}
+      </button>
+  </form>
+{% endblock forms %}

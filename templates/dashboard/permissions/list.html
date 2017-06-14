@@ -1,0 +1,1083 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Permissions
+{% endblock %}
+
+{% block menu_user_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Manage Permission Groups</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+        <div class="tabbable">
+          <ul class="nav nav-tabs nav-tabs-highlight">
+            <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">create group</a></li>
+            <li class="" id="permissions-tab"><a href="#permissions" data-toggle="tab" class="legitRipple" aria-expanded="true">manage group permissions</a></li>
+            <li class="" id="groups-tab"><a href="#groups" data-toggle="tab" class="legitRipple" aria-expanded="true">manage group</a></li>
+
+          </ul>
+
+          <div class="tab-content">
+
+            <div class="tab-pane animated fadeIn active" id="profile">
+              <form class="form" enctype="multipart/form-data" id="group-form" name="group-form">
+                {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="name">Group Name</label>
+                            <input type="text" class="form-control" name="group_name" id="group_name" placeholder="Name">
+                          </div>
+                           <div class="form-group">
+                            <label for="exampleInputPassword1">Select Users:</label>
+                            <div class="multi-select-full">
+                              <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="multiple" placeholder="select a user...">
+                              {% for usr in users %}
+                                {% if usr.is_active == True and usr.is_superuser == False %}
+                                   <option value="{{usr.id}}"> 
+                                     {% if usr.name %}
+                                        {{usr.name}}
+                                     {% else %}
+                                        {{usr.email}}
+                                     {% endif %}
+                                   </option>
+                                {% endif %}
+                              {% endfor %}
+                              </select>
+                            </div>
+                            <label id="group_name_error" class="select-error" for="user_select"></label>
+                           </div>
+                           <div class="form-group">
+                             <div class="row">
+                                <div class="col-md-12">
+                                 <div class="pull-left" style="margin-top:40px;">
+                                  <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                                  <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create Group <i class="icon-arrow-right14 position-right"></i></button>
+                                 </div>
+                                </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label>select a group to view users in that group</label>
+                            <select data-placeholder="Select a Group..." class="select  select2-hidden-accessible group_select_users" tabindex="-1" aria-hidden="true">
+                              {% for group in groups %}
+                                <option value="{{group.id}}">{{group.name}}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                           <div class="form-group">
+                            <label for="confirm_password">Users List</label>
+                            <div class="table-responsive pre-scrollable group-users" style="max-height: 290px;">
+                            
+                              <table class="table table-framed">
+                                <thead>
+                                  <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                  <div class="loader" style="margin: 20px 0px 0px 200px;display: none;">
+                                    <img src="{% static 'images/ripple-loader.svg' %}">
+                                  </div>
+                                </tr>
+                                  {% if users_in_group %}
+                                    {% for user in users_in_group %}
+                                      <tr class="animated fadeIn">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                        {% if user.name %}
+                                        {{ user.name}}
+                                        {% else %}
+                                        {{ user.email }}
+                                        {% endif %}
+                                        </td>
+                                      </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr class="animated fadeIn">
+                                       <td>No users in this group</td>
+                                    </tr>
+                                  {% endif %}
+                                </tbody>
+                              </table>
+                            </div>
+                           </div>
+                        </div>
+                      </div>
+                      
+                     
+                    </div>
+                  </div>
+                </form>
+            </div>
+            <div class="tab-pane animated fadeIn" id="permissions">
+              <div class="row">                
+                  <div class="col-md-6 col-md-offset-3">
+                    <p class="content-group">Define group permissions by ticking on particular access options. 
+                   <input class="group_id" type="hidden" name="group_id" value=""></p>
+                    <div class="form-group">
+                      <label>select a group to view permissions in that group</label>
+                      <select data-placeholder="Select a Group..." class="select  select2-hidden-accessible group_select_permissions" tabindex="-1" aria-hidden="true">
+                            {% for group in groups %}
+                              <option value="{{group.id}}">{{group.name}}</option>
+                            {% endfor %}
+                          </select>
+                    </div>
+                    <span class="current_group animated shake" style="color: red;font-size:20px;"></span>
+                  </div>
+                </div>
+          <div class="content_display">
+            <div class="row">    
+              <div class="col-md-12">
+                   <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">System Permission Default</label>
+                      <div class="checkbox">
+                        <label>
+                          <div class="checker"><input class="styled" id="can-login" checked="checked" type="checkbox" value="active"></div>
+                          can login
+                        </label>
+                        <span id="granted" class="text-success">(granted)</span>
+                      </div>
+                      <div class="checkbox">
+                        <label>
+                          <div class="checker"><input class="styled" type="checkbox" id="checkAll"></div>
+                          select all
+                        </label>
+                      </div>
+                     </div>
+                    </div>                                    
+                </div>
+                 <div class="col-md-12">
+                 <h5>Inventory Management</h5>
+                 </div>
+                <div class="col-md-12">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">product</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'product' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">category</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'category' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">product attribute</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'productattribute' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">prodyct class(type)</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'productclass' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  </div>
+                  <div class="col-md-12">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">prodyct image</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'productimage' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">prodyct tax</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'producttax' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">product variants</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'productvariant' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">product variant image</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'variantimage' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  </div>
+                  <div class="col-md-12">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">stock</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'stock' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">stock location</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'stocklocation' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  </div>
+            </div>
+            <!-- end inventory -->
+            <!-- user -->
+            <div class="row">
+                 <div class="col-md-12">
+                 <h5>User Management</h5>
+                 </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">users</label>
+                      {% for permission in permissions %}
+                       {% if permission.content_type.model ==  'user' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+            </div>
+          </div><!-- content display-->
+            <!-- end user-->
+            <div class="row">
+              <div class="col-md-8 col-md-offset-2 text-center">
+                <button class="btn btn-primary" id="permission-btn">Submit Permissions</button>
+              </div>
+            </div>
+           </div>
+           <div class="tab-pane animated fadeIn" id="groups">
+              <div class="row">                
+                  <div class="col-md-8 col-md-offset-2">
+                            <div class="table-responsives">
+         
+
+          <table class="table table-bordered datatable-header-footer">
+            <caption style="margin-bottom: 10px;">
+             <div class="row">
+             <div class="col-md-8">
+                <input type="text" name="search_group" class="form-control">
+             </div>
+             <div class="col-md-4">
+                {% if perms.userprofile.add_user %}
+                     <a href="javascript:;" class="btn btn-primary waves-effect waves-light" onclick="next_tab('groups', 'profile');">Add Group</a>
+                {% endif %}
+             </div>
+             </div>
+            
+           
+
+              {#{% for p in request.user.get_all_permissions %}#}
+              {#{{p}}#}
+              {#{% endfor %}#}
+
+             </caption> 
+                <thead style="border-top:1px solid #ddd;">
+                  <tr>
+                    <th>Id</th>
+                    <th>Group Name</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tb">           
+               {% if groups %}
+                  {% for group in groups %}
+                  <tr id="{{group.id }}">
+                    <td>{{ forloop.counter }} </td>
+                    <td>{{ group.name }}</td>
+                    <!-- actions -->
+                    <td class="text-center">
+                      <ul class="icons-list">
+                        <li>
+                          <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
+                         class="modal_trigger_edit btn btn-default btn-sm edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal" style="font-size: 11px;"></i> edit</a>
+                        </li>
+                        <li>
+                          <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
+                         class="modal_trigger_delete btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                         </a>
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                   <tr><td colspan="6"><h2 class="text-center">no groups available</h2></td></tr>
+               {% endif %}
+                  </tbody>
+
+           </table>
+
+        </div>
+                  </div>
+              </div>
+             
+           </div>
+
+          </div>
+        </div>
+      </div>
+<!--       <div class="panel-footer">
+      <button class="btn btn-primary disabled">checki this</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<!-- edit modal -->
+ <div id="modal_edit" class="modal fade">
+   <div class="modal-dialog modal-lg" style="width: 1200px;">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+       <div class="row">
+         <div class="col-md-6">
+           <div class="row">
+           <div class="col-md-12">
+             <h5>Group & Users</h5>
+             <input type="hidden" name="group-id" id="group-id">
+           </div>
+            <div class="col-md-12">
+             <div class="form-group">
+              <label>Group Name:</label>
+              <input type="text" name="g_name" class="form-control" id="g_name">
+             </div>
+            </div>
+           </div>
+           <div class="row">
+            <div class="col-md-9">
+              <div class="form-group">
+               <label>Add Users:</label>
+                <div class="multi-select-full">
+                  <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="edit_multiple" placeholder="select a user...">
+                  {% for usr in users %}
+                    {% if usr.is_active == True and usr.is_superuser == False %}
+                       <option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}
+                       {% else %}{{usr.email}}{% endif %}" data-image="{% if usr.image %}{{usr.image.url}}
+                       {% else %}/static/images/user.png{% endif %}">
+                         {% if usr.name %}
+                            {{usr.name}}
+                         {% else %}
+                            {{usr.email}}
+                         {% endif %}
+                       </option>
+                    {% endif %}
+                  {% endfor %}
+                  </select>
+                </div>
+               </div><!-- end of formgroup-->
+            </div>
+            <div class="col-md-3">
+             <div class="form-group">
+               <label><span style="visibility: hidden;">X</span></label>
+               <button class="btn btn-primary form-control" id="add_user_btn">Add User</button>
+            </div>
+            </div>
+           </div>
+           <div class="row">
+            <div class="col-md-12">
+             <div class="table-responsive pre-scrollable group-users" style="height: 240px;">
+             <table class="table table-framed" id="group_user_table">
+                <thead>
+                  <tr>
+                    <th>image</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="table_body">
+
+                </tbody>
+              </table>
+              </div>
+            </div>
+           </div>
+         </div>
+
+         <div class="col-md-6">
+           <div class="row">
+              <div class="col-md-12">
+               <h5>Permissions</h5>
+              </div>
+               <div class="col-md-12">
+                <div class="permissions_display row" style="overflow-y: scroll;height:429px;">
+                </div>
+              </div>
+           </div>
+         </div>
+        </div>
+       </div>    
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger update" onclick="submitGroupDetails()" data-id="" data-href="">Update</button>         
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /edit modal -->
+
+<!-- delete modal -->
+ <div id="modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+         <div class="">
+         <form action="" class="delete_form" method="post" id="delform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm group delete!
+           </h5>
+           <input type="hidden" class="item-id" />
+           </div>
+           
+         </div>
+       </div>
+       
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" onclick="return false" data-id="" data-href="">Delete</button>
+         </form>          
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /delete modal -->
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+
+ 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript">
+
+
+function remove_duplicates(objectsArray) {
+    var usedObjects = {};
+    for (var i=objectsArray.length - 1;i>=0;i--) {
+        var so = JSON.stringify(objectsArray[i]);
+        if (usedObjects[so]) {
+            objectsArray.splice(i, 1);
+        } else {
+            usedObjects[so] = true;          
+        }
+    }
+    return objectsArray;
+}
+//**@ remove duplicate names
+function remove_duplicate_name(list) {
+  var result = [];
+  $.each(list, function(i, e) {
+    if ($.inArray(e, result) == -1) result.push(e);
+  });
+  return result;
+}
+//**@ global users array
+ var names = [];
+//**@ group users on load
+$('document').ready(function () {
+
+  //**@ edit modal
+$('.modal_trigger_edit').on('click', function (e) {
+     var url = $(this).data('href')
+     var prompt_text = $(this).data('title');
+     var username = $(this).data('name');
+     var modal = $(this).data('ta');
+     var id = $(this).data('id');
+     $('#group-id').val(id);
+     var user_url = $(this).data('users');
+     $('#g_name').val(username);
+     $('.del').attr('data-id', id);
+     $('.del').attr('data-href', url);
+     $('.modal-title').html(prompt_text +'id: '+id);
+     $(modal).modal();
+     $('.delete_form').attr('action',url);
+     var token = '{{ csrf_token }}';
+     
+      //*@ get group permissions
+      $.post(url,{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"}, function(data){
+        $('.permissions_display').html(data);
+      });
+
+      //*@ get group users
+      $.ajax({
+        type:"POST",
+        url:user_url,
+        data:{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"},
+        async:false,
+        success:function(data){
+          names = data;
+          console.log(names);
+        },error:function(error){
+          console.log(error);
+        }
+      });
+    //*@ populate table
+    var table_body = $('#group_user_table tbody');
+    var parent = table_body.parent();
+    
+    table_body.detach().empty().each(function(i, val){
+        for (var x = 0; x < remove_duplicates(names).length; x++){
+            $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
+            if (x == remove_duplicates(names).length - 1){
+                $(this).appendTo(parent);
+            }
+        }
+    });
+
+});
+
+});
+//**@ users select
+$('#add_user_btn').on('click', function(e){
+   var selected = $("#edit_multiple :selected").map(function() {
+                      return {
+                          id: parseInt($(this).val()),
+                          name: $(this).data("name"),
+                          image: $(this).data("image")
+                      };
+                  }).get();
+    $.each(selected, function(i, val){
+      // var index = selected.findIndex(x=>x.name==val.name);
+      names.indexOf(val) === -1 ? names.push(val): console.log('already exists');
+      // index === -1 ? names.push(val): console.log('already exists');
+    });
+
+    var table_body = $('#group_user_table tbody');
+    var parent = table_body.parent();
+    
+    table_body.detach().empty().each(function(i, val){
+        for (var x = 0; x < remove_duplicates(names).length; x++){
+            $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
+            if (x == remove_duplicates(names).length - 1){
+                $(this).appendTo(parent);
+            }
+        }
+    });
+
+});
+//**@ remove user from array
+function removeuser(user){
+   users = remove_duplicates(names);
+   var index = names.indexOf(user);
+    $('#'+user).remove();
+    names.splice(index,1);
+    console.log(names);
+}
+//**@ submit group details
+function submitGroupDetails(){
+   var user_ids = [];
+   //**@ get list of users ids
+       $.each(names, function(i, val){
+          user_ids.push(val.id);
+       });
+
+   //**@ get list of all checked permissions
+   var checkBoxesStringArray = $(".check:checked").map(function(){
+      return $(this).val();
+    }).get();
+   var checkBoxesStringNumber = checkBoxesStringArray.map(Number);
+   console.log(checkBoxesStringNumber);
+       //**@ check login status
+    if($("#edit-can-login").is(':checked')){
+      $("#edit-can-login").val('active')
+    }else{
+      $("#edit-can-login").val('inactive');
+    }
+    //**@ check login val
+    var can_login_value = $("#edit-can-login").val();
+    //**@ id
+    var g_id = $('#group-id').val();
+    var g_name = $('#g_name').val();
+    console.log('id: '+g_id);
+
+    //**@ post
+    $.ajax({
+      url: "{% url 'dashboard:group_update' %}",
+      type: 'POST',
+      data: {
+             'checklist[]': checkBoxesStringArray,
+             'users[]': user_ids,
+             'id': g_id ,
+             'group_name': g_name,
+             'check_login':can_login_value,
+             'csrfmiddlewaretoken':"{{ csrf_token }}"
+      },
+      async:false,
+      success: function(data){
+              $.jGrowl('group updated successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+              });
+          window.location.reload();
+          user_ids=[];
+      }
+      ,error:function(){
+        $.jGrowl('something went wrong', {
+              header: 'Oops!',
+              theme: 'bg-danger'
+         });
+      }
+    });
+}
+//**@ delete modal
+$('.modal_trigger_delete').on('click', function (e) {
+     var url = $(this).data('href')
+     var prompt_text = $(this).data('title');
+     var username = $(this).data('name');
+     var modal = $(this).data('ta');
+     var id = $(this).data('id');
+     $('.del').attr('data-id', id);
+     $('.del').attr('data-href', url);
+     $('.modal-title').html(prompt_text);
+     $(modal).modal();
+     $('.delete_form').attr('action',url);
+});
+//**@ on modal delete
+$('.del').on('click', function (e) {
+    var f = document.getElementById('delform');
+    var formData = new FormData(f);
+    var id = $(this).data('id');
+    var url = $(this).data('href');
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success:function(data){        
+          $('#modal_instance').modal('hide');
+          $('#tb #'+id).remove();            
+          $.jGrowl('Group deleted successfully', {
+            header: 'Well done!',
+            theme: 'bg-success'
+          });
+          window.location.reload();
+       // $("#mydiv").load(location.href + " #mydiv");
+        },
+        error:function(error){
+          console.log(error);
+          $.jGrowl('Error deleting Staff', {
+              header: 'Oh snap!',
+              theme: 'bg-danger'
+          });
+        }
+    });
+});
+//**@ load users on select
+$( ".group_select_permissions" ).change(function() {
+    // alert( $(this).val() );
+        var g_u_id = $(this).val();
+    $.ajax({
+        url: "{% url 'dashboard:group_edit' %}",
+        type: "POST",
+        data: {
+           'id': g_u_id,
+           'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(data){
+          $('.content_display').html(data);
+        },
+        error:function(error){
+           $.jGrowl(error, {
+            header: 'Oops!',
+            theme: 'bg-danger'
+          });
+        }
+    });
+});
+//**@ load group permissions on select
+var $loading = $('.loader').hide();
+    $(document)
+          .ajaxStart(function () {
+            $loading.show();
+          })
+          .ajaxStop(function () {
+            $loading.hide();
+          });
+$( ".group_select_users" ).change(function() {
+    var g_u_id = $(this).val();
+    $.ajax({
+        url: "{% url 'dashboard:get_search_users' %}",
+        type: "POST",
+        data: {
+           'id': g_u_id,
+           'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(data){
+          $('.group-users').html(data);
+        },
+        error:function(error){
+           $.jGrowl(error, {
+            header: 'Oops!',
+            theme: 'bg-danger'
+          });
+        }
+    });
+});
+//**@ disable th permissions tab code
+$('#next-tab').click(function(){
+  $('#permissions-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
+});
+//**@ disable tab
+function disable_profile_tab(){
+  $('#rofile-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
+}
+//**@ move to next tab
+function next_tab(remove, add){
+  $('#'+remove).removeClass('active');
+  $('#'+remove+'-tab').removeClass('active');
+  $('#'+add).addClass('active');
+  $('#'+add+'-tab').addClass('active');
+}
+//**@ if not login permission checked
+$("#can-login").click(function () {
+  var checked = $(this).is(':checked');
+  if(checked){
+      $('.check').each(function(){
+          $(this).prop("checked", true);          
+          $(this).parent().parent().removeClass('disabled');
+          $(this).parent().parent().parent().parent().removeClass('disabled');
+          $(this).parent().addClass('checked');
+          $(this).removeAttr('disabled');
+      });
+  }else{
+      $('.check').each(function(){
+          $(this).prop("checked", false);
+          $(this).parent().parent().parent().siblings('span').hide();
+          $(this).parent().parent().addClass('disabled');
+          $(this).parent().parent().parent().parent().addClass('disabled');
+          $(this).parent().removeClass('checked');
+          $(this).attr('disabled', 'disabled');
+      });
+  }
+});
+
+//**@ check all
+$("#checkAll").click(function () {
+  var checked = $(this).is(':checked');
+  if(checked){
+      $('.check').each(function(){
+          $(this).prop("checked", true);
+          $(this).parent().parent().parent().siblings('span').show();
+          $(this).parent().parent().parent().siblings('span').text('(granted)');
+          $(this).parent().addClass('checked');
+      });
+  }else{
+      $('.check').each(function(){
+          $(this).prop("checked", false);
+          $(this).parent().parent().parent().siblings('span').hide();
+          $(this).parent().removeClass('checked');
+      });
+  }
+});
+
+//**@ status on each check
+$( ".check" ).on( "click", function(){
+  var checked = $(this).is(':checked');
+  if(checked){
+    $(this).prop("checked", true);
+    $(this).parent().parent().parent().siblings('span').show();
+    $(this).parent().parent().parent().siblings('span').text('(granted)');      
+  }else{
+    $(this).prop("checked", false);
+    $(this).parent('span').removeClass('checked');
+    $(this).parent().parent().parent().siblings('span').hide();
+  }
+} );
+
+ /*--- create group ---*/
+ //**@ validator rule
+ $.validator.addMethod("valueNotEquals", function(value, element, arg){
+  return arg != value;
+ }, "Value must not equal arg.");
+ //**@ validate form
+  $('#group-form').validate({
+    rules:{
+        group_name: {
+          required:true,
+          minlength:3
+        },
+        user_select:{ valueNotEquals: "default" }
+
+    },
+    messages:{
+      name:{
+        required: "please provide a group name",
+        minlength: "name must be atleast 3 characters long"
+      },
+      user_select:{ valueNotEquals: "please select a user!" }
+    },
+    submitHandler: function() { 
+          if(!$('#multiple').val()){
+            $('.select-error').text('This field is required');
+          }else{
+          //**@ get group name and user array
+          var group_name = $('#group_name').val();
+          var raw_users = $("#multiple :selected").map(function(){
+                             return $(this).val();
+                          }).get();
+          var users = raw_users.map(Number);
+
+            $.ajax({
+                url: "{% url 'dashboard:add_group' %}",
+                type: "POST",
+                data: {
+                   'users[]': users,
+                   'group_name':group_name,
+                   'csrfmiddlewaretoken':"{{ csrf_token }}"
+                },
+                success:function(data){
+                   $("#group_name").val('');             
+                   if(data == 'error'){
+                      $.jGrowl('a group exists with that name', {
+                        header: 'Oops!',
+                        theme: 'bg-danger'
+                      });          
+                   }else{
+                      $.jGrowl('Staff added successfully, now define permissioins', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                      });
+                      //**@ inactive profile active permissions
+                      next_tab('profile', 'permissions');
+                      $('.current_group').text('First choose permissions for '+ group_name);
+                      localStorage.setItem('group_id', data.id);
+                      localStorage.setItem('group_name', data.name);
+                      console.log('group name is :'+data.name + ' and id is '+ data.id)
+                   }        
+
+                },
+                error:function(error, data){
+                  console.log(error, data);
+                  $.jGrowl(error, data, {
+                      header: 'Oh snap!',
+                      theme: 'bg-danger'
+                  });
+                }
+            });
+
+       }
+    }
+  });
+
+/*--- create group ---*/
+//**@ check group id in storage 
+if(localStorage.getItem("group_id")){
+  $('.current_group').text('First choose permissions for '+ localStorage.getItem("group_name"));
+}else{
+  $('.current_group').text('');
+}
+/*-------  permission button --------*/
+$("#permission-btn").click(function(event){
+    event.preventDefault();
+    var checkBoxesStringArray = $(".check:checked").map(function(){
+      return $(this).val();
+    }).get();
+    var checkBoxesStringNumber = checkBoxesStringArray.map(Number);
+    //**@ check login status
+    if($("#can-login").is(':checked')){
+      $("#can-login").val('active')
+    }else{
+      $("#can-login").val('inactive');
+    }
+    //**@ check login val
+    var can_login_value = $("#can-login").val();
+    //**@ span val
+    var set_current_group_text = $('.current_group').text('');
+    //**@ set group_id
+     var g_id =   localStorage.getItem("group_id") ? localStorage.getItem('group_id') : $('.group_select_permissions').val();
+    //**@ call
+    $.ajax({
+      url: "{% url 'dashboard:group_assign_permission' %}",
+      type: 'POST',
+      data: {
+             'checklist[]': checkBoxesStringArray,
+             'group_id': g_id ,
+             'check_login':can_login_value,
+             'csrfmiddlewaretoken':"{{ csrf_token }}"
+      },
+      success: function(data){
+         $('.current_group').text('');
+         if(localStorage.getItem("group_id")){
+             $.jGrowl('permissions added successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+             });
+         }else{
+              $.jGrowl('permissions updated successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+              });
+         }
+
+         // window.location = "{% url 'dashboard:users' %}";
+         localStorage.removeItem('group_id');
+         localStorage.removeItem('group_name');
+      }
+      ,error:function(){
+        $.jGrowl('something went wrong', {
+              header: 'Oops!',
+              theme: 'bg-danger'
+         });
+      }
+     });
+
+});
+/*-------  end permission button --------*/
+</script>
+{% endblock %}

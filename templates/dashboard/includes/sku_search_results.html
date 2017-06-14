@@ -1,0 +1,145 @@
+{% if product_results %} 
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+ {% if search_count %} 
+  <div class="text-center content-text-muted content-divider">
+  <span class="pt-10 pb-10">
+   {{ search_count }} results of {{ products_count  }}
+   </span>  
+   </div>
+  {% endif %}
+<!-- output data -->
+<div class="panel panel-default">
+  <div class="panelbody">
+   <div class='table-responsive'>
+	<table class="table text-nowrap datatable-header-footer">
+    <thead>
+      <tr class="bg-primary">        
+        <th>Product Name/sku</th>        
+        <th>Buying Price</th>      
+        <th>Retail price</th> 
+        <th>Quantity</th>
+        <th>Tax %</th>             
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tfoot>
+      <tr class="bg-primary">       
+        <th>Product Name/sku</th> 
+        <th>Buying Price</th>      
+        <th>Retail price</th> 
+        <th>Quantity</th> 
+        <th>Tax %</th>             
+        <th class="text-center">Actions</th>
+      </tr>
+    </tfoot>
+    <tbody>
+    {% for variant in product_results %}
+    <tr>
+    <!-- product name/sku -->    
+	<td>
+		<div class="media-left media-middle">
+			<a href="#">#</a>
+		</div>
+		<div class="media-left">
+			<div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibold"> {{ variant.display_product }} </a></div>
+			<div class="text-muted text-size-small">	{{ variant.sku }}
+			</div>
+		</div>
+	</td>
+	<!-- Buying price  -->
+	<td>
+	 {% if variant.get_cost_price %}
+	 {% gross variant.get_cost_price html=True %}
+	 {% endif %}
+	 </td>
+	<!-- Retail price -->
+	<td>
+	<h6 class="text-semibold">
+	{% if variant.get_price_per_item %}
+	 {% gross variant.get_price_per_item html=True %}
+	{% endif %}
+	</h6>
+	</td>
+	<!-- quantity -->
+	<td>
+		<span class="text-muted">
+		{{ variant.get_stock_quantity }}	
+		</span>
+	</td>
+	<!-- product tax -->
+	<td>
+	<span class="text-warning">
+	{% if variant.product.get_product_tax %}
+	{{ variant.product.get_product_tax }}
+	{% else %}
+	<i class="icon-menu position-left"></i> 
+	{% endif %}
+	</span></td>	
+    {% if variant.get_stock_pk %}
+	<td href="#modal_instance" class="modal-trigger-ajax" data-title="Edit {{ variant.product.name }}" 
+	data-href="{% url 'dashboard:product-stock-update' product_pk=variant.product.pk stock_pk=variant.get_stock_pk %}">
+	{% else %}
+	<td href="#modal_instance" class="modal-trigger-ajax" 
+	data-href="{% url 'dashboard:product-stock-add' product_pk=variant.product.pk %}">
+	{% endif %}
+	<span class="label bg-success-400">Add stock
+	</span>
+			
+	</td>
+	
+	</tr>
+	{% endfor %}
+	</tbody>
+	</table>	
+	</div>
+	</div>
+	<!-- / .table responsive -->
+</div>
+<style type="text/css">
+	.modal-trigger-ajax { cursor: pointer; }
+</style>
+<script type="text/javascript">
+ $(document).ready(function() {
+
+       $(".clickable-td").click(function() {
+
+           window.location = $(this).data("href");
+
+       });
+    });	
+</script>
+<!-- add stock modal trigger script -->
+<script type="text/javascript">
+	$( ".modal-trigger-ajax").on('click',function() {        
+    var url = $(this).data('href')
+    var prompt_text = $(this).data('title');
+    var modal = $(this).attr('href');
+    var csrf_token = $(this).data('csrf_token')
+    $('#form-stock').attr('action',url);    
+    $('.modal-title').html(prompt_text);
+    $(".results" ).empty().append('<span class="text-center" style="padding:23px">Loading...<i class=" icon-spinner"></i></span>');
+    $(modal).modal();
+      var posting = $.get( url, {'csrfmiddlewaretoken':csrf_token });
+      // Put the results in a div
+      posting.done(function( data ) {    
+      $(".results" ).empty().append( data ); 
+       
+      });
+    
+   });
+</script>
+{% include "dashboard/includes/_modal_add_stock.html"  %}
+{% else %}
+ <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>
+ <script type="text/javascript">
+ 	function notify() {
+          new PNotify({
+              text: 'No result matches your search',
+              addclass: 'bg-danger'
+          });
+      }
+      notify();
+ </script>
+{% endif %}

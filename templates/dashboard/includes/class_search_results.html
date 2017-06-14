@@ -1,0 +1,76 @@
+{% if productClass_results %} 
+{% load i18n %}
+
+<!-- search count -->  
+  {% if search_count %} 
+  <div class="text-center content-text-muted content-divider">
+  <span class="pt-10 pb-10">
+   {{ search_count }} results of {{ productClass_count  }}
+   </span>  
+   </div>
+  {% endif %}
+  
+  
+    <div class="row">
+    <div class="col s12 " >
+      {% if productClass_results %}
+        <div>
+          {% for pk, name, has_variants, product_attributes, variant_attributes in productClass_results %}
+            <div class="col-md-6 equalize">
+              
+              <!-- product type panel -->
+              <!-- Heading label -->
+              <div class="panel panel-white">
+                <div class="panel-heading">
+                  <h6 class="panel-title">{{ name }}</h6>
+                  <div class="heading-elements">
+                    <span class="text-primary"><a class="title" href="{% url 'dashboard:product-class-update' pk=pk %}"><i class='icon-pencil7'></i></a></span>
+                     <a href="#modal_instance" data-title='Delete {{ product_class }} Product type' data-href="{% url 'dashboard:product-class-delete' pk=pk %}" class="modal-trigger"><span class="text-danger"><i class="icon-trash position-left"></i> </span>  </a>
+                  </div>
+                  
+                   
+                  
+                </div>                
+                <div class="panel-body">
+                  <div class="col-md-6">
+                   <span class="text-bold text-strong"> {% trans "Variants" context "Dashboard variants" %}: </span>
+                  {% if has_variants %}
+                    {% trans "Yes" %}
+                  {% else %}
+                    {% trans "No" %}
+                  {% endif %}
+                  {% if variant_attributes %}
+                   <br/><span class="text-bold text-strong"> {% trans "Variant attributes" context "Product type item list text" %}:</span><br/> {{ variant_attributes|join:", " }}
+                  {% endif %}
+                  </div>
+                  <div class="col-md-6">
+                    {% if product_attributes %}
+                   <span class="text-bold text-strong">{% trans "Product attributes" context "Product type item list text" %}:</span><br/> {{ product_attributes|join:", " }}
+                  {% endif %}
+                  </div>               
+                </div>
+              </div>
+              <!-- /heading label -->
+              <!-- end panel -->
+               
+             
+            </div>
+          {% endfor %}
+        </div>
+        {% include "dashboard/includes/_pagination.html" with page_obj=product_classes %}
+      {% else %}
+        <div class="not-found">
+          <p class="grey-text">
+            {% trans "No product types found." context "Empty product type list message" %}
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+   
+  
+{% else %}
+ <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>
+{% endif %}
+{% load static %}
+ <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>

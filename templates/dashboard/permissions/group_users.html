@@ -1,0 +1,28 @@
+<table class="table table-framed">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% if users %}
+  {% for user in users %}
+    <tr class="animated fadeIn">
+      <td>{{ forloop.counter }}</td>
+      <td>
+      {% if user.name %}
+      {{ user.name}}
+      {% else %}
+      {{ user.email }}
+      {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  {% else %}
+  <tr class="animated fadeIn">
+     <td>No users in this group</td>
+  </tr>
+  {% endif %}
+  </tbody>
+</table>

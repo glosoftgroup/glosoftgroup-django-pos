@@ -1,0 +1,25 @@
+<div class="row">
+<div class="col-md-12">			
+			   		{% if errors %}
+			   		<div class="alert alert-warning">
+			   		{{ errors.as_text}}
+			   		</div>
+			   		{% endif %}
+			   </div>
+							
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Tax name (optional)</label>
+									{{ form.name }}	
+								</div>
+							</div>
+
+							<div class="col-md-6">
+								<div class="form-group">
+								<label>Tax: %</label>
+									<div class="form-group">
+										{{ form.tax }}
+									</div>
+								</div>
+							</div>
+						</div>

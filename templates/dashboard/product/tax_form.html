@@ -1,0 +1,88 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block title %}
+  Add Tax  - {{ block.super }}
+{% endblock %}
+{% block breadcrumbs %}
+ 
+    <li class="active">
+     <a href="{% url 'dashboard:tax-list' %}"> Tax</a>
+    </li>
+    <li class="active">
+     Add Tax
+    </li>
+
+{% endblock %}
+{% block header_extra %}
+<li style='padding: 9px;'>
+	<a class="" href="{% url 'dashboard:tax-add' %}"><i class="icon-plus"></i>
+	 Add Tax
+	</a>
+</li>
+{% endblock %}
+{% block menu_tax_list %}active{% endblock %}
+{% block content %}
+  {% if errors %}
+  	
+      <div class="row">
+        <div class='alert-danger'>{{ errors }}</div>
+      </div>
+   
+  {% endif %}
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+       <form method="post" id="form-producttax" enctype="multipart/form-data"> {% csrf_token %}
+        
+       <div class="panel panel-flat">
+		<div class="panel-heading">
+			<h5 class="panel-title">Add New Tax</h5>
+			<div class="heading-elements">
+				<ul class="icons-list">
+					<li><a data-action="collapse"></a></li>
+					
+					<li><a data-action="close"></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="panel-body">
+			<div class="row">	
+
+				<div class="col-md-6">					
+					<div class="row">
+							
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Tax name (optional)</label>
+									{{ form.name }}	
+								</div>
+							</div>
+
+							<div class="col-md-6">
+								<div class="form-group">
+								<label>Tax: %</label>
+									<div class="form-group">
+										{{ form.tax }}
+									</div>
+								</div>
+							</div>
+						</div>
+
+				</div>
+			</div>
+
+			<div class="text-right">
+			 {% if tax_instance.pk %}
+				<button type="submit" class="btn btn-primary">Update <i class="icon-arrow-right14 position-right"></i></button>
+			 {% else %}
+			 	<button type="submit" class="btn btn-primary">Create <i class="icon-arrow-right14 position-right"></i></button>
+			 {% endif %}
+
+			</div>
+		</div>
+	</div>
+       
+       </form>
+      </div>
+{% endblock %}

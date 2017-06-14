@@ -1,0 +1,43 @@
+ <div class="form-group" id='tax_field'>
+    <label>Tax: % </label>
+    <div class="input-group">
+    {{ product_form.product_tax }}
+    <div class="input-group-btn">
+      <button type="button" class="btn btn-info" id="add-new-tax">Add new</button>
+    </div>
+    </div>
+    {% if added %}
+	 <input value='{{ added }}' id='added' hidden="hidden">
+	{% endif %}
+ </div>
+
+<script type="text/javascript">
+// $('#modal_add_tax').modal('hide');
+	// Add options dynamically
+	function notify() {
+          new PNotify({
+              text: 'Tax added successfully',
+              addclass: 'bg-primary'
+          });
+      }
+      notify(); 
+    $(".selectbox-dynamic-options").selectBoxIt({
+        autoWidth: false
+    });  
+
+    // listen again
+     $( "#add-new-tax").on('click',function() {   
+   var taxvalue = $( this ).val();
+         
+      {% url "dashboard:tax-add-ajax" as url %} 
+      var url = "{{ url }}";
+      var posting = $.post( url, {} );
+      // Put the results in a div
+      posting.done(function( data ) {    
+      $("#add_tax_form" ).empty().append( data ); 
+      $('#modal_add_tax').modal(); 
+      });
+    
+   });
+    
+</script>

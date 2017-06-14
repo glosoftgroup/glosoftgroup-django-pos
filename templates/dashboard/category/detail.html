@@ -1,0 +1,113 @@
+{% extends "dashboard/base.html" %}
+{% load materializecss %}
+{% load i18n %}
+{% load mptt_tags %}
+{% load staticfiles %}
+
+{% block title %}
+  {% if category.pk %}
+    {{ category }}
+  {% else %}
+    {% trans "Add new category" context "Category detail page title" %}
+  {% endif %} 
+  - {% trans "Categories" context "Dashboard categories list" %} - {{ block.super }}
+{% endblock %}
+
+{% block body_class %}body-categories{% endblock %}
+
+{% block menu_categories_class %}active{% endblock %}
+
+{% block page_title %}
+  {% if category.pk %}
+    {{ category }}
+  {% else %}
+    {% trans "Add new category" context "Category detail page title" %}
+  {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+  
+    <li>
+      <a href="{% url 'dashboard:category-list'%}" class="">
+        {% trans "Categories" context "Dashboard categories list" %}
+      </a>
+    </li>
+    <li >
+      <a href="{% url 'dashboard:category-list' %}" class="breadcrumbs--ellipsed-item"> 
+       <i class="icon-arrow-left7"></i>
+      </a>
+    </li>
+    <li>
+      {% if category.pk %}
+        <span class="">{{ category }}</span>
+      {% else %}
+        <span class="">
+          {% trans "Add new category" context "Category detail breadcrumbs" %}
+        </span>
+      {% endif %}
+    </li>
+  
+{% endblock %}
+
+{% block menu_catalogue_class %} active{% endblock %}
+
+{% block content %}
+  
+    <div class="panel panel-flat">
+    <div class="panel-heading">
+      <h5 class="panel-title">Category</h5>
+      <div class="heading-elements">
+        <ul class="icons-list">
+          <li><a data-action="collapse"></a></li>
+          <li><a data-action="reload"></a></li>
+          <li><a data-action="close"></a></li>
+        </ul>
+      </div>
+    </div> 
+    <div class="panel-body">
+    <div class="row">
+     <form method="post" id="form-category" enctype="multipart/form-data" novalidate>      
+            {% csrf_token %}
+           
+         <div class="col-md-6">
+            <div class="form-group">
+               {{ form.name|materializecss }}
+            </div>
+            <div class="form-group">
+              {{ form.description|materializecss }}
+            </div>
+            <div class="form-group">
+            {{ form.hidden|materializecss:"input-field s12" }}
+            </div>
+             <!-- action buttons -->
+     <div class="text-right form-group">
+     {% if category.parent %}
+              <a href="{% url 'dashboard:category-list' root_pk=category.parent.pk %}" class="btn btn-flat">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+            {% else %}
+              <a href="{% url 'dashboard:category-list' %}" class="btn btn-flat">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+            {% endif %}
+            {% if category.pk %}
+              <button type="submit" class="btn btn-primary waves-effect waves-light">
+                {% trans "Update" context "Dashboard update action" %}
+              </button>
+            {% else %}
+              <button type="submit" class="btn btn-primary waves-effect waves-light">
+                {% trans "Create" context "Dashboard create action" %}
+              </button>
+            {% endif %}
+     </div>
+         </div>         
+         
+     
+      </form>
+    </div>
+   
+    </div>
+
+   </div>
+  <div class="col m12 l3 help-box"></div>
+{% endblock %}

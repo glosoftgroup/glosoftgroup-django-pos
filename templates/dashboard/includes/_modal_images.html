@@ -1,0 +1,40 @@
+<!-- Blue modal -->
+  <div id="modal_instance" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-blue">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h6 class="modal-title text-white"></h6>
+        </div>
+
+        <div class="modal-body">
+          <div class="">
+          <form action="" class="delete_form" method="post" novalidate>
+          {% csrf_token %}
+          {% if product.pk %}
+           <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=images">
+          {% endif %}
+          <div class="">
+            <h5>
+              Are you sure?
+            </h5>
+            </div>
+            
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="submit" id='modal_delete' class="btn  bg-danger">
+            <i class='text-white'>Delete</i>
+          </button> 
+          </form>
+
+          
+          <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /blue modal -->

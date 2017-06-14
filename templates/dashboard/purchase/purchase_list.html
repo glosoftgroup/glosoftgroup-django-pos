@@ -1,0 +1,56 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+{% load product_first_image from product_images %}
+{% block title %}
+ Purchase- {{ block.super }}
+{% endblock %}
+{% block breadcrumbs %}
+ 
+    <li class="active">
+      Purchase
+    </li>
+
+{% endblock %}
+{% block header_extra %}
+<li style=''>
+	<a class="" href=""><i class="icon-plus"></i>
+	 Purchase item
+	</a>
+</li>
+{% endblock %}
+{% block menu_purchase_list %}active{% endblock %}
+{% block content %}
+<!-- Search field -->
+<div class="panel panel-flat">
+	<div class="panel-heading">
+		<h5 class="panel-title">Search Product Stock</h5>
+		<div class="heading-elements">
+			<ul class="icons-list">
+        		<li><a data-action="collapse"></a></li>
+        		<li><a data-action="close"></a></li>
+        	</ul>
+    	</div>
+	</div>
+
+	<div class="panel-body">
+	{% url "dashboard:search-sku" as url %}
+	{% include "dashboard/includes/_product_filter.html" with url=url%}
+	</div>
+</div>
+<div id="search_results"></div>
+<!-- /search field -->
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+ $(document).ready(function() {
+
+       $(".clickable-td").click(function() {
+         window.location = $(this).data("href");
+       });
+    });	
+</script>
+<script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
+{% endblock %}

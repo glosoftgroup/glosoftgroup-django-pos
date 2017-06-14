@@ -1,0 +1,63 @@
+
+<div class="navbar navbar-default navbar-xs navbar-component">
+<ul class="nav navbar-nav no-border visible-xs-block">
+	<li><a class="text-center collapsed" data-toggle="collapse" data-target="#navbar-filter"><i class="icon-menu7"></i></a></li>
+</ul>
+
+<div class="navbar-collapse collapse" id="navbar-filter">
+	<p class="navbar-text">Filter:</p>
+
+	<ul class="nav navbar-nav">
+		<li>
+		
+		<form action="#" class="main-search" style="margin:3px;">
+			<div class="input-group contentgroup">
+				<div class="has-feedback has-feedback-left">
+					<input type="text" id='search_product' name='search_product' class="form-control " value="" placeholder="Search product">
+					<div class="form-control-feedback">
+						<i class="icon-search4 text-muted text-size-base"></i>
+					</div>
+					{% url "dashboard:search-product" as url %}
+					<input class="hidden" type="hidden" id="csrf_token" value="{{ csrf_token }}" name="csrf_token">
+					<input type="hidden" class="hidden" value='{{ url }}' id='search_url' name="url">
+				</div>
+
+				<div class="input-group-btn">
+					<button type="submit" id='submit_search_product' onclick='return false' class="btn btn-primary ">Search</button>
+				</div>
+			</div>			
+		</form>
+		</li>
+		<!-- 
+		<li class="dropdown">
+			<a href="task_manager_grid.html#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-sort-numeric-asc position-left"></i> By priority <span class="caret"></span></a>
+			<ul class="dropdown-menu">
+				<li><a href="task_manager_grid.html#">Show all</a></li>
+				<li class="divider"></li>
+				<li><a href="task_manager_grid.html#">Highest</a></li>
+				<li><a href="task_manager_grid.html#">High</a></li>
+				<li><a href="task_manager_grid.html#">Normal</a></li>
+				<li><a href="task_manager_grid.html#">Low</a></li>
+			</ul>
+		</li> -->
+	</ul>
+
+	<div class="navbar-right">
+	  <ul class="nav navbar-nav">
+		<li class="dropdown">
+			<a href="task_manager_grid.html#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cogs position-left"></i> Actions <span class="caret"></span></a>
+			<ul class="dropdown-menu">
+				<li><a href="{% url 'dashboard:product-add' %}">Add product</a></li>
+				<li class="divider"></li>
+				<li><a href="{% url 'dashboard:category-list' %}">Manage Product Category</a></li>
+				<li><a href="{% url 'dashboard:product-class-list' %}">Manage Product Types</a></li>
+				<li><a href="{% url 'dashboard:product-attributes' %}">Manage Product Attribute</a></li>
+				<li><a href="{% url 'dashboard:tax-list' %}">Manage Tax</a></li>
+				<li><a href="{% url 'dashboard:sale-list' %}">Manage Discounts</a></li>		
+			</ul>
+		</li>
+	  </ul>
+	</div>
+</div>
+</div>
+<!-- /tasks options -->

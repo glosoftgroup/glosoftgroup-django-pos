@@ -1,0 +1,13 @@
+<div class="form-group" id='div_attributes'>
+	<label>Product Attributes</label>
+	{% for attribute_field in product_form.iter_attribute_fields %}
+	<div class="">
+	<label>{{ attribute_field.label }}</label>
+	{{ attribute_field }}
+	</div>
+	{% endfor %}
+</div>
+<script type="text/javascript">
+ // Basic select
+    $('.bootstrap-select').selectpicker();
+</script>

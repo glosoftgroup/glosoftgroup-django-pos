@@ -1,0 +1,91 @@
+{% if product_results %} 
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+<!-- search count -->
+  
+  {% if search_count %} 
+  <div class="text-center content-text-muted content-divider">
+  <span class="pt-10 pb-10">
+   {{ search_count }} results of {{ products_count  }}
+   </span>  
+   </div>
+  {% endif %}
+  
+<div class="panel panel-default">
+  <div class="table-responsive">  
+        
+ <table class="table  datatable-header-footer">
+    <thead>
+      <tr class="bg-primary">
+        <th>Id</th>
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Variants</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tfoot>
+      <tr class="bg-primary">
+        <th>Id</th>
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Variants</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </tfoot>
+    <tbody>
+    {% for product in product_results %}
+   <tr >
+    <td>#{{ product.id }}</td>
+    <!-- image -->
+    <td><a href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}" 
+     srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x" 
+     alt="" class="circle teal"></a></td>
+     <!-- product name -->
+    <td>{{ product.name }}</td>
+    <!-- product category -->
+    <td>
+      {% with product.get_first_category as category %}
+      {% if category %}
+      {{ category }}
+      {% endif %}
+      {% endwith %}
+    </td>
+    <!-- price -->
+    <td> {% gross product.price html=True %}</td>
+    <!-- quantity -->
+    <td>{{ product.get_variants_count }}</td>
+    <!-- actions -->
+    <td class="text-center">
+      <ul class="icons-list">
+        <li><a href="{% url 'dashboard:product-update' pk=product.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me"></i></a></li>
+        <li>
+  <a href="#modal_instance" data-title='Remove {{ product.name }}' data-href="{% url 'dashboard:product-delete' pk=product.pk %}"
+                          class="modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Delete me"></i> 
+                           
+                          </a> 
+           
+          </a>  
+        </li>
+        <li>
+          <!-- <a href="{{ product.get_absolute_url }}"><i class="icon-eye position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="View me on site"></i>   </a> -->
+        </li>
+      </ul>
+    </td>
+  </tr>
+   {% endfor %}
+   </tbody>
+ </table>
+  </div>
+  <!-- end panel body -->
+ </div>
+{% else %}
+ <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>
+{% endif %}
+{% load static %}
+ <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>

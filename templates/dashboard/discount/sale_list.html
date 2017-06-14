@@ -1,0 +1,82 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+
+{% block title %}
+  {% trans "Sales" %} - {{ block.super }}
+{% endblock %}
+
+{% block body_class %}body-sales{% endblock %}
+
+{% block menu_sales_class %}active{% endblock %}
+
+{% block breadcrumbs %} 
+    <li class="visible-s">{% trans "Sales" context "Dashboard sales (discounts) list." %}
+    </li>
+ 
+{% endblock %}
+
+{% block menu_discounts_class %} active{% endblock %}
+
+{% block content %}
+  <div class="panel panel-default">
+    <div class='panelbody'>
+    <div class="" style="padding: 8px;">
+      <a href="{% url 'dashboard:sale-add' %}" class="btn btn-primary"  title="{% trans "Add sale" context "Sale (discount) list add button text" %}">
+        {% trans "Add" context "Dashboard add action" %}
+      </a>
+    </div>
+    <div class="table-responsive">
+      <table class="table responsive data-table">
+        <thead>
+          <tr class="bg-primary">
+            <th>
+              {% trans "Name" context "Sale (discount) table header" %}
+            </th>
+            <th>
+              {% trans "Discount" context "Sale (discount) table header" %}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if sales %}
+            {% for sale in sales %}
+              <tr class="clickable-row" data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+                <td>
+                  {{ sale }}
+                </td>
+                <td>
+                  {{ sale.value }}{{ sale.get_type_display }}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+          <tr>
+            <td>
+              <span>
+                {% trans "No sales found" context "Empty sales table message" %}
+              </span>
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+  {% include "dashboard/includes/_pagination.html" %}
+{% endblock %}
+
+{% block custom_js %}
+<style type="text/css">
+  .clickable-row { cursor: pointer; }
+</style>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $(".clickable-row").click(function() {
+           window.location = $(this).data("href");
+       });
+ });
+</script>
+{% endblock %}

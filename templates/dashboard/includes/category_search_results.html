@@ -1,0 +1,43 @@
+{% if category_results %} 
+
+<!-- search count -->
+  
+  {% if search_count %} 
+  <div class="text-center content-text-muted content-divider">
+  <span class="pt-10 pb-10">
+   {{ search_count }} results of {{ categories_count  }}
+   </span>  
+   </div>
+  {% endif %}
+  <div class="panel panel-flat">
+   <ul class="list-group">
+      {% for node in category_results %}
+        <li class="list-group-item">
+          <a class="list-group-item"  href="{% url "dashboard:category-list" root_pk=node.pk %}">
+           <h6 class="list-group-item-heading"><i class=" icon-quill4 position-left"></i> {{ node.name }}</h6> 
+            <p class="list-item-desc">
+              <span>
+                {% if node.description %}
+                  <p class="list-group-item-text">{{ node.description }}</p>
+                {% else %}
+                  &nbsp;
+                {% endif %}
+              </span>
+            </p>
+            {% if node.hidden %}
+              <span class="list-item-icon">
+                Hidden
+              </span>
+            {% endif %}
+          </a>
+        </li>
+        <li class="list-group-divider"></li>
+      {% endfor %}
+    </ul>
+  </div>
+  
+{% else %}
+ <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>
+{% endif %}
+{% load static %}
+ <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>

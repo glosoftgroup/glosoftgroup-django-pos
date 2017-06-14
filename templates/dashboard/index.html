@@ -1,0 +1,235 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  {{ block.super }}
+{% endblock %}
+
+{% block content %}
+          <!-- Quick stats boxes -->
+          <div class="row">
+            <div class="col-lg-4">
+
+              <!-- Members online -->
+              <div class="panel bg-indigo-300">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                    <span class="heading-text badge bg-indigo-800">+53,6%</span>
+                  </div>
+
+                  <h3 class="no-margin">3,450</h3>
+                  Customers Today
+                </div>
+
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /members online -->
+
+            </div>
+
+            <div class="col-lg-4">
+
+              <!-- Current server load -->
+              <div class="panel bg-pink-400">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                    <ul class="icons-list">
+                    <li><a data-action="reload"></a></li>
+                      <li class="dropdown">
+                        <a href="boxed_mini.html#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog3"></i> <span class="caret"></span></a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                          <li><a href="javascript:;"><i class="icon-sync"></i> Today</a></li>
+                          <li><a href="javascript:;"><i class="icon-list-unordered"></i> Week</a></li>
+                          <li><a href="javascript:;"><i class="icon-pie5"></i> Month</a></li>
+                          <li><a href="javascript:;"><i class="icon-cross3"></i> Clear list</a></li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <h3 class="no-margin">KShs. 23202</h3>
+                  Total Sales
+                </div>
+
+                <div id="server-load"></div>
+              </div>
+              <!-- /current server load -->
+
+            </div>
+
+            <div class="col-lg-4">
+
+              <!-- Today's revenue -->
+              <div class="panel bg-slate">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                    <ul class="icons-list">
+                              <li><a data-action="reload"></a></li>
+                            </ul>
+                          </div>
+                  <div class="col-sm-6">
+                    <h5 class="no-margin">KShs. 2300</h5>
+                    Highest <span>(rice)</span>
+                  </div>
+                  <div class="col-sm-6">
+                    <h5 class="no-margin">KShs. 200</h5>
+                    Lowest <span>(sugar)</span>
+                  </div>
+                </div>
+
+                <div id="today-revenue"></div>
+              </div>
+              <!-- /today's revenue -->
+
+            </div>
+          </div>
+          <!-- /quick stats boxes -->
+
+  <div class="row">
+   <div class="col-md-12">
+       <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Chart summaries</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+
+        <div class="col-md-6 col-md-offset-3">
+         <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+      </div>
+    </div>    
+   </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">
+          <h6 class="panel-title">{% trans "Products with low stock" context "Dashboard homepage table title" %}</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+        <div class="panel-body">
+
+            <div class="card">
+
+              {% if low_stock %}
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead>
+                      <tr>
+                        <th>
+                          {% trans "Product name" context "Low stock product list" %}
+                        </th>
+                        <th class="right-align">
+                          {% trans "Stock left" context "Low stock product list" %}
+                        </th>
+                        <th> Low stock Threshold</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for product in low_stock %}
+                        <tr data-action-go="{% url "dashboard:product-update" pk=product.pk %}#stock">
+                          <td>
+                            {{ product }}
+                          </td>
+                          <td class="right-align">
+                            {{ product.total_stock }}
+                          </td>
+                          <td class="right-align">
+                            {{ product.low_stock_threshold }}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+    </div>
+  </div>
+{% endblock %}
+{% block custom_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  var endpoint = "{% url 'dashboard:chart' %}";
+  var defaultData = [];
+  var labels = [];
+
+  $.ajax({
+    method:"GET",
+    url:endpoint,
+    success:function(data){
+      labels = data.label;
+      defaultData = data.default;
+      // console.log(defaultData);
+      // console.log(labels)
+      console.log(data.net);
+      console.log(data.todays_sales);
+      setChart();
+    },
+    error:function(error_data){
+
+    }
+  });
+
+  function setChart(){
+      var ctx = document.getElementById("myChart").getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData,
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 159, 64, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255,99,132,1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          }
+      });
+  }
+
+});
+</script>
+{% endblock %}

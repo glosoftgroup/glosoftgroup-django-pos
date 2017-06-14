@@ -1,0 +1,524 @@
+    <div class="col-md-12">
+         <label class="display-block text-semibold">System Permission Default {{group.name}}</label>
+            <div class="checkbox">
+              <label>
+                <div class="checker">
+                  <span class="checked">
+                    <input class="styled"  id="edit-can-login" checked="checked" type="checkbox" value="active">
+                  </span>
+                </div>
+                can login
+              </label>
+              <span id="granted" class="text-success">(granted)</span>
+            </div>
+            <div class="checkbox">
+              <label>
+                <div class="checker">
+                 <span class="">
+                   <input class="styled" type="checkbox" id="edit-checkAll"></span></div>
+                select all
+              </label>
+            </div>                                  
+      </div>
+
+       <div class="col-md-12">
+       <h5>Inventory Management</h5>
+       </div>
+
+       <div class="col-md-12">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">product</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'product' %}
+                
+                  {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+                
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">category</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'category' %}
+                  {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+       </div>
+
+       <div class="col-md-12">
+                  <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">product attribute</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'productattribute' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">product class(type)</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'productclass' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+       </div>
+
+       <div class="col-md-12">
+                  <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">product image</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'productimage' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">product tax</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'producttax' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+       </div>
+
+       <div class="col-md-12">
+                  <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">product variants</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'productvariant' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">product variant image</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'variantimage' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+       </div>
+
+       <div class="col-md-12">
+                  <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">stock</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'stock' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">stock location</label>
+            {% for permission in permissions%}
+             {% if permission.content_type.model ==  'stocklocation' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+       </div>
+
+       <div class="col-md-12">
+          <h5>User Management</h5>
+       </div>
+       <div class="col-md-12">
+                <div class="col-md-6">
+          <div class="form-group">
+            <label class="display-block text-semibold">users</label>
+            {% for permission in permissions %}
+             {% if permission.content_type.model ==  'user' %}
+                                    {% if permission in group_permissions %}                          
+                      <div class="checkbox">
+                        <label>
+                        <div class="checker">
+                          <span class="checked">
+                            <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+                          </span>
+                          </div>
+                          {{permission.name}}
+                        </label>
+                        <span id="granted" class="granted text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                     <div class="checkbox">
+                     <label>
+                     <div class="checker">
+                        <span class="">   
+                         <input class="styled check" type="checkbox" 
+                        value="{{permission.id}}">
+                        </span>
+                      </div>
+                         {{permission.name}}
+                     </label>
+                     <span id="granted" class="granted text-success"></span>
+                     </div>
+                  {% endif %}
+              {% else %}
+              {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+       </div>
+       <script type="text/javascript">
+    /*--- if not login permission checked ---*/
+$("#edit-can-login").on("click",function () {
+  var checked = $(this).is(':checked');
+  // alert(checked);
+  if(checked){
+      $(this).parent().addClass('checked');
+      $(this).parent().parent().parent().siblings('span').show();
+      $(this).parent().parent().parent().siblings('span').text('(granted)');
+      $('.check').each(function(){
+          // $(this).prop("checked", true);          
+          $(this).parent().parent().removeClass('disabled');
+          $(this).parent().parent().parent().parent().removeClass('disabled');
+          // $(this).parent().addClass('checked');
+          $(this).removeAttr('disabled');
+      });
+      $('#edit-checkAll').parent().parent().removeClass('disabled');
+      $('#edit-checkAll').parent().parent().parent().parent().removeClass('disabled');
+      $('#edit-checkAll').removeAttr('disabled');
+  }else{
+      $(this).parent().removeClass('checked');
+      $(this).parent().parent().parent().siblings('span').hide();
+      $('.check').each(function(){
+          // $(this).prop("checked", false);
+          // $(this).parent().parent().parent().siblings('span').hide();
+          $(this).parent().parent().parent().siblings('span').css('color','#999');
+          $(this).parent().parent().addClass('disabled');
+          $(this).parent().parent().parent().parent().addClass('disabled');
+          // $(this).parent().removeClass('checked');
+          $(this).attr('disabled', 'disabled');
+      });
+      $('#edit-checkAll').parent().parent().addClass('disabled');
+      $('#edit-checkAll').parent().parent().parent().parent().addClass('disabled');
+      $('#edit-checkAll').attr('disabled', 'disabled');
+  }
+});
+
+/*--- check all ---*/
+$("#edit-checkAll").on("click",function (event) {
+  var checked = $(this).is(':checked');
+  if(checked){
+      $(this).parent().addClass('checked');
+      $(this).parent().parent().parent().siblings('span').show();
+      $(this).parent().parent().parent().siblings('span').text('(granted)');
+      $('.check').each(function(){
+          $(this).prop("checked", true);
+          $(this).parent().parent().parent().siblings('span').show();
+          $(this).parent().parent().parent().siblings('span').text('(granted)');
+          $(this).parent().addClass('checked');
+      });
+  }else{
+      $(this).parent().removeClass('checked');
+      $(this).parent().parent().parent().siblings('span').hide();
+      $('.check').each(function(event){
+          $(this).prop("checked", false);
+          $(this).parent().parent().parent().siblings('span').hide();
+          $(this).parent().removeClass('checked');
+      });
+  }
+});
+
+/*--- status on each check ---*/
+$( ".check" ).on( "click", function(event){
+  var checked = $(this).is(':checked');
+  if(checked){
+    $(this).prop("checked", true);
+    $(this).parent('span').addClass('checked');
+    $(this).parent().parent().parent().siblings('span').show();
+    $(this).parent().parent().parent().siblings('span').text('(granted)');      
+  }else{
+    $(this).prop("checked", false);
+    $(this).parent('span').removeClass('checked');
+    $(this).parent().parent().parent().siblings('span').hide();
+  }
+} );
+
+  </script>

@@ -1,0 +1,86 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+
+{% block title %}
+  {% trans "Attributes" context "Dashboard attributes list" %} - {{ block.super }}
+{% endblock %}
+
+{% block body_class %}body-attributes{% endblock %}
+
+{% block menu_attributes_class %}active{% endblock %}
+
+{% block header_extra %}
+    <!-- search field -->
+    {% url "dashboard:search-attribute" as url %}
+    {% include "dashboard/includes/_search_filter.html" with url=url  %}
+    <!-- end search -->
+  <li>&nbsp;&nbsp;&nbsp;</li>
+ <li>              
+    <a href="{% url 'dashboard:product-attribute-add' %}"><i class="icon-plus3 position-left"></i> Add attribute</a></li>
+  
+{% endblock %}
+
+{% block breadcrumbs %}
+  
+    <li class="active">
+      {% trans "Attributes" context "Dashboard attributes list" %}
+    </li>
+
+{% endblock %}
+
+{% block menu_catalogue_class %} active{% endblock %}
+
+{% block content %}
+  {% if attributes %}
+    <div class="row ">
+      {% for pk, name, values in attributes %}        
+          <a class="list-item-name" href="{% url 'dashboard:product-attribute-update' pk=pk %}">
+          <div class="col-md-4 equalize">
+            <div class="panel panel-body border-top-warning text-center">
+              <h6 class="no-margin text-semibold">{{ name }}</h6>
+              <p class="content-group-sm text-muted">
+                {% for value in values %}
+                {{ value }}
+                {% if not forloop.last %}, {% endif %}
+              {% endfor %}
+              </p>
+
+              <ul class="fab-menu">
+                <li>
+                  <a href="{% url 'dashboard:product-attribute-update' pk=pk %}" class="fab-menu-btn btn bg-blue btn-float btn-rounded btn-icon">
+                    <i class="fab-icon-open icon-pencil"></i>
+                   
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>           
+          </a>
+        
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="not-found">
+      <p class="grey-text">
+        {% trans "No attributes found." context "Empty attribute list message" %}
+      </p>
+    </div>
+  {% endif %}
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    var maxHeight = 0;
+    $(".equalize").each(function() {
+        if ($(this).height() > maxHeight) {
+            maxHeight = $(this).height();
+        }
+    });
+    $(".equalize").height(maxHeight);
+});
+
+</script>
+{% endblock %}

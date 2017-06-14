@@ -1,0 +1,20 @@
+<li>
+		
+		<form action="#" class="main-search" style="margin:3px;">
+			<div class="input-group contentgroup">
+				<div class="has-feedback has-feedback-left">
+					<input type="text" id='search_product' name='search_product' class="form-control " value="" placeholder="Search ">
+					<div class="form-control-feedback">
+						<i class="icon-search4 text-muted text-size-base"></i>
+					</div>
+					
+					<input class="hidden" type="hidden" id="csrf_token" value="{{ csrf_token }}" name="csrf_token">
+					<input type="hidden" class="hidden" value='{{ url }}' id='search_url' name="url">
+				</div>
+
+				<div class="input-group-btn">
+					<button type="submit" id='submit_search_product' onclick='return false' class="btn btn-primary ">Search</button>
+				</div>
+			</div>			
+		</form>
+		</li>
