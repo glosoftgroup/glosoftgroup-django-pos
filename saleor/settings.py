@@ -464,6 +464,7 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     rest framework configuration
 '''
 REST_FRAMEWORK = {
+	'EXCEPTION_HANDLER': 'saleor.jwt_payload.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES':(
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
@@ -500,7 +501,7 @@ JWT_AUTH = {
     'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
 
     'JWT_RESPONSE_PAYLOAD_HANDLER':
-    'saleor.decorators.jwt_response_payload_handler',
+    'saleor.jwt_payload.jwt_response_payload_handler',
     'JWT_EXPIRATION_DELTA':
      timedelta(days=2),
 }

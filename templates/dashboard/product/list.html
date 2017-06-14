@@ -9,20 +9,7 @@
   {% trans "Products" context "Dashboard products list" %} - {{ block.super }}
 {% endblock %}
 
-{% block custom_js %}
-  <!-- Theme JS files -->
-  <script type="text/javascript">
-    
-    
-  
-  
-  </script>
-  <script type="text/javascript" src="{% static 'backend/js/plugins/tables/datatables/datatables.min.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/plugins/tables/datatables/extensions/fixed_header.min.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
-  <!-- <script type="text/javascript" src="{% static 'backend/js/pages/colors_blue.js' %}"></script> -->
-{% endblock %}
+
 
 {% block menu_products_class %}active{% endblock %}
 
@@ -87,29 +74,31 @@
           </div>
         </div>
         <div class="table-responsive">
-        <table class="table table-bordered datatable-header-footer">
+        <style type="text/css">
+          .fixed{
+              top:0;
+              position:fixed;
+              width:auto;
+              display:none;
+              border:none;
+            }
+            .scrollMore{
+              margin-top:600px;
+            }
+        </style>
+        <table class="table table-striped table-hover fixed_headers">
                 <thead>
-                  <tr class="bg-primary">
-                    <th>Id</th>
-                    <th>Image</th>
-                    <th>Product Name</th>
-                    <th>Variants</th>
-                    <th>Price</th>
-                    <th>Variant</th>
-                    <th class="text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tfoot>
                   <tr class="bg-primary">
                     <th>Id</th>
                     <th>Image</th>
                     <th>Product Name</th>
                     <th>Category</th>
                     <th>Price</th>
-                    <th>Variants</th>
+                    <th>Variant</th>
                     <th class="text-center">Actions</th>
                   </tr>
-                </tfoot>
+                </thead>
+               
                 <tbody>
                  {% for product in products %}
                   <tr>
@@ -207,7 +196,22 @@
       </div>
     </div>
   </div>
-  
+  <style type="text/css">
+    .fixed { margin-top: 50px; }
+  </style>
 
 {% include "dashboard/includes/_modal_template.html"  %}
+{% endblock %}
+
+{% block custom_js %}
+  
+  
+  <script type="text/javascript" src="{% static 'backend/js/plugins/tables/datatables/datatables.min.js' %}"></script>
+  <!-- <script type="text/javascript" src="{% static 'backend/js/plugins/tables/datatables/extensions/fixed_header.min.js' %}"></script> -->
+  <script type="text/javascript" src="{% static 'backend/js/pages/datatables_advanced.js' %}"></script>
+  
+  <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+  <!-- <script type="text/javascript" src="{% static 'backend/js/pages/colors_blue.js' %}"></script> -->
 {% endblock %}

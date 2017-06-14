@@ -100,7 +100,7 @@ class SoldItem(models.Model):
     
 
     class Meta:
-        unique_together = ('sales','order')
+        #unique_together = ('sales')
         ordering = ['order']
     def __unicode__(self):
         return '%d: %s' % (self.order,self.product_name)

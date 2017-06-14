@@ -174,7 +174,7 @@
                 </li>
                 <li id="first">
                   <a href="{% url 'dashboard:product-list' %}"><i class="icon-stack"></i> <span>
-                     {% trans "Catalogue" context "Dashboard catalogue" %}
+                     {% trans "Inventory" context "Dashboard inventory" %}
                   </span></a>
                   <ul>
                    {% if perms.userprofile.view_product %}
@@ -184,7 +184,7 @@
                     {% endif %}
                     <li class="{% block menu_purchase_list %}{% endblock %}">
                     <a href="{% url 'dashboard:purchase-list' %}"><i class='icon-plus'></i>
-                    Purchase</a>
+                    Add stock</a>
                     </li>
                     <!-- categories -->
                      <li class="{% block menu_categories_class %}{% endblock %}">

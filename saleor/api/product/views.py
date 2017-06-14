@@ -72,7 +72,9 @@ class SalesDetailAPIView(generics.RetrieveAPIView):
 class SalesCreateAPIView(generics.CreateAPIView):
     queryset = Sales.objects.all()
     serializer_class = SalesSerializer
-    def perform_create(self, serializer):        
+    def perform_create(self, serializer):
+        if not serializer.is_valid(): 
+            print 'sdfsdfsdfjsldfj'       
         serializer.save(user=self.request.user)
 
 class SalesListAPIView(generics.ListAPIView):
