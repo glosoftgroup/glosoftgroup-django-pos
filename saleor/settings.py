@@ -500,7 +500,7 @@ JWT_AUTH = {
     'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
 
     'JWT_RESPONSE_PAYLOAD_HANDLER':
-    'saleor.decorators.jwt_response_payload_handler',
+    'saleor.jwt_payload.jwt_response_payload_handler',
     'JWT_EXPIRATION_DELTA':
      timedelta(days=2),
 }

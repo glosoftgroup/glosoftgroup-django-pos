@@ -3,13 +3,6 @@ from django.http import HttpResponse
 from .userprofile.models import UserTrail
 from django.shortcuts import get_object_or_404
 import logging
-from .api.product.serializers import UserSerializer
-
-def jwt_response_payload_handler(token, user=None, request=None):
-        return {
-            'token': token,
-            'user': UserSerializer(user, context={'request': request}).data
-        }
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
