@@ -5,10 +5,10 @@
 {% load prices_i18n %}
 
 {% block title %}
-  Permissions
+  Groups & Permissions
 {% endblock %}
 
-{% block menu_user_class %}active{% endblock %}
+{% block menu_perm_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -37,8 +37,6 @@
           <ul class="nav nav-tabs nav-tabs-highlight">
             <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">create group</a></li>
             <li class="" id="permissions-tab"><a href="#permissions" data-toggle="tab" class="legitRipple" aria-expanded="true">manage group permissions</a></li>
-            <li class="" id="groups-tab"><a href="#groups" data-toggle="tab" class="legitRipple" aria-expanded="true">manage group</a></li>
-
           </ul>
 
           <div class="tab-content">
@@ -393,73 +391,6 @@
               </div>
             </div>
            </div>
-           <div class="tab-pane animated fadeIn" id="groups">
-              <div class="row">                
-                  <div class="col-md-8 col-md-offset-2">
-                            <div class="table-responsives">
-         
-
-          <table class="table table-bordered datatable-header-footer">
-            <caption style="margin-bottom: 10px;">
-             <div class="row">
-             <div class="col-md-8">
-                <input type="text" name="search_group" class="form-control">
-             </div>
-             <div class="col-md-4">
-                {% if perms.userprofile.add_user %}
-                     <a href="javascript:;" class="btn btn-primary waves-effect waves-light" onclick="next_tab('groups', 'profile');">Add Group</a>
-                {% endif %}
-             </div>
-             </div>
-            
-           
-
-              {#{% for p in request.user.get_all_permissions %}#}
-              {#{{p}}#}
-              {#{% endfor %}#}
-
-             </caption> 
-                <thead style="border-top:1px solid #ddd;">
-                  <tr>
-                    <th>Id</th>
-                    <th>Group Name</th>
-                    <th class="text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="tb">           
-               {% if groups %}
-                  {% for group in groups %}
-                  <tr id="{{group.id }}">
-                    <td>{{ forloop.counter }} </td>
-                    <td>{{ group.name }}</td>
-                    <!-- actions -->
-                    <td class="text-center">
-                      <ul class="icons-list">
-                        <li>
-                          <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
-                         class="modal_trigger_edit btn btn-default btn-sm edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal" style="font-size: 11px;"></i> edit</a>
-                        </li>
-                        <li>
-                          <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
-                         class="modal_trigger_delete btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
-                         </a>
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">no groups available</h2></td></tr>
-               {% endif %}
-                  </tbody>
-
-           </table>
-
-        </div>
-                  </div>
-              </div>
-             
-           </div>
 
           </div>
         </div>
@@ -471,132 +402,6 @@
   </div>
 </div>
 
-<!-- edit modal -->
- <div id="modal_edit" class="modal fade">
-   <div class="modal-dialog modal-lg" style="width: 1200px;">
-     <div class="modal-content">
-       <div class="modal-header bg-blue">
-         <button type="button" class="close" data-dismiss="modal">&times;</button>
-         <h6 class="modal-title text-white text-center"></h6>
-       </div>
-       <div class="modal-body">
-       <div class="row">
-         <div class="col-md-6">
-           <div class="row">
-           <div class="col-md-12">
-             <h5>Group & Users</h5>
-             <input type="hidden" name="group-id" id="group-id">
-           </div>
-            <div class="col-md-12">
-             <div class="form-group">
-              <label>Group Name:</label>
-              <input type="text" name="g_name" class="form-control" id="g_name">
-             </div>
-            </div>
-           </div>
-           <div class="row">
-            <div class="col-md-9">
-              <div class="form-group">
-               <label>Add Users:</label>
-                <div class="multi-select-full">
-                  <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="edit_multiple" placeholder="select a user...">
-                  {% for usr in users %}
-                    {% if usr.is_active == True and usr.is_superuser == False %}
-                       <option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}
-                       {% else %}{{usr.email}}{% endif %}" data-image="{% if usr.image %}{{usr.image.url}}
-                       {% else %}/static/images/user.png{% endif %}">
-                         {% if usr.name %}
-                            {{usr.name}}
-                         {% else %}
-                            {{usr.email}}
-                         {% endif %}
-                       </option>
-                    {% endif %}
-                  {% endfor %}
-                  </select>
-                </div>
-               </div><!-- end of formgroup-->
-            </div>
-            <div class="col-md-3">
-             <div class="form-group">
-               <label><span style="visibility: hidden;">X</span></label>
-               <button class="btn btn-primary form-control" id="add_user_btn">Add User</button>
-            </div>
-            </div>
-           </div>
-           <div class="row">
-            <div class="col-md-12">
-             <div class="table-responsive pre-scrollable group-users" style="height: 240px;">
-             <table class="table table-framed" id="group_user_table">
-                <thead>
-                  <tr>
-                    <th>image</th>
-                    <th>Name</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="table_body">
-
-                </tbody>
-              </table>
-              </div>
-            </div>
-           </div>
-         </div>
-
-         <div class="col-md-6">
-           <div class="row">
-              <div class="col-md-12">
-               <h5>Permissions</h5>
-              </div>
-               <div class="col-md-12">
-                <div class="permissions_display row" style="overflow-y: scroll;height:429px;">
-                </div>
-              </div>
-           </div>
-         </div>
-        </div>
-       </div>    
-       <div class="modal-footer">
-         <button type="submit" id='modal_delete' class="btn pull-right bg-danger update" onclick="submitGroupDetails()" data-id="" data-href="">Update</button>         
-         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
-       </div>
-     </div>
-   </div>
- </div>
- <!-- /edit modal -->
-
-<!-- delete modal -->
- <div id="modal_instance" class="modal fade">
-   <div class="modal-dialog modal-sm">
-     <div class="modal-content">
-       <div class="modal-header bg-blue">
-         <button type="button" class="close" data-dismiss="modal">&times;</button>
-         <h6 class="modal-title text-white text-center"></h6>
-       </div>
-       <div class="modal-body">
-         <div class="">
-         <form action="" class="delete_form" method="post" id="delform" novalidate>
-         {% csrf_token %}
-         <div class="">
-           <h5 class="text-center">
-             Confirm group delete!
-           </h5>
-           <input type="hidden" class="item-id" />
-           </div>
-           
-         </div>
-       </div>
-       
-       <div class="modal-footer">
-         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" onclick="return false" data-id="" data-href="">Delete</button>
-         </form>          
-         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
-       </div>
-     </div>
-   </div>
- </div>
- <!-- /delete modal -->
 {% endblock%}
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
@@ -606,217 +411,9 @@
 <script type="text/javascript">
 
 
-function remove_duplicates(objectsArray) {
-    var usedObjects = {};
-    for (var i=objectsArray.length - 1;i>=0;i--) {
-        var so = JSON.stringify(objectsArray[i]);
-        if (usedObjects[so]) {
-            objectsArray.splice(i, 1);
-        } else {
-            usedObjects[so] = true;          
-        }
-    }
-    return objectsArray;
-}
-//**@ remove duplicate names
-function remove_duplicate_name(list) {
-  var result = [];
-  $.each(list, function(i, e) {
-    if ($.inArray(e, result) == -1) result.push(e);
-  });
-  return result;
-}
-//**@ global users array
- var names = [];
 //**@ group users on load
 $('document').ready(function () {
 
-  //**@ edit modal
-$('.modal_trigger_edit').on('click', function (e) {
-     var url = $(this).data('href')
-     var prompt_text = $(this).data('title');
-     var username = $(this).data('name');
-     var modal = $(this).data('ta');
-     var id = $(this).data('id');
-     $('#group-id').val(id);
-     var user_url = $(this).data('users');
-     $('#g_name').val(username);
-     $('.del').attr('data-id', id);
-     $('.del').attr('data-href', url);
-     $('.modal-title').html(prompt_text +'id: '+id);
-     $(modal).modal();
-     $('.delete_form').attr('action',url);
-     var token = '{{ csrf_token }}';
-     
-      //*@ get group permissions
-      $.post(url,{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"}, function(data){
-        $('.permissions_display').html(data);
-      });
-
-      //*@ get group users
-      $.ajax({
-        type:"POST",
-        url:user_url,
-        data:{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"},
-        async:false,
-        success:function(data){
-          names = data;
-          console.log(names);
-        },error:function(error){
-          console.log(error);
-        }
-      });
-    //*@ populate table
-    var table_body = $('#group_user_table tbody');
-    var parent = table_body.parent();
-    
-    table_body.detach().empty().each(function(i, val){
-        for (var x = 0; x < remove_duplicates(names).length; x++){
-            $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
-            if (x == remove_duplicates(names).length - 1){
-                $(this).appendTo(parent);
-            }
-        }
-    });
-
-});
-
-});
-//**@ users select
-$('#add_user_btn').on('click', function(e){
-   var selected = $("#edit_multiple :selected").map(function() {
-                      return {
-                          id: parseInt($(this).val()),
-                          name: $(this).data("name"),
-                          image: $(this).data("image")
-                      };
-                  }).get();
-    $.each(selected, function(i, val){
-      // var index = selected.findIndex(x=>x.name==val.name);
-      names.indexOf(val) === -1 ? names.push(val): console.log('already exists');
-      // index === -1 ? names.push(val): console.log('already exists');
-    });
-
-    var table_body = $('#group_user_table tbody');
-    var parent = table_body.parent();
-    
-    table_body.detach().empty().each(function(i, val){
-        for (var x = 0; x < remove_duplicates(names).length; x++){
-            $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
-            if (x == remove_duplicates(names).length - 1){
-                $(this).appendTo(parent);
-            }
-        }
-    });
-
-});
-//**@ remove user from array
-function removeuser(user){
-   users = remove_duplicates(names);
-   var index = names.indexOf(user);
-    $('#'+user).remove();
-    names.splice(index,1);
-    console.log(names);
-}
-//**@ submit group details
-function submitGroupDetails(){
-   var user_ids = [];
-   //**@ get list of users ids
-       $.each(names, function(i, val){
-          user_ids.push(val.id);
-       });
-
-   //**@ get list of all checked permissions
-   var checkBoxesStringArray = $(".check:checked").map(function(){
-      return $(this).val();
-    }).get();
-   var checkBoxesStringNumber = checkBoxesStringArray.map(Number);
-   console.log(checkBoxesStringNumber);
-       //**@ check login status
-    if($("#edit-can-login").is(':checked')){
-      $("#edit-can-login").val('active')
-    }else{
-      $("#edit-can-login").val('inactive');
-    }
-    //**@ check login val
-    var can_login_value = $("#edit-can-login").val();
-    //**@ id
-    var g_id = $('#group-id').val();
-    var g_name = $('#g_name').val();
-    console.log('id: '+g_id);
-
-    //**@ post
-    $.ajax({
-      url: "{% url 'dashboard:group_update' %}",
-      type: 'POST',
-      data: {
-             'checklist[]': checkBoxesStringArray,
-             'users[]': user_ids,
-             'id': g_id ,
-             'group_name': g_name,
-             'check_login':can_login_value,
-             'csrfmiddlewaretoken':"{{ csrf_token }}"
-      },
-      async:false,
-      success: function(data){
-              $.jGrowl('group updated successfully', {
-                  header: 'Well done!',
-                  theme: 'bg-success'
-              });
-          window.location.reload();
-          user_ids=[];
-      }
-      ,error:function(){
-        $.jGrowl('something went wrong', {
-              header: 'Oops!',
-              theme: 'bg-danger'
-         });
-      }
-    });
-}
-//**@ delete modal
-$('.modal_trigger_delete').on('click', function (e) {
-     var url = $(this).data('href')
-     var prompt_text = $(this).data('title');
-     var username = $(this).data('name');
-     var modal = $(this).data('ta');
-     var id = $(this).data('id');
-     $('.del').attr('data-id', id);
-     $('.del').attr('data-href', url);
-     $('.modal-title').html(prompt_text);
-     $(modal).modal();
-     $('.delete_form').attr('action',url);
-});
-//**@ on modal delete
-$('.del').on('click', function (e) {
-    var f = document.getElementById('delform');
-    var formData = new FormData(f);
-    var id = $(this).data('id');
-    var url = $(this).data('href');
-    $.ajax({
-        url: url,
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success:function(data){        
-          $('#modal_instance').modal('hide');
-          $('#tb #'+id).remove();            
-          $.jGrowl('Group deleted successfully', {
-            header: 'Well done!',
-            theme: 'bg-success'
-          });
-          window.location.reload();
-       // $("#mydiv").load(location.href + " #mydiv");
-        },
-        error:function(error){
-          console.log(error);
-          $.jGrowl('Error deleting Staff', {
-              header: 'Oh snap!',
-              theme: 'bg-danger'
-          });
-        }
-    });
 });
 //**@ load users on select
 $( ".group_select_permissions" ).change(function() {
@@ -1065,7 +662,7 @@ $("#permission-btn").click(function(event){
               });
          }
 
-         // window.location = "{% url 'dashboard:users' %}";
+         window.location = "{% url 'dashboard:perms' %}";
          localStorage.removeItem('group_id');
          localStorage.removeItem('group_name');
       }

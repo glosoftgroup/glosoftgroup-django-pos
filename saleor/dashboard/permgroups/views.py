@@ -17,6 +17,19 @@ from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User
 
+def groups(request):
+    users = User.objects.all().order_by('id')
+    permissions = Permission.objects.all()
+    groups = Group.objects.all()
+    try:
+        first_group = Group.objects.filter()[:1].get()
+        users_in_group = User.objects.filter(groups__id=first_group.id)
+        return TemplateResponse(request, 'dashboard/permissions/group_list.html', 
+        {'users':users, 'permissions':permissions, 'groups':groups, 'users_in_group':users_in_group})
+    except: ObjectDoesNotExist
+    return TemplateResponse(request, 'dashboard/permissions/group_list.html', 
+        {'users':users, 'permissions':permissions, 'groups':groups})
+
 def perms(request):
     users = User.objects.all().order_by('id')
     permissions = Permission.objects.all()
@@ -115,6 +128,12 @@ def group_edit(request):
     ctx = {'group': group,'permissions':permissions, 'group_permissions':group_permissions}
     html = render_to_string('dashboard/permissions/group_permissions.html', ctx)
     return HttpResponse(html)
+
+def group_detail(request, pk):
+    group = Group.objects.get(id=pk)
+    group_permissions = Permission.objects.filter(group=group)
+    users_in_group = User.objects.filter(groups__name=group.name)
+    return HttpResponse('error deleting')
 
 def group_delete(request, pk):
     group = Group.objects.get(id=pk)
