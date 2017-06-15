@@ -114,7 +114,7 @@
                     
                     </td>
                     <!-- actions -->
-                    <td class="text-center">
+                    <td class="action-data">
                       <ul class="icons-list">
                         <li><a href="{% url 'dashboard:product-update' pk=product.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me"></i></a></li>
                         <li>
@@ -202,7 +202,7 @@
   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
   <script type="text/javascript">
     $(document).ready(function() {
-       $(".clickable-row").click(function() {
+       $(".clickable-row").on('click','td:not(action-data)',function() {
            window.location = $(this).data("href");
        });
     })
