@@ -19,13 +19,9 @@
 
 {% block content %}
  <div class="row">
-  <div class="col s12">
-  <h2>Users</h2>
-    
-      <!-- Header and footer fixed -->
+   <div class="col-md-12">
       <div class="panel panel-flat">
-        <div class="panel-heading">        
-          {#{% include "dashboard/includes/_pagination.html" with page_obj=products %}#}
+        <div class="panel-heading">      
           <div class="heading-elements">
             <ul class="icons-list">              
               <li><a data-action="collapse"></a></li>       
@@ -33,21 +29,54 @@
             </ul>
           </div>
         </div>
+        <div class="panel-body">
+            <div class="col-md-6">
+             <label>Search Users</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search Users" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" data-width="100%" tabindex="-98">
+                    <option selected="selected">No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                   <a href="{% url 'dashboard:user-add' %}" class="btn-block btn-primary btn-lg">Add User</a>
+                {% endif %}
+              </div>
+            </div>
+        </div>
+      </div>
+   </div>
+  <div class="col-md-12">
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+<!--         <div class="panel-heading">
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div> -->
         <div class="table-responsive">
          
 
-          <table class="table table-bordered datatable-header-footer">
-            <caption style="margin-bottom: 10px;">
-            {% if perms.userprofile.add_user %}
-               <a href="{% url 'dashboard:user-add' %}" class="btn btn-primary waves-effect waves-light">Add User</a>
-            {% endif %}
-
-              {#{% for p in request.user.get_all_permissions %}#}
-              {#{{p}}#}
-              {#{% endfor %}#}
-
-             </caption> 
-                <thead style="border-top:1px solid #ddd;">
+          <table class="table table-bordered table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
+                <thead>
                   <tr>
                     <th>Id</th>
                     <th>Image</th>
@@ -59,18 +88,6 @@
                     {% endif %}
                   </tr>
                 </thead>
-                <tfoot>
-                   <tr>
-                    <th>Id</th>
-                    <th>Image</th>
-                    <th>User Name</th>
-                    <th>Email</th>
-                    <th>User Role</th>
-                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
-                    <th class="text-center">Actions</th>
-                    {% endif %}
-                  </tr>
-                </tfoot>
                 <tbody id="tb">           
                {% if users %}
                   {% for user in users%}
@@ -83,6 +100,7 @@
                    {% else %}
                       <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
                    {% endif %}
+                   </td>
                      <!-- product name -->
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.name}}</td>
                     <!-- product category -->
@@ -112,10 +130,19 @@
                    <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
                {% endif %}
                   </tbody>
-
            </table>
 
         </div>
+         <div class="my-paginate">
+            <div class="text-center bootpag-callback" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav">Page 1</div>
+            </div>
+            <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
+              <ul class="pagination2 bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1</div>
+            </div>
+          </div>
       </div>
  
   </div>
@@ -154,16 +181,57 @@
  <!-- /blue modal -->
 {% endblock%}
 {% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-      $('.results').on("click", ".pagination a", function(e){
-           e.preventDefault();
-           $(".loading").show();
-           var page = $(this).attr("data-page");
-           $(".results").load(url, {page:page}, function(){
-              $(".loading").hide();
-           });
-      });
+    var sz;
+    var paginated_size;
+    //**@ get
+    $.ajax({ url: "{% url 'dashboard:users' %}",type: 'GET',data: {initial:'initial'},
+        async:false,success: function(data){
+         sz = data;
+    }});
+    $('.list-sz').on('change', function(){
+        var ts = $(this).val();
+
+        $.get("{% url 'dashboard:user_paginate' %}",{page:1, size:ts},function(data){
+            $('#tb').html(data);
+        });
+        $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {size:ts,select_size:'select_size'},async:false,success: function(data){
+           paginated_size = data;
+           console.log(paginated_size);
+           $('.bootpag-callback').remove();
+           // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
+            $('.bootpag-callback2').show();
+        } });
+
+        console.log('from outside '+paginated_size);
+        $('#bootpag-callback2').bootpag({
+            total: parseInt(paginated_size),
+            maxVisible: 3,
+            leaps: false
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+paginated_size); // or some ajax content loading...
+                $.get("{% url 'dashboard:user_paginate' %}",{page:num, size:ts},function(data){
+                   $('#tb').html(data);
+                });
+        }).children('.pagination2').addClass('pagination-flat pagination-sm');
+    });
+
+
+
+    $('.bootstrap-select').selectpicker();
+    // pagination
+    $('.bootpag-callback').bootpag({
+        total: parseInt(sz),
+        maxVisible: 3,
+        leaps: false
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+sz); // or some ajax content loading...
+            $.get("{% url 'dashboard:user_paginate' %}",{page:num},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
 
       $(".td").click(function() {
           window.location = $(this).data("href");
@@ -214,6 +282,33 @@
               }
           });
       });
+
+
+    var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+    $('.search_user').keyup(function() {
+       var search_text = $(this).val();
+       var url = "{% url 'dashboard:user_search' %}";
+       $.ajax({
+          type: "GET",
+          url:url,
+          data:{'q':search_text},
+          success: function(data){
+             $('#tb').html(data);
+          },
+          error:function(data){
+            console.log(data);
+          }
+       });
+    });
+
+
 
   });
 

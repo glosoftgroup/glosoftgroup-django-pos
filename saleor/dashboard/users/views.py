@@ -1,16 +1,19 @@
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.template import RequestContext, Context
 from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
 from django.utils.translation import pgettext_lazy
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.paginator import Paginator
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -27,12 +30,44 @@ error_logger = logging.getLogger('error_logger')
 def users(request):
 	try:
 		users = User.objects.all().order_by('id')
+		page = request.GET.get('page', 1)
+		paginator = Paginator(users, 10)
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
 		user_trail(request.user.name, 'accessed users list page')
 		info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
-		return TemplateResponse(request, 'dashboard/users/users.html', {'users':users})
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			return TemplateResponse(request, 'dashboard/users/users.html', {'users':users})
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
+
+def user_paginate(request):
+	users = User.objects.all().order_by('id')
+	page = request.GET.get('page', 1)
+	list_sz = request.GET.get('size')
+	select_sz = request.GET.get('select_size')
+	if list_sz:
+		paginator = Paginator(users, int(list_sz))
+	else:
+		paginator = Paginator(users, 10)
+	if select_sz and list_sz:
+		paginator = Paginator(users, int(list_sz))
+		return HttpResponse(paginator.num_pages)
+	try:
+		users = paginator.page(page)
+	except PageNotAnInteger:
+		users = paginator.page(1)
+	except EmptyPage:
+		users = paginator.page(paginator.num_pages)
+	np = users.paginator.num_pages
+	return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
 
 @staff_member_required
 @permission_decorator('userprofile.add_user')
@@ -187,6 +222,17 @@ def user_trails(request):
 	user_trail(request.user.name, 'accessed user trail page')
 	info_logger.info('User: '+str(request.user.name)+' accessed the user trail page')
 	return TemplateResponse(request, 'dashboard/users/trail.html', {'users':users})
+
+def user_search( request ):
+
+    if request.is_ajax():
+        q = request.GET.get( 'q' )
+        if q is not None:            
+            users = User.objects.filter( 
+                Q( name__contains = q ) |
+                Q( email__contains = q ) | Q( mobile__contains = q ) ).order_by( 'id' )
+
+            return TemplateResponse(request, 'dashboard/users/search.html', {'users':users})
 
 
 

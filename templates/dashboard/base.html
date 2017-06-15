@@ -370,7 +370,9 @@ margin-bottom: 0;">
   
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-    
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <!-- <script type="text/javascript" src="{% static 'backend/js/pages/components_pagination.js' %}"></script> -->
    
     
     {% include "dashboard/includes/_messages.html" %}
