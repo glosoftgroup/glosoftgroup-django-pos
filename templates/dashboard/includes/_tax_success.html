@@ -41,3 +41,61 @@
    });
     
 </script>
+<script type="text/javascript">
+ function roundOff(val){
+  return Math.round(val * 100) / 100;
+ }
+ function getTax(){
+    // get tax value
+    {% url "dashboard:tax-add-ajax" as url %} 
+    var url = "{{ url }}";
+    var tax_id = $('#id_product_tax').val();
+    var posting = $.post( url, {tax_id:tax_id,} );
+    posting.done(function( data ){       
+      if(data.length > 3)
+      {
+        localStorage.setItem('tax', parseInt(0));
+      }else{
+       localStorage.setItem('tax', parseInt(data)); 
+      }
+      pricing()
+     });    
+    return localStorage.getItem("tax");
+    
+ }
+ getTax()
+ function pricing(){
+  // fetch tax from the server
+  var tax = localStorage.getItem("tax")
+  // calculate retail tax exclusive tax       
+  var retail = $('#id_price').val();
+  var retail_plus_tax = (parseInt(retail)*100)/(parseInt(tax)+100);
+  retail_plus_tax=roundOff(retail_plus_tax);
+
+  $('#retail_plus_tax').attr('value',retail_plus_tax);
+  //alert(retail_plus_tax);
+  var tx = parseInt(retail)-parseInt(retail_plus_tax);
+  
+  $('#retail_tax').attr('value',tx);
+
+  // calculate wholesale price exclusive tax
+  var wholesale = $('#id_wholesale_price').val();
+
+  var wholesale_plus_tax = (parseInt(wholesale)*100)/(parseInt(tax)+100);
+  wholesale_plus_tax=roundOff(wholesale_plus_tax);
+   $('#wholesale_plus_tax').attr('value',wholesale_plus_tax);
+   var wtx = parseInt(wholesale)-parseInt(wholesale_plus_tax);
+   $('#wholesale_tax').attr('value',wtx);
+  }
+  $("#id_price").on("change keyup paste keydown", function(event) {    
+      pricing();      
+  });
+  $("#id_product_tax").on("change onbur keyup keydown", function(event) {     
+    getTax();   
+    // calculate exclusive tax price values    
+    pricing();  
+  });
+  $("#id_wholesale_price").on("change keyup paste keydown", function(event) {    
+    pricing();  
+  });
+</script>

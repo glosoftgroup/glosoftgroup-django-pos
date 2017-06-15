@@ -15,7 +15,7 @@
 <div class="panel panel-default">
   <div class="table-responsive">  
         
- <table class="table  datatable-header-footer">
+ <table class="table table-striped table-hover fixed_headers">
     <thead>
       <tr class="bg-primary">
         <th>Id</th>
@@ -27,17 +27,7 @@
         <th class="text-center">Actions</th>
       </tr>
     </thead>
-    <tfoot>
-      <tr class="bg-primary">
-        <th>Id</th>
-        <th>Image</th>
-        <th>Product Name</th>
-        <th>Category</th>
-        <th>Price</th>
-        <th>Variants</th>
-        <th class="text-center">Actions</th>
-      </tr>
-    </tfoot>
+    
     <tbody>
     {% for product in product_results %}
    <tr >
@@ -89,3 +79,4 @@
 {% endif %}
 {% load static %}
  <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

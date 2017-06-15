@@ -204,6 +204,11 @@ def product_edit(request, pk):
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
            'variant_form': variant_form}
+    if request.is_ajax():
+        return TemplateResponse(
+                    request, 
+                    'dashboard/product/product_view.html',
+                     ctx)
     return TemplateResponse(
         request, 'dashboard/product/product_form.html', ctx)
 

@@ -69,6 +69,20 @@
             <div class="panel panel-flat">
               <div class="panel-heading">
                 <h6 class="panel-title">Product Details</h6>
+                <div class="navbar-right">
+                    <p class="navbartext"></p>
+                    {% if perms.userprofile.change_product %}
+                    <form class="" action="#">
+                      <div class="formgroup">
+                        <label class="checkbox-inline switchery-double checkbox-switchery switchery-xs">
+                          Edit
+                          <input id='edit-toggle' type="checkbox" class="switch-mode" checked="false">
+                         
+                        </label>
+                      </div>
+                    </form>
+                    {% endif %}
+                  </div>
                 <div class="heading-elements">
                   <ul class="icons-list">
                             <li><a data-action="collapse"></a></li>
@@ -726,7 +740,27 @@
   <script type="text/javascript" src="{% static 'backend/js/core/libraries/jquery_ui/core.min.js' %}"></script>
 
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switchery.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/tasks_grid.js' %}"></script>
 <script type="text/javascript">
+ 
+ function editableFields()
+ {
+  $("#form-product :input").prop("disabled", true);
+ }
+ {% if perms.userprofile.change_product %} 
+ // editableFields()  
+ {% endif %}
+ editableFields()
+ $("#edit-toggle").on('click',function(){
+   if($(this).is(':checked')){
+       $("#form-product :input").prop("disabled", false);
+    }else{
+      $("#form-product :input").prop("disabled", true);
+    }
+   });
+  
+
  function roundOff(val){
   return Math.round(val * 100) / 100;
  }
@@ -808,7 +842,7 @@
       });
     
    });
-
+  
   // submit add tax form
   function notifyerror() {
           new PNotify({
@@ -856,9 +890,7 @@
         formatSubmit: 'yyyy-dd-mm',
 
     });
-     // Checkboxes/radios (Uniform)
-    // ------------------------------
-
+    
     // Default initialization
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'

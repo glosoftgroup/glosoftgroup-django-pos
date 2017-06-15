@@ -94,40 +94,87 @@
 
 {% block content %}
   {% if categories %}
-   <div class="panel panel-flat">
-    <div class="panel-body">
-    <ul class="list-group">
+   <div class="row">
+    <div class="panelbody">    
+   
+
       {% for node in categories %}
-        <li class="list-group-item">
-          <a class="list-group-item"  href="{% url "dashboard:category-list" root_pk=node.pk %}">
-           <h6 class="list-group-item-heading"><i class=" icon-quill4 position-left"></i> {{ node.name }}</h6> 
-            <p class="list-item-desc">
-              <span>
-                {% if node.description %}
-                  <p class="list-group-item-text">{{ node.description }}</p>
-                {% else %}
-                  &nbsp;
-                {% endif %}
-              </span>
-            </p>
-            {% if node.hidden %}
-              <span class="list-item-icon">
-                Hidden
-              </span>
-            {% endif %}
-          </a>
-        </li>
-        <li class="list-group-divider"></li>
-      {% endfor %}
-    </ul>
+      <div class="col-md-4">
+      <!-- Current server load -->
+              <div class="panel bg-indigo">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                    <ul class="icons-list">
+                    <li><a data-action="reload"></a></li>
+                      <li class="">
+                        <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
+                        <i class="icon-pencil7"></i> 
+                       
+                        </a>                        
+                      </li>
+                    </ul>
+                  </div>
+
+                  <h3 class="no-margin">{{ node.name }}</h3>
+                  Total products 
+                  <span class="badge bg-success">
+                          {{ node.get_product_num }}
+                    </span>
+                </div>
+
+                <div id="server-load"></div>
+              </div>
+              <!-- /current server load -->
+       
+      </div>
+     {% endfor %}
+    
     </div>
   </div>
   {% else %}
-    <div class="alert alert-warning">
+
+    <div class="row">
       {% if root %}
-        <p class="grey-text">
-          {% trans "No subcategories." context "Empty Category list message" %}
-        </p>
+       <div class="col-md-6">
+       <!-- Thumbnail with badge -->
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h6 class="panel-title">
+                    {{ root.name }}
+                  </h6>
+                  <!-- <div class="heading-elements">
+                    <ul class="">
+                      <li>                        
+                        <span class="badge bg-danger"> {{ root.get_product_num }}</span>
+                      </li>
+                    </ul>
+                  </div> -->
+                </div>
+                
+                <div class="panel-body">
+                 <span>
+                   <i class="text-bold">
+                     {{ root.get_product_num }}
+                   </i>
+                    products in this category
+                 </span>
+                  {{ root.description }}
+                </div>
+              </div>
+              <!-- /thumbnail with badge -->
+
+       </div>
+        <div class="col-md-6">
+        <div class="panelpanel-flat">
+          <div class="panel-body alert alert-danger">
+          <p class="">
+            {% trans "No subcategories." context "Empty Category list message" %}
+            
+          </p>
+          </div>
+          </div>
+        </div>
+        
       {% else %}
         <p class="grey-text">
           {% trans "No categories." context "Empty Category list message" %}
@@ -161,4 +208,9 @@
 
 </script>
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
+<script type="text/javascript">
+ $(document).ready(function() {
+  $('#search_product').attr('placeholder','Search Category');
+});
+</script>
 {% endblock %}

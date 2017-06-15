@@ -73,19 +73,7 @@
             </ul>
           </div>
         </div>
-        <div class="table-responsive">
-        <style type="text/css">
-          .fixed{
-              top:0;
-              position:fixed;
-              width:auto;
-              display:none;
-              border:none;
-            }
-            .scrollMore{
-              margin-top:600px;
-            }
-        </style>
+        <div class="table-responsive">        
         <table class="table table-striped table-hover fixed_headers">
                 <thead>
                   <tr class="bg-primary">
@@ -101,7 +89,7 @@
                
                 <tbody>
                  {% for product in products %}
-                  <tr>
+                  <tr data-title=" {{ product.name }} " href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
                     <td>#{{ product.id }}</td>
                     <!-- image -->
                     <td><a href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}" 
@@ -196,11 +184,10 @@
       </div>
     </div>
   </div>
-  <style type="text/css">
-    .fixed { margin-top: 50px; }
-  </style>
+  
 
 {% include "dashboard/includes/_modal_template.html"  %}
+{% include "dashboard/includes/_modal_large.html"  %}
 {% endblock %}
 
 {% block custom_js %}
@@ -213,5 +200,11 @@
   <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
-  <!-- <script type="text/javascript" src="{% static 'backend/js/pages/colors_blue.js' %}"></script> -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+       $(".clickable-row").click(function() {
+           window.location = $(this).data("href");
+       });
+    })
+  </script>
 {% endblock %}

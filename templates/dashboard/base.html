@@ -31,14 +31,11 @@
   <link href="{% static 'backend/css/colors.css' %}" rel="stylesheet" type="text/css">
    <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
   <!--image preview -->
-  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">
-  <!-- bootstrap select -->
-  <!-- <link href="{% static 'backend/js/plugins/ui/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" type="text/css"> -->
-  
-  
+  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">  
   <!-- /global stylesheets -->
 
     {% block custom_css %}{% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'backend/css/fixed_table_header.css' %}">
   </head>
 
   <body class="{% block body_class %}{% endblock %} navbar-top">
