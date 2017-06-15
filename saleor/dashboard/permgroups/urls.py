@@ -17,6 +17,9 @@ urlpatterns = [
         url(r'^group_update/$', views.group_update, name='group_update'),
         url(r'^detail/(?P<pk>[0-9]+)/$', views.group_detail, name='group-detail'),
         url(r'^delete/(?P<pk>[0-9]+)/$', views.group_delete, name='group-delete'),
+        url(r'^group_paginate/', views.group_paginate, name='group_paginate'),
+        url( r'^groups_search/$', views.group_search, name = 'group_search' ),
+        
 ]
 
 if settings.DEBUG:

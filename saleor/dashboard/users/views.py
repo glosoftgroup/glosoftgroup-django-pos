@@ -36,6 +36,8 @@ def users(request):
 			users = paginator.page(page)
 		except PageNotAnInteger:
 			users = paginator.page(1)
+		except InvalidPage:
+			users = paginator.page(1)
 		except EmptyPage:
 			users = paginator.page(paginator.num_pages)
 		user_trail(request.user.name, 'accessed users list page')
@@ -225,14 +227,14 @@ def user_trails(request):
 
 def user_search( request ):
 
-    if request.is_ajax():
-        q = request.GET.get( 'q' )
-        if q is not None:            
-            users = User.objects.filter( 
-                Q( name__contains = q ) |
-                Q( email__contains = q ) | Q( mobile__contains = q ) ).order_by( 'id' )
+	if request.is_ajax():
+		q = request.GET.get( 'q' )
+		if q is not None:            
+			users = User.objects.filter( 
+				Q( name__contains = q ) |
+				Q( email__contains = q ) | Q( mobile__contains = q ) ).order_by( 'id' )
 
-            return TemplateResponse(request, 'dashboard/users/search.html', {'users':users})
+			return TemplateResponse(request, 'dashboard/users/search.html', {'users':users})
 
 
 
