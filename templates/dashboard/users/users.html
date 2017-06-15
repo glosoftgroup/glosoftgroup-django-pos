@@ -185,7 +185,6 @@
 <script type="text/javascript">
   $(document).ready(function() {
     var sz;
-    var paginated_size;
     //**@ get
     $.ajax({ url: "{% url 'dashboard:users' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
@@ -197,6 +196,7 @@
         $.get("{% url 'dashboard:user_paginate' %}",{page:1, size:ts},function(data){
             $('#tb').html(data);
         });
+        var paginated_size;
         $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {size:ts,select_size:'select_size'},async:false,success: function(data){
            paginated_size = data;
            console.log(paginated_size);
@@ -211,7 +211,7 @@
             maxVisible: 3,
             leaps: false
             }).on("page", function(event, num){
-                $(".pages-nav2").html("Page " + num +" of "+paginated_size); // or some ajax content loading...
+                $(".pages-nav2").html("Pages " + num +" of "+paginated_size); // or some ajax content loading...
                 $.get("{% url 'dashboard:user_paginate' %}",{page:num, size:ts},function(data){
                    $('#tb').html(data);
                 });

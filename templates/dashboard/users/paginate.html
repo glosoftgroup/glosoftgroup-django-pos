@@ -38,3 +38,17 @@
                 {% else %}
                    <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
                {% endif %}
+
+               <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
+                <ul class="pagination2 bootpag pagination-flat pagination-sm"></ul>
+                <div class="pull-right pages-nav2">Page 1</div>
+            </div>
+
+
+            <script type="text/javascript">
+                 $(document).ready(function(){
+                    $(".td").click(function() {
+                       window.location = $(this).data("href");
+                    });
+                 });
+               </script>
