@@ -71,13 +71,12 @@
                 <h6 class="panel-title">Product Details</h6>
                 <div class="navbar-right">
                     <p class="navbartext"></p>
-                    {% if perms.userprofile.change_product %}
+                    {% if product.pk %}
                     <form class="" action="#">
                       <div class="formgroup">
                         <label class="checkbox-inline switchery-double checkbox-switchery switchery-xs">
                           Edit
-                          <input id='edit-toggle' type="checkbox" class="switch-mode" checked="false">
-                         
+                          <input id='edit-toggle' type="checkbox" class="switch-mode" >     
                         </label>
                       </div>
                     </form>
@@ -151,7 +150,11 @@
               
                 <div class="row">
                   <div class="col-md-6">
-                    <fieldset>                  
+                    {% if product.pk %}
+                    <fieldset id='fieldset1' disabled="disabled"> 
+                    {% else %}
+                    <fieldset>
+                    {% endif %}
                    
                       <div class="form-group">
                         <label>Product Name:<i class='text-muted'>required</i></label>
@@ -185,7 +188,11 @@
                   </div>
 
                   <div class="col-md-6">
+                    {% if product.pk %}
+                    <fieldset id='fieldset2' disabled="disabled"> 
+                    {% else %}
                     <fieldset>
+                    {% endif %} 
                       <div class="">
                       <!-- Tax -->
                        <div class="col-md-12">
@@ -744,21 +751,18 @@
 <script type="text/javascript" src="{% static 'backend/js/pages/tasks_grid.js' %}"></script>
 <script type="text/javascript">
  
- function editableFields()
- {
-  $("#form-product :input").prop("disabled", true);
- }
- {% if perms.userprofile.change_product %} 
- // editableFields()  
- {% endif %}
- editableFields()
+
+ {% if product.pk %}
  $("#edit-toggle").on('click',function(){
    if($(this).is(':checked')){
-       $("#form-product :input").prop("disabled", false);
+      $("#fieldset1").attr("disabled", false);
+      $("#fieldset2").attr("disabled", false);
     }else{
-      $("#form-product :input").prop("disabled", true);
+      $("#fieldset1").attr("disabled", true);
+      $("#fieldset2").attr("disabled", true);
     }
    });
+ {% endif %}
   
 
  function roundOff(val){

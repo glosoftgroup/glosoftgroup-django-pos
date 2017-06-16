@@ -170,7 +170,7 @@ class ProductForm(forms.ModelForm):
         field.widget.attrs['multiple'] = 'multiple'         
 
         field = self.fields['product_tax']
-        field.widget.attrs['class'] = ' selectbox-dynamic-options'
+        field.widget.attrs['class'] = 'form-control bootstrap-select'
         product_class = self.instance.product_class
         self.product_attributes = product_class.product_attributes.all()
         self.product_attributes = self.product_attributes.prefetch_related(
