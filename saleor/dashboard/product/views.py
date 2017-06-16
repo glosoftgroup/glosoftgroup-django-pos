@@ -17,6 +17,7 @@ from ...product.models import (Product, ProductAttribute, ProductClass,
 from ..views import staff_member_required
 from django.http import HttpResponse
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @staff_member_required
 def product_class_list(request):
@@ -617,23 +618,40 @@ def search_product(request):
             return TemplateResponse(
         request, 'dashboard/includes/product_search_results.html',
         ctx)
+@staff_member_required
+def stock_pages(request):
+    queryset_list = ProductVariant.objects.all()
+    paginator = Paginator(queryset_list, 10) # Show 10 contacts per page
+    page = request.GET.get('page',1)
+    try:
+        queryset = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        queryset = paginator.page(paginator.num_pages)
+    return HttpResponse(paginator.num_pages)
 
 @staff_member_required
 def search_sku(request):
     if request.method == 'POST':
-        if request.is_ajax():
-            search  = request.POST.get("search_product", "--") 
-            product = Product()
-            products_count = len(ProductVariant.objects.all())
-            product_results = ProductVariant.objects.filter(
-                Q(sku__icontains=search) |
-                Q(product__name__icontains=search)
-                )            
-            search_count = len(product_results)
-            ctx = {'products_count': products_count,'product_results': product_results,'search_count':search_count}
-            return TemplateResponse(
-        request, 'dashboard/includes/sku_search_results.html',
-        ctx)
+        search = request.POST.get("search_product", "--")
+    if request.method == 'GET':
+        search = request.GET.get('search_product')
+    if request.is_ajax():                
+        product = Product()
+        products_count = len(ProductVariant.objects.all())
+        product_results = ProductVariant.objects.filter(
+            Q(sku__icontains=search) |
+            Q(product__name__icontains=search)
+            )            
+        search_count = len(product_results)
+        ctx = {'products_count': products_count,'product_results': product_results,'search_count':search_count}
+        return TemplateResponse(
+    request, 'dashboard/includes/sku_search_results.html',
+    ctx)
+    
 
 @staff_member_required
 def search_productclass(request):

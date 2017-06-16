@@ -40,6 +40,9 @@ urlpatterns = [
         views.search_sku, name='search-sku'),
     url(r'^search_productclass/$',
         views.search_productclass, name='search-type'),
+    # pagination
+    url(r'^stock_pages/$',
+        views.stock_pages, name='stock_pages'),
     # end search routes
     url(r'^classes/$',
         views.product_class_list, name='product-class-list'),

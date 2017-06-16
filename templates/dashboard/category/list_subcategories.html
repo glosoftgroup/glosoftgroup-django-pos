@@ -100,12 +100,41 @@
   {% if categories %}
    <div class="row">
     <div class="panelbody">    
-   
-
+   <div class="">
+      {% if root %}
+       <div class="col-md-12">
+       <!-- Thumbnail with badge -->
+              <div class="panel panel-default">
+                <div class="panel-heading bg-indigo">
+                  <h6 class="panel-title">
+                    Root Category {{ root.name }}
+                  </h6>
+                  <div class="heading-elements">
+                  	<span class="label label-danger heading-text">
+                     {{ root.get_product_num }}
+                   </span>
+                  </div>
+                 
+                </div>
+                
+                <div class="panel-body">
+                 
+                  {{ root.description }}
+                </div>
+              </div>
+              <!-- /thumbnail with badge -->
+              </div>
+              {% endif %}
+       </div>
+     <div class="col-md-12">
+      <div class="text-center content-text-muted content-divider">
+		  <span class="pt-10 pb-10">
+		   SUB-CATEGORIES
+		   </span>  
+	 </div>
       {% for node in categories %}
       <div class="col-md-4">
-      <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
-      <!-- category panel -->
+      <!-- Current server load -->
               <div class="panel bg-indigo">
                 <div class="panel-body">
                   <div class="heading-elements">
@@ -119,9 +148,8 @@
                       </li>
                     </ul>
                   </div>
-                   <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="text-white">
+
                   <h3 class="no-margin">{{ node.name }}</h3>
-                  </a>
                   Total products 
                   <span class="badge bg-success">
                           {{ node.get_product_num }}
@@ -131,11 +159,12 @@
                 <div id="server-load"></div>
               </div>
               <!-- /current server load -->
-              </a>
        
       </div>
+
      {% endfor %}
     
+    </div>
     </div>
   </div>
   {% else %}
@@ -168,7 +197,7 @@
         <div class="col-md-6">
         <div class="panelpanel-flat">
           <div class="panel-body alert alert-danger">
-          <p class="">
+          <p class="">          
             {% trans "No subcategories." context "Empty Category list message" %}
             {% if categories %}
    <div class="row">

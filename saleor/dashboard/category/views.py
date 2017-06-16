@@ -20,6 +20,9 @@ def category_list(request, root_pk=None):
         root = get_object_or_404(Category, pk=root_pk)
         path = root.get_ancestors(include_self=True) if root else []
         categories = root.get_children().order_by('-id')
+        ctx = {'categories': categories, 'path': path, 'root': root}
+        return TemplateResponse(request, 'dashboard/category/list_subcategories.html', ctx)
+
     ctx = {'categories': categories, 'path': path, 'root': root}
     return TemplateResponse(request, 'dashboard/category/list.html', ctx)
 

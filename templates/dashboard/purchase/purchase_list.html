@@ -24,27 +24,20 @@
 {% block menu_purchase_list %}active{% endblock %}
 {% block content %}
 <!-- Search field -->
-<div class="panel panel-flat">
-	<div class="panel-heading">
-		<h5 class="panel-title">Search Product Stock</h5>
-		<div class="heading-elements">
-			<ul class="icons-list">
-        		<li><a data-action="collapse"></a></li>
-        		<li><a data-action="close"></a></li>
-        	</ul>
-    	</div>
-	</div>
-
-	<div class="panel-body">
-	{% url "dashboard:search-sku" as url %}
-	{% include "dashboard/includes/_product_filter.html" with url=url%}
-	</div>
+<div class="row">
+{% url "dashboard:search-sku" as url %}
+{% include "dashboard/includes/_main_search_filter.html" with url=url%}
 </div>
-<div id="search_results"></div>
+	
+
+<div id="stock_content">Dynamic Content goes here</div>
+<div id="page-selection"></div>
 <!-- /search field -->
 {% endblock %}
 {% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
+ $('.bootstrap-select').selectpicker();
  $(document).ready(function() {
 
        $(".clickable-td").click(function() {
@@ -53,4 +46,147 @@
     });	
 </script>
 <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+
+    var sz;
+    var total_pages
+    //**@ get
+    $.ajax({ url: "{% url 'dashboard:stock_pages' %}",type: 'GET',data: {total_pages:'total_pages'},
+        async:false,success: function(data){
+         sz = data;
+         total_pages = data;
+         //alert(data);
+    }});
+	// init bootpag
+	$('#page-selection').bootpag({
+	    total: parseInt(total_pages),
+	    maxVisible:5,
+	}).on("page", function(event, /* page number here */ num){
+	     $("#stock_content").html("sldfjslkdfe"); // some ajax content loading...
+	});
+
+    $('.list-sz').on('change', function(){
+        var ts = $(this).val();
+
+        $.get("{% url 'dashboard:search-sku' %}",{page:1, size:ts},function(data){
+            $('#search_results').html(data);
+        });
+        var paginated_size;
+        $.ajax({ url: "{% url 'dashboard:search-sku' %}",type: 'GET',data: {size:ts,select_size:'select_size'},async:false,success: function(data){
+           paginated_size = data;
+           console.log(paginated_size);
+           $('.bootpag-callback').remove();
+           // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
+            $('.bootpag-callback2').show();
+        } });
+
+        console.log('from outside '+paginated_size);
+        $('#bootpag-callback2').bootpag({
+            total: parseInt(paginated_size),
+            maxVisible: 3,
+            leaps: false
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Pages " + num +" of "+paginated_size); // or some ajax content loading...
+                $.get("{% url 'dashboard:search-sku' %}",{page:num, size:ts},function(data){
+                   $('#search_results').html(data);
+                });
+        }).children('.pagination2').addClass('pagination-flat pagination-sm');
+    });
+
+
+
+    $('.bootstrap-select').selectpicker();
+    // pagination
+    $('.bootpag-callback').bootpag({
+        total: parseInt(total_pages),
+        maxVisible: 3,
+        leaps: false
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+sz); // or some ajax content loading...
+            $.get("{% url 'dashboard:search-sku' %}",{page:num},function(data){
+               $('#search_results').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+      $(".td").click(function() {
+          window.location = $(this).data("href");
+      });
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+      /* clicked the submit button */
+      $('.del').on('click', function (e) {
+          var f = document.getElementById('delform');
+          var formData = new FormData(f);
+          var id = $(this).data('id');
+          var url = $(this).data('href');
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){        
+                $('#modal_instance').modal('hide');
+                $('#search_results #'+id).remove();            
+                $.jGrowl('User deleted successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                window.location.reload();
+             // $("#mydiv").load(location.href + " #mydiv");
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error deleting Staff', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });
+      });
+
+
+    var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+    $('.search_user').keyup(function() {
+       var search_text = $(this).val();
+       var url = "{% url 'dashboard:search-sku' %}";
+       $.ajax({
+          type: "GET",
+          url:url,
+          data:{'search_product':search_text},
+          success: function(data){
+             $('#search_product').html(data);
+          },
+          error:function(data){
+            console.log(data);
+          }
+       });
+    });
+
+  });
+
+</script>
 {% endblock %}

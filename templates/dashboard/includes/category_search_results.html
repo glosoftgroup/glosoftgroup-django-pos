@@ -21,14 +21,15 @@
                     <li><a data-action="reload"></a></li>
                       <li class="">
                         <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
-                        <i class="icon-pencil7"></i> 
+                        <i class="icon-eye"></i> 
                        
                         </a>                        
                       </li>
                     </ul>
                   </div>
-
+                  <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="text-white">
                   <h3 class="no-margin">{{ node.name }}</h3>
+                  </a>
                   
                   <span class="badge bg-danger">
                           {{ node.get_product_num }}
