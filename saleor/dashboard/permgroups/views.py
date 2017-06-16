@@ -32,7 +32,7 @@ def groups(request):
 	permissions = Permission.objects.all()
 	groups = Group.objects.all()
 	page = request.GET.get('page', 1)
-	paginator = Paginator(groups, 10)
+	paginator = Paginator(groups, 5)
 	try:
 		groups = paginator.page(page)
 	except PageNotAnInteger:
@@ -63,7 +63,7 @@ def group_paginate(request):
 	if list_sz:
 		paginator = Paginator(groups, int(list_sz))
 	else:
-		paginator = Paginator(groups, 10)
+		paginator = Paginator(groups, 5)
 	if select_sz and list_sz:
 		paginator = Paginator(groups, int(list_sz))
 		return HttpResponse(paginator.num_pages)

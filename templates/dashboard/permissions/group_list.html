@@ -152,7 +152,7 @@
               <div class="form-group">
                <label>Add Users:</label>
                 <div class="multi-select-full">
-                  <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="edit_multiple" placeholder="select a user...">
+                  <select class="multiselect-full-featured" multiple="multiple" style="display: nones;" name="user_select" id="edit_multiple" placeholder="select a user...">
                   {% for usr in users %}
                     {% if usr.is_active == True and usr.is_superuser == False %}
                        <option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}
@@ -350,7 +350,7 @@ $('document').ready(function () {
     }});
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
-        console.log(ts);
+        // console.log(ts);
 
         $.get("{% url 'dashboard:group_paginate' %}",{page:1, size:ts},function(data){
             $('#tb').html(data);
@@ -358,7 +358,7 @@ $('document').ready(function () {
         var paginated_size;
         $.ajax({ url: "{% url 'dashboard:group_paginate' %}",type: 'GET',data: {size:ts,select_size:'select_size'},async:false,success: function(data){
            paginated_size = data;
-           console.log(paginated_size);
+           console.log('from inside '+paginated_size);
            $('.bootpag-callback').remove();
            // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
             $('.bootpag-callback2').show();
@@ -544,12 +544,11 @@ $('.del').on('click', function (e) {
             header: 'Well done!',
             theme: 'bg-success'
           });
-          window.location.reload();
-       // $("#mydiv").load(location.href + " #mydiv");
+          // window.location.reload();
         },
         error:function(error){
           console.log(error);
-          $.jGrowl('Error deleting Staff', {
+          $.jGrowl('Error deleting Group', {
               header: 'Oh snap!',
               theme: 'bg-danger'
           });

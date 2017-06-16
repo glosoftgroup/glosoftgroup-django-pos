@@ -25,14 +25,17 @@
                    <tr><td colspan="6"><h2 class="text-center">no groups available</h2></td></tr>
                {% endif %}
 
-               <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
-  <ul class="pagination2 bootpag pagination-flat pagination-sm"></ul>
-  <div class="pull-right pages-nav2">Page 1</div>
-</div>
- <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
-  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
+    $('.ajax_users').multiselect({
+        includeSelectAllOption: true,
+        enableFiltering: true,
+        templates: {
+            filter: '<li class="multiselect-item multiselect-filter"><i class="icon-search4"></i> <input class="form-control" type="text"></li>'
+        },
+        onSelectAll: function() {
+            $.uniform.update();
+        }
+    });
     //**@ global users array
     var names = [];
   $(document).ready(function(){
@@ -67,7 +70,6 @@
             async:false,
             success:function(data){
               names = data;
-              console.log(names);
             },error:function(error){
               console.log(error);
             }
@@ -119,12 +121,11 @@ $('.del').on('click', function (e) {
             header: 'Well done!',
             theme: 'bg-success'
           });
-          window.location.reload();
-       // $("#mydiv").load(location.href + " #mydiv");
+          // window.location.reload();
         },
         error:function(error){
           console.log(error);
-          $.jGrowl('Error deleting Staff', {
+          $.jGrowl('Error deleting Group', {
               header: 'Oh snap!',
               theme: 'bg-danger'
           });
