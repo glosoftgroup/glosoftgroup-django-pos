@@ -190,7 +190,7 @@
         async:false,success: function(data){
          sz = data;
     }});
-    $('.list-sz').on('change', function(){
+    $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
 
         $.get("{% url 'dashboard:user_paginate' %}",{page:1, size:ts},function(data){
@@ -219,8 +219,6 @@
     });
 
 
-
-    $('.bootstrap-select').selectpicker();
     // pagination
     $('.bootpag-callback').bootpag({
         total: parseInt(sz),
