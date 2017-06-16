@@ -42,11 +42,23 @@
             <div class="col-md-2">
               <label>display list size</label>
               <div class="form-group">
-                 <select class="bootstrap-select list-sz" data-width="100%" tabindex="-98">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
                     <option selected="selected">No:</option>
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>Select group name</label>
+              <div class="form-group">
+                  <select class="bootstrap-select group-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
+                  {% for group in groups %}
+                       <option value="{{group.id}}">
+                            {{group.name}}
+                       </option>
+                  {% endfor %}
                   </select>
               </div>
             </div>
@@ -181,6 +193,8 @@
  <!-- /blue modal -->
 {% endblock%}
 {% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
@@ -190,6 +204,38 @@
         async:false,success: function(data){
          sz = data;
     }});
+    //**@ group name select
+    $('.group-sz').selectpicker().on('change', function(){
+       var group_id = $(this).val();
+       // console.log(group_id);/
+
+        // $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
+        //     $('#tb').html(data);
+        // });
+        // var p_size;
+        // $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {group_size:5,gid:group_id},async:false,success: function(data){
+        //    p_size = data;
+        //    console.log('from inside '+p_size);
+        //    $('.bootpag-callback').remove();
+        //    // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
+        //     $('.bootpag-callback2').show();
+        // } });
+
+        // console.log('from outside '+p_size);
+        // $('#bootpag-callback2').bootpag({
+        //     total: parseInt(p_size),
+        //     maxVisible: 3,
+        //     leaps: false
+        //     }).on("page", function(event, num){
+        //         $(".pages-nav2").html("Pages " + num +" of "+p_size); // or some ajax content loading...
+        //         $.get("{% url 'dashboard:user_paginate' %}",{page:num, gr_size:5},function(data){
+        //            $('#tb').html(data);
+        //         });
+        // }).children('.pagination2').addClass('pagination-flat pagination-sm');
+
+    });
+
+    //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
 

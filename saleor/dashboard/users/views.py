@@ -29,7 +29,8 @@ error_logger = logging.getLogger('error_logger')
 # @permission_decorator('userprofile.view_user')
 def users(request):
 	try:
-		users = User.objects.all().order_by('id')
+		users = User.objects.all().order_by('-id')
+		groups = Group.objects.all()
 		page = request.GET.get('page', 1)
 		paginator = Paginator(users, 10)
 		try:
@@ -45,13 +46,13 @@ def users(request):
 		if request.GET.get('initial'):
 			return HttpResponse(paginator.num_pages)
 		else:
-			return TemplateResponse(request, 'dashboard/users/users.html', {'users':users})
+			return TemplateResponse(request, 'dashboard/users/users.html', {'groups':groups,'users':users})
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
 
 def user_paginate(request):
-	users = User.objects.all().order_by('id')
+	users = User.objects.all().order_by('-id')
 	page = request.GET.get('page', 1)
 	list_sz = request.GET.get('size')
 	select_sz = request.GET.get('select_size')
