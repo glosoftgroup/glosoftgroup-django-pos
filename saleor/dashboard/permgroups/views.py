@@ -56,7 +56,7 @@ def groups(request):
 			{'users':users, 'permissions':permissions, 'groups':groups})
 
 def group_paginate(request):
-	groups = Group.objects.all().order_by('id')
+	groups = Group.objects.all().order_by('-id')
 	page = request.GET.get('page', 1)
 	list_sz = request.GET.get('size')
 	select_sz = request.GET.get('select_size')
@@ -75,7 +75,6 @@ def group_paginate(request):
 		groups = paginator.page(1)
 	except EmptyPage:
 		groups = paginator.page(paginator.num_pages)
-	np = groups.paginator.num_pages
 	return TemplateResponse(request,'dashboard/permissions/paginate.html',{'groups':groups})
 
 def group_search( request ):

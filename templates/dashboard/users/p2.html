@@ -80,10 +80,17 @@
             leaps: false
             }).on("page", function(event, num){
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
-
-                $.get("{% url 'dashboard:user_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:user_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                    });
+                }else{
+                    $.get("{% url 'dashboard:user_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
                    $('#p-tb').html(data);
                 });
+                }
+
         }).children('.pagination').addClass('pagination-flat pagination-sm')
 
       $(".td").click(function() {

@@ -350,7 +350,6 @@ $('document').ready(function () {
     }});
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
-        // console.log(ts);
 
         $.get("{% url 'dashboard:group_paginate' %}",{page:1, size:ts},function(data){
             $('#tb').html(data);
@@ -377,9 +376,7 @@ $('document').ready(function () {
         }).children('.pagination2').addClass('pagination-flat pagination-sm');
     });
 
-
-
-   
+ 
     // pagination
     $('.bootpag-callback').bootpag({
         total: parseInt(sz),

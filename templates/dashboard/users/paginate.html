@@ -38,64 +38,66 @@
                 {% else %}
                    <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
                {% endif %}
-
+                 
                <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
                 <ul class="pagination2 bootpag pagination-flat pagination-sm"></ul>
-                <div class="pull-right pages-nav2">Page of 1</div>
+                <div class="pull-right pages-nav2">Page2 of 1</div>
             </div>
 
 
             <script type="text/javascript">
                  $(document).ready(function(){
+
+                    $('.click').alert('hey');
                     $(".td").click(function() {
                        window.location = $(this).data("href");
                     });
 
-                          $('.modal-trigger').on('click', function (e) {
+                    $('.modal-trigger').on('click', function (e) {
 
-         var url = $(this).data('href')
-         var prompt_text = $(this).data('title');
-         var username = $(this).data('name');
-         var modal = $(this).data('ta');
-         var id = $(this).data('id');
-         $('.del').attr('data-id', id);
-         $('.del').attr('data-href', url);
-         $('.modal-title').html(prompt_text);
-         $(modal).modal();
-         $('.delete_form').attr('action',url);
-      });
+                       var url = $(this).data('href')
+                       var prompt_text = $(this).data('title');
+                       var username = $(this).data('name');
+                       var modal = $(this).data('ta');
+                       var id = $(this).data('id');
+                       $('.del').attr('data-id', id);
+                       $('.del').attr('data-href', url);
+                       $('.modal-title').html(prompt_text);
+                       $(modal).modal();
+                       $('.delete_form').attr('action',url);
+                    });
 
-      /* clicked the submit button */
-      $('.del').on('click', function (e) {
-          var f = document.getElementById('delform');
-          var formData = new FormData(f);
-          var id = $(this).data('id');
-          var url = $(this).data('href');
-          $.ajax({
-              url: url,
-              type: "POST",
-              data: formData,
-              processData: false,
-              contentType: false,
-              success:function(data){        
-                $('#modal_instance').modal('hide');
-                $('#tb #'+id).remove();            
-                $.jGrowl('User deleted successfully', {
-                  header: 'Well done!',
-                  theme: 'bg-success'
-                });
-                window.location.reload();
-             // $("#mydiv").load(location.href + " #mydiv");
-              },
-              error:function(error){
-                console.log(error);
-                $.jGrowl('Error deleting Staff', {
-                    header: 'Oh snap!',
-                    theme: 'bg-danger'
-                });
-              }
-          });
-      });
+                    /* clicked the submit button */
+                    $('.del').on('click', function (e) {
+                        var f = document.getElementById('delform');
+                        var formData = new FormData(f);
+                        var id = $(this).data('id');
+                        var url = $(this).data('href');
+                        $.ajax({
+                            url: url,
+                            type: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success:function(data){        
+                              $('#modal_instance').modal('hide');
+                              $('#tb #'+id).remove();            
+                              $.jGrowl('User deleted successfully', {
+                                header: 'Well done!',
+                                theme: 'bg-success'
+                              });
+                              window.location.reload();
+                           // $("#mydiv").load(location.href + " #mydiv");
+                            },
+                            error:function(error){
+                              console.log(error);
+                              $.jGrowl('Error deleting Staff', {
+                                  header: 'Oh snap!',
+                                  theme: 'bg-danger'
+                              });
+                            }
+                        });
+                    });
       
                  });
                </script>

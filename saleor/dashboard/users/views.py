@@ -52,25 +52,45 @@ def users(request):
 		return HttpResponse('error accessing users')
 
 def user_paginate(request):
-	users = User.objects.all().order_by('-id')
 	page = request.GET.get('page', 1)
 	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
 	select_sz = request.GET.get('select_size')
-	if list_sz:
-		paginator = Paginator(users, int(list_sz))
-	else:
+	if request.GET.get('gid'):
+		users = User.objects.filter(groups__id=request.GET.get('gid'))
+		if p2_sz:
+			paginator = Paginator(users, int(p2_sz))
+			users = paginator.page(page)
+			return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
+
 		paginator = Paginator(users, 10)
-	if select_sz and list_sz:
-		paginator = Paginator(users, int(list_sz))
-		return HttpResponse(paginator.num_pages)
-	try:
 		users = paginator.page(page)
-	except PageNotAnInteger:
-		users = paginator.page(1)
-	except EmptyPage:
-		users = paginator.page(paginator.num_pages)
-	np = users.paginator.num_pages
-	return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
+		return TemplateResponse(request,'dashboard/users/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':10,'gid':request.GET.get('gid')})
+
+	else:
+		users = User.objects.all().order_by('-id')
+		if list_sz:
+			paginator = Paginator(users, int(list_sz))
+			users = paginator.page(page)
+			return TemplateResponse(request,'dashboard/users/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0})
+		else:
+			paginator = Paginator(users, 10)
+		if p2_sz:
+			paginator = Paginator(users, int(p2_sz))
+			users = paginator.page(page)
+			return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
+
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except InvalidPage:
+			groups = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
+		return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
+		# return TemplateResponse(request,'dashboard/users/p2.html',{'users':users, 'pn':paginator.num_pages})
+
 
 @staff_member_required
 @permission_decorator('userprofile.add_user')
@@ -227,15 +247,36 @@ def user_trails(request):
 	return TemplateResponse(request, 'dashboard/users/trail.html', {'users':users})
 
 def user_search( request ):
-
+	
 	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size',10)
+		p2_sz = request.GET.get('psize')
 		q = request.GET.get( 'q' )
+		if list_sz is None:
+			sz = 10
+		else:
+			sz = list_sz
+
 		if q is not None:            
 			users = User.objects.filter( 
 				Q( name__contains = q ) |
 				Q( email__contains = q ) | Q( mobile__contains = q ) ).order_by( 'id' )
+			paginator = Paginator(users, 10)
+			try:
+				users = paginator.page(page)
+			except PageNotAnInteger:
+				users = paginator.page(1)
+			except InvalidPage:
+				users = paginator.page(1)
+			except EmptyPage:
+				users = paginator.page(paginator.num_pages)
+			if p2_sz:
+				# paginator = Paginator(users, int(p2_sz))
+				users = paginator.page(page)
+				return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
 
-			return TemplateResponse(request, 'dashboard/users/search.html', {'users':users})
+			return TemplateResponse(request, 'dashboard/users/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 
 

@@ -43,7 +43,7 @@
               <label>display list size</label>
               <div class="form-group">
                  <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option selected="selected">No:</option>
+                    <option value="0" selected>No:</option>
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="20">20</option>
@@ -74,6 +74,7 @@
       </div>
    </div>
   <div class="col-md-12">
+   <div id="pagination-div">
       <!-- Header and footer fixed -->
       <div class="panel panel-flat">
 <!--         <div class="panel-heading">
@@ -150,13 +151,14 @@
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav">Page 1</div>
             </div>
-            <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
+            <!-- <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
               <ul class="pagination2 bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav2">Page 1</div>
-            </div>
+            </div> -->
+            <input type="hidden" id="page_size" val="">
           </div>
       </div>
- 
+    </div><!-- pagination -->
   </div>
 </div>
 
@@ -198,86 +200,42 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-    var sz;
+    // $('.bootstrap_select').selectpicker();
+    var pagination_totalsize;
+    var status;
     //**@ get
     $.ajax({ url: "{% url 'dashboard:users' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
-         sz = data;
+         pagination_totalsize = data;
     }});
-    //**@ group name select
-    $('.group-sz').selectpicker().on('change', function(){
-       var group_id = $(this).val();
-       // console.log(group_id);/
-
-        // $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
-        //     $('#tb').html(data);
-        // });
-        // var p_size;
-        // $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {group_size:5,gid:group_id},async:false,success: function(data){
-        //    p_size = data;
-        //    console.log('from inside '+p_size);
-        //    $('.bootpag-callback').remove();
-        //    // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
-        //     $('.bootpag-callback2').show();
-        // } });
-
-        // console.log('from outside '+p_size);
-        // $('#bootpag-callback2').bootpag({
-        //     total: parseInt(p_size),
-        //     maxVisible: 3,
-        //     leaps: false
-        //     }).on("page", function(event, num){
-        //         $(".pages-nav2").html("Pages " + num +" of "+p_size); // or some ajax content loading...
-        //         $.get("{% url 'dashboard:user_paginate' %}",{page:num, gr_size:5},function(data){
-        //            $('#tb').html(data);
-        //         });
-        // }).children('.pagination2').addClass('pagination-flat pagination-sm');
-
-    });
-
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
 
-        $.get("{% url 'dashboard:user_paginate' %}",{page:1, size:ts},function(data){
-            $('#tb').html(data);
-        });
-        var paginated_size;
-        $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {size:ts,select_size:'select_size'},async:false,success: function(data){
-           paginated_size = data;
-           console.log(paginated_size);
-           $('.bootpag-callback').remove();
-           // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
-            $('.bootpag-callback2').show();
-        } });
-
-        console.log('from outside '+paginated_size);
-        $('#bootpag-callback2').bootpag({
-            total: parseInt(paginated_size),
-            maxVisible: 3,
-            leaps: false
-            }).on("page", function(event, num){
-                $(".pages-nav2").html("Pages " + num +" of "+paginated_size); // or some ajax content loading...
-                $.get("{% url 'dashboard:user_paginate' %}",{page:num, size:ts},function(data){
-                   $('#tb').html(data);
-                });
-        }).children('.pagination2').addClass('pagination-flat pagination-sm');
-    });
-
-
-    // pagination
     $('.bootpag-callback').bootpag({
-        total: parseInt(sz),
+        total: parseInt(pagination_totalsize),
         maxVisible: 3,
         leaps: false
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+sz); // or some ajax content loading...
+            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
             $.get("{% url 'dashboard:user_paginate' %}",{page:num},function(data){
                $('#tb').html(data);
             });
-    }).children('.pagination').addClass('pagination-flat pagination-sm');
+    }).children('.pagination').addClass('pagination-flat pagination-sm')
 
-      $(".td").click(function() {
+    //**@ group name select
+    $('.group-sz').selectpicker().on('change', function(){
+       var group_id = $(this).val();
+        $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
+             $('#pagination-div').html(data);
+        });
+    });
+
+      $(".td").click(function(){
           window.location = $(this).data("href");
       });
 
@@ -328,33 +286,29 @@
       });
 
 
-    var delay = (function(){
-      var timer = 0;
-      return function(callback, ms){
-        clearTimeout (timer);
-        timer = setTimeout(callback, ms);
-      };
-    })();
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
 
-    $('.search_user').keyup(function() {
-       var search_text = $(this).val();
-       var url = "{% url 'dashboard:user_search' %}";
-       $.ajax({
-          type: "GET",
-          url:url,
-          data:{'q':search_text},
-          success: function(data){
-             $('#tb').html(data);
-          },
-          error:function(data){
-            console.log(data);
-          }
-       });
-    });
+      $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        delay(function(){ 
+           var url = "{% url 'dashboard:user_search' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                  $('#pagination-div').html(data);
+           }});
+        }, 500 );
+
+      });
 
 
 
   });
+
 
 </script>
 {% endblock %}
