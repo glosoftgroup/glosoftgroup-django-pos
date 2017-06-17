@@ -17,15 +17,14 @@
   {% if product_classes %}
     {% if product_classes|length > 1 %}
     <!-- search field -->
-    {% url "dashboard:search-product" as url %}
-    {% include "dashboard/includes/_search_filter.html" with url=url  %}
+    
     <!-- end search -->
     <li>&nbsp;&nbsp;&nbsp;</li>
-     <li >
+    <!--  <li >
         <a class="" style="box-shadow: 0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.18);" href="{% url 'dashboard:product-add' %}" title="{% trans 'Add product' context 'Product list add button text' %}">
          <i class="icon-plus3 position-left"></i>Add Product
         </a>
-      </li>
+      </li> -->
       {% else %}
        <a class="btn btn-primary text-white btn-xs waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:product-add' product_classes.0.pk %}" title="{% trans "Add product" context "Product list add button text" %}">
           Add Product 
@@ -57,85 +56,29 @@
 
 {% block content %}
 
+<!-- filter -->
+<div class="row">
+{% url "dashboard:product-add" as url %}
+{% include "dashboard/includes/_product_search_filter.html" with url=url%}
+</div>
 <div class="clearfix"></div>
   <div class="" id="search_results">
     <div class="col s12">
    
-      {% if products %}      
-      <!-- Header and footer fixed -->
-      <div class="panel panel-flat">
-        <div class="panel-heading">        
-          {% include "dashboard/includes/_pagination.html" with page_obj=products %}
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
+      {% if products %} 
+       <!-- pagination data -->
+        <div id="stock_content"></div>
+          <div class="text-center">
+            <div class="col-md-10">
+               <span  id='pagination-demo'></span>
+            </div>
+            <div class="col-md-2">
+              <span class="text-right" id='pag_nav'></span>
+            </div>  
         </div>
-        <div class="table-responsive">        
-        <table class="table table-striped table-hover fixed_headers">
-                <thead>
-                  <tr class="bg-primary">
-                    <th>Id</th>
-                    <th>Image</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Variant</th>
-                    <th class="text-center">Actions</th>
-                  </tr>
-                </thead>
-               
-                <tbody>
-                 {% for product in products %}
-                  <tr data-title=" {{ product.name }} ">
-                    <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">#{{ product.id }}</td>
-                    <!-- image -->
-                    <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}"
-                     srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"
-                     alt="" class="circle teal"></td>
-                     <!-- product name -->
-                    <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.name }}</td>
-                    <!-- product category -->
-                    <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
-                      {% with product.get_first_category as category %}
-                      {% if category %}
-                      {{ category }}
-                      {% endif %}
-                      {% endwith %}
-                    </td>
-                    <!-- price -->
-                    <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> {% gross product.price html=True %}</td>
-                    <!-- variants -->
-                    <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
-
-                    {{ product.get_variants_count }}
-
-                    </td>
-                <!-- actions -->
-                    <td class="action-data">
-                      <ul class="icons-list">
-                        <li><a href="{% url 'dashboard:product-update' pk=product.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me"></i></a></li>
-                        <li>
-                  <a href="#modal_instance" data-title='Remove {{ product.name }}' data-href="{% url 'dashboard:product-delete' pk=product.pk %}"
-                          class="modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Delete me"></i>
-
-                          </a>
-                        </li>
-                        <li>
-                          <!-- <a href="{{ product.get_absolute_url }}"><i class="icon-eye position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="View me on site"></i>   </a> -->
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                    {% endfor %}
-                  </tbody>
-           </table>
-           </div>
-           </div>
-       
-        {% include "dashboard/includes/_pagination.html" with page_obj=products %}
+        <!-- end pagination -->     
+      <!-- Header and footer fixed -->
+      
       {% else %}
         <div class="not-found">
           <p class="grey-text">
@@ -207,4 +150,164 @@
        });
     })
   </script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
+  <script type="text/javascript">
+  $(document).ready(function() {    
+
+    var sz;
+    var total_pages;
+    var visiblePages = $('.list-size').val();   
+    localStorage.setItem('visiblePages', parseInt(visiblePages));
+
+    var search_text = $('.search_sku').val();
+    
+    function getVisiblePages(){
+      var visiblePages = $('.list-size').val();   
+        localStorage.setItem('visiblePages', parseInt(visiblePages));
+        return localStorage.getItem('visiblePages');
+    }
+
+    function getSearchtext(){
+      var search_text = $('.search_sku').val();
+       //alert(search_text);
+        localStorage.setItem('search_text', search_text);
+        return localStorage.getItem('search_text');
+    } 
+    function getPages(){
+    // get tax value
+    {% url 'dashboard:product_pages' as url %} 
+    var url = "{{ url }}";    
+    var posting = $.get( 
+      url,
+       {
+        track:'onpageload',
+        page:1, 
+          size:localStorage.getItem('visiblePages'),
+          search_text:getSearchtext(),
+       } );
+    posting.done(function( data ){ 
+        //alert(data);
+        localStorage.setItem('total_pages', parseInt(data));
+     });    
+    return  localStorage.getItem('total_pages');    
+    }
+    getPages();
+
+    // end totalPages   
+
+    var $pagination = $('#pagination-demo');
+    var defaultOpts = {
+        totalPages: getPages(),
+        visiblePages: 3,
+        onPageClick: function (event, page) {
+            $('#pag_nav').text('Page ' + page + ' of '+getPages());
+            $.get("{% url 'dashboard:product_filter' %}",
+              {
+               track:'onPageClick',
+               page:page, 
+               size:getVisiblePages(),
+               search_text:getSearchtext(),
+              },function(data){
+                $('#stock_content').html(data);
+                });
+        }
+    };
+    $pagination.twbsPagination(defaultOpts);
+  
+    // on list size change
+    $('.list-size').on('change', function(){
+        var visiblePages = $(this).val();
+        var ts = visiblePages;        
+        var search_text = getSearchtext();
+
+        // changecontent        
+        $.get("{% url 'dashboard:product_filter' %}",
+          {
+            page:1, 
+            size:getVisiblePages(),
+            search_text:getSearchtext()
+          },function(data){
+            $('#stock_content').html(data);
+        });
+        //alert(ts);
+        //change total pages
+        $.ajax({ url: "{% url 'dashboard:product_pages' %}",type: 'GET',
+          data: {
+            track:'onchangesize',
+            size:visiblePages,
+            select_size:'select_size',
+            search_text:getSearchtext()
+          },async:false,success: function(data){
+           paginated_size = data;
+           localStorage.setItem('total_pages',parseInt(data));         
+           
+        } });
+
+        // destroy and create new pagination
+        var totalPages = getPages();
+        
+        var currentPage = $pagination.twbsPagination('getCurrentPage');
+         $pagination.twbsPagination('destroy');
+         $pagination.twbsPagination($.extend({}, defaultOpts, {
+                startPage: currentPage,
+                totalPages: totalPages
+            }));
+    });
+
+    //change content
+    function changecontent(){
+      $.get("{% url 'dashboard:product_filter' %}",
+          {
+            page:1, 
+            size:getVisiblePages(),
+            search_text:getSearchtext()
+          },function(data){
+            $('#stock_content').html(data);
+        });
+    }
+    // change total_pages
+    function changeTotalPages(){
+      $.ajax({ url: "{% url 'dashboard:product_pages' %}",type: 'GET',
+          data: {
+            track:'onchangesize',
+            size:getVisiblePages(),
+            select_size:'select_size',
+            search_text:getSearchtext()
+          },async:false,success: function(data){
+           
+           localStorage.setItem('total_pages',parseInt(data));         
+           
+        } });
+    }
+   // destroy and create new pagination
+   function createNewPagination(){   
+        var totalPages = getPages();        
+        var currentPage = $pagination.twbsPagination('getCurrentPage');
+        $pagination.twbsPagination('destroy');
+        $pagination.twbsPagination($.extend({}, defaultOpts, {
+                startPage: currentPage,
+                totalPages: totalPages
+            }));
+          }
+
+    var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+    $('.search_sku').keyup(function() {
+      delay(function(){
+        var search_text = $('.search_sku').val();
+        var url = "{% url 'dashboard:product_filter' %}";
+        changecontent();
+        changeTotalPages();
+        createNewPagination();
+      }, 800 );
+  });  
+
+  });
+
+</script>
 {% endblock %}

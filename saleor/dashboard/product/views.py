@@ -539,7 +539,7 @@ def tax_add_ajax(request):
                 request, 'dashboard/includes/_tax_success.html',
                 ctx)
             else:
-                ctx = {'tax':ProductTax.objects.all(),'form':formadd,'errors':formadd.errors}
+                ctx = {'tax':ProductTax.objects.all(),'formadd':formadd,'errors':formadd.errors}
            
             return TemplateResponse(
                 request, 'dashboard/includes/_tax_ajax_form.html',
@@ -588,7 +588,7 @@ def tax_delete(request, pk):
         instance.delete()
         messages.success(
             request,
-            pgettext_lazy('Tax message', 'Deleted Tax %s') % (instance.name,))
+            pgettext_lazy('Tax message', 'Deleted Tax %s') % (instance.tax_name,))
         return redirect('dashboard:tax-list')
     ctx = {'instance': instance}
     return TemplateResponse(
@@ -610,21 +610,32 @@ def search_product(request):
             search  = request.POST.get("search_product", "--") 
             product = Product()
             products_count = len(Product.objects.all())
-            product_results = Product.objects.filter(Q(name__icontains=search)|
+            product_results = Product.objects.filter(
+                        Q(name__icontains=search)|
                         Q(variants__sku__icontains=search)|
-                        Q(categories__name__icontains=search))
+                        Q(categories__name__icontains=search)
+                        )
             search_count = len(product_results)
             ctx = {'products_count': products_count,'product_results': product_results,'search_count':search_count}
             return TemplateResponse(
         request, 'dashboard/includes/product_search_results.html',
         ctx)
+
 @staff_member_required
 def stock_pages(request):
     queryset_list = ProductVariant.objects.all()
-    paginator = Paginator(queryset_list, 10) # Show 10 contacts per page
+    size = request.GET.get('size',10)
     page = request.GET.get('page',1)
+    search = str(request.GET.get('search_text',''))
+    if search != '' and search != None:
+        queryset_list = ProductVariant.objects.filter(
+            Q(sku__icontains=search) |
+            Q(product__name__icontains=search)
+            ) 
+    paginator = Paginator(queryset_list,int(size)) # Show 10 contacts per page
+    
     try:
-        queryset = paginator.page(page)
+        queryset = paginator.page(int(page))
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
         queryset = paginator.page(1)
@@ -632,6 +643,89 @@ def stock_pages(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         queryset = paginator.page(paginator.num_pages)
     return HttpResponse(paginator.num_pages)
+
+
+
+@staff_member_required
+def stock_filter(request):
+    queryset_list = ProductVariant.objects.all()
+    #paginator = Paginator(queryset_list, 10)
+    page = request.GET.get('page',1)
+    size = request.GET.get('size',10)
+    search = request.GET.get('search_text','')
+    if search != '' and search != None:
+        queryset_list = ProductVariant.objects.filter(
+            Q(sku__icontains=search) |
+            Q(product__name__icontains=search)
+            )            
+    paginator = Paginator(queryset_list, int(size))
+    products_count = len(queryset_list)
+    try:
+        queryset = paginator.page(int(page))
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        queryset = paginator.page(paginator.num_pages)
+    product_results = queryset    
+    ctx = {'products_count': products_count,'product_results': product_results,'search_count':len(product_results)}
+    return TemplateResponse(
+    request, 'dashboard/includes/sku_search_results.html',
+    ctx)
+
+@staff_member_required
+def product_pages(request):
+    queryset_list = Product.objects.all()
+    size = request.GET.get('size',10)
+    page = request.GET.get('page',1)
+    search = str(request.GET.get('search_text',''))
+    if search != '' and search != None:
+        queryset_list = Product.objects.filter(
+            Q(sku__icontains=search) |
+            Q(product__name__icontains=search)
+            ) 
+    paginator = Paginator(queryset_list,int(size)) # Show 10 contacts per page
+    
+    try:
+        queryset = paginator.page(int(page))
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        queryset = paginator.page(paginator.num_pages)
+    return HttpResponse(paginator.num_pages)
+
+@staff_member_required
+def product_filter(request):
+    queryset_list = Product.objects.all()
+    #paginator = Paginator(queryset_list, 10)
+    page = request.GET.get('page',1)
+    size = request.GET.get('size',10)
+    search = request.GET.get('search_text','')
+    if search != '' and search != None:
+        queryset_list = Product.objects.filter(
+           Q(name__icontains=search)|
+           Q(variants__sku__icontains=search)|
+           Q(categories__name__icontains=search)
+            )            
+    paginator = Paginator(queryset_list, int(size))
+    products_count = len(queryset_list)
+    try:
+        queryset = paginator.page(int(page))
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        queryset = paginator.page(paginator.num_pages)
+    product_results = queryset    
+    ctx = {'products_count': products_count,'product_results': product_results,'search_count':len(product_results)}
+    return TemplateResponse(
+    request, 'dashboard/includes/product_search_results.html',
+    ctx)
+    
 
 @staff_member_required
 def search_sku(request):

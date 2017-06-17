@@ -857,7 +857,7 @@
       
   $('#modal_add_tax_btn').on('click',function(){
     var tax = $('#id_tax').val();
-    var name = $('#id_name').val();
+    var tax_name = $('#id_tax_name').val();
     if(!$.isNumeric(tax)){ 
       notifyerror();
       return false; 
@@ -866,7 +866,7 @@
     {% url "dashboard:tax-add-ajax" as url %} 
     var url = "{{ url }}";    
     // var csrf_token = "{% csrf_token %}";
-    var posting = $.post( url, {tax:tax,name:name,} );
+    var posting = $.post( url, {tax:tax,tax_name:tax_name,} );
     // $('#modal_add_tax').modal('hide');
     posting.done(function( data ) { 
       

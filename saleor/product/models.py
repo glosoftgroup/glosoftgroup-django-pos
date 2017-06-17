@@ -103,7 +103,7 @@ class ProductClass(models.Model):
             class_.__module__, class_.__name__, self.pk, self.name)
 
 class ProductTax(models.Model):    
-    name = models.CharField(
+    tax_name = models.CharField(
         pgettext_lazy('Tax name', 'Tax name (optional)'),
         max_length=128, blank=True)   
     tax_label = models.CharField(
@@ -112,7 +112,7 @@ class ProductTax(models.Model):
     tax = models.IntegerField( pgettext_lazy('Product Tax', 'tax %'),
         validators=[MinValueValidator(0)], default=Decimal(0)) 
     def __str__(self):
-        return self.name+' '+str(self.tax)+' %'
+        return self.tax_name +' '+str(self.tax)+' %'
     def get_tax(self):
         return self.tax
 

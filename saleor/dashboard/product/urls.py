@@ -43,6 +43,13 @@ urlpatterns = [
     # pagination
     url(r'^stock_pages/$',
         views.stock_pages, name='stock_pages'),
+     url(r'^stock_filter/$',
+        views.stock_filter, name='stock_filter'),
+     
+     url(r'^product_pages/$',
+        views.stock_pages, name='product_pages'),
+     url(r'^product_filter/$',
+        views.product_filter, name='product_filter'),
     # end search routes
     url(r'^classes/$',
         views.product_class_list, name='product-class-list'),

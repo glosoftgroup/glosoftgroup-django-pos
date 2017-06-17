@@ -351,6 +351,10 @@ class StockLocationForm(forms.ModelForm):
     class Meta:
         model = StockLocation
         exclude = []
+    def __init__(self, *args, **kwargs):        
+        super(StockLocationForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
 
 class AttributeChoiceValueForm(forms.ModelForm):

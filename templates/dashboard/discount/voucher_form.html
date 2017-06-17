@@ -23,22 +23,16 @@
 
 {% block header_extra %}
   {% if voucher.pk %}
-    <a class="dropdown-button right" href="#" data-activates="voucher-delete"
-    data-constrainwidth="false">
-      <svg data-src="{% static "dashboard/images/more_vert.svg" %}" height="24" width="24" />
-    </a>
-    <ul id="voucher-delete" class="dropdown-content">
-      <li>
-        <a class="modal-trigger-custom" href="#base-modal" data-href="{% url 'dashboard:voucher-delete' pk=voucher.pk %}">
+   <li>
+      <a class="modal-trigger-custom" href="#base-modal" data-href="{% url 'dashboard:voucher-delete' pk=voucher.pk %}"><i class="icon-trash"></i>
           {% trans "Remove voucher" context "Voucher action" %}
         </a>
-      </li>
-    </ul>
+      </li>   
   {% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
-  <ul class="breadcrumbs breadcrumbs--history">
+  
     <li>
       <a href="{% url 'dashboard:voucher-list' %}">
         {% trans "Vouchers" context "Dashboard vouchers list" %}
@@ -46,17 +40,15 @@
     </li>
     <li class="back-mobile">
       <a href="{% url 'dashboard:voucher-list' %}">
-        <svg data-src="{% static "dashboard/images/arrow_left.svg" %}" fill="#fff" width="20px" height="20px" />
+       ←
       </a>
     </li>
-    <li>
-      <span class="breadcrumbs--ellipsed-item">
+    <li class="active">     
         {% if voucher.pk %}
           {{ voucher }}
         {% else %}
           {% trans "Add new voucher" context "Voucher breadcrumbs" %}
-        {% endif %}
-      </span>
+        {% endif %}     
     </li>
   </ul>
 {% endblock %}
@@ -64,9 +56,78 @@
 {% block menu_discounts_class %} active{% endblock %}
 
 {% block content %}
+  <div class="panel panel-flat">
+    <div class="panel-heading">
+      <h5 class="panel-title">Product Stock</h5>
+      <div class="heading-elements">
+        <ul class="icons-list">
+          <li><a data-action="collapse"></a></li>
+          <li><a data-action="reload"></a></li>
+          <li><a data-action="close"></a></li>
+        </ul>
+      </div>
+    </div> 
+    <div class="panel-body">
+    <div class="row">
+    <form method="post" enctype="multipart/form-data" id="form-vouchers" novalidate>
+          {% csrf_token %}
+            {% if form.non_field_errors %}
+              <blockquote>
+                {% for non_field_error in form.non_field_errors %}
+                  {{ non_field_error }}
+                {% endfor %}
+              </blockquote>
+            {% endif %}  
+         <div class="col-md-8">
+            <div class="form-group">
+               {{ form.code|materializecss }}
+            </div>
+            <div class="form-group">
+              {{ form.name|materializecss }}
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 {{ form.discount_value|materializecss }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                  {{ form.discount_value_type|materializecss:"input-field s12" }}
+              </div>
+            </div>
+            <div class="form-group">
+              {% for form_type, form in type_base_forms.items %}
+                  <div class="voucher-form" data-type="{{ form_type }}">
+                    {% for field in form %}
+                      {{ field|materializecss:"input-field s12" }}
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+            </div>
+         </div>
+         <div class="col-md-4">
+            <div class="form-group">
+             {{ form.start_date|materializecss:"input-field s12" }}
+            </div>
+            <div class="form-group">
+              {{ form.end_date|materializecss:"input-field s12" }}
+            </div>
+            <div class="form-group">
+              {{ form.usage_limit|materializecss }}
+            </div>
+         </div>
+      <!-- action buttons -->
+         <div class="text-right">
+     </div>
+      </form>
+    </div>
+   
+    </div>
+
+   </div>
   <div class="row">
-    <div class="col m12 l9">
-      <div class="card">
+    <div class="col-md-12">
+      <div class="panel">
         <form method="post" enctype="multipart/form-data" id="form-vouchers" novalidate>
           <div class="card-content card-content-form">
             {% csrf_token %}
@@ -77,45 +138,45 @@
                 {% endfor %}
               </blockquote>
             {% endif %}
-            <div class="row">
-              <div class="col s12 m8">
-                <div class="row">
+            <div class="">
+              <div class="col-md-6">
+                <div class="form-group">
                   {{ form.code|materializecss }}
                 </div>
-                <div class="row">
+                <div class="form-group">
                   {{ form.name|materializecss }}
                 </div>
-                <div class="row">
-                  <div class="col s12 m8">
-                    <div class="row">
+                <div class="form-group">
+                  <div class="">
+                    <div class="form-group">
                       {{ form.discount_value|materializecss }}
                     </div>
                   </div>
-                  <div class="col s12 m4">
-                    <div class="row">
+                  <div class="">
+                    <div class="form-group">
                       {{ form.discount_value_type|materializecss:"input-field s12" }}
                     </div>
                   </div>
                 </div>
-                <div class="row">
+                <div class="form-group">
                   {{ form.type|materializecss:"input-field s12" }}
                 </div>
                 {% for form_type, form in type_base_forms.items %}
-                  <div class="row voucher-form" data-type="{{ form_type }}">
+                  <div class="voucher-form" data-type="{{ form_type }}">
                     {% for field in form %}
                       {{ field|materializecss:"input-field s12" }}
                     {% endfor %}
                   </div>
                 {% endfor %}
               </div>
-              <div class="col s12 m4">
-                <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
                   {{ form.start_date|materializecss:"input-field s12" }}
                 </div>
-                <div class="row">
+                <div class="form-group">
                   {{ form.end_date|materializecss:"input-field s12" }}
                 </div>
-                <div class="row">
+                <div class="form-group">
                   {{ form.usage_limit|materializecss }}
                 </div>
               </div>
@@ -126,14 +187,14 @@
               <a href="{% url 'dashboard:voucher-list' %}" class="btn btn-flat">
                 {% trans "Cancel" context "Dashboard cancel action" %}
               </a>
-              <button type="submit" class="btn waves-effect waves-light">
+              <button type="submit" class="btn btn-primary waves-effect waves-light">
                 {% trans "Update" context "Dashboard update action" %}
               </button>
             {% else %}
               <a href="{% url 'dashboard:voucher-list' %}" class="btn btn-flat">
                 {% trans "Cancel" context "Dashboard cancel action" %}
               </a>
-              <button type="submit" class="btn waves-effect waves-light">
+              <button type="submit" class="btn btn-primary waves-effect waves-light">
                 {% trans "Create" context "Dashboard create action" %}
               </button>
             {% endif %}
@@ -143,4 +204,5 @@
     </div>
     <div class="col m12 l3 help-box"></div>
   </div>
+
 {% endblock %}

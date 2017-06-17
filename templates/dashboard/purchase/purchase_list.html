@@ -26,20 +26,30 @@
 <!-- Search field -->
 <div class="row">
 {% url "dashboard:search-sku" as url %}
-{% include "dashboard/includes/_main_search_filter.html" with url=url%}
+{% include "dashboard/includes/_sku_search_filter.html" with url=url%}
 </div>
-	
 
-<div id="stock_content">Dynamic Content goes here</div>
-<div id="page-selection"></div>
+
+<div id="stock_content"></div>
+<div class="text-center">
+	<div class="col-md-10">
+		 <span  id='pagination-demo'></span>
+	</div>
+	<div class="col-md-2">
+		<span class="text-right" id='pag_nav'></span>
+	</div>	
+</div>
+
 <!-- /search field -->
 {% endblock %}
 {% block custom_js %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/form_select2.js' %}"></script>
 <script type="text/javascript">
+ // Basic select
  $('.bootstrap-select').selectpicker();
  $(document).ready(function() {
-
        $(".clickable-td").click(function() {
          window.location = $(this).data("href");
        });
@@ -48,143 +58,164 @@
 <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
 <script type="text/javascript">
-  $(document).ready(function() {
+  $(document).ready(function() {  	
 
     var sz;
-    var total_pages
-    //**@ get
-    $.ajax({ url: "{% url 'dashboard:stock_pages' %}",type: 'GET',data: {total_pages:'total_pages'},
-        async:false,success: function(data){
-         sz = data;
-         total_pages = data;
-         //alert(data);
-    }});
-	// init bootpag
-	$('#page-selection').bootpag({
-	    total: parseInt(total_pages),
-	    maxVisible:5,
-	}).on("page", function(event, /* page number here */ num){
-	     $("#stock_content").html("sldfjslkdfe"); // some ajax content loading...
-	});
+    var total_pages;
+    var visiblePages = $('.list-size').val();   
+    localStorage.setItem('visiblePages', parseInt(visiblePages));
 
-    $('.list-sz').on('change', function(){
-        var ts = $(this).val();
+    var search_text = $('.search_sku').val();
+    
+    function getVisiblePages(){
+     	var visiblePages = $('.list-size').val();   
+        localStorage.setItem('visiblePages', parseInt(visiblePages));
+        return localStorage.getItem('visiblePages');
+    }
 
-        $.get("{% url 'dashboard:search-sku' %}",{page:1, size:ts},function(data){
-            $('#search_results').html(data);
+    function getSearchtext(){
+    	var search_text = $('.search_sku').val();
+       //alert(search_text);
+        localStorage.setItem('search_text', search_text);
+        return localStorage.getItem('search_text');
+    } 
+    function getPages(){
+    // get tax value
+    {% url 'dashboard:stock_pages' as url %} 
+    var url = "{{ url }}";    
+    var posting = $.get( 
+    	url,
+    	 {
+    	 	track:'onpageload',
+    	 	page:1, 
+        	size:localStorage.getItem('visiblePages'),
+        	search_text:getSearchtext(),
+    	 } );
+    posting.done(function( data ){ 
+       	//alert(data);
+        localStorage.setItem('total_pages', parseInt(data));
+     });    
+    return  localStorage.getItem('total_pages');    
+    }
+    getPages();
+
+    // end totalPages   
+
+    var $pagination = $('#pagination-demo');
+    var defaultOpts = {
+        totalPages: getPages(),
+        visiblePages: 3,
+        onPageClick: function (event, page) {
+            $('#pag_nav').text('Page ' + page + ' of '+getPages());
+            $.get("{% url 'dashboard:stock_filter' %}",
+            	{
+            	 track:'onPageClick',
+            	 page:page, 
+            	 size:getVisiblePages(),
+            	 search_text:getSearchtext(),
+            	},function(data){
+                $('#stock_content').html(data);
+                });
+        }
+    };
+    $pagination.twbsPagination(defaultOpts);
+	
+    // on list size change
+    $('.list-size').on('change', function(){
+        var visiblePages = $(this).val();
+        var ts = visiblePages;        
+        var search_text = getSearchtext();
+
+        // changecontent        
+        $.get("{% url 'dashboard:stock_filter' %}",
+        	{
+        		page:1, 
+        		size:getVisiblePages(),
+        		search_text:getSearchtext()
+        	},function(data){
+            $('#stock_content').html(data);
         });
-        var paginated_size;
-        $.ajax({ url: "{% url 'dashboard:search-sku' %}",type: 'GET',data: {size:ts,select_size:'select_size'},async:false,success: function(data){
+        //alert(ts);
+        //change total pages
+        $.ajax({ url: "{% url 'dashboard:stock_pages' %}",type: 'GET',
+        	data: {
+        		track:'onchangesize',
+        		size:visiblePages,
+        		select_size:'select_size',
+        		search_text:getSearchtext()
+        	},async:false,success: function(data){
            paginated_size = data;
-           console.log(paginated_size);
-           $('.bootpag-callback').remove();
-           // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
-            $('.bootpag-callback2').show();
+           localStorage.setItem('total_pages',parseInt(data));         
+           
         } });
 
-        console.log('from outside '+paginated_size);
-        $('#bootpag-callback2').bootpag({
-            total: parseInt(paginated_size),
-            maxVisible: 3,
-            leaps: false
-            }).on("page", function(event, num){
-                $(".pages-nav2").html("Pages " + num +" of "+paginated_size); // or some ajax content loading...
-                $.get("{% url 'dashboard:search-sku' %}",{page:num, size:ts},function(data){
-                   $('#search_results').html(data);
-                });
-        }).children('.pagination2').addClass('pagination-flat pagination-sm');
+        // destroy and create new pagination
+        var totalPages = getPages();
+        
+        var currentPage = $pagination.twbsPagination('getCurrentPage');
+         $pagination.twbsPagination('destroy');
+         $pagination.twbsPagination($.extend({}, defaultOpts, {
+                startPage: currentPage,
+                totalPages: totalPages
+            }));
     });
 
+    //change content
+    function changecontent(){
+    	$.get("{% url 'dashboard:stock_filter' %}",
+        	{
+        		page:1, 
+        		size:getVisiblePages(),
+        		search_text:getSearchtext()
+        	},function(data){
+            $('#stock_content').html(data);
+        });
+    }
+    // change total_pages
+    function changeTotalPages(){
+    	$.ajax({ url: "{% url 'dashboard:stock_pages' %}",type: 'GET',
+        	data: {
+        		track:'onchangesize',
+        		size:getVisiblePages(),
+        		select_size:'select_size',
+        		search_text:getSearchtext()
+        	},async:false,success: function(data){
+           
+           localStorage.setItem('total_pages',parseInt(data));         
+           
+        } });
+    }
+   // destroy and create new pagination
+   function createNewPagination(){   
+        var totalPages = getPages();        
+        var currentPage = $pagination.twbsPagination('getCurrentPage');
+        $pagination.twbsPagination('destroy');
+        $pagination.twbsPagination($.extend({}, defaultOpts, {
+                startPage: currentPage,
+                totalPages: totalPages
+            }));
+          }
 
-
-    $('.bootstrap-select').selectpicker();
-    // pagination
-    $('.bootpag-callback').bootpag({
-        total: parseInt(total_pages),
-        maxVisible: 3,
-        leaps: false
-        }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+sz); // or some ajax content loading...
-            $.get("{% url 'dashboard:search-sku' %}",{page:num},function(data){
-               $('#search_results').html(data);
-            });
-    }).children('.pagination').addClass('pagination-flat pagination-sm');
-
-      $(".td").click(function() {
-          window.location = $(this).data("href");
-      });
-
-      $('.modal-trigger').on('click', function (e) {
-
-         var url = $(this).data('href')
-         var prompt_text = $(this).data('title');
-         var username = $(this).data('name');
-         var modal = $(this).data('ta');
-         var id = $(this).data('id');
-         $('.del').attr('data-id', id);
-         $('.del').attr('data-href', url);
-         $('.modal-title').html(prompt_text);
-         $(modal).modal();
-         $('.delete_form').attr('action',url);
-      });
-
-      /* clicked the submit button */
-      $('.del').on('click', function (e) {
-          var f = document.getElementById('delform');
-          var formData = new FormData(f);
-          var id = $(this).data('id');
-          var url = $(this).data('href');
-          $.ajax({
-              url: url,
-              type: "POST",
-              data: formData,
-              processData: false,
-              contentType: false,
-              success:function(data){        
-                $('#modal_instance').modal('hide');
-                $('#search_results #'+id).remove();            
-                $.jGrowl('User deleted successfully', {
-                  header: 'Well done!',
-                  theme: 'bg-success'
-                });
-                window.location.reload();
-             // $("#mydiv").load(location.href + " #mydiv");
-              },
-              error:function(error){
-                console.log(error);
-                $.jGrowl('Error deleting Staff', {
-                    header: 'Oh snap!',
-                    theme: 'bg-danger'
-                });
-              }
-          });
-      });
-
-
-    var delay = (function(){
+	  var delay = (function(){
       var timer = 0;
       return function(callback, ms){
         clearTimeout (timer);
         timer = setTimeout(callback, ms);
       };
     })();
+    $('.search_sku').keyup(function() {
+    	delay(function(){
+        var search_text = $('.search_sku').val();
+        var url = "{% url 'dashboard:stock_filter' %}";
+        changecontent();
+        changeTotalPages();
+        createNewPagination();
+	    }, 1000 );
+	});
 
-    $('.search_user').keyup(function() {
-       var search_text = $(this).val();
-       var url = "{% url 'dashboard:search-sku' %}";
-       $.ajax({
-          type: "GET",
-          url:url,
-          data:{'search_product':search_text},
-          success: function(data){
-             $('#search_product').html(data);
-          },
-          error:function(data){
-            console.log(data);
-          }
-       });
-    });
+  
 
   });
 

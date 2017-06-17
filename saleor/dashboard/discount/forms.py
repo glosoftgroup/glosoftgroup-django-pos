@@ -52,6 +52,8 @@ class VoucherForm(forms.ModelForm):
             initial['code'] = self._generate_code
         kwargs['initial'] = initial
         super(VoucherForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
     def _generate_code(self):
         while True:
