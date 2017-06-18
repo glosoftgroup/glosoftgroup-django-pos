@@ -27,6 +27,32 @@ error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 # @permission_decorator('userprofile.view_user')
+def user_trails(request):	
+	try:
+		users = UserTrail.objects.all().order_by('-now')
+		paginator = Paginator(users, 10)
+		page = request.GET.get('page', 1)
+		user_trail(request.user.name, 'accessed user trail page', 'view')
+		info_logger.info('User: '+str(request.user.name)+' accessed the user trail page')
+
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except InvalidPage:
+			users = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
+		user_trail(request.user.name, 'accessed users list page', 'view')
+		info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			return TemplateResponse(request, 'dashboard/users/trail.html', {'users':users, 'pn':paginator.num_pages})
+	except TypeError as e:
+		error_logger.error(e)
+		return HttpResponse('error accessing users')
+
 def users(request):
 	try:
 		users = User.objects.all().order_by('-id')
@@ -41,7 +67,7 @@ def users(request):
 			users = paginator.page(1)
 		except EmptyPage:
 			users = paginator.page(paginator.num_pages)
-		user_trail(request.user.name, 'accessed users list page')
+		user_trail(request.user.name, 'accessed users list page','view')
 		info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
 		if request.GET.get('initial'):
 			return HttpResponse(paginator.num_pages)
@@ -51,8 +77,101 @@ def users(request):
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
 
+def usertrail_paginate(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	date = request.GET.get('date')
+	action = request.GET.get('action')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+	gid = request.GET.get('gid')
+	users = UserTrail.objects.all().order_by('-now')
+	if request.GET.get('sth'):
+
+		if date:
+			try:
+				users = UserTrail.objects.filter(date=date).order_by('-now')
+				if p2_sz and gid:
+					paginator = Paginator(users, int(p2_sz))
+					users = paginator.page(page)
+					return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users, 'gid':date})
+
+				paginator = Paginator(users, 10)
+				users = paginator.page(page)
+				return TemplateResponse(request,'dashboard/users/trail/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':10,'gid':date})
+
+			except ValueError as e:
+				return HttpResponse(e)
+
+		if action:
+			try:
+				users = UserTrail.objects.filter(crud=action).order_by('-now')
+				if p2_sz and gid:
+					paginator = Paginator(users, int(p2_sz))
+					users = paginator.page(page)
+					return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users, 'gid':action})
+
+				paginator = Paginator(users, 10)
+				users = paginator.page(page)
+				return TemplateResponse(request,'dashboard/users/trail/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':10,'gid':action})
+
+			except ValueError as e:
+				return HttpResponse(e)
+	else:
+
+		if list_sz:
+			paginator = Paginator(users, int(list_sz))
+			users = paginator.page(page)
+			return TemplateResponse(request,'dashboard/users/trail/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0})
+		else:
+			paginator = Paginator(users, 10)
+		if p2_sz:
+			paginator = Paginator(users, int(p2_sz))
+			users = paginator.page(page)
+			return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users})
+
+		if date:
+			try:
+				users = UserTrail.objects.filter(date=date).order_by('-now')
+				if p2_sz:
+					paginator = Paginator(users, int(p2_sz))
+					users = paginator.page(page)
+					return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users, 'gid':date})
+
+				paginator = Paginator(users, 10)
+				users = paginator.page(page)
+				return TemplateResponse(request,'dashboard/users/trail/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':10,'gid':date})
+
+			except ValueError as e:
+				return HttpResponse(e)
+
+		if action:
+			try:
+				users = UserTrail.objects.filter(crud=action).order_by('-now')
+				if p2_sz:
+					paginator = Paginator(users, int(p2_sz))
+					users = paginator.page(page)
+					return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users, 'gid':action})
+
+				paginator = Paginator(users, 10)
+				users = paginator.page(page)
+				return TemplateResponse(request,'dashboard/users/trail/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':10,'gid':action})
+
+			except ValueError as e:
+				return HttpResponse(e)
+
+
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except InvalidPage:
+			groups = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
+		return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users})
 def user_paginate(request):
-	page = request.GET.get('page', 1)
+	page = int(request.GET.get('page', 1))
 	list_sz = request.GET.get('size')
 	p2_sz = request.GET.get('psize')
 	select_sz = request.GET.get('select_size')
@@ -89,7 +208,6 @@ def user_paginate(request):
 		except EmptyPage:
 			users = paginator.page(paginator.num_pages)
 		return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
-		# return TemplateResponse(request,'dashboard/users/p2.html',{'users':users, 'pn':paginator.num_pages})
 
 
 @staff_member_required
@@ -98,7 +216,7 @@ def user_add(request):
 	try:
 		permissions = Permission.objects.all()
 		groups = Group.objects.all()
-		user_trail(request.user.name, 'accessed add users page')
+		user_trail(request.user.name, 'accessed add users page', 'view')
 		info_logger.info('User: '+str(request.user.name)+' accessed user create page')
 		return TemplateResponse(request, 'dashboard/users/add_user.html',{'permissions':permissions, 'groups':groups})
 	except TypeError as e:
@@ -137,7 +255,7 @@ def user_process(request):
 			gps = Group.objects.filter(name__in=groups)
 			last_id.groups.add(*gps)
 			last_id.save()
-		user_trail(request.user.name, 'created user: '+str(name))
+		user_trail(request.user.name, 'added user: '+str(name), 'add')
 		info_logger.info('User: '+str(request.user.name)+' created user:'+str(name))
 		return HttpResponse(last_id.id)
 
@@ -146,10 +264,10 @@ def user_detail(request, pk):
 	permissions = Permission.objects.filter(user=user)
 	groups = user.groups.all()
 	if request.user == user:
-		user_trail(request.user.name, 'viewed self profile ')
+		user_trail(request.user.name, 'viewed self profile ','view')
 		info_logger.info('User: '+str(request.user)+' viewed self profile')
 	else:
-		user_trail(request.user.name, 'viewed '+str(user.name)+ '`s profile')
+		user_trail(request.user.name, 'viewed '+str(user.name)+ '`s profile','view')
 		info_logger.info('User: '+str(request.user.name)+' viewed '+str(user.name)+'`s profile')
 	return TemplateResponse(request, 'dashboard/users/detail.html', {'user':user,'permissions':permissions,'groups':groups})
 
@@ -157,14 +275,14 @@ def user_delete(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.method == 'POST':
 		user.delete()
-		user_trail(request.user.name, 'deleted user: '+ str(user.name))
+		user_trail(request.user.name, 'deleted user: '+ str(user.name),'delete')
 		return HttpResponse('success')
 def user_edit(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	permissions = Permission.objects.all()
 	user_permissions = Permission.objects.filter(user=user)
 	ctx = {'user': user,'permissions':permissions, 'user_permissions':user_permissions}
-	user_trail(request.user.name, 'accessed edit page for user '+ str(user.name))
+	user_trail(request.user.name, 'accessed edit page for user '+ str(user.name),'view')
 	info_logger.info('User: '+str(request.user.name)+' accessed edit page for user: '+str(user.name))
 	return TemplateResponse(request, 'dashboard/users/edit_user.html', ctx)
 
@@ -189,7 +307,7 @@ def user_update(request, pk):
 			user.mobile = mobile
 			user.image = image
 			user.save()
-			user_trail(request.user.name, 'updated user: '+ str(user.name))
+			user_trail(request.user.name, 'updated user: '+ str(user.name),'update')
 			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name))
 			return HttpResponse("success with image")
 		else:
@@ -200,7 +318,7 @@ def user_update(request, pk):
 			user.mobile = mobile
 			user.save()
 			user_trail(request.user.name, 'updated user: '+ str(user.name))
-			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name))
+			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name),'update')
 			return HttpResponse("success without image")
 
 @csrf_exempt
@@ -216,7 +334,7 @@ def user_assign_permission(request):
 			user.is_active = False
 			user.user_permissions.remove(*user_has_permissions)
 			user.save()
-			user_trail(request.user.name, 'deactivated and removed all permissions for user: '+ str(user.name))
+			user_trail(request.user.name, 'deactivated and removed all permissions for user: '+ str(user.name), delete)
 			info_logger.info('User: '+str(request.user.name)+' deactivated and removed all permissions for user: '+str(user.name))
 			return HttpResponse('deactivated')
 		else:
@@ -226,7 +344,7 @@ def user_assign_permission(request):
 				user.is_active = True
 				user.user_permissions.add(*not_in_user_permissions)
 				user.save()
-				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name))
+				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name),'add')
 				info_logger.info('User: '+str(request.user)+' assigned permissions for user: '+str(user.name))
 				return HttpResponse('permissions added')
 			else:
@@ -236,15 +354,9 @@ def user_assign_permission(request):
 				user.user_permissions.remove(*user_has_permissions)
 				user.user_permissions.add(*not_in_user_permissions)
 				user.save()
-				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name))
+				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name),'add')
 				info_logger.info('User: '+str(request.user.name)+' assigned permissions for user: '+str(user.name))
 				return HttpResponse('permissions updated')
-
-def user_trails(request):
-	users = UserTrail.objects.all().order_by('id')
-	user_trail(request.user.name, 'accessed user trail page')
-	info_logger.info('User: '+str(request.user.name)+' accessed the user trail page')
-	return TemplateResponse(request, 'dashboard/users/trail.html', {'users':users})
 
 def user_search( request ):
 	
@@ -272,11 +384,44 @@ def user_search( request ):
 			except EmptyPage:
 				users = paginator.page(paginator.num_pages)
 			if p2_sz:
-				# paginator = Paginator(users, int(p2_sz))
 				users = paginator.page(page)
 				return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
 
 			return TemplateResponse(request, 'dashboard/users/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
+
+def usertrail_search( request ):
+	
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size',10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get( 'q' )
+		if list_sz is None:
+			sz = 10
+		else:
+			sz = list_sz
+
+		if q is not None:            
+			users = UserTrail.objects.filter( 
+				Q( name__contains = q ) |
+				Q( action__contains = q ) | Q( date__contains = q ) ).order_by( '-now' )
+			paginator = Paginator(users, 10)
+			try:
+				users = paginator.page(page)
+			except PageNotAnInteger:
+				users = paginator.page(1)
+			except InvalidPage:
+				users = paginator.page(1)
+			except EmptyPage:
+				users = paginator.page(paginator.num_pages)
+			if p2_sz:
+				users = paginator.page(page)
+				return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users})
+
+			return TemplateResponse(request, 'dashboard/users/trail/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
+
+			
+
 
 
 

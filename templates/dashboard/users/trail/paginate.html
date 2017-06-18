@@ -1,0 +1,18 @@
+               {% if users %}
+                  {% for user in users %}
+                  <tr>
+                    <td class="td">#{{ forloop.counter }}</td>
+
+                    <td class="td">{{user.name}}</td>
+
+                    <td class="td"> 
+                    {{user.action}} on {{user.now}}</td>
+                     {% if gid %}
+                      <td class="td"> {{ gid }}</td>
+                    {% endif %}
+
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                   <tr><td colspan="6"><h2 class="text-center">no users trail available</h2></td></tr>
+               {% endif %}

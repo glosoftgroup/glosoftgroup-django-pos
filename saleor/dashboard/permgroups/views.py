@@ -41,7 +41,7 @@ def groups(request):
 		groups = paginator.page(paginator.num_pages)
 	except InvalidPage:
 		groups = paginator.page(1)
-	user_trail(request.user.name, 'accessed groups list page')
+	user_trail(request.user.name, 'accessed groups list page', 'view')
 	info_logger.info('User: '+str(request.user.name)+' accessed the view groups page')
 	if request.GET.get('initial'):
 		return HttpResponse(paginator.num_pages)
@@ -57,16 +57,21 @@ def groups(request):
 
 def group_paginate(request):
 	groups = Group.objects.all().order_by('-id')
-	page = request.GET.get('page', 1)
+	page = int(request.GET.get('page', 1))
 	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
 	select_sz = request.GET.get('select_size')
 	if list_sz:
 		paginator = Paginator(groups, int(list_sz))
+		groups = paginator.page(page)
+		return TemplateResponse(request,'dashboard/permissions/p2.html',{'groups':groups, 'pn':paginator.num_pages,'sz':list_sz})
 	else:
 		paginator = Paginator(groups, 5)
-	if select_sz and list_sz:
-		paginator = Paginator(groups, int(list_sz))
-		return HttpResponse(paginator.num_pages)
+	if p2_sz:
+		paginator = Paginator(groups, int(p2_sz))
+		groups = paginator.page(page)
+		return TemplateResponse(request,'dashboard/permissions/paginate.html',{'groups':groups})
+
 	try:
 		groups = paginator.page(page)
 	except PageNotAnInteger:
@@ -80,12 +85,32 @@ def group_paginate(request):
 def group_search( request ):
 
 	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size',10)
+		p2_sz = request.GET.get('psize')
 		q = request.GET.get( 'q' )
+		if list_sz is None:
+			sz = 5
+		else:
+			sz = list_sz
+
 		if q is not None:            
 			groups = Group.objects.filter( 
 				Q( name__contains = q ) ).order_by( 'id' )
+		   	paginator = Paginator(groups, 5)
+			try:
+				groups = paginator.page(page)
+			except PageNotAnInteger:
+				groups = paginator.page(1)
+			except InvalidPage:
+				groups = paginator.page(1)
+			except EmptyPage:
+				groups = paginator.page(paginator.num_pages)
+			if p2_sz:
+				groups = paginator.page(page)
+				return TemplateResponse(request,'dashboard/permissions/paginate.html',{'groups':groups})
 
-			return TemplateResponse(request, 'dashboard/permissions/search.html', {'groups':groups})
+			return TemplateResponse(request, 'dashboard/permissions/search.html', {'groups':groups, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 
 def perms(request):
@@ -118,6 +143,7 @@ def create_group(request):
 			group.user_set.add(*users)
 			group.save()
 			last_id_group = Group.objects.latest('id')
+			user_trail(request.user.name, 'added group '+group_name, 'add')
 			return JsonResponse({"id":last_id_group.id, "name":last_id_group.name})
 
 @csrf_exempt
@@ -198,6 +224,7 @@ def group_edit(request):
 	group_permissions = Permission.objects.filter(group=group)
 	ctx = {'group': group,'permissions':permissions, 'group_permissions':group_permissions}
 	html = render_to_string('dashboard/permissions/group_permissions.html', ctx)
+	user_trail(request.user.name, 'updated group '+group.name, 'update')
 	return HttpResponse(html)
 
 def group_detail(request, pk):
@@ -214,10 +241,9 @@ def group_delete(request, pk):
 		group.permissions.remove(*group_permissions)
 		for user in users_in_group:
 			group.user_set.remove(user)
-			# user_groups = user.groups.all()
-			# all_permissions = [group.permissions.all() for group in user_groups]
 			user.user_permissions.remove(*group_permissions)
 		group.delete()
+		user_trail(request.user.name, 'deleted group '+group.name, 'delete')
 		return HttpResponse('success')
 	else:
 		return HttpResponse('error deleting')
@@ -282,7 +308,7 @@ def group_update(request):
 					user_manage(users, group_has_users, group)
 					#** refine update users permissions
 					refine_users_permissions(group_users_set_2, permission_list)
-					user_trail(request.user.name, 'added permissions to group: '+ group.name)
+					user_trail(request.user.name, 'added permissions to group: '+ group.name, 'add')
 					info_logger.info(request.user.name, 'added permissions to group: '+ group.name)
 					return HttpResponse('permissions added')
 				except IntegrityError as e:
@@ -301,7 +327,7 @@ def group_update(request):
 						user.user_permissions.remove(*group_has_permissions)
 						user.user_permissions.add(*not_in_group_permissions)
 						user.save()
-					user_trail(request.user.name, 'updated permissions to group: '+ group.name)
+					user_trail(request.user.name, 'updated permissions to group: '+ group.name,'update')
 					info_logger.info(request.user.name, 'updated permissions to group: '+ group.name)
 					return HttpResponse('permissions updated')
 				except IntegrityError as e:

@@ -42,7 +42,7 @@
             <div class="col-md-2">
               <label>display list size</label>
               <div class="form-group">
-                 <select class="bootstrap-select list-sz" data-width="100%" tabindex="-98">
+                 <select class="bootstrap-select list-sz" data-width="100%" tabindex="-98" style="display: none;">
                     <option >5</option>
                     <option >10</option>
                     <option >20</option>
@@ -61,7 +61,8 @@
       </div>
    </div> 
   <div class="col-md-12">
-      <!-- Header and footer fixed -->
+
+    <div id="pagination-div">
       <div class="panel panel-flat">
         <div class="table-responsive">
          
@@ -119,6 +120,7 @@
             </div>
           </div>
       </div>
+      </div><!-- pagination-div-->
  
   </div>
 </div>
@@ -179,7 +181,7 @@
            </div>
            <div class="row">
             <div class="col-md-12">
-             <div class="table-responsive pre-scrollable group-users" style="height: 240px;">
+             <div class="table-responsive pre-scrollable group-users">
              <table class="table table-framed" id="group_user_table">
                 <thead>
                   <tr>
@@ -351,33 +353,13 @@ $('document').ready(function () {
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
 
-        $.get("{% url 'dashboard:group_paginate' %}",{page:1, size:ts},function(data){
-            $('#tb').html(data);
-        });
-        var paginated_size;
-        $.ajax({ url: "{% url 'dashboard:group_paginate' %}",type: 'GET',data: {size:ts,select_size:'select_size'},async:false,success: function(data){
-           paginated_size = data;
-           console.log('from inside '+paginated_size);
-           $('.bootpag-callback').remove();
-           // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
-            $('.bootpag-callback2').show();
-        } });
-
-        console.log('from outside '+paginated_size);
-        $('#bootpag-callback2').bootpag({
-            total: parseInt(paginated_size),
-            maxVisible: 3,
-            leaps: false
-            }).on("page", function(event, num){
-                $(".pages-nav2").html("Pages " + num +" of "+paginated_size); // or some ajax content loading...
-                $.get("{% url 'dashboard:group_paginate' %}",{page:num, size:ts},function(data){
-                   $('#tb').html(data);
-                });
-        }).children('.pagination2').addClass('pagination-flat pagination-sm');
+       $.ajax({ url: "{% url 'dashboard:group_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
     });
 
  
-    // pagination
+    //**@ pagination
     $('.bootpag-callback').bootpag({
         total: parseInt(sz),
         maxVisible: 3,
@@ -398,23 +380,14 @@ $('document').ready(function () {
     })();
 
     $('.search_group').keyup(function() {
-       var search_text = $(this).val();
+    var search_text = $(this).val();
+    delay(function(){ 
        var url = "{% url 'dashboard:group_search' %}";
-       $.ajax({
-          type: "GET",
-          url:url,
-          data:{'q':search_text},
-          success: function(data){
-             $('#tb').html(data);
-          },
-          error:function(data){
-            console.log(data);
-          }
-       });
-    });
-
-
-
+       $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+              $('#pagination-div').html(data);
+       }});
+    }, 500 );
+});
 });
 
 //**@ users select
@@ -638,7 +611,7 @@ $( ".check" ).on( "click", function(){
     $(this).parent('span').removeClass('checked');
     $(this).parent().parent().parent().siblings('span').hide();
   }
-} );
+});
 
 </script>
 {% endblock %}

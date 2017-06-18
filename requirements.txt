@@ -85,6 +85,7 @@ text-unidecode==1.0
 typing==3.5.2.2           # via promise
 urllib3==1.19.1           # via elasticsearch
 #uwsgi==2.0.14
+xhtml2pdf==0.0.6
 xmltodict==0.10.2         # via django-payments
 
 # The following packages are considered to be unsafe in a requirements file:

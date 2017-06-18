@@ -46,9 +46,9 @@
 
         </div>
          <div class="my-paginate">
-            <div id="bootpag-callback" class="text-center bootpag-callback p3-pag" style="padding:20px;">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav2">Pages 1 of {{pn}}</div>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
       </div>
@@ -58,14 +58,14 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
  <script type="text/javascript">
    $(document).ready(function(){
-        $('.p3-pag').bootpag({
+        $('.p2-pag').bootpag({
             total: parseInt('{{pn}}'),
             maxVisible: 3,
             leaps: false
             }).on("page", function(event, num){
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
 
-                $.get("{% url 'dashboard:group_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                $.get("{% url 'dashboard:group_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
                   $('#p-tb').html(data);
                 });
 

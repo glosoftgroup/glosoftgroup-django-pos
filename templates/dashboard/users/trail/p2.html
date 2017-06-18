@@ -1,0 +1,83 @@
+{% load staticfiles %}
+      <div class="panel panel-flat">
+        <div class="table-responsive">
+         
+
+          <table class="table table-bordered datatable-header-footer" style="border-bottom:1px solid #ddd;">
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>action</th>
+                     {% if gid %}
+                    <th> Operation</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody id="p-tb">           
+               {% if users %}
+                  {% for user in users %}
+                  <tr>
+                    <td class="td">#{{ forloop.counter }}</td>
+
+                    <td class="td">{{user.name}}</td>
+
+                    <td class="td"> 
+                    {{user.action}} on {{user.now}}</td>
+                    {% if gid %}
+                    <td> {{ gid}}</td>
+                    {% endif %}
+
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                   <tr><td colspan="6"><h2 class="text-center">no users trail available</h2></td></tr>
+               {% endif %}
+                  </tbody>
+
+           </table>
+
+        </div>
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+      </div>
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            leaps: false
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                var gid = '{{gid}}';
+                if(gid == 0 || gid == null){
+                    $.get("{% url 'dashboard:usertrail_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                    });
+                    console.log('bila');
+                }else{
+                    if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
+                        $.get("{% url 'dashboard:usertrail_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('action is '+'{{gid}}');
+                    }else{
+                        $.get("{% url 'dashboard:usertrail_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('date is'+gid);
+                    }
+
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm');
+   });
+ </script>

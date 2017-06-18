@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.forms.models import model_to_dict
 from django.utils import timezone
+from datetime import date
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import pgettext_lazy
 from django_countries.fields import Country, CountryField
@@ -155,4 +156,6 @@ class User(PermissionsMixin, AbstractBaseUser, index.Indexed):
 class UserTrail(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     action = models.CharField(max_length=100, null=True, blank=True)
-    access_date = models.DateTimeField(default=timezone.now, editable=False)
+    now = models.DateTimeField(default=timezone.now)
+    date = models.DateField(default=date.today())
+    crud = models.CharField(max_length=100, null=True, blank=True)
