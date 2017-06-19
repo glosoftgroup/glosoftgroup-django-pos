@@ -15,9 +15,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     {% endblock meta %}
 
-    {% include 'favicon.html' %}
-    
-    
+    {% include 'favicon.html' %}    
    
     
 
@@ -208,6 +206,18 @@
                     </a>
                     </li>               
                     
+                  </ul>
+                </li>
+                <li id="first">
+                  <a href="{% url 'dashboard:customers' %}"><i class="icon-user"></i> <span>
+                    Customer Management
+                  </span></a>
+                  <ul>
+                    <li class="{% block menu_addCustomer_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:customers' %}">
+                    <i class="icon-user-plus">Customers</i>
+                    </a>
+                    </li>
                   </ul>
                 </li>
                 <li><a href="#"><i class="icon-coins"></i> <span>{% trans "Discounts" context "Dashboard discounts list" %}</span></a>

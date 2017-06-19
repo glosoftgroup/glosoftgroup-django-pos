@@ -113,7 +113,7 @@
             	{
             	 track:'onPageClick',
             	 page:page, 
-            	 size:visiblePages,
+            	 size:localStorage.getItem('visiblePages'),
             	 search_text:getSearchtext(),
             	},function(data){
                 $('#stock_content').html(data);
