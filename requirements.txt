@@ -87,6 +87,6 @@ urllib3==1.19.1           # via elasticsearch
 #uwsgi==2.0.14
 xhtml2pdf==0.0.6
 xmltodict==0.10.2         # via django-payments
-
+html5lib==1.0b8
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools                # via cryptography

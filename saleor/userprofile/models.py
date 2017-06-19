@@ -123,7 +123,7 @@ class User(PermissionsMixin, AbstractBaseUser, index.Indexed):
         default=True)
     nid = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
-    image = models.FileField(upload_to='staff', blank=True, null=True)
+    image = models.ImageField(upload_to='staff', default='staff/user.png')
     date_joined = models.DateTimeField(
         pgettext_lazy('User field', 'date joined'),
         default=timezone.now, editable=False)

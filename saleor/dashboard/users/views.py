@@ -19,7 +19,12 @@ from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...decorators import permission_decorator, user_trail
+from ...utils import render_to_pdf
+import csv
+import random
+from django.utils.encoding import smart_str
 import logging
+from datetime import date
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -27,7 +32,7 @@ error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 # @permission_decorator('userprofile.view_user')
-def user_trails(request):	
+def user_trails(request):   
 	try:
 		users = UserTrail.objects.all().order_by('-now')
 		paginator = Paginator(users, 10)
@@ -419,6 +424,36 @@ def usertrail_search( request ):
 				return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users})
 
 			return TemplateResponse(request, 'dashboard/users/trail/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
+def users_pdf(request):
+	users = User.objects.all()
+	data = {
+		'today': date.today(), 
+		'users': users,
+		'puller': request.user
+		}
+	pdf = render_to_pdf('dashboard/users/pdf/users.html', data)
+	return HttpResponse(pdf, content_type='application/pdf')
+
+def users_export_csv(request):
+	pdfname = 'users'+str(random.random())
+	response = HttpResponse(content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+	qs = User.objects.all()
+	writer = csv.writer(response, csv.excel)
+	response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+	writer.writerow([
+		smart_str(u"ID"),
+		smart_str(u"Name"),
+		smart_str(u"Email"),
+	])
+	for obj in qs:
+		writer.writerow([
+			smart_str(obj.pk),
+			smart_str(obj.name),
+			smart_str(obj.email),
+		])
+	return response
+	
 
 			
 

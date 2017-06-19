@@ -267,14 +267,18 @@ LOGGING = {
 		},
 		'error_logger': {
 			'handlers': ['error_logfile'],
-			'level': 'DEBUG',
+			'level': 'ERROR',
 			'propagate': True
 		},
 		'info_logger': {
 			'handlers': ['info_logfile'],
-			'level': 'DEBUG',
+			'level': 'INFO',
 			'propagate': True
-		}
+		},
+		'xhtml2pdf': {
+			'handlers': ['debug_logfile'],
+			'level': 'DEBUG'
+		},
 	}
 }
 
@@ -461,46 +465,46 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 # }
 
 '''
-    rest framework configuration
+	rest framework configuration
 '''
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES':(
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ),
-    'PAGE_SIZE': 10,
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    ),
+	'DEFAULT_RENDERER_CLASSES':(
+		'rest_framework.renderers.JSONRenderer',
+		'rest_framework.renderers.BrowsableAPIRenderer',
+	),
+	'PAGE_SIZE': 10,
+	'DEFAULT_AUTHENTICATION_CLASSES': (
+		'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+		'rest_framework.authentication.BasicAuthentication',
+		'rest_framework.authentication.SessionAuthentication',
+		'rest_framework.authentication.TokenAuthentication',
+	),
 'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    )
+		'rest_framework.permissions.IsAuthenticated',
+	)
 
 }
 
 '''
-    JWT REST FRAMEWORK CONFUGURATIONS
+	JWT REST FRAMEWORK CONFUGURATIONS
 '''
 from datetime import timedelta
 
 JWT_AUTH = {
-    'JWT_ENCODE_HANDLER':
-    'rest_framework_jwt.utils.jwt_encode_handler',
+	'JWT_ENCODE_HANDLER':
+	'rest_framework_jwt.utils.jwt_encode_handler',
 
-    'JWT_DECODE_HANDLER':
-    'rest_framework_jwt.utils.jwt_decode_handler',
+	'JWT_DECODE_HANDLER':
+	'rest_framework_jwt.utils.jwt_decode_handler',
 
-    'JWT_PAYLOAD_HANDLER':
-    'rest_framework_jwt.utils.jwt_payload_handler',
+	'JWT_PAYLOAD_HANDLER':
+	'rest_framework_jwt.utils.jwt_payload_handler',
 
-    'JWT_PAYLOAD_GET_USER_ID_HANDLER':
-    'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
+	'JWT_PAYLOAD_GET_USER_ID_HANDLER':
+	'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
 
-    'JWT_RESPONSE_PAYLOAD_HANDLER':
-    'saleor.jwt_payload.jwt_response_payload_handler',
-    'JWT_EXPIRATION_DELTA':
-     timedelta(days=2),
+	'JWT_RESPONSE_PAYLOAD_HANDLER':
+	'saleor.jwt_payload.jwt_response_payload_handler',
+	'JWT_EXPIRATION_DELTA':
+	 timedelta(days=2),
 }

@@ -30,7 +30,7 @@
           </div>
         </div>
         <div class="panel-body">
-            <div class="col-md-6">
+            <div class="col-md-4">
              <label>Search Users</label>
               <div class="form-group form-group-material has-feedback">
                 <input class="form-control search_user" placeholder="Search Users" type="text">
@@ -59,6 +59,16 @@
                             {{group.name}}
                        </option>
                   {% endfor %}
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none">Option</option>
+                    <option value="pdf">export pdf</a></option>
+                    <option value="excel">export excel</option>
                   </select>
               </div>
             </div>
@@ -180,6 +190,7 @@
      </div>
    </div>
  </div>
+ <div class="info"></div>
  <!-- /blue modal -->
 {% endblock%}
 {% block custom_js %}
@@ -188,7 +199,19 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-    // $('.bootstrap_select').selectpicker();
+    $('.export-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        if(ts == 'pdf'){
+          var url = "{% url 'dashboard:users_pdf' %}";
+          window.open(url, '_blank');
+
+        }else if(ts=='excel'){
+          window.location="{% url 'dashboard:users_export_csv' %}";
+
+        }else{
+          $(this).val('')
+        }
+    });
     var pagination_totalsize;
     var status;
     //**@ get
