@@ -14,19 +14,20 @@
 <div class="panel panel-default">
   <div class="panelbody">
    <div class='table-responsive'>
-	<table class="table table-striped table-hover ">
+	<table class="table table-striped table-hover fixed_headers">
     <thead>
       <tr class="bg-primary">        
-        <th>Product Name/sku</th>        
-        <th>Buying Price</th>      
+        <th>Product Name/sku</th>            
         <th>Retail price</th> 
-        <th>Quantity</th>
-        <th>Tax %</th>             
-        <th class="text-center">Actions</th>
+        <th>Current Quantity</th>
+        <th>stock in</th>
+        <th>Tax %</th>            
+        
       </tr>
     </thead>
     
     <tbody>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/editable/editable.min.js' %}"></script>
     {% for variant in product_results %}
     <tr>
     <!-- product name/sku -->    
@@ -41,11 +42,11 @@
 		</div>
 	</td>
 	<!-- Buying price  -->
-	<td>
+	<!-- <td>
 	 {% if variant.get_cost_price %}
 	 {% gross variant.get_cost_price html=True %}
 	 {% endif %}
-	 </td>
+	 </td> -->
 	<!-- Retail price -->
 	<td>
 	<h6 class="text-semibold">
@@ -56,9 +57,16 @@
 	</td>
 	<!-- quantity -->
 	<td>
-		<span class="text-muted">
+		<span class="old_value{{ variant.get_stock_pk }}" data-quantity="{{ variant.get_stock_quantity }}"
+		data-href="{% url 'dashboard:add_stock_ajax' %}">
 		{{ variant.get_stock_quantity }}	
 		</span>
+	</td>
+	<!-- stock in  -->
+	<td>
+	<a href="javascript(0)" id="type-number{{ variant.get_stock_pk }}" data-type="number"
+	data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Enter stock</a>
+		
 	</td>
 	<!-- product tax -->
 	<td>
@@ -69,19 +77,62 @@
 	<i class="icon-menu position-left"></i> 
 	{% endif %}
 	</span></td>	
-    {% if variant.get_stock_pk %}
-	<td href="#modal_instance" class="modal-trigger-ajax" data-title="Edit {{ variant.product.name }}" 
-	data-href="{% url 'dashboard:product-stock-update' product_pk=variant.product.pk stock_pk=variant.get_stock_pk %}">
-	{% else %}
-	<td href="#modal_instance" class="modal-trigger-ajax" 
-	data-href="{% url 'dashboard:product-stock-add' product_pk=variant.product.pk %}">
-	{% endif %}
-	<span class="label bg-success-400">Add stock
-	</span>
-			
-	</td>
+   </tr>
+	<script type="text/javascript">
+	$('#stock_in'+{{ variant.get_stock_pk }}).on('focus',function()
+		{
+			var stock_id = $(this).data('pk');
+			alert(stock_id);
+		});
+
+    function notifyme(msg) {
+          new PNotify({
+              text: msg,
+              addclass: 'bg-success-400'
+          });
+      }
+		 // Number
+    $('#type-number'+{{ variant.get_stock_pk }}).editable({
+        //url: "{% url 'dashboard:stock_pages' %}",
+        ajaxOptions: {
+            type: 'get',
+            dataType: 'json',
+        }, 
+        validate: function(value) {
+            if($.trim(value) == ''){
+             return 'This field is required';	
+            }else{
+             var old_quantity = $('.old_value{{ variant.get_stock_pk }}').data('quantity');
+             var url = $('.old_value{{ variant.get_stock_pk }}').data('href');
+             var total = parseInt($.trim(value)) + parseInt(old_quantity);
+            	$('.old_value{{ variant.get_stock_pk }}').html($.trim(total));
+            //post total to stock
+            //{% url 'dashboard:add_stock_ajax' as url %}
+		    //var url = '{{ url }}';    
+		    var posting = $.post( 
+		    	url,
+		    	 {
+		    	 	'csrfmiddlewaretoken':"{{ csrf_token }}",
+		    	 	product:"{{ variant.display_product }}",
+		    	 	stock_pk:{{ variant.get_stock_pk }},
+		        	quantity:total,
+		    	 } );
+		    posting.done(function( data ){ 
+		       	//alert(data);
+		       	notifyme(data);
+		     });
+            }
+        },        
+        title: 'Enter any number',
+        response: function(settings) {
+            console.log(settings);
+        },
+        
+        
+    });
+    
+	</script>
 	
-	</tr>
 	{% endfor %}
 	</tbody>
 	</table>	
@@ -94,11 +145,8 @@
 </style>
 <script type="text/javascript">
  $(document).ready(function() {
-
        $(".clickable-td").click(function() {
-
            window.location = $(this).data("href");
-
        });
     });	
 </script>
@@ -122,7 +170,7 @@
     
    });
 </script>
-
+<script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
 {% include "dashboard/includes/_modal_add_stock.html"  %}
 {% else %}
  <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>

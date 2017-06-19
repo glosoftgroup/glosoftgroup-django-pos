@@ -18,6 +18,11 @@ from ..views import staff_member_required
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import logging
+
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 def product_class_list(request):
@@ -226,6 +231,25 @@ def product_delete(request, pk):
     return TemplateResponse(
         request, 'dashboard/product/modal_product_confirm_delete.html',
         {'product': product})
+
+@staff_member_required
+def add_stock_ajax(request):
+    if request.is_ajax():
+        stock_pk = request.POST.get('stock_pk',None)
+        quantity = request.POST.get('quantity',None)
+        productName = request.POST.get('product','')
+        if not quantity:
+            return HttpResponse('quantity required')        
+        if stock_pk:
+            stock = get_object_or_404(Stock, pk=stock_pk)
+        else:
+            return HttpResponse('stock pk required')
+        stock.quantity = int(quantity)
+        stock.save()
+        message = "Stock for "+str(productName)+\
+                 " updated successfully"+" current stock is "+quantity
+        info_logger.error(message)
+        return HttpResponse(message)
 
 
 @staff_member_required

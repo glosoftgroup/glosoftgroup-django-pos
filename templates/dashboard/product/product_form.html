@@ -162,13 +162,24 @@
                       </div>
                       <div class="form-group">
                           <label>{{ product_form.categories.label }}:<i class='text-muted'>required</i></label>
-                          <div class="multi-select-full">
-                          {{ product_form.categories }}
+                          <div class="input-group">
+                          <div class="multi-select-full">   
+                            {{ product_form.categories }}
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-primary" id="add-new-tax">Add new</button>
+                            </div>
+                            </div>
                           </div>
+                          <!-- <span class="help-block">Add category</span> -->
                         </div> 
                       <div class="form-group">
-                      <label>Product Type</label>           
+                      <label>Product Type</label> 
+                      <div class="input-group">          
                       {{ product_form.product_class}}
+                         <div class="input-group-btn">
+                            <button type="button" class="btn btn-primary" id="add-new-tax">Add new</button>
+                          </div>
+                      </div>
                        <!-- {{ form_classes }} -->
                       </div>
                       <div class="form-group" id='div_attributes'>
