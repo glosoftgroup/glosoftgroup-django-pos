@@ -15,61 +15,90 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-      <div class="panel panel-flat">
-        <div class="panel-heading">
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-flat">
+
+          <div class="panel-body">
+  		    <div class="col-md-6 col-xs-12 left text-center">
+          <div class="col-md-12">
+                      {% if user.image %}
+              <img src=" {{user.image.url}}" alt="Texto Alternativo" class="img-circle img-thumbnail" style="width: 200px;height: 200px;" />
+           {% else %}
+              <img src="{% static 'images/user.png' %}" alt="" class="img-circle img-thumbnail" style="width: 200px;height: 200px;" />
+            {% endif %}
+
+                    <div class="caption text-center">
+            <h3 class="text-semibold no-margin">
+              {{user.name }} 
+            </h3>
+            
           </div>
-        </div>
-        <div class="panel-body">
-		    <div class="col-md-6 col-xs-12 left text-center">
-		      <div class="left">
-			        {% if user.image %}
-					<img src=" {{user.image.url}}" alt="Texto Alternativo" class="img-circle img-thumbnail" style="width: 200px;height: 200px;" />
-			       {% else %}
-			          <img src="{% static 'images/user.png' %}" alt="" class="img-circle img-thumbnail" style="width: 100px;height: 100px;" />
-			       {% endif %}
-			       <h1>{{user.name }}</h1>
-			       <span>{% if user.is_superuser == True %}
-                    Admin : {% if user.is_active == True %} (active) {% else %} (inactive) {% endif %}
-                 {% else %} 
-                    Staff : {% if user.is_active == True %} (active) {% else %} (inactive) {% endif %}
-                 {% endif %}</span>
-                 <br />
-                 <span>Can Login : {% if user.is_staff == True %} (granted) {% else %} (denied) {% endif %}</span>
-			    </div>
-		       <div class="right">
-			      <p> Email: {{user.email }}</p>
-			      <p> National ID No: {{user.nid }}</p>
-			      <p> Mobile No: {{user.mobile }}</p>  
-		       </div>
-		     </div> 
-         <div class="col-md-6 col0xs-12">
-          {% if groups %}
-            <h2>Groups</h2>
-            {% for group in groups %}
-            <li>{{ group.name }}</li>
-            {% endfor %}
-          {% else %}
-              <li>No groups assigned</li>
-          {% endif %}
-         <h2> Permissions 
-            <a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>
-         </h2>
-         {% if permissions %}
-           {% for permission in permissions %}
-           <li>{{ permission.name }}</li>
-           {% endfor %}
-          {% else %}
-          <li>No permissions assigned</li>
-          {% endif %}
-         </div> 
-   </div>
-  </div>   
-  </div>
-</div>
+
+          </div>
+             
+          <table class="table datatable-header-footer">
+             <thead><tr><td colspan="2"><h5>User details</h5></td></tr></thead>
+            <tbody>
+              <tr><td>Email:</td><td> {{user.email }}</td></tr>
+              <tr><td>National ID No:</td><td> {{user.nid }}</td></tr>
+              <tr><td>Mobile No:</td><td> {{user.mobile }}</td></tr>
+              <tr><td>Can Login :</td><td>{% if user.is_staff == True %} <span class="text-success"> (granted)<span> {% else %} <span class="text-danger"> (denied)<span> {% endif %}</td></tr>
+              <tr><td>Status :</td><td>{% if user.is_active == True and user.is_staff == True %} 
+                       <span class="text-success"> (active)<span> {% else %} <span class="text-danger"> (inactive)<span> {% endif %}</td>
+              </tr>
+            </tbody>
+
+          </table> 
+         <a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn-block btn-info btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>        
+  		     </div> 
+           <div class="col-md-6 col0xs-12" style="padding-left: 60px;">
+              <div class="col-md-12">
+                <div class="panel border-left-lg border-left-warning invoice-grid timeline-content">
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <h6 class="text-semibold no-margin-top">Groups</h6>
+                        <ul class="list list-unstyled">
+                        {% if groups %}
+                            {% for group in groups %}
+                              <li>{{ group.name }}</li>
+                            {% endfor %}
+                          {% else %}
+                              <li><span class="text-semibold"> No groups assigned</span></li>
+                        {% endif %}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="panel border-left-lg border-left-info invoice-grid timeline-content">
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <h6 class="text-semibold no-margin-top">Permissions</h6>
+                        <ul class="list list-unstyled">
+                        {% if permissions %}
+                           {% for permission in permissions %}
+                           <li>{{ permission.name }}</li>
+                           {% endfor %}
+                        {% else %}
+                            <li><span class="text-semibold"> No permissions assigned</span></li>
+                        {% endif %}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+           </div> 
+     </div>
+    </div>  
+    </div> 
+    </div>
+  </span>
 {% endblock %}

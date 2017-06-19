@@ -1,0 +1,48 @@
+            {% load staticfiles %}
+               {% if users %}
+                  {% for user in users%}
+                  <tr class='clickable-row' id="{{user.pk }}">
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                    <!-- image -->
+                   <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
+                   {% if user.image %}
+                      <img src="{{user.image.url }}" alt="" class="circle teal img-responsive img-circle" style="width: 40px;height: 40px;"/>
+                   {% else %}
+                      <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
+                   {% endif %}
+                     <!-- product name -->
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.name}}</td>
+                    <!-- product category -->
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.email}}
+                    </td>
+                    <!-- role -->
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}"> 
+                    {% if user.is_superuser == True %}admin{% else %} staff {% endif %}</td>
+                    <!-- actions -->
+                    <td class="text-center">
+                      <ul class="icons-list">
+                       {% if perms.userprofile.change_user %}
+                        <li><a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
+                        {% endif %}
+                         {% if perms.userprofile.delete_user %}
+                        <li>
+                          <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:user-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                         </a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                   <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
+               {% endif %}
+              
+               <script type="text/javascript">
+                 $(document).ready(function(){
+                    $(".td").click(function() {
+                       window.location = $(this).data("href");
+                    });
+                 });
+               </script>

@@ -6,7 +6,8 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-        url(r'^$', views.perms, name='perms'),
+        url(r'^$', views.groups, name='groups'),
+        url(r'^groups/$', views.perms, name='perms'),
         url(r'^add_group/$', views.create_group, name='add_group'),
         url(r'^group_assign_permission/$', views.group_assign_permission, name='group_assign_permission'),
         url(r'^get_search_users/$', views.get_search_users, name='get_search_users'),
@@ -14,6 +15,7 @@ urlpatterns = [
         url(r'^group_manage/$', views.group_manage, name='group_manage'),
         url(r'^get_group_users/$', views.get_group_users, name='get_group_users'),
         url(r'^group_update/$', views.group_update, name='group_update'),
+        url(r'^detail/(?P<pk>[0-9]+)/$', views.group_detail, name='group-detail'),
         url(r'^delete/(?P<pk>[0-9]+)/$', views.group_delete, name='group-delete'),
 ]
 
