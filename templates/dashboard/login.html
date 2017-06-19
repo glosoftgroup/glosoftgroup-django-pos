@@ -53,7 +53,8 @@
         <div class="content">
 
           <!-- Simple login form -->
-          <form novalidate>
+          <form name="loginForm" id="loginForm">
+            {% csrf_token %} 
             <div class="panel panel-body login-form">
               <div class="text-center">
                 <div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>
@@ -65,21 +66,21 @@
               </div>
 
               <div class="form-group has-feedback has-feedback-left">
-                <input type="text" class="form-control email" placeholder="Email">
+                <input type="text" class="form-control email" name="email" placeholder="Email">
                 <div class="form-control-feedback">
                   <i class="icon-user text-muted"></i>
                 </div>
               </div>
 
               <div class="form-group has-feedback has-feedback-left">
-                <input type="text" class="form-control password" placeholder="Password">
+                <input type="password" name="password" class="form-control password" placeholder="Password">
                 <div class="form-control-feedback">
                   <i class="icon-lock2 text-muted"></i>
                 </div>
               </div>
 
               <div class="form-group">
-                <button type="button" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i></button>
+                <button type="submit" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i></button>
               </div>
             </div>
           </form>
@@ -145,26 +146,39 @@
     <!-- <script type="text/javascript" src="{% static 'backend/js/chart.js'%}"></script> -->
     {% block custom_js %}{% endblock %}
     <script type="text/javascript">
-       // $(document).ready(function(){
-         $('.login_btn').click(function(){
-            var url = "{% url 'login' %}";
-            $.ajax({
-              url: url,
-              type: "GET",
-              data:{
-                email: $('.email').val(),
-                password: $('.password').val()
-              },
-              async:false,
-              success:function(data){
-                $('#status').show();
-                alert(data);
-              },
-              error: function(error){
-                 console.log(error);
-              }
-            });
-         });
+         $("#loginForm").submit(function(e)
+          {
+              var postData = $(this).serializeArray();
+              var formURL = "{% url 'account_login' %}";
+
+              $.ajax(
+              {
+                  url : formURL,
+                  type: "POST",
+                  crossDomain: true,
+                  data : postData,
+                  success:function(data, textStatus, jqXHR) 
+                  {
+                      if(data == 'success'){ 
+                         window.location = "{% url 'dashboard:index' %}";
+                         $('.email').val('');
+                         $('.password').val('');
+                         console.log(data);
+                       }
+                       else{
+                        console.log(data);
+                          $('#status').show();
+                       }
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) 
+                  {
+                      $('#status').show();  
+                  }
+              });
+              e.preventDefault(); //STOP default action
+              e.unbind();
+          });
+
         
        // });
     </script>

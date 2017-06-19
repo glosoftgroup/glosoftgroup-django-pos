@@ -11,7 +11,7 @@ from ..product.models import Product
 
 
 def staff_member_required(f):
-    return _staff_member_required(f, login_url='account_login')
+    return _staff_member_required(f, login_url='home')
 
 
 @staff_member_required

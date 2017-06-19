@@ -57,7 +57,7 @@ def user_trails(request):
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
-
+@staff_member_required
 def users(request):
 	try:
 		users = User.objects.all().order_by('-id')
@@ -81,7 +81,7 @@ def users(request):
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
-
+@staff_member_required
 def usertrail_paginate(request):
 	page = int(request.GET.get('page', 1))
 	list_sz = request.GET.get('size')
@@ -175,6 +175,8 @@ def usertrail_paginate(request):
 		except EmptyPage:
 			users = paginator.page(paginator.num_pages)
 		return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users})
+
+@staff_member_required
 def user_paginate(request):
 	page = int(request.GET.get('page', 1))
 	list_sz = request.GET.get('size')
@@ -264,6 +266,7 @@ def user_process(request):
 		info_logger.info('User: '+str(request.user.name)+' created user:'+str(name))
 		return HttpResponse(last_id.id)
 
+@staff_member_required
 def user_detail(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	permissions = Permission.objects.filter(user=user)
@@ -282,6 +285,8 @@ def user_delete(request, pk):
 		user.delete()
 		user_trail(request.user.name, 'deleted user: '+ str(user.name),'delete')
 		return HttpResponse('success')
+
+@staff_member_required
 def user_edit(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	permissions = Permission.objects.all()
@@ -291,6 +296,7 @@ def user_edit(request, pk):
 	info_logger.info('User: '+str(request.user.name)+' accessed edit page for user: '+str(user.name))
 	return TemplateResponse(request, 'dashboard/users/edit_user.html', ctx)
 
+@staff_member_required
 def user_update(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.method == 'POST':
@@ -326,6 +332,7 @@ def user_update(request, pk):
 			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name),'update')
 			return HttpResponse("success without image")
 
+@staff_member_required
 @csrf_exempt
 def user_assign_permission(request):
 	if request.method == 'POST':
@@ -362,7 +369,7 @@ def user_assign_permission(request):
 				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name),'add')
 				info_logger.info('User: '+str(request.user.name)+' assigned permissions for user: '+str(user.name))
 				return HttpResponse('permissions updated')
-
+@staff_member_required
 def user_search( request ):
 	
 	if request.is_ajax():
@@ -394,6 +401,7 @@ def user_search( request ):
 
 			return TemplateResponse(request, 'dashboard/users/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
+@staff_member_required
 def usertrail_search( request ):
 	
 	if request.is_ajax():
@@ -424,6 +432,8 @@ def usertrail_search( request ):
 				return TemplateResponse(request,'dashboard/users/trail/paginate.html',{'users':users})
 
 			return TemplateResponse(request, 'dashboard/users/trail/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
+
+@staff_member_required			
 def users_pdf(request):
 	users = User.objects.all()
 	data = {
@@ -434,6 +444,7 @@ def users_pdf(request):
 	pdf = render_to_pdf('dashboard/users/pdf/users.html', data)
 	return HttpResponse(pdf, content_type='application/pdf')
 
+@staff_member_required
 def users_export_csv(request):
 	pdfname = 'users'+str(random.random())
 	response = HttpResponse(content_type='text/csv')
