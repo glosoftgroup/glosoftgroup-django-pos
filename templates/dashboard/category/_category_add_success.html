@@ -1,0 +1,18 @@
+{% load static %}
+<div class="col-md-12" id='category_field'>              
+  <div class="multi-select-full">   
+    {{ product_form.categories }}
+  </div>                         
+</div>
+<!-- scripts -->
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript">
+	// Default initialization
+    $(".styled, .multiselect-container input").uniform({
+        radioClass: 'choice'
+    });
+    // Basic select
+    $('.bootstrap-select').selectpicker();
+</script>

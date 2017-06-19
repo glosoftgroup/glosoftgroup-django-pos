@@ -155,33 +155,45 @@
                     {% else %}
                     <fieldset>
                     {% endif %}
-                   
+                    <!-- product name -->
                       <div class="form-group">
                         <label>Product Name:<i class='text-muted'>required</i></label>
                         {{ product_form.name}}
                       </div>
+                      <!-- product category -->
                       <div class="form-group">
-                          <label>{{ product_form.categories.label }}:<i class='text-muted'>required</i></label>
-                          <div class="input-group">
+                        <label>
+                        {{ product_form.categories.label }}:
+                        <i class='text-danger'> *</i>
+                        </label>
+                       <div class="row">
+                        <div class="col-md-8" id='category_field'>              
                           <div class="multi-select-full">   
                             {{ product_form.categories }}
-                            <div class="input-group-btn">
-                              <button type="button" class="btn btn-primary" id="add-new-tax">Add new</button>
-                            </div>
-                            </div>
-                          </div>
-                          <!-- <span class="help-block">Add category</span> -->
-                        </div> 
+                          </div>                         
+                        </div>
+                        <div class="col-md-4">
+                          <button href="#modal_add_category" class="btn btn-flat" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                          <i class=" icon-stack-plus"></i>
+                          Add category
+                          </button>
+                        </div>
+                       </div>
+                      </div> 
+
+                      <!-- product type -->
                       <div class="form-group">
                       <label>Product Type</label> 
                       <div class="input-group">          
                       {{ product_form.product_class}}
                          <div class="input-group-btn">
-                            <button type="button" class="btn btn-primary" id="add-new-tax">Add new</button>
+                            <button type="button" class="btn btn-primary" id="add-new-type">Add new</button>
                           </div>
                       </div>
                        <!-- {{ form_classes }} -->
                       </div>
+
+                      <!-- product attributes -->
                       <div class="form-group" id='div_attributes'>
                         <label>Product Attributes</label>
                          {% for attribute_field in product_form.iter_attribute_fields %}
@@ -304,10 +316,6 @@
                           </div>
                         </div> -->
                       </div>
-
-                      
-
-
                     </fieldset>
                   </div>                  
                 </div>
@@ -734,6 +742,7 @@
 </div>
  
  {% include "dashboard/includes/_modal_images.html"  %}
+ {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
 {% endblock %}
 
@@ -759,6 +768,8 @@
 
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switchery.min.js' %}"></script>
+<!-- additional js -->
+<script type="text/javascript" src="{% static 'backend/js/category.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/tasks_grid.js' %}"></script>
 <script type="text/javascript">
  
@@ -845,23 +856,22 @@
     
   
   $( "#add-new-tax").on('click',function() {   
-    var taxvalue = $( this ).val();
-         
+      var taxvalue = $( this ).val();         
       {% url "dashboard:tax-add-ajax" as url %} 
       var url = "{{ url }}";
       var posting = $.post( url, {} );
       // Put the results in a div
       posting.done(function( data ) {    
-      $("#add_tax_form" ).empty().append( data ); 
-      $('#modal_add_tax').modal(); 
+        $("#add_tax_form" ).empty().append( data ); 
+        $('#modal_add_tax').modal(); 
       });
     
    });
   
-  // submit add tax form
-  function notifyerror() {
+  
+   function notify(msg) {
           new PNotify({
-              text: 'Enter a valid tax',
+              text: msg,
               addclass: 'bg-danger'
           });
       }
@@ -870,7 +880,7 @@
     var tax = $('#id_tax').val();
     var tax_name = $('#id_tax_name').val();
     if(!$.isNumeric(tax)){ 
-      notifyerror();
+      notify('Enter a valid tax');
       return false; 
     }
     // post form data using jquery
@@ -888,9 +898,8 @@
          $('#modal_add_tax').modal('hide');
          $('#tax_field').empty().append(data);
        }else
-       {
-                 
-       $('#modal_add_tax').modal();
+       {                 
+        $('#modal_add_tax').modal();
        }
      
       });
@@ -940,8 +949,11 @@
   }
 });
   </script>
+<script type="text/javascript">
+  $('#id_description').attr('required','required');
+</script>
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
-<!-- <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script> -->
+
 {% if product.pk %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/media/fancybox.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/gallery.js' %}"></script>

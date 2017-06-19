@@ -5,11 +5,13 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.utils.translation import pgettext_lazy
 
-from ...product.models import Category
+from ...product.models import ( Category, 
+                                Product, 
+                                ProductClass)
 from ..views import staff_member_required
-from .forms import CategoryForm
+from .forms import CategoryForm, ProductForm
 from django.db.models import Q
-
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 @staff_member_required
 def category_list(request, root_pk=None):
@@ -26,7 +28,6 @@ def category_list(request, root_pk=None):
     ctx = {'categories': categories, 'path': path, 'root': root}
     return TemplateResponse(request, 'dashboard/category/list.html', ctx)
 
-
 @staff_member_required
 def category_create(request, root_pk=None):
     category = Category()
@@ -37,11 +38,21 @@ def category_create(request, root_pk=None):
             request,
             pgettext_lazy(
                 'Dashboard message', 'Added category %s') % category)
+        if request.is_ajax():
+            product = Product()
+            class_pk = 1
+            product_class = get_object_or_404(ProductClass, pk=class_pk)
+            product.product_class = product_class
+            product_form = ProductForm(request.POST or None, instance=product)
+            ctx = {'category': category, 'product_form': product_form}
+            return TemplateResponse(request, 'dashboard/category/_category_add_success.html', ctx)    
         if root_pk:
             return redirect('dashboard:category-list', root_pk=root_pk)
         else:
             return redirect('dashboard:category-list')
     ctx = {'category': category, 'form': form}
+    if request.is_ajax():        
+        return TemplateResponse(request, 'dashboard/category/ajax_modal_detail.html', ctx)    
     return TemplateResponse(request, 'dashboard/category/detail.html', ctx)
 
 
