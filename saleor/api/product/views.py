@@ -28,8 +28,10 @@ from ...product.models import (
     )
 from ...sale.models import (Sales)
 from ...order.models import Order
+from ...customer.models import Customer
 from .serializers import (
     CreateStockSerializer,
+    CustomerListSerializer,
     ProductStockListSerializer,
     ProductListSerializer,
     UserListSerializer,    
@@ -50,7 +52,9 @@ class CreateStockAPIView(CreateAPIView):
     #permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Stock.objects.all()
 
-
+class CustomerListAPIView(ListAPIView):
+    serializer_class = CustomerListSerializer
+    queryset = Customer.objects.all()
 
 class UserDetailAPIView(generics.RetrieveAPIView):
     queryset = User.objects.all()

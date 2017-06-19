@@ -1,7 +1,6 @@
 from rest_framework.views import exception_handler
 from .api.product.serializers import UserSerializer
 import logging
-
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')

@@ -1,14 +1,14 @@
 from rest_framework.serializers import (   
-	BooleanField,
-	EmailField,
-	DictField,
-	CharField,
-	ModelField,
-	ModelSerializer,
-	HyperlinkedIdentityField,
-	SerializerMethodField,
-	ValidationError
-	)
+			BooleanField,
+			EmailField,
+			DictField,
+			CharField,
+			ModelField,
+			ModelSerializer,
+			HyperlinkedIdentityField,
+			SerializerMethodField,
+			ValidationError
+			)
 from django.contrib.auth.models import Permission
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
@@ -24,6 +24,7 @@ from ...product.models import (
 	ProductVariant,
 	Stock,
 	)
+from ...customer.models import Customer
 
 import logging
 debug_logger = logging.getLogger('debug_logger')
@@ -68,10 +69,33 @@ class UserListSerializer(serializers.ModelSerializer):
 				 'email', 
 				 'url', 
 				 'delete_url')
+
+
+class CustomerListSerializer(serializers.ModelSerializer):
+	url = HyperlinkedIdentityField(view_name='product-api:detail')
+	delete_url = HyperlinkedIdentityField(view_name='product-api:customer-delete')
+	#profile = ProfileSerializer(required=False, )
+	class Meta:
+		model = Customer
+		fields = ('id',
+				 'email', 
+				 'url',
+				 'nid',
+				 'delete_url'
+				 )
+
 class TrackSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = SoldItem
-		fields = ('order','sku', 'quantity')
+		fields = (
+					'order',
+					'sku', 
+					'quantity',
+					'unit_cost',
+					'total_cost'
+				 )
+
+
 class SalesSerializer(serializers.ModelSerializer):
 	url = HyperlinkedIdentityField(view_name='product-api:sales-details')
 	
@@ -99,7 +123,6 @@ class SalesSerializer(serializers.ModelSerializer):
 			if stock:
 				Stock.objects.allocate_stock(stock, solditem_data['quantity'])        			
 		return sales
-
 		
 
 class OrderedItemSerializer(serializers.Serializer):
