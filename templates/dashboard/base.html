@@ -157,7 +157,7 @@
                     {% endif %}
                     {% if perms.userprofile.view_usertrail %}
                     <li class="{% block menu_perm_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:perms' %}"><i class='icon-bag'></i>Permissions</a>
+                      <a href="{% url 'dashboard:groups' %}"><i class='icon-bag'></i>Groups</a>
                     </li>
                     {% endif %}
                     {% if perms.userprofile.view_product %}  
@@ -383,7 +383,9 @@ margin-bottom: 0;">
   
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-    
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <!-- <script type="text/javascript" src="{% static 'backend/js/pages/components_pagination.js' %}"></script> -->
    
     
     {% include "dashboard/includes/_messages.html" %}
