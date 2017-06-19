@@ -1,0 +1,74 @@
+             {% load staticfiles %}
+               {% if items %}
+                {% for item in items %}
+                  <tr>
+                    <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
+                    <td>{{item.sku}}</td>
+                    <td>{% if item.sales.user.email %}{{item.sales.user.email}}{% else %}{{item.sales.user.name}}{% endif %}</td>
+                    <td>{{item.product_name}}</td>
+                    <td>{{item.sales.sub_total}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{item.sales.total_net}}</td>
+                  </tr>
+                {% endfor %}
+                {% else %}
+                 <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                {% endif %}
+
+
+            <script type="text/javascript">
+                 $(document).ready(function(){
+
+                    $('.click').alert('hey');
+                    $(".td").click(function() {
+                       window.location = $(this).data("href");
+                    });
+
+                    $('.modal-trigger').on('click', function (e) {
+
+                       var url = $(this).data('href')
+                       var prompt_text = $(this).data('title');
+                       var username = $(this).data('name');
+                       var modal = $(this).data('ta');
+                       var id = $(this).data('id');
+                       $('.del').attr('data-id', id);
+                       $('.del').attr('data-href', url);
+                       $('.modal-title').html(prompt_text);
+                       $(modal).modal();
+                       $('.delete_form').attr('action',url);
+                    });
+
+                    /* clicked the submit button */
+                    $('.del').on('click', function (e) {
+                        var f = document.getElementById('delform');
+                        var formData = new FormData(f);
+                        var id = $(this).data('id');
+                        var url = $(this).data('href');
+                        $.ajax({
+                            url: url,
+                            type: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success:function(data){        
+                              $('#modal_instance').modal('hide');
+                              $('#tb #'+id).remove();            
+                              $.jGrowl('User deleted successfully', {
+                                header: 'Well done!',
+                                theme: 'bg-success'
+                              });
+                              window.location.reload();
+                           // $("#mydiv").load(location.href + " #mydiv");
+                            },
+                            error:function(error){
+                              console.log(error);
+                              $.jGrowl('Error deleting Staff', {
+                                  header: 'Oh snap!',
+                                  theme: 'bg-danger'
+                              });
+                            }
+                        });
+                    });
+      
+                 });
+               </script>
