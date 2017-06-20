@@ -21,14 +21,13 @@ from saleor.decorators import permission_decorator, user_trail
 #     return django_views.login(request, **kwargs)
 # @find_and_assign_anonymous_cart()
 def login(request):
-	# email = request.POST.get('email')
-	# password = request.POST.get('password')
 	email = request.POST['email']
 	password = request.POST['password']
 	user = auth.authenticate(email=email, password=password)
 	if user is not None:
 		if user.is_active:
 			auth.login(request, user)
+			user_trail(request.user,"logged in ", "login")
 			# return redirect('dashboard:index')
 			return HttpResponse('success')
 		else: 

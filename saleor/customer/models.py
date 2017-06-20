@@ -5,17 +5,16 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.forms.models import model_to_dict
 from django.utils import timezone
-from datetime import date
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import pgettext_lazy
 from django_countries.fields import Country, CountryField
 from ..search import index
 
 
-class AddressManager(models.Manager):
+class AddressBookManager(models.Manager):
 
     def as_data(self, address):
-        data = model_to_dict(address, exclude=['id', 'user'])
+        data = model_to_dict(addressbook, exclude=['id', 'user'])
         if isinstance(data['country'], Country):
             data['country'] = data['country'].code
         return data
@@ -32,48 +31,48 @@ class AddressManager(models.Manager):
 
 
 @python_2_unicode_compatible
-class Address(models.Model):
+class AddressBook(models.Model):
     first_name = models.CharField(
-        pgettext_lazy('Address field', 'given name'),
+        pgettext_lazy('AddressBook field', 'given name'),
         max_length=256, blank=True)
     last_name = models.CharField(
-        pgettext_lazy('Address field', 'family name'),
+        pgettext_lazy('AddressBook field', 'family name'),
         max_length=256, blank=True)
     company_name = models.CharField(
-        pgettext_lazy('Address field', 'company or organization'),
+        pgettext_lazy('AddressBook field', 'company or organization'),
         max_length=256, blank=True)
     street_address_1 = models.CharField(
-        pgettext_lazy('Address field', 'address'),
+        pgettext_lazy('AddressBook field', 'address'),
         max_length=256, blank=True)
     street_address_2 = models.CharField(
-        pgettext_lazy('Address field', 'address'),
+        pgettext_lazy('AddressBook field', 'address'),
         max_length=256, blank=True)
     city = models.CharField(
-        pgettext_lazy('Address field', 'city'),
+        pgettext_lazy('AddressBook field', 'city'),
         max_length=256, blank=True)
     city_area = models.CharField(
-        pgettext_lazy('Address field', 'district'),
+        pgettext_lazy('AddressBook field', 'district'),
         max_length=128, blank=True)
     postal_code = models.CharField(
-        pgettext_lazy('Address field', 'postal code'),
+        pgettext_lazy('AddressBook field', 'postal code'),
         max_length=20, blank=True)
     country = CountryField(
-        pgettext_lazy('Address field', 'country'))
+        pgettext_lazy('AddressBook field', 'country'))
     country_area = models.CharField(
-        pgettext_lazy('Address field', 'state or province'),
+        pgettext_lazy('AddressBook field', 'state or province'),
         max_length=128, blank=True)
     phone = models.CharField(
-        pgettext_lazy('Address field', 'phone number'),
+        pgettext_lazy('AddressBook field', 'phone number'),
         max_length=30, blank=True)
-    objects = AddressManager()
+    objects = AddressBookManager()
 
     @property
     def full_name(self):
         return '%s %s' % (self.first_name, self.last_name)
 
     class Meta:
-        verbose_name = pgettext_lazy('Address model', 'address')
-        verbose_name_plural = pgettext_lazy('Address model', 'addresses')
+        verbose_name = pgettext_lazy('AddressBook model', 'address book')
+        verbose_name_plural = pgettext_lazy('AddressBook model', 'address books')
 
     def __str__(self):
         if self.company_name:
@@ -82,7 +81,7 @@ class Address(models.Model):
 
     def __repr__(self):
         return (
-            'Address(first_name=%r, last_name=%r, company_name=%r, '
+            'AddressBook(first_name=%r, last_name=%r, company_name=%r, '
             'street_address_1=%r, street_address_2=%r, city=%r, '
             'postal_code=%r, country=%r, country_area=%r, phone=%r)' % (
                 self.first_name, self.last_name, self.company_name,
@@ -91,61 +90,54 @@ class Address(models.Model):
                 self.phone))
 
 
-class UserManager(BaseUserManager):
+class CustomerManager(BaseUserManager):
 
-    def create_user(self, email, password=None, is_staff=False,
+    def create_customer(self, email, password=None,
                     is_active=True, username='', **extra_fields):
         'Creates a User with the given username, email and password'
-        email = UserManager.normalize_email(email)
-        user = self.model(email=email, is_active=is_active,
-                          is_staff=is_staff, **extra_fields)
+        email = CustomerManager.normalize_email(email)
+        customer = self.model(email=email, is_active=is_active,
+                           **extra_fields)
         if password:
-            user.set_password(password)
-        user.save()
-        return user
+            customer.set_password(password)
+        customer.save()
+        return customer
+    
 
-    def create_superuser(self, email, password=None, **extra_fields):
-        return self.create_user(email, password, is_staff=True,
-                                is_superuser=True, **extra_fields)
-
-
-class User(PermissionsMixin, AbstractBaseUser, index.Indexed):
-    email = models.EmailField(pgettext_lazy('User field', 'email'), unique=True)
+class Customer(models.Model):
+    email = models.EmailField(pgettext_lazy('Customer field', 'email'), unique=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     addresses = models.ManyToManyField(
-        Address, blank=True,
-        verbose_name=pgettext_lazy('User field', 'addresses'))
-    is_staff = models.BooleanField(
-        pgettext_lazy('User field', 'staff status'),
-        default=False)
+        AddressBook, blank=True,
+        verbose_name=pgettext_lazy('Customer field', 'addresses'))   
     is_active = models.BooleanField(
-        pgettext_lazy('User field', 'active'),
+        pgettext_lazy('Customer field', 'active'),
         default=True)
     nid = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
-    image = models.ImageField(upload_to='staff', default='staff/user.png')
+    image = models.FileField(upload_to='staff', blank=True, null=True)
     date_joined = models.DateTimeField(
-        pgettext_lazy('User field', 'date joined'),
+        pgettext_lazy('Customer field', 'date joined'),
         default=timezone.now, editable=False)
     default_shipping_address = models.ForeignKey(
-        Address, related_name='+', null=True, blank=True,
+        AddressBook, related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL,
-        verbose_name=pgettext_lazy('User field', 'default shipping address'))
+        verbose_name=pgettext_lazy('Customer field', 'default shipping address'))
     default_billing_address = models.ForeignKey(
-        Address, related_name='+', null=True, blank=True,
+        AddressBook, related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL,
-        verbose_name=pgettext_lazy('User field', 'default billing address'))
+        verbose_name=pgettext_lazy('Customer field', 'default billing address'))
 
     USERNAME_FIELD = 'email'
 
-    objects = UserManager()
+    objects = CustomerManager()
 
     search_fields = [
         index.SearchField('email')]
 
     class Meta:
-        verbose_name = pgettext_lazy('User model', 'user')
-        verbose_name_plural = pgettext_lazy('User model', 'users')
+        verbose_name = pgettext_lazy('Customer model', 'customer')
+        verbose_name_plural = pgettext_lazy('Customer model', 'customers')
 
     def get_full_name(self):
         return self.email
@@ -153,9 +145,3 @@ class User(PermissionsMixin, AbstractBaseUser, index.Indexed):
     def get_short_name(self):
         return self.email
 
-class UserTrail(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
-    action = models.CharField(max_length=100, null=True, blank=True)
-    now = models.DateTimeField(default=timezone.now)
-    date = models.DateField(default=date.today)
-    crud = models.CharField(max_length=100, null=True, blank=True)

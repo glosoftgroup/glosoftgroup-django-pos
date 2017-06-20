@@ -104,9 +104,9 @@
                             <td>{{item.sku}}</td>
                             <td>{% if item.sales.user.email %}{{item.sales.user.email}}{% else %}{{item.sales.user.name}}{% endif %}</td>
                             <td>{{item.product_name}}</td>
-                            <td>{{item.sales.sub_total}}</td>
+                            <td>{{item.unit_cost}}</td>
                             <td>{{item.quantity}}</td>
-                            <td>{{item.sales.total_net}}</td>
+                            <td>{{item.total_cost}}</td>
                           </tr>
                         {% endfor %}
                         {% else %}
@@ -128,6 +128,7 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
+                   Todays Sales: Kshs {{tsum.total_net__sum}}<br />
                    Total Sales: Kshs {{total_sales.total_net__sum}}<br />
                    Total Tax: Kshs {{ total_tax.total_tax__sum}}
                  </p>

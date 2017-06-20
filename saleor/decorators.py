@@ -30,5 +30,5 @@ def user_trail(name, action, tag):
 	# except:
 	# 	HttpResponse('error saving action')
 	# 	info_logger.info('status: 400, not able to add action')
-		record = UserTrail(name=name, action=action, crud= tag, date=date.today())
-		record.save()
+	record = UserTrail(name=name, action=action, crud= tag, date=date.today())
+	record.save()

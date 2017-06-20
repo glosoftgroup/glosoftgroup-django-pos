@@ -22,7 +22,7 @@ import logging
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User
-from ...sale.models import Sales, SoldItem, Item
+from ...sale.models import Sales, SoldItem
 from ...product.models import Product, ProductVariant
 from ...decorators import permission_decorator, user_trail
 
@@ -34,7 +34,10 @@ error_logger = logging.getLogger('error_logger')
 # @permission_required('userprofile.view_user', raise_exception=True)
 def sales_reports(request):
 	try:
+		today = datetime.date.today()
 		items = SoldItem.objects.all().order_by('-id')
+		ts = Sales.objects.filter(created__icontains=today)
+		tsum = ts.aggregate(Sum('total_net'))
 		total_sales = Sales.objects.aggregate(Sum('total_net'))
 		total_tax = Sales.objects.aggregate(Sum('total_tax'))
 		page = request.GET.get('page', 1)
@@ -52,7 +55,7 @@ def sales_reports(request):
 		if request.GET.get('initial'):
 			return HttpResponse(paginator.num_pages)
 		else:
-			return TemplateResponse(request, 'dashboard/reports/sales/sales.html', {'items':items, 'total_sales':total_sales,'total_tax':total_tax})
+			return TemplateResponse(request, 'dashboard/reports/sales/sales.html', {'items':items, 'total_sales':total_sales,'total_tax':total_tax, 'ts':ts, 'tsum':tsum})
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing sales reports')
@@ -66,11 +69,19 @@ def sales_paginate(request):
 	select_sz = request.GET.get('select_size')
 	gid = request.GET.get('gid')
 	items = SoldItem.objects.all().order_by('-id')
+	today = datetime.date.today()
+	ts = Sales.objects.filter(created__icontains=today)
+	tsum = ts.aggregate(Sum('total_net'))
+	total_sales = Sales.objects.aggregate(Sum('total_net'))
+	total_tax = Sales.objects.aggregate(Sum('total_tax'))
+
 	if request.GET.get('sth'):
 
 		if date:
 			try:
 				items = SoldItem.objects.filter(date=date).order_by('-id')
+				that_date = Sales.objects.filter(created__icontains=date)
+				that_date_sum = ts.aggregate(Sum('total_net'))
 				if p2_sz and gid:
 					paginator = Paginator(items, int(p2_sz))
 					items = paginator.page(page)
@@ -78,7 +89,7 @@ def sales_paginate(request):
 
 				paginator = Paginator(items, 10)
 				items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':date})
+				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':date,'total_sales':total_sales,'total_tax':total_tax,'tsum':tsum, 'that_date_sum':that_date_sum, 'date':date})
 
 			except ValueError as e:
 				return HttpResponse(e)
@@ -92,7 +103,7 @@ def sales_paginate(request):
 
 				paginator = Paginator(items, 10)
 				items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':action})
+				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':action, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
 
 			except ValueError as e:
 				return HttpResponse(e)
@@ -101,7 +112,7 @@ def sales_paginate(request):
 		if list_sz:
 			paginator = Paginator(items, int(list_sz))
 			items = paginator.page(page)
-			return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0})
+			return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
 		else:
 			paginator = Paginator(items, 10)
 		if p2_sz:
@@ -112,6 +123,8 @@ def sales_paginate(request):
 		if date:
 			try:
 				items = SoldItem.objects.filter(date=date).order_by('-id')
+				that_date = Sales.objects.filter(created__icontains=date)
+				that_date_sum = ts.aggregate(Sum('total_net'))
 				if p2_sz:
 					paginator = Paginator(items, int(p2_sz))
 					items = paginator.page(page)
@@ -119,7 +132,7 @@ def sales_paginate(request):
 
 				paginator = Paginator(items, 10)
 				items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':date})
+				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':date, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum, 'that_date_sum':that_date_sum, 'date':date})
 
 			except ValueError as e:
 				return HttpResponse(e)
@@ -148,8 +161,10 @@ def sales_search(request):
 
 		if q is not None:            
 			items = SoldItem.objects.filter( 
-				Q( sku__contains = q ) |
-				Q( product_name__contains = q ) ).order_by( 'id' )
+				Q( sku__icontains = q ) |
+				Q( product_name__icontains = q ) | 
+				Q(sales__created__icontains=q) | 
+				Q(sales__user__email__icontains=q)).order_by( 'id' )
 			paginator = Paginator(items, 10)
 			try:
 				items = paginator.page(page)
