@@ -1,0 +1,130 @@
+  {% load staticfiles %}
+  {% if groups %}
+    {% for group in groups %}
+    <tr class='clickable-row' id="{{group.id }}">
+      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}">#{{ forloop.counter }}</td>
+       <!-- group name -->
+      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}">{{group.name}}</td>
+      <!-- actions -->
+      <td class="text-center">
+        <ul class="icons-list">
+          <li>
+            <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
+           class="modal_trigger_edit btn btn-default btn-sm edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal" style="font-size: 11px;"></i> edit</a>
+          </li>
+          <li>
+            <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
+           class="modal_trigger_delete btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+           </a>
+          </li>
+        </ul>
+      </td>
+    </tr>
+    {% endfor %}
+  {% else %}
+     <tr><td colspan="6"><h2 class="text-center">no groups available</h2></td></tr>
+ {% endif %}
+
+<script type="text/javascript">
+  //**@ global users array
+    var names = [];
+ $(document).ready(function(){
+
+     //**@ edit modal
+    $('.modal_trigger_edit').on('click', function (e) {
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('#group-id').val(id);
+         var user_url = $(this).data('users');
+         $('#g_name').val(username);
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+         var token = '{{ csrf_token }}';
+         
+          //*@ get group permissions
+          $.post(url,{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"}, function(data){
+            $('.permissions_display').html(data);
+          });
+
+          //*@ get group users
+          $.ajax({
+            type:"POST",
+            url:user_url,
+            data:{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"},
+            async:false,
+            success:function(data){
+              names = data;
+              console.log(names);
+            },error:function(error){
+              console.log(error);
+            }
+          });
+        //*@ populate table
+        var table_body = $('#group_user_table tbody');
+        var parent = table_body.parent();
+        
+        table_body.detach().empty().each(function(i, val){
+            for (var x = 0; x < remove_duplicates(names).length; x++){
+                $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
+                if (x == remove_duplicates(names).length - 1){
+                    $(this).appendTo(parent);
+                }
+            }
+        });
+
+    });
+
+    //**@ delete modal
+$('.modal_trigger_delete').on('click', function (e) {
+     var url = $(this).data('href')
+     var prompt_text = $(this).data('title');
+     var username = $(this).data('name');
+     var modal = $(this).data('ta');
+     var id = $(this).data('id');
+     $('.del').attr('data-id', id);
+     $('.del').attr('data-href', url);
+     $('.modal-title').html(prompt_text);
+     $(modal).modal();
+     $('.delete_form').attr('action',url);
+});
+//**@ on modal delete
+$('.del').on('click', function (e) {
+    var f = document.getElementById('delform');
+    var formData = new FormData(f);
+    var id = $(this).data('id');
+    var url = $(this).data('href');
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success:function(data){        
+          $('#modal_instance').modal('hide');
+          $('#tb #'+id).remove();            
+          $.jGrowl('Group deleted successfully', {
+            header: 'Well done!',
+            theme: 'bg-success'
+          });
+          window.location.reload();
+       // $("#mydiv").load(location.href + " #mydiv");
+        },
+        error:function(error){
+          console.log(error);
+          $.jGrowl('Error deleting Staff', {
+              header: 'Oh snap!',
+              theme: 'bg-danger'
+          });
+        }
+    });
+});
+
+ });
+
+</script>

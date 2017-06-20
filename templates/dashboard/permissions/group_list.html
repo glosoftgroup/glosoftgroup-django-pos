@@ -19,13 +19,9 @@
 
 {% block content %}
  <div class="row">
-  <div class="col s12">
-  <h2>Groups</h2>
-    
-      <!-- Header and footer fixed -->
+     <div class="col-md-12">
       <div class="panel panel-flat">
-        <div class="panel-heading">        
-          {#{% include "dashboard/includes/_pagination.html" with page_obj=products %}#}
+        <div class="panel-heading">      
           <div class="heading-elements">
             <ul class="icons-list">              
               <li><a data-action="collapse"></a></li>       
@@ -33,21 +29,46 @@
             </ul>
           </div>
         </div>
+        <div class="panel-body">
+            <div class="col-md-6">
+             <label>Search Groups</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_group placeholder="Search Groups" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" data-width="100%" tabindex="-98" style="display: none;">
+                    <option >5</option>
+                    <option >10</option>
+                    <option >20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                   <a href="{% url 'dashboard:perms' %}" class="btn btn-primary waves-effect waves-light">Add Group</a>
+                {% endif %}
+              </div>
+            </div>
+        </div>
+      </div>
+   </div> 
+  <div class="col-md-12">
+
+    <div id="pagination-div">
+      <div class="panel panel-flat">
+        <div class="panel-body">
         <div class="table-responsive">
          
-
-          <table class="table table-bordered datatable-header-footer">
-            <caption style="margin-bottom: 10px;">
-            {% if perms.userprofile.add_user %}
-               <a href="{% url 'dashboard:perms' %}" class="btn btn-primary waves-effect waves-light">Add Group</a>
-            {% endif %}
-
-              {#{% for p in request.user.get_all_permissions %}#}
-              {#{{p}}#}
-              {#{% endfor %}#}
-
-             </caption> 
-                <thead style="border-top:1px solid #ddd;">
+          <table class="table table-bordered datatable-header-footer" style="border-bottom:1px solid #ddd;">
+                <thead>
                  <tr>
                     <th>Id</th>
                     <th>Group Name</th>
@@ -86,9 +107,20 @@
                   </tbody>
 
            </table>
-
+         </div>
         </div>
+        <div class="my-paginate">
+            <div class="text-center bootpag-callback" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav">Page 1</div>
+            </div>
+            <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
+              <ul class="pagination2 bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1</div>
+            </div>
+          </div>
       </div>
+      </div><!-- pagination-div-->
  
   </div>
 </div>
@@ -122,7 +154,7 @@
               <div class="form-group">
                <label>Add Users:</label>
                 <div class="multi-select-full">
-                  <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="edit_multiple" placeholder="select a user...">
+                  <select class="multiselect-full-featured" multiple="multiple" style="display: nones;" name="user_select" id="edit_multiple" placeholder="select a user...">
                   {% for usr in users %}
                     {% if usr.is_active == True and usr.is_superuser == False %}
                        <option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}
@@ -149,7 +181,7 @@
            </div>
            <div class="row">
             <div class="col-md-12">
-             <div class="table-responsive pre-scrollable group-users" style="height: 240px;">
+             <div class="table-responsive pre-scrollable group-users">
              <table class="table table-framed" id="group_user_table">
                 <thead>
                   <tr>
@@ -224,6 +256,7 @@
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
 function remove_duplicates(objectsArray) {
     var usedObjects = {};
@@ -259,9 +292,6 @@ $('document').ready(function () {
          });
     });
 
-    $(".td").click(function() {
-        window.location = $(this).data("href");
-    });
 
     //**@ edit modal
     $('.modal_trigger_edit').on('click', function (e) {
@@ -275,7 +305,7 @@ $('document').ready(function () {
          $('#g_name').val(username);
          $('.del').attr('data-id', id);
          $('.del').attr('data-href', url);
-         $('.modal-title').html(prompt_text +'id: '+id);
+         $('.modal-title').html(prompt_text);
          $(modal).modal();
          $('.delete_form').attr('action',url);
          var token = '{{ csrf_token }}';
@@ -312,7 +342,52 @@ $('document').ready(function () {
         });
 
     });
+   // $('.bootstrap-select').selectpicker();
+   //**@ pagination & filters
+   var sz;
+    //**@ get
+    $.ajax({ url: "{% url 'dashboard:groups' %}",type: 'GET',data: {initial:'initial'},
+        async:false,success: function(data){
+         sz = data;
+    }});
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
 
+       $.ajax({ url: "{% url 'dashboard:group_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+    });
+
+ 
+    //**@ pagination
+    $('.bootpag-callback').bootpag({
+        total: parseInt(sz),
+        maxVisible: 3,
+        leaps: false
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+sz); // or some ajax content loading...
+            $.get("{% url 'dashboard:group_paginate' %}",{page:num},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+    var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+    $('.search_group').keyup(function() {
+    var search_text = $(this).val();
+    delay(function(){ 
+       var url = "{% url 'dashboard:group_search' %}";
+       $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+              $('#pagination-div').html(data);
+       }});
+    }, 500 );
+});
 });
 
 //**@ users select
@@ -439,12 +514,11 @@ $('.del').on('click', function (e) {
             header: 'Well done!',
             theme: 'bg-success'
           });
-          window.location.reload();
-       // $("#mydiv").load(location.href + " #mydiv");
+          // window.location.reload();
         },
         error:function(error){
           console.log(error);
-          $.jGrowl('Error deleting Staff', {
+          $.jGrowl('Error deleting Group', {
               header: 'Oh snap!',
               theme: 'bg-danger'
           });
@@ -537,7 +611,7 @@ $( ".check" ).on( "click", function(){
     $(this).parent('span').removeClass('checked');
     $(this).parent().parent().parent().siblings('span').hide();
   }
-} );
+});
 
 </script>
 {% endblock %}

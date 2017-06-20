@@ -143,7 +143,7 @@ $(function () {
         bindto: '#c3-bar-stacked-chart',
         size: { height: 400 },
         color: {
-            pattern: ['#FF9800', '#F44336', '#009688', '#4CAF50']
+            pattern: ['#FF9800', '#F44336', '#2196F3', '#4CAF50']
         },
         data: {
             columns: [
@@ -189,7 +189,7 @@ $(function () {
         bindto: '#c3-combined-chart',
         size: { height: 400 },
         color: {
-            pattern: ['#FF9800', '#F44336', '#009688', '#4CAF50', '#03A9F4', '#8BC34A']
+            pattern: ['#FF9800', '#F44336', '#2196F3', '#4CAF50', '#03A9F4', '#8BC34A']
         },
         data: {
             columns: [

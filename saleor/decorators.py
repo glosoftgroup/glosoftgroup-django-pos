@@ -2,6 +2,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from .userprofile.models import UserTrail
 from django.shortcuts import get_object_or_404
+from datetime import date
+from django.utils import timezone
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -20,7 +22,7 @@ def permission_decorator(argument):
 		return wrap
 	return permitted_users_only
 
-def user_trail(name, action):
+def user_trail(name, action, tag):
 	# try:
 	# 	record = UserTrail(name=name, action=action)
 	# 	record.save()
@@ -28,5 +30,5 @@ def user_trail(name, action):
 	# except:
 	# 	HttpResponse('error saving action')
 	# 	info_logger.info('status: 400, not able to add action')
-		record = UserTrail(name=name, action=action)
-		record.save()
+	record = UserTrail(name=name, action=action, crud= tag, date=date.today())
+	record.save()

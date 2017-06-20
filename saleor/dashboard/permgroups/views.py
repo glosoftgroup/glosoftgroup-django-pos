@@ -11,11 +11,16 @@ from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
+from django.db.models import Q
+from django.db import IntegrityError
 import json
 import simplejson
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
+from django.core.paginator import Paginator
+
 from ...userprofile.models import User
+from ...decorators import permission_decorator, user_trail
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -26,14 +31,87 @@ def groups(request):
 	users = User.objects.all().order_by('id')
 	permissions = Permission.objects.all()
 	groups = Group.objects.all()
+	page = request.GET.get('page', 1)
+	paginator = Paginator(groups, 5)
 	try:
-		first_group = Group.objects.filter()[:1].get()
-		users_in_group = User.objects.filter(groups__id=first_group.id)
+		groups = paginator.page(page)
+	except PageNotAnInteger:
+		groups = paginator.page(1)
+	except EmptyPage:
+		groups = paginator.page(paginator.num_pages)
+	except InvalidPage:
+		groups = paginator.page(1)
+	user_trail(request.user.name, 'accessed groups list page', 'view')
+	info_logger.info('User: '+str(request.user.name)+' accessed the view groups page')
+	if request.GET.get('initial'):
+		return HttpResponse(paginator.num_pages)
+	else:
+		try:
+			first_group = Group.objects.filter()[:1].get()
+			users_in_group = User.objects.filter(groups__id=first_group.id)
+			return TemplateResponse(request, 'dashboard/permissions/group_list.html', 
+			{'users':users, 'permissions':permissions, 'groups':groups, 'users_in_group':users_in_group})
+		except: ObjectDoesNotExist
 		return TemplateResponse(request, 'dashboard/permissions/group_list.html', 
-		{'users':users, 'permissions':permissions, 'groups':groups, 'users_in_group':users_in_group})
-	except: ObjectDoesNotExist
-	return TemplateResponse(request, 'dashboard/permissions/group_list.html', 
-		{'users':users, 'permissions':permissions, 'groups':groups})
+			{'users':users, 'permissions':permissions, 'groups':groups})
+
+def group_paginate(request):
+	groups = Group.objects.all().order_by('-id')
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+	if list_sz:
+		paginator = Paginator(groups, int(list_sz))
+		groups = paginator.page(page)
+		return TemplateResponse(request,'dashboard/permissions/p2.html',{'groups':groups, 'pn':paginator.num_pages,'sz':list_sz})
+	else:
+		paginator = Paginator(groups, 5)
+	if p2_sz:
+		paginator = Paginator(groups, int(p2_sz))
+		groups = paginator.page(page)
+		return TemplateResponse(request,'dashboard/permissions/paginate.html',{'groups':groups})
+
+	try:
+		groups = paginator.page(page)
+	except PageNotAnInteger:
+		groups = paginator.page(1)
+	except InvalidPage:
+		groups = paginator.page(1)
+	except EmptyPage:
+		groups = paginator.page(paginator.num_pages)
+	return TemplateResponse(request,'dashboard/permissions/paginate.html',{'groups':groups})
+
+def group_search( request ):
+
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size',10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get( 'q' )
+		if list_sz is None:
+			sz = 5
+		else:
+			sz = list_sz
+
+		if q is not None:            
+			groups = Group.objects.filter( 
+				Q( name__contains = q ) ).order_by( 'id' )
+		   	paginator = Paginator(groups, 5)
+			try:
+				groups = paginator.page(page)
+			except PageNotAnInteger:
+				groups = paginator.page(1)
+			except InvalidPage:
+				groups = paginator.page(1)
+			except EmptyPage:
+				groups = paginator.page(paginator.num_pages)
+			if p2_sz:
+				groups = paginator.page(page)
+				return TemplateResponse(request,'dashboard/permissions/paginate.html',{'groups':groups})
+
+			return TemplateResponse(request, 'dashboard/permissions/search.html', {'groups':groups, 'pn':paginator.num_pages,'sz':sz,'q':q})
+
 
 def perms(request):
 	users = User.objects.all().order_by('id')
@@ -65,6 +143,7 @@ def create_group(request):
 			group.user_set.add(*users)
 			group.save()
 			last_id_group = Group.objects.latest('id')
+			user_trail(request.user.name, 'added group '+group_name, 'add')
 			return JsonResponse({"id":last_id_group.id, "name":last_id_group.name})
 
 @csrf_exempt
@@ -145,6 +224,7 @@ def group_edit(request):
 	group_permissions = Permission.objects.filter(group=group)
 	ctx = {'group': group,'permissions':permissions, 'group_permissions':group_permissions}
 	html = render_to_string('dashboard/permissions/group_permissions.html', ctx)
+	user_trail(request.user.name, 'updated group '+group.name, 'update')
 	return HttpResponse(html)
 
 def group_detail(request, pk):
@@ -161,10 +241,9 @@ def group_delete(request, pk):
 		group.permissions.remove(*group_permissions)
 		for user in users_in_group:
 			group.user_set.remove(user)
-			# user_groups = user.groups.all()
-			# all_permissions = [group.permissions.all() for group in user_groups]
 			user.user_permissions.remove(*group_permissions)
 		group.delete()
+		user_trail(request.user.name, 'deleted group '+group.name, 'delete')
 		return HttpResponse('success')
 	else:
 		return HttpResponse('error deleting')
@@ -222,25 +301,39 @@ def group_update(request):
 		else:
 			users_loop(True, group_has_users)
 			if group_has_permissions in permission_list:
-				not_in_group_permissions = list(set(permission_list) - set(group_has_permissions))
-				group.permissions.add(*not_in_group_permissions)
-				group.save()
-				user_manage(users, group_has_users, group)
-				#** refine update users permissions
-				refine_users_permissions(group_users_set_2, permission_list)
-				return HttpResponse('permissions added')
+				try:
+					not_in_group_permissions = list(set(permission_list) - set(group_has_permissions))
+					group.permissions.add(*not_in_group_permissions)
+					group.save()
+					user_manage(users, group_has_users, group)
+					#** refine update users permissions
+					refine_users_permissions(group_users_set_2, permission_list)
+					user_trail(request.user.name, 'added permissions to group: '+ group.name, 'add')
+					info_logger.info(request.user.name, 'added permissions to group: '+ group.name)
+					return HttpResponse('permissions added')
+				except IntegrityError as e:
+					debug_logger.debug(e)
+					error_logger.error(e)
+					return HttpResponse(str(e)+"That group already exists")
 			else:
-				not_in_group_permissions = list(set(permission_list) - set(group_has_permissions))
-				group.permissions.remove(*group_has_permissions)
-				group.permissions.add(*not_in_group_permissions)
-				group.save()
-				user_manage(users, group_has_users, group)
-				users2 = User.objects.filter(groups__name=group.name)
-				for user in users2:
-					user.user_permissions.remove(*group_has_permissions)
-					user.user_permissions.add(*not_in_group_permissions)
-					user.save()
-				return HttpResponse('permissions updated')
+				try:
+					not_in_group_permissions = list(set(permission_list) - set(group_has_permissions))
+					group.permissions.remove(*group_has_permissions)
+					group.permissions.add(*not_in_group_permissions)
+					group.save()
+					user_manage(users, group_has_users, group)
+					users2 = User.objects.filter(groups__name=group.name)
+					for user in users2:
+						user.user_permissions.remove(*group_has_permissions)
+						user.user_permissions.add(*not_in_group_permissions)
+						user.save()
+					user_trail(request.user.name, 'updated permissions to group: '+ group.name,'update')
+					info_logger.info(request.user.name, 'updated permissions to group: '+ group.name)
+					return HttpResponse('permissions updated')
+				except IntegrityError as e:
+					debug_logger.debug(e)
+					error_logger.error(e)
+					return HttpResponse(str(e)+"That group already exists")
 
 #** filter and save users in order
 def user_manage(users, group_has_users, group):

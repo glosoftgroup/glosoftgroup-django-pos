@@ -177,7 +177,7 @@ $(function () {
             type: 'bar',
             colors: {
                 data1: '#4DB6AC',
-                data2: '#009688',
+                data2: '#2196F3',
                 data3: '#00796B'
             }
         },

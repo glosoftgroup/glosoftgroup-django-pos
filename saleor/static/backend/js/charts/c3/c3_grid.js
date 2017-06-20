@@ -143,7 +143,7 @@ $(function () {
         bindto: '#c3-grid-chart-region',
         size: { height: 400 },
         color: {
-            pattern: ['#009688', '#9C27B0']
+            pattern: ['#2196F3', '#9C27B0']
         },
         data: {
             columns: [

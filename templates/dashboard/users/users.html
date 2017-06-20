@@ -21,16 +21,18 @@
  <div class="row">
    <div class="col-md-12">
       <div class="panel panel-flat">
-        <div class="panel-heading">      
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
+      <div class="panel-heading">
+        <h6 class="panel-title">Users Display</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
         </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
-            <div class="col-md-6">
+            <div class="col-md-4">
              <label>Search Users</label>
               <div class="form-group form-group-material has-feedback">
                 <input class="form-control search_user" placeholder="Search Users" type="text">
@@ -42,11 +44,37 @@
             <div class="col-md-2">
               <label>display list size</label>
               <div class="form-group">
-                 <select class="bootstrap-select list-sz" data-width="100%" tabindex="-98">
-                    <option selected="selected">No:</option>
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>Select group name</label>
+              <div class="form-group">
+                  <select class="bootstrap-select group-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
+                  {% if groups %}
+                  {% for group in groups %}
+                       <option value="{{group.id}}">
+                            {{group.name}}
+                       </option>
+                  {% endfor %}
+                  {% else %}
+                   <option value="none" data-icon="fa-dot-circle-o">No groups</option>
+                  {% endif %}
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
                   </select>
               </div>
             </div>
@@ -62,16 +90,10 @@
       </div>
    </div>
   <div class="col-md-12">
+   <div id="pagination-div">
       <!-- Header and footer fixed -->
       <div class="panel panel-flat">
-<!--         <div class="panel-heading">
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        </div> -->
+        <div class="panel-body">
         <div class="table-responsive">
          
 
@@ -133,18 +155,16 @@
            </table>
 
         </div>
+        </div>
          <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav">Page 1</div>
             </div>
-            <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
-              <ul class="pagination2 bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav2">Page 1</div>
-            </div>
+            <input type="hidden" id="page_size" val="">
           </div>
       </div>
- 
+    </div><!-- pagination -->
   </div>
 </div>
 
@@ -178,62 +198,73 @@
      </div>
    </div>
  </div>
+ <div class="info"></div>
  <!-- /blue modal -->
 {% endblock%}
 {% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-    var sz;
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change', function(){
+
+        var ts = $(this).val();
+        if(ts == 'pdf'){
+          var url = "{% url 'dashboard:users_pdf' %}";
+          window.open(url, '_blank');
+
+        }else if(ts=='excel'){
+          window.location="{% url 'dashboard:users_export_csv' %}";
+
+        }else{
+          $(this).val('')
+        }
+    });
+    var pagination_totalsize;
+    var status;
     //**@ get
     $.ajax({ url: "{% url 'dashboard:users' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
-         sz = data;
+         pagination_totalsize = data;
     }});
-    $('.list-sz').on('change', function(){
+    //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
 
-        $.get("{% url 'dashboard:user_paginate' %}",{page:1, size:ts},function(data){
-            $('#tb').html(data);
-        });
-        var paginated_size;
-        $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {size:ts,select_size:'select_size'},async:false,success: function(data){
-           paginated_size = data;
-           console.log(paginated_size);
-           $('.bootpag-callback').remove();
-           // $('.bootpag-callback2').attr('id', 'show-'+toString(paginated_size));
-            $('.bootpag-callback2').show();
-        } });
-
-        console.log('from outside '+paginated_size);
-        $('#bootpag-callback2').bootpag({
-            total: parseInt(paginated_size),
-            maxVisible: 3,
-            leaps: false
-            }).on("page", function(event, num){
-                $(".pages-nav2").html("Pages " + num +" of "+paginated_size); // or some ajax content loading...
-                $.get("{% url 'dashboard:user_paginate' %}",{page:num, size:ts},function(data){
-                   $('#tb').html(data);
-                });
-        }).children('.pagination2').addClass('pagination-flat pagination-sm');
-    });
-
-
-
-    $('.bootstrap-select').selectpicker();
-    // pagination
     $('.bootpag-callback').bootpag({
-        total: parseInt(sz),
+        total: parseInt(pagination_totalsize),
         maxVisible: 3,
         leaps: false
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+sz); // or some ajax content loading...
+            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
             $.get("{% url 'dashboard:user_paginate' %}",{page:num},function(data){
                $('#tb').html(data);
             });
-    }).children('.pagination').addClass('pagination-flat pagination-sm');
+    }).children('.pagination').addClass('pagination-flat pagination-sm')
 
-      $(".td").click(function() {
+    //**@ group name select
+    $('.group-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o'
+    }).on('change', function(){
+       var group_id = $(this).val();
+        $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
+             $('#pagination-div').html(data);
+        });
+    });
+
+      $(".td").click(function(){
           window.location = $(this).data("href");
       });
 
@@ -284,33 +315,29 @@
       });
 
 
-    var delay = (function(){
-      var timer = 0;
-      return function(callback, ms){
-        clearTimeout (timer);
-        timer = setTimeout(callback, ms);
-      };
-    })();
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
 
-    $('.search_user').keyup(function() {
-       var search_text = $(this).val();
-       var url = "{% url 'dashboard:user_search' %}";
-       $.ajax({
-          type: "GET",
-          url:url,
-          data:{'q':search_text},
-          success: function(data){
-             $('#tb').html(data);
-          },
-          error:function(data){
-            console.log(data);
-          }
-       });
-    });
+      $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        delay(function(){ 
+           var url = "{% url 'dashboard:user_search' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                  $('#pagination-div').html(data);
+           }});
+        }, 500 );
+
+      });
 
 
 
   });
+
 
 </script>
 {% endblock %}

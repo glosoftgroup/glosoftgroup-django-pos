@@ -1,0 +1,16 @@
+                      {% if items %}
+                        {% for item in items %}
+                          <tr>
+                            <td>{{item.sku}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.product.product_class.name}}</td>
+                            <td>{{item.product.categories.name}}</td>
+                            <td>{{item.product.low_stock_threshold}}</td>
+                            <td>200 kgs</td>
+                            <td>Kshs 20</td>
+                            <td>Ksh. 4000</td>
+                          </tr>
+                        {% endfor %}
+                        {% else %}
+                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                        {% endif %}

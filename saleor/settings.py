@@ -43,7 +43,7 @@ DATABASES = {
 		conn_max_age=600)}
 
 
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Africa/Nairobi'
 LANGUAGE_CODE = 'en-us'
 LOCALE_PATHS = [os.path.join(PROJECT_ROOT, 'locale')]
 USE_I18N = True
@@ -173,6 +173,8 @@ INSTALLED_APPS = [
 	'saleor.data_feeds',
 	'saleor.sale',
 	'saleor.api',
+	'saleor.customer',
+	'saleor.supplier',
 
 	# External apps
 	'versatileimagefield',
@@ -464,6 +466,7 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     rest framework configuration
 '''
 REST_FRAMEWORK = {
+	'EXCEPTION_HANDLER': 'saleor.jwt_payload.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES':(
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',

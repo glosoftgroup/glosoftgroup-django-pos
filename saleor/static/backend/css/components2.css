@@ -1,0 +1,159 @@
+
+
+.stepy-header li:after,
+.wizard>.steps>ul>li:after {
+    right: 0
+}
+
+
+
+@media (min-width:1025px) 
+{
+ 
+
+
+.stepy-step {
+    padding: 0 20px 20px
+}
+
+.stepy-header {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: table;
+    width: 100%
+}
+
+.panel-flat>.stepy-header {
+    border-top: 1px solid #ddd
+}
+
+.stepy-header li {
+    cursor: pointer;
+    display: table-cell;
+    vertical-align: top;
+    width: auto;
+    padding: 20px 0;
+    text-align: center;
+    position: relative
+}
+
+.stepy-header li span {
+    display: block;
+    margin-top: 10px;
+    color: #999
+}
+
+.stepy-header li:after,
+.stepy-header li:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 43px;
+    width: 50%;
+    height: 2px;
+    background-color: #00BCD4;
+    z-index: 9
+}
+
+.stepy-header li:before {
+    left: 0
+}
+
+.stepy-header li:first-child:before,
+.stepy-header li:last-child:after {
+    content: none
+}
+
+.stepy-header li div {
+    background-color: #00BCD4;
+    font-size: 0;
+    position: relative;
+    color: #fff;
+    margin-left: auto;
+    margin-right: auto;
+    width: 38px;
+    height: 38px;
+    border: 2px solid #00BCD4;
+    z-index: 10;
+    line-height: 34px;
+    text-align: center;
+    border-radius: 50%
+}
+
+.stepy-header li div:after {
+    content: '\ed6c';
+    display: inline-block;
+    font-size: 16px;
+    -o-transition: all .15s ease-in-out;
+    transition: all .15s ease-in-out
+}
+
+.stepy-header li.stepy-active:after,
+.stepy-header li.stepy-active~li:after,
+.stepy-header li.stepy-active~li:before {
+    background-color: #f5f5f5
+}
+
+.stepy-header li.stepy-active~li div {
+    border-color: #eee;
+    background-color: #fff;
+    color: #ccc;
+    font-size: 14px
+}
+
+.stepy-header li.stepy-active~li div:after {
+    content: none
+}
+
+.stepy-header li.stepy-active div {
+    cursor: auto;
+    border-color: #00BCD4;
+    background-color: #fff;
+    color: #00BCD4
+}
+
+.stepy-header li.stepy-active div:after {
+    content: '\e913'
+}
+
+.stepy-header li.stepy-active span {
+    color: #333
+}
+
+@media (max-width:769px) {
+    .stepy-header {
+        margin-bottom: 20px
+    }
+    .stepy-header li {
+        display: block;
+        float: left;
+        width: 50%;
+        padding-bottom: 0
+    }
+    .stepy-header li:first-child:before,
+    .stepy-header li:last-child:after {
+        content: ''
+    }
+    .stepy-header li.stepy-active:last-child:after {
+        background-color: #00BCD4
+    }
+}
+
+@media (max-width:480px) {
+    .stepy-header li {
+        width: 100%
+    }
+    .stepy-header li.stepy-active:after {
+        background-color: #00BCD4
+    }
+}
+
+.stepy-navigator {
+    text-align: right
+}
+
+.stepy-navigator .btn+.btn {
+    margin-left: 5px
+}
+
