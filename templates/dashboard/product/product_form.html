@@ -187,7 +187,10 @@
                       <div class="input-group">          
                       {{ product_form.product_class}}
                          <div class="input-group-btn">
-                            <button type="button" class="btn btn-primary" id="add-new-type">Add new</button>
+                            <button type="button"  id="add-new-type" href="#modal_add_category" class="btn btn-flat" data-title="Add New category" data-href='{% url "dashboard:product-class-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                            <i class=" icon-stack-plus"></i>
+                            Add new
+                            </button>
                           </div>
                       </div>
                        <!-- {{ form_classes }} -->
@@ -770,6 +773,7 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switchery.min.js' %}"></script>
 <!-- additional js -->
 <script type="text/javascript" src="{% static 'backend/js/category.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/productclass.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/tasks_grid.js' %}"></script>
 <script type="text/javascript">
  

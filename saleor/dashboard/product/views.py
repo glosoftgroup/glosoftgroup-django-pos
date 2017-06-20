@@ -27,7 +27,7 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def product_class_list(request):
     classes = ProductClass.objects.all().prefetch_related(
-        'product_attributes', 'variant_attributes')
+        'product_attributes', 'variant_attributes').order_by('-id')
     form = forms.ProductClassForm(request.POST or None)
     if form.is_valid():
         return redirect('dashboard:product-class-add')
@@ -52,6 +52,10 @@ def product_class_create(request):
         messages.success(request, msg)
         return redirect('dashboard:product-class-list')
     ctx = {'form': form, 'product_class': product_class}
+    if request.is_ajax():
+        return TemplateResponse(
+        request, 
+        'dashboard/product/modal_product_class_form.html', ctx)
     return TemplateResponse(
         request, 'dashboard/product/product_class_form.html', ctx)
 

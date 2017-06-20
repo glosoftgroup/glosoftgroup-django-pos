@@ -9,6 +9,7 @@ from .discount.urls import urlpatterns as discount_urls
 from .search.urls import urlpatterns as search_urls
 from .sites.urls import urlpatterns as site_urls
 from .shipping.urls import urlpatterns as shipping_urls
+from .supplier.urls import urlpatterns as supplier_urls
 from .users.urls import urlpatterns as users_urls
 from .permgroups.urls import urlpatterns as group_urls
 from .reports.urls import urlpatterns as reports_urls
@@ -25,6 +26,7 @@ urlpatterns = [
     url(r'^settings/', include(site_urls)),
     url(r'^shipping/', include(shipping_urls)),
     url(r'^style-guide/', core_views.styleguide, name='styleguide'),
+    url(r'^supplier/', include(supplier_urls)),
     url(r'^users/', include(users_urls)),
     url(r'^perms/', include(group_urls)),
     url(r'^reports/', include(reports_urls)),
