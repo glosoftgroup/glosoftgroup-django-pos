@@ -4,17 +4,17 @@
 {% load materializecss %}
 
 {% block title %}
-  {% trans "Customers" context "Dashboard customers list" %} - {{ block.super }}
+  {% trans "Supplier" context "Dashboard supplier list" %} - {{ block.super }}
 {% endblock %}
 
-{% block body_class %}body-customers{% endblock %}
+{% block body_class %}body-supplier{% endblock %}
 
-{% block menu_customers_class %}active{% endblock %}
+{% block menu_supplier_class %}active{% endblock %}
 
 {% block breadcrumbs %}
   
     <li class="active">
-      {% trans "Customers" context "Dashboard customers list" %}
+      {% trans "Supplier" context "Dashboard customers list" %}
     </li>
   
 {% endblock %}

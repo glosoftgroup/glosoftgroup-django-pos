@@ -55,6 +55,12 @@ urlpatterns = [
         views.product_class_list, name='product-class-list'),
     url(r'^classes/add/$',
         views.product_class_create, name='product-class-add'),
+    url(r'^classes/refresh/$',
+        views.refresh_producttype, name='refresh_producttype'),    
+    
+    url(r'^classes/add/new_window/(\d+)/$',
+        views.product_class_create, name='product-class-add-new'),
+    
     url(r'^classes/(?P<pk>[0-9]+)/update/$',
         views.product_class_edit, name='product-class-update'),
     url(r'^classes/(?P<pk>[0-9]+)/delete/$',
@@ -79,7 +85,7 @@ urlpatterns = [
         views.stock_bulk_delete, name='stock-bulk-delete'),
     url(r'^add_stock_ajax/$',
         views.add_stock_ajax,name='add_stock_ajax'),
-    
+
     url(r'^(?P<product_pk>[0-9]+)/images/(?P<img_pk>[0-9]+)/$',
         views.product_image_edit, name='product-image-update'),
     url(r'^(?P<product_pk>[0-9]+)/images/add/$',
@@ -102,6 +108,12 @@ urlpatterns = [
         views.attribute_edit, name='product-attribute-add'),
     url(r'attributes/(?P<pk>[0-9]+)/delete/$',
         views.attribute_delete, name='product-attribute-delete'),
+
+    url(r'attributes/ajax_add/$',
+        views.attribute_add, name='product-attr-add'),
+    url(r'attributes/ajax_add/(\d+)/$',
+        views.attribute_add, name='product-attr-add-value'),
+    
 
     url(r'stocklocations/$', views.stock_location_list,
         name='product-stock-location-list'),

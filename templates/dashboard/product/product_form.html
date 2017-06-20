@@ -151,7 +151,7 @@
                 <div class="row">
                   <div class="col-md-6">
                     {% if product.pk %}
-                    <fieldset id='fieldset1' disabled="disabled"> 
+                    <fieldset id='fieldset1' > 
                     {% else %}
                     <fieldset>
                     {% endif %}
@@ -181,13 +181,14 @@
                        </div>
                       </div> 
 
+                      <div id='productType'>
                       <!-- product type -->
                       <div class="form-group">
                       <label>Product Type</label> 
                       <div class="input-group">          
                       {{ product_form.product_class}}
                          <div class="input-group-btn">
-                            <button type="button"  id="add-new-type" href="#modal_add_category" class="btn btn-flat" data-title="Add New category" data-href='{% url "dashboard:product-class-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                            <button type="button"  id="add-new-type" href="#modal_add_category" class="btn btn-flat" data-title="Add New category" data-href='{% url "dashboard:product-class-add-new" 12 %}' data-csrf="{% csrf_token %}" onclick='return false;'>
                             <i class=" icon-stack-plus"></i>
                             Add new
                             </button>
@@ -206,6 +207,7 @@
                         </div>
                         {% endfor %}
                       </div>
+                      </div>
                       <div class="form-group">
                         <label>Product Description:<i class='text-muted'>required</i></label>
                        {{ product_form.description }}
@@ -215,7 +217,7 @@
 
                   <div class="col-md-6">
                     {% if product.pk %}
-                    <fieldset id='fieldset2' disabled="disabled"> 
+                    <fieldset id='fieldset2'> 
                     {% else %}
                     <fieldset>
                     {% endif %} 
@@ -774,7 +776,7 @@
 <!-- additional js -->
 <script type="text/javascript" src="{% static 'backend/js/category.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/productclass.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/pages/tasks_grid.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
 <script type="text/javascript">
  
 
@@ -879,6 +881,17 @@
               addclass: 'bg-danger'
           });
       }
+  function refreshProductType()
+  {
+    notify('I will refresh product type page ');
+    $('#productType').html('refresh me..!');    
+    var url= "{% url 'dashboard:refresh_producttype' %}";
+    var posting = $.get(url,{});
+    posting.done(function(data){
+      $( "#productType" ).empty().append( data );     
+      notify('New product type added successfully','bg-success');
+    });
+  }
       
   $('#modal_add_tax_btn').on('click',function(){
     var tax = $('#id_tax').val();
@@ -952,6 +965,19 @@
     $btnChecked.hide();
   }
 });
+
+$('#form-product').validate({
+    rules:{
+        name: {
+          required:true,
+          minlength:3
+        },
+        description: {
+          required:true,
+          minlength:3
+        },
+      }
+    });
   </script>
 <script type="text/javascript">
   $('#id_description').attr('required','required');

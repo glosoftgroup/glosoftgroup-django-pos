@@ -8,6 +8,9 @@
 	{% endfor %}
 </div>
 <script type="text/javascript">
- // Basic select
-    $('.bootstrap-select').selectpicker();
+ $('.select').select2({
+        minimumResultsForSearch: Infinity
+    });
+  // Select with search
+  $('.select-search').select2();
 </script>

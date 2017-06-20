@@ -21,12 +21,14 @@ $(function() {
       // end post
   });
 
+
   function notify(msg,color='bg-danger') {
           new PNotify({
               text: msg,
               addclass: color
           });
       }
+   
   $('#modal_add_category_btn').on('click',function(){
   	var cat_description = $('#cat_description').val();
     var cat_name = $('#cat_name').val();

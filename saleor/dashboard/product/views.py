@@ -11,7 +11,8 @@ from django.contrib.postgres.search import SearchVector
 
 from . import forms
 from ...core.utils import get_paginator_items
-from ...product.models import (Product, ProductAttribute, ProductClass,
+from ...product.models import (Product, ProductAttribute, 
+                               ProductClass, AttributeChoiceValue,
                                ProductImage, ProductVariant, Stock,
                                StockLocation, ProductTax)
 from ..views import staff_member_required
@@ -41,7 +42,7 @@ def product_class_list(request):
 
 
 @staff_member_required
-def product_class_create(request):
+def product_class_create(request,new_window=None):
     product_class = ProductClass()
     form = forms.ProductClassForm(request.POST or None,
                                   instance=product_class)
@@ -50,12 +51,18 @@ def product_class_create(request):
         msg = pgettext_lazy(
             'Dashboard message', 'Added product type %s') % product_class
         messages.success(request, msg)
+        if new_window:
+            return HttpResponse('<script>function closeme(){ window.opener.refreshProductType(); window.close();} closeme();</script>')
         return redirect('dashboard:product-class-list')
     ctx = {'form': form, 'product_class': product_class}
     if request.is_ajax():
+        return TemplateResponse(request, 'dashboard/product/product_class_form_ajax.html',
+                            ctx)
+    if new_window:
         return TemplateResponse(
         request, 
-        'dashboard/product/modal_product_class_form.html', ctx)
+        'dashboard/product/modal_product_class_form.html',
+         ctx)    
     return TemplateResponse(
         request, 'dashboard/product/product_class_form.html', ctx)
 
@@ -73,6 +80,7 @@ def product_class_edit(request, pk):
         messages.success(request, msg)
         return redirect('dashboard:product-class-update', pk=pk)
     ctx = {'form': form, 'product_class': product_class}
+    
     return TemplateResponse(
         request, 'dashboard/product/product_class_form.html', ctx)
 
@@ -440,12 +448,30 @@ def variants_bulk_delete(request, product_pk):
 def attribute_list(request):
     attributes = [
         (attribute.pk, attribute.name, attribute.values.all())
-        for attribute in ProductAttribute.objects.prefetch_related('values')]
-    ctx = {'attributes': attributes}
+        for attribute in ProductAttribute.objects.prefetch_related('values').order_by('-id')]
+    ctx = {'attributes': attributes}    
     return TemplateResponse(request, 'dashboard/product/attributes/list.html',
                             ctx)
 
-
+@staff_member_required
+def attribute_add(request,pk=None):
+    if request.method == 'POST':
+        if pk:
+            attribute = get_object_or_404(ProductAttribute, pk=pk)
+            name = request.POST.get("value")
+            if name != '':
+                AttributeChoiceValue.objects.create(attribute=attribute,slug=name,name=name);        
+                last_id = ProductAttribute.objects.latest('id')
+                choices = AttributeChoiceValue.objects.filter(attribute=attribute)
+                ctx = {'choices':choices}
+                return TemplateResponse(request, 'dashboard/product/attributes/add_value.html',
+                            ctx)
+        name = request.POST.get("name")
+        if name != '':
+            ProductAttribute.objects.create(slug=name,name=name);        
+            last_id = ProductAttribute.objects.latest('id')
+            return HttpResponse(last_id.pk)
+    return HttpResponse('bad request')
 @staff_member_required
 def attribute_edit(request, pk=None):
     if pk:
@@ -536,6 +562,17 @@ def tax_list(request):
     return TemplateResponse(
         request, 'dashboard/product/tax_list.html',
         ctx)
+
+def refresh_producttype(request):
+    product = Product()
+    class_pk = 1
+    product_class = get_object_or_404(ProductClass, pk=class_pk)
+    product.product_class = product_class
+    product_form = forms.ProductForm(request.POST or None, instance=product)
+    ctx = {'product_form':product_form,'added':'added' }
+    return TemplateResponse(
+    request, 'dashboard/includes/_producttype_success.html',
+    ctx)
 
 @staff_member_required
 @csrf_exempt

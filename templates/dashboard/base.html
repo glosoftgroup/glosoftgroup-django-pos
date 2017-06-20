@@ -32,7 +32,11 @@
   <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">  
   <!-- /global stylesheets -->
 
-    {% block custom_css %}{% endblock %}
+    {% block custom_css %}
+    <style type="text/css">
+      .error{ color: red; }
+    </style>
+    {% endblock %}
     <link rel="stylesheet" type="text/css" href="{% static 'backend/css/fixed_table_header.css' %}">
   </head>
 
@@ -208,7 +212,7 @@
                     
                   </ul>
                 </li>
-                <li id="first">
+                <li id="">
                   <a href="{% url 'dashboard:customers' %}"><i class="icon-user"></i> <span>
                     Customer Management
                   </span></a>
@@ -216,6 +220,18 @@
                     <li class="{% block menu_addCustomer_class %}{% endblock %}">
                     <a href="{% url 'dashboard:customers' %}">
                     <i class="icon-user-plus">Customers</i>
+                    </a>
+                    </li>
+                  </ul>
+                </li>
+                <li id="">
+                  <a href="{% url 'dashboard:supplier' %}"><i class="icon-user"></i> <span>
+                    Supplier Management
+                  </span></a>
+                  <ul>
+                    <li class="{% block menu_supplier_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:supplier' %}">
+                    <i class="icon-user-plus">Supplier</i>
                     </a>
                     </li>
                   </ul>
@@ -231,11 +247,11 @@
                     </a>
                     </li>
 
-                    <li class="{% block menu_vouchers_class %}{% endblock %}">
+                    <!-- <li class="{% block menu_vouchers_class %}{% endblock %}">
                     <a href="{% url 'dashboard:voucher-list' %}">
                        {% trans "Vouchers" context "Dashboard vouchers list" %}
                     </a>
-                    </li>
+                    </li> -->
                     </ul>
                 </li>
                                 <li>

@@ -37,7 +37,7 @@ class ProductClassSelectorForm(forms.Form):
         super(ProductClassSelectorForm, self).__init__(*args, **kwargs)
         choices = [(obj.pk, obj.name) for obj in product_classes]
         for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control bootstrap-select'
+            field.widget.attrs['class'] = 'form-control select'
         if len(product_classes) > self.MAX_RADIO_SELECT_ITEMS:
             widget = forms.Select
         else:
@@ -46,7 +46,7 @@ class ProductClassSelectorForm(forms.Form):
             label=pgettext_lazy('Product class form label', 'Product type'),
             choices=choices, widget=widget)
         field = self.fields['product_cls'] 
-        field.widget.attrs['class'] = 'form-control bootstrap-select'
+        field.widget.attrs['class'] = 'form-control select'
 
 
 class StockForm(forms.ModelForm):
@@ -67,10 +67,10 @@ class StockForm(forms.ModelForm):
         self.fields['variant'] = forms.ModelChoiceField(
             queryset=product.variants, initial=initial)
         field = self.fields['variant'] 
-        field.widget.attrs['class'] = 'form-control bootstrap-select'
+        field.widget.attrs['class'] = 'form-control select'
 
         field = self.fields['location'] 
-        field.widget.attrs['class'] = 'form-control bootstrap-select'
+        field.widget.attrs['class'] = 'form-control select'
 
 class ProductClassForm(forms.ModelForm):
     class Meta:
@@ -154,7 +154,7 @@ class ProductForm(forms.ModelForm):
         field.widget.attrs['class'] = 'styled' 
 
         field = self.fields['product_class'] 
-        field.widget.attrs['class'] = 'form-control bootstrap-select'
+        field.widget.attrs['class'] = 'form-control select'
 
         field = self.fields['available_on'] 
         field.widget.attrs['class'] = 'form-control pickadate-selectors'
@@ -186,7 +186,7 @@ class ProductForm(forms.ModelForm):
             if attribute.has_values():
                 field = CachingModelChoiceField(
                     queryset=attribute.values.all(), **field_defaults)
-                field.widget.attrs['class'] = 'form-control bootstrap-select'
+                field.widget.attrs['class'] = 'form-control select'
             else:
                 field = forms.CharField(**field_defaults)
                 field.widget.attrs['class'] = 'form-control'

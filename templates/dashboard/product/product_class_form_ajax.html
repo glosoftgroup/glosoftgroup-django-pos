@@ -1,0 +1,46 @@
+
+{% load prices_i18n %}
+{% load i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+{% load attributes %}
+
+
+            <div id='refresh-content'>
+            <div class="form-group">
+             <label>{{ form.product_attributes.label }}</label>
+             <div class="multi-select-full">
+               {{ form.product_attributes }}
+              </div>
+            </div>
+            <div class="form-group">
+             <label>{{ form.variant_attributes.label }}</label>
+             <div class="multi-select-full">
+              {{ form.variant_attributes }}
+              </div>
+            </div>
+            </div>
+            
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript">
+   // Checkboxes/radios (Uniform)
+    // ------------------------------
+
+    // Default initialization
+    $(".styled, .multiselect-container input").uniform({
+        radioClass: 'choice'
+    });
+    
+  function refresh(){
+    var url = "{% url 'dashboard:product-class-add' %}";
+    var posting = $.get( url, {});
+    posting.done(function(data) {
+      $('#refresh-content').empty().append( data );
+    });
+  }
+  $('#refresh_content').on('click', function(){
+    refresh();
+  });
+</script>

@@ -1,13 +1,74 @@
-
+{% extends "dashboard/base.html" %}
 {% load prices_i18n %}
 {% load i18n %}
 {% load materializecss %}
 {% load staticfiles %}
 {% load attributes %}
 
-<div class="">
-   <div class="panel panel-flat">
+{% block title %}
+  {% if product_class.pk %}
+    {{ product_class }}
+  {% else %}
+    {% trans "Add new product type" context "Product class page title" %}
+  {% endif %} 
+  - {% trans "Products" context "Dashboard products list" %} - {{ block.super }}
+{% endblock %}
+
+{% block body_class %}body-products{% endblock %}
+
+{% block menu_product_classes_class %}active{% endblock %}
+
+{% block header_menu %}
+  {% url "dashboard:product-class-list" as url %}
+  {% include "dashboard/includes/_back-link.html" with url=url %}
+{% endblock %}
+
+{% block breadcrumbs %}
+ 
+    <li>
+      <a href="{% url "dashboard:product-class-list" %}" >
+        {% trans "Product types" context "Dashboard product types list" %}
+      </a>
+    </li>
     
+    <li class='active'>
+      
+        {% if product_class.pk %}
+          {{ product_class }}
+        {% else %}
+          {% trans 'Add new product type' context "Product class breadcrumbs" %}
+        {% endif %}
+     
+    </li>
+ 
+{% endblock %}
+
+{% block header_extra %}
+
+  {% if product_class.pk %}
+  <li>              
+    <a href="#modal_instance" data-title='Delete {{ product_class }} Product type' data-href="{% url 'dashboard:product-class-delete' pk=product_class.pk %}" class="modal-trigger"><i class="icon-trash position-left"></i> 
+    {% trans "Remove product type" context "Product class action" %}
+    </a>
+  </li>
+    
+   
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+ <div class="">
+   <div class="panel panel-flat">
+    <div class="panel-heading">
+      <h5 class="panel-title">Product Stock</h5>
+      <div class="heading-elements">
+        <ul class="icons-list">
+          <li><a data-action="collapse"></a></li>
+          <li><a data-action="reload"></a></li>
+          <li><a data-action="close"></a></li>
+        </ul>
+      </div>
+    </div> 
     <div class="panel-body">
     <div class="row">
     <form method="post" id="form-product" enctype="multipart/form-data" novalidate>       
@@ -27,12 +88,16 @@
              <div class="multi-select-full">
               {{ form.variant_attributes }}
               </div>
-            </div> 
-                       
+            </div>                       
          </div>
           <!-- form left -->
           <div class="col-md-6">
-             
+             <!-- <div class="form-group">
+              <label class="checkbox-inline">
+               {{ form.is_shipping_required }}
+               {{ form.is_shipping_required.label }}
+              </label>
+             </div> --> 
               <div class="form-group">
                <label class="checkbox-inline">
                 {{ form.has_variants }}
@@ -42,7 +107,23 @@
           </div>
           <!-- ./form left -->
       <!-- action buttons -->
-        
+         <div class="text-right col-md-12">
+          {% if product_class.pk %}
+              <a href="{% url 'dashboard:product-class-list' %}" class="btn btn-flat">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+              <button type="submit" class="btn waves-effect waves-light">
+                {% trans "Update" context "Dashboard update action" %}
+              </button>
+            {% else %}
+              <a onclick="closeme();">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+              <button type="submit" class="btn waves-effect waves-light">
+                {% trans "Create" context "Dashboard create action" %}
+              </button>
+            {% endif %}
+         </div>
       </form>
     </div>
    
@@ -62,12 +143,14 @@
       </p>
     </div>
   </div>
-  
-
+   {% include "dashboard/includes/_modal.html"  %}
+{% endblock %}
+{% block custom_js %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/productclass.js' %}"></script>
 <script type="text/javascript">
    // Checkboxes/radios (Uniform)
     // ------------------------------
@@ -76,4 +159,11 @@
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
     });
+    function closeme(){
+      //alert('wewe');
+      //window.opener.refreshProductType(); 
+      window.close();     
+      return false;
+    }
 </script>
+{% endblock %}
