@@ -1,0 +1,44 @@
+<!-- dashboard\includes\_main_search_filter.html -->
+<div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">      
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-6">
+             <label>Search Stock</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_sku" placeholder="Search Stock" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="select list-sz list-size" data-width="100%" tabindex="-98">
+                    <option value="5" selected="selected">5</option>                   
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+              </div>
+            </div>
+            <!-- <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                   <a href="{% url 'dashboard:user-add' %}" class="btn-block btn-primary btn-lg">Add Product</a>
+                {% endif %}
+              </div>
+            </div> -->
+        </div>
+      </div>
+   </div>

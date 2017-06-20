@@ -1,0 +1,167 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  users
+{% endblock %}
+
+{% block menu_trail_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+   </style>
+ {% endblock %}
+
+{% block content %}
+ <div class="row">
+  <div class="col s12">
+	<h2>Users</h2>
+    
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-heading">        
+          {#{% include "dashboard/includes/_pagination.html" with page_obj=products %}#}
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="table-responsive">
+         
+
+        	<table class="table table-bordered datatable-header-footer">
+        		<caption style="margin-bottom: 10px;">
+            {#{% if perms.userprofile.add_user %}#}
+               <!-- <a href="{% url 'dashboard:user-add' %}" class="btn btn-primary waves-effect waves-light">CheckUsers</a> -->
+            {#{% endif %}#}
+
+        		 </caption> 
+                <thead style="border-top:1px solid #ddd;">
+                  <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>action</th>
+                  </tr>
+                </thead>
+                <tbody id="tb">           
+               {% if users %}
+                  {% for user in users %}
+                  <tr>
+                    <td class="td">#{{ forloop.counter }}</td>
+
+                     <!-- product name -->
+                    <td class="td">{{user.name}}</td>
+
+                    <!-- role -->
+                    <td class="td"> 
+                    {{user.action}} on {{user.access_date}}</td>
+
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                   <tr><td colspan="6"><h2 class="text-center">no users trail available</h2></td></tr>
+               {% endif %}
+                  </tbody>
+
+           </table>
+
+        </div>
+      </div>
+ 
+  </div>
+</div>
+
+<!-- Blue modal -->
+ <div id="modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+         <div class="">
+         <form action="" class="delete_form" method="post" id="delform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm user delete!
+           </h5>
+           <input type="hidden" class="item-id" />
+           </div>
+           
+         </div>
+       </div>
+       
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" onclick="return false" data-id="" data-href="">Delete</button>
+         </form>          
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /blue modal -->
+{% endblock%}
+{% block custom_js %}
+<script type="text/javascript">
+
+  $(document).ready(function() {
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+         /* clicked the submit button */
+            $('.del').on('click', function (e) {
+                var f = document.getElementById('delform');
+                var formData = new FormData(f);
+                var id = $(this).data('id');
+                var url = $(this).data('href');
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){        
+                      $('#modal_instance').modal('hide');
+                      $('#tb #'+id).remove();            
+                      $.jGrowl('User deleted successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                      });
+                      window.location.reload();
+                   // $("#mydiv").load(location.href + " #mydiv");
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Error deleting Staff', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            });
+
+  });
+
+</script>
+{% endblock %}

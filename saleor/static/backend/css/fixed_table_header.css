@@ -1,0 +1,15 @@
+/*fixed table header styling*/
+.fixed{
+    top:0;
+    position:fixed;
+    width:auto;
+    display:none;
+    border:none;
+    margin-top: 50px;
+  }
+  .scrollMore{
+    margin-top:600px;
+  }
+  .modal-trigger-ajax2 { cursor: pointer; }
+  .modal-trigger-ajax { cursor: pointer; }
+      

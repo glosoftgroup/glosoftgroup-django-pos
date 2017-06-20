@@ -1,0 +1,285 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load mptt_tags %}
+{% load materializecss %}
+{% load staticfiles %}
+
+{% block title %}{% trans "Categories" context "Category list page title" %} - {{ block.super }}{% endblock %}
+
+{% block body_class %}body-categories{% endblock %}
+
+{% block menu_categories_class %}active{% endblock %}
+
+{% block header_menu %}
+  {% if root %}
+    {% if root.parent %}
+      {% url 'dashboard:category-list' root_pk=root.parent.pk as url %}
+    {% else %}
+      {% url 'dashboard:category-list' as url %}
+    {% endif %}
+      {% include "dashboard/includes/_back-link.html" with url=url %}
+    {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock %}
+
+{% block header_extra %}
+    {% if not root %}
+    <!-- search field -->
+    {% url "dashboard:search-category" as url %}
+    {% include "dashboard/includes/_search_filter.html" with url=url  %}
+    <!-- end search -->
+    {% endif %}
+    <li>&nbsp;&nbsp;&nbsp;</li>
+  <li>
+    <a class="" href="{% if root %}{% url 'dashboard:category-add' root_pk=root.pk %}{% else %}{% url 'dashboard:category-add' %}{% endif %}"><i class="icon-plus3"></i>
+     {% if not root %}
+     Add category
+     {% else %}
+     Add sub category
+     {% endif %}
+    </a>
+  </li>  
+  {% if root %}
+  <li>
+    <a href="#modal_instance" data-title="Edit {{ root.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-edit' root_pk=root.pk %}"
+    class="modal-trigger-ajax"><i class="icon-pencil7 position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom"  data-original-title="Edit me"></i>Edit category
+    </a>
+  </li>
+  <li>
+    <a href="#modal_instance" data-title="Delete {{ root.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-delete' pk=root.pk %}"
+    class="modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>Remove category
+    </a>
+  </li>    
+  {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+ 
+    {% if path %}
+      <li>
+        <a href="{% url 'dashboard:category-list' %}">
+          {% trans "Categories" context "Dashboard categories list" %}
+        </a>
+      </li>
+    {% else %}
+      <li class="active">
+        <span>
+          {% trans "Categories" context "Dashboard categories list" %}
+        </span>
+      </li>
+    {% endif %}
+    {% if path %}
+      <li >
+        <a href="{% url 'dashboard:category-list' %}">
+         Back
+        </a>
+      </li>
+      {% for node in path %}
+        {% if forloop.last %}
+          <li title="{{ node.name }}">
+            <span class="breadcrumbs--ellipsed-item">
+              {{ node.name }}
+            </span>
+          </li>
+        {% else %}
+          <li class="hide-on-med-and-down">
+            <a title="{{ node.name }}" href="{% url 'dashboard:category-list' root_pk=node.pk %}" class="breadcrumbs--ellipsed-item">
+              {{ node.name }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+{% endblock %}
+
+{% block menu_catalogue_class %} active{% endblock %}
+
+{% block content %}
+  {% if categories %}
+   <div class="row">
+    <div class="panelbody">    
+   <div class="">
+      {% if root %}
+       <div class="col-md-12">
+       <!-- Thumbnail with badge -->
+              <div class="panel panel-default">
+                <div class="panel-heading bg-indigo">
+                  <h6 class="panel-title">
+                    Root Category {{ root.name }}
+                  </h6>
+                  <div class="heading-elements">
+                  	<span class="label label-danger heading-text">
+                     {{ root.get_product_num }}
+                   </span>
+                  </div>
+                 
+                </div>
+                
+                <div class="panel-body">
+                 
+                  {{ root.description }}
+                </div>
+              </div>
+              <!-- /thumbnail with badge -->
+              </div>
+              {% endif %}
+       </div>
+     <div class="col-md-12">
+      <div class="text-center content-text-muted content-divider">
+		  <span class="pt-10 pb-10">
+		   SUB-CATEGORIES
+		   </span>  
+	 </div>
+      {% for node in categories %}
+      <div class="col-md-4">
+      <!-- Current server load -->
+              <div class="panel bg-indigo">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                    <ul class="icons-list">
+                    <li><a data-action="reload"></a></li>
+                      <li class="">
+                        <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
+                        <i class="icon-eye"></i> 
+                       
+                        </a>                        
+                      </li>
+                    </ul>
+                  </div>
+
+                  <h3 class="no-margin">{{ node.name }}</h3>
+                  Total products 
+                  <span class="badge bg-success">
+                          {{ node.get_product_num }}
+                    </span>
+                </div>
+
+                <div id="server-load"></div>
+              </div>
+              <!-- /current server load -->
+       
+      </div>
+
+     {% endfor %}
+    
+    </div>
+    </div>
+  </div>
+  {% else %}
+
+    <div class="row">
+      {% if root %}
+       <div class="col-md-6">
+       <!-- Thumbnail with badge -->
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h6 class="panel-title">
+                    {{ root.name }}
+                  </h6>
+                 
+                </div>
+                
+                <div class="panel-body">
+                 <span>
+                   <i class="text-bold">
+                     {{ root.get_product_num }}
+                   </i>
+                    products in this category
+                 </span>
+                  {{ root.description }}
+                </div>
+              </div>
+              <!-- /thumbnail with badge -->
+
+       </div>
+        <div class="col-md-6">
+        <div class="panelpanel-flat">
+          <div class="panel-body alert alert-danger">
+          <p class="">          
+            {% trans "No subcategories." context "Empty Category list message" %}
+            {% if categories %}
+   <div class="row">
+    <div class="panelbody">    
+   
+
+      {% for node in categories %}
+      <div class="col-md-4">
+      <!-- Current server load -->
+              <div class="panel bg-indigo">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                    <ul class="icons-list">
+                    <li><a data-action="reload"></a></li>
+                      <li class="">
+                        <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
+                        <i class="icon-eye"></i> 
+                       
+                        </a>                        
+                      </li>
+                    </ul>
+                  </div>
+
+                  <h3 class="no-margin">{{ node.name }}</h3>
+                  Total products 
+                  <span class="badge bg-success">
+                          {{ node.get_product_num }}
+                    </span>
+                </div>
+
+                <div id="server-load"></div>
+              </div>
+              <!-- /current server load -->
+       
+      </div>
+     {% endfor %}
+    
+    </div>
+  </div>
+  {% endif %}
+            
+          </p>
+          </div>
+          </div>
+        </div>
+        
+      {% else %}
+        <p class="grey-text">
+          {% trans "No categories." context "Empty Category list message" %}
+        </p>
+      {% endif %}
+    </div>
+  {% endif %}
+  <!-- include action modal instance -->
+{% include "dashboard/includes/_modal_template.html"  %}
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  $( ".modal-trigger-ajax").on('click',function() {   
+       
+    var url = $(this).data('href')
+    var prompt_text = $(this).data('title');
+    var modal = $(this).attr('href');
+    var csrf_token = $(this).data('csrf_token')
+    
+    $('.modal-title').html(prompt_text);
+    $(".results" ).empty().append('Loading...<i class=" icon-spinner"></i>');
+    $(modal).modal();
+      var posting = $.get( url, {'csrfmiddlewaretoken':csrf_token });
+      // Put the results in a div
+      posting.done(function( data ) {    
+      $(".results" ).empty().append( data ); 
+       
+      });
+    
+   });
+
+</script>
+<script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
+<script type="text/javascript">
+ $(document).ready(function() {
+  $('#search_product').attr('placeholder','Search Category');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+{% load product_first_image from product_images %}
+<div class="modal-body">
+<!-- start content -->
+<!-- general settings -->
+ <div class="col-md-12">
+ 	<div class="col-md-6 ">
+ 	 <table class="table">
+ 	 	<tbody>
+ 	 		<tr>
+ 	 			<td>Product Name:</td>
+ 	 			<td>
+ 	 				<span class="text-semibold">
+			 		{{ product_form.name.value|default_if_none:""}}
+			 		</span>
+ 	 			</td>
+ 	 		</tr>
+ 	 		<tr>
+ 	 			<td>Product Category:</td>
+ 	 			<td>
+ 	 				<span class="text-semibold">
+			 		{% with product.get_first_category as category %}
+			          {% if category %}
+			          {{ category }}
+			          {% endif %}
+			        {% endwith %}
+			 		</span>
+ 	 			</td>
+ 	 		</tr>
+ 	 		<tr>
+ 	 			<td>Retail Price:</td>
+ 	 			<td>
+ 	 				<span class="text-semibold">
+			 		{% gross product.price html=True %}
+			 		</span>
+ 	 			</td>
+ 	 		</tr>
+ 	 		<tr>
+ 	 			<td>Tax:</td>
+ 	 			<td>
+ 	 				<span class="text-semibold" >
+ 	 				<form action='#'>
+ 	 				<fieldset disabled>
+			 		{{ product_form.product_tax }}
+			 		</fieldset>
+			 		</form>
+			 		</span>
+ 	 			</td>
+ 	 		</tr>
+ 	 	</tbody>
+ 	 </table>
+ 		<h6 class="text-semibold">
+ 			Product Description: 		
+ 		</h6>
+ 		 
+		<p>{{ product_form.description.value|default_if_none:""}}</p>
+
+		
+ 	</div>
+ 	<div class="col-md-6 well well-sm">
+ 	 <span style="text-align:center">
+	 	<img  src="{% product_first_image product size="255x255" method="crop" %}" 
+             srcset="{% product_first_image product size="255x255" method="crop" %} 1x, {% product_first_image product size="510x510" method="crop" %} 2x" 
+             alt="" class="text-center">
+		<hr>
+		<h6 class="text-semibold" id="test">Product Attributes</h6>
+	<p>
+	<form method="post" class="form-horizontal" id="form-product" enctype="multipart/form-data" novalidate>
+	<fieldset disabled>
+		{% for attribute_field in product_form.iter_attribute_fields %}
+         <div class="col-md-12" >
+           <div class="col-md-6">
+             <label>{{ attribute_field.label }}</label>
+           </div>
+           <div class="col-md-6">
+            {{ attribute_field }}
+           </div>
+        </div>
+        {% endfor %}
+        </fieldset>
+       </form>
+	</p>
+	</span>
+ 	</div>
+ </div>
+ <!-- ./ general description -->
+
+	
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>	
+</div>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>
+<script type="text/javascript">
+    // Add options dynamically
+    $(".selectbox-dynamic-option").selectBoxIt({
+        autoWidth: false
+    });
+    $('.id_product_tax').attr("class", 'form-control');
+</script>

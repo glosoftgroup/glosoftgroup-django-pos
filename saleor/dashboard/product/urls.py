@@ -40,11 +40,27 @@ urlpatterns = [
         views.search_sku, name='search-sku'),
     url(r'^search_productclass/$',
         views.search_productclass, name='search-type'),
+    # pagination
+    url(r'^stock_pages/$',
+        views.stock_pages, name='stock_pages'),
+     url(r'^stock_filter/$',
+        views.stock_filter, name='stock_filter'),
+     
+     url(r'^product_pages/$',
+        views.stock_pages, name='product_pages'),
+     url(r'^product_filter/$',
+        views.product_filter, name='product_filter'),
     # end search routes
     url(r'^classes/$',
         views.product_class_list, name='product-class-list'),
     url(r'^classes/add/$',
         views.product_class_create, name='product-class-add'),
+    url(r'^classes/refresh/$',
+        views.refresh_producttype, name='refresh_producttype'),    
+    
+    url(r'^classes/add/new_window/(\d+)/$',
+        views.product_class_create, name='product-class-add-new'),
+    
     url(r'^classes/(?P<pk>[0-9]+)/update/$',
         views.product_class_edit, name='product-class-update'),
     url(r'^classes/(?P<pk>[0-9]+)/delete/$',
@@ -67,6 +83,8 @@ urlpatterns = [
         views.stock_delete, name='product-stock-delete'),
     url(r'^(?P<product_pk>[0-9]+)/stock/bulk_delete/',
         views.stock_bulk_delete, name='stock-bulk-delete'),
+    url(r'^add_stock_ajax/$',
+        views.add_stock_ajax,name='add_stock_ajax'),
 
     url(r'^(?P<product_pk>[0-9]+)/images/(?P<img_pk>[0-9]+)/$',
         views.product_image_edit, name='product-image-update'),
@@ -90,6 +108,12 @@ urlpatterns = [
         views.attribute_edit, name='product-attribute-add'),
     url(r'attributes/(?P<pk>[0-9]+)/delete/$',
         views.attribute_delete, name='product-attribute-delete'),
+
+    url(r'attributes/ajax_add/$',
+        views.attribute_add, name='product-attr-add'),
+    url(r'attributes/ajax_add/(\d+)/$',
+        views.attribute_add, name='product-attr-add-value'),
+    
 
     url(r'stocklocations/$', views.stock_location_list,
         name='product-stock-location-list'),

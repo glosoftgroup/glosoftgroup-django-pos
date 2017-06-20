@@ -112,4 +112,13 @@ class SoldItem(models.Model):
         #unique_together = ('sales')
         ordering = ['order']
     def __unicode__(self):
+<<<<<<< HEAD
 return '%d: %s' % (self.order,self.product_name)
+=======
+        return '%d: %s' % (self.order,self.product_name)
+
+
+
+    
+        
+>>>>>>> d8f854b681ac445c501a2b7014024279cea52f9e

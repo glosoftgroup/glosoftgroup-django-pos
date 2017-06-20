@@ -11,17 +11,24 @@ from django.contrib.postgres.search import SearchVector
 
 from . import forms
 from ...core.utils import get_paginator_items
-from ...product.models import (Product, ProductAttribute, ProductClass,
+from ...product.models import (Product, ProductAttribute, 
+                               ProductClass, AttributeChoiceValue,
                                ProductImage, ProductVariant, Stock,
                                StockLocation, ProductTax)
 from ..views import staff_member_required
 from django.http import HttpResponse
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import logging
+
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 def product_class_list(request):
     classes = ProductClass.objects.all().prefetch_related(
-        'product_attributes', 'variant_attributes')
+        'product_attributes', 'variant_attributes').order_by('-id')
     form = forms.ProductClassForm(request.POST or None)
     if form.is_valid():
         return redirect('dashboard:product-class-add')
@@ -35,7 +42,7 @@ def product_class_list(request):
 
 
 @staff_member_required
-def product_class_create(request):
+def product_class_create(request,new_window=None):
     product_class = ProductClass()
     form = forms.ProductClassForm(request.POST or None,
                                   instance=product_class)
@@ -44,8 +51,18 @@ def product_class_create(request):
         msg = pgettext_lazy(
             'Dashboard message', 'Added product type %s') % product_class
         messages.success(request, msg)
+        if new_window:
+            return HttpResponse('<script>function closeme(){ window.opener.refreshProductType(); window.close();} closeme();</script>')
         return redirect('dashboard:product-class-list')
     ctx = {'form': form, 'product_class': product_class}
+    if request.is_ajax():
+        return TemplateResponse(request, 'dashboard/product/product_class_form_ajax.html',
+                            ctx)
+    if new_window:
+        return TemplateResponse(
+        request, 
+        'dashboard/product/modal_product_class_form.html',
+         ctx)    
     return TemplateResponse(
         request, 'dashboard/product/product_class_form.html', ctx)
 
@@ -63,6 +80,7 @@ def product_class_edit(request, pk):
         messages.success(request, msg)
         return redirect('dashboard:product-class-update', pk=pk)
     ctx = {'form': form, 'product_class': product_class}
+    
     return TemplateResponse(
         request, 'dashboard/product/product_class_form.html', ctx)
 
@@ -204,6 +222,11 @@ def product_edit(request, pk):
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
            'variant_form': variant_form}
+    if request.is_ajax():
+        return TemplateResponse(
+                    request, 
+                    'dashboard/product/product_view.html',
+                     ctx)
     return TemplateResponse(
         request, 'dashboard/product/product_form.html', ctx)
 
@@ -220,6 +243,25 @@ def product_delete(request, pk):
     return TemplateResponse(
         request, 'dashboard/product/modal_product_confirm_delete.html',
         {'product': product})
+
+@staff_member_required
+def add_stock_ajax(request):
+    if request.is_ajax():
+        stock_pk = request.POST.get('stock_pk',None)
+        quantity = request.POST.get('quantity',None)
+        productName = request.POST.get('product','')
+        if not quantity:
+            return HttpResponse('quantity required')        
+        if stock_pk:
+            stock = get_object_or_404(Stock, pk=stock_pk)
+        else:
+            return HttpResponse('stock pk required')
+        stock.quantity = int(quantity)
+        stock.save()
+        message = "Stock for "+str(productName)+\
+                 " updated successfully"+" current stock is "+quantity
+        info_logger.error(message)
+        return HttpResponse(message)
 
 
 @staff_member_required
@@ -406,12 +448,30 @@ def variants_bulk_delete(request, product_pk):
 def attribute_list(request):
     attributes = [
         (attribute.pk, attribute.name, attribute.values.all())
-        for attribute in ProductAttribute.objects.prefetch_related('values')]
-    ctx = {'attributes': attributes}
+        for attribute in ProductAttribute.objects.prefetch_related('values').order_by('-id')]
+    ctx = {'attributes': attributes}    
     return TemplateResponse(request, 'dashboard/product/attributes/list.html',
                             ctx)
 
-
+@staff_member_required
+def attribute_add(request,pk=None):
+    if request.method == 'POST':
+        if pk:
+            attribute = get_object_or_404(ProductAttribute, pk=pk)
+            name = request.POST.get("value")
+            if name != '':
+                AttributeChoiceValue.objects.create(attribute=attribute,slug=name,name=name);        
+                last_id = ProductAttribute.objects.latest('id')
+                choices = AttributeChoiceValue.objects.filter(attribute=attribute)
+                ctx = {'choices':choices}
+                return TemplateResponse(request, 'dashboard/product/attributes/add_value.html',
+                            ctx)
+        name = request.POST.get("name")
+        if name != '':
+            ProductAttribute.objects.create(slug=name,name=name);        
+            last_id = ProductAttribute.objects.latest('id')
+            return HttpResponse(last_id.pk)
+    return HttpResponse('bad request')
 @staff_member_required
 def attribute_edit(request, pk=None):
     if pk:
@@ -503,6 +563,17 @@ def tax_list(request):
         request, 'dashboard/product/tax_list.html',
         ctx)
 
+def refresh_producttype(request):
+    product = Product()
+    class_pk = 1
+    product_class = get_object_or_404(ProductClass, pk=class_pk)
+    product.product_class = product_class
+    product_form = forms.ProductForm(request.POST or None, instance=product)
+    ctx = {'product_form':product_form,'added':'added' }
+    return TemplateResponse(
+    request, 'dashboard/includes/_producttype_success.html',
+    ctx)
+
 @staff_member_required
 @csrf_exempt
 def tax_add_ajax(request):
@@ -533,7 +604,7 @@ def tax_add_ajax(request):
                 request, 'dashboard/includes/_tax_success.html',
                 ctx)
             else:
-                ctx = {'tax':ProductTax.objects.all(),'form':formadd,'errors':formadd.errors}
+                ctx = {'tax':ProductTax.objects.all(),'formadd':formadd,'errors':formadd.errors}
            
             return TemplateResponse(
                 request, 'dashboard/includes/_tax_ajax_form.html',
@@ -582,7 +653,7 @@ def tax_delete(request, pk):
         instance.delete()
         messages.success(
             request,
-            pgettext_lazy('Tax message', 'Deleted Tax %s') % (instance.name,))
+            pgettext_lazy('Tax message', 'Deleted Tax %s') % (instance.tax_name,))
         return redirect('dashboard:tax-list')
     ctx = {'instance': instance}
     return TemplateResponse(
@@ -604,9 +675,11 @@ def search_product(request):
             search  = request.POST.get("search_product", "--") 
             product = Product()
             products_count = len(Product.objects.all())
-            product_results = Product.objects.filter(Q(name__icontains=search)|
+            product_results = Product.objects.filter(
+                        Q(name__icontains=search)|
                         Q(variants__sku__icontains=search)|
-                        Q(categories__name__icontains=search))
+                        Q(categories__name__icontains=search)
+                        )
             search_count = len(product_results)
             ctx = {'products_count': products_count,'product_results': product_results,'search_count':search_count}
             return TemplateResponse(
@@ -614,21 +687,130 @@ def search_product(request):
         ctx)
 
 @staff_member_required
+def stock_pages(request):
+    queryset_list = ProductVariant.objects.all()
+    size = request.GET.get('size',10)
+    page = request.GET.get('page',1)
+    search = str(request.GET.get('search_text',''))
+    if search != '' and search != None:
+        queryset_list = ProductVariant.objects.filter(
+            Q(sku__icontains=search) |
+            Q(product__name__icontains=search)
+            ) 
+    paginator = Paginator(queryset_list,int(size)) # Show 10 contacts per page
+    
+    try:
+        queryset = paginator.page(int(page))
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        queryset = paginator.page(paginator.num_pages)
+    return HttpResponse(paginator.num_pages)
+
+
+
+@staff_member_required
+def stock_filter(request):
+    queryset_list = ProductVariant.objects.all()
+    #paginator = Paginator(queryset_list, 10)
+    page = request.GET.get('page',1)
+    size = request.GET.get('size',10)
+    search = request.GET.get('search_text','')
+    if search != '' and search != None:
+        queryset_list = ProductVariant.objects.filter(
+            Q(sku__icontains=search) |
+            Q(product__name__icontains=search)
+            )            
+    paginator = Paginator(queryset_list, int(size))
+    products_count = len(queryset_list)
+    try:
+        queryset = paginator.page(int(page))
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        queryset = paginator.page(paginator.num_pages)
+    product_results = queryset    
+    ctx = {'products_count': products_count,'product_results': product_results,'search_count':len(product_results)}
+    return TemplateResponse(
+    request, 'dashboard/includes/sku_search_results.html',
+    ctx)
+
+@staff_member_required
+def product_pages(request):
+    queryset_list = Product.objects.all()
+    size = request.GET.get('size',10)
+    page = request.GET.get('page',1)
+    search = str(request.GET.get('search_text',''))
+    if search != '' and search != None:
+        queryset_list = Product.objects.filter(
+            Q(sku__icontains=search) |
+            Q(product__name__icontains=search)
+            ) 
+    paginator = Paginator(queryset_list,int(size)) # Show 10 contacts per page
+    
+    try:
+        queryset = paginator.page(int(page))
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        queryset = paginator.page(paginator.num_pages)
+    return HttpResponse(paginator.num_pages)
+
+@staff_member_required
+def product_filter(request):
+    queryset_list = Product.objects.all()
+    #paginator = Paginator(queryset_list, 10)
+    page = request.GET.get('page',1)
+    size = request.GET.get('size',10)
+    search = request.GET.get('search_text','')
+    if search != '' and search != None:
+        queryset_list = Product.objects.filter(
+           Q(name__icontains=search)|
+           Q(variants__sku__icontains=search)|
+           Q(categories__name__icontains=search)
+            )            
+    paginator = Paginator(queryset_list, int(size))
+    products_count = len(queryset_list)
+    try:
+        queryset = paginator.page(int(page))
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        queryset = paginator.page(paginator.num_pages)
+    product_results = queryset    
+    ctx = {'products_count': products_count,'product_results': product_results,'search_count':len(product_results)}
+    return TemplateResponse(
+    request, 'dashboard/includes/product_search_results.html',
+    ctx)
+    
+
+@staff_member_required
 def search_sku(request):
     if request.method == 'POST':
-        if request.is_ajax():
-            search  = request.POST.get("search_product", "--") 
-            product = Product()
-            products_count = len(ProductVariant.objects.all())
-            product_results = ProductVariant.objects.filter(
-                Q(sku__icontains=search) |
-                Q(product__name__icontains=search)
-                )            
-            search_count = len(product_results)
-            ctx = {'products_count': products_count,'product_results': product_results,'search_count':search_count}
-            return TemplateResponse(
-        request, 'dashboard/includes/sku_search_results.html',
-        ctx)
+        search = request.POST.get("search_product", "--")
+    if request.method == 'GET':
+        search = request.GET.get('search_product')
+    if request.is_ajax():                
+        product = Product()
+        products_count = len(ProductVariant.objects.all())
+        product_results = ProductVariant.objects.filter(
+            Q(sku__icontains=search) |
+            Q(product__name__icontains=search)
+            )            
+        search_count = len(product_results)
+        ctx = {'products_count': products_count,'product_results': product_results,'search_count':search_count}
+        return TemplateResponse(
+    request, 'dashboard/includes/sku_search_results.html',
+    ctx)
+    
 
 @staff_member_required
 def search_productclass(request):

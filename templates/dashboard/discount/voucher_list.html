@@ -11,12 +11,10 @@
 
 {% block menu_vouchers_class %}active{% endblock %}
 
-{% block breadcrumbs %}
-  <ul class="breadcrumbs">
-    <li class="visible-s">
+{% block breadcrumbs %}  
+    <li class="active">
       {% trans "Vouchers" context "Dashboard vouchers list" %}
-    </li>
-  </ul>
+    </li>  
 {% endblock %}
 
 {% block menu_discounts_class %} active{% endblock %}
@@ -24,15 +22,16 @@
 {% block content %}
   <div class="card">
     <div class="data-table-header-action">
-      <a href="{% url 'dashboard:voucher-add' %}" class="btn-data-table btn-flat" title="{% trans "Add voucher" context "Voucher list add button text" %}">
+      <a href="{% url 'dashboard:voucher-add' %}" class="btn-data-table btn btn-primary" title="{% trans "Add voucher" context "Voucher list add button text" %}">
         {% trans "Add" context "Dashboard add action" %}
       </a>
     </div>
-    <div class="data-table-container">
-      <table class="bordered highlight responsive data-table">
+    <hr>
+    <div class="panel">
+      <table class="table">
         {% if vouchers %}
           <thead>
-            <tr>
+            <tr class="bg-primary">
               <th class="wide">
                 {% trans "Name" context "Voucher table header" %}
               </th>
@@ -58,7 +57,7 @@
           </thead>
           {% for voucher in vouchers %}
             <tbody>
-              <tr data-action-go="{% url 'dashboard:voucher-update' pk=voucher.pk %}">
+              <tr class="clickable-row" data-href="{% url 'dashboard:voucher-update' pk=voucher.pk %}">
                 <td>
                   {{ voucher }}
                 </td>
@@ -106,4 +105,16 @@
     </div>
   </div>
   {% include "dashboard/includes/_pagination.html" %}
+{% endblock %}
+{% block custom_js %}
+ <script type="text/javascript">
+    $(document).ready(function() {
+       $(".clickable-row").on('click',function() {
+           window.location = $(this).data("href");
+       });
+    })
+  </script>
+  <style type="text/css">
+    .clickable-row { cursor: pointer; }
+  </style>
 {% endblock %}

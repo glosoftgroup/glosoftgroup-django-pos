@@ -69,6 +69,19 @@
             <div class="panel panel-flat">
               <div class="panel-heading">
                 <h6 class="panel-title">Product Details</h6>
+                <div class="navbar-right">
+                    <p class="navbartext"></p>
+                    {% if product.pk %}
+                    <form class="" action="#">
+                      <div class="formgroup">
+                        <label class="checkbox-inline switchery-double checkbox-switchery switchery-xs">
+                          Edit
+                          <input id='edit-toggle' type="checkbox" class="switch-mode" >     
+                        </label>
+                      </div>
+                    </form>
+                    {% endif %}
+                  </div>
                 <div class="heading-elements">
                   <ul class="icons-list">
                             <li><a data-action="collapse"></a></li>
@@ -137,23 +150,54 @@
               
                 <div class="row">
                   <div class="col-md-6">
-                    <fieldset>                  
-                   
+                    {% if product.pk %}
+                    <fieldset id='fieldset1' > 
+                    {% else %}
+                    <fieldset>
+                    {% endif %}
+                    <!-- product name -->
                       <div class="form-group">
                         <label>Product Name:<i class='text-muted'>required</i></label>
                         {{ product_form.name}}
                       </div>
+                      <!-- product category -->
                       <div class="form-group">
-                          <label>{{ product_form.categories.label }}:<i class='text-muted'>required</i></label>
-                          <div class="multi-select-full">
-                          {{ product_form.categories }}
-                          </div>
-                        </div> 
+                        <label>
+                        {{ product_form.categories.label }}:
+                        <i class='text-danger'> *</i>
+                        </label>
+                       <div class="row">
+                        <div class="col-md-8" id='category_field'>              
+                          <div class="multi-select-full">   
+                            {{ product_form.categories }}
+                          </div>                         
+                        </div>
+                        <div class="col-md-4">
+                          <button href="#modal_add_category" class="btn btn-flat" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                          <i class=" icon-stack-plus"></i>
+                          Add category
+                          </button>
+                        </div>
+                       </div>
+                      </div> 
+
+                      <div id='productType'>
+                      <!-- product type -->
                       <div class="form-group">
-                      <label>Product Type</label>           
+                      <label>Product Type</label> 
+                      <div class="input-group">          
                       {{ product_form.product_class}}
+                         <div class="input-group-btn">
+                            <button type="button"  id="add-new-type" href="#modal_add_category" class="btn btn-flat" data-title="Add New category" data-href='{% url "dashboard:product-class-add-new" 12 %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                            <i class=" icon-stack-plus"></i>
+                            Add new
+                            </button>
+                          </div>
+                      </div>
                        <!-- {{ form_classes }} -->
                       </div>
+
+                      <!-- product attributes -->
                       <div class="form-group" id='div_attributes'>
                         <label>Product Attributes</label>
                          {% for attribute_field in product_form.iter_attribute_fields %}
@@ -163,6 +207,7 @@
                         </div>
                         {% endfor %}
                       </div>
+                      </div>
                       <div class="form-group">
                         <label>Product Description:<i class='text-muted'>required</i></label>
                        {{ product_form.description }}
@@ -171,7 +216,11 @@
                   </div>
 
                   <div class="col-md-6">
+                    {% if product.pk %}
+                    <fieldset id='fieldset2'> 
+                    {% else %}
                     <fieldset>
+                    {% endif %} 
                       <div class="">
                       <!-- Tax -->
                        <div class="col-md-12">
@@ -272,10 +321,6 @@
                           </div>
                         </div> -->
                       </div>
-
-                      
-
-
                     </fieldset>
                   </div>                  
                 </div>
@@ -702,6 +747,7 @@
 </div>
  
  {% include "dashboard/includes/_modal_images.html"  %}
+ {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
 {% endblock %}
 
@@ -726,7 +772,27 @@
   <script type="text/javascript" src="{% static 'backend/js/core/libraries/jquery_ui/core.min.js' %}"></script>
 
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switchery.min.js' %}"></script>
+<!-- additional js -->
+<script type="text/javascript" src="{% static 'backend/js/category.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/productclass.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
 <script type="text/javascript">
+ 
+
+ {% if product.pk %}
+ $("#edit-toggle").on('click',function(){
+   if($(this).is(':checked')){
+      $("#fieldset1").attr("disabled", false);
+      $("#fieldset2").attr("disabled", false);
+    }else{
+      $("#fieldset1").attr("disabled", true);
+      $("#fieldset2").attr("disabled", true);
+    }
+   });
+ {% endif %}
+  
+
  function roundOff(val){
   return Math.round(val * 100) / 100;
  }
@@ -796,39 +862,49 @@
     
   
   $( "#add-new-tax").on('click',function() {   
-    var taxvalue = $( this ).val();
-         
+      var taxvalue = $( this ).val();         
       {% url "dashboard:tax-add-ajax" as url %} 
       var url = "{{ url }}";
       var posting = $.post( url, {} );
       // Put the results in a div
       posting.done(function( data ) {    
-      $("#add_tax_form" ).empty().append( data ); 
-      $('#modal_add_tax').modal(); 
+        $("#add_tax_form" ).empty().append( data ); 
+        $('#modal_add_tax').modal(); 
       });
     
    });
-
-  // submit add tax form
-  function notifyerror() {
+  
+  
+   function notify(msg) {
           new PNotify({
-              text: 'Enter a valid tax',
+              text: msg,
               addclass: 'bg-danger'
           });
       }
+  function refreshProductType()
+  {
+    notify('I will refresh product type page ');
+    $('#productType').html('refresh me..!');    
+    var url= "{% url 'dashboard:refresh_producttype' %}";
+    var posting = $.get(url,{});
+    posting.done(function(data){
+      $( "#productType" ).empty().append( data );     
+      notify('New product type added successfully','bg-success');
+    });
+  }
       
   $('#modal_add_tax_btn').on('click',function(){
     var tax = $('#id_tax').val();
-    var name = $('#id_name').val();
+    var tax_name = $('#id_tax_name').val();
     if(!$.isNumeric(tax)){ 
-      notifyerror();
+      notify('Enter a valid tax');
       return false; 
     }
     // post form data using jquery
     {% url "dashboard:tax-add-ajax" as url %} 
     var url = "{{ url }}";    
     // var csrf_token = "{% csrf_token %}";
-    var posting = $.post( url, {tax:tax,name:name,} );
+    var posting = $.post( url, {tax:tax,tax_name:tax_name,} );
     // $('#modal_add_tax').modal('hide');
     posting.done(function( data ) { 
       
@@ -839,9 +915,8 @@
          $('#modal_add_tax').modal('hide');
          $('#tax_field').empty().append(data);
        }else
-       {
-                 
-       $('#modal_add_tax').modal();
+       {                 
+        $('#modal_add_tax').modal();
        }
      
       });
@@ -856,9 +931,7 @@
         formatSubmit: 'yyyy-dd-mm',
 
     });
-     // Checkboxes/radios (Uniform)
-    // ------------------------------
-
+    
     // Default initialization
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
@@ -892,9 +965,25 @@
     $btnChecked.hide();
   }
 });
+
+$('#form-product').validate({
+    rules:{
+        name: {
+          required:true,
+          minlength:3
+        },
+        description: {
+          required:true,
+          minlength:3
+        },
+      }
+    });
   </script>
+<script type="text/javascript">
+  $('#id_description').attr('required','required');
+</script>
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
-<!-- <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script> -->
+
 {% if product.pk %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/media/fancybox.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/gallery.js' %}"></script>

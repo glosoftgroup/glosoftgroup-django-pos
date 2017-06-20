@@ -24,33 +24,216 @@
 {% block menu_purchase_list %}active{% endblock %}
 {% block content %}
 <!-- Search field -->
-<div class="panel panel-flat">
-	<div class="panel-heading">
-		<h5 class="panel-title">Search Product Stock</h5>
-		<div class="heading-elements">
-			<ul class="icons-list">
-        		<li><a data-action="collapse"></a></li>
-        		<li><a data-action="close"></a></li>
-        	</ul>
-    	</div>
-	</div>
-
-	<div class="panel-body">
-	{% url "dashboard:search-sku" as url %}
-	{% include "dashboard/includes/_product_filter.html" with url=url%}
-	</div>
+<div class="row">
+{% url "dashboard:search-sku" as url %}
+{% include "dashboard/includes/_sku_search_filter.html" with url=url%}
 </div>
-<div id="search_results"></div>
+
+
+<div id="stock_content"></div>
+<div class="text-center">
+	<div class="col-md-10">
+		 <span  id='pagination-demo'></span>
+	</div>
+	<div class="col-md-2">
+		<span class="text-right" id='pag_nav'></span>
+	</div>	
+</div>
+
 <!-- /search field -->
 {% endblock %}
 {% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/form_select2.js' %}"></script>
 <script type="text/javascript">
+ // Basic select
+ $('.bootstrap-select').selectpicker();
  $(document).ready(function() {
-
        $(".clickable-td").click(function() {
          window.location = $(this).data("href");
        });
     });	
 </script>
 <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {  	
+
+    var sz;
+    var total_pages;
+    var visiblePages = $('.list-size').val();   
+    localStorage.setItem('visiblePages', parseInt(visiblePages));
+
+    var search_text = $('.search_sku').val();
+    
+    function getVisiblePages(){
+     	var visiblePages = $('.list-size').val();   
+        localStorage.setItem('visiblePages', parseInt(visiblePages));
+        return localStorage.getItem('visiblePages');
+    }
+
+    function getSearchtext(){
+    	var search_text = $('.search_sku').val();
+       //alert(search_text);
+        localStorage.setItem('search_text', search_text);
+        return localStorage.getItem('search_text');
+    } 
+    function getPages(){
+    // get tax value
+    {% url 'dashboard:stock_pages' as url %} 
+    var url = "{{ url }}";    
+    var posting = $.get( 
+    	url,
+    	 {
+    	 	track:'onpageload',
+    	 	page:1, 
+        	size:localStorage.getItem('visiblePages'),
+        	search_text:getSearchtext(),
+    	 } );
+    posting.done(function( data ){ 
+       	//alert(data);
+        localStorage.setItem('total_pages', parseInt(data));
+     });    
+    return  localStorage.getItem('total_pages');    
+    }
+    getPages();
+
+    // end totalPages   
+
+    var $pagination = $('#pagination-demo');
+    var defaultOpts = {
+        totalPages: getPages(),
+        visiblePages: 3,
+        onPageClick: function (event, page) {
+            $('#pag_nav').text('Page ' + page + ' of '+getPages());
+            $.get("{% url 'dashboard:stock_filter' %}",
+            	{
+            	 track:'onPageClick',
+            	 page:page, 
+            	 size:localStorage.getItem('visiblePages'),
+            	 search_text:getSearchtext(),
+            	},function(data){
+                $('#stock_content').html(data);
+                });
+        }
+    };
+    $pagination.twbsPagination(defaultOpts);
+	
+    // on list size change
+    $('.list-size').on('change', function(){
+        var visiblePages = $(this).val();
+        var ts = visiblePages;        
+        var search_text = getSearchtext();
+
+        // changecontent        
+        $.get("{% url 'dashboard:stock_filter' %}",
+        	{
+        		page:1, 
+        		size:getVisiblePages(),
+        		search_text:getSearchtext()
+        	},function(data){
+            $('#stock_content').html(data);
+        });
+        //alert(ts);
+        //change total pages
+        $.ajax({ url: "{% url 'dashboard:stock_pages' %}",type: 'GET',
+        	data: {
+        		track:'onchangesize',
+        		size:visiblePages,
+        		select_size:'select_size',
+        		search_text:getSearchtext()
+        	},async:false,success: function(data){
+           paginated_size = data;
+           localStorage.setItem('total_pages',parseInt(data));         
+           
+        } });
+
+        // destroy and create new pagination
+        var totalPages = getPages();
+        
+        var currentPage = $pagination.twbsPagination('getCurrentPage');
+         $pagination.twbsPagination('destroy');
+         $pagination.twbsPagination($.extend({}, defaultOpts, {
+                startPage: currentPage,
+                totalPages: totalPages
+            }));
+    });
+
+    //change content
+    function changecontent(){
+    	$.get("{% url 'dashboard:stock_filter' %}",
+        	{
+        		page:1, 
+        		size:getVisiblePages(),
+        		search_text:getSearchtext()
+        	},function(data){
+            $('#stock_content').html(data);
+        });
+    }
+    // change total_pages
+    function changeTotalPages(){
+    	$.ajax({ url: "{% url 'dashboard:stock_pages' %}",type: 'GET',
+        	data: {
+        		track:'onchangesize',
+        		size:getVisiblePages(),
+        		select_size:'select_size',
+        		search_text:getSearchtext()
+        	},async:false,success: function(data){
+           
+           localStorage.setItem('total_pages',parseInt(data));         
+           
+        } });
+    }
+   // destroy and create new pagination
+   function createNewPagination(){   
+        var totalPages = getPages();        
+        var currentPage = $pagination.twbsPagination('getCurrentPage');
+        $pagination.twbsPagination('destroy');
+        $pagination.twbsPagination($.extend({}, defaultOpts, {
+                startPage: currentPage,
+                totalPages: totalPages
+            }));
+          }
+
+	  var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+    $('.search_sku').keyup(function() {
+    	delay(function(){
+        var search_text = $('.search_sku').val();
+        var url = "{% url 'dashboard:stock_filter' %}";
+        changecontent();
+        changeTotalPages();
+        createNewPagination();
+	    }, 1000 );
+	});
+
+  
+
+  });
+
+</script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/editable/editable.min.js' %}"></script>
+<!-- Theme JS files -->
+	<script type="text/javascript" src="{% static 'backend/js/core/libraries/jasny_bootstrap.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/editable/editable.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/extensions/mockjax.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/editable/address.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/ui/moment/moment.min.js' %}"></script>
+	
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/autosize.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/tags/tagsinput.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/touchspin.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/formatter.min.js' %}"></script>
+
 {% endblock %}

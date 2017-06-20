@@ -14,10 +14,10 @@ def permission_decorator(argument):
 	def permitted_users_only(function):
 		def wrap(request, *args, **kwargs):
 			if request.user.has_perm(argument):
-				debug_logger.debug('status: 200, access granted for '+str(request.user))
+				info_logger.info('status: 200, '+ str(argument)+' permission granted for '+str(request.user))
 				return function(request, *args, **kwargs)
 			else:
-				debug_logger.debug('status: 403, permission denied for '+str(request.user))
+				debug_logger.debug('status: 403, '+ str(argument)+' permission denied for '+str(request.user))				
 				return HttpResponse('permission denied')
 		return wrap
 	return permitted_users_only

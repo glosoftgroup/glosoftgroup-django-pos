@@ -34,16 +34,7 @@
                     <th class="text-center">Actions</th>
                   </tr>
                 </thead>
-                <tfoot>
-                  <tr class="bg-primary">
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Tax %</th>
-                   
-                    <th>Label</th>                    
-                    <th class="text-center">Actions</th>
-                  </tr>
-                </tfoot>
+                
                 <tbody>
                   {% for tx in tax %}
                   <tr>
@@ -51,7 +42,7 @@
                     <!-- image -->
                    
                      <!-- Tax name -->
-                    <td>{{ tx.name }}</td>
+                    <td>{{ tx.tax_name }}</td>
                     <!-- tax -->
                     <td>{{ tx.tax}}</td>
                    
@@ -60,10 +51,10 @@
                     <!-- actions -->
                     <td class="text-center">
                       <ul class="icons-list">
-                        <li><a href="{% url 'dashboard:tax-update' pk=tx.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me">Edit</i></a></li>
+                        <li><a href="{% url 'dashboard:tax-update' pk=tx.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom"></i></a></li>
                         <li>
                   <a href="#modal_instance" data-title="Delete {{ tx.name }} Tax, with {{ tx.tax }}%" data-warning="" data-href="{% url 'dashboard:tax-delete' pk=tx.pk %}"
-                          class="modal-trigger"><i class="icon-trash position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom"  data-original-title="Delete me"></i> 
+                          class="modal-trigger"><i class="icon-trash position-left" data-popup="tooltip"></i> 
                            
                           </a>  
                         </li>
