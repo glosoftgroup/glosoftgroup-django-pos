@@ -1,0 +1,309 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  users
+{% endblock %}
+
+{% block menu_addCustomer_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Update Customer Details</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+        <div class="tabbable">
+          <ul class="nav nav-tabs nav-tabs-highlight">
+            <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">edit customer profile</a></li>            
+
+          </ul>
+
+          <div class="tab-content">
+
+            <div class="tab-pane animated fadeIn active" id="profile">
+              <form class="form" enctype="multipart/form-data" id="update-details" name="update-details">
+              {% csrf_token %}
+          <div class="row">
+            <div class="col-md-4">
+            <label for="exampleInputEmail1">Customer Image</label>
+              <div class="form-group">
+                <!-- <label for="exampleInputEmail1">User Image</label> -->
+                <div class="fileinput fileinput-new" data-provides="fileinput">
+                  <div class="fileinput-new thumbnail" style="width: 150px; height: auto;">
+                    <img data-src="holder.js/100%x100%" alt="..." src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'images/user.png' %} {% endif %}">
+                  </div>
+                  <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                  <div style="text-align: center;">
+                    <span class="btn btn-warning btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="image" id="image"></span>
+                    <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="col-md-8">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="{{ user.name}}">
+                  </div>
+                  
+                   <div class="form-group">
+                    <label for="exampleInputPassword1">National ID No:</label>
+                    <input type="text" class="form-control" name="nid" id="nid" placeholder="Id No" value="{{ user.nid}}">
+                   </div>
+                </div>
+                <div class="col-md-6">
+                   <div class="form-group">
+                      <label for="email">Email address</label>
+                      <input type="email" class="form-control" name="email" id="email" placeholder="Email" value="{{ user.email}}">
+                   </div>
+                  
+                   <div class="form-group">
+                    <label for="mobile">Phone</label>
+                    <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile" value="{{ user.mobile}}">
+                   </div>
+                </div>
+              </div>
+              
+             
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+             <div class="pull-right" style="margin-top:40px;">
+              <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+              <!-- <button class="btn btn-primary waves-effect waves-light" onclick="return false" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button> -->
+              <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Update Customer <i class="icon-arrow-right14 position-right"></i></button>
+             </div>
+            </div>
+          </div>
+        </form>
+            </div>
+            
+
+          </div>
+        </div>
+      </div>
+<!--       <div class="panel-footer">
+      <button class="btn btn-primary disabled">checki this</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block custom_js %}
+<script type="text/javascript">
+/* disable th permissions tab code */
+$('#next-tab').click(function(){
+  $('#permissions-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
+});
+function disable_profile_tab(){
+  $('#rofile-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
+}
+/* code to move to next tab */
+function next_tab(){
+  $('#profile').removeClass('active');
+  $('#profile-tab').removeClass('active');
+  $('#permissions').addClass('active');
+  $('#permissions-tab').addClass('active');
+}
+/* if not login permission */
+$("#can-login").click(function () {
+  var checked = $(this).is(':checked');
+  if(checked){
+      $('.check').each(function(){
+          $(this).prop("checked", true);          
+          $(this).parent().parent().removeClass('disabled');
+          $(this).parent().parent().parent().parent().removeClass('disabled');
+          $(this).parent().addClass('checked');
+          $(this).removeAttr('disabled');
+      });
+  }else{
+      $('.check').each(function(){
+          $(this).prop("checked", false);
+          $(this).parent().parent().parent().siblings('span').hide();
+          $(this).parent().parent().addClass('disabled');
+          $(this).parent().parent().parent().parent().addClass('disabled');
+          $(this).parent().removeClass('checked');
+          $(this).attr('disabled', 'disabled');
+      });
+  }
+});
+/* end login */
+/* check all */
+$("#checkAll").click(function () {
+  var checked = $(this).is(':checked');
+  if(checked){
+      $('.check').each(function(){
+          $(this).prop("checked", true);
+          $(this).parent().parent().parent().siblings('span').show();
+          $(this).parent().parent().parent().siblings('span').text('(granted)');
+          $(this).parent().addClass('checked');
+      });
+  }else{
+      $('.check').each(function(){
+          $(this).prop("checked", false);
+          $(this).parent().parent().parent().siblings('span').hide();
+          $(this).parent().removeClass('checked');
+      });
+  }
+});
+/* endcheck all */
+/* on each check */
+$( ".check" ).on( "click", function(){
+  var checked = $(this).is(':checked');
+  if(checked){
+    $(this).prop("checked", true);
+    $(this).parent().parent().parent().siblings('span').show();
+    $(this).parent().parent().parent().siblings('span').text('(granted)');      
+  }else{
+    $(this).prop("checked", false);
+    $(this).parent('span').removeClass('checked');
+    $(this).parent().parent().parent().siblings('span').hide();
+  }
+} );
+/* end each check*/
+/* update user details */
+  $('#update-details').validate({
+    rules:{
+        name: {
+          required:true,
+          minlength:3
+        },
+        email:{
+          required: true,
+          email:true
+        },
+        password:{
+          required:true,
+          minlength: 6
+        },
+        confirm_password:{
+          required:true,
+          minlength:6,
+          equalTo: "#password"
+        },
+        nid:{
+          required:true,
+          digits: true,
+          minlength: 6
+        },
+        mobile:{
+          required:true,
+          digits: true,
+          minlength: 6
+        }
+
+    },
+    messages:{
+      name:{
+        required: "please provide a name",
+        minlength: "name must be atleast 3 characters long"
+      },
+      password:{
+        required: "please provide a password",
+        minlength: "password must be atleast 6 characters long"
+      },
+      confirm_password:{
+        required: "please provide a password",
+        minlength: "password must be atleast 6 characters long",
+        equalTo: "please enter the same password"
+      }
+    },
+    submitHandler: function() { 
+        var file = $('#image')[0].files[0];
+        var f = document.getElementById('update-details');
+        var formData = new FormData(f);
+        if(file){
+          formData.append("image", file);
+        }
+        // formData.append("image", file);
+        if (formData) {
+              $.ajax({
+                  url: "{% url 'dashboard:customer-update' pk=user.pk %}",
+                  type: "POST",
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success:function(data){
+                     console.log(data);             
+
+                     $.jGrowl('Updated successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                     });
+                     // window.location = "{% url 'dashboard:users' %}";
+                  },
+                  error:function(error){
+                    console.log(error);
+                    $.jGrowl('Change a few things up and try submitting again', {
+                        header: 'Oh snap!',
+                        theme: 'bg-danger'
+                    });
+                  }
+              });
+          } 
+    }
+  });
+
+/* permission button */
+$("#permission-btn").click(function(event){
+    event.preventDefault();
+    var checkBoxesStringArray = $(".check:checked").map(function(){
+      return $(this).val();
+    }).get();
+    var checkBoxesStringNumber = checkBoxesStringArray.map(Number);
+    /* check can login status */
+    if($("#can-login").is(':checked')){
+      $("#can-login").val('active')
+    }else{
+      $("#can-login").val('inactive');
+    }
+    var can_login_value = $("#can-login").val();
+     console.log(checkBoxesStringNumber+' and '+ can_login_value);
+    $.ajax({
+      url: "{% url 'dashboard:user_assign_permission' %}",
+      type: 'POST',
+      data: {
+             'checklist[]': checkBoxesStringArray,
+             'user_id': '{{user.id}}',
+             'check_login':can_login_value,
+             'csrfmiddlewaretoken':"{% csrf_token %}"
+      },
+      success: function(data){
+         $.jGrowl('permissions updated successfully', {
+              header: 'Well done!',
+              theme: 'bg-success'
+         });
+         window.location = "{% url 'dashboard:users' %}";
+         localStorage.removeItem('user_id');
+      }
+      ,error:function(){}
+     });
+
+});
+</script>
+{% endblock %}

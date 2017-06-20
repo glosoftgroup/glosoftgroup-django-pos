@@ -24,7 +24,7 @@
 {% block header_extra %}
   {% if attribute.pk %}
    <li>    
-     <a href="#modal_instance" data-title='Remove attribute {{ attribute.name }} Product type' data-href="{% url 'dashboard:product-attribute-delete' pk=attribute.pk %}" class="modal-trigger"><i class="icon-trash position-left"></i> 
+     <a href="#modal_instance" data-title='Remove attribute {{ attribute.name }} Product type' data-href="{% url 'dashboard:product-attribute-delete' pk=attribute.pk %}" class="modal-trigger-ajax"><i class="icon-trash position-left"></i> 
        {% trans "Remove attribute" context "Attribute detail action" %}
       </a>          
    </li>    
@@ -101,13 +101,7 @@
                       {% endfor %}
                     </tr>
                   </thead>
-                  <tfoot>
-                    <tr class="bg-primary">
-                      {% for field in form.visible_fields %}
-                        <th>{{ field.label|capfirst }}</th>
-                      {% endfor %}
-                    </tr>
-                  </tfoot>
+                  
                 {% endif %}
                 <tr>
                   {% for field in form.visible_fields %}
@@ -151,6 +145,7 @@
   
     <div class="col m12 l3 help-box"></div>
   </div>
+{% include "dashboard/includes/_modal_template.html"  %}
 {% endblock %}
 
 <!-- add custom javascripts -->

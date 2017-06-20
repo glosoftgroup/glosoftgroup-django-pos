@@ -21,6 +21,7 @@ from satchless.item import ItemLine, ItemSet
 from ..discount.models import Voucher
 from ..product.models import Product
 from ..userprofile.models import Address
+from ..customer.models import Customer
 
 from . import OrderStatus
 
@@ -35,6 +36,10 @@ class Sales(models.Model):
     last_status_change = models.DateTimeField(
         pgettext_lazy('Sales field', 'last status change'),
         default=now, editable=False)
+    customer = models.ForeignKey(
+        Customer, blank=True, null=True, related_name='customers',
+        verbose_name=pgettext_lazy('Sales field', 'customer'))
+    
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, related_name='users',
         verbose_name=pgettext_lazy('Sales field', 'user'))
@@ -97,29 +102,19 @@ class SoldItem(models.Model):
         validators=[MinValueValidator(0)], default=Decimal(1))
     product_name = models.CharField(
         pgettext_lazy('SoldItem field', 'product name'), max_length=128)
+    total_cost = models.DecimalField(
+        pgettext_lazy('SoldItem field', 'total cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+    unit_cost = models.DecimalField(
+        pgettext_lazy('SoldItem field', 'unit cost'), default=Decimal(0), max_digits=100, decimal_places=2)
     
 
     class Meta:
-        unique_together = ('sales','order')
+        #unique_together = ('sales')
         ordering = ['order']
     def __unicode__(self):
         return '%d: %s' % (self.order,self.product_name)
 
 
-class Item(models.Model):
-    sales = models.ForeignKey(Sales, related_name='items',
-     on_delete=models.CASCADE)
-    sku = models.CharField(
-        pgettext_lazy('Item field', 'SKU'), max_length=32, unique=True)    
-    quantity = models.IntegerField(
-        pgettext_lazy('item field', 'quantity'),
-        validators=[MinValueValidator(0)], default=Decimal(1))
-    product_name = models.CharField(
-        pgettext_lazy('item field', 'product name'), max_length=128)
-    
-    def __str__(self):
-        return self.product_name
-    def __unicode__(self):
-        return self.sku
+
     
         

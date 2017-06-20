@@ -1,0 +1,103 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+
+{% block title %}
+  {% trans "Supplier" context "Dashboard supplier list" %} - {{ block.super }}
+{% endblock %}
+
+{% block body_class %}body-supplier{% endblock %}
+
+{% block menu_supplier_class %}active{% endblock %}
+
+{% block breadcrumbs %}
+  
+    <li class="active">
+      {% trans "Supplier" context "Dashboard customers list" %}
+    </li>
+  
+{% endblock %}
+
+{% block content %}
+  {% if customers %}
+    <div class="panel panel-default">
+      <div class="table-responsive">
+        <table class="table bordered highlight responsive data-table">
+          <thead>
+            <tr class="bg-primary">
+              <th>
+                {% trans "Email" context "Customers table header" %}
+              </th>
+              <th class="wide">
+                {% trans "Name" context "Customers table header" %}
+              </th>
+              <th>
+                {% trans "Location" context "Customers table header" %}
+              </th>
+              <th class="right-align">
+                {% trans "Number of orders" context "Customers table header" %}
+              </th>
+              <th>
+                {% trans "Last order" context "Customers table header" %}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for customer in customers %}
+              <tr class="clickable-row" data-href="{% url "dashboard:customer-details" pk=customer.pk %}">
+                {% with customer.default_billing_address as default_address %}
+                  <td>
+                    {{ customer.email }}
+                  </td>
+                  {% if default_address %}
+                    <td>
+                      {{ default_address.first_name }} {{ default_address.last_name }}
+                    </td>
+                    <td>
+                      {{ default_address.city }}, {{ default_address.get_country_display }}
+                    </td>
+                  {% else %}
+                    <td colspan="2"></td>
+                  {% endif %}
+                {% endwith %}
+                <td class="right-align">
+                  {{ customer.num_orders }}
+                </td>
+                <td class="ignore-link">
+                  {% if customer.last_order %}
+                    <a href="{% url 'dashboard:order-details' order_pk=customer.last_order %}">
+                      {% blocktrans with last_order=customer.last_order trimmed context "Customers table last order data" %}
+                        #{{ last_order }}
+                      {% endblocktrans %}
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="card-content card-content--no-data not-found">
+      <p class="grey-text">
+        {% trans "No customers found." context "Empty customers table message" %}
+      </p>
+    </div>
+  {% endif %}
+  {% include "dashboard/includes/_pagination.html" with page_obj=customers %}
+{% endblock %}
+{% block custom_js %}
+<style type="text/css">
+  .clickable-row { cursor: pointer; }
+</style>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $(".clickable-row").click(function() 
+     {
+      window.location = $(this).data("href");
+     });
+  });
+</script>
+{% endblock %}
