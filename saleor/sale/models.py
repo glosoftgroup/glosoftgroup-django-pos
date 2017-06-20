@@ -17,6 +17,7 @@ from payments import PaymentStatus, PurchasedItem
 from payments.models import BasePayment
 from prices import Price, FixedDiscount
 from satchless.item import ItemLine, ItemSet
+from datetime import date
 
 from ..discount.models import Voucher
 from ..product.models import Product
@@ -106,6 +107,7 @@ class SoldItem(models.Model):
         pgettext_lazy('SoldItem field', 'total cost'), default=Decimal(0), max_digits=100, decimal_places=2)
     unit_cost = models.DecimalField(
         pgettext_lazy('SoldItem field', 'unit cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+    date = models.DateField(default=date.today)
     
 
     class Meta:
