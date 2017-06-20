@@ -89,7 +89,7 @@ $(function() {
 
     // Switchery toggle
     var switchery = document.querySelector('.switch');
-    var init = new Switchery(switchery, {color: '#009688'});
+    var init = new Switchery(switchery, {color: '#2196F3'});
 
 
     // Checkboxes and radios

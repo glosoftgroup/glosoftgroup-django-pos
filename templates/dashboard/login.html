@@ -24,6 +24,7 @@
     <!-- Global stylesheets -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/icons/icomoon/styles.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/icons/fontawesome/styles.min.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/bootstrap.css' %}" rel="stylesheet" type="text/css">
 
   <link href="{% static 'backend/css/core.css' %}" rel="stylesheet" type="text/css">
@@ -38,7 +39,10 @@
   
   <!-- /global stylesheets -->
 
-    {% block custom_css %}{% endblock %}
+    {% block custom_css %}
+       <style type="text/css">
+       </style>
+    {% endblock %}
   </head>
 
   <body class="{% block body_class %}{% endblock %} login-container">
@@ -55,7 +59,7 @@
           <!-- Simple login form -->
           <form name="loginForm" id="loginForm">
             {% csrf_token %} 
-            <div class="panel panel-body login-form">
+            <div class="panel panel-body login-form animated bounceIn">
               <div class="text-center">
                 <div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>
                 <h5 class="content-group">Login to your account <small class="display-block">Enter your credentials below</small></h5>
@@ -80,7 +84,7 @@
               </div>
 
               <div class="form-group">
-                <button type="submit" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i></button>
+                <button type="submit" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i><br><i class="fa fa-spinner fa-spin fa-2x fa-fw position-right spinner" style="display: none;"></i></button>
               </div>
             </div>
           </form>
@@ -148,6 +152,7 @@
     <script type="text/javascript">
          $("#loginForm").submit(function(e)
           {
+              $('.spinner').show();
               var postData = $(this).serializeArray();
               var formURL = "{% url 'account_login' %}";
 
@@ -164,15 +169,18 @@
                          $('.email').val('');
                          $('.password').val('');
                          console.log(data);
+                         $('.spinner').hide();
                        }
                        else{
                         console.log(data);
                           $('#status').show();
+                          $('.spinner').hide();
                        }
                   },
                   error: function(jqXHR, textStatus, errorThrown) 
                   {
-                      $('#status').show();  
+                      $('#status').show();
+                      $('.spinner').hide();  
                   }
               });
               e.preventDefault(); //STOP default action

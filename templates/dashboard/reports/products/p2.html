@@ -19,16 +19,17 @@
                         </tr>
                       </thead>
                       <tbody id="p-tb">
-                        {% if items %}
+                      {% if items %}
                         {% for item in items %}
                           <tr>
-                            <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
                             <td>{{item.sku}}</td>
-                            <td>{% if item.sales.user.email %}{{item.sales.user.email}}{% else %}{{item.sales.user.name}}{% endif %}</td>
-                            <td>{{item.product_name}}</td>
-                            <td>{{item.sales.sub_total}}</td>
-                            <td>{{item.quantity}}</td>
-                            <td>{{item.sales.total_net}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.product.product_class.name}}</td>
+                            <td>{{item.product.categories.name}}</td>
+                            <td>{{item.product.low_stock_threshold}}</td>
+                            <td>200 kgs</td>
+                            <td>Kshs 20</td>
+                            <td>Ksh. 4000</td>
                           </tr>
                         {% endfor %}
                         {% else %}
@@ -62,7 +63,7 @@
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
                 var gid = '{{gid}}';
                 if(gid == 0){
-                    $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                    $.get("{% url 'dashboard:products_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
                       $('#p-tb').html(data);
                       console.log('without gid '+data);
                     });
@@ -72,12 +73,12 @@
                 //    console.log('with gid '+data);
                 // });
                     if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
-                        $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
+                        $.get("{% url 'dashboard:products_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
                            $('#p-tb').html(data);
                         });
                         console.log('action is '+'{{gid}}');
                     }else{
-                        $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth'},function(data){
+                        $.get("{% url 'dashboard:products_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth'},function(data){
                            $('#p-tb').html(data);
                         });
                         console.log('date is'+gid);

@@ -21,14 +21,16 @@
 <div class="row">
     <div class="col-md-12">
       <div class="panel panel-flat">
-        <div class="panel-heading">      
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
+      <div class="panel-heading">
+        <h6 class="panel-title">Sales Reports</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
         </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
             <div class="col-md-6">
              <label>Search Sales</label>
@@ -63,9 +65,9 @@
              <label>Export</label>
               <div class="form-group">
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="none">Option</option>
-                    <option value="pdf">export pdf</option>
-                    <option value="excel">export excel</option>
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
                   </select>
               </div>
             </div>
@@ -182,7 +184,12 @@ $(document).ready(function(){
         }});
     });
 
-   $('.export-sz').selectpicker();
+   $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    });
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();

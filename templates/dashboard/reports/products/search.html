@@ -1,34 +1,34 @@
 {% load staticfiles %}
       <div class="panel panel-flat">
-      <div class="panel-body">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="table-responsive">
+        <div class="table-responsive">
+         
                 <table class="table table-bordered datatable-header-footer">
                   <caption style="margin-bottom: 10px;">
                    </caption> 
-                      <thead style="border-top:1px solid #ddd;">
+                      <thead>
                         <tr>
-                          <th>Transaction Date</th>
-                          <th>Receipt No</th>
-                          <th>Client Name</th>
-                          <th>Item Name</th>
+                          <th>sku</th>
+                          <th>Product Name</th>
+                          <th>Category</th>
+                          <th>Type</th>
+                          <th>Reorder-level</th>
+                          <th>Current Quantity <span style="font-size:.9em;">(units)</span></th>
                           <th>Unit Cost</th>
-                          <th>Quantity</th>
-                          <th>Total Sales</th>
+                          <th>Total Cost</th>
                         </tr>
                       </thead>
                       <tbody id="p-tb">
                         {% if items %}
                         {% for item in items %}
                           <tr>
-                            <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
                             <td>{{item.sku}}</td>
-                            <td>{% if item.sales.user.email %}{{item.sales.user.email}}{% else %}{{item.sales.user.name}}{% endif %}</td>
-                            <td>{{item.product_name}}</td>
-                            <td>{{item.sales.sub_total}}</td>
-                            <td>{{item.quantity}}</td>
-                            <td>{{item.sales.total_net}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.product.product_class.name}}</td>
+                            <td>{{item.product.categories.name}}</td>
+                            <td>{{item.product.low_stock_threshold}}</td>
+                            <td>200 kgs</td>
+                            <td>Kshs 20</td>
+                            <td>Ksh. 4000</td>
                           </tr>
                         {% endfor %}
                         {% else %}
@@ -37,6 +37,7 @@
                         </tbody>
 
                  </table>
+
         </div>
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
@@ -44,10 +45,7 @@
               <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
-          </div>
-        </div>
       </div>
-    </div>
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
@@ -60,32 +58,15 @@
             leaps: false
             }).on("page", function(event, num){
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
-                var gid = '{{gid}}';
-                if(gid == 0){
-                    $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
-                      $('#p-tb').html(data);
-                      console.log('without gid '+data);
-                    });
-                }else{
-                //     $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid},function(data){
-                //    $('#p-tb').html(data);
-                //    console.log('with gid '+data);
-                // });
-                    if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
-                        $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
-                           $('#p-tb').html(data);
-                        });
-                        console.log('action is '+'{{gid}}');
-                    }else{
-                        $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth'},function(data){
-                           $('#p-tb').html(data);
-                        });
-                        console.log('date is'+gid);
-                    }
-                }
 
+                $.get("{% url 'dashboard:products_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                   $('#p-tb').html(data);
+                });
         }).children('.pagination').addClass('pagination-flat pagination-sm')
 
+      $(".td").click(function() {
+         window.location = $(this).data("href");
+      });
 
       $('.modal-trigger').on('click', function (e) {
 

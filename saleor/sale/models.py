@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 from uuid import uuid4
+from datetime import date
 
 import emailit.api
 from django.conf import settings
@@ -71,6 +72,7 @@ class Sales(models.Model):
     discount_name = models.CharField(
         verbose_name=pgettext_lazy('Sales field', 'discount name'),
         max_length=255, default='', blank=True)
+    date = models.DateField(default=date.today())
     class Meta:
         ordering = ('-last_status_change',)
         verbose_name = pgettext_lazy('Sales model', 'Sales')
@@ -97,6 +99,7 @@ class SoldItem(models.Model):
         validators=[MinValueValidator(0)], default=Decimal(1))
     product_name = models.CharField(
         pgettext_lazy('SoldItem field', 'product name'), max_length=128)
+    date = models.DateField(default=date.today())
     
 
     class Meta:
