@@ -121,7 +121,7 @@ class SalesSerializer(serializers.ModelSerializer):
 			SoldItem.objects.create(sales=sales,**solditem_data)
 			stock = Stock.objects.get(variant__sku=solditem_data['sku'])
 			if stock:
-				Stock.objects.allocate_stock(stock, solditem_data['quantity'])                  
+				Stock.objects.allocate_stock(stock, solditem_data['quantity'])        			
 		return sales
 		
 
@@ -217,6 +217,4 @@ class PermissionListSerializer(serializers.ModelSerializer):
 	url = HyperlinkedIdentityField(view_name='users-api:permission-detail')
 	class Meta:
 		model = Permission
-		fields = ('id','url','codename')
-
-
+fields = ('id','url','codename')

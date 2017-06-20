@@ -143,5 +143,4 @@ class Customer(models.Model):
         return self.email
 
     def get_short_name(self):
-        return self.email
-
+return self.email
