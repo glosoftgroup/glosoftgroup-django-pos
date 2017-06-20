@@ -176,11 +176,7 @@
                 </li>
                 <li id="first">
                   <a href="{% url 'dashboard:product-list' %}"><i class="icon-stack"></i> <span>
-<<<<<<< HEAD
                      {% trans "Inventory Management" context "Dashboard catalogue" %}
-=======
-                     {% trans "Inventory" context "Dashboard inventory" %}
->>>>>>> d8f854b681ac445c501a2b7014024279cea52f9e
                   </span></a>
                   <ul>
                    {% if perms.userprofile.view_product %}
@@ -189,61 +185,44 @@
                     </li>
                     {% endif %}
                     <li class="{% block menu_purchase_list %}{% endblock %}">
-<<<<<<< HEAD
                     <a href="{% url 'dashboard:purchase-list' %}"><i class=' icon-coin-dollar'></i>
                     Purchase</a>
-=======
-                    <a href="{% url 'dashboard:purchase-list' %}"><i class='icon-new'></i>
-                    Add stock</a>
->>>>>>> d8f854b681ac445c501a2b7014024279cea52f9e
                     </li>
                     <!-- categories -->
                      <li class="{% block menu_categories_class %}{% endblock %}">
                     <a href="{% url 'dashboard:category-list' %}"><i class='icon-package'></i> {% trans "Categories" context "Dashboard categories list" %}</a>
                     </li>
-                    <!-- product type -->
-                    <li class="{% block menu_product_classes_class %}{% endblock %}">
-                    <a href="{% url 'dashboard:product-class-list' %}">
-                    <i class="icon-typography"></i>
-                       {% trans "Product types" context "Dashboard product types list" %}
-                    </a>
-                    </li>
+
+
                     <!-- stock location -->
                     <li class="{% block menu_location_class %}{% endblock %}">
                     <a href="{% url 'dashboard:product-stock-location-list' %}"><i class="icon-location4"></i>
                        {% trans "Stock locations" context "Dashboard stock loactions list" %}
                     </a>
-                    </li>
-                    <!-- product attributes -->
-                    <li class="{% block menu_attributes_class %}{% endblock %}">
-                    <a href="{% url 'dashboard:product-attributes' %}">
-                    <i class="icon-subscript2"></i>
-                        {% trans "Product Attributes" context "Dashboard attributes list" %}
-                    </a>
-                    </li>               
+                    </li>              
                     
                   </ul>
                 </li>
                 <li id="">
-                  <a href="{% url 'dashboard:customers' %}"><i class="icon-user"></i> <span>
+                  <a href="{% url 'dashboard:customers' %}"><i class="icon-theater"></i> <span>
                     Customer Management
                   </span></a>
                   <ul>
                     <li class="{% block menu_addCustomer_class %}{% endblock %}">
                     <a href="{% url 'dashboard:customers' %}">
-                    <i class="icon-user-plus">Customers</i>
+                    <i class="icon-users2"></i> Customers
                     </a>
                     </li>
                   </ul>
                 </li>
                 <li id="">
-                  <a href="{% url 'dashboard:supplier' %}"><i class="icon-user"></i> <span>
+                  <a href="{% url 'dashboard:supplier' %}"><i class="icon-collaboration"></i> <span>
                     Supplier Management
                   </span></a>
                   <ul>
                     <li class="{% block menu_supplier_class %}{% endblock %}">
                     <a href="{% url 'dashboard:supplier' %}">
-                    <i class="icon-user-plus">Supplier</i>
+                    <i class="icon-users2"></i>Supplier
                     </a>
                     </li>
                   </ul>
@@ -292,7 +271,7 @@
                 <!-- configuration menu -->
                  <li><a href="#"><i class="icon-cogs"></i> <span> {% trans "Configuration"  context "Dashboard configuration" %}</span></a>
                   <ul>
-<<<<<<< HEAD
+
                     <li class="{% block menu_product_classes_class %}{% endblock %}">
                     <a href="{% url 'dashboard:product-class-list' %}">
                       <i class="icon-books"></i>
@@ -305,17 +284,13 @@
                         {% trans "Attributes" context "Dashboard attributes list" %}
                     </a>
                     </li>
+                    
                     <li class="{% block menu_delivery_class %}{% endblock %}">
-=======
-                    
-                    
-                    <!-- <li class="{% block menu_delivery_class %}{% endblock %}">
->>>>>>> d8f854b681ac445c501a2b7014024279cea52f9e
                     <a href="{% url 'dashboard:shipping-methods' %}">
                       <i class="icon-ship"></i>
                          {% trans "Shipping methods" context "Dashboard shipping methods list" %}
                     </a>
-                    </li> -->
+                    </li>
                     <li class="{% block menu_settings_class %}{% endblock %}">
                     <a href="{% url 'dashboard:site-index' %}">
                         <i class=" icon-earth"></i>
