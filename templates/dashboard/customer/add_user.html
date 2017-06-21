@@ -80,29 +80,12 @@
                             <label for="name">Name</label>
                             <input type="text" class="form-control" name="name" id="name" placeholder="Name">
                           </div>
-                         <!--  <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control" name="password" id="password" placeholder="Password">
-                           </div> -->
+                        
                            <div class="form-group">
                             <label for="exampleInputPassword1">National ID No:</label>
                             <input type="text" class="form-control" name="nid" id="nid" placeholder="Id No">
                            </div>
-                           <div class="form-group">
-                            <label for="exampleInputPassword1">Select Group:</label>
-                            <div class="multi-select-full">
-                              <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="group" id="multiple" placeholder="select a group...">
-                              {% if groups %}
-                                {% for group in groups %}
-                                   <option value="{{group.name}}"> 
-                                     {{ group.name }}
-                                   </option>
-                                {% endfor %}
-                              {% endif %}
-                              </select>
-                            </div>
-                            <label id="group_name_error" class="select-error" for="user_select"></label>
-                           </div>
+                           
                         </div>
                         <div class="col-md-6">
                            <div class="form-group">
@@ -127,7 +110,6 @@
                     <div class="col-md-12">
                      <div class="pull-right" style="margin-top:40px;">
                       <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
-                      <!-- <button class="btn btn-primary waves-effect waves-light" onclick="return false" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button> -->
                       <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button>
                      </div>
                     </div>
@@ -308,10 +290,11 @@ $( ".check" ).on( "click", function(){
                           theme: 'bg-success'
                        });
                        // window.location = "{% url 'dashboard:users' %}";
-                      next_tab();
-                      disable_profile_tab()
+                      //next_tab();
+                      //disable_profile_tab()
                       localStorage.setItem('user_id', data);
                       $('.user_id').val(localStorage.getItem("user_id"));
+                      window.location = "{% url 'dashboard:customers'%}";
                     },
                     error:function(error){
                       console.log(error);
@@ -360,7 +343,7 @@ $("#permission-btn").click(function(event){
               header: 'Well done!',
               theme: 'bg-success'
          });
-         window.location = "{% url 'dashboard:users' %}";
+         window.location = "{% url 'dashboard:customers' %}";
          localStorage.removeItem('user_id');
       }
       ,error:function(){}

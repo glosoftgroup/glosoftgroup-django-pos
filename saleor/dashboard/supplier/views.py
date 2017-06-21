@@ -42,7 +42,7 @@ def user_add(request):
 	try:
 		permissions = Permission.objects.all()
 		groups = Group.objects.all()
-		user_trail(request.user.name, 'accessed add supplier page')
+		user_trail(request.user.name, 'accessed add supplier page','view')
 		info_logger.info('User: '+str(request.user.name)+' accessed supplier create page')
 		return TemplateResponse(request, 'dashboard/supplier/add_user.html',{'permissions':permissions, 'groups':groups})
 	except TypeError as e:
@@ -80,7 +80,7 @@ def user_process(request):
 			gps = Group.objects.filter(name__in=groups)
 			last_id.groups.add(*gps)
 			last_id.save()
-		user_trail(request.user.name, 'created user: '+str(name))
+		user_trail(request.user.name, 'created user: '+str(name),'add')
 		info_logger.info('User: '+str(request.user.name)+' created user:'+str(name))
 		return HttpResponse(last_id.id)
 
@@ -98,7 +98,7 @@ def user_delete(request, pk):
 def user_edit(request, pk):
 	user = get_object_or_404(Supplier, pk=pk)		
 	ctx = {'user': user}
-	user_trail(request.user.name, 'accessed edit page for supplier '+ str(user.name))
+	user_trail(request.user.name, 'accessed edit page for supplier '+ str(user.name),'update')
 	info_logger.info('User: '+str(request.user.name)+' accessed edit page for supplier: '+str(user.name))
 	return TemplateResponse(request, 'dashboard/supplier/edit_user.html', ctx)
 
