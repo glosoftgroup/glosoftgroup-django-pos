@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
+import os
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -281,8 +282,9 @@ def user_detail(request, pk):
 
 def user_delete(request, pk):
 	user = get_object_or_404(User, pk=pk)
+	default_p = 'C:\Users\kibur\Desktop\fresh install\glosoftgroup-django-pos\media\staff\user.png '
 	if request.method == 'POST':
-		user.delete()
+		user.delete()		
 		user_trail(request.user.name, 'deleted user: '+ str(user.name),'delete')
 		return HttpResponse('success')
 
@@ -328,7 +330,7 @@ def user_update(request, pk):
 			user.nid = nid
 			user.mobile = mobile
 			user.save()
-			user_trail(request.user.name, 'updated user: '+ str(user.name))
+			user_trail(request.user.name, 'updated user: '+ str(user.name), 'update')
 			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name),'update')
 			return HttpResponse("success without image")
 
@@ -346,7 +348,7 @@ def user_assign_permission(request):
 			user.is_active = False
 			user.user_permissions.remove(*user_has_permissions)
 			user.save()
-			user_trail(request.user.name, 'deactivated and removed all permissions for user: '+ str(user.name), delete)
+			user_trail(request.user.name, 'deactivated and removed all permissions for user: '+ str(user.name), 'delete')
 			info_logger.info('User: '+str(request.user.name)+' deactivated and removed all permissions for user: '+str(user.name))
 			return HttpResponse('deactivated')
 		else:

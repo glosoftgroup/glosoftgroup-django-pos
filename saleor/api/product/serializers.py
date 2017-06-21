@@ -92,7 +92,8 @@ class TrackSerializer(serializers.ModelSerializer):
 					'sku', 
 					'quantity',
 					'unit_cost',
-					'total_cost'
+					'total_cost',
+					'product_name',
 				 )
 
 
