@@ -175,6 +175,7 @@ INSTALLED_APPS = [
 	'saleor.api',
 	'saleor.customer',
 	'saleor.supplier',
+	'saleor.payment',
 
 	# External apps
 	'versatileimagefield',

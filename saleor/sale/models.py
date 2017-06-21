@@ -93,6 +93,7 @@ class Sales(models.Model):
 	#         self.save()
 	def __str__(self):
 		return self.invoice_number
+        
 class SoldItem(models.Model):
 	sales = models.ForeignKey(Sales,related_name='solditems',on_delete=models.CASCADE)
 	order = models.IntegerField()
