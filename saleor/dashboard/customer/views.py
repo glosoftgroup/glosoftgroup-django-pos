@@ -39,11 +39,11 @@ def users(request):
 @permission_decorator('userprofile.add_user')
 def user_add(request):
 	try:
-		permissions = Permission.objects.all()
-		groups = Group.objects.all()
-		user_trail(request.user.name, 'accessed add customer page')
-		info_logger.info('User: '+str(request.user.name)+' accessed user create page')
-		return TemplateResponse(request, 'dashboard/customer/add_user.html',{'permissions':permissions, 'groups':groups})
+		# permissions = Permission.objects.all()
+		# groups = Group.objects.all()
+		# user_trail(request.user.name, 'accessed add customer page')
+		# info_logger.info('User: '+str(request.user.name)+' accessed user create page')
+		return TemplateResponse(request, 'dashboard/customer/add_user.html',{'permissions':"permissions", 'groups':"groups"})
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing add users page')
@@ -79,7 +79,7 @@ def user_process(request):
 			gps = Group.objects.filter(name__in=groups)
 			last_id.groups.add(*gps)
 			last_id.save()
-		user_trail(request.user.name, 'created user: '+str(name))
+		user_trail(request.user.name, 'created user: '+str(name),'add')
 		info_logger.info('User: '+str(request.user.name)+' created user:'+str(name))
 		return HttpResponse(last_id.id)
 
@@ -97,7 +97,7 @@ def user_delete(request, pk):
 def user_edit(request, pk):
 	user = get_object_or_404(Customer, pk=pk)		
 	ctx = {'user': user}
-	user_trail(request.user.name, 'accessed edit page for user '+ str(user.name))
+	user_trail(request.user.name, 'accessed edit page for user '+ str(user.name),'update')
 	info_logger.info('User: '+str(request.user.name)+' accessed edit page for user: '+str(user.name))
 	return TemplateResponse(request, 'dashboard/customer/edit_user.html', ctx)
 

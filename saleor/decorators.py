@@ -22,7 +22,7 @@ def permission_decorator(argument):
 		return wrap
 	return permitted_users_only
 
-def user_trail(name, action, tag):
+def user_trail(name, action, tag=None):
 	# try:
 	# 	record = UserTrail(name=name, action=action)
 	# 	record.save()
