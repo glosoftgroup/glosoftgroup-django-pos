@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import messages, auth
 # from django.contrib.auth import views as django_views
+from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
@@ -12,6 +13,7 @@ import json
 from saleor.cart.utils import find_and_assign_anonymous_cart
 from .forms import LoginForm, SignupForm, SetPasswordForm
 from saleor.decorators import permission_decorator, user_trail
+from saleor.userprofile.models import User
 
 
 # @find_and_assign_anonymous_cart()
@@ -23,7 +25,7 @@ from saleor.decorators import permission_decorator, user_trail
 def login(request):
 	email = request.POST['email']
 	password = request.POST['password']
-	user = auth.authenticate(email=email, password=password)
+	user = authenticate(username=email, password=password)
 	if user is not None:
 		if user.is_active:
 			auth.login(request, user)

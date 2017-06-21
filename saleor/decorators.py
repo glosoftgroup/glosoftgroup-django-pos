@@ -22,7 +22,7 @@ def permission_decorator(argument):
 		return wrap
 	return permitted_users_only
 
-def user_trail(name, action, tag):
+def user_trail(name, action, tag=None):
 	# try:
 	# 	record = UserTrail(name=name, action=action)
 	# 	record.save()
@@ -32,3 +32,29 @@ def user_trail(name, action, tag):
 	# 	info_logger.info('status: 400, not able to add action')
 	record = UserTrail(name=name, action=action, crud= tag, date=date.today())
 	record.save()
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+
+class EmailOrUsernameModelBackend(object):
+	"""
+	This is a ModelBacked that allows authentication with either a username or an email address.
+
+	"""
+	def authenticate(self, username=None, password=None):
+		if '@' in username:
+			kwargs = {'email': username}
+		else:
+			kwargs = {'name': username}
+		try:
+			user = get_user_model().objects.get(**kwargs)
+			if user.check_password(password):
+				return user
+		except User.DoesNotExist:
+			return None
+
+	def get_user(self, username):
+		try:
+			return get_user_model().objects.get(pk=username)
+		except get_user_model().DoesNotExist:
+			return None

@@ -7,6 +7,10 @@
 {% block title %}
   Groups
 {% endblock %}
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:users' %}">Users</a></li>
+     <li class="active"><a href="{% url 'dashboard:groups' %}">Groups</a></li>
+ {% endblock %}
 
 {% block menu_perm_class %}active{% endblock %}
  {% block custom_css %}
@@ -18,7 +22,7 @@
  {% endblock %}
 
 {% block content %}
- <div class="row">
+ <div class="row animated fadeIn">
      <div class="col-md-12">
       <div class="panel panel-flat">
         <div class="panel-heading">      
@@ -94,7 +98,7 @@
                         </li>
                         <li>
                           <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
-                         class="modal_trigger_delete btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                         class="modal_trigger_delete btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
                          </a>
                         </li>
                       </ul>

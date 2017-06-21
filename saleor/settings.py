@@ -433,6 +433,7 @@ SITE_SETTINGS_ID = 1
 AUTHENTICATION_BACKENDS = [
 	'saleor.registration.backends.facebook.CustomFacebookOAuth2',
 	'saleor.registration.backends.google.CustomGoogleOAuth2',
+	'saleor.decorators.EmailOrUsernameModelBackend',
 	'django.contrib.auth.backends.ModelBackend',
 ]
 

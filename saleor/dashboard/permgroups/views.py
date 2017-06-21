@@ -96,7 +96,7 @@ def group_search( request ):
 
 		if q is not None:            
 			groups = Group.objects.filter( 
-				Q( name__contains = q ) ).order_by( 'id' )
+				Q( name__icontains = q ) ).order_by( 'id' )
 		   	paginator = Paginator(groups, 5)
 			try:
 				groups = paginator.page(page)
@@ -114,7 +114,7 @@ def group_search( request ):
 
 
 def perms(request):
-	users = User.objects.all().order_by('id')
+	users = User.objects.all().order_by('-id')
 	permissions = Permission.objects.all()
 	groups = Group.objects.all()
 	try:

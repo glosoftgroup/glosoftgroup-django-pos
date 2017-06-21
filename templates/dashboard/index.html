@@ -1,14 +1,18 @@
 {% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
 {% load i18n %}
 {% load prices_i18n %}
 
 {% block title %}
   {{ block.super }}
 {% endblock %}
+{% block breadcrumbs %}
+    <li class="active"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+{% endblock %}
 
 {% block content %}
           <!-- Quick stats boxes -->
-          <div class="row">
+          <div class="row animated fadeIn">
             <div class="col-lg-4">
 
               <!-- Members online -->
@@ -175,7 +179,6 @@
   </div>
 {% endblock %}
 {% block custom_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
   var endpoint = "{% url 'dashboard:chart' %}";

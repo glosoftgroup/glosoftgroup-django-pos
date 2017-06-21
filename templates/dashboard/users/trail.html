@@ -7,6 +7,11 @@
 {% block title %}
   users
 {% endblock %}
+ {% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:users' %}">Users</a></li>
+     <li class="active"><a href="{% url 'dashboard:user_trail'">User Trail</a></li>
+ {% endblock %}
+
 
 {% block menu_trail_class %}active{% endblock %}
  {% block custom_css %}
@@ -18,7 +23,7 @@
  {% endblock %}
 
 {% block content %}
- <div class="row">
+ <div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
         <div class="panel-heading">      
