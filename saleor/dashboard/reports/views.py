@@ -17,6 +17,7 @@ from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.db.models import Q
 import datetime
+from django.utils.dateformat import DateFormat
 import logging
 
 from ...core.utils import get_paginator_items
@@ -69,7 +70,8 @@ def sales_paginate(request):
 	select_sz = request.GET.get('select_size')
 	gid = request.GET.get('gid')
 	items = SoldItem.objects.all().order_by('-id')
-	today = datetime.date.today()
+	today_formart = DateFormat(datetime.date.today())
+	today = today_formart.format('Y-m-d')
 	ts = Sales.objects.filter(created__icontains=today)
 	tsum = ts.aggregate(Sum('total_net'))
 	total_sales = Sales.objects.aggregate(Sum('total_net'))
@@ -81,7 +83,7 @@ def sales_paginate(request):
 			try:
 				items = SoldItem.objects.filter(sales__created__icontains=date).order_by('-id')
 				that_date = Sales.objects.filter(created__icontains=date)
-				that_date_sum = ts.aggregate(Sum('total_net'))
+				that_date_sum = that_date.aggregate(Sum('total_net'))
 				if p2_sz and gid:
 					paginator = Paginator(items, int(p2_sz))
 					items = paginator.page(page)
@@ -89,7 +91,10 @@ def sales_paginate(request):
 
 				paginator = Paginator(items, 10)
 				items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':date,'total_sales':total_sales,'total_tax':total_tax,'tsum':tsum, 'that_date_sum':that_date_sum, 'date':date})
+				return TemplateResponse(request,'dashboard/reports/sales/p2.html',
+					{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':date,
+					'total_sales':total_sales,'total_tax':total_tax,'tsum':tsum, 
+					'that_date_sum':that_date_sum, 'date':date, 'today':today})
 
 			except ValueError as e:
 				return HttpResponse(e)
@@ -104,7 +109,9 @@ def sales_paginate(request):
 
 				paginator = Paginator(items, 10)
 				items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':action, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
+				return TemplateResponse(request,'dashboard/reports/sales/p2.html',
+					{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':action, 
+					'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
 
 			except ValueError as e:
 				return HttpResponse(e)
@@ -125,7 +132,7 @@ def sales_paginate(request):
 			try:
 				items = SoldItem.objects.filter(sales__created__icontains=date).order_by('-id')
 				that_date = Sales.objects.filter(created__icontains=date)
-				that_date_sum = ts.aggregate(Sum('total_net'))
+				that_date_sum = that_date.aggregate(Sum('total_net'))
 				if p2_sz:
 					paginator = Paginator(items, int(p2_sz))
 					items = paginator.page(page)
@@ -133,7 +140,10 @@ def sales_paginate(request):
 
 				paginator = Paginator(items, 10)
 				items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':date, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum, 'that_date_sum':that_date_sum, 'date':date})
+				return TemplateResponse(request,'dashboard/reports/sales/p2.html',
+					{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':date, 
+					'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum, 
+					'that_date_sum':that_date_sum, 'date':date, 'today':today})
 
 			except ValueError as e:
 				return HttpResponse(e)

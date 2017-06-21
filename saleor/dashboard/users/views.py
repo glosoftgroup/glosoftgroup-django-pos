@@ -282,10 +282,9 @@ def user_detail(request, pk):
 
 def user_delete(request, pk):
 	user = get_object_or_404(User, pk=pk)
+	default_p = 'C:\Users\kibur\Desktop\fresh install\glosoftgroup-django-pos\media\staff\user.png '
 	if request.method == 'POST':
-		user.delete()
-		if user.image:
-			os.unlink(user.image.path)
+		user.delete()		
 		user_trail(request.user.name, 'deleted user: '+ str(user.name),'delete')
 		return HttpResponse('success')
 

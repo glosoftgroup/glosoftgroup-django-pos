@@ -49,8 +49,13 @@
          <div class="row">
             <div class="col-md-10 col-md-offset-1">
                <p class="text-center" style="margin: 20px 0px;">
-                 {% if date %}
-                   Sales of {{date}} : Kshs {{that_date_sum.total_net__sum}}<br />
+                 {% if date != today %}
+                   Sales of {{date}} : Kshs 
+                   {% if not that_date_sum.total_net_sum %}
+                      0.00 <br />
+                   {% else %}
+                   {{that_date_sum.total_net__sum}}<br />
+                   {% endif %}
                  {% endif %}
                  Todays Sales: Kshs {{tsum.total_net__sum}}<br />
                  Total Sales: Kshs {{total_sales.total_net__sum}}<br />
