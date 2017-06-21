@@ -60,27 +60,6 @@
     <div class="navbar-collapse collapse" id="navbar-mobile">
       <ul class="nav navbar-nav">
         <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a></li>
-        <!-- search filter -->
-        <li>
-          <form action="#" class="main-search" style="margin:3px;">
-      <div class="input-group contentgroup">
-        <div class="has-feedback has-feedback-left">
-          <input type="text" id='search_product_main' name='search_product_main' class="form-control " value="" placeholder="Search product name/ SKU name">
-          <div class="form-control-feedback">
-            <i class="icon-search4 text-muted text-size-base"></i>
-          </div>
-          {% url "dashboard:search-sku" as url %}
-          <input class="hidden" type="hidden" id="csrf_token" value="{{ csrf_token }}" name="csrf_token">
-          <input type="hidden" class="hidden" value='{{ url }}' id='search_url_main' name="url">
-        </div>
-
-        <div class="input-group-btn hidden">
-          <button type="submit" id='main_search_box' onclick='return false' class="btn btn-primary ">Search</button>
-        </div>
-      </div>      
-    </form>
-        </li>
-        <!-- end search -->
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
@@ -116,6 +95,7 @@
             <li role="separator" class="divider"></li>
             <li>
                 <a href="{% url 'account_logout' %}" class="waves-effect waves-teal">
+                <i class="icon-switch"></i>
                   {% trans "Log out" context "Dashboard top navigation action" %}
                 </a>
             </li>

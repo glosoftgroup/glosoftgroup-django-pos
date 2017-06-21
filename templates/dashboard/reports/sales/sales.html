@@ -134,6 +134,9 @@
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
                   <span>Report pullled by User</span></p>
+                  <input type="hidden" class="setValue">
+                  <input type="hidden" class="setName">
+                  <button class="btn btn-primary ck">Click</button>
                   
               </div>
              </div>
@@ -190,6 +193,19 @@ $(document).ready(function(){
           tickIcon: 'fa-dot-circle-o',
           pdfIcon:'fa-file-pdf-o',
           excelIcon:'fa-file-excel-o'
+    }).on('change',function(){
+         $('.setValue').val($(this).val());
+         $('.setName').val('export');
+         // $('.set').value = $(this).val();
+    });
+    $('.ck').click(function(){
+      var name = $('.setName').val();
+      var vl = $('.setValue').val();
+        if( !name || !vl || vl == 'none'){
+           alert('nothing');
+        }else{
+         alert(name +' and '+ vl);
+        }
     });
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
