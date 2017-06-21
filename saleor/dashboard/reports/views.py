@@ -79,7 +79,7 @@ def sales_paginate(request):
 
 		if date:
 			try:
-				items = SoldItem.objects.filter(date=date).order_by('-id')
+				items = SoldItem.objects.filter(sales__created__icontains=date).order_by('-id')
 				that_date = Sales.objects.filter(created__icontains=date)
 				that_date_sum = ts.aggregate(Sum('total_net'))
 				if p2_sz and gid:
@@ -95,7 +95,8 @@ def sales_paginate(request):
 				return HttpResponse(e)
 		if action:
 			try:
-				items = SoldItem.objects.filter(date=date).order_by('-id')
+				# items = SoldItem.objects.filter(date=date).order_by('-id')
+				items = SoldItem.objects.filter(sales__created__icontains=date).order_by('-id')
 				if p2_sz and gid:
 					paginator = Paginator(items, int(p2_sz))
 					items = paginator.page(page)
@@ -122,7 +123,7 @@ def sales_paginate(request):
 
 		if date:
 			try:
-				items = SoldItem.objects.filter(date=date).order_by('-id')
+				items = SoldItem.objects.filter(sales__created__icontains=date).order_by('-id')
 				that_date = Sales.objects.filter(created__icontains=date)
 				that_date_sum = ts.aggregate(Sum('total_net'))
 				if p2_sz:
