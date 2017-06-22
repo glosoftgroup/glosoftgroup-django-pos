@@ -193,6 +193,7 @@ class Product(models.Model, ItemRange, index.Indexed):
     
     def get_product_tax(self):
         return self.product_tax
+
     def get_tax_value(self):
         return self.product_tax.get_tax()
 
@@ -200,7 +201,7 @@ class Product(models.Model, ItemRange, index.Indexed):
         return any(variant.is_in_stock() for variant in self)
 
     def total_stock(self):
-        return Sum(self.variants.stock_available())
+        return Sum(variant.stock_available())
 
     def get_first_category(self):
         for category in self.categories.all():
@@ -208,8 +209,11 @@ class Product(models.Model, ItemRange, index.Indexed):
                 return category
         return None
     def get_variants_count(self):
-        attr_count = self.variants.filter(product=self.pk)
-        return len(attr_count)
+        variants = self.variants.filter(product=self.pk)
+        total = 0
+        for stock in variants:
+            total += stock.get_stock_quantity()
+        return total
 
     def is_available(self):
         today = datetime.date.today()
