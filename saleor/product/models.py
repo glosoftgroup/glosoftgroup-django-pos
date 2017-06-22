@@ -296,6 +296,10 @@ class ProductVariant(models.Model, Item):
                                            **kwargs)
         return price
 
+    def get_total_price_cost(self):
+        cost = self.get_price_per_item().gross * self.get_stock_quantity()
+        return cost
+
     def get_absolute_url(self):
         slug = self.product.get_slug()
         product_id = self.product.id

@@ -1,0 +1,219 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Sales Report
+{% endblock %}
+
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
+     <li><a href="{% url 'dashboard:sales_date_chart' %}">Sales Date Chart</a></li>
+ {% endblock %}
+
+{% block sales_by_date_chart_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+    <div class="col-md-12">
+      <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Sales Reports Charts by Date</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+        <div class="panel-body">
+
+            <div class="col-md-3">
+              <label>select single date to search</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                  <input class="form-control daterange-single" type="text">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-7">
+              <label>select a date range and click button to search</label>
+              <div class="form-group">
+                 <div class="col-md-4">
+                    <div class="input-group"><span class="input-group-addon">
+                        <i class="icon-calendar22"></i>
+                      </span>
+                      <input class="form-control daterange-from from" type="text" placeholder="from">
+                      
+                    </div>
+                 </div>
+                 <div class="col-md-4">
+                    <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="icon-calendar22"></i>
+                      </span>
+                      <input class="form-control daterange-to to" type="text" placeholder="to">
+                      
+                    </div>
+                 </div>
+                 <div class="col-md-4">
+                      <button class="btn btn-primary btn-block search_daterange">
+                        <i class="icon-search4 position-left"></i> Search
+                      </button>
+                 </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
+                  </select>
+              </div>
+            </div>
+      </div>
+   </div>
+   </div>
+
+<div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+
+            <div class="col-md-6 col-md-offset-3">
+              <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+</div>
+
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  var endpoint = "{% url 'dashboard:chart' %}";
+  var defaultData = [];
+  var labels = [];
+
+  $.ajax({
+    method:"GET",
+    url:endpoint,
+    success:function(data){
+      labels = data.label;
+      defaultData = data.default;
+      setChart();
+    },
+    error:function(error_data){
+
+    }
+  });
+
+  function setChart(){
+      var ctx = document.getElementById("myChart").getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData,
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 159, 64, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255,99,132,1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          }
+      });
+  }
+
+      $('.daterange-single').daterangepicker({ 
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+      alert(date);
+        $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:date }, async:false,success: function(data){
+              // $('#pagination-div').html(data);
+              console.log(data);
+        }});
+    });
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change',function(){
+         $('.setValue').val($(this).val());
+         $('.setName').val('export');
+         // $('.set').value = $(this).val();
+    });
+    //**@ daterange from
+    $('.daterange-from').daterangepicker({ 
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    });
+    //**@ daterange to
+    $('.daterange-to').daterangepicker({ 
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    });
+    //**@ put placeholders
+    $('.from').val('');
+    $('.from').attr("placeholder","From");
+    $('.to').val('');
+    $('.to').attr("placeholder","To");
+    //**@ date search button
+    $('.search_daterange').click(function(){
+      var from = $('.daterange-from').val();
+      var to = $('.daterange-to').val();
+       alert('from: '+from+' to: '+to);
+    });
+
+
+});
+
+</script>
+{% endblock %}
