@@ -22,6 +22,7 @@ from text_unidecode import unidecode
 from versatileimagefield.fields import VersatileImageField, PPOIField
 
 from ..discount.models import calculate_discounted_price
+from ..supplier.models import Supplier
 from ..search import index
 from .utils import get_attributes_display_map
 
@@ -145,6 +146,9 @@ class Product(models.Model, ItemRange, index.Indexed):
     wholesale_price = PriceField(
         pgettext_lazy('Product field', 'Wholesale price'),
         currency=settings.DEFAULT_CURRENCY, blank=True,null=True, max_digits=12, decimal_places=2)
+    product_supplier = models.ForeignKey(
+        Supplier, related_name='suppliers',blank=True, null=True,
+        verbose_name=pgettext_lazy('Product field', 'product supplier'))
     
     available_on = models.DateField(
         pgettext_lazy('Product field', 'available on'), blank=True, null=True)

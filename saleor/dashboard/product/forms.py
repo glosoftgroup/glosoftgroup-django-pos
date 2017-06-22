@@ -156,6 +156,9 @@ class ProductForm(forms.ModelForm):
         field = self.fields['product_class'] 
         field.widget.attrs['class'] = 'form-control select'
 
+        field = self.fields['product_supplier'] 
+        field.widget.attrs['class'] = 'form-control select'        
+        
         field = self.fields['available_on'] 
         field.widget.attrs['class'] = 'form-control pickadate-selectors'
          
