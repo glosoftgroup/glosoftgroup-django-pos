@@ -22,7 +22,7 @@
 <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
-        <h6 class="panel-title">Update Customer Details</h6>
+        <h6 class="panel-title">Update Supplier Details</h6>
         <div class="heading-elements">
           <ul class="icons-list">
             <li><a data-action="collapse"></a></li>
@@ -35,7 +35,7 @@
       <div class="panel-body">
         <div class="tabbable">
           <ul class="nav nav-tabs nav-tabs-highlight">
-            <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">edit customer profile</a></li>            
+            <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">edit supplier profile</a></li>            
 
           </ul>
 
@@ -46,7 +46,7 @@
               {% csrf_token %}
           <div class="row">
             <div class="col-md-4">
-            <label for="exampleInputEmail1">Customer Image</label>
+            <label for="exampleInputEmail1">Supplier Image</label>
               <div class="form-group">
                 <!-- <label for="exampleInputEmail1">User Image</label> -->
                 <div class="fileinput fileinput-new" data-provides="fileinput">
@@ -96,7 +96,7 @@
              <div class="pull-right" style="margin-top:40px;">
               <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
               <!-- <button class="btn btn-primary waves-effect waves-light" onclick="return false" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button> -->
-              <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Update Customer <i class="icon-arrow-right14 position-right"></i></button>
+              <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Update Supplier<i class="icon-arrow-right14 position-right"></i></button>
              </div>
             </div>
           </div>
@@ -243,7 +243,7 @@ $( ".check" ).on( "click", function(){
         // formData.append("image", file);
         if (formData) {
               $.ajax({
-                  url: "{% url 'dashboard:customer-update' pk=user.pk %}",
+                  url: "{% url 'dashboard:supplier-update' pk=user.pk %}",
                   type: "POST",
                   data: formData,
                   processData: false,

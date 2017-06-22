@@ -696,7 +696,7 @@ def stock_pages(request):
         queryset_list = ProductVariant.objects.filter(
             Q(sku__icontains=search) |
             Q(product__name__icontains=search)
-            ) 
+            ).order_by('-id') 
     paginator = Paginator(queryset_list,int(size)) # Show 10 contacts per page
     
     try:
@@ -722,7 +722,7 @@ def stock_filter(request):
         queryset_list = ProductVariant.objects.filter(
             Q(sku__icontains=search) |
             Q(product__name__icontains=search)
-            )            
+            ).order_by('-id')            
     paginator = Paginator(queryset_list, int(size))
     products_count = len(queryset_list)
     try:
@@ -749,7 +749,7 @@ def product_pages(request):
         queryset_list = Product.objects.filter(
             Q(sku__icontains=search) |
             Q(product__name__icontains=search)
-            ).distinct()
+            ).order_by('-id').distinct()
     paginator = Paginator(queryset_list,int(size)) # Show 10 contacts per page
     
     try:
@@ -774,7 +774,7 @@ def product_filter(request):
            Q(name__icontains=search)|
            Q(variants__sku__icontains=search)|
            Q(categories__name__icontains=search)
-            ).distinct()            
+            ).order_by('-id').distinct()            
     paginator = Paginator(queryset_list, int(size))
     products_count = len(queryset_list)
     try:
