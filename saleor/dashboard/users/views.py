@@ -302,11 +302,11 @@ def user_edit(request, pk):
 def user_update(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.method == 'POST':
-		name = request.POST.get('name')
-		email = request.POST.get('email')
-		password = request.POST.get('password')
-		nid = request.POST.get('nid')
-		mobile = request.POST.get('mobile')
+		name = request.POST.get('user_name')
+		email = request.POST.get('user_email')
+		password = request.POST.get('user_password')
+		nid = request.POST.get('user_nid')
+		mobile = request.POST.get('user_mobile')
 		image= request.FILES.get('image')
 		if password == user.password:
 			encr_password = user.password
@@ -386,8 +386,8 @@ def user_search( request ):
 
 		if q is not None:            
 			users = User.objects.filter( 
-				Q( name__contains = q ) |
-				Q( email__contains = q ) | Q( mobile__contains = q ) ).order_by( 'id' )
+				Q( name__icontains = q ) |
+				Q( email__icontains = q ) | Q( mobile__icontains = q ) ).order_by( 'id' )
 			paginator = Paginator(users, 10)
 			try:
 				users = paginator.page(page)
@@ -418,8 +418,8 @@ def usertrail_search( request ):
 
 		if q is not None:            
 			users = UserTrail.objects.filter( 
-				Q( name__contains = q ) |
-				Q( action__contains = q ) | Q( date__contains = q ) ).order_by( '-now' )
+				Q( name__icontains = q ) |
+				Q( action__icontains = q ) | Q( date__icontains = q ) ).order_by( '-now' )
 			paginator = Paginator(users, 10)
 			try:
 				users = paginator.page(page)

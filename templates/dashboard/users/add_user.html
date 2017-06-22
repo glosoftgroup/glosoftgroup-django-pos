@@ -7,7 +7,10 @@
 {% block title %}
   users
 {% endblock %}
-
+ {% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:users' %}">Users</a></li>
+     <li class="active"><a href="{% url 'dashboard:user-add' %}">Add User</a></li>
+ {% endblock %}
 {% block menu_user_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
@@ -18,7 +21,7 @@
  {% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row animated fadeIn">
 <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
@@ -223,7 +226,7 @@
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label class="display-block text-semibold">prodyct class(type)</label>
+                      <label class="display-block text-semibold">product class(type)</label>
                       {% for permission in permissions%}
                        {% if permission.content_type.model ==  'productclass' %}
                           <div class="checkbox">
@@ -242,7 +245,7 @@
                   <div class="col-md-12">
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label class="display-block text-semibold">prodyct image</label>
+                      <label class="display-block text-semibold">product image</label>
                       {% for permission in permissions%}
                        {% if permission.content_type.model ==  'productimage' %}
                           <div class="checkbox">
@@ -259,7 +262,7 @@
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label class="display-block text-semibold">prodyct tax</label>
+                      <label class="display-block text-semibold">product tax</label>
                       {% for permission in permissions%}
                        {% if permission.content_type.model ==  'producttax' %}
                           <div class="checkbox">
@@ -378,6 +381,57 @@
                         {% endfor %}
                     </div>
                   </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">groups</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'group' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">customer</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'customer' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">supplier</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'supplier' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
             </div>
             <!-- end user-->
             <div class="row">
@@ -474,6 +528,7 @@ $( ".check" ).on( "click", function(){
 } );
 /* end each check*/
   $('#user-details').validate({
+    onkeyup: function(element) {$(element).valid()},
     rules:{
         name: {
           required:true,

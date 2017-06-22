@@ -7,6 +7,10 @@
 {% block title %}
   Sales Report
 {% endblock %}
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
+ {% endblock %}
 
 {% block menu_report_class %}active{% endblock %}
  {% block custom_css %}
@@ -18,7 +22,7 @@
  {% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
       <div class="panel-heading">

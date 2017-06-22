@@ -289,12 +289,7 @@
       <div class="content-wrapper">
       <div class="page-header page-header-default">
           <div class="breadcrumb-line">
-            <!-- <ul class="breadcrumb">
-              <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
-              <li><a href="icons_fontawesome.html">Icons</a></li>
-              <li class="active">Font awesome</li>
-            </ul> -->
-                        <ul class="breadcrumb">
+            <ul class="breadcrumb">
                <li><a href="{% url 'dashboard:index' %}"><span class="icon-home"></span data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Back to dashboard"> Home</a></li>
                {% block breadcrumbs %}
               <li class="active">{% trans "Home" context "Dashboard homepage" %}</li>

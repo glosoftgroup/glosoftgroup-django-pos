@@ -70,7 +70,7 @@
               </div>
 
               <div class="form-group has-feedback has-feedback-left">
-                <input type="text" class="form-control email" name="email" placeholder="Email">
+                <input type="text" class="form-control email" name="email" placeholder="Username or Email">
                 <div class="form-control-feedback">
                   <i class="icon-user text-muted"></i>
                 </div>
@@ -168,11 +168,9 @@
                          window.location = "{% url 'dashboard:index' %}";
                          $('.email').val('');
                          $('.password').val('');
-                         console.log(data);
                          $('.spinner').hide();
                        }
                        else{
-                        console.log(data);
                           $('#status').show();
                           $('.spinner').hide();
                        }
@@ -184,7 +182,6 @@
                   }
               });
               e.preventDefault(); //STOP default action
-              e.unbind();
           });
 
         
