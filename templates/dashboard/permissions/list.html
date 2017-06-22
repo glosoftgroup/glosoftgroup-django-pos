@@ -8,6 +8,12 @@
   Groups & Permissions
 {% endblock %}
 
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:users' %}">Users</a></li>
+     <li class="active"><a href="{% url 'dashboard:groups' %}">Groups</a></li>
+     <li class="active"><a href="{% url 'dashboard:perms' %}">Add Group</a></li>
+ {% endblock %}
+
 {% block menu_perm_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
@@ -18,7 +24,7 @@
  {% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row animated fadeIn">
 <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
@@ -57,7 +63,7 @@
                             <div class="multi-select-full">
                               <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="multiple" placeholder="select a user...">
                               {% for usr in users %}
-                                {% if usr.is_active == True and usr.is_superuser == False %}
+                                {% if usr.is_staff == True and usr.is_superuser == False %}
                                    <option value="{{usr.id}}"> 
                                      {% if usr.name %}
                                         {{usr.name}}
@@ -235,7 +241,7 @@
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label class="display-block text-semibold">prodyct class(type)</label>
+                      <label class="display-block text-semibold">product class(type)</label>
                       {% for permission in permissions%}
                        {% if permission.content_type.model ==  'productclass' %}
                           <div class="checkbox">
@@ -254,7 +260,7 @@
                   <div class="col-md-12">
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label class="display-block text-semibold">prodyct image</label>
+                      <label class="display-block text-semibold">product image</label>
                       {% for permission in permissions%}
                        {% if permission.content_type.model ==  'productimage' %}
                           <div class="checkbox">
@@ -271,7 +277,7 @@
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label class="display-block text-semibold">prodyct tax</label>
+                      <label class="display-block text-semibold">product tax</label>
                       {% for permission in permissions%}
                        {% if permission.content_type.model ==  'producttax' %}
                           <div class="checkbox">
@@ -387,7 +393,13 @@
             <!-- end user-->
             <div class="row">
               <div class="col-md-8 col-md-offset-2 text-center">
-                <button class="btn btn-primary" id="permission-btn">Submit Permissions</button>
+                <div class="col-md-6">
+                <button class="btn btn-primary" id="permission-btn"><i class="icon-arrow-left13 position-left"></i> Save and add another</button>
+                </div>
+                <div class="col-md-6">
+                <button class="btn btn-warning" id="save-group-btn">
+                Save <i class="icon-arrow-right14 position-right"></i></button>
+                </div>
               </div>
             </div>
            </div>
@@ -676,5 +688,64 @@ $("#permission-btn").click(function(event){
 
 });
 /*-------  end permission button --------*/
+
+/*-------  permission button --------*/
+$("#save-group-btn").click(function(event){
+    event.preventDefault();
+    var checkBoxesStringArray = $(".check:checked").map(function(){
+      return $(this).val();
+    }).get();
+    var checkBoxesStringNumber = checkBoxesStringArray.map(Number);
+    //**@ check login status
+    if($("#can-login").is(':checked')){
+      $("#can-login").val('active')
+    }else{
+      $("#can-login").val('inactive');
+    }
+    //**@ check login val
+    var can_login_value = $("#can-login").val();
+    //**@ span val
+    var set_current_group_text = $('.current_group').text('');
+    //**@ set group_id
+     var g_id =   localStorage.getItem("group_id") ? localStorage.getItem('group_id') : $('.group_select_permissions').val();
+    //**@ call
+    $.ajax({
+      url: "{% url 'dashboard:group_assign_permission' %}",
+      type: 'POST',
+      data: {
+             'checklist[]': checkBoxesStringArray,
+             'group_id': g_id ,
+             'check_login':can_login_value,
+             'csrfmiddlewaretoken':"{{ csrf_token }}"
+      },
+      success: function(data){
+         $('.current_group').text('');
+         if(localStorage.getItem("group_id")){
+             $.jGrowl('permissions added successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+             });
+         }else{
+              $.jGrowl('permissions updated successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+              });
+         }
+         localStorage.removeItem('group_id');
+         localStorage.removeItem('group_name');
+         window.location = "{% url 'dashboard:groups' %}";
+
+      }
+      ,error:function(){
+        $.jGrowl('something went wrong', {
+              header: 'Oops!',
+              theme: 'bg-danger'
+         });
+      }
+     });
+
+});
+/*-------  end permission button --------*/
+
 </script>
 {% endblock %}

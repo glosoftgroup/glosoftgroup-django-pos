@@ -8,17 +8,34 @@
   users
 {% endblock %}
 
+ {% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:users' %}">Users</a></li>
+     <li class="active"><a href="{% url 'dashboard:user-edit' pk=user.pk %}">Update User</a></li>
+ {% endblock %}
+
 {% block menu_user_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
       color: #FF5722;
     }
+    #name::placeholder {color: #333;opacity: 1;}
+    #name:focus::placeholder { color:transparent; }
+    #email::placeholder {color: #333;opacity: 1;}
+    #email:focus::placeholder { color:transparent; }
+    #password::-moz-placeholder {color: #333;opacity: 1;}
+    #password:focus::placeholder { color:transparent; }
+    #confirm_password::placeholder {color: #333;opacity: 1;}
+    #confirm_password:focus::placeholder { color:transparent; }
+    #nid::placeholder {color: #333;opacity: 1;}
+    #nid:focus::placeholder { color:transparent; }
+    #mobile::placeholder {color: #333;opacity: 1;}
+    #mobile:focus::placeholder { color:transparent; }
   </style>
  {% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row animated fadeIn">
 <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
@@ -43,7 +60,7 @@
           <div class="tab-content">
 
             <div class="tab-pane animated fadeIn active" id="profile">
-              <form class="form" enctype="multipart/form-data" id="update-details" name="update-details">
+              <form id="update-details" enctype="multipart/form-data"  name="update-details">
               {% csrf_token %}
           <div class="row">
             <div class="col-md-4">
@@ -68,29 +85,29 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="{{ user.name}}">
+                    <input type="text" class="form-control" name="name" id="name" placeholder="{{ user.name}}">
                   </div>
                   <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" class="form-control" name="password" id="password" placeholder="Password" value="{{ user.password}}">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="*******" pas="{{ user.password}}">
                    </div>
                    <div class="form-group">
                     <label for="exampleInputPassword1">National ID No:</label>
-                    <input type="text" class="form-control" name="nid" id="nid" placeholder="Id No" value="{{ user.nid}}">
+                    <input type="text" class="form-control" name="nid" id="nid" placeholder="{{ user.nid}}">
                    </div>
                 </div>
                 <div class="col-md-6">
                    <div class="form-group">
                       <label for="email">Email address</label>
-                      <input type="email" class="form-control" name="email" id="email" placeholder="Email" value="{{ user.email}}">
+                      <input type="email" class="form-control" name="email" id="email" placeholder="{{ user.email}}">
                    </div>
                    <div class="form-group">
                     <label for="confirm_password">Confirm Password</label>
-                    <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="Confirm Password" value="{{ user.password}}">
+                    <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="*******">
                    </div>
                    <div class="form-group">
                     <label for="mobile">Phone</label>
-                    <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile" value="{{ user.mobile}}">
+                    <input type="text" class="form-control" name="mobile" id="mobile" placeholder="{{ user.mobile}}">
                    </div>
                 </div>
               </div>
@@ -100,10 +117,11 @@
           </div>
           <div class="row">
             <div class="col-md-12">
+            <button class="btn btn-primary sth"> click</button>
              <div class="pull-right" style="margin-top:40px;">
               <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
               <!-- <button class="btn btn-primary waves-effect waves-light" onclick="return false" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button> -->
-              <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Update User <i class="icon-arrow-right14 position-right"></i></button>
+              <button class="btn btn-primary waves-effect waves-light" id="submit" type="button">Update User <i class="icon-arrow-right14 position-right"></i></button>
              </div>
             </div>
           </div>
@@ -510,6 +528,90 @@
                         {% endfor %}
                     </div>
                   </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">group</label>
+                      {% for permission in permissions %}
+                       {% if permission.content_type.model ==  'group' %}
+                            {% if permission in user_permissions %}                          
+                                <div class="checkbox">
+                                  <label>
+                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    {{permission.name}}
+                                  </label>
+                                  <span id="granted" class="granted text-success">(granted)</span>
+                                </div>
+                            {% else %}
+                               <div class="checkbox">
+                               <label>          
+                                   <input class="styled check" type="checkbox" 
+                                  value="{{permission.id}}">
+                                   {{permission.name}}
+                               </label>
+                               <span id="granted" class="granted text-success"></span>
+                               </div>
+                            {% endif %}
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">customer</label>
+                      {% for permission in permissions %}
+                       {% if permission.content_type.model ==  'customer' %}
+                            {% if permission in user_permissions %}                          
+                                <div class="checkbox">
+                                  <label>
+                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    {{permission.name}}
+                                  </label>
+                                  <span id="granted" class="granted text-success">(granted)</span>
+                                </div>
+                            {% else %}
+                               <div class="checkbox">
+                               <label>          
+                                   <input class="styled check" type="checkbox" 
+                                  value="{{permission.id}}">
+                                   {{permission.name}}
+                               </label>
+                               <span id="granted" class="granted text-success"></span>
+                               </div>
+                            {% endif %}
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">supplier</label>
+                      {% for permission in permissions %}
+                       {% if permission.content_type.model ==  'supplier' %}
+                            {% if permission in user_permissions %}                          
+                                <div class="checkbox">
+                                  <label>
+                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    {{permission.name}}
+                                  </label>
+                                  <span id="granted" class="granted text-success">(granted)</span>
+                                </div>
+                            {% else %}
+                               <div class="checkbox">
+                               <label>          
+                                   <input class="styled check" type="checkbox" 
+                                  value="{{permission.id}}">
+                                   {{permission.name}}
+                               </label>
+                               <span id="granted" class="granted text-success"></span>
+                               </div>
+                            {% endif %}
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
             </div>
             <!-- end user-->
             <div class="row">
@@ -531,6 +633,178 @@
 {% endblock%}
 {% block custom_js %}
 <script type="text/javascript">
+$(document).ready(function(){
+    // alert('hey');
+    $('#update-details').validate({
+      onkeyup: function(element) {$(element).valid()},
+      onsubmit: false,
+        rules: {
+            email: {
+                required: true,
+                email: true
+            },
+            name: {
+                required: true,
+                minlength: 3,
+                alphanumeric: true
+            },
+            password:{
+              required:true,
+              minlength: 6
+            },
+            confirm_password:{
+              required:true,
+              minlength:6,
+              equalTo: "#password"
+            },
+            nid:{
+              required:true,
+              digits: true,
+              minlength: 6
+            },
+            mobile:{
+              required:true,
+              digits: true,
+              minlength: 6
+            }
+        }
+    });
+    $('#submit').click(function(){
+         // $('#email-field-only').valid();
+        var user_name, user_email, user_password, user_nid, user_mobile;
+
+        var name= $('#name').attr('placeholder'), email= $('#email').attr('placeholder'), nid= $('#nid').attr('placeholder'), mobile= $('#mobile').attr('placeholder'), password = $('#password').attr('pas');
+
+        var name_v = $('#name').val(), email_v = $('#email').val(), password_v = $('#password').val(), nid_v = $('#nid').val(), mobile_v = $('#mobile').val();
+
+        user_name = !name_v ? name : name_v;
+        user_email = !email_v ? email : email_v;
+        user_password = !password_v ? password : password_v;
+        user_nid = !nid_v ? nid : nid_v;
+        user_mobile = !mobile_v ? mobile : mobile_v;
+        console.log(user_name);
+
+        var file = $('#image')[0].files[0];
+        var f = document.getElementById('update-details');
+        var formData = new FormData(f);
+        formData.append("user_name", user_name);
+        formData.append("user_email", user_email);
+        formData.append("user_password", user_password);
+        formData.append("user_nid", user_nid);
+        formData.append("user_mobile", user_mobile);
+
+        if (formData) {
+              $.ajax({
+                  url: "{% url 'dashboard:user-update' pk=user.pk %}",
+                  type: "POST",
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success:function(data){
+                     console.log(data);             
+
+                     $.jGrowl('Updated successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                     });
+                     window.location = "{% url 'dashboard:users' %}";
+                  },
+                  error:function(error){
+                    console.log(error);
+                    $.jGrowl('Change a few things up and try submitting again', {
+                        header: 'Oh snap!',
+                        theme: 'bg-danger'
+                    });
+                  }
+              });
+          } 
+
+    });
+
+/* update user details */
+  // $('#update-details').validate({
+  // onkeyup: function(element) {$(element).valid()},
+  //   rules:{
+  //       name: {
+  //         required:true,
+  //         minlength:3
+  //       },
+  //       email:{
+  //         required: true,
+  //         email:true
+  //       },
+  //       password:{
+  //         required:true,
+  //         minlength: 6
+  //       },
+  //       confirm_password:{
+  //         required:true,
+  //         minlength:6,
+  //         equalTo: "#password"
+  //       },
+  //       nid:{
+  //         required:true,
+  //         digits: true,
+  //         minlength: 6
+  //       },
+  //       mobile:{
+  //         required:true,
+  //         digits: true,
+  //         minlength: 6
+  //       }
+
+  //   },
+  //   messages:{
+  //     name:{
+  //       required: "please provide a name",
+  //       minlength: "name must be atleast 3 characters long"
+  //     },
+  //     password:{
+  //       required: "please provide a password",
+  //       minlength: "password must be atleast 6 characters long"
+  //     },
+  //     confirm_password:{
+  //       required: "please provide a password",
+  //       minlength: "password must be atleast 6 characters long",
+  //       equalTo: "please enter the same password"
+  //     }
+  //   },
+  //   submitHandler: function() { 
+  //       var file = $('#image')[0].files[0];
+  //       var f = document.getElementById('update-details');
+  //       var formData = new FormData(f);
+  //       if(file){
+  //         formData.append("image", file);
+  //       }
+  //       // formData.append("image", file);
+  //       if (formData) {
+  //             $.ajax({
+  //                 url: "{% url 'dashboard:user-update' pk=user.pk %}",
+  //                 type: "POST",
+  //                 data: formData,
+  //                 processData: false,
+  //                 contentType: false,
+  //                 success:function(data){
+  //                    console.log(data);             
+
+  //                    $.jGrowl('Updated successfully', {
+  //                       header: 'Well done!',
+  //                       theme: 'bg-success'
+  //                    });
+  //                    window.location = "{% url 'dashboard:users' %}";
+  //                 },
+  //                 error:function(error){
+  //                   console.log(error);
+  //                   $.jGrowl('Change a few things up and try submitting again', {
+  //                       header: 'Oh snap!',
+  //                       theme: 'bg-danger'
+  //                   });
+  //                 }
+  //             });
+  //         } 
+  //   }
+  // });
+});
 /* disable th permissions tab code */
 $('#next-tab').click(function(){
   $('#permissions-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
@@ -601,88 +875,7 @@ $( ".check" ).on( "click", function(){
   }
 } );
 /* end each check*/
-/* update user details */
-  $('#update-details').validate({
-    rules:{
-        name: {
-          required:true,
-          minlength:3
-        },
-        email:{
-          required: true,
-          email:true
-        },
-        password:{
-          required:true,
-          minlength: 6
-        },
-        confirm_password:{
-          required:true,
-          minlength:6,
-          equalTo: "#password"
-        },
-        nid:{
-          required:true,
-          digits: true,
-          minlength: 6
-        },
-        mobile:{
-          required:true,
-          digits: true,
-          minlength: 6
-        }
 
-    },
-    messages:{
-      name:{
-        required: "please provide a name",
-        minlength: "name must be atleast 3 characters long"
-      },
-      password:{
-        required: "please provide a password",
-        minlength: "password must be atleast 6 characters long"
-      },
-      confirm_password:{
-        required: "please provide a password",
-        minlength: "password must be atleast 6 characters long",
-        equalTo: "please enter the same password"
-      }
-    },
-    submitHandler: function() { 
-        var file = $('#image')[0].files[0];
-        var f = document.getElementById('update-details');
-        var formData = new FormData(f);
-        if(file){
-          formData.append("image", file);
-        }
-        // formData.append("image", file);
-        if (formData) {
-              $.ajax({
-                  url: "{% url 'dashboard:user-update' pk=user.pk %}",
-                  type: "POST",
-                  data: formData,
-                  processData: false,
-                  contentType: false,
-                  success:function(data){
-                     console.log(data);             
-
-                     $.jGrowl('Updated successfully', {
-                        header: 'Well done!',
-                        theme: 'bg-success'
-                     });
-                     window.location = "{% url 'dashboard:users' %}";
-                  },
-                  error:function(error){
-                    console.log(error);
-                    $.jGrowl('Change a few things up and try submitting again', {
-                        header: 'Oh snap!',
-                        theme: 'bg-danger'
-                    });
-                  }
-              });
-          } 
-    }
-  });
 
 /* permission button */
 $("#permission-btn").click(function(event){

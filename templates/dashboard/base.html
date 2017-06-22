@@ -226,11 +226,7 @@
                     <i class="icon-price-tags"></i>Discounts
                     </a>
                     </li>
-                    <li class="{% block menu_tax_list %}{% endblock %}">
-                    <a href="{% url 'dashboard:tax-list' %}">
-                    <i class="icon-drawer-out"></i>Tax
-                    </a>
-                    </li>
+                    
 
                     <!-- <li class="{% block menu_vouchers_class %}{% endblock %}">
                     <a href="{% url 'dashboard:voucher-list' %}">
@@ -254,6 +250,11 @@
                     </li>
                     <li class="{% block menu_purchase_report_class %}{% endblock %}">
                       <a href="{% url 'dashboard:purchases_reports' %}"><i class='icon-price-tag'></i>Purchases</a>
+                    </li>
+                    <li class="{% block menu_tax_list %}{% endblock %}">
+                    <a href="{% url 'dashboard:tax-list' %}">
+                    <i class="icon-drawer-out"></i>Tax
+                    </a>
                     </li>
                     <li class="{% block menu_balancesheet_report_class %}{% endblock %}">
                       <a href="{% url 'dashboard:balancesheet_reports' %}"><i class='icon-book'></i>Balance Sheet</a>
@@ -288,12 +289,7 @@
       <div class="content-wrapper">
       <div class="page-header page-header-default">
           <div class="breadcrumb-line">
-            <!-- <ul class="breadcrumb">
-              <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
-              <li><a href="icons_fontawesome.html">Icons</a></li>
-              <li class="active">Font awesome</li>
-            </ul> -->
-                        <ul class="breadcrumb">
+            <ul class="breadcrumb">
                <li><a href="{% url 'dashboard:index' %}"><span class="icon-home"></span data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Back to dashboard"> Home</a></li>
                {% block breadcrumbs %}
               <li class="active">{% trans "Home" context "Dashboard homepage" %}</li>
