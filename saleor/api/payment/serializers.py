@@ -10,7 +10,8 @@ class MpesaPaymentListSerializer(serializers.ModelSerializer):
 		model = MpesaPayment
 		fields = ('id',
 				 'ref_number', 
-				 'phone', 
+				 'phone',
+				 'amount', 
 				 'first_name',
 				 'middle_name',
 				 'last_name')
