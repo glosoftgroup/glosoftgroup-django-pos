@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from decimal import Decimal
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from django.db import models
@@ -9,6 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import pgettext_lazy
 from django_countries.fields import Country, CountryField
 from ..search import index
+#from ..sale.models import Sales
 
 
 class AddressBookManager(models.Manager):
@@ -113,6 +115,8 @@ class Customer(models.Model):
     is_active = models.BooleanField(
         pgettext_lazy('Customer field', 'active'),
         default=True)
+    loyalty_points = models.DecimalField(
+        pgettext_lazy('Customer field', 'loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
     nid = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
     image = models.FileField(upload_to='staff', blank=True, null=True)
@@ -139,8 +143,13 @@ class Customer(models.Model):
         verbose_name = pgettext_lazy('Customer model', 'customer')
         verbose_name_plural = pgettext_lazy('Customer model', 'customers')
 
+    def __str__(self):
+        return self.name
+
     def get_full_name(self):
         return self.email
 
     def get_short_name(self):
         return self.email
+    def get_sales(self):
+        return len(self.customers.all())

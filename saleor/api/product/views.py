@@ -40,7 +40,12 @@ from .serializers import (
     SalesSerializer,  
      )
 from rest_framework import generics
-
+from ...userprofile.models import User, UserTrail
+from ...decorators import permission_decorator, user_trail
+import logging
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 class UserCreateAPIView(CreateAPIView):
     serializer_class = UserCreateSerializer
@@ -76,10 +81,11 @@ class SalesDetailAPIView(generics.RetrieveAPIView):
 class SalesCreateAPIView(generics.CreateAPIView):
     queryset = Sales.objects.all()
     serializer_class = SalesSerializer
-    def perform_create(self, serializer):
-        if not serializer.is_valid(): 
-            print 'sdfsdfsdfjsldfj'       
+    def perform_create(self, serializer):              
         serializer.save(user=self.request.user)
+        user_trail(self.request.user.name,'made a sale:#'+str(serializer.data['invoice_number'])+' sale worth: '+str(serializer.data['total_net']),'add')
+        info_logger.info('User: '+str(self.request.user)+' made a sale:'+str(serializer.data['invoice_number']))
+
 
 class SalesListAPIView(generics.ListAPIView):
     queryset = Sales.objects.all()

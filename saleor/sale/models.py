@@ -81,19 +81,11 @@ class Sales(models.Model):
 		ordering = ('-last_status_change',)
 		verbose_name = pgettext_lazy('Sales model', 'Sales')
 		verbose_name_plural = pgettext_lazy('Sales model', 'Sales')
-
-	# def save(self, *args, **kwargs):
-	#     if not self.token:
-	#         self.token = str(uuid4())
-	#     return super(Order, self).save(*args, **kwargs)
-
-	# def change_status(self, status):
-	#     if status != self.status:
-	#         self.status = status
-	#         self.save()
+	
+	
 	def __str__(self):
 		return self.invoice_number
-        
+								
 class SoldItem(models.Model):
 	sales = models.ForeignKey(Sales,related_name='solditems',on_delete=models.CASCADE)
 	order = models.IntegerField()

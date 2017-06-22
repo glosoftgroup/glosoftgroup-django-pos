@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.serializers import (   
 			BooleanField,
 			EmailField,
@@ -26,10 +27,6 @@ from ...product.models import (
 	)
 from ...customer.models import Customer
 
-import logging
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 User = get_user_model()
 
@@ -113,11 +110,22 @@ class SalesSerializer(serializers.ModelSerializer):
 				 'terminal',
 				 'amount_paid',
 				 'solditems',
+				 'customer',
 				)
 	def create(self,validated_data):
-		solditems_data = validated_data.pop('solditems')        
-		
-		sales = Sales.objects.create(**validated_data)
+		# calculate loyalty_points
+		customer = validated_data.get('customer')
+		total_net = validated_data.get('total_net')
+		invoice_number = validated_data.get('invoice_number')
+		if customer:
+			total_net = validated_data.get('total_net')
+			points_eq = settings.LOYALTY_POINT_EQUIVALENCE
+			loyalty_points = total_net/points_eq			
+			customer.loyalty_points += loyalty_points
+			customer.save()
+		# get sold products	
+		solditems_data = validated_data.pop('solditems')		
+		sales = Sales.objects.create(**validated_data)		
 		for solditem_data in solditems_data:
 			SoldItem.objects.create(sales=sales,**solditem_data)
 			stock = Stock.objects.get(variant__sku=solditem_data['sku'])
