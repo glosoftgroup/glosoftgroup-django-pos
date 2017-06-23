@@ -46,6 +46,9 @@ class MpesaPaymentListAPIView(generics.ListAPIView):
         if query:
             queryset_list = queryset_list.filter(
                 Q(ref_number__icontains=query)|
-                Q(phone__sku__icontains=query)                
-                ).distinct()
+                Q(first_name__icontains=query)|
+                Q(last_name__icontains=query)|
+                Q(middle_name__icontains=query)|
+                Q(phone__icontains=query)                
+                ).order_by('-id').distinct()
         return queryset_list

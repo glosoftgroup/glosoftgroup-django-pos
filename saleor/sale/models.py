@@ -88,7 +88,7 @@ class Sales(models.Model):
 								
 class SoldItem(models.Model):
 	sales = models.ForeignKey(Sales,related_name='solditems',on_delete=models.CASCADE)
-	order = models.IntegerField()
+	order = models.IntegerField(default=Decimal(1))
 	sku = models.CharField(
 		pgettext_lazy('SoldItem field', 'SKU'), max_length=32)    
 	quantity = models.IntegerField(
