@@ -1,11 +1,14 @@
 # Payment rest api serializers
 from rest_framework import serializers
-
+from rest_framework.serializers import (
+					SerializerMethodField,
+				 )
+from datetime import datetime
 from ...payment.models import MpesaPayment
 
 
 class MpesaPaymentListSerializer(serializers.ModelSerializer):
-	#url = HyperlinkedIdentityField(view_name='product-api:detail')	
+	time = SerializerMethodField()
 	class Meta:
 		model = MpesaPayment
 		fields = ('id',
@@ -14,6 +17,9 @@ class MpesaPaymentListSerializer(serializers.ModelSerializer):
 				 'amount', 
 				 'first_name',
 				 'middle_name',
-				 'last_name')
-
+				 'last_name',
+				 'time')
+	def get_time(self,obj):
+		time = obj.created.strftime("%d/%m/%Y %H:%M:%S %p")
+		return time
 

@@ -14,6 +14,7 @@ from django.contrib.auth.models import Permission
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from ...discount.models import Sale
+from ...discount.models import get_product_discounts
 from ...sale.models import (Sales, SoldItem)
 from ...order.models import (
 	Order,
@@ -183,16 +184,16 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 			'quantity',            
 			)
 	def get_discount(self,obj):
-		price = obj.get_price_per_item().gross
-		try:
-			discount = Sale.objects.get(products__pk=obj.product.pk)
-			if discount.type == 'fixed':                
-				discount = float(discount.value)/float(price)*float(100)
-			else:
-				discount = discount.value
-		except:
-			discount = 0
-		discount = float(discount)*float(price)/float(100)
+		price = obj.get_price_per_item().gross		
+		discounts = Sale.objects.all()
+		discount_list = get_product_discounts(obj.product, discounts)
+		for discount in discount_list:
+			try:
+				discount = discount.factor
+			except:
+				discount = discount.amount.gross
+				discount = float(discount)/float(price)*float(100)
+
 		return discount
 
 	def get_quantity(self,obj):
