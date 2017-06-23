@@ -26,6 +26,7 @@ from ...product.models import (
 	ProductVariant,
 	Stock,
 	)
+from decimal import Decimal
 from ...customer.models import Customer
 
 
@@ -186,13 +187,14 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 	def get_discount(self,obj):
 		price = obj.get_price_per_item().gross		
 		discounts = Sale.objects.all()
+		discount = 0
 		discount_list = get_product_discounts(obj.product, discounts)
 		for discount in discount_list:
 			try:
 				discount = discount.factor
 			except:
 				discount = discount.amount.gross
-				discount = float(discount)/float(price)*float(100)
+				discount = Decimal(discount)/Decimal(price)*Decimal(100)
 
 		return discount
 
