@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     url(r'sale/$', views.sale_list, name='sale-list'),
     url(r'sale/(?P<pk>[0-9]+)/$', views.sale_edit, name='sale-update'),
+    url(r'sale/(?P<pk>[0-9]+)/detail/$', views.discount_detail, name='discount-detail'),
     url(r'sale/add/$', views.sale_edit, name='sale-add'),
     url(r'sale/(?P<pk>[0-9]+)/delete/$', views.sale_delete, name='sale-delete'),
 

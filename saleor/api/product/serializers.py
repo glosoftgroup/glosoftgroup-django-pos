@@ -1,4 +1,6 @@
 from django.conf import settings
+from datetime import date
+from django.db.models import Q
 from rest_framework.serializers import (   
 			BooleanField,
 			EmailField,
@@ -185,8 +187,9 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 			'quantity',            
 			)
 	def get_discount(self,obj):
+		today = date.today()
 		price = obj.get_price_per_item().gross		
-		discounts = Sale.objects.all()
+		discounts = Sale.objects.filter(start_date__lte=today).filter(end_date__gte=today)
 		discount = 0
 		discount_list = get_product_discounts(obj.product, discounts)
 		for discount in discount_list:
