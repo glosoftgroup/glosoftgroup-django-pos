@@ -1,0 +1,174 @@
+  {% load staticfiles i18n %}
+  {% if date_total_sales %}
+  <div class="col-md-12">
+   <div class="panel panel-flat">
+    <div class="panel-heading">
+        <h6 class="panel-title">Sale summary of Date {{date}}</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+     <div class="panel-body">
+          <!-- Quick stats boxes -->
+          <div class="row animated fadeIn">
+            <div class="col-lg-3">
+              <!-- Date Sales -->
+              <div class="panel bg-info-300">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+                  <h4 class="no-margin">Total Sales</h4>
+                  <h5 class="no-margin">KShs.{{date_total_sales}}</h5>
+                  
+                  {% if popular_item.count > 1%}
+                  <div class="popular">
+                   Popular products: <button class="btn btn-sm btn-default" onclick="alert('clicked ')" style="padding: 2px 5px;font-size: 10px;">View</button>
+                 {{popular_item}}
+                  </div>
+                  {% else %}
+                    <div class="popular">
+                        Popular item: {% for p in popular_item %}{{p.product_name}} - ({{p.c}} sales) {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div id="server-load"></div>
+              </div>
+              <!-- /date sales -->
+            </div>
+            
+            <div class="col-lg-3">
+              <!-- Highest Sold -->
+              <div class="panel bg-success-700">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+                  <h4 class="no-margin">Highest Sold Item</h4>
+                  <h5 class="no-margin">KShs. {{highest_item.total_cost__sum}}</h5>
+                    <div class="high_product">
+                    {{highest_item.product_name}}   
+                    </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /highest sold -->
+            </div>
+
+            <div class="col-lg-3">
+              <!-- Lowest Sold-->
+              <div class="panel bg-danger-600">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+                  <h4 class="no-margin">Lowest Sold Item</h4>
+                  <h5 class="no-margin">KShs. {{lowest_item.total_cost__sum}}</h5>
+                  <div class="low_product">
+                  {{lowest_item.product_name}}   
+                  </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /lowest sold -->
+            </div>
+
+            <div class="col-lg-3">
+              <!-- Customers Visited -->
+              <div class="panel bg-purple-600">
+                <div class="panel-body">
+                  <h4 class="no-margin">Customers</h4>
+                  <h5 class="no-margin">{{no_of_customers}}</h5>
+                  Customers Visited
+                  <div class="any" style="visibility: hidden;">
+                   1000 customers
+                  </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /customers visited -->
+            </div>
+
+          </div>
+          <!-- /quick stats boxes -->
+     </div>
+   </div>
+ </div>
+
+<div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+
+          <div class="col-md-12">
+
+            <div class="col-md-10 col-md-offset-1">
+                <canvas id="dateChart" width="900" height="400"></canvas>
+                <div class="text-center"><span style="color: #72726d;">Hours in {{date}}</span></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+   <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/chart.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    var defaultData = [{% for d in default %} {{ d }}, {% endfor %}];
+    var labels = [{% for i in labels %} "{{ i }}", {% endfor %}];
+    var ctx = document.getElementById("dateChart").getContext('2d');
+    var dateChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Amount of sales',
+                data: defaultData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        }
+
+    });
+
+});
+</script>
+ {% else %}
+  <div class="col-md-12 animated slideInUp ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+       No sales summary available for {{date}}
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}

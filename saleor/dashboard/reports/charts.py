@@ -16,6 +16,7 @@ from django.core import serializers
 from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 import datetime
 from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
@@ -27,6 +28,8 @@ from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem
 from ...product.models import Product, ProductVariant
 from ...decorators import permission_decorator, user_trail
+
+from .hours_chart import get_hours_results
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -53,21 +56,59 @@ def get_sales_charts(request):
 	return JsonResponse(data)
 def get_sales_by_date(request):
 	date = request.GET.get('date')
-	# if date:
-	items = SoldItem.objects.filter(sales__created__icontains=date)
-	item_occurences = items.values('product_name','total_cost').annotate(c=Count('sku')).order_by('-c')
-	
-	highest_no = item_occurences.aggregate(Max('c'))['c__max']
-	highest_product = item_occurences.get(c=highest_no)
+	if date:
+		try:
+			no_of_customers = Sales.objects.filter(created__contains=date).count()
+			date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
+			items = SoldItem.objects.filter(sales__created__icontains=date)
+			# to get all items and their totals
+			item_occurences = items.values('product_name','total_cost').annotate(c=Count('sku')).annotate(Sum('total_cost'))
+			popular_no = item_occurences.aggregate(Max('c'))['c__max']
+			popular_item = item_occurences.filter(c=popular_no)
 
-	lowest_no = item_occurences.aggregate(Min('c'))['c__min']
-	lowest_product = item_occurences.filter(c=lowest_no)
+			highest_sale = item_occurences.aggregate(Max('total_cost__sum'))['total_cost__sum__max']
+			highest_item = item_occurences.get(total_cost__sum=highest_sale)
 
-	data = {
-		"highest_product": highest_product,
-		"lowest_product":list(lowest_product)
-	}
-	return JsonResponse(data)
+			# lowest_no = item_occurences.aggregate(Min('c'))['c__min']
+			# lowest_product = item_occurences.filter(c=lowest_no)
+			lowest_sale = item_occurences.aggregate(Min('total_cost__sum'))['total_cost__sum__min']
+			lowest_item = item_occurences.get(total_cost__sum=lowest_sale)
+
+			seven_eight = get_hours_results(date, 7, 8)
+			eight_nine = get_hours_results(date, 8, 9)
+			nine_ten = get_hours_results(date, 9, 10)
+			ten_eleven = get_hours_results(date, 10, 11)
+			eleven_twelve = get_hours_results(date, 11, 12)
+			twelve_thirteen = get_hours_results(date, 12, 13)
+			thriteen_fourteen = get_hours_results(date, 13, 14)
+			fourteen_fifteen = get_hours_results(date, 14, 15)
+			fifteen_sixteen = get_hours_results(date, 15, 16)
+			sixteen_seventeen = get_hours_results(date, 16, 17)
+			seventeen_eighteen = get_hours_results(date, 17, 18)
+			eighteen_nineteen = get_hours_results(date, 18, 19)
+			nineteen_twenty = get_hours_results(date, 19, 20)
+			twenty_twentyone = get_hours_results(date, 20, 21)
+
+			labels = ["7-8","8-9", "9-10", "10-11", "11-12", "12-13", "13-14",
+			"14-15","15-16","16-17","17-18","18-19","19-20","20-21"]
+			default = [seven_eight, eight_nine, nine_ten, ten_eleven, 
+			eleven_twelve, twelve_thirteen, thriteen_fourteen, fourteen_fifteen, 
+			fifteen_sixteen, sixteen_seventeen, seventeen_eighteen, 
+			eighteen_nineteen, nineteen_twenty,twenty_twentyone]
+
+			data = {
+				"highest_item": highest_item,
+				"lowest_item":lowest_item,
+				"no_of_customers":no_of_customers,
+				"date_total_sales":date_total_sales,
+				"popular_item":popular_item,
+				"date":date,
+				"labels":labels,
+				"default":default
+			}
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html',data)
+		except ObjectDoesNotExist as e:
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html',{"error":e, "date":date})
 
 def sales_user_chart(request):
 	return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html', {})

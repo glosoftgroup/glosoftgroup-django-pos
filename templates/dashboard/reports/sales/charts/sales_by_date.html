@@ -25,8 +25,8 @@
 
 {% block content %}
 <div class="row animated fadeIn">
-    <div class="col-md-12">
-      <div class="panel panel-flat">
+  <div class="col-md-12">
+    <div class="panel panel-flat">
       <div class="panel-heading">
         <h6 class="panel-title">Sales Reports Charts by Date</h6>
         <div class="heading-elements">
@@ -88,12 +88,112 @@
       </div>
    </div>
    </div>
+<div class="p-sales">
+  <div class="col-md-12">
+   <div class="panel panel-flat">
+    <div class="panel-heading">
+        <h6 class="panel-title">Sale summary of Date info 12/12/2019</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+     <div class="panel-body">
+          <!-- Quick stats boxes -->
+          <div class="row animated fadeIn">
+            <div class="col-lg-3">
+              <!-- Date Sales -->
+              <div class="panel bg-info-300">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+
+                  <h3 class="no-margin">KShs. 23202</h3>
+                  Total Sales 
+                  <!-- <div class="popular">
+                   Popular product: Unga
+                  </div> -->
+                  <div class="popular">
+                   Popular products: <button class="btn btn-sm btn-default" onclick="alert('clicked ')" style="padding: 2px 5px;font-size: 10px;">View</button>
+                  </div>
+                </div>
+
+                <div id="server-load"></div>
+              </div>
+              <!-- /date sales -->
+            </div>
+            
+            <div class="col-lg-3">
+              <!-- Highest Sold -->
+              <div class="panel bg-success-700">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+                  <h3 class="no-margin">KShs. 3,450</h3>
+                  Highest Sold Product 
+                  <div class="high_product">
+                      Rice    
+                  </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /highest sold -->
+            </div>
+
+            <div class="col-lg-3">
+              <!-- Lowest Sold-->
+              <div class="panel bg-danger-600">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+                  <h3 class="no-margin">KShs.3,450</h3>
+                  Lowest Sold Product 
+                  <div class="low_product">
+                      Spanner    
+                  </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /lowest sold -->
+            </div>
+
+            <div class="col-lg-3">
+              <!-- Customers Visited -->
+              <div class="panel bg-purple-600">
+                <div class="panel-body">
+                  <h3 class="no-margin">3,450</h3>
+                  Customers Visited
+                  <div class="any" style="visibility: hidden;">
+                   1000 customers
+                  </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /customers visited -->
+            </div>
+
+          </div>
+          <!-- /quick stats boxes -->
+     </div>
+   </div>
+ </div>
 
 <div class="col-md-12">
    <div id="pagination-div">
     <div class="panel panel-flat">
       <div class="panel-body">
         <div class="row">
+
           <div class="col-md-12">
 
             <div class="col-md-6 col-md-offset-3">
@@ -107,6 +207,7 @@
     </div>
    </div><!--pagination div-->
   </div>
+ </div>
 </div>
 
 
@@ -171,10 +272,8 @@ $(document).ready(function(){
         showDropdowns:true
     }).on('change',function(){
       var date = $(this).val();
-      alert(date);
-        $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:date }, async:false,success: function(data){
-              // $('#pagination-div').html(data);
-              console.log(data);
+        $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:date },success: function(data){
+              $('.p-sales').html(data);
         }});
     });
 
