@@ -51,13 +51,18 @@
                <p class="text-center" style="margin: 20px 0px;">
                  {% if date != today %}
                    Sales of {{date}} : Kshs 
-                   {% if not that_date_sum.total_net_sum %}
+                   {% if not that_date_sum.total_net__sum %}
                       0.00 <br />
                    {% else %}
-                   {{that_date_sum.total_net__sum}}<br />
+                      {{that_date_sum.total_net__sum}}<br />
                    {% endif %}
                  {% endif %}
-                 Todays Sales: Kshs {{tsum.total_net__sum}}<br />
+                 Todays Sales: Kshs 
+                 {% if tsum.total_net__sum %}
+                      {{tsum.total_net__sum}} 
+                 {% else %}
+                      0.00<br />
+                 {% endif %}<br />
                  Total Sales: Kshs {{total_sales.total_net__sum}}<br />
                  Total Tax: Kshs {{ total_tax.total_tax__sum}}
                </p>

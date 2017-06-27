@@ -17,6 +17,7 @@ from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.db.models import Q
 import datetime
+from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
 
@@ -83,7 +84,12 @@ def sales_paginate(request):
 			try:
 				items = SoldItem.objects.filter(sales__created__icontains=date).order_by('-id')
 				that_date = Sales.objects.filter(created__icontains=date)
-				that_date_sum = that_date.aggregate(Sum('total_net'))
+				that_date_sum = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))
+				# that_date_sum = that_date.aggregate(Sum('total_net'))
+				# sum_by_month = Sales.objects.filter(created__month='06').aggregate(Sum('total_net'))
+				#sum_by_daterange = Sales.objects.filter(created__range=['2017-06-10','2017-06-22']).aggregate(Sum('total_net'))
+				#customers_no = Sales.objects.all().aggregate(Count('id'))
+				#after--formating lastweek_date = datetime.today() - timedelta(days=days_to_subtract)
 				if p2_sz and gid:
 					paginator = Paginator(items, int(p2_sz))
 					items = paginator.page(page)

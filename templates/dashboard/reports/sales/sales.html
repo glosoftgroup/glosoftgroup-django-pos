@@ -132,7 +132,12 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Todays Sales: Kshs {{tsum.total_net__sum}}<br />
+                   Todays Sales: Kshs 
+                    {% if tsum.total_net__sum %}
+                       {{tsum.total_net__sum}} 
+                    {% else %}
+                       0.00<br />
+                    {% endif %}<br />
                    Total Sales: Kshs {{total_sales.total_net__sum}}<br />
                    Total Tax: Kshs {{ total_tax.total_tax__sum}}
                  </p>
@@ -140,7 +145,7 @@
                   <span>Report pullled by User</span></p>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
-                  <button class="btn btn-primary ck">Click</button>
+                  <!--<button class="btn btn-primary ck">Click</button> -->
                   
               </div>
              </div>

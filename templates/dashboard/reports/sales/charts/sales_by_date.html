@@ -1,0 +1,482 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Sales Report
+{% endblock %}
+
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
+     <li><a href="{% url 'dashboard:sales_date_chart' %}">Sales Date Chart</a></li>
+ {% endblock %}
+
+{% block sales_by_date_chart_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+    .daterangepicker-inputs{display: none;}
+
+    /* chart */
+          canvas{
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+    .chartjs-tooltip {
+      opacity: 1;
+      position: absolute;
+      background: rgba(0, 0, 0, .7);
+      color: white;
+      border-radius: 3px;
+      -webkit-transition: all .1s ease;
+      transition: all .1s ease;
+      pointer-events: none;
+      -webkit-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+      padding: 4px;
+    }
+
+    .chartjs-tooltip-key {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+    }
+    /* chart*/
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+  <div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Sales Reports Charts by Date</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+        <div class="panel-body">
+
+            <div class="col-md-3">
+              <label>select single date to search</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                  <input class="form-control daterange-single" type="text">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-7">
+              <label>select a date range and click search button for results</label>
+              <div class="form-group">
+                 <div class="col-md-8">
+                    <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="icon-calendar22"></i>
+                      </span>
+                      <input class="form-control daterange-to to" type="text" placeholder="to">
+                      
+                    </div>
+                 </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
+                  </select>
+              </div>
+            </div>
+      </div>
+   </div>
+   </div>
+<div class="p-sales">
+  <div class="col-md-12">
+   <div class="panel panel-flat">
+    <div class="panel-heading">
+        <h6 class="panel-title">Sale summary of Date info 12/12/2019</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+     <div class="panel-body">
+          <!-- Quick stats boxes -->
+          <div class="row animated fadeIn">
+            <div class="col-lg-3">
+              <!-- Date Sales -->
+              <div class="panel bg-info-300">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+
+                  <h3 class="no-margin">KShs. 23202</h3>
+                  Total Sales 
+                  <!-- <div class="popular">
+                   Popular product: Unga
+                  </div> -->
+                  <div class="popular">
+                   Popular products: <button class="btn btn-sm btn-default" onclick="alert('clicked ')" style="padding: 2px 5px;font-size: 10px;">View</button>
+                  </div>
+                </div>
+
+                <div id="server-load"></div>
+              </div>
+              <!-- /date sales -->
+            </div>
+            
+            <div class="col-lg-3">
+              <!-- Highest Sold -->
+              <div class="panel bg-success-700">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+                  <h3 class="no-margin">KShs. 3,450</h3>
+                  Highest Sold Product 
+                  <div class="high_product">
+                      Rice    
+                  </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /highest sold -->
+            </div>
+
+            <div class="col-lg-3">
+              <!-- Lowest Sold-->
+              <div class="panel bg-danger-600">
+                <div class="panel-body">
+                  <div class="heading-elements">
+                  </div>
+                  <h3 class="no-margin">KShs.3,450</h3>
+                  Lowest Sold Product 
+                  <div class="low_product">
+                      Spanner    
+                  </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /lowest sold -->
+            </div>
+
+            <div class="col-lg-3">
+              <!-- Customers Visited -->
+              <div class="panel bg-purple-600">
+                <div class="panel-body">
+                  <h3 class="no-margin">3,450</h3>
+                  Customers Visited
+                  <div class="any" style="visibility: hidden;">
+                   1000 customers
+                  </div>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+              <!-- /customers visited -->
+            </div>
+
+          </div>
+          <!-- /quick stats boxes -->
+     </div>
+   </div>
+ </div>
+<div class="col-md-12">
+  <div class="panel panel-flat">
+    <div class="panel-body">
+     <div class="row">
+        <h3 style="padding-left: 20px;">Dail Gross Sales</h3>
+     </div>
+      <div class="row">    
+          <div class="col-md-10">
+              <div id="canvas-holder1" style="width:100%;">
+                <canvas id="chart1"></canvas>
+                <div class="chartjs-tooltip" id="tooltip-0"></div>
+                <div class="chartjs-tooltip" id="tooltip-1"></div>
+              </div>
+          </div>
+          <div class="col-md-2">
+            <ul><li>yes</li><li>no</li></ul>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="col-md-6 col-md-offset-3">
+              <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+ </div>
+</div>
+
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
+<script type="text/javascript">
+$(document).ready(function(){
+  var endpoint = "{% url 'dashboard:chart' %}";
+  var defaultData = [];
+  var labels = [];
+
+  $.ajax({
+    method:"GET",
+    url:endpoint,
+    success:function(data){
+      labels = data.label;
+      defaultData = data.default;
+      setChart();
+    },
+    error:function(error_data){
+
+    }
+  });
+
+  function setChart(){
+      var ctx = document.getElementById("myChart").getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData,
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 159, 64, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255,99,132,1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          }
+      });
+  }
+
+    $('.daterange-single').daterangepicker({ 
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:date },success: function(data){
+              $('.p-sales').html(data);
+        }});
+    });
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change',function(){
+         $('.setValue').val($(this).val());
+         $('.setName').val('export');
+         // $('.set').value = $(this).val();
+    });
+    //**@ daterange from
+    $('.daterange-from').daterangepicker({ 
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    });
+    //**@ daterange to
+    $('.daterange-to').daterangepicker({
+            alwaysShowCalendars: true,
+            showCustomRangeLabel: true,
+            linkedCalendars:false,
+            locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
+            opens: 'right',
+            applyClass: 'btn-small bg-slate',
+            cancelClass: 'btn-small btn-default',
+            ranges: {
+               'Today': [moment(), moment()],
+               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+               'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+               'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+               'This Month': [moment().startOf('month'), moment()],
+               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+               'This Year': [moment().startOf('year'), moment()],
+               'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+            }
+    }, function(start, end){
+        $('.daterangepicker ').addClass('show-calendar');
+    });
+    $('.daterange-to').on('apply.daterangepicker', function(ev, picker) {
+      var from = picker.startDate.format('YYYY-MM-DD'), to = picker.endDate.format('YYYY-MM-DD');
+        if(from == to ){
+            $(this).val(from);
+            $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:from },success: function(data){
+                    $('.p-sales').html(data);
+            }});
+         }else{
+            $(this).val(from + ' - ' + to);
+         }   
+    });
+    $('.daterange-to').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+
+    //**@ put placeholders
+    $('.to').val('');
+    $('.to').attr("placeholder","To");
+    //**@ date search button
+    $('.search_daterange').click(function(){
+      var from = $('.daterange-from').val();
+      var to = $('.daterange-to').val();
+       alert('from: '+from+' to: '+to);
+    });
+
+
+//**@ chart
+ var customTooltips = function (tooltip) {
+      $(this._chart.canvas).css("cursor", "pointer");
+
+      var positionY = this._chart.canvas.offsetTop;
+      var positionX = this._chart.canvas.offsetLeft;
+
+      $(".chartjs-tooltip").css({
+        opacity: 0,
+      });
+
+      if (!tooltip || !tooltip.opacity) {
+        return;
+      }
+
+      if (tooltip.dataPoints.length > 0) {
+        tooltip.dataPoints.forEach(function (dataPoint) {
+          var content = [dataPoint.xLabel, dataPoint.yLabel].join(": ");
+          var $tooltip = $("#tooltip-" + dataPoint.datasetIndex);
+
+          $tooltip.html(content);
+          $tooltip.css({
+            opacity: 1,
+            top: positionY + dataPoint.y + "px",
+            left: positionX + dataPoint.x + "px",
+          });
+        });
+      }
+    };
+    var color = Chart.helpers.color;
+  // alert(x.substring(0,3));
+    var lineChartData = {
+      labels: ["Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.", "Jul.","Aug.","Sep.","Oct.","Nov.","Dec."],
+      datasets: [{
+        label: "This Week",
+        backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+        borderColor: window.chartColors.red,
+        // pointBackgroundColor: window.chartColors.red,
+        fill: false,
+        data: [
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor()
+        ]
+      }, {
+        label: "Last Week",
+        backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
+        borderColor: window.chartColors.blue,
+        // pointBackgroundColor: window.chartColors.blue,
+        fill:false,
+        data: [
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor()
+        ]
+      }]
+    };
+
+    window.onload = function() {
+      var chartEl = document.getElementById("chart1");
+      var chart = new Chart(chartEl, {
+        type: "line",
+        data: lineChartData,
+        options: {
+          title:{
+            display: true,
+            text: "Chart demo"
+          },
+          tooltips: {
+            enabled: false,
+            mode: 'index',
+            intersect: false,
+            custom: customTooltips
+          },
+          elements: {
+            line: {
+              tension: 0.000001
+            }
+          }
+        }
+      });
+    };
+//-----chart**/
+});
+
+</script>
+{% endblock %}
