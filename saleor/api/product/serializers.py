@@ -1,105 +1,61 @@
-from rest_framework.serializers import (   
-			BooleanField,
-			EmailField,
-			DictField,
-			CharField,
-			ModelField,
-			ModelSerializer,
-			HyperlinkedIdentityField,
-			SerializerMethodField,
-			ValidationError
-			)
-from django.contrib.auth.models import Permission
+from django.conf import settings
+from datetime import date
+from rest_framework.serializers import (
+                ModelSerializer,
+                HyperlinkedIdentityField,
+                SerializerMethodField,
+                )
+
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from ...discount.models import Sale
+from ...discount.models import get_product_discounts
 from ...sale.models import (Sales, SoldItem)
-from ...order.models import (
-	Order,
-	DeliveryGroup,
-	OrderedItem,
-	)
 from ...product.models import (
-	Product,
-	ProductVariant,
-	Stock,
-	)
+            Product,
+            ProductVariant,
+            Stock,
+            )
+from decimal import Decimal
 from ...customer.models import Customer
 
-import logging
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 User = get_user_model()
 
+
 class CreateStockSerializer(ModelSerializer):
 	class Meta:
-		model = Stock
-		exclude = ['quantity_allocated']
-
-
-class UserCreateSerializer(ModelSerializer):
-	email    = EmailField(label='Email address')    
-	class Meta:
-		model = User
-		fields = [            
-			'email',
-			'password',  
-			'is_staff',            
-		]
-		extra_kwargs = {'password':
-							{'write_only':True}
-						}
-
-
-class UserSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = User
-		fields = ['id','email','name']
-
-
-class UserListSerializer(serializers.ModelSerializer):
-	url = HyperlinkedIdentityField(view_name='product-api:detail')
-	delete_url = HyperlinkedIdentityField(view_name='product-api:user-delete')
-	#profile = ProfileSerializer(required=False, )
-	class Meta:
-		model = User
-		fields = ('id',
-				 'email', 
-				 'url', 
-				 'delete_url')
+		 model = Stock
+		 exclude = ['quantity_allocated']
 
 
 class CustomerListSerializer(serializers.ModelSerializer):
 	url = HyperlinkedIdentityField(view_name='product-api:detail')
-	delete_url = HyperlinkedIdentityField(view_name='product-api:customer-delete')
-	#profile = ProfileSerializer(required=False, )
+
 	class Meta:
 		model = Customer
 		fields = ('id',
 				 'email', 
 				 'url',
 				 'nid',
-				 'delete_url'
 				 )
+
 
 class TrackSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = SoldItem
 		fields = (
-					'order',
-					'sku', 
-					'quantity',
-					'unit_cost',
-					'total_cost',
-					'product_name',
+                'order',
+                'sku',
+                'quantity',
+                'unit_cost',
+                'total_cost',
+                'product_name',
 				 )
 
 
 class SalesSerializer(serializers.ModelSerializer):
 	url = HyperlinkedIdentityField(view_name='product-api:sales-details')
-	
 	solditems = TrackSerializer(many=True)
 	class Meta:
 		model = Sales
@@ -113,11 +69,23 @@ class SalesSerializer(serializers.ModelSerializer):
 				 'terminal',
 				 'amount_paid',
 				 'solditems',
+				 'customer',
 				)
+
 	def create(self,validated_data):
-		solditems_data = validated_data.pop('solditems')        
-		
-		sales = Sales.objects.create(**validated_data)
+		# calculate loyalty_points
+		customer = validated_data.get('customer')
+		total_net = validated_data.get('total_net')
+		invoice_number = validated_data.get('invoice_number')
+		if customer:
+			total_net = validated_data.get('total_net')
+			points_eq = settings.LOYALTY_POINT_EQUIVALENCE
+			loyalty_points = total_net/points_eq			
+			customer.loyalty_points += loyalty_points
+			customer.save()
+		# get sold products	
+		solditems_data = validated_data.pop('solditems')		
+		sales = Sales.objects.create(**validated_data)		
 		for solditem_data in solditems_data:
 			SoldItem.objects.create(sales=sales,**solditem_data)
 			stock = Stock.objects.get(variant__sku=solditem_data['sku'])
@@ -158,7 +126,6 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 	productName = SerializerMethodField()
 	price = SerializerMethodField()
 	quantity = SerializerMethodField()
-	productlist = UserListSerializer(required=False)
 	tax = SerializerMethodField()
 	discount = SerializerMethodField()
 	#description = SerializerMethodField()
@@ -170,21 +137,23 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 			'sku',
 			'price',
 			'tax',
-			'productlist',
 			'discount',
 			'quantity',            
 			)
+
 	def get_discount(self,obj):
-		price = obj.get_price_per_item().gross
-		try:
-			discount = Sale.objects.get(products__pk=obj.product.pk)
-			if discount.type == 'fixed':                
-				discount = float(discount.value)/float(price)*float(100)
-			else:
-				discount = discount.value
-		except:
-			discount = 0
-		discount = float(discount)*float(price)/float(100)
+		today = date.today()
+		price = obj.get_price_per_item().gross		
+		discounts = Sale.objects.filter(start_date__lte=today).filter(end_date__gte=today)
+		discount = 0
+		discount_list = get_product_discounts(obj.product, discounts)
+		for discount in discount_list:
+			try:
+				discount = discount.factor
+			except:
+				discount = discount.amount.gross
+				discount = Decimal(discount)/Decimal(price)*Decimal(100)
+
 		return discount
 
 	def get_quantity(self,obj):
@@ -206,16 +175,13 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 		return tax
 
 
-
 class ProductVariantSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = ProductVariant         
+		model = ProductVariant
 
 
-
-# PERMISSIONS SERIALIZERS
-class PermissionListSerializer(serializers.ModelSerializer):
-	url = HyperlinkedIdentityField(view_name='users-api:permission-detail')
+class UserSerializer(serializers.ModelSerializer):
+    # used during jwt authentication
 	class Meta:
-		model = Permission
-		fields = ('id','url','codename')
+		model = User
+		fields = ['id','email','name']

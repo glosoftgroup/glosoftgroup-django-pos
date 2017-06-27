@@ -8,6 +8,7 @@ from django.contrib.postgres.fields import HStoreField
 from django.core.urlresolvers import reverse
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+from django.utils.timezone import now
 from django.db.models import F, Max, Q, Sum
 from django.utils.encoding import python_2_unicode_compatible, smart_text
 from django.utils.text import slugify
@@ -22,6 +23,7 @@ from text_unidecode import unidecode
 from versatileimagefield.fields import VersatileImageField, PPOIField
 
 from ..discount.models import calculate_discounted_price
+from ..supplier.models import Supplier
 from ..search import index
 from .utils import get_attributes_display_map
 
@@ -145,6 +147,9 @@ class Product(models.Model, ItemRange, index.Indexed):
     wholesale_price = PriceField(
         pgettext_lazy('Product field', 'Wholesale price'),
         currency=settings.DEFAULT_CURRENCY, blank=True,null=True, max_digits=12, decimal_places=2)
+    product_supplier = models.ForeignKey(
+        Supplier, related_name='suppliers',blank=True, null=True,
+        verbose_name=pgettext_lazy('Product field', 'product supplier'))
     
     available_on = models.DateField(
         pgettext_lazy('Product field', 'available on'), blank=True, null=True)
@@ -193,6 +198,7 @@ class Product(models.Model, ItemRange, index.Indexed):
     
     def get_product_tax(self):
         return self.product_tax
+
     def get_tax_value(self):
         return self.product_tax.get_tax()
 
@@ -200,7 +206,7 @@ class Product(models.Model, ItemRange, index.Indexed):
         return any(variant.is_in_stock() for variant in self)
 
     def total_stock(self):
-        return Sum(self.variants.stock_available())
+        return Sum(variant.stock_available())
 
     def get_first_category(self):
         for category in self.categories.all():
@@ -208,8 +214,11 @@ class Product(models.Model, ItemRange, index.Indexed):
                 return category
         return None
     def get_variants_count(self):
-        attr_count = self.variants.filter(product=self.pk)
-        return len(attr_count)
+        variants = self.variants.filter(product=self.pk)
+        total = 0
+        for stock in variants:
+            total += stock.get_stock_quantity()
+        return total
 
     def is_available(self):
         today = datetime.date.today()
@@ -275,10 +284,14 @@ class ProductVariant(models.Model, Item):
             raise InsufficientStock(self)
     def get_cost_price(self):
         cost_price = self.stock.cost_price
+
     def get_stock_pk(self):
         stock_pk = self.stock.all().values('pk')
-        for st in stock_pk:
-            stock_pk = st['pk']       
+        if stock_pk.exists():
+            for st in stock_pk:
+                stock_pk = st['pk']
+        else:
+            stock_pk = 0        
         return stock_pk
     def get_stock_quantity(self):
         if not len(self.stock.all()):
@@ -381,6 +394,7 @@ class StockManager(models.Manager):
         stock.save(update_fields=['quantity', 'quantity_allocated'])
 
 
+
 @python_2_unicode_compatible
 class Stock(models.Model):
     variant = models.ForeignKey(
@@ -417,6 +431,37 @@ class Stock(models.Model):
     def Access_pk(self):
         return self.pk
 
+
+@python_2_unicode_compatible
+class StockHistoryEntry(models.Model):
+    date = models.DateTimeField(
+        pgettext_lazy('Stock history entry field', 'last history change'),
+        default=now, editable=False)
+    stock = models.ForeignKey(
+        Stock, related_name='history',
+        verbose_name=pgettext_lazy('Stock history entry field', 'order'))
+    
+    comment = models.CharField(
+        pgettext_lazy('Stock history entry field', 'comment'),
+        max_length=100, default='', blank=True)
+    crud = models.CharField(
+        pgettext_lazy('Stock history entry field', 'crud'),
+        max_length=30, default='', blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        verbose_name=pgettext_lazy('Stock history entry field', 'user'))
+
+    class Meta:
+        ordering = ('date', )
+        verbose_name = pgettext_lazy(
+            'Stock history entry model', 'Stock history entry')
+        verbose_name_plural = pgettext_lazy(
+            'Stock history entry model', 'Stock history entries')
+
+    def __str__(self):
+        return pgettext_lazy(
+            'Stock history entry str',
+            'StockHistoryEntry for Stock #%d') % self.stock.pk
 
 
 @python_2_unicode_compatible

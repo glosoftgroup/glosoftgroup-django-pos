@@ -196,9 +196,15 @@
        </div>
         <div class="col-md-6">
         <div class="panelpanel-flat">
-          <div class="panel-body alert alert-danger">
+          <div class="panel-body alertalert-danger">
           <p class="">          
-            {% trans "No subcategories." context "Empty Category list message" %}
+            <a class="btn btn-primary" href="{% if root %}{% url 'dashboard:category-add' root_pk=root.pk %}{% else %}{% url 'dashboard:category-add' %}{% endif %}"><i class="icon-plus3"></i>
+     {% if not root %}
+     Add category
+     {% else %}
+     Add sub category
+     {% endif %}
+    </a>
             {% if categories %}
    <div class="row">
     <div class="panelbody">    

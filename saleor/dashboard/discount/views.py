@@ -15,6 +15,14 @@ def sale_list(request):
     ctx = {'sales': sales}
     return TemplateResponse(request, 'dashboard/discount/sale_list.html', ctx)
 
+@staff_member_required
+def discount_detail(request,pk=None):
+    if request.method == 'GET':
+        if pk:
+            instance = get_object_or_404(Sale, pk=pk)
+            products = instance.products.all()
+            ctx = {'product_results':products}
+            return TemplateResponse(request, 'dashboard/includes/product_search_results.html', ctx)
 
 @staff_member_required
 def sale_edit(request, pk=None):

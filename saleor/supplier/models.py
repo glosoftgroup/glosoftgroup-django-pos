@@ -55,11 +55,14 @@ class Supplier(models.Model):
 
     search_fields = [
         index.SearchField('email')]
-
+    
     class Meta:
         verbose_name = pgettext_lazy('Supplier model', 'supplier')
         verbose_name_plural = pgettext_lazy('Supplier model', 'supplier')
 
+    def __str__(self):
+        return self.name
+        
     def get_full_name(self):
         return self.email
 

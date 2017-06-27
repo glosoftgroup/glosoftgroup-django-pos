@@ -19,6 +19,7 @@
       <tr class="bg-primary">        
         <th>Product Name/sku</th>            
         <th>Retail price</th> 
+        <th>Supplier</th>
         <th>Current Quantity</th>
         <th>stock in</th>
         <th>Tax %</th>         
@@ -37,15 +38,15 @@
 		<div class="media-left">
 			<div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibold"> {{ variant.display_product }} </a></div>
 			<div class="text-muted text-size-small">	{{ variant.sku }}
+			<span class="label label-success">
+				<a href="#modal_instance" class="text-white modal-trigger-ajax" data-title="" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
+				History
+				</a>
+			</span>
 			</div>
 		</div>
 	</td>
-	<!-- Buying price  -->
-	<!-- <td>
-	 {% if variant.get_cost_price %}
-	 {% gross variant.get_cost_price html=True %}
-	 {% endif %}
-	 </td> -->
+	
 	<!-- Retail price -->
 	<td>
 	<h6 class="text-semibold">
@@ -54,8 +55,13 @@
 	{% endif %}
 	</h6>
 	</td>
-	<!-- quantity -->
 	<td>
+	{% if variant.product.product_supplier %}
+	{{ variant.product.product_supplier }}
+	{% endif %}
+	</td>
+	<!--current stock quantity -->
+	<td>	
 		<span class="old_value{{ variant.get_stock_pk }}" data-quantity="{{ variant.get_stock_quantity }}"
 		data-href="{% url 'dashboard:add_stock_ajax' %}">
 		{{ variant.get_stock_quantity }}	
@@ -63,9 +69,13 @@
 	</td>
 	<!-- stock in  -->
 	<td>
-	<a href="javascript(0)" id="type-number{{ variant.get_stock_pk }}" data-type="number"
-	data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Enter stock</a>
-		
+	{% if variant.get_stock_pk == 0 %}
+	<a href="{% url 'dashboard:product-stock-add' product_pk=variant.product.pk %}" id="" data-type="number"
+	data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Add stock</a>
+	{% else %}
+	<a href="javascript:;" id="type-number{{ variant.get_stock_pk }}" data-type="number"
+	data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Add stock</a>
+	{% endif %}		
 	</td>
 	<!-- product tax -->
 	<td>

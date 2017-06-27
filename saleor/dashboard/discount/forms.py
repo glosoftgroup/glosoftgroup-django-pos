@@ -26,8 +26,12 @@ class SaleForm(forms.ModelForm):
         field = self.fields['categories'] 
         field.widget.attrs['class'] = 'form-control multiselect'
         field.widget.attrs['multiple'] = 'multiple'
-        
 
+        field = self.fields['start_date']
+        field.widget.attrs['class'] = 'form-control pickadate-selectors'
+        
+        field = self.fields['end_date']
+        field.widget.attrs['class'] = 'form-control pickadate-selectors'
     def clean(self):
         cleaned_data = super(SaleForm, self).clean()
         discount_type = cleaned_data['type']

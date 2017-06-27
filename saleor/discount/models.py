@@ -256,7 +256,12 @@ class Sale(models.Model):
     categories = models.ManyToManyField(
         'product.Category', blank=True,
         verbose_name=pgettext_lazy('Sale (discount) field', 'categories'))
+    start_date = models.DateField(
+        pgettext_lazy('Sale field', 'start date'), default=date.today)
+    end_date = models.DateField(
+        pgettext_lazy('Sale field', 'end date'), null=True, blank=True)
 
+    
     class Meta:
         app_label = 'discount'
         verbose_name = pgettext_lazy('Sale (discount) model', 'sale')

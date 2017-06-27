@@ -104,21 +104,21 @@
                {% if users %}
                   {% for user in users%}
                   <tr class='clickable-row' id="{{user.pk }}">
-                    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
                     <!-- image -->
-                   <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
+                   <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">
                    {% if user.image %}
                       <img src="{{user.image.url }}" alt="" class="circle teal img-responsive img-circle" style="width: 40px;height: 40px;"/>
                    {% else %}
                       <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
                    {% endif %}
                      <!-- product name -->
-                    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.name}}</td>
+                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{user.name}}</td>
                     <!-- product category -->
-                    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.email}}
+                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{user.email}}
                     </td>
                     <!-- role -->
-                    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}"> 
+                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}"> 
                     {{ user.mobile }}
                     </td>
                     <!-- actions -->
@@ -129,7 +129,7 @@
                         {% endif %}
                          {% if perms.userprofile.delete_user %}
                         <li>
-                          <a data-ta="#modal_instance" data-title="Delete Customer {{ user.name }} ?" data-href="{% url 'dashboard:supplier-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                          <a data-ta="#modal_instance" data-title="Delete Supplier {{ user.name }} ?" data-href="{% url 'dashboard:supplier-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
                          class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
                          </a>
                         </li>
@@ -139,7 +139,7 @@
                   </tr>
                   {% endfor %}
                 {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
+                   <tr><td colspan="6"><h2 class="text-center">no Supplier available</h2></td></tr>
                {% endif %}
                   </tbody>
 

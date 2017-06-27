@@ -1,0 +1,8 @@
+{% if products %}
+	{% for product in products %}
+		{{ product.name }}
+	{% endfor %}
+{% else %}
+<div class="alert alert-warning">
+</div>
+{% endif %}

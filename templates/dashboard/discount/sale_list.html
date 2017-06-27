@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load prices_i18n %}
 {% load materializecss %}
+{% load static %}
 
 {% block title %}
   {% trans "Sales" %} - {{ block.super }}
@@ -12,7 +13,7 @@
 {% block menu_sales_class %}active{% endblock %}
 
 {% block breadcrumbs %} 
-    <li class="visible-s">{% trans "Sales" context "Dashboard sales (discounts) list." %}
+    <li class="visible-s">{% trans "Discounts" context "Dashboard sales (discounts) list." %}
     </li>
  
 {% endblock %}
@@ -37,17 +38,26 @@
             <th>
               {% trans "Discount" context "Sale (discount) table header" %}
             </th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {% if sales %}
             {% for sale in sales %}
               <tr class="clickable-row" data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
-                <td>
+                <td class='td'  data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
                   {{ sale }}
                 </td>
-                <td>
+                <td class='td' data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
                   {{ sale.value }}{{ sale.get_type_display }}
+                </td>
+                <!-- actions -->
+                <td >
+                <span  class="label label-primary">
+                <a href="#modal_instance" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
+                Detail
+                </a>
+                </span>
                 </td>
               </tr>
             {% endfor %}
@@ -55,7 +65,7 @@
           <tr>
             <td>
               <span>
-                {% trans "No sales found" context "Empty sales table message" %}
+                {% trans "No Discount found" context "Empty sales table message" %}
               </span>
             </td>
           </tr>
@@ -66,17 +76,22 @@
   </div>
   </div>
   {% include "dashboard/includes/_pagination.html" %}
+  {% include "dashboard/includes/_modal_template.html"  %}
 {% endblock %}
 
 {% block custom_js %}
 <style type="text/css">
   .clickable-row { cursor: pointer; }
 </style>
+<script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-      $(".clickable-row").click(function() {
-           window.location = $(this).data("href");
-       });
+      // $(".clickable-row").click(function() {
+      //      window.location = $(this).data("href");
+      //  });
+      $(".td").click(function() {
+            window.location = $(this).data("href");
+        });
  });
 </script>
 {% endblock %}

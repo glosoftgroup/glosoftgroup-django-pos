@@ -1,0 +1,29 @@
+{% if stock_history %}
+
+  <div class="tableresponsive">
+  	<table class="table table-striped table-hover fixed_headers">  	   
+  		<thead>
+  		  <tr class="bg-primary">
+  			<th>User</th>
+  			<th>Action</th>
+  			<th>Comment</th>
+  			<th>Date</th>
+  		  <tr>
+  		</thead>
+  		<tbody>
+  		{% for history in stock_history %}
+  		  <tr>
+  			<td> {{ history.user.name }}</td>
+  			<td> {{ history.crud }}</td>
+  			<td> {{ history.comment }}</td>
+  			<td> {{ history.date }}</td>
+  		  </tr>
+  		{% endfor %}
+  		</tbody>
+  	</table>
+  </div>
+ {% else %}
+  <div class="alert alert-warning">
+  	No stock history
+  </div>
+{% endif %}

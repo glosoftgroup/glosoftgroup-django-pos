@@ -14,11 +14,12 @@ from ...core.utils import get_paginator_items
 from ...product.models import (Product, ProductAttribute, 
                                ProductClass, AttributeChoiceValue,
                                ProductImage, ProductVariant, Stock,
-                               StockLocation, ProductTax)
+                               StockLocation, ProductTax, StockHistoryEntry)
 from ..views import staff_member_required
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from ...decorators import permission_decorator, user_trail
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -245,6 +246,17 @@ def product_delete(request, pk):
         {'product': product})
 
 @staff_member_required
+def stock_history(request,stock_pk=None):
+    if request.method == 'GET':
+        if stock_pk:
+            instance = get_object_or_404(Stock, pk=stock_pk)
+            stock_history = StockHistoryEntry.objects.filter(stock=instance).order_by('-id')
+            ctx = {'stock_history':stock_history}
+            return TemplateResponse(request, 'dashboard/includes/_stock_history.html', ctx)
+            #return HttpResponse(len(stock_history))
+
+
+@staff_member_required
 def add_stock_ajax(request):
     if request.is_ajax():
         stock_pk = request.POST.get('stock_pk',None)
@@ -256,8 +268,26 @@ def add_stock_ajax(request):
             stock = get_object_or_404(Stock, pk=stock_pk)
         else:
             return HttpResponse('stock pk required')
-        stock.quantity = int(quantity)
+        old_quantity = stock.quantity
+        diff = int(quantity) - int(old_quantity)  
+        crud = 'Removed' if diff < 0 else "Added"     
+
+        try:
+            stock_list = request.session['stock_list']
+            if stock_pk in stock_list:
+                trail = str(productName)+' Stock '+crud+': quantity '+str(diff).replace('-','')+': Total stock '+str(quantity)              
+            else:
+                trail = crud+' '+str(diff)+' stock of '+str(productName)+'. Total stock '+str(quantity)                               
+        except:
+            stock_list = []
+            stock_list.append(stock_pk)
+            request.session['stock_list'] = stock_list       
+       
+        user_trail(request.user.name, trail,'add')
+        info_logger.info('User: '+str(request.user.name)+trail)
+        stock.quantity = int(quantity)   
         stock.save()
+        StockHistoryEntry.objects.create(stock=stock,comment=trail,crud=crud,user=request.user)
         message = "Stock for "+str(productName)+\
                  " updated successfully"+" current stock is "+quantity
         info_logger.error(message)
@@ -696,7 +726,7 @@ def stock_pages(request):
         queryset_list = ProductVariant.objects.filter(
             Q(sku__icontains=search) |
             Q(product__name__icontains=search)
-            ) 
+            ).order_by('-id') 
     paginator = Paginator(queryset_list,int(size)) # Show 10 contacts per page
     
     try:
@@ -722,7 +752,7 @@ def stock_filter(request):
         queryset_list = ProductVariant.objects.filter(
             Q(sku__icontains=search) |
             Q(product__name__icontains=search)
-            )            
+            ).order_by('-id')            
     paginator = Paginator(queryset_list, int(size))
     products_count = len(queryset_list)
     try:
@@ -749,7 +779,7 @@ def product_pages(request):
         queryset_list = Product.objects.filter(
             Q(sku__icontains=search) |
             Q(product__name__icontains=search)
-            ) 
+            ).order_by('-id').distinct()
     paginator = Paginator(queryset_list,int(size)) # Show 10 contacts per page
     
     try:
@@ -774,7 +804,7 @@ def product_filter(request):
            Q(name__icontains=search)|
            Q(variants__sku__icontains=search)|
            Q(categories__name__icontains=search)
-            )            
+            ).order_by('-id').distinct()            
     paginator = Paginator(queryset_list, int(size))
     products_count = len(queryset_list)
     try:

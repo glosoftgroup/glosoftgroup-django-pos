@@ -88,6 +88,20 @@
                 {{ form.categories }}
                 </div>
               </div>
+              <div class="row">
+               <div class="col-md-6">
+               <div class="form-group">
+                <label>Start Date:</label>
+                {{ form.start_date }}
+                </div>
+               </div>
+               <div class="col-md-6">
+               <div class="form-group">
+                <label>End Date:</label>
+                {{ form.end_date }}
+                </div>
+               </div>
+              </div>
             </div>           
            
           </div>
@@ -126,6 +140,15 @@
      // Default initialization
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
+    });
+
+    $('.pickadate-selectors').pickadate({
+        format: 'yyyy-mm-dd',
+        editable: true,  
+        selectYears: true,
+        selectMonths: true,
+        formatSubmit: 'yyyy-mm-dd',
+
     });
 </script>
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
