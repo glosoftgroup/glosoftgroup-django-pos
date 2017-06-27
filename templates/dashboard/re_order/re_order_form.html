@@ -1,0 +1,141 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+{% load attributes %}
+
+{% block title %}
+ Re-order - {{ block.super }}
+{% endblock %}
+{% block breadcrumbs %}
+    <li>
+     <a href="{% url 'dashboard:re_order' %}">
+      Re-order
+     </a>
+    </li>
+    <li class="active">
+      Re-order 
+    </li>
+
+{% endblock %}
+{% block header_extra %}
+<li style=''>
+	<!-- <a class="" href=""><i class="icon-plus"></i>
+	 Purchase item
+	</a> -->
+</li>
+{% endblock %}
+{% block menu_reorder_class %}active{% endblock %}
+{% block content %}
+<!-- Search field -->
+<div class="panel panel-default">
+{% if product %}
+  <div class="panel panel-flat">
+    <div class="panel-heading">
+      <h5 class="panel-title text-bold">Request for Quotation </h5>
+      {{ product.name }}
+      <div class="heading-elements">
+        <ul class="icons-list">
+          <li><a data-action="collapse"></a></li>
+          <li><a data-action="reload"></a></li>
+          <li><a data-action="close"></a></li>
+        </ul>
+      </div>
+    </div> 
+    <div class="panel-body">
+    <div class="row">
+    <form method="post" enctype="multipart/form-data">        
+         <div class="col-md-4">
+            <div class="form-group">
+              <div class="col-md-6">
+                <label style="margin-top: 12px;" class="text-bold text-center">Supplier:</label>
+              </div>
+              <div class="col-md-6">
+                <select name='supplier' class="select-search">
+                  {% if suppliers %}
+                    {% for supplier in suppliers %}
+                       <option value="{{supplier.name}}"> 
+                         {{ supplier.name }}
+                       </option>
+                    {% endfor %}
+                  {% endif %}
+                </select>
+              </div>              
+            </div>            
+         </div>
+         <div class="col-md-4">
+            <div class="form-group">
+              <div class="col-md-6">
+                <label style="margin-top: 12px;" class="text-bold text-center">Supplier Reference:</label>
+              </div>
+              <div class="col-md-6">
+               <input type="text" name="ref_no" class="form-control">
+               </div>
+            </div>
+         </div>
+         <div class="col-md-4">
+         </div>
+         <hr>
+         <div class="col-md-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>variant</th>
+                {% for attribute in attributes %}
+                  <th>
+                    {{ attribute.name|capfirst }}
+                  </th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+              {% if variants %}
+              <td>
+              <select id='item_sku' class="select-search">
+               {% for variant in variants %}             
+                <option value="{{variant.sku}}">{{ variant }}</option>         
+               {% endfor %}
+               </select>
+               </td>   
+              {% endif %} 
+              </tr>             
+            </tbody>
+          </table>
+         </div>
+      <!-- action buttons -->
+         <div class="text-right">
+     </div>
+      </form>
+    </div>
+   
+    </div>
+
+   </div>
+{% else %}
+<div class="card-content card-content--no-data not-found">
+  <p class="grey-text">
+    {% trans "No products are low in stock." context "Empty low stock table message" %}
+  </p>
+</div>
+{% endif %}
+    
+</div>
+<div id="stock_content"></div>
+<div class="text-center">
+		
+</div>
+
+<!-- /search field -->
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/form_select2.js' %}"></script>
+<script type="text/javascript">
+  $('#item_sku').on('change',function(){
+    var sku = $(this).val();
+    alert(sku);
+  });
+</script>
+{% endblock %}

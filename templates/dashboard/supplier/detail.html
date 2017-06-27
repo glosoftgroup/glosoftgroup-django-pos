@@ -4,7 +4,7 @@
 {% load prices_i18n %}
 
 {% block title %}
-  users
+  Supplier
 {% endblock %}
 
 {% block menu_supplier_class %}active{% endblock %}
@@ -44,7 +44,7 @@
          <div class="col-md-6 col0xs-12">
           
          <h2> Edit Supplier 
-            <a href="{% url 'dashboard:Supplier-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>
+            <a href="{% url 'dashboard:supplier-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>
          </h2>
          
          </div> 

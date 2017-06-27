@@ -11,11 +11,13 @@ from django.contrib.postgres.search import SearchVector
 
 from . import forms
 from ...core.utils import get_paginator_items
+from ...supplier.models import Supplier
 from ...product.models import (Product, ProductAttribute, 
                                ProductClass, AttributeChoiceValue,
                                ProductImage, ProductVariant, Stock,
                                StockLocation, ProductTax, StockHistoryEntry)
 from ..views import staff_member_required
+from ..views import get_low_stock_products
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -25,6 +27,25 @@ import logging
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
+
+@staff_member_required
+def re_order(request):
+    low_stock = get_low_stock_products()
+    ctx = {"low_stock":low_stock}
+    return TemplateResponse(request, 'dashboard/re_order/re_order.html', ctx)    
+
+@staff_member_required
+def re_order_form(request, pk):
+    product = get_object_or_404(Product.objects.prefetch_related(
+            'images', 'variants'), pk=pk)
+    suppliers = Supplier.objects.all()
+    variants = product.variants.all()
+    edit_variant = not product.product_class.has_variants
+    
+    attributes = product.product_class.variant_attributes.prefetch_related(
+        'values')
+    ctx = {"product":product,'suppliers':suppliers,'variants':variants,'attributes':attributes}
+    return TemplateResponse(request, 'dashboard/re_order/re_order_form.html', ctx)    
 
 @staff_member_required
 def product_class_list(request):
