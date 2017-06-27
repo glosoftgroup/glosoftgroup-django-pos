@@ -250,7 +250,7 @@ def stock_history(request,stock_pk=None):
     if request.method == 'GET':
         if stock_pk:
             instance = get_object_or_404(Stock, pk=stock_pk)
-            stock_history = StockHistoryEntry.objects.filter(stock=instance)
+            stock_history = StockHistoryEntry.objects.filter(stock=instance).order_by('-id')
             ctx = {'stock_history':stock_history}
             return TemplateResponse(request, 'dashboard/includes/_stock_history.html', ctx)
             #return HttpResponse(len(stock_history))
@@ -268,15 +268,21 @@ def add_stock_ajax(request):
             stock = get_object_or_404(Stock, pk=stock_pk)
         else:
             return HttpResponse('stock pk required')
-        
         old_quantity = stock.quantity
-        diff = int(quantity) - int(old_quantity)        
-        if diff  < 0:            
-            trail = ' Stock added: quantity '+str(diff).replace('-','')+' total stock '+str(quantity)
-            crud = 'add'
-        else:            
-            trail = ' Added '+str(diff)+' stock of '+str(productName)+'. Total stock '+str(quantity)
-            crud = 'add'
+        diff = int(quantity) - int(old_quantity)  
+        crud = 'Removed' if diff < 0 else "Added"     
+
+        try:
+            stock_list = request.session['stock_list']
+            if stock_pk in stock_list:
+                trail = str(productName)+' Stock '+crud+': quantity '+str(diff).replace('-','')+': Total stock '+str(quantity)              
+            else:
+                trail = crud+' '+str(diff)+' stock of '+str(productName)+'. Total stock '+str(quantity)                               
+        except:
+            stock_list = []
+            stock_list.append(stock_pk)
+            request.session['stock_list'] = stock_list       
+       
         user_trail(request.user.name, trail,'add')
         info_logger.info('User: '+str(request.user.name)+trail)
         stock.quantity = int(quantity)   
