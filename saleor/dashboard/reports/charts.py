@@ -58,6 +58,12 @@ def get_sales_by_date(request):
 	date = request.GET.get('date')
 	if date:
 		try:
+			td_sales = Sales.objects.filter(created__contains=date).order_by('-id')[:1]
+			
+			for d in td_sales:
+				prevd = d.created - timedelta(days=1)
+			prevdate = DateFormat(prevd).format('Y-m-d')
+
 			no_of_customers = Sales.objects.filter(created__contains=date).count()
 			date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
 			items = SoldItem.objects.filter(sales__created__icontains=date)
@@ -73,7 +79,7 @@ def get_sales_by_date(request):
 			# lowest_product = item_occurences.filter(c=lowest_no)
 			lowest_sale = item_occurences.aggregate(Min('total_cost__sum'))['total_cost__sum__min']
 			lowest_item = item_occurences.get(total_cost__sum=lowest_sale)
-
+			# that date
 			seven_eight = get_hours_results(date, 7, 8)
 			eight_nine = get_hours_results(date, 8, 9)
 			nine_ten = get_hours_results(date, 9, 10)
@@ -88,14 +94,46 @@ def get_sales_by_date(request):
 			eighteen_nineteen = get_hours_results(date, 18, 19)
 			nineteen_twenty = get_hours_results(date, 19, 20)
 			twenty_twentyone = get_hours_results(date, 20, 21)
+			twentyone_twentytwo = get_hours_results(date, 21, 22)
 
-			labels = ["7-8","8-9", "9-10", "10-11", "11-12", "12-13", "13-14",
-			"14-15","15-16","16-17","17-18","18-19","19-20","20-21"]
+			labels = ["7am","8am", "9am", "10am", "11am", "12am", "1pm",
+			"2pm","3pm","4pm","5pm","6pm","7pm","8pm","9pm"]
+
 			default = [seven_eight, eight_nine, nine_ten, ten_eleven, 
 			eleven_twelve, twelve_thirteen, thriteen_fourteen, fourteen_fifteen, 
 			fifteen_sixteen, sixteen_seventeen, seventeen_eighteen, 
 			eighteen_nineteen, nineteen_twenty,twenty_twentyone]
 
+			#previous date
+			seven_eight2 = get_hours_results(prevdate, 7, 8)
+			eight_nine2 = get_hours_results(prevdate, 8, 9)
+			nine_ten2 = get_hours_results(prevdate, 9, 10)
+			ten_eleven2 = get_hours_results(prevdate, 10, 11)
+			eleven_twelve2 = get_hours_results(prevdate, 11, 12)
+			twelve_thirteen2 = get_hours_results(prevdate, 12, 13)
+			thriteen_fourteen2 = get_hours_results(prevdate, 13, 14)
+			fourteen_fifteen2 = get_hours_results(prevdate, 14, 15)
+			fifteen_sixteen2 = get_hours_results(prevdate, 15, 16)
+			sixteen_seventeen2 = get_hours_results(prevdate, 16, 17)
+			seventeen_eighteen2 = get_hours_results(prevdate, 17, 18)
+			eighteen_nineteen2 = get_hours_results(prevdate, 18, 19)
+			nineteen_twenty2 = get_hours_results(prevdate, 19, 20)
+			twenty_twentyone2 = get_hours_results(prevdate, 20, 21)
+			twentyone_twentytwo2 = get_hours_results(prevdate, 21, 22)
+
+
+			labels2 = ["7am","8am", "9am", "10am", "11am", "12am", "1pm",
+			"2pm","3pm","4pm","5pm","6pm","7pm","8pm","9pm"]
+
+			default2 = [seven_eight2, eight_nine2, nine_ten2, ten_eleven2, 
+			eleven_twelve2, twelve_thirteen2, thriteen_fourteen2, fourteen_fifteen2, 
+			fifteen_sixteen2, sixteen_seventeen2, seventeen_eighteen2, 
+			eighteen_nineteen2, nineteen_twenty2,twenty_twentyone2, twentyone_twentytwo2]
+
+			#get users in each teller and their total sales
+			sales_that_day = Sales.objects.filter(created__contains=date)
+			users_that_day = sales_that_day.values('user','user__email','total_net', 'created').annotate(c=Count('user__id', distinct=True))
+			users = Sales.objects.values('user__email','user__name','terminal').annotate(Count('user')).annotate(Sum('total_net')).order_by().filter(created__contains=date)
 			data = {
 				"highest_item": highest_item,
 				"lowest_item":lowest_item,
@@ -103,8 +141,13 @@ def get_sales_by_date(request):
 				"date_total_sales":date_total_sales,
 				"popular_item":popular_item,
 				"date":date,
+				"prevdate":prevdate,
 				"labels":labels,
-				"default":default
+				"default":default,
+				"labels2":labels2,
+				"default2":default2,
+				"cashiers":users_that_day,
+				"users":users
 			}
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html',data)
 		except ObjectDoesNotExist as e:

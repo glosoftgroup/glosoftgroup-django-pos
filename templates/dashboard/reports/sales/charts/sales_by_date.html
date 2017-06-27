@@ -20,6 +20,34 @@
     label.error{
       color: #FF5722;
     }
+    .daterangepicker-inputs{display: none;}
+
+    /* chart */
+          canvas{
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+    .chartjs-tooltip {
+      opacity: 1;
+      position: absolute;
+      background: rgba(0, 0, 0, .7);
+      color: white;
+      border-radius: 3px;
+      -webkit-transition: all .1s ease;
+      transition: all .1s ease;
+      pointer-events: none;
+      -webkit-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+      padding: 4px;
+    }
+
+    .chartjs-tooltip-key {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+    }
+    /* chart*/
   </style>
  {% endblock %}
 
@@ -49,17 +77,9 @@
               </div>
             </div>
             <div class="col-md-7">
-              <label>select a date range and click button to search</label>
+              <label>select a date range and click search button for results</label>
               <div class="form-group">
-                 <div class="col-md-4">
-                    <div class="input-group"><span class="input-group-addon">
-                        <i class="icon-calendar22"></i>
-                      </span>
-                      <input class="form-control daterange-from from" type="text" placeholder="from">
-                      
-                    </div>
-                 </div>
-                 <div class="col-md-4">
+                 <div class="col-md-8">
                     <div class="input-group">
                     <span class="input-group-addon">
                         <i class="icon-calendar22"></i>
@@ -67,11 +87,6 @@
                       <input class="form-control daterange-to to" type="text" placeholder="to">
                       
                     </div>
-                 </div>
-                 <div class="col-md-4">
-                      <button class="btn btn-primary btn-block search_daterange">
-                        <i class="icon-search4 position-left"></i> Search
-                      </button>
                  </div>
               </div>
             </div>
@@ -187,20 +202,38 @@
      </div>
    </div>
  </div>
-
+<div class="col-md-12">
+  <div class="panel panel-flat">
+    <div class="panel-body">
+     <div class="row">
+        <h3 style="padding-left: 20px;">Dail Gross Sales</h3>
+     </div>
+      <div class="row">    
+          <div class="col-md-10">
+              <div id="canvas-holder1" style="width:100%;">
+                <canvas id="chart1"></canvas>
+                <div class="chartjs-tooltip" id="tooltip-0"></div>
+                <div class="chartjs-tooltip" id="tooltip-1"></div>
+              </div>
+          </div>
+          <div class="col-md-2">
+            <ul><li>yes</li><li>no</li></ul>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="col-md-12">
    <div id="pagination-div">
     <div class="panel panel-flat">
       <div class="panel-body">
         <div class="row">
-
           <div class="col-md-12">
-
             <div class="col-md-6 col-md-offset-3">
               <canvas id="myChart" width="400" height="400"></canvas>
             </div>
-
           </div>
+
         </div>
 
       </div>
@@ -216,6 +249,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
 <script type="text/javascript">
 $(document).ready(function(){
   var endpoint = "{% url 'dashboard:chart' %}";
@@ -266,7 +300,7 @@ $(document).ready(function(){
       });
   }
 
-      $('.daterange-single').daterangepicker({ 
+    $('.daterange-single').daterangepicker({ 
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true
@@ -294,14 +328,43 @@ $(document).ready(function(){
         showDropdowns:true
     });
     //**@ daterange to
-    $('.daterange-to').daterangepicker({ 
-        singleDatePicker: true,
-        locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true
+    $('.daterange-to').daterangepicker({
+            alwaysShowCalendars: true,
+            showCustomRangeLabel: true,
+            linkedCalendars:false,
+            locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
+            opens: 'right',
+            applyClass: 'btn-small bg-slate',
+            cancelClass: 'btn-small btn-default',
+            ranges: {
+               'Today': [moment(), moment()],
+               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+               'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+               'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+               'This Month': [moment().startOf('month'), moment()],
+               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+               'This Year': [moment().startOf('year'), moment()],
+               'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+            }
+    }, function(start, end){
+        $('.daterangepicker ').addClass('show-calendar');
     });
+    $('.daterange-to').on('apply.daterangepicker', function(ev, picker) {
+      var from = picker.startDate.format('YYYY-MM-DD'), to = picker.endDate.format('YYYY-MM-DD');
+        if(from == to ){
+            $(this).val(from);
+            $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:from },success: function(data){
+                    $('.p-sales').html(data);
+            }});
+         }else{
+            $(this).val(from + ' - ' + to);
+         }   
+    });
+    $('.daterange-to').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+
     //**@ put placeholders
-    $('.from').val('');
-    $('.from').attr("placeholder","From");
     $('.to').val('');
     $('.to').attr("placeholder","To");
     //**@ date search button
@@ -312,6 +375,107 @@ $(document).ready(function(){
     });
 
 
+//**@ chart
+ var customTooltips = function (tooltip) {
+      $(this._chart.canvas).css("cursor", "pointer");
+
+      var positionY = this._chart.canvas.offsetTop;
+      var positionX = this._chart.canvas.offsetLeft;
+
+      $(".chartjs-tooltip").css({
+        opacity: 0,
+      });
+
+      if (!tooltip || !tooltip.opacity) {
+        return;
+      }
+
+      if (tooltip.dataPoints.length > 0) {
+        tooltip.dataPoints.forEach(function (dataPoint) {
+          var content = [dataPoint.xLabel, dataPoint.yLabel].join(": ");
+          var $tooltip = $("#tooltip-" + dataPoint.datasetIndex);
+
+          $tooltip.html(content);
+          $tooltip.css({
+            opacity: 1,
+            top: positionY + dataPoint.y + "px",
+            left: positionX + dataPoint.x + "px",
+          });
+        });
+      }
+    };
+    var color = Chart.helpers.color;
+  // alert(x.substring(0,3));
+    var lineChartData = {
+      labels: ["Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.", "Jul.","Aug.","Sep.","Oct.","Nov.","Dec."],
+      datasets: [{
+        label: "This Week",
+        backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+        borderColor: window.chartColors.red,
+        // pointBackgroundColor: window.chartColors.red,
+        fill: false,
+        data: [
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor()
+        ]
+      }, {
+        label: "Last Week",
+        backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
+        borderColor: window.chartColors.blue,
+        // pointBackgroundColor: window.chartColors.blue,
+        fill:false,
+        data: [
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(), 
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor()
+        ]
+      }]
+    };
+
+    window.onload = function() {
+      var chartEl = document.getElementById("chart1");
+      var chart = new Chart(chartEl, {
+        type: "line",
+        data: lineChartData,
+        options: {
+          title:{
+            display: true,
+            text: "Chart demo"
+          },
+          tooltips: {
+            enabled: false,
+            mode: 'index',
+            intersect: false,
+            custom: customTooltips
+          },
+          elements: {
+            line: {
+              tension: 0.000001
+            }
+          }
+        }
+      });
+    };
+//-----chart**/
 });
 
 </script>
