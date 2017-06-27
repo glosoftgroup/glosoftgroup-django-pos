@@ -45,7 +45,7 @@
     </div> 
     <div class="panel-body">
     <div class="row">
-    <form method="post" enctype="multipart/form-data">        
+    <form method="post" enctype="multipart/form-data">      {% csrf_token %}    
          <div class="col-md-4">
             <div class="form-group">
               <div class="col-md-6">
@@ -81,27 +81,28 @@
           <table class="table">
             <thead>
               <tr>
-                <th>variant</th>
-                {% for attribute in attributes %}
-                  <th>
-                    {{ attribute.name|capfirst }}
-                  </th>
-                {% endfor %}
+                <th>Name</th>
+                <th>Quantity</th>                
               </tr>
             </thead>
-            <tbody>
+            <tbody id="results">
+            </tbody>
+            <tfoot>             
               <tr>
               {% if variants %}
-              <td>
-              <select id='item_sku' class="select-search">
+              <td class="text-bold">
+              Add Item 
+              </td><td>
+              {% url 'dashboard:reorder_stock' pk=product.pk as url %}
+              <select data-href="{{ url }}" id='item_sku' class="select-search">
                {% for variant in variants %}             
-                <option value="{{variant.sku}}">{{ variant }}</option>         
+                <option value="{{variant.pk}}">{{ variant }}</option>         
                {% endfor %}
-               </select>
-               </td>   
+               </select>               
+               </td><td><button class="btn btn-primary" id='btn_submit' onclick="return false;">Submit</button></td>   
               {% endif %} 
               </tr>             
-            </tbody>
+            </tfoot>
           </table>
          </div>
       <!-- action buttons -->
@@ -134,8 +135,45 @@
 <script type="text/javascript" src="{% static 'backend/js/pages/form_select2.js' %}"></script>
 <script type="text/javascript">
   $('#item_sku').on('change',function(){
-    var sku = $(this).val();
-    alert(sku);
+    var variant_id = $(this).val();
+    var url = $(this).data('href');
+    
+    var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+    var posting = $.post( url, {csrfmiddlewaretoken:csrf_token,variant_id:variant_id });
+      // Put the results in a div
+      posting.done(function( data ) {    
+      $("#results" ).append( data );});
+  });
+
+</script>
+<script type="text/javascript">
+  var names = [];
+  $('#btn_submit').on('click',function(){     
+     var selected = $(".orderitem").map(function(e) {
+                return {
+                id: parseInt($(this).data('id')),
+                quantity: $(this).val() 
+
+                     };
+
+                 }).get();
+
+   $.each(selected, function(i, val){     
+
+     names.indexOf(val) === -1 ? names.push(val): console.log('already exists');  
+
+        });
+     var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+     var url = $('#item_sku').data('href');
+     alert(names);
+     var posting = $.post(      
+      url, {
+        csrfmiddlewaretoken:csrf_token,
+        'variants[]':names });
+      // Put the results in a div
+      posting.done(function( data ) {    
+      $("#results" ).append( data );});
+
   });
 </script>
 {% endblock %}

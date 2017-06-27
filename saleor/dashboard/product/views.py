@@ -35,6 +35,19 @@ def re_order(request):
     return TemplateResponse(request, 'dashboard/re_order/re_order.html', ctx)    
 
 @staff_member_required
+def add_reorder_stock(request,pk=None):
+    if request.is_ajax():
+        if request.POST.getlist('variants[]'):
+            variants = request.POST.getlist('variants[]')
+            return HttpResponse(variants)
+        variant_id = request.POST.get('variant_id')
+        #return HttpResponse(variant_id)
+        variant = ProductVariant.objects.get(pk=int(variant_id))
+        ctx = {"variant":variant}
+        return TemplateResponse(request, 'dashboard/re_order/_order.html', ctx)    
+
+
+@staff_member_required
 def re_order_form(request, pk):
     product = get_object_or_404(Product.objects.prefetch_related(
             'images', 'variants'), pk=pk)
