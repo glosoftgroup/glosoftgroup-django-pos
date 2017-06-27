@@ -54,7 +54,7 @@
                 <!-- actions -->
                 <td >
                 <span  class="label label-primary">
-                <a href="#modal_instance" class="text-white modal-trigger-ajax" data-title="{{ sale.get_type_display }}{{ sale.value}}" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
+                <a href="#modal_instance" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
                 Detail
                 </a>
                 </span>

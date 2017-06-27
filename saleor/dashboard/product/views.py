@@ -14,11 +14,12 @@ from ...core.utils import get_paginator_items
 from ...product.models import (Product, ProductAttribute, 
                                ProductClass, AttributeChoiceValue,
                                ProductImage, ProductVariant, Stock,
-                               StockLocation, ProductTax)
+                               StockLocation, ProductTax, StockHistoryEntry)
 from ..views import staff_member_required
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from ...decorators import permission_decorator, user_trail
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -245,6 +246,17 @@ def product_delete(request, pk):
         {'product': product})
 
 @staff_member_required
+def stock_history(request,stock_pk=None):
+    if request.method == 'GET':
+        if stock_pk:
+            instance = get_object_or_404(Stock, pk=stock_pk)
+            stock_history = StockHistoryEntry.objects.filter(stock=instance)
+            ctx = {'stock_history':stock_history}
+            return TemplateResponse(request, 'dashboard/includes/_stock_history.html', ctx)
+            #return HttpResponse(len(stock_history))
+
+
+@staff_member_required
 def add_stock_ajax(request):
     if request.is_ajax():
         stock_pk = request.POST.get('stock_pk',None)
@@ -256,8 +268,20 @@ def add_stock_ajax(request):
             stock = get_object_or_404(Stock, pk=stock_pk)
         else:
             return HttpResponse('stock pk required')
-        stock.quantity = int(quantity)
+        
+        old_quantity = stock.quantity
+        diff = int(quantity) - int(old_quantity)        
+        if diff  < 0:            
+            trail = ' Stock added: quantity '+str(diff).replace('-','')+' total stock '+str(quantity)
+            crud = 'add'
+        else:            
+            trail = ' Added '+str(diff)+' stock of '+str(productName)+'. Total stock '+str(quantity)
+            crud = 'add'
+        user_trail(request.user.name, trail,'add')
+        info_logger.info('User: '+str(request.user.name)+trail)
+        stock.quantity = int(quantity)   
         stock.save()
+        StockHistoryEntry.objects.create(stock=stock,comment=trail,crud=crud,user=request.user)
         message = "Stock for "+str(productName)+\
                  " updated successfully"+" current stock is "+quantity
         info_logger.error(message)

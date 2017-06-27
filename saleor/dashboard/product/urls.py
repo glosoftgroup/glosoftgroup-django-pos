@@ -77,6 +77,8 @@ urlpatterns = [
 
     url(r'^(?P<product_pk>[0-9]+)/stock/(?P<stock_pk>[0-9]+)/$',
         views.stock_edit, name='product-stock-update'),
+    url(r'^stock/(?P<stock_pk>[0-9]+)/history$',
+        views.stock_history, name='stock-history'),
     url(r'^(?P<product_pk>[0-9]+)/stock/add/$',
         views.stock_edit, name='product-stock-add'),
     url(r'^(?P<product_pk>[0-9]+)/stock/(?P<stock_pk>[0-9]+)/delete/$',

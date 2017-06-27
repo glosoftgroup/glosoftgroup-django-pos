@@ -23,6 +23,7 @@ def discount_detail(request,pk=None):
             products = instance.products.all()
             ctx = {'product_results':products}
             return TemplateResponse(request, 'dashboard/includes/product_search_results.html', ctx)
+
 @staff_member_required
 def sale_edit(request, pk=None):
     if pk:

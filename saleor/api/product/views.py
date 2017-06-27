@@ -1,82 +1,59 @@
 from django.db.models import Q
-
-from .pagination import PostLimitOffsetPagination, PostPageNumberPagination
-from rest_framework.authentication import TokenAuthentication, BasicAuthentication
-from rest_framework.filters import (
-    SearchFilter,
-    OrderingFilter
-)
-from rest_framework.decorators import api_view
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly,
-    IsAuthenticated,
-    )
-
+from .pagination import PostLimitOffsetPagination
 from rest_framework.generics import (ListAPIView,
                                      CreateAPIView,
                                      RetrieveAPIView,
                                      DestroyAPIView,
-                                     UpdateAPIView,
-                                     RetrieveUpdateAPIView)
+                                    )
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from django.contrib.auth.models import Permission
 from ...product.models import (
     Product,
     ProductVariant,
     Stock,
     )
 from ...sale.models import (Sales)
-from ...order.models import Order
 from ...customer.models import Customer
 from .serializers import (
     CreateStockSerializer,
     CustomerListSerializer,
     ProductStockListSerializer,
     ProductListSerializer,
-    UserListSerializer,    
-    UserCreateSerializer,
-    PermissionListSerializer,
     SalesSerializer,  
      )
 from rest_framework import generics
-from ...userprofile.models import User, UserTrail
-from ...decorators import permission_decorator, user_trail
+
+from ...decorators import user_trail
 import logging
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
-class UserCreateAPIView(CreateAPIView):
-    serializer_class = UserCreateSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    queryset = User.objects.all()
 
 class CreateStockAPIView(CreateAPIView):
     serializer_class = CreateStockSerializer
-    #permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Stock.objects.all()
+
 
 class CustomerListAPIView(ListAPIView):
     serializer_class = CustomerListSerializer
     queryset = Customer.objects.all()
 
-class UserDetailAPIView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserListSerializer
 
+class CustomerDetailAPIView(generics.RetrieveAPIView):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerListSerializer
 
-class UserDeleteAPIView(DestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserListSerializer
 
 class SalesDeleteAPIView(DestroyAPIView):
     queryset = Sales.objects.all()
     serializer_class = SalesSerializer
-        
+
+
 class SalesDetailAPIView(generics.RetrieveAPIView):
     queryset = Sales.objects.all()
     serializer_class = SalesSerializer
+
 
 class SalesCreateAPIView(generics.CreateAPIView):
     queryset = Sales.objects.all()
@@ -90,8 +67,9 @@ class SalesCreateAPIView(generics.CreateAPIView):
 class SalesListAPIView(generics.ListAPIView):
     queryset = Sales.objects.all()
     serializer_class = SalesSerializer
+
+
 class ProductListAPIView(generics.ListAPIView):
-    #permission_classes = [IsAuthenticatedOrReadOnly]    
     pagination_class = PostLimitOffsetPagination
     serializer_class = ProductListSerializer
 
@@ -105,9 +83,12 @@ class ProductListAPIView(generics.ListAPIView):
                 Q(categories__name__icontains=query)
                 ).distinct()
         return queryset_list
+
+
 class SearchSkuListAPIView(generics.ListAPIView):
     pagination_class = PostLimitOffsetPagination
     serializer_class = ProductStockListSerializer
+
     def get_queryset(self, *args, **kwargs):        
         queryset_list = ProductVariant.objects.all().select_related()
         query = self.request.GET.get('q')
@@ -116,9 +97,9 @@ class SearchSkuListAPIView(generics.ListAPIView):
                 sku__startswith=query               
                 ).distinct()
         return queryset_list
-        
+
+
 class ProductStockListAPIView(generics.ListAPIView):
-    #permission_classes = [IsAuthenticatedOrReadOnly]    
     pagination_class = PostLimitOffsetPagination
     serializer_class = ProductStockListSerializer
 
@@ -133,28 +114,3 @@ class ProductStockListAPIView(generics.ListAPIView):
                 ).distinct()
         return queryset_list
 
-class UserListAPIView(generics.ListAPIView):
-    #permission_classes = [IsAuthenticatedOrReadOnly]
-    queryset = User.objects.all()
-    serializer_class = UserListSerializer
-
-
-# Permissions views
-class PermissionListView(generics.ListAPIView):
-    serializer_class = PermissionListSerializer
-    queryset = Permission.objects.all()
-
-
-class PermissionDetailAPIView(generics.RetrieveAPIView):
-    serializer_class = PermissionListSerializer
-    queryset = Permission.objects.all()
-
-
-@api_view(['GET', 'POST'])
-def snippet_list(request):
-    if request.method == 'POST':
-        serializer = CreateStockSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

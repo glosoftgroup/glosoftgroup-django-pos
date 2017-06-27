@@ -8,6 +8,7 @@ from django.contrib.postgres.fields import HStoreField
 from django.core.urlresolvers import reverse
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+from django.utils.timezone import now
 from django.db.models import F, Max, Q, Sum
 from django.utils.encoding import python_2_unicode_compatible, smart_text
 from django.utils.text import slugify
@@ -393,6 +394,7 @@ class StockManager(models.Manager):
         stock.save(update_fields=['quantity', 'quantity_allocated'])
 
 
+
 @python_2_unicode_compatible
 class Stock(models.Model):
     variant = models.ForeignKey(
@@ -429,6 +431,37 @@ class Stock(models.Model):
     def Access_pk(self):
         return self.pk
 
+
+@python_2_unicode_compatible
+class StockHistoryEntry(models.Model):
+    date = models.DateTimeField(
+        pgettext_lazy('Stock history entry field', 'last history change'),
+        default=now, editable=False)
+    stock = models.ForeignKey(
+        Stock, related_name='history',
+        verbose_name=pgettext_lazy('Stock history entry field', 'order'))
+    
+    comment = models.CharField(
+        pgettext_lazy('Stock history entry field', 'comment'),
+        max_length=100, default='', blank=True)
+    crud = models.CharField(
+        pgettext_lazy('Stock history entry field', 'crud'),
+        max_length=30, default='', blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        verbose_name=pgettext_lazy('Stock history entry field', 'user'))
+
+    class Meta:
+        ordering = ('date', )
+        verbose_name = pgettext_lazy(
+            'Stock history entry model', 'Stock history entry')
+        verbose_name_plural = pgettext_lazy(
+            'Stock history entry model', 'Stock history entries')
+
+    def __str__(self):
+        return pgettext_lazy(
+            'Stock history entry str',
+            'StockHistoryEntry for Stock #%d') % self.stock.pk
 
 
 @python_2_unicode_compatible

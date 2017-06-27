@@ -1,106 +1,61 @@
 from django.conf import settings
 from datetime import date
-from django.db.models import Q
-from rest_framework.serializers import (   
-			BooleanField,
-			EmailField,
-			DictField,
-			CharField,
-			ModelField,
-			ModelSerializer,
-			HyperlinkedIdentityField,
-			SerializerMethodField,
-			ValidationError
-			)
-from django.contrib.auth.models import Permission
+from rest_framework.serializers import (
+                ModelSerializer,
+                HyperlinkedIdentityField,
+                SerializerMethodField,
+                )
+
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from ...discount.models import Sale
 from ...discount.models import get_product_discounts
 from ...sale.models import (Sales, SoldItem)
-from ...order.models import (
-	Order,
-	DeliveryGroup,
-	OrderedItem,
-	)
 from ...product.models import (
-	Product,
-	ProductVariant,
-	Stock,
-	)
+            Product,
+            ProductVariant,
+            Stock,
+            )
 from decimal import Decimal
 from ...customer.models import Customer
 
 
 User = get_user_model()
 
+
 class CreateStockSerializer(ModelSerializer):
 	class Meta:
-		model = Stock
-		exclude = ['quantity_allocated']
-
-
-class UserCreateSerializer(ModelSerializer):
-	email    = EmailField(label='Email address')    
-	class Meta:
-		model = User
-		fields = [            
-			'email',
-			'password',  
-			'is_staff',            
-		]
-		extra_kwargs = {'password':
-							{'write_only':True}
-						}
-
-
-class UserSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = User
-		fields = ['id','email','name']
-
-
-class UserListSerializer(serializers.ModelSerializer):
-	url = HyperlinkedIdentityField(view_name='product-api:detail')
-	delete_url = HyperlinkedIdentityField(view_name='product-api:user-delete')
-	#profile = ProfileSerializer(required=False, )
-	class Meta:
-		model = User
-		fields = ('id',
-				 'email', 
-				 'url', 
-				 'delete_url')
+		 model = Stock
+		 exclude = ['quantity_allocated']
 
 
 class CustomerListSerializer(serializers.ModelSerializer):
 	url = HyperlinkedIdentityField(view_name='product-api:detail')
-	delete_url = HyperlinkedIdentityField(view_name='product-api:customer-delete')
-	#profile = ProfileSerializer(required=False, )
+
 	class Meta:
 		model = Customer
 		fields = ('id',
 				 'email', 
 				 'url',
 				 'nid',
-				 'delete_url'
 				 )
+
 
 class TrackSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = SoldItem
 		fields = (
-					'order',
-					'sku', 
-					'quantity',
-					'unit_cost',
-					'total_cost',
-					'product_name',
+                'order',
+                'sku',
+                'quantity',
+                'unit_cost',
+                'total_cost',
+                'product_name',
 				 )
 
 
 class SalesSerializer(serializers.ModelSerializer):
 	url = HyperlinkedIdentityField(view_name='product-api:sales-details')
-	
 	solditems = TrackSerializer(many=True)
 	class Meta:
 		model = Sales
@@ -116,6 +71,7 @@ class SalesSerializer(serializers.ModelSerializer):
 				 'solditems',
 				 'customer',
 				)
+
 	def create(self,validated_data):
 		# calculate loyalty_points
 		customer = validated_data.get('customer')
@@ -170,7 +126,6 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 	productName = SerializerMethodField()
 	price = SerializerMethodField()
 	quantity = SerializerMethodField()
-	productlist = UserListSerializer(required=False)
 	tax = SerializerMethodField()
 	discount = SerializerMethodField()
 	#description = SerializerMethodField()
@@ -182,10 +137,10 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 			'sku',
 			'price',
 			'tax',
-			'productlist',
 			'discount',
 			'quantity',            
 			)
+
 	def get_discount(self,obj):
 		today = date.today()
 		price = obj.get_price_per_item().gross		
@@ -220,16 +175,13 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 		return tax
 
 
-
 class ProductVariantSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = ProductVariant         
+		model = ProductVariant
 
 
-
-# PERMISSIONS SERIALIZERS
-class PermissionListSerializer(serializers.ModelSerializer):
-	url = HyperlinkedIdentityField(view_name='users-api:permission-detail')
+class UserSerializer(serializers.ModelSerializer):
+    # used during jwt authentication
 	class Meta:
-		model = Permission
-		fields = ('id','url','codename')
+		model = User
+		fields = ['id','email','name']
