@@ -191,7 +191,13 @@
                     <a href="{% url 'dashboard:product-stock-location-list' %}"><i class="icon-location4"></i>
                        {% trans "Stock locations" context "Dashboard stock loactions list" %}
                     </a>
-                    </li>              
+                    </li>
+                    <!-- stock reorder -->
+                    <li class="{% block menu_reorder_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:re_order' %}"><i class="icon-toggle"></i>
+                       {% trans "Stock Reorder" context "Dashboard stock reorder list" %}
+                    </a>
+                    </li>
                     
                   </ul>
                 </li>

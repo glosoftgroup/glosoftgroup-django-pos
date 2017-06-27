@@ -87,6 +87,10 @@ urlpatterns = [
         views.stock_bulk_delete, name='stock-bulk-delete'),
     url(r'^add_stock_ajax/$',
         views.add_stock_ajax,name='add_stock_ajax'),
+    url(r'^re_order/$',
+        views.re_order,name='re_order'),
+    url(r'^re_order/form/(?P<pk>[0-9]+)$',
+        views.re_order_form,name='re_order_form'),
 
     url(r'^(?P<product_pk>[0-9]+)/images/(?P<img_pk>[0-9]+)/$',
         views.product_image_edit, name='product-image-update'),

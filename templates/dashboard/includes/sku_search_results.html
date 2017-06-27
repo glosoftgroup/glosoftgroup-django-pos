@@ -39,7 +39,7 @@
 			<div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibold"> {{ variant.display_product }} </a></div>
 			<div class="text-muted text-size-small">	{{ variant.sku }}
 			<span class="label label-success">
-				<a href="#modal_instance" class="text-white modal-trigger-ajax" data-title="" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
+				<a href="#modal_instance" class="text-white modal-trigger-ajax" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
 				History
 				</a>
 			</span>
