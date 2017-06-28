@@ -92,7 +92,10 @@ urlpatterns = [
     url(r'^re_order/form/(?P<pk>[0-9]+)$',
         views.re_order_form,name='re_order_form'),
     url(r'^re_order/form/item/(?P<pk>[0-9]+)$',
-        views.add_reorder_stock,name='reorder_stock'),    
+        views.add_reorder_stock,name='reorder_stock'),
+    url(r'^re_order/request/$',
+        views.request_order,name='request_order'),  
+           
 
     url(r'^(?P<product_pk>[0-9]+)/images/(?P<img_pk>[0-9]+)/$',
         views.product_image_edit, name='product-image-update'),
