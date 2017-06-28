@@ -1,10 +1,10 @@
 from django.conf import settings
 from datetime import date
 from rest_framework.serializers import (
-                ModelSerializer,
-                HyperlinkedIdentityField,
-                SerializerMethodField,
-                )
+				ModelSerializer,
+				HyperlinkedIdentityField,
+				SerializerMethodField,
+				)
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
@@ -12,10 +12,10 @@ from ...discount.models import Sale
 from ...discount.models import get_product_discounts
 from ...sale.models import (Sales, SoldItem)
 from ...product.models import (
-            Product,
-            ProductVariant,
-            Stock,
-            )
+			Product,
+			ProductVariant,
+			Stock,
+			)
 from decimal import Decimal
 from ...customer.models import Customer
 
@@ -45,12 +45,13 @@ class TrackSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = SoldItem
 		fields = (
-                'order',
-                'sku',
-                'quantity',
-                'unit_cost',
-                'total_cost',
-                'product_name',
+				'order',
+				'sku',
+				'quantity',
+				'unit_cost',
+				'total_cost',
+				'product_name',
+				'product_category'
 				 )
 
 
@@ -128,6 +129,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 	quantity = SerializerMethodField()
 	tax = SerializerMethodField()
 	discount = SerializerMethodField()
+	product_category = SerializerMethodField()
 	#description = SerializerMethodField()
 	class Meta:        
 		model = ProductVariant
@@ -138,7 +140,8 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 			'price',
 			'tax',
 			'discount',
-			'quantity',            
+			'quantity',
+			'product_category',            
 			)
 
 	def get_discount(self,obj):
@@ -174,6 +177,10 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 			tax = 0        
 		return tax
 
+	def get_product_category(self,obj):
+		product_category = obj.product_category()
+		return product_category
+
 
 class ProductVariantSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -181,7 +188,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # used during jwt authentication
+	# used during jwt authentication
 	class Meta:
 		model = User
 		fields = ['id','email','name']

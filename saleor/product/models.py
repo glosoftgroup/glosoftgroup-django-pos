@@ -372,6 +372,10 @@ class ProductVariant(models.Model, Item):
         if stock:
             return stock.cost_price
 
+    def product_category(self):
+        category = self.product.categories.first().name
+        return category
+
 
 @python_2_unicode_compatible
 class StockLocation(models.Model):

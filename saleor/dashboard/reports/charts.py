@@ -21,6 +21,7 @@ import datetime
 from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
+import random
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -59,11 +60,13 @@ def get_sales_by_date(request):
 	if date:
 		try:
 			td_sales = Sales.objects.filter(created__contains=date).order_by('-id')[:1]
-			
-			for d in td_sales:
-				prevd = d.created - timedelta(days=1)
-				previd = d.id -1
-			prevdate = DateFormat(prevd).format('Y-m-d')
+			prev_sales = Sales.objects.filter(created__lte=date)[:1]
+			if prev_sales:
+				for dt in prev_sales:
+					prevd = dt.created
+				prevdate = DateFormat(prevd).format('Y-m-d')
+			else:		
+				prevdate = date;
 
 			no_of_customers = Sales.objects.filter(created__contains=date).count()
 			date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
@@ -135,6 +138,13 @@ def get_sales_by_date(request):
 			sales_that_day = Sales.objects.filter(created__contains=date)
 			users_that_day = sales_that_day.values('user','user__email','total_net', 'created').annotate(c=Count('user__id', distinct=True))
 			users = Sales.objects.values('user__email','user__name','terminal').annotate(Count('user')).annotate(Sum('total_net')).order_by().filter(created__contains=date)
+			sales_by_category = SoldItem.objects.filter(sales__created__contains='2017-06-28').values('product_category').annotate(c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')
+			new_sales = []
+			for sales in sales_by_category:
+				color = "#%03x" % random.randint(0, 0xFFF)
+				sales['color'] = color
+				new_sales.append(sales)
+			top_items = item_occurences.order_by('-total_cost__sum')[:5]
 			data = {
 				"highest_item": highest_item,
 				"lowest_item":lowest_item,
@@ -148,7 +158,9 @@ def get_sales_by_date(request):
 				"labels2":labels2,
 				"default2":default2,
 				"cashiers":users_that_day,
-				"users":users
+				"users":users,
+				"top_items":top_items,
+				"sales_by_category":new_sales
 			}
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html',data)
 		except ObjectDoesNotExist as e:

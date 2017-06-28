@@ -176,6 +176,94 @@
     </div>
   </div>
 </div>
+<div class="col-md-12">
+<div class="row">
+  <div class="col-md-4">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+          <h6 class="panel-title">Top Items By Sales</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+      </div>
+      <div class="panel-body">
+          <div class="data-table-container">
+            <table class="table bordered highlight responsive data-table">
+              <tbody>
+                {% for item in top_items %}
+                  <tr>
+                    <td>
+                      {{ forloop.counter }}
+                    </td>
+                    <td class="right-align">
+                      {{ item.product_name }}
+                    </td>
+                    <td class="right-align">
+                      {{ item.total_cost__sum }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+          <h6 class="panel-title">Top Categories By Sales</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-6">
+           <canvas id="catChart" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-6">
+          <div class="data-table-container">
+            <table class="table bordered highlight responsive data-table">
+              <tbody>
+              {% if sales_by_category %}
+               {% for sales in sales_by_category %}
+                  <tr data-action-go="">
+                    <td>
+                      <div class="sqaure" style="width: 15px;height: 15px;border-radius: 50%;background-color: {{sales.color}};">
+                      </div>
+                    </td>
+                    <td> 
+                       {{sales.product_category}}
+                    </td>
+                    <td>
+                        {{sales.total_cost__sum}}
+                    </td>
+                    <td>
+                      68%
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% endif %}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
 
   <div class="col-md-12">
       <div class="panel panel-flat">
@@ -241,6 +329,7 @@
    <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
 <script type="text/javascript">
 $(document).ready(function(){
+    // setChart();
     var defaultData = [{% for d in default %} {{ d }}, {% endfor %}];
     var labels = [{% for i in labels %} "{{ i }}", {% endfor %}];
     var ctx = document.getElementById("dateChart").getContext('2d');
@@ -346,6 +435,27 @@ $(document).ready(function(){
         }
       });
 //-----chart**/
+//**@ doughnut chart
+  // function setChart(){
+    var defaultData2 = [{% for d in sales_by_category %} {{ d.total_cost__sum }}, {% endfor %}];
+    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}", {% endfor %}];
+    var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
+    // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
+      var ctx = document.getElementById("catChart").getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: labels2,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData2,
+                  backgroundColor:backColor,
+                  borderWidth: 1
+              }]
+          }
+      });
+  // }
+//---------------doghnut chart**/
 
 });
 </script>
