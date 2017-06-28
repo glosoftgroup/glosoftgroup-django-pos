@@ -62,6 +62,7 @@ def get_sales_by_date(request):
 			
 			for d in td_sales:
 				prevd = d.created - timedelta(days=1)
+				previd = d.id -1
 			prevdate = DateFormat(prevd).format('Y-m-d')
 
 			no_of_customers = Sales.objects.filter(created__contains=date).count()

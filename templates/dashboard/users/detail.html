@@ -8,6 +8,10 @@
 {% endblock %}
 
 {% block menu_user_class %}active{% endblock %}
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:users' %}">Users</a></li>
+     <li class="active"><a href="{% url 'dashboard:user-detail' pk=user.pk %}">Update User</a></li>
+ {% endblock %}
 {% block custom_css %}
 <style type="text/css">
 

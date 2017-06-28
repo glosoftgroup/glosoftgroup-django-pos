@@ -167,12 +167,21 @@
                     <div class="form-group">
                       <label class="display-block text-semibold">System Permission Default</label>
                       <div class="checkbox">
+                            <label>
+                              <input class="styled checks" id="can-login" type="checkbox"" value="active">
+                              can login
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+
+                     <!--  <div class="checkbox">
                         <label>
                           <div class="checker"><input class="styled" id="can-login" checked="checked" type="checkbox" value="active"></div>
                           can login
                         </label>
-                        <span id="granted" class="text-success">(granted)</span>
-                      </div>
+                        <span id="granted" class="text-success"></span>
+                      </div> -->
+
                       <div class="checkbox">
                         <label>
                           <div class="checker"><input class="styled" type="checkbox" id="checkAll"></div>
@@ -497,20 +506,21 @@ function next_tab(remove, add){
 $("#can-login").click(function () {
   var checked = $(this).is(':checked');
   if(checked){
-      $('.check').each(function(){
-          $(this).prop("checked", true);          
+      $(this).prop("checked", true);
+      $(this).parent().parent().parent().siblings('span').show();
+      $(this).parent().parent().parent().siblings('span').text('(granted)');
+      $('.check').each(function(){         
           $(this).parent().parent().removeClass('disabled');
           $(this).parent().parent().parent().parent().removeClass('disabled');
-          $(this).parent().addClass('checked');
           $(this).removeAttr('disabled');
       });
   }else{
+      $(this).prop("checked", false);
+      $(this).parent('span').removeClass('checked');
+      $(this).parent().parent().parent().siblings('span').hide();
       $('.check').each(function(){
-          $(this).prop("checked", false);
-          $(this).parent().parent().parent().siblings('span').hide();
           $(this).parent().parent().addClass('disabled');
           $(this).parent().parent().parent().parent().addClass('disabled');
-          $(this).parent().removeClass('checked');
           $(this).attr('disabled', 'disabled');
       });
   }
