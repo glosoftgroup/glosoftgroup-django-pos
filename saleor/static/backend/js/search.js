@@ -6,14 +6,14 @@ $(function() {
       var csrf_token = $('#csrf_token').val();      
       var url = $('#search_url').val();
 
-      var where_toshow_loader = "#content";
+      var where_toshow_loader = "#content-search";
       content_loader(where_toshow_loader); 
       var posting = $.post( url, {search_product:search_product,'csrfmiddlewaretoken': csrf_token} );
       // Put the results in a div
       posting.done(function( data ) {
       var block = $(where_toshow_loader).parent().parent().parent().parent().parent();   
       $(block).unblock();    
-      $("#content").empty().append( data ); 
+      $("#content-search").empty().append( data ); 
          
       });
     
