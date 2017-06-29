@@ -1,5 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
 from .userprofile.models import UserTrail
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
