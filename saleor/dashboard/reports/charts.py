@@ -22,6 +22,7 @@ from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
 import random
+from decimal import Decimal
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -139,10 +140,14 @@ def get_sales_by_date(request):
 			users_that_day = sales_that_day.values('user','user__email','total_net', 'created').annotate(c=Count('user__id', distinct=True))
 			users = Sales.objects.values('user__email','user__name','terminal').annotate(Count('user')).annotate(Sum('total_net')).order_by().filter(created__contains=date)
 			sales_by_category = SoldItem.objects.filter(sales__created__contains='2017-06-28').values('product_category').annotate(c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')
+			sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
 			new_sales = []
 			for sales in sales_by_category:
 				color = "#%03x" % random.randint(0, 0xFFF)
 				sales['color'] = color
+				percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+				percentage = round(percent, 2)
+				sales['percentage'] = percentage
 				new_sales.append(sales)
 			top_items = item_occurences.order_by('-total_cost__sum')[:5]
 			data = {

@@ -203,8 +203,8 @@
                     <td class="right-align">
                       {{ item.product_name }}
                     </td>
-                    <td class="right-align">
-                      {{ item.total_cost__sum }}
+                    <td class="right-align">  
+                      <div><span style="font-size: 0.7em;">Ksh.</span>{{ item.total_cost__sum }}</div>
                     </td>
                   </tr>
                 {% endfor %}
@@ -246,10 +246,10 @@
                        {{sales.product_category}}
                     </td>
                     <td>
-                        {{sales.total_cost__sum}}
+                         <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
                     </td>
                     <td>
-                      68%
+                      {{ sales.percentage }}% 
                     </td>
                   </tr>
                   {% endfor %}
