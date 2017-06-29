@@ -369,7 +369,8 @@ def add_stock_ajax(request):
 		except:
 			stock_list = []
 			stock_list.append(stock_pk)
-			request.session['stock_list'] = stock_list       
+			request.session['stock_list'] = stock_list
+			trail = str(productName)+' Stock '+crud+': quantity '+str(diff).replace('-','')+': Total stock '+str(quantity)                     
 	   
 		user_trail(request.user.name, trail,'add')
 		info_logger.info('User: '+str(request.user.name)+trail)
