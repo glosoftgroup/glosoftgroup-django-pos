@@ -14,8 +14,7 @@
 
 {% block header_extra %}
    <!-- search field -->
-    {% url "dashboard:search-type" as url %}
-    {% include "dashboard/includes/_search_filter.html" with url=url  %}
+    
     <!-- end search -->
     <li>&nbsp;&nbsp;</li>
 <li>              
@@ -38,49 +37,83 @@
   <div class="row">
     <div class="col s12 " >
       {% if product_classes %}
-        <div>
-          {% for pk, name, has_variants, product_attributes, variant_attributes in product_classes %}
-            <div class="col-md-6 equalize">
-              
-              <!-- product type panel -->
-              <!-- Heading label -->
-              <div class="panel panel-white">
-                <div class="panel-heading">
-                  <h6 class="panel-title">{{ name }}</h6>
-                  <div class="heading-elements">
-                    <span class="text-primary"><a class="title" href="{% url 'dashboard:product-class-update' pk=pk %}"><i class='icon-pencil7'></i></a></span>
-                     <a href="#modal_instance" data-title='Delete {{ product_class }} Product type' data-href="{% url 'dashboard:product-class-delete' pk=pk %}" class="modal-trigger"><span class="text-danger"><i class="icon-trash position-left"></i> </span>  </a>
-                  </div>
-                  
-                   
-                  
-                </div>                
-                <div class="panel-body">
-                  <div class="col-md-6">
-                   <span class="text-bold text-strong"> {% trans "Variants" context "Dashboard variants" %}: </span>
-                  {% if has_variants %}
-                    {% trans "Yes" %}
-                  {% else %}
-                    {% trans "No" %}
-                  {% endif %}
-                  {% if variant_attributes %}
-                   <br/><span class="text-bold text-strong"> {% trans "Variant attributes" context "Product type item list text" %}:</span><br/> {{ variant_attributes|join:", " }}
-                  {% endif %}
-                  </div>
-                  <div class="col-md-6">
-                    {% if product_attributes %}
-                   <span class="text-bold text-strong">{% trans "Product attributes" context "Product type item list text" %}:</span><br/> {{ product_attributes|join:", " }}
-                  {% endif %}
-                  </div>               
-                </div>
-              </div>
-              <!-- /heading label -->
-              <!-- end panel -->
-               
-             
-            </div>
-          {% endfor %}
+      <div class="row">
+      <!-- search -->
+      <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">      
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
         </div>
+        <div class="panel-body">
+            <div class="col-md-6">
+             {% url "dashboard:search-type" as url %}
+    {% include "dashboard/includes/_search_filter.html" with url=url  %}
+            </div>
+            <!--  -->
+            <div class="col-md-3">             
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                   <a href="{% url 'dashboard:product-class-add' %}" class="btn-block btn-primary btn-lg">Add Product type</a>
+                {% endif %}
+              </div>
+            </div> 
+        </div>
+      </div>
+   </div>
+      <!-- end search -->
+      </div>
+
+       <table class="table table-striped table-hover fixed_headers">          <!-- Header and footer fixed -->
+                  <thead>         
+                    <tr class="bg-primary">   
+                      <th>Has varaints</th>   
+                      <th>Name</th>    
+                      <th>Variant attribute</th>   
+                      <th>Product attributes</th>       
+                      <th class="text-center">Actions</th>    
+                    </tr>   
+                  </thead>                     
+                  <tbody id='content-search'>
+                   {% for pk, name, has_variants, product_attributes, variant_attributes in product_classes %}
+                    <tr>
+                      <!-- has variants   -->
+                      <td>
+                        <span class="text-bold text-strong"> {% trans "Variants" context "Dashboard variants" %}: </span>
+                        {% if has_variants %}
+                          {% trans "Yes" %}
+                        {% else %}
+                          {% trans "No" %}
+                        {% endif %}
+                      </td>
+                      <!-- name -->
+                      <td>{{ name }}</td> 
+                      <!-- variant attributes  -->
+                      <td>
+                        {% if variant_attributes %}
+                         <br/><span class="text-bold text-strong"> {% trans "Variant attributes" context "Product type item list text" %}:</span><br/> {{ variant_attributes|join:", " }}
+                        {% endif %}
+                      </td>
+                      <!-- product attributes -->
+                      <td>
+                        {% if product_attributes %}
+                       <span class="text-bold text-strong">{% trans "Product attributes" context "Product type item list text" %}:</span><br/> {{ product_attributes|join:", " }}
+                      {% endif %}
+                      </td>
+                      <!-- actions -->
+                      <td>
+                        <span class="text-primary"><a class="title" href="{% url 'dashboard:product-class-update' pk=pk %}"><i class='icon-pencil7'></i></a></span>
+                     <a href="#modal_instance" data-title='Delete {{ product_class }} Product type' data-href="{% url 'dashboard:product-class-delete' pk=pk %}" class="modal-trigger"><span class="text-danger"><i class="icon-trash position-left"></i> </span>  </a>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  </table>
+        
         {% include "dashboard/includes/_pagination.html" with page_obj=product_classes %}
       {% else %}
         <div class="not-found">

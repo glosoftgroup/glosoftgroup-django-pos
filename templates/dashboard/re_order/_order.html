@@ -1,0 +1,14 @@
+{% if variant %}
+	<tr >
+	<td >{{ variant }}</td>
+	<td>
+	<input data-id={{variant.id}} data-vname='{{ variant }}' id='v{{ variant.id }}' class="form-control orderitem" name="quantity" type="text">
+	</td>
+	</tr>
+	<script type="text/javascript">
+		$('#v{{ variant.id }}').on('blur',function(){
+			q = $(this).val();
+			variant_id = $(this).data('id');
+		});
+	</script>	
+{% endif %}

@@ -45,14 +45,84 @@
     </div> 
     <div class="panel-body">
     <div class="row">
-    <form method="post" enctype="multipart/form-data">        
+    {% if order %}
+    <button class="btn btn-primary" id='send_mail'>send email</button>
+    
+    <form method="post" enctype="multipart/form-data">      {% csrf_token %} 
+       <fieldset disabled="disabled">
+         <div class="col-md-4">
+            <div class="form-group">
+              <div class="col-md-6">
+                <label style="" class="text-bold text-center">Supplier:</label>
+              </div>
+              <div class="col-md-6">
+                
+                    {% for supplier in suppliers %}
+                       <span style="margin-top: 12px;" class="text-bold"> 
+                         <input hidden="hidden" id="supplier_id" value="{{ supplier.id }}" type="hidden">
+                         <input hidden="hidden" id="order_id" value="{{ order.id }}" type="hidden">
+                         {{ supplier.name }}
+                       </span>
+                    {% endfor %}
+                  
+              </div>              
+            </div>            
+         </div>
+         <div class="col-md-4">
+            <div class="form-group">
+              <div class="col-md-6">
+                <label style="" class="text-bold text-center">Supplier Reference:</label>
+              </div>
+              <div class="col-md-6">
+               <input type="text" value="{{ order.lfo_number }}" id="ref_no" name="ref_no" class="form-control">
+               </div>
+            </div>
+         </div>
+         <div class="col-md-4">
+         </div>
+         
+         <div class="col-md-12">
+          <table class="table">
+            <thead>
+              <tr class="bg-primary">
+                <th>Name</th>
+                <th>Quantity</th>                
+              </tr>
+            </thead>
+            <tbody id="results">
+            </tbody>
+            <tfoot>             
+              
+              {% if items %}
+                 {% for item in items %}
+                 <tr>
+                  <td>{{ item.product_name }}</td>
+                  <td>{{ item.quantity }}</td>
+                  </tr>
+                 {% endfor %}
+              {% else %}
+              no items
+              {% endif %} 
+                           
+            </tfoot>
+          </table>
+         </div>
+      <!-- action buttons -->
+         <div class="text-right">
+     </div>
+      </fieldset> 
+      </form>
+    <!-- section   -->
+     
+    {% else %}
+    <form method="post" enctype="multipart/form-data">      {% csrf_token %}    
          <div class="col-md-4">
             <div class="form-group">
               <div class="col-md-6">
                 <label style="margin-top: 12px;" class="text-bold text-center">Supplier:</label>
               </div>
               <div class="col-md-6">
-                <select name='supplier' class="select-search">
+                <select name='supplier' id='supplier' class="select-search">
                   {% if suppliers %}
                     {% for supplier in suppliers %}
                        <option value="{{supplier.name}}"> 
@@ -70,44 +140,46 @@
                 <label style="margin-top: 12px;" class="text-bold text-center">Supplier Reference:</label>
               </div>
               <div class="col-md-6">
-               <input type="text" name="ref_no" class="form-control">
+               <input type="text" id="ref_no" name="ref_no" class="form-control">
                </div>
             </div>
          </div>
          <div class="col-md-4">
          </div>
-         <hr>
+         
          <div class="col-md-12">
           <table class="table">
             <thead>
               <tr>
-                <th>variant</th>
-                {% for attribute in attributes %}
-                  <th>
-                    {{ attribute.name|capfirst }}
-                  </th>
-                {% endfor %}
+                <th>Name</th>
+                <th>Quantity</th>                
               </tr>
             </thead>
-            <tbody>
+            <tbody id="results">
+            </tbody>
+            <tfoot>             
               <tr>
               {% if variants %}
-              <td>
-              <select id='item_sku' class="select-search">
+              <td class="text-bold">
+              Add Item 
+              </td><td>
+              {% url 'dashboard:reorder_stock' pk=product.pk as url %}
+              <select data-href="{{ url }}" data-pid="{{ product.pk }}" data-pname="{{ product.name }}" id='item_sku' class="select-search">
                {% for variant in variants %}             
-                <option value="{{variant.sku}}">{{ variant }}</option>         
+                <option value="{{variant.pk}}">{{ variant }}</option>         
                {% endfor %}
-               </select>
-               </td>   
+               </select>               
+               </td><td><button class="btn btn-primary" id='btn_submit' onclick="return false;">Submit</button></td>   
               {% endif %} 
               </tr>             
-            </tbody>
+            </tfoot>
           </table>
          </div>
       <!-- action buttons -->
          <div class="text-right">
      </div>
       </form>
+      {%  endif %}
     </div>
    
     </div>
@@ -134,8 +206,93 @@
 <script type="text/javascript" src="{% static 'backend/js/pages/form_select2.js' %}"></script>
 <script type="text/javascript">
   $('#item_sku').on('change',function(){
-    var sku = $(this).val();
-    alert(sku);
+    var variant_id = $(this).val();
+    var url = $(this).data('href');
+    
+    var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+    var posting = $.post( url, {csrfmiddlewaretoken:csrf_token,variant_id:variant_id });
+      // Put the results in a div
+      posting.done(function( data ) {    
+      $("#results" ).append( data );});
+  });
+
+</script>
+<script type="text/javascript">
+  var names = [];
+  var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+  $('#btn_submit').on('click',function(){     
+     var selected = $(".orderitem").map(function(e){
+          return {
+                  id: parseInt($(this).data('id')),
+                  name:$(this).data('vname'),
+                  quantity: $(this).val()
+                  };
+                 }).get();
+
+   $.each(selected, function(i, val){ 
+     names.indexOf(val) === -1 ? names.push(val): console.log('already exists'); 
+        });
+    
+     var url = $('#item_sku').data('href');    
+     var pname = $('#item_sku').data('pname');
+     var pid   = $('#item_sku').data('pid');
+     var supplier = $('#supplier').val(); 
+     var ref_no = $('#ref_no').val();
+     names = JSON.stringify(names);
+     $.ajax({
+      url,
+      dataType:"json",
+      type: 'POST', 
+      data:{
+            csrfmiddlewaretoken:csrf_token,
+            'variants[]':names,
+            supplier:supplier,
+            ref_no:ref_no,            
+            pname:pname,
+            pid:parseInt(pid),
+      },      
+      success: function(data){
+        console.log(data);
+        names = [];        
+        window.location.reload();
+      },
+      error:function(){
+        console.log('error');
+        names = [];        
+        window.location.reload();
+      }
+     });     
+
+  });
+
+  // send send_mail
+  $('#send_mail').on('click',function(){
+    {% url 'dashboard:request_order' as url %}
+    var url = "{{ url }}";
+    var supplier_id= $('#supplier_id').val();
+    var order_id = $('#order_id').val();
+    $.ajax({
+      url,
+      dataType:"json",
+      type: 'POST', 
+      data:{
+            csrfmiddlewaretoken:csrf_token,
+            order_id:order_id,
+            supplier:supplier_id,            
+      },      
+      success: function(data){
+        console.log(data);
+        names = [];        
+        //window.location.reload();
+      },
+      error:function(){
+        console.log('error');
+        names = [];        
+        //window.location.reload();
+      }
+     });
+    
   });
 </script>
+
 {% endblock %}
