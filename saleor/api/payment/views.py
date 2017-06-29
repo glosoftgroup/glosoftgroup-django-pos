@@ -1,30 +1,15 @@
 from django.db.models import Q
 
-from .pagination import PostLimitOffsetPagination, PostPageNumberPagination
-from rest_framework.authentication import TokenAuthentication, BasicAuthentication
-from rest_framework.filters import (
-    SearchFilter,
-    OrderingFilter
-)
-from rest_framework.decorators import api_view
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly,
-    IsAuthenticated,
-    )
+from .pagination import PostLimitOffsetPagination
 
-from rest_framework.generics import (ListAPIView,                                     
-                                     RetrieveAPIView,                                    
-                                     RetrieveUpdateAPIView)
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from django.contrib.auth.models import Permission
 
 from ...payment.models import MpesaPayment
 from .serializers import (
      MpesaPaymentListSerializer  
      )
 from rest_framework import generics
-
 
         
 class MpesaPaymentDetailAPIView(generics.RetrieveAPIView):
