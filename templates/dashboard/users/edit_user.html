@@ -639,14 +639,13 @@ $(document).ready(function(){
       onkeyup: function(element) {$(element).valid()},
       onsubmit: false,
         rules: {
+            name: {
+                required: true,
+                minlength: 3
+            },
             email: {
                 required: true,
                 email: true
-            },
-            name: {
-                required: true,
-                minlength: 3,
-                alphanumeric: true
             },
             password:{
               required:true,
@@ -667,6 +666,21 @@ $(document).ready(function(){
               digits: true,
               minlength: 6
             }
+        },  
+        messages:{
+          name:{
+            required: "please provide a name",
+            minlength: "name must be atleast 3 characters long"
+          },
+          password:{
+            required: "please provide a password",
+            minlength: "password must be atleast 6 characters long"
+          },
+          confirm_password:{
+            required: "please provide a password",
+            minlength: "password must be atleast 6 characters long",
+            equalTo: "please enter the same password"
+          }
         }
     });
     $('#submit').click(function(){
@@ -720,90 +734,6 @@ $(document).ready(function(){
           } 
 
     });
-
-/* update user details */
-  // $('#update-details').validate({
-  // onkeyup: function(element) {$(element).valid()},
-  //   rules:{
-  //       name: {
-  //         required:true,
-  //         minlength:3
-  //       },
-  //       email:{
-  //         required: true,
-  //         email:true
-  //       },
-  //       password:{
-  //         required:true,
-  //         minlength: 6
-  //       },
-  //       confirm_password:{
-  //         required:true,
-  //         minlength:6,
-  //         equalTo: "#password"
-  //       },
-  //       nid:{
-  //         required:true,
-  //         digits: true,
-  //         minlength: 6
-  //       },
-  //       mobile:{
-  //         required:true,
-  //         digits: true,
-  //         minlength: 6
-  //       }
-
-  //   },
-  //   messages:{
-  //     name:{
-  //       required: "please provide a name",
-  //       minlength: "name must be atleast 3 characters long"
-  //     },
-  //     password:{
-  //       required: "please provide a password",
-  //       minlength: "password must be atleast 6 characters long"
-  //     },
-  //     confirm_password:{
-  //       required: "please provide a password",
-  //       minlength: "password must be atleast 6 characters long",
-  //       equalTo: "please enter the same password"
-  //     }
-  //   },
-  //   submitHandler: function() { 
-  //       var file = $('#image')[0].files[0];
-  //       var f = document.getElementById('update-details');
-  //       var formData = new FormData(f);
-  //       if(file){
-  //         formData.append("image", file);
-  //       }
-  //       // formData.append("image", file);
-  //       if (formData) {
-  //             $.ajax({
-  //                 url: "{% url 'dashboard:user-update' pk=user.pk %}",
-  //                 type: "POST",
-  //                 data: formData,
-  //                 processData: false,
-  //                 contentType: false,
-  //                 success:function(data){
-  //                    console.log(data);             
-
-  //                    $.jGrowl('Updated successfully', {
-  //                       header: 'Well done!',
-  //                       theme: 'bg-success'
-  //                    });
-  //                    window.location = "{% url 'dashboard:users' %}";
-  //                 },
-  //                 error:function(error){
-  //                   console.log(error);
-  //                   $.jGrowl('Change a few things up and try submitting again', {
-  //                       header: 'Oh snap!',
-  //                       theme: 'bg-danger'
-  //                   });
-  //                 }
-  //             });
-  //         } 
-  //   }
-  // });
 });
 /* disable th permissions tab code */
 $('#next-tab').click(function(){

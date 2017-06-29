@@ -30,110 +30,6 @@
     /* chart*/
   </style>
  {% endblock %}
-  <div class="col-md-12">
-   <div class="panel panel-flat">
-    <div class="panel-heading">
-        <h6 class="panel-title">Sale summary of Date {{date}}</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-
-     <div class="panel-body">
-          <!-- Quick stats boxes -->
-          <div class="row animated fadeIn">
-            <div class="col-lg-3">
-              <!-- Date Sales -->
-              <div class="panel bg-info-300">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-                  <h4 class="no-margin">Total Sales</h4>
-                  <h5 class="no-margin">KShs.{{date_total_sales}}</h5>
-                  
-                  {% if popular_item.count > 1%}
-                  <div class="popular">
-                   Popular products: <button class="btn btn-sm btn-default" onclick="alert('clicked ')" style="padding: 2px 5px;font-size: 10px;">View</button>
-                 {{popular_item}}
-                  </div>
-                  {% else %}
-                    <div class="popular">
-                        Popular item: {% for p in popular_item %}{{p.product_name}} - ({{p.c}} sales) {% endfor %}
-                  </div>
-                  {% endif %}
-                </div>
-
-                <div id="server-load"></div>
-              </div>
-              <!-- /date sales -->
-            </div>
-            
-            <div class="col-lg-3">
-              <!-- Highest Sold -->
-              <div class="panel bg-success-700">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-                  <h4 class="no-margin">Highest Sold Item</h4>
-                  <h5 class="no-margin">KShs. {{highest_item.total_cost__sum}}</h5>
-                    <div class="high_product">
-                    {{highest_item.product_name}}   
-                    </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /highest sold -->
-            </div>
-
-            <div class="col-lg-3">
-              <!-- Lowest Sold-->
-              <div class="panel bg-danger-600">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-                  <h4 class="no-margin">Lowest Sold Item</h4>
-                  <h5 class="no-margin">KShs. {{lowest_item.total_cost__sum}}</h5>
-                  <div class="low_product">
-                  {{lowest_item.product_name}}   
-                  </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /lowest sold -->
-            </div>
-
-            <div class="col-lg-3">
-              <!-- Customers Visited -->
-              <div class="panel bg-purple-600">
-                <div class="panel-body">
-                  <h4 class="no-margin">Customers</h4>
-                  <h5 class="no-margin">{{no_of_customers}}</h5>
-                  Customers Visited
-                  <div class="any" style="visibility: hidden;">
-                   1000 customers
-                  </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /customers visited -->
-            </div>
-
-          </div>
-          <!-- /quick stats boxes -->
-     </div>
-   </div>
- </div>
-
 <div class="col-md-12">
    <div id="pagination-div">
     <div class="panel panel-flat">
@@ -152,25 +48,78 @@
 
       </div>
     </div>
-   </div><!--pagination div-->
+   </div>
   </div>
 
 <div class="col-md-12">
   <div class="panel panel-flat">
     <div class="panel-body">
      <div class="row">
-        <h3 style="padding-left: 20px;">Dail Gross Sales</h3>
+        <h3 style="padding-left: 20px;">Daily Gross Sales</h3>
+              <p class="text-centers" style="padding-left: 20px;">Gross Sales on {{date}} were <span class="text-primary">KShs. {{date_total_sales}}</span>. 
+                {% if prevdate_total_sales %}
+                  This was 
+                  {% if sales_percent < 0 %}
+                      <span class="text-danger">down {{sales_percent}} %</span>
+                   {% elif sales_percent > 0 %}
+                      <span class="text-success">up {{sales_percent}} %</span>
+                   {% endif %}
+                   from the prior sales of date {{prevdate}}
+                {% endif %}
+              </p>
      </div>
       <div class="row">    
           <div class="col-md-10">
-              <div id="canvas-holder1" style="width:100%;">
+              <div id="canvas-holder1" width="900" height="400">
                 <canvas id="chart1"></canvas>
                 <div class="chartjs-tooltip" id="tooltip-0"></div>
                 <div class="chartjs-tooltip" id="tooltip-1"></div>
+                <div class="text-center"><span style="color: #72726d;">Hours</span></div>
               </div>
           </div>
           <div class="col-md-2">
-            <ul><li>yes</li><li>no</li></ul>
+
+            <div class="col-md-12">
+              <div class="panel bg-success-600">
+                <div class="panel-body">
+                  <h5 class="no-margin text-center">Total Sales</h5>
+                  <h5 class="no-margin text-center"><span style="font-size: 0.8em;">Kshs.</span> {{date_total_sales}}</h5>
+                  <h6 class="no-margin text-center">
+                   {% if sales_percent < 0 %}
+                      ({{sales_percent}} % dec <i class="icon-stats-decline2"></i> )
+                   {% elif sales_percent > 0 %}
+                      ({{sales_percent}} % inc <i class="icon-stats-growth2"></i> )
+                   {% else %}
+                      
+                   {% endif %}
+                  </h6>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+            </div><!-- total sales -->
+
+            <div class="col-md-12">
+              <div class="panel bg-purple-600">
+                <div class="panel-body">
+                  <h5 class="no-margin text-center">Customers Visited</h5>
+                  <h5 class="no-margin text-center">{{no_of_customers}}</h5>
+                  <h6 class="no-margin text-center">
+                    {% if customer_percent < 0 %}
+                      ({{customer_percent}} % dec <i class="icon-stats-decline2"></i> )
+                   {% elif sales_percent > 0 %}
+                      ({{customer_percent}} % inc <i class="icon-stats-growth2"></i> )
+                   {% else %}
+                      
+                   {% endif %}
+                  </h6>
+                </div>
+                <div class="container-fluid">
+                  <div id="members-online"></div>
+                </div>
+              </div>
+            </div><!-- customers visited -->
           </div>
       </div>
     </div>
@@ -208,6 +157,16 @@
                     </td>
                   </tr>
                 {% endfor %}
+                <tr>
+                  <td colspan="3"> <h6 style="font-weight: bold;font-size:1.0em;">Least Sold Item</h6></td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>{{lowest_item.product_name}}</td>
+                  <td>
+                    <div><span style="font-size: 0.7em;">Ksh.</span>{{lowest_item.total_cost__sum}}</div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -264,6 +223,101 @@
   </div>
   </div>
 </div>
+  <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">
+          <h6 class="panel-title">Sales Summary</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+        <div class="panel-body">
+
+            <div class="card">
+
+              {% if cashiers %}
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead>
+                      <tr>
+                        <th>
+                        </th>
+                        <th class="right-align">
+                          Sales
+                        </th>
+                        <th> Refund </th>
+                        <th> Net </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-action-go="">
+                          <td>
+                            <span style="font-weight: bold;">Gross Sales</span>
+                          </td>
+                          <td class="right-align">
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                          <td class="right-align">
+                            <span style="font-weight: bold;">0.00</span>
+                          </td>
+                          <td>
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Discounts</td>
+                          <td class="right-align">0.00</td>
+                          <td>0.00</td>
+                          <td>0.00</td>
+                        </tr>
+                        <tr>
+                          <td>Tax</td>
+                          <td class="right-align">0.00</td>
+                          <td>0.00</td>
+                          <td>0.00</td>
+                        </tr>
+                        <tr data-action-go="">
+                          <td>
+                            <span style="font-weight: bold;">Net Sales</span>
+                          </td>
+                          <td class="right-align">
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                          <td class="right-align">
+                            <span style="font-weight: bold;">0.00</span>
+                          </td>
+                          <td>
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+    </div>
 
   <div class="col-md-12">
       <div class="panel panel-flat">
@@ -306,7 +360,7 @@
                             {{ user.terminal }}
                           </td>
                           <td class="right-align">
-                            {{ user.total_net__sum }}
+                            <div><span style="font-size: 0.7em;">Ksh. </span>{{ user.total_net__sum }}</div>
                           </td>
                         </tr>
                       {% endfor %}
@@ -379,10 +433,10 @@ $(document).ready(function(){
 
       if (tooltip.dataPoints.length > 0) {
         tooltip.dataPoints.forEach(function (dataPoint) {
-          var content = [dataPoint.xLabel, dataPoint.yLabel].join(": ");
+          var content = [dataPoint.xLabel, '(Kshs) '+dataPoint.yLabel].join(": ");
           var $tooltip = $("#tooltip-" + dataPoint.datasetIndex);
 
-          $tooltip.html(content);
+          $tooltip.html('Sales '+content);
           $tooltip.css({
             opacity: 1,
             top: positionY + dataPoint.y + "px",
@@ -396,14 +450,14 @@ $(document).ready(function(){
     var lineChartData = {
       labels: [{% for i in labels2 %} "{{ i }}", {% endfor %}],
       datasets: [{
-        label: "This Week",
+        label: "Sales of {{date}}",
         backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
         borderColor: window.chartColors.red,
         // pointBackgroundColor: window.chartColors.red,
         fill: false,
         data: [{% for d in default %} {{ d }}, {% endfor %}]
       }, {
-        label: "{{prevdate}} Last Week",
+        label: "Previous Sales of {{prevdate}}",
         backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
         borderColor: window.chartColors.blue,
         // pointBackgroundColor: window.chartColors.blue,
@@ -416,10 +470,14 @@ $(document).ready(function(){
       var chart = new Chart(chartEl, {
         type: "line",
         data: lineChartData,
+        // pointLabelFontSize: 20,
         options: {
           title:{
-            display: true,
-            text: "Chart demo"
+            display: false,
+            text: "Hourly Sales"
+          },
+          legend: {
+              display: true,
           },
           tooltips: {
             enabled: false,

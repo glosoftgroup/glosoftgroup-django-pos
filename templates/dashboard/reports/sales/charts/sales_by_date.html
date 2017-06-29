@@ -339,8 +339,8 @@ $(document).ready(function(){
             ranges: {
                'Today': [moment(), moment()],
                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-               'Last Week': [moment().subtract(6, 'days'), moment()],
-               'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+               'This week':[moment().startOf('week'), moment()],
+               'Last Week': [moment().subtract(13, 'days'), moment().startOf('week')],
                'This Month': [moment().startOf('month'), moment()],
                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                'This Year': [moment().startOf('year'), moment()],
@@ -358,6 +358,9 @@ $(document).ready(function(){
             }});
          }else{
             $(this).val(from + ' - ' + to);
+            $.ajax({ url: "{% url 'dashboard:get_sales_by_week' %}",type: 'GET',data: {from:from, to:to },success: function(data){
+                    $('.p-sales').html(data);
+            }});
          }   
     });
     $('.daterange-to').on('cancel.daterangepicker', function(ev, picker) {

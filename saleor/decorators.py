@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from .userprofile.models import UserTrail
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 from django.utils import timezone
 import logging
@@ -50,7 +51,7 @@ class EmailOrUsernameModelBackend(object):
 			user = get_user_model().objects.get(**kwargs)
 			if user.check_password(password):
 				return user
-		except User.DoesNotExist:
+		except ObjectDoesNotExist:
 			return None
 
 	def get_user(self, username):
