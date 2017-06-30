@@ -233,14 +233,26 @@
                     </a>
                     </li>
                     
-
-                    <!-- <li class="{% block menu_vouchers_class %}{% endblock %}">
-                    <a href="{% url 'dashboard:voucher-list' %}">
-                    <i class="icon-ticket"></i>
-                       {% trans "Vouchers" context "Dashboard vouchers list" %}
-                    </a>
-                    </li> -->
                     </ul>
+                </li>
+                 <li>
+                  <a href="javascript:;">
+                    <i class="icon-wallet"></i> 
+                    <span>Drawer Cash</span>
+                  </a>
+                  <ul>
+                    <li class="{% block menu_terminal_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:terminals' %}">
+                    <i class="icon-versions"></i>Tills
+                    </a>
+                    </li>
+                    <li class="{% block menu_cashmovement_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:transactions' %}">
+                    <i class="icon-cash4"></i>
+                    Cash movement
+                    </a>
+                    </li>
+                  </ul>
                 </li>
                 <li>
                   <a href="javascript:;">

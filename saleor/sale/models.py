@@ -27,6 +27,25 @@ from ..customer.models import Customer
 from . import OrderStatus
 from . import TransactionStatus
 
+class Terminal(models.Model):
+	terminal_name = models.CharField(
+		pgettext_lazy('Terminal field', 'terminal name'),
+		max_length=52,)	
+	terminal_number = models.IntegerField(default=Decimal(0))
+	created = models.DateTimeField(
+		pgettext_lazy('Terminal field', 'created'),
+		default=now, editable=False)
+
+	class Meta:		
+		verbose_name = pgettext_lazy('Terminal model', 'Terminal')
+		verbose_name_plural = pgettext_lazy('Terminals model', 'Terminals')
+		
+	def __str__(self):
+		return str(self.terminal_name)+' '+str(self.terminal_number)
+
+	def get_transations(self):
+		return len(self.terminals.all())
+		
 @python_2_unicode_compatible
 class Sales(models.Model):
 	status = models.CharField(
@@ -119,9 +138,9 @@ class DrawerCash(models.Model):
 		verbose_name=pgettext_lazy('DrawerCash field', 'user'))
 	manager = models.ForeignKey(
 		settings.AUTH_USER_MODEL, blank=True, null=True, related_name='managers',
-		verbose_name=pgettext_lazy('DrawerCash field', 'manager'))
-	terminal = models.CharField(
-		pgettext_lazy('DrawerCash field', 'terminal'), null=True, max_length=36,)
+		verbose_name=pgettext_lazy('DrawerCash field', 'manager'))	
+	terminal = models.ForeignKey(Terminal, related_name='terminals',
+								null=True,blank=True,)
 	amount = models.DecimalField(
 		pgettext_lazy('DrawerCash field', 'total cost'), default=Decimal(0), max_digits=100, decimal_places=2)
 	created = models.DateTimeField(
@@ -134,4 +153,4 @@ class DrawerCash(models.Model):
 		
 	def __str__(self):
 		return str(self.user)+' '+str(self.amount)
-		
+

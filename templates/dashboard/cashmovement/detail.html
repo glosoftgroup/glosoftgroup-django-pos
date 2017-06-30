@@ -1,0 +1,55 @@
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  users
+{% endblock %}
+
+{% block menu_addCustomer_class %}active{% endblock %}
+{% block custom_css %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+      <div class="panel panel-flat">
+        <div class="panel-heading">
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-body">
+        <div class="col-md-6 col-xs-12 left text-center">
+          <div class="left">
+              {% if user.image %}
+          <img src=" {{user.image.url}}" alt="Texto Alternativo" class="img-circle img-thumbnail" style="width: 200px;height: 200px;" />
+             {% else %}
+                <img src="{% static 'images/user.png' %}" alt="" class="img-circle img-thumbnail" style="width: 100px;height: 100px;" />
+             {% endif %}
+             <h1>{{user.name }}</h1>
+            
+           <div class="right">
+            <p> Email: {{user.email }}</p>
+            <p> National ID No: {{user.nid }}</p>
+            <p> Mobile No: {{user.mobile }}</p>  
+           </div>
+         </div> 
+         <div class="col-md-6 col0xs-12">
+          
+         <h2> Edit Customer 
+            <a href="{% url 'dashboard:customer-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>
+         </h2>
+         
+         </div> 
+   </div>
+  </div>   
+  </div>
+</div>
+{% endblock %}

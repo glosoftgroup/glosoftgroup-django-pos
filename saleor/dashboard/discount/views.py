@@ -22,7 +22,7 @@ def discount_detail(request,pk=None):
             instance = get_object_or_404(Sale, pk=pk)
             products = instance.products.all()
             ctx = {'product_results':products}
-            return TemplateResponse(request, 'dashboard/includes/product_search_results.html', ctx)
+            return TemplateResponse(request, 'dashboard/discount/discount_detail.html', ctx)
 
 @staff_member_required
 def sale_edit(request, pk=None):
