@@ -18,6 +18,7 @@ urlpatterns = [
 		url(r'^chart/$', views.get_dashboard_data, name='chart'), 
 		url( r'^sales_search/$', views.sales_search, name = 'sales_search' ),
 		url( r'^sales_paginate/$', views.sales_paginate, name = 'sales_paginate' ),
+		url( r'^chart_pdf/$', charts.chart_pdf, name = 'chart_pdf' ),
 
 		url( r'^datechart/$', charts.sales_date_chart, name = 'sales_date_chart' ),
 		url( r'^productchart/$', charts.sales_product_chart, name = 'sales_product_chart' ),

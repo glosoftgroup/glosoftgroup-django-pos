@@ -69,3 +69,37 @@ def get_hours_results_range(date_from, date_to, l, h):
 	except ObjectDoesNotExist:
 		amount = 0
 		return amount
+
+def get_date_results_range(date_from, date_to):
+	try:
+		sales_at_date = Sales.objects.filter(created__range=[date_from, date_to])
+		try:
+			amount = Sales.objects.filter(pk__in=sales_at_date).aggregate(Sum('total_net'))['total_net__sum']
+			if amount is not None:
+				return amount
+			else:
+				amount = 0
+				return amount
+		except ObjectDoesNotExist:
+			amount = 0
+			return amount
+	except ObjectDoesNotExist:
+		amount = 0
+		return amount
+
+def get_date_results(date):
+	try:
+		sales_at_date = Sales.objects.filter(created__contains=date)
+		try:
+			amount = Sales.objects.filter(pk__in=sales_at_date).aggregate(Sum('total_net'))['total_net__sum']
+			if amount is not None:
+				return amount
+			else:
+				amount = 0
+				return amount
+		except ObjectDoesNotExist:
+			amount = 0
+			return amount
+	except ObjectDoesNotExist:
+		amount = 0
+		return amount

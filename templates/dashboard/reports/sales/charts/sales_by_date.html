@@ -96,7 +96,7 @@
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
                     <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
+                    <option value="excel" data-icon="fa-file-excel-o" onclick="alert('hi')">export excel</option>
                   </select>
               </div>
             </div>
@@ -320,6 +320,9 @@ $(document).ready(function(){
          $('.setValue').val($(this).val());
          $('.setName').val('export');
          // $('.set').value = $(this).val();
+         if($(this).val() == 'pdf'){
+            window.location = "{% url 'dashboard:chart_pdf' %}";
+         }
     });
     //**@ daterange from
     $('.daterange-from').daterangepicker({ 
@@ -340,7 +343,7 @@ $(document).ready(function(){
                'Today': [moment(), moment()],
                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                'This week':[moment().startOf('week'), moment()],
-               'Last Week': [moment().subtract(13, 'days'), moment().startOf('week')],
+               'Last Week': [moment().subtract(13, 'days'), moment().startOf('week').subtract(1, 'days')],
                'This Month': [moment().startOf('month'), moment()],
                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                'This Year': [moment().startOf('year'), moment()],
