@@ -99,49 +99,114 @@
 {% block content %}
   {% if categories %}
    <div class="row">
-    <div class="panelbody">    
-   
-
-      {% for node in categories %}
-      <div class="col-md-4">
-      <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
-      <!-- category panel -->
-              <div class="panel bg-indigo">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                    <ul class="icons-list">
-                    <li><a data-action="reload"></a></li>
-                      <li class="">
-                        <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
-                        <i class="icon-eye"></i> 
-                       
-                        </a>                        
-                      </li>
-                    </ul>
-                  </div>
-                   <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="text-white">
-                  <h3 class="no-margin">{{ node.name }}</h3>
-                  </a>
-                  Total products 
-                  <span class="badge bg-success">
-                          {{ node.get_product_num }}
-                    </span>
-                </div>
-
-                <div id="server-load"></div>
+   <!-- search -->
+      <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">      
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-6">
+    {% url "dashboard:search-category" as url %}
+    {% include "dashboard/includes/_search_filter.html" with url=url  %}
+            </div>
+            <!--  -->
+            <div class="col-md-3">             
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                   <a href="{% url 'dashboard:product-attribute-add' %}" class="btn-block btn-primary btn-lg">Add Category</a>
+                {% endif %}
               </div>
-              <!-- /current server load -->
-              </a>
-       
+            </div> 
+        </div>
       </div>
-     {% endfor %}
+   </div>
+  <!-- end search -->
+   </div>
+   <div class="row">   
+   <div class="panel">
+    <table class="table table-striped table-hover fixed_headers">
+      <thead>
+       <tr class="bg-primary">
+        <th>#</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Products</th>
+        <th>Actions</th>
+       </tr>
+      </thead>
+      <tbody id='content-search'>
+       {% for node in categories %}
+       <tr>
+       <!-- ## -->
+        <td>{{ node.pk }}</td>
+        <!-- name -->
+        <td>{{ node.name }}</td>
+        <!-- description\ -->
+        <td>{{ node.description|slice:":60" }}...</td>
+        <!-- products count-->
+        <td>
+          <span class="badge bg-indigo">
+            {{ node.get_product_num }}
+          </span>
+        </td>
+        <!-- actions -->
+        <td>
+          <!-- view -->
+          <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
+          <i class="icon-eye"></i>
+        </td>
+       </tr>
+       {% endfor %}
+      </tbody>
+    </table>
+   </div>
     
-    </div>
   </div>
   {% else %}
 
     <div class="row">
       {% if root %}
+      <div class="panel">
+    <table class="table table-striped table-hover fixed_headers">
+      <thead>
+        <th>#</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Products</th>
+        <th></th>
+      </thead>
+      <tbody>
+       {% for node in categories %}
+       <tr>
+       <!-- ## -->
+        <td>{{ node.pk }}</td>
+        <!-- name -->
+        <td>{{ node.name }}</td>
+        <!-- description\ -->
+        <td>{{ node.description }}</td>
+        <!-- products count-->
+        <td>
+          <span class="badge bg-success">
+            {{ node.get_product_num }}
+          </span>
+        </td>
+        <!-- actions -->
+        <td>
+          <!-- view -->
+          <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
+          <i class="icon-eye"></i>
+        </td>
+       </tr>
+       {% endfor %}
+      </tbody>
+    </table>
+   </div>
        <div class="col-md-6">
        <!-- Thumbnail with badge -->
               <div class="panel panel-default">

@@ -7,12 +7,9 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-        url(r'^$', views.users, name='customers'),
-        # url(r'^$', permission_required('userprofile.view_user', login_url='account_login')
-        #     (views.users), name='users'),
+        url(r'^$', views.users, name='customers'),        
         url(r'^add/$', permission_required('userprofile.add_user', login_url='account_login')
             (views.user_add), name='customer-add'),
-        # url(r'^add/$', views.user_add, name='user-add'),
         url(r'^customer_process/$', views.user_process, name='customer_process'),
         url(r'^detail/(?P<pk>[0-9]+)/$', views.user_detail, name='customer-detail'),
         url(r'user_trail/$', views.user_trails, name='user_trail'),

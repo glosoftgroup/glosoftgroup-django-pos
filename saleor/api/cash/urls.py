@@ -3,6 +3,8 @@ from django.conf.urls import url
 from .views import (
     UserTransactionAPIView,  
     UserAuthorizationAPIView,
+    logout,
+    login,
     )
 
 
@@ -12,7 +14,9 @@ urlpatterns = [
     	name='transaction'), 
     url(r'^auth/',
     	UserAuthorizationAPIView.as_view(),
-    	name='authorization'),   
+    	name='authorization'),
+    url(r'^login/',login, name='login'),
+    url(r'^logout/',logout, name='logout'),  
     
 ]
 

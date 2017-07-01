@@ -93,7 +93,8 @@
                     <th>#ID</th>
                     <th>Till Id</th>                 
                     <th>Till Name</th>
-                    <th>Transactions</th>                    
+                    <th>Transactions</th>
+                    <th>Amount</th>                          
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <th class="text-center">Actions</th>
                     {% endif %}
@@ -120,6 +121,10 @@
                       {{ user.get_transations}}
                      </span>
                     </td>
+                    <!-- amount -->
+                    <td>
+                      {{ user.amount}}
+                    </td>                   
                     
                     <!-- actions -->
                     <td class="text-center">

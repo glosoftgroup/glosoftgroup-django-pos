@@ -13,8 +13,7 @@
 
 {% block header_extra %}
     <!-- search field -->
-    {% url "dashboard:search-attribute" as url %}
-    {% include "dashboard/includes/_search_filter.html" with url=url  %}
+    
     <!-- end search -->
   <li>&nbsp;&nbsp;&nbsp;</li>
  <li>              
@@ -34,33 +33,73 @@
 
 {% block content %}
   {% if attributes %}
-    <div class="row ">
-      {% for pk, name, values in attributes %}        
-          <a class="list-item-name" href="{% url 'dashboard:product-attribute-update' pk=pk %}">
-          <div class="col-md-4 equalize">
-            <div class="panel panel-body border-top-warning text-center">
-              <h6 class="no-margin text-semibold">{{ name }}</h6>
-              <p class="content-group-sm text-muted">
-                {% for value in values %}
-                {{ value }}
-                {% if not forloop.last %}, {% endif %}
-              {% endfor %}
-              </p>
-
-              <ul class="fab-menu">
-                <li>
-                  <a href="{% url 'dashboard:product-attribute-update' pk=pk %}" class="fab-menu-btn btn bg-blue btn-float btn-rounded btn-icon">
-                    <i class="fab-icon-open icon-pencil"></i>
-                   
-                  </a>
-                </li>
-              </ul>
+  <div class="row">
+      <!-- search -->
+      <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">      
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-6">
+    {% url "dashboard:search-attribute" as url %}
+            
+    {% include "dashboard/includes/_search_filter.html" with url=url  %}
             </div>
-          </div>           
+            <!--  -->
+            <div class="col-md-3">             
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                   <a href="{% url 'dashboard:product-attribute-add' %}" class="btn-block btn-primary btn-lg">Add attributes</a>
+                {% endif %}
+              </div>
+            </div> 
+        </div>
+      </div>
+   </div>
+  <!-- end search -->
+  </div>
+  <div class="panel">
+  <table class="table table-striped table-hover fixed_headers">          
+  <!-- Header and footer fixed -->
+    <thead>         
+      <tr class="bg-primary">   
+        <th>#</th>   
+        <th>Name</th>    
+        <th>Value</th>                 
+        <th class="text-center"></th>    
+      </tr>   
+    </thead>                     
+    <tbody id='content-search'>
+    {% for pk, name, values in attributes %}
+      <tr>
+        <td>{{ pk }}</td>
+        <!-- names -->
+        <td>{{ name }}</td>
+        <!-- values -->
+        <td>
+          {% for value in values %}
+              {{ value }}
+              {% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </td>
+        <!-- action -->
+        <td>
+          <a href="{% url 'dashboard:product-attribute-update' pk=pk %}" class="btn bg-blue">
+          <i class="icon-pencil"></i>
           </a>
-        
-      {% endfor %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    </table>
     </div>
+    
 
   {% else %}
     <div class="not-found">

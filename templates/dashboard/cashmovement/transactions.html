@@ -89,11 +89,12 @@
                 <thead style="border-top:1px solid #ddd;">
                   <tr class="bg-primary">
                     <th>#ID</th>
-                    <th>Terminal</th>                 
+                    <th>Terminal</th>               
                     <th>Cashier</th>
                     <th>Supervisor</th>
                     <th>Type</th>
-                    <th>Amount</th>                    
+                    <th>Amount</th>
+                    <th>Transaction date</th>      
                   </tr>
                 </thead>
                 
@@ -105,7 +106,7 @@
                     <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
 
                      <!-- terminal -->
-                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">                   
+                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">                 
                     {{transaction.terminal}}
                     </td>
                     <!-- user -->
@@ -122,6 +123,10 @@
                      <!-- amount -->
                      <td>
                        {{transaction.amount}}
+                     </td>
+                     <!-- transaction date -->
+                     <td>
+                       {{ transaction.created}}
                      </td>
                     
                   </tr>

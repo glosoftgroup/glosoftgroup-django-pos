@@ -4,13 +4,17 @@ from rest_framework.serializers import (
 				ModelSerializer,
 				HyperlinkedIdentityField,
 				SerializerMethodField,
+				ValidationError,
 				)
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from ...discount.models import Sale
 from ...discount.models import get_product_discounts
-from ...sale.models import (Sales, SoldItem)
+from ...sale.models import (
+			Sales, 
+			SoldItem,
+			Terminal)
 from ...product.models import (
 			Product,
 			ProductVariant,
@@ -73,10 +77,26 @@ class SalesSerializer(serializers.ModelSerializer):
 				 'customer',
 				)
 
+	def validate_terminal(self,value):
+		data = self.get_initial()
+		self.terminal_id = int(data.get('terminal'))
+		self.l=[]
+		terminals = Terminal.objects.all()
+		for term in terminals:
+			self.l.append(term.pk)
+		if not self.terminal_id in self.l:		
+			raise ValidationError('Terminal specified does not extist')
+		return value	
+
 	def create(self,validated_data):
-		# calculate loyalty_points
-		customer = validated_data.get('customer')
+		# add sold amount to drawer	
 		total_net = validated_data.get('total_net')
+		terminal = Terminal.objects.get(pk=self.terminal_id)	
+		terminal.amount += Decimal(total_net)
+		terminal.save()
+		print terminal.pk
+		# calculate loyalty_points
+		customer = validated_data.get('customer')		
 		invoice_number = validated_data.get('invoice_number')
 		if customer:
 			total_net = validated_data.get('total_net')
