@@ -52,6 +52,7 @@
              tr{padding:5px;}
             .foot{padding-top:30px;}
             .foot p{ color: #007cae;font-size: 12px;}
+            .chart{width:500px;height: 400px;}
          </style>
      </head>
      <body>
@@ -96,5 +97,48 @@
          <div class="foot">
              <p style="text-align: center;">Report Pulled by: {% if puller.email %}{{ puller.email }} {% else %} {{ puller.name }}{% endif %}</p>
          </div>
+         <div class="chart">
+         hello
+              <iframe id="myChart" width="400" height="400"></iframe>
+         </div>
+        <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/chart.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
+        <script type="text/javascript">
+          $(document).ready(function(){
+            $('.chart').html('mamabo');
+              var ctx = document.getElementById("myChart").getContext('2d');
+              var myChart = new Chart(ctx, {
+                  type: 'doughnut',
+                  data: {
+                      labels: ['mon','tue','wed','thurs','fri','sat'],
+                      datasets: [{
+                          label: 'Amount of sale',
+                          data: [23,12,43,1,23,56],
+                          backgroundColor: [
+                              'rgba(255, 99, 132, 0.2)',
+                              'rgba(54, 162, 235, 0.2)',
+                              'rgba(255, 206, 86, 0.2)',
+                              'rgba(75, 192, 192, 0.2)',
+                              'rgba(153, 102, 255, 0.2)',
+                              'rgba(255, 159, 64, 0.2)'
+                          ],
+                          borderColor: [
+                              'rgba(255,99,132,1)',
+                              'rgba(54, 162, 235, 1)',
+                              'rgba(255, 206, 86, 1)',
+                              'rgba(75, 192, 192, 1)',
+                              'rgba(153, 102, 255, 1)',
+                              'rgba(255, 159, 64, 1)'
+                          ],
+                          borderWidth: 1
+                      }]
+                  },
+                  options:{
+                    animation:false
+                  }
+              });
+          });
+        </script>
+
      </body>
  </html>

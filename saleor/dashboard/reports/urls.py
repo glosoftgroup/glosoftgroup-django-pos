@@ -5,6 +5,7 @@ from . import views
 from . import charts
 from django.conf import settings
 from django.conf.urls.static import static
+# from wkhtmltopdf.views import PDFTemplateView
 
 
 urlpatterns = [
@@ -19,6 +20,8 @@ urlpatterns = [
 		url( r'^sales_search/$', views.sales_search, name = 'sales_search' ),
 		url( r'^sales_paginate/$', views.sales_paginate, name = 'sales_paginate' ),
 		url( r'^chart_pdf/$', charts.chart_pdf, name = 'chart_pdf' ),
+		# url(r'^pdf/$', PDFTemplateView.as_view(template_name='dashboard/reports/sales/charts/pdf/pdf.html',filename='my_pdf.pdf'), 
+			# name='chart_pdf'),
 
 		url( r'^datechart/$', charts.sales_date_chart, name = 'sales_date_chart' ),
 		url( r'^productchart/$', charts.sales_product_chart, name = 'sales_product_chart' ),

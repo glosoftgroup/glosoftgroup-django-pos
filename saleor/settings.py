@@ -193,7 +193,7 @@ INSTALLED_APPS = [
 	'webpack_loader',
 	'social_django',
 	'django_countries',
-	'rest_framework.authtoken',
+	'rest_framework.authtoken'
 ]
 
 LOGGING = {
