@@ -63,7 +63,7 @@
                             <div class="multi-select-full">
                               <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="multiple" placeholder="select a user...">
                               {% for usr in users %}
-                                {% if usr.is_staff == True and usr.is_superuser == False %}
+                                {% if usr.is_superuser == False %}
                                    <option value="{{usr.id}}"> 
                                      {% if usr.name %}
                                         {{usr.name}}
@@ -174,20 +174,35 @@
                             <span id="granted" class="granted text-success"></span>
                           </div>
 
-                     <!--  <div class="checkbox">
-                        <label>
-                          <div class="checker"><input class="styled" id="can-login" checked="checked" type="checkbox" value="active"></div>
-                          can login
-                        </label>
-                        <span id="granted" class="text-success"></span>
-                      </div> -->
-
                       <div class="checkbox">
                         <label>
                           <div class="checker"><input class="styled" type="checkbox" id="checkAll"></div>
                           select all
                         </label>
                       </div>
+                  {% for permission in permissions%}
+                  {% if permission.content_type.model ==  'unused' %}
+                          {% if permission in user_permissions %}                          
+                              <div class="checkbox">
+                                <label>
+                                  <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
+                                  {{permission.name}}
+                                </label>
+                                <span id="granted" class="granted text-success">(granted)</span>
+                              </div>
+                          {% else %}
+                             <div class="checkbox">
+                             <label>          
+                                 <input class="styled check" type="checkbox" 
+                                value="{{permission.id}}">
+                                 {{permission.name}}
+                             </label>
+                             <span id="granted" class="granted text-success"></span>
+                             </div>
+                          {% endif %}
+                      {% else %}
+                      {% endif %}
+                    {% endfor %}
                      </div>
                     </div>                                    
                 </div>
@@ -684,7 +699,7 @@ $("#permission-btn").click(function(event){
               });
          }
 
-         //window.location = "{% url 'dashboard:perms' %}";
+         window.location = "{% url 'dashboard:perms' %}";
          localStorage.removeItem('group_id');
          localStorage.removeItem('group_name');
       }
