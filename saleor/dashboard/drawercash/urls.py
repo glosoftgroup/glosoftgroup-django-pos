@@ -12,6 +12,7 @@ urlpatterns = [
         url(r'^add/$', views.terminal_add, name='terminal-add'),
         url(r'^terminal_process/$', views.terminal_process, name='terminal_process'),
         url(r'^edit/(?P<pk>[0-9]+)/$', views.terminal_edit, name='terminal-edit'),
+        url(r'^terminal/history/(?P<pk>[0-9]+)/$', views.terminal_history, name='terminal-history'),
         url(r'^terminal_update(?P<pk>[0-9]+)/$', views.terminal_update, name='terminal-update'),
         url(r'^detail/(?P<pk>[0-9]+)/$', views.terminal_detail, name='terminal-detail'),
         url(r'^delete/(?P<pk>[0-9]+)/$', views.terminal_delete, name='terminal-delete'),

@@ -12,7 +12,7 @@ from ...product.models import (
     ProductVariant,
     Stock,
     )
-from ...sale.models import (Sales)
+from ...sale.models import (Sales, Terminal, TerminalHistoryEntry)
 from ...customer.models import Customer
 from .serializers import (
     CreateStockSerializer,
@@ -62,6 +62,16 @@ class SalesCreateAPIView(generics.CreateAPIView):
         serializer.save(user=self.request.user)
         user_trail(self.request.user.name,'made a sale:#'+str(serializer.data['invoice_number'])+' sale worth: '+str(serializer.data['total_net']),'add')
         info_logger.info('User: '+str(self.request.user)+' made a sale:'+str(serializer.data['invoice_number']))
+        terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
+        trail = 'User: '+str(self.request.user)+\
+                ' made a sale:'+str(serializer.data['invoice_number'])+\
+                ' Net#: '+str(serializer.data['total_net'])
+        TerminalHistoryEntry.objects.create(
+                            terminal=terminal,
+                            comment=trail,
+                            crud='deposit',
+                            user=self.request.user
+                        )
 
 
 class SalesListAPIView(generics.ListAPIView):

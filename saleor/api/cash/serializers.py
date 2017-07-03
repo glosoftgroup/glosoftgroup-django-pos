@@ -11,7 +11,7 @@ from rest_framework.serializers import (
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from ...sale.models import DrawerCash, Terminal
+from ...sale.models import DrawerCash, Terminal, TerminalHistoryEntry
 from ...decorators import user_trail
 
 
@@ -107,18 +107,35 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 		""" authenticate user and transact
 		"""
 		trans_type = str(validated_data['trans_type'])
-		amount = validated_data['amount']	
-		#terminal = Terminal.objects.get(pk=self.terminal_id)	
+		amount = validated_data['amount']
+		manager = self.manager	
+		terminal = validated_data['terminal']
+		user = validated_data['User']
+
+		self.terminal = Terminal.objects.get(pk=self.terminal_id)	
+		trail = str(manager)+' '+trans_type+' '+str(amount)+\
+					' from TERMINAL:'+str(terminal)
+		print trail
 		if trans_type == 'deposit':
+		    #trail += '<br>Initial amount'+str('amount')			
 			self.terminal.amount += Decimal(amount)			
 			self.terminal.save()
+			TerminalHistoryEntry.objects.create(
+							terminal=terminal,
+							comment=trail,
+							crud=trans_type,
+							user=manager
+						)
 		elif trans_type == 'withdraw':
 			self.terminal.amount -= Decimal(amount)	
-			self.terminal.save()		
-
-		manager = self.manager
-		terminal = validated_data['terminal']
-		user = validated_data['User']	
+			self.terminal.save()
+			TerminalHistoryEntry.objects.create(
+							terminal=terminal,
+							comment=trail,
+							crud=trans_type,
+							user=manager
+						)		
+			
 
 		drawer = DrawerCash.objects.create(manager=manager,										   
 										   user = User.objects.get(pk=int(user)),

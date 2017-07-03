@@ -95,7 +95,8 @@
                     <th>Till Name</th>
                     <th>Cash movements</th>
                     <th>Sales</th>
-                    <th>Amount</th>                          
+                    <th>Amount</th>
+                    <th>History</th>                          
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <th class="text-center">Actions</th>
                     {% endif %}
@@ -132,7 +133,13 @@
                     <td>
                       {{ user.amount}}
                     </td>                   
-                    
+                    <td>
+                      <span class="label label-success">
+                       <a href="#modal_instance2" class="text-white modal-trigger-ajax" data-title="{{ user }} History" data-href="{% url 'dashboard:terminal-history' pk=user.pk %}">
+                      History
+                      </a>
+                      </span>
+                    </td>
                     <!-- actions -->
                     <td class="text-center">
                       <ul class="icons-list">
@@ -194,6 +201,7 @@
    </div>
  </div>
  <!-- /blue modal -->
+ {% include "dashboard/includes/_modal_terminal_history.html"  %}
 {% endblock%}
 {% block custom_js %}
 <script type="text/javascript">
@@ -251,5 +259,24 @@
 
   });
 
+</script>
+<script type="text/javascript">
+  $( ".modal-trigger-ajax").on('click',function() {        
+    var url = $(this).data('href')
+    var prompt_text = $(this).data('title');
+    var modal = $(this).attr('href');
+    var csrf_token = $(this).data('csrf_token')
+    $('#form-stock').attr('action',url);    
+    $('.modal-title').html(prompt_text);
+    $(".results" ).empty().append('<span class="text-center" style="padding:23px">Loading...<i class=" icon-spinner"></i></span>');
+    $(modal).modal();
+      var posting = $.get( url, {'csrfmiddlewaretoken':csrf_token });
+      // Put the results in a div
+      posting.done(function( data ) {    
+      $(".results" ).empty().append( data ); 
+       
+      });
+    
+   });
 </script>
 {% endblock %}

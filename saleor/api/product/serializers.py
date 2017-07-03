@@ -93,6 +93,8 @@ class SalesSerializer(serializers.ModelSerializer):
 		total_net = validated_data.get('total_net')
 		terminal = Terminal.objects.get(pk=self.terminal_id)	
 		terminal.amount += Decimal(total_net)
+		# add terminal history	
+
 		terminal.save()
 		print terminal.pk
 		# calculate loyalty_points

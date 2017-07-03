@@ -16,7 +16,7 @@ from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...customer.models import Customer
-from ...sale.models import Terminal, DrawerCash
+from ...sale.models import Terminal, DrawerCash, TerminalHistoryEntry
 from ...decorators import permission_decorator, user_trail
 import logging
 
@@ -30,6 +30,7 @@ def transactions(request):
 	return TemplateResponse(request, 
 							'dashboard/cashmovement/transactions.html', 
 							{'transactions':transactions})
+
 @staff_member_required
 # @permission_decorator('userprofile.view_user')
 def terminals(request):
@@ -138,6 +139,16 @@ def user_assign_permission(request):
 				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name))
 				info_logger.info('User: '+str(request.user.name)+' assigned permissions for user: '+str(user.name))
 				return HttpResponse('permissions updated')
+
+@staff_member_required
+def terminal_history(request,pk=None):
+	if request.method == 'GET':
+		if pk:
+			instance = get_object_or_404(Terminal, pk=pk)
+			terminal_history = TerminalHistoryEntry.objects.filter(terminal=instance).order_by('-id')
+			ctx = {'terminal_history':terminal_history}
+			return TemplateResponse(request, 'dashboard/includes/_terminal_history.html', ctx)
+			
 
 def user_trails(request):
 	users = UserTrail.objects.all().order_by('id')
