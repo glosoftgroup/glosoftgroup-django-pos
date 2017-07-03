@@ -23,36 +23,7 @@
   {% endif %}
 {% endblock %}
 
-{% block header_extra %}
-    {% if not root %}
-    <!-- search field -->
-    {% url "dashboard:search-category" as url %}
-    {% include "dashboard/includes/_search_filter.html" with url=url  %}
-    <!-- end search -->
-    {% endif %}
-    <li>&nbsp;&nbsp;&nbsp;</li>
-  <li>
-    <a class="" href="{% if root %}{% url 'dashboard:category-add' root_pk=root.pk %}{% else %}{% url 'dashboard:category-add' %}{% endif %}"><i class="icon-plus3"></i>
-     {% if not root %}
-     Add category
-     {% else %}
-     Add sub category
-     {% endif %}
-    </a>
-  </li>  
-  {% if root %}
-  <li>
-    <a href="#modal_instance" data-title="Edit {{ root.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-edit' root_pk=root.pk %}"
-    class="modal-trigger-ajax"><i class="icon-pencil7 position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom"  data-original-title="Edit me"></i>Edit category
-    </a>
-  </li>
-  <li>
-    <a href="#modal_instance" data-title="Delete {{ root.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-delete' pk=root.pk %}"
-    class="modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>Remove category
-    </a>
-  </li>    
-  {% endif %}
-{% endblock %}
+
 
 {% block breadcrumbs %}
  
@@ -103,66 +74,96 @@
    <div class="">
       {% if root %}
        <div class="col-md-12">
-       <!-- Thumbnail with badge -->
-              <div class="panel panel-default">
-                <div class="panel-heading bg-indigo">
-                  <h6 class="panel-title">
-                    Root Category {{ root.name }}
-                  </h6>
-                  <div class="heading-elements">
-                  	<span class="label label-danger heading-text">
-                     {{ root.get_product_num }}
-                   </span>
-                  </div>
-                 
-                </div>
-                
-                <div class="panel-body">
-                 
-                  {{ root.description }}
-                </div>
-              </div>
+       <!-- Root category -->
+       <div class="alert alert-info alert-styled-left alert-arrow-left alert-component">
+       <button class="close" data-dismiss='alert'>
+         <span>×</span>
+       </button>
+       <h6 class="alert-heading text-semibold">
+         {{ root.name }}
+       </h6>
+       <!-- description -->
+       <p>
+         {{ root.description }}
+       </p>
+       <span class="text-bold">{{ root.get_product_num }}</span> Products in this category
+       </div>              
               <!-- /thumbnail with badge -->
               </div>
               {% endif %}
        </div>
+       <div class="col-md-12">
+         <div class="btn-group">
+          <a href="#modal_instance" data-title="Edit {{ root.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-edit' root_pk=root.pk %}"
+    class="modal-trigger-ajax btn btn-info btn-raised legitRipple">
+           
+             <i class="icon-pencil7 position-left"></i>
+             Edit
+           </a>
+           <a class="btn btn-primary btn-raised legitRipple" href="{% if root %}{% url 'dashboard:category-add' root_pk=root.pk %}{% else %}{% url 'dashboard:category-add' %}{% endif %}">    
+           
+             <i class="icon-plus3 position-left"></i>
+             Add sub-category            
+           
+          </a>
+          <a href="#modal_instance" data-title="Delete {{ root.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-delete' pk=root.pk %}"
+        class="modal-trigger-ajax btn btn-danger btn-raised legitRipple">           
+             <i class="icon-trash position-left"></i>
+             Delete
+           </a>
+         </div>
+         </div>
      <div class="col-md-12">
       <div class="text-center content-text-muted content-divider">
 		  <span class="pt-10 pb-10">
 		   SUB-CATEGORIES
 		   </span>  
 	 </div>
-      {% for node in categories %}
-      <div class="col-md-4">
-      <!-- Current server load -->
-              <div class="panel bg-indigo">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                    <ul class="icons-list">
-                    <li><a data-action="reload"></a></li>
-                      <li class="">
-                        <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
-                        <i class="icon-eye"></i> 
-                       
-                        </a>                        
-                      </li>
-                    </ul>
-                  </div>
-
-                  <h3 class="no-margin">{{ node.name }}</h3>
-                  Total products 
-                  <span class="badge bg-success">
-                          {{ node.get_product_num }}
-                    </span>
-                </div>
-
-                <div id="server-load"></div>
-              </div>
-              <!-- /current server load -->
-       
-      </div>
-
-     {% endfor %}
+     
+      <table class=" panel table table-striped table-hover fixed_headers">
+      <thead>
+       <tr class="bg-primary">
+        <th>#</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Products</th>
+        <th>Actions</th>
+       </tr>
+      </thead>
+      <tbody id='content-search'>
+       {% for node in categories %}
+       <tr>
+       <!-- ## -->
+        <td 
+        class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+        >{{ node.pk }}</td>
+        <!-- name -->
+        <td
+        class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+        >{{ node.name }}</td>
+        <!-- description\ -->
+        <td
+        class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+        >{{ node.description|slice:":60" }}...</td>
+        <!-- products count-->
+        <td
+        class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+        >
+          <span class="badge bg-indigo">
+            {{ node.get_product_num }}
+          </span>
+        </td>
+        <!-- actions -->
+        <td>
+          <!-- view -->
+          <a href='{% url "dashboard:category-list" root_pk=node.pk %}' class="">
+          <i class="icon-eye"></i>
+        </td>
+       </tr>
+       {% endfor %}
+      </tbody>
+    </table> 
+    
     
     </div>
     </div>
@@ -172,7 +173,22 @@
     <div class="row">
       {% if root %}
        <div class="col-md-6">
+       <!-- Root category -->
+       <div class="alert alert-info alert-styled-left alert-arrow-left alert-component">
+       <button class="close" data-dismiss='alert'>
+         <span>×</span>
+       </button>
+       <h6 class="alert-heading text-semibold">
+         {{ root.name }}
+       </h6>
+       <!-- description -->
+       <p>
+         {{ root.description }}
+       </p>
+       <span class="text-bold">{{ root.get_product_num }}</span> Products in this category
+       </div>
        <!-- Thumbnail with badge -->
+
               <div class="panel panel-default">
                 <div class="panel-heading">
                   <h6 class="panel-title">
@@ -213,6 +229,7 @@
       {% for node in categories %}
       <div class="col-md-4">
       <!-- Current server load -->
+
               <div class="panel bg-indigo">
                 <div class="panel-body">
                   <div class="heading-elements">

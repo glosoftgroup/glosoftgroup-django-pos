@@ -144,13 +144,21 @@
        {% for node in categories %}
        <tr>
        <!-- ## -->
-        <td>{{ node.pk }}</td>
+        <td 
+        class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+        >{{ node.pk }}</td>
         <!-- name -->
-        <td>{{ node.name }}</td>
+        <td
+        class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+        >{{ node.name }}</td>
         <!-- description\ -->
-        <td>{{ node.description|slice:":60" }}...</td>
+        <td
+        class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+        >{{ node.description|slice:":60" }}...</td>
         <!-- products count-->
-        <td>
+        <td
+        class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+        >
           <span class="badge bg-indigo">
             {{ node.get_product_num }}
           </span>
@@ -317,5 +325,11 @@
  $(document).ready(function() {
   $('#search_product').attr('placeholder','Search Category');
 });
+$(".td").click(function() {
+    window.location = $(this).data("href");
+  });
 </script>
+<style>
+  .td { cursor: pointer; }
+</style>
 {% endblock %}

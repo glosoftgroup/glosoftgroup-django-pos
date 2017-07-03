@@ -341,6 +341,10 @@
               <li class="active">{% trans "Home" context "Dashboard homepage" %}</li>
                {% endblock %}              
             </ul>
+            <ul class="breadcrumb-elements">
+              {% block header_extra %}
+              {% endblock %}
+            </ul>
             <!--  -->
           <a class="breadcrumb-elements-toggle"><i class="icon-menu-open"></i></a></div>
         </div>
