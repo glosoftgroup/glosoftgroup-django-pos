@@ -1,0 +1,52 @@
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Terminal
+{% endblock %}
+
+{% block menu_terminal_class %}active{% endblock %}
+{% block custom_css %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+      <div class="panel panel-flat">
+        <div class="panel-heading">
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-body">
+        <table class="table">
+          <thead>
+            <th>Name</th>
+            <th>Number</th>
+            <th></th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ user.terminal_name }}</td>
+              <td>{{ user.terminal_number }}</td>
+              <td>
+                <a href="{% url 'dashboard:terminal-edit' pk=user.pk %}" class="btn btn-primary btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="col-md-6 col-xs-12 left text-center">
+          
+         
+   </div>
+  </div>   
+  </div>
+</div>
+{% endblock %}

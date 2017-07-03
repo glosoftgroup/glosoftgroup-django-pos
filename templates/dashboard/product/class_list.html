@@ -67,7 +67,7 @@
    </div>
       <!-- end search -->
       </div>
-
+      <div class="panel">
        <table class="table table-striped table-hover fixed_headers">          <!-- Header and footer fixed -->
                   <thead>         
                     <tr class="bg-primary">   
@@ -106,15 +106,18 @@
                       </td>
                       <!-- actions -->
                       <td>
-                        <span class="text-primary"><a class="title" href="{% url 'dashboard:product-class-update' pk=pk %}"><i class='icon-pencil7'></i></a></span>
+
+                        <a class="btn btn-default btn-sm legitRipple" href="{% url 'dashboard:product-class-update' pk=pk %}"><i class="icon-pencil7"></i></a>
+                     
                      <a href="#modal_instance" data-title='Delete {{ product_class }} Product type' data-href="{% url 'dashboard:product-class-delete' pk=pk %}" class="modal-trigger"><span class="text-danger"><i class="icon-trash position-left"></i> </span>  </a>
                       </td>
                     </tr>
                     {% endfor %}
                   </tbody>
                   </table>
+                  </div>
         
-        {% include "dashboard/includes/_pagination.html" with page_obj=product_classes %}
+        
       {% else %}
         <div class="not-found">
           <p class="grey-text">

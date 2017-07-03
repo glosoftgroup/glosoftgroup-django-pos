@@ -27,6 +27,64 @@ from ..customer.models import Customer
 from . import OrderStatus
 from . import TransactionStatus
 
+
+class Terminal(models.Model):
+	terminal_name = models.CharField(
+		pgettext_lazy('Terminal field', 'terminal name'),
+		max_length=52,)	
+	terminal_number = models.IntegerField(default=Decimal(0))
+	created = models.DateTimeField(
+		pgettext_lazy('Terminal field', 'created'),
+		default=now, editable=False)
+	amount = models.IntegerField(default=Decimal(0))
+	
+
+	class Meta:		
+		verbose_name = pgettext_lazy('Terminal model', 'Terminal')
+		verbose_name_plural = pgettext_lazy('Terminals model', 'Terminals')
+		
+	def __str__(self):
+		return str(self.terminal_name)+' #'+str(self.terminal_number)
+
+	def get_transations(self):
+		return len(self.terminals.all())
+	def get_sales(self):
+		return len(self.terminal_sales.all())
+
+
+@python_2_unicode_compatible
+class TerminalHistoryEntry(models.Model):
+	date = models.DateTimeField(
+		pgettext_lazy('Terminal history entry field', 'last history change'),
+		default=now, editable=False)
+	terminal = models.ForeignKey(
+		Terminal, related_name='history',
+		verbose_name=pgettext_lazy('Terminal history entry field', 'order'))
+	
+	comment = models.CharField(
+		pgettext_lazy('Terminal history entry field', 'comment'),
+		max_length=100, default='', blank=True)
+	crud = models.CharField(
+		pgettext_lazy('Terminal history entry field', 'crud'),
+		max_length=30, default='', blank=True)
+	user = models.ForeignKey(
+		settings.AUTH_USER_MODEL, blank=True, null=True,
+		verbose_name=pgettext_lazy('Terminal history entry field', 'user'))
+
+	class Meta:
+		ordering = ('date', )
+		verbose_name = pgettext_lazy(
+			'Terminal history entry model', 'Terminal history entry')
+		verbose_name_plural = pgettext_lazy(
+			'Terminal history entry model', 'Terminal history entries')
+
+	def __str__(self):
+		return pgettext_lazy(
+			'Terminal history entry str',
+			'TerminalHistoryEntry for terminal #%d') % self.terminal.pk
+
+
+		
 @python_2_unicode_compatible
 class Sales(models.Model):
 	status = models.CharField(
@@ -52,8 +110,9 @@ class Sales(models.Model):
 	user_email = models.EmailField(
 		pgettext_lazy('Sales field', 'user email'),
 		blank=True, default='', editable=False)
-	terminal = models.CharField(
-		pgettext_lazy('Sales field', 'terminal'), null=True, max_length=36,)
+	terminal = models.ForeignKey(
+		Terminal, related_name='terminal_sales',blank=True, default='',
+		verbose_name=pgettext_lazy('Sales field', 'order'))
 	invoice_number = models.CharField(
 		pgettext_lazy('Sales field', 'invoice_number'), null=True, max_length=36,)
 	
@@ -119,9 +178,9 @@ class DrawerCash(models.Model):
 		verbose_name=pgettext_lazy('DrawerCash field', 'user'))
 	manager = models.ForeignKey(
 		settings.AUTH_USER_MODEL, blank=True, null=True, related_name='managers',
-		verbose_name=pgettext_lazy('DrawerCash field', 'manager'))
-	terminal = models.CharField(
-		pgettext_lazy('DrawerCash field', 'terminal'), null=True, max_length=36,)
+		verbose_name=pgettext_lazy('DrawerCash field', 'manager'))	
+	terminal = models.ForeignKey(Terminal, related_name='terminals',
+								null=True,blank=True,)
 	amount = models.DecimalField(
 		pgettext_lazy('DrawerCash field', 'total cost'), default=Decimal(0), max_digits=100, decimal_places=2)
 	created = models.DateTimeField(
@@ -134,4 +193,4 @@ class DrawerCash(models.Model):
 		
 	def __str__(self):
 		return str(self.user)+' '+str(self.amount)
-		
+

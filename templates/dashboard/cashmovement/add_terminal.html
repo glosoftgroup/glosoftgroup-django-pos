@@ -1,0 +1,192 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  {% trans "Terminal" context "Dashboard terminal list" %} - {{ block.super }}
+{% endblock %}
+{% block header_extra %}
+{% endblock %}
+{% block breadcrumbs %} 
+   <li>
+      <a href="{% url 'dashboard:terminals' %}">
+      Terminal
+      </a>
+    </li>
+    <li class="active">
+      Add terminal
+    </li>
+{% endblock %}
+
+{% block menu_terminal_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Create terminal Details</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+        <div class="tabbable">
+          <ul class="nav nav-tabs nav-tabs-highlight">
+            <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">add terminal </a></li>
+          </ul>
+
+          <div class="tab-content">
+
+            <div class="tab-pane animated fadeIn active" id="profile">
+              <form class="form" enctype="multipart/form-data" id="user-details" name="user-details">
+                {% csrf_token %}
+                  <div class="row">
+                    
+                    <div class="col-md-8">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Terminal Name">
+                          </div>
+                        
+                           <div class="form-group">
+                            <label for="exampleInputPassword1">Termnial No:</label>
+                            <input type="text" class="form-control" name="nid" id="nid" placeholder="Termnial Number">
+                           </div>
+                           
+                        </div>
+                        <div class="col-md-6">
+                           
+                          
+                        </div>
+                      </div>                      
+                     
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                     <div class="pull-right" style="margin-top:40px;">
+                      <a href="{% url 'dashboard:terminals' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                      <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create Terminal <i class="icon-arrow-right14 position-right"></i></button>
+                     </div>
+                    </div>
+                  </div>
+                </form>
+            </div>
+            
+
+          </div>
+        </div>
+      </div>
+<!--       <div class="panel-footer">
+      <button class="btn btn-primary disabled">checki this</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+
+ 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript">
+/* disable th permissions tab code */
+$('#next-tab').click(function(){
+  $('#permissions-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
+});
+function disable_profile_tab(){
+  $('#rofile-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
+}
+
+
+
+  $('#user-details').validate({
+    rules:{
+        name: {
+          required:true,
+          minlength:3
+        },        
+        nid:{
+          required:true,
+          digits: true,
+          minlength: 1
+        },
+        
+
+    },
+    messages:{
+      name:{
+        required: "please provide a name",
+        minlength: "name must be atleast 3 characters long"
+      },      
+    },
+    submitHandler: function() { 
+      
+      if(1 != ''){
+          var f = document.getElementById('user-details');
+          var formData = new FormData(f);
+          
+          for (var pair of formData.entries()) {
+              console.log(pair[0]+ ', ' + pair[1]); 
+          }
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:terminal_process' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       console.log(data);
+                       $("#name").val('');               
+                       $("#nid").val('');               
+
+                       $.jGrowl('Terminal added successfully,', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+                       
+                      localStorage.setItem('user_id', data);
+                      $('.user_id').val(localStorage.getItem("user_id"));
+                      window.location = "{% url 'dashboard:terminals'%}";
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try submitting again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            } 
+      }else{
+        $.jGrowl('Image is empty fill and try submitting again', {
+            header: 'Oh snap!',
+            theme: 'bg-danger'
+        });
+      }
+    }
+  });
+
+  
+
+
+</script>
+{% endblock %}

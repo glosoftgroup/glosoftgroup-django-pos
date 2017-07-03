@@ -1,0 +1,236 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  {% trans "Transactions" context "Dashboard terminal list" %} - {{ block.super }}
+{% endblock %}
+
+{% block menu_cashmovement_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+   </style>
+ {% endblock %}
+{% block header_extra %}
+{% endblock %}
+{% block breadcrumbs %} 
+    
+    <li class="active">
+      Transactions
+    </li>
+{% endblock %}
+{% block content %}
+ <div class="row">
+ <!-- dashboard\includes\_main_search_filter.html -->
+<div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">      
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-6">
+             <label>Search Transactions</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_sku" placeholder="Search transactions" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="select list-sz list-size" data-width="100%" tabindex="-98">
+                    <option value="5" selected="selected">5</option>                   
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+              </div>
+            </div>
+             <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                
+              </div>
+            </div> 
+        </div>
+      </div>
+   </div>
+  <div class="col-md-12">  
+    
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-heading">        
+       
+          <div class="heading-elements">
+            <ul class="icons-list">              
+              <li><a data-action="collapse"></a></li>       
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="table-responsive">
+         
+
+          <table class="table table-striped table-hover fixed_headers">
+           
+                <thead style="border-top:1px solid #ddd;">
+                  <tr class="bg-primary">
+                    <th>#ID</th>
+                    <th>Terminal</th>               
+                    <th>Cashier</th>
+                    <th>Supervisor</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Transaction date</th>      
+                  </tr>
+                </thead>
+                
+                <tbody id="tb">           
+               {% if transactions %}
+                  {% for transaction in transactions %}
+                  <tr class='clickable-row' id="{{user.pk }}">
+                    <!-- ## id-->
+                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+
+                     <!-- terminal -->
+                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">                 
+                    {{transaction.terminal}}
+                    </td>
+                    <!-- user -->
+                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{transaction.user}}
+                    </td>
+                    <!-- supervisor -->
+                    <td>
+                      {{transaction.manager}}
+                    </td>
+                    <!-- type -->
+                    <td>
+                      {{transaction.trans_type}}
+                    </td>
+                     <!-- amount -->
+                     <td>
+                       {{transaction.amount}}
+                     </td>
+                     <!-- transaction date -->
+                     <td>
+                       {{ transaction.created}}
+                     </td>
+                    
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                   <tr><td colspan="6"><h2 class="text-center">no cash movement available</h2></td></tr>
+               {% endif %}
+                  </tbody>
+
+           </table>
+
+        </div>
+      </div>
+ 
+  </div>
+</div>
+
+<!-- Blue modal -->
+ <div id="modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+         <div class="">
+         <form action="" class="delete_form" method="post" id="delform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm Terminal delete!
+           </h5>
+           <input type="hidden" class="item-id" />
+           </div>
+           
+         </div>
+       </div>
+       
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" onclick="return false" data-id="" data-href="">Delete</button>
+         </form>          
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /blue modal -->
+{% endblock%}
+{% block custom_js %}
+<script type="text/javascript">
+
+  $(document).ready(function() {
+        $(".td").click(function() {
+            window.location = $(this).data("href");
+        });
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+         /* clicked the submit button */
+            $('.del').on('click', function (e) {
+                var f = document.getElementById('delform');
+                var formData = new FormData(f);
+                var id = $(this).data('id');
+                var url = $(this).data('href');
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){        
+                      $('#modal_instance').modal('hide');
+                      $('#tb #'+id).remove();            
+                      $.jGrowl('Terminal deleted successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                      });
+                      window.location.reload();
+                   // $("#mydiv").load(location.href + " #mydiv");
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Error deleting Terminal', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            });
+
+  });
+
+</script>
+{% endblock %}

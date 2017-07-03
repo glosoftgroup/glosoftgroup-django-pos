@@ -1,0 +1,162 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Edit Terminal
+{% endblock %}
+
+{% block menu_terminal_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Update Terminal Details</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+        <div class="tabbable">
+          <ul class="nav nav-tabs nav-tabs-highlight">
+            <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">edit terminal profile</a></li>            
+
+          </ul>
+
+          <div class="tab-content">
+
+            <div class="tab-pane animated fadeIn active" id="profile">
+              <form class="form" enctype="multipart/form-data" id="update-details" name="update-details">
+              {% csrf_token %}
+          <div class="row">
+            
+            <div class="col-md-8">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="{{ user.terminal_name}}">
+                  </div>
+                  
+                   <div class="form-group">
+                    <label for="exampleInputPassword1">Terminal No.:</label>
+                    <input type="text" class="form-control" name="nid" id="nid" placeholder="Terminal Number" value="{{ user.terminal_number }}">
+                   </div>
+                </div>
+                <div class="col-md-6">   
+                  
+                   
+                </div>
+              </div>
+              
+             
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+             <div class="pull-right" style="margin-top:40px;">
+              <a href="{% url 'dashboard:terminals' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+              <!-- <button class="btn btn-primary waves-effect waves-light" onclick="return false" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button> -->
+              <button  class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Update Terminal<i class="icon-arrow-right14 position-right"></i></button>
+             </div>
+            </div>
+          </div>
+        </form>
+            </div>
+            
+
+          </div>
+        </div>
+      </div>
+<!--       <div class="panel-footer">
+      <button class="btn btn-primary disabled">checki this</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block custom_js %}
+<script type="text/javascript">
+
+function disable_profile_tab(){
+  $('#rofile-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
+}
+/* code to move to next tab */
+function next_tab(){
+  $('#profile').removeClass('active');
+  $('#profile-tab').removeClass('active');
+  $('#permissions').addClass('active');
+  $('#permissions-tab').addClass('active');
+}
+
+/* update user details */
+  $('#update-details').validate({
+    rules:{
+        name: {
+          required:true,
+          minlength:3
+        },     
+        
+        nid:{
+          required:true,
+          digits: true,
+          minlength: 1
+        },
+       
+    },
+    messages:{
+      name:{
+        required: "please provide a name",
+        minlength: "name must be atleast 3 characters long"
+      }
+    },
+    submitHandler: function() {         
+        var f = document.getElementById('update-details');
+        var formData = new FormData(f);
+        if (formData) {
+              $.ajax({
+                  url: "{% url 'dashboard:terminal-update' pk=user.pk %}",
+                  type: "POST",
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success:function(data){
+                     console.log(data);             
+
+                     $.jGrowl('Updated successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                     });
+                     window.location = "{% url 'dashboard:terminals' %}";
+                  },
+                  error:function(error){
+                    console.log(error);
+                    $.jGrowl('Change a few things up and try submitting again', {
+                        header: 'Oh snap!',
+                        theme: 'bg-danger'
+                    });
+                  }
+              });
+          } 
+    }
+  });
+
+
+</script>
+{% endblock %}
