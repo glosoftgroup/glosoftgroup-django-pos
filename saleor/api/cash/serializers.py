@@ -84,8 +84,15 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 
 	def validate_amount(self,value):
 		data = self.get_initial()
-		terminal = int(data.get('terminal'))
+		terminal_id = int(data.get('terminal'))
 		self.amount = Decimal(data.get('amount'))
+		self.type = str(data.get('trans_type'))
+		if self.type != 'deposit' and self.type != 'withdraw':
+			raise PermissionDenied('Transaction type error!')
+		if self.type == 'withdraw':
+			self.terminal = Terminal.objects.get(pk=terminal_id)
+			if self.terminal.amount < self.amount:
+				raise PermissionDenied('Insufficient cash in drawer!')				
 		return value
 
 	def validate_trans_type(self,value):	
@@ -101,16 +108,16 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 		"""
 		trans_type = str(validated_data['trans_type'])
 		amount = validated_data['amount']	
-		terminal = Terminal.objects.get(pk=self.terminal_id)	
+		#terminal = Terminal.objects.get(pk=self.terminal_id)	
 		if trans_type == 'deposit':
-			terminal.amount += Decimal(amount)			
-			terminal.save()
+			self.terminal.amount += Decimal(amount)			
+			self.terminal.save()
 		elif trans_type == 'withdraw':
-			print 'pending....'
-			
+			self.terminal.amount -= Decimal(amount)	
+			self.terminal.save()		
 
 		manager = self.manager
-		terminal = validated_data['terminal']				
+		terminal = validated_data['terminal']
 		user = validated_data['User']	
 
 		drawer = DrawerCash.objects.create(manager=manager,										   
@@ -120,10 +127,3 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 										   trans_type=trans_type)
 		print drawer		
 		return validated_data
-		
-			
-			
-		
-
-
-

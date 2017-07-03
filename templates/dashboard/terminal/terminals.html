@@ -93,7 +93,8 @@
                     <th>#ID</th>
                     <th>Till Id</th>                 
                     <th>Till Name</th>
-                    <th>Transactions</th>
+                    <th>Cash movements</th>
+                    <th>Sales</th>
                     <th>Amount</th>                          
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <th class="text-center">Actions</th>
@@ -117,9 +118,15 @@
                     </td>
                     <!-- transactions -->
                     <td>
-                     <span class="text-bold label bg-indigo-800">
+                     <span class="text-bold label bg-indigo-800">           
                       {{ user.get_transations}}
                      </span>
+                    </td>
+                    <!-- sales -->
+                    <td>
+                    <span class="text-bold label bg-indigo-800">
+                      {{ user.get_sales }}
+                      </span>
                     </td>
                     <!-- amount -->
                     <td>

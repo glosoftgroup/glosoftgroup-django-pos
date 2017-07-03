@@ -48,6 +48,8 @@ class Terminal(models.Model):
 
 	def get_transations(self):
 		return len(self.terminals.all())
+	def get_sales(self):
+		return len(self.terminal_sales.all())
 
 
 @python_2_unicode_compatible
