@@ -193,7 +193,7 @@ INSTALLED_APPS = [
 	'webpack_loader',
 	'social_django',
 	'django_countries',
-	'rest_framework.authtoken',
+	'rest_framework.authtoken'
 ]
 
 LOGGING = {
@@ -338,7 +338,6 @@ BOOTSTRAP3 = {
 
 TEST_RUNNER = ''
 ALLOWED_HOSTS = ['*']
-#ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '192.168.0.17').split()
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

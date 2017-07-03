@@ -21,6 +21,43 @@
 							</label>
 						</div>                                  
 			</div>
+	        <div class="col-md-12">
+	           <div class="form-group">
+	           {% for permission in permissions%}
+	            {% if permission.content_type.model ==  'unused' %}
+	                    {% if permission in group_permissions %}                          
+	                        <div class="checkbox">
+								<label>
+								<div class="checker">
+									<span class="checked">
+										<input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+									</span>
+									</div>
+									{{permission.name}}
+								</label>
+								<span id="granted" class="granted text-success">(granted)</span>
+							</div>
+	                    {% else %}
+	                        <div class="checkbox">
+								 <label>
+								 <div class="checker">
+										<span class="">   
+										 <input class="styled check" type="checkbox" 
+										value="{{permission.id}}">
+										</span>
+									</div>
+										 {{permission.name}}
+								 </label>
+								 <span id="granted" class="granted text-success"></span>
+							 </div>
+	                    {% endif %}
+	                {% else %}
+	                {% endif %}
+	              {% endfor %}
+	              
+	           </div>
+	        </div>
+
 
 			 <div class="col-md-12">
 			 <h5>Inventory Management</h5>

@@ -31,6 +31,27 @@
   </style>
  {% endblock %}
 <div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+
+          <div class="col-md-12">
+
+            <div class="col-md-10 col-md-offset-1">
+                <canvas id="dateChart" width="900" height="400"></canvas>
+                <div class="text-center"><span style="color: #72726d;">Hours in {{date}}</span></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+   </div>
+  </div>
+
+<div class="col-md-12">
   <div class="panel panel-flat">
     <div class="panel-body">
      <div class="row">
@@ -362,8 +383,40 @@
    <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
 <script type="text/javascript">
 $(document).ready(function(){
+    // setChart();
+    var defaultData = [{% for d in default3 %} {{ d }}, {% endfor %}];
+    var labels = [{% for i in labels3 %} "{{ i }}", {% endfor %}];
+    var ctx = document.getElementById("dateChart").getContext('2d');
+    var dateChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Sales in (Kshs)',
+                data: defaultData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        }
 
- //**@ chart
+    });
+
+    //**@ chart
  var customTooltips = function (tooltip) {
       $(this._chart.canvas).css("cursor", "pointer");
 

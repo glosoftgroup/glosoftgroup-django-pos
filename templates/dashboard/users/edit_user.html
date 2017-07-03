@@ -85,7 +85,7 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" class="form-control" name="name" id="name" placeholder="{{ user.name}}">
+                    <input type="text" class="form-control" name="name" id="name" value="{{ user.name}}">
                   </div>
                   <div class="form-group">
                     <label for="password">Password</label>
@@ -93,13 +93,13 @@
                    </div>
                    <div class="form-group">
                     <label for="exampleInputPassword1">National ID No:</label>
-                    <input type="text" class="form-control" name="nid" id="nid" placeholder="{{ user.nid}}">
+                    <input type="text" class="form-control" name="nid" id="nid" value="{{ user.nid}}">
                    </div>
                 </div>
                 <div class="col-md-6">
                    <div class="form-group">
                       <label for="email">Email address</label>
-                      <input type="email" class="form-control" name="email" id="email" placeholder="{{ user.email}}">
+                      <input type="email" class="form-control" name="email" id="email" value="{{ user.email}}">
                    </div>
                    <div class="form-group">
                     <label for="confirm_password">Confirm Password</label>
@@ -107,8 +107,26 @@
                    </div>
                    <div class="form-group">
                     <label for="mobile">Phone</label>
-                    <input type="text" class="form-control" name="mobile" id="mobile" placeholder="{{ user.mobile}}">
+                    <input type="text" class="form-control" name="mobile" id="mobile" value="{{ user.mobile}}">
                    </div>
+                </div>
+                <div class="col-md-12">
+                   <div class="form-group">
+                    <label>Click to Select Groups</label>
+                    <select multiple="" class="select-border-color border-warning select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+                        {% if groups %}
+                          {% for group in groups %}
+                              {% if group in user_groups %}
+                                  <option value="{{group.name}}" selected="selected"> 
+                                   {{ group.name }}
+                                  </option>
+                              {% else %}
+                                   <option value="{{group.name}}">{{group.name}}</option>
+                              {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                    </select>
+                  </div>
                 </div>
               </div>
               
@@ -117,10 +135,9 @@
           </div>
           <div class="row">
             <div class="col-md-12">
-            <button class="btn btn-primary sth"> click</button>
              <div class="pull-right" style="margin-top:40px;">
               <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
-              <!-- <button class="btn btn-primary waves-effect waves-light" onclick="return false" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button> -->
+
               <button class="btn btn-primary waves-effect waves-light" id="submit" type="button">Update User <i class="icon-arrow-right14 position-right"></i></button>
              </div>
             </div>
@@ -132,13 +149,25 @@
                 <p class="content-group">Define user permissions by ticking on particular access options. User : <input class="user_id" type="hidden" name="user_id" value=""></p>
                 <p> 
                   <label class="display-block text-semibold">System Permission Default</label>
-                  <div class="checkbox">
-                    <label>
-                      <div class="checker"><input class="styled" id="can-login" checked="checked" type="checkbox" value="active"></div>
-                      can login
-                    </label>
-                    <span id="granted" class="text-success">(granted)</span>
-                  </div>
+                 
+                  {% if user.is_staff and user.is_active %}                          
+                      <div class="checkbox">
+                        <label>
+                          <input class="styled" id="can-login" checked="checked" type="checkbox" value="active">
+                          can login
+                        </label>
+                        <span id="granted" class="text-success">(granted)</span>
+                      </div>
+                  {% else %}
+                      <div class="checkbox">
+                        <label>
+                          <input class="styled checks" id="can-login" type="checkbox"" value="active">
+                          can login
+                        </label>
+                        <span id="granted" class="granted text-success"></span>
+                      </div>
+                  {% endif %}
+
                 </p>
                 <p>
                   <div class="checkbox">
@@ -156,7 +185,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -191,7 +220,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -221,7 +250,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -250,7 +279,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -278,7 +307,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -308,7 +337,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -336,7 +365,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -364,7 +393,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -393,7 +422,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -423,7 +452,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -451,7 +480,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -487,7 +516,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -508,7 +537,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -536,7 +565,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -564,7 +593,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -592,7 +621,7 @@
                             {% if permission in user_permissions %}                          
                                 <div class="checkbox">
                                   <label>
-                                    <input class="styled check" id="can-login" checked="checked" type="checkbox" value="{{permission.id}}">
+                                    <input class="styled check" checked="checked" type="checkbox" value="{{permission.id}}">
                                     {{permission.name}}
                                   </label>
                                   <span id="granted" class="granted text-success">(granted)</span>
@@ -624,17 +653,22 @@
           </div>
         </div>
       </div>
-<!--       <div class="panel-footer">
-      <button class="btn btn-primary disabled">checki this</button>
-      </div> -->
     </div>
   </div>
 </div>
 {% endblock%}
 {% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
 <script type="text/javascript">
+
 $(document).ready(function(){
-    // alert('hey');
+  $('.select-border-color').select2({
+        dropdownCssClass: 'border-primary',
+        containerCssClass: 'border-primary text-primary-700'
+        // containerCssClass: 'select-lg'
+    });
     $('#update-details').validate({
       onkeyup: function(element) {$(element).valid()},
       onsubmit: false,
@@ -684,7 +718,9 @@ $(document).ready(function(){
         }
     });
     $('#submit').click(function(){
-         // $('#email-field-only').valid();
+        var raw_groups = $(".select-border-color :selected").map(function(){
+               return $(this).val();
+            }).get();
         var user_name, user_email, user_password, user_nid, user_mobile;
 
         var name= $('#name').attr('placeholder'), email= $('#email').attr('placeholder'), nid= $('#nid').attr('placeholder'), mobile= $('#mobile').attr('placeholder'), password = $('#password').attr('pas');
@@ -706,6 +742,9 @@ $(document).ready(function(){
         formData.append("user_password", user_password);
         formData.append("user_nid", user_nid);
         formData.append("user_mobile", user_mobile);
+        for (var i = 0; i < raw_groups.length; i++) {
+              formData.append('groups[]', raw_groups[i]);
+          }
 
         if (formData) {
               $.ajax({
@@ -753,20 +792,21 @@ function next_tab(){
 $("#can-login").click(function () {
   var checked = $(this).is(':checked');
   if(checked){
-      $('.check').each(function(){
-          $(this).prop("checked", true);          
+          $(this).prop("checked", true);
+          $(this).parent().parent().parent().siblings('span').show();
+          $(this).parent().parent().parent().siblings('span').text('(granted)');
+      $('.check').each(function(){         
           $(this).parent().parent().removeClass('disabled');
           $(this).parent().parent().parent().parent().removeClass('disabled');
-          $(this).parent().addClass('checked');
           $(this).removeAttr('disabled');
       });
   }else{
-      $('.check').each(function(){
           $(this).prop("checked", false);
+          $(this).parent('span').removeClass('checked');
           $(this).parent().parent().parent().siblings('span').hide();
+      $('.check').each(function(){
           $(this).parent().parent().addClass('disabled');
           $(this).parent().parent().parent().parent().addClass('disabled');
-          $(this).parent().removeClass('checked');
           $(this).attr('disabled', 'disabled');
       });
   }
@@ -836,7 +876,7 @@ $("#permission-btn").click(function(event){
               header: 'Well done!',
               theme: 'bg-success'
          });
-         window.location = "{% url 'dashboard:users' %}";
+         // window.location = "{#{% url 'dashboard:users' %}#}";
          localStorage.removeItem('user_id');
       }
       ,error:function(){}

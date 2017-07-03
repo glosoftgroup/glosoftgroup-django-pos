@@ -33,6 +33,7 @@ django-webpack-loader==0.4.1
 django==1.10.7
 djangorestframework==3.5.3
 djangorestframework-jwt==1.10.0
+django-xhtml2pdf==0.0.3
 docutils==0.13.1          # via botocore
 elasticsearch==2.4.1
 faker==0.7.7

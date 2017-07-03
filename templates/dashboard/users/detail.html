@@ -84,16 +84,18 @@
                   <div class="panel-body">
                     <div class="row">
                       <div class="col-sm-12">
-                        <h6 class="text-semibold no-margin-top">Permissions</h6>
-                        <ul class="list list-unstyled">
-                        {% if permissions %}
-                           {% for permission in permissions %}
-                           <li>{{ permission.name }}</li>
-                           {% endfor %}
-                        {% else %}
-                            <li><span class="text-semibold"> No permissions assigned</span></li>
-                        {% endif %}
-                        </ul>
+                        <div style="overflow-y: auto; max-height:400px;">
+                          <h6 class="text-semibold no-margin-top">Permissions</h6>
+                          <ul class="list list-unstyled">
+                          {% if all_permissions %}
+                             {% for permission in all_permissions %}
+                             <li>{{ permission.name }}</li>
+                             {% endfor %}
+                          {% else %}
+                              <li><span class="text-semibold"> No permissions assigned</span></li>
+                          {% endif %}
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>

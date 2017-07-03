@@ -120,7 +120,6 @@
                     <div class="col-md-12">
                      <div class="pull-right" style="margin-top:40px;">
                       <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
-                      <!-- <button class="btn btn-primary waves-effect waves-light" onclick="return false" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button> -->
                       <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button>
                      </div>
                     </div>
@@ -133,19 +132,12 @@
                 <p> 
                   <label class="display-block text-semibold">System Permission Default</label>
                   <div class="checkbox">
-                            <label>
-                              <input class="styled checks" id="can-login" type="checkbox"" value="active">
-                              can login
-                            </label>
-                            <span id="granted" class="granted text-success"></span>
-                          </div>
-                  <!-- <div class="checkbox">
                     <label>
-                      <div class="checker"><input class="styled" id="can-login" checked="checked" type="checkbox" value="active"></div>
+                      <input class="styled checks" id="can-login" type="checkbox"" value="active">
                       can login
                     </label>
-                    <span id="granted" class="text-success">(granted)</span>
-                  </div> -->
+                    <span id="granted" class="granted text-success"></span>
+                  </div>
                 </p>
                 <p>
                   <div class="checkbox">
@@ -459,9 +451,7 @@
 </div>
 {% endblock%}
 {% block custom_js %}
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
-
- 
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript">
 /* disable th permissions tab code */
@@ -501,28 +491,6 @@ $("#can-login").click(function () {
       });
   }
 });
-
-// $("#can-login").click(function () {
-//   var checked = $(this).is(':checked');
-//   if(checked){
-//       $('.check').each(function(){
-//           $(this).prop("checked", true);          
-//           $(this).parent().parent().removeClass('disabled');
-//           $(this).parent().parent().parent().parent().removeClass('disabled');
-//           $(this).parent().addClass('checked');
-//           $(this).removeAttr('disabled');
-//       });
-//   }else{
-//       $('.check').each(function(){
-//           $(this).prop("checked", false);
-//           $(this).parent().parent().parent().siblings('span').hide();
-//           $(this).parent().parent().addClass('disabled');
-//           $(this).parent().parent().parent().parent().addClass('disabled');
-//           $(this).parent().removeClass('checked');
-//           $(this).attr('disabled', 'disabled');
-//       });
-//   }
-// });
 /* end login */
 /* check all */
 $("#checkAll").click(function () {
@@ -609,8 +577,6 @@ $( ".check" ).on( "click", function(){
       var raw_groups = $("#multiple :selected").map(function(){
                return $(this).val();
             }).get();
-      var groups = raw_groups.map(Number);
-      console.log(groups);
 
       if(file != ''){
           var f = document.getElementById('user-details');

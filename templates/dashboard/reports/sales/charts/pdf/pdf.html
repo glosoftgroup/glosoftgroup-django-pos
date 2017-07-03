@@ -1,0 +1,144 @@
+ {% load staticfiles %}
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+ <html>
+    <link href='https://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
+     <head>
+         <title>Users Report</title>
+         <style type="text/css">
+             body {
+                   font-family: 'Nunito', sans-serif;
+                   color: #384047;
+             }
+             .header {
+                 font-size: 15px;
+                 font-weight: 100;
+                 text-align: center;
+                 color: #007cae;
+             }
+             .title {
+                 font-size: 16px;
+                 font-weight: 100;
+                /* text-align: right;*/
+                padding: 10px 20px 0px 20px;  
+             }
+             .title span {
+                 color: #007cae;
+             }
+             .detailss {
+                 padding: 10px 20px 0px 20px;
+                 text-align: left !important;
+                 /*margin-left: 40%;*/
+             }
+             .hrItem {
+                 border: none;
+                 height: 1px;
+                 /* Set the hr color */
+                 color: #333; /* old IE */
+                 background-color: #fff; /* Modern Browsers */
+             }
+             .img-circle{
+              border-radius: 50%;
+             }
+             table {
+              max-width: 960px;
+              margin: 10px auto;
+            }
+            th {
+                  font-weight: 400;
+                  background: #1779c6;
+                  color: #FFF;
+                }
+             .td{text-align: center;}
+             tr{padding:5px;}
+            .foot{padding-top:30px;}
+            .foot p{ color: #007cae;font-size: 12px;}
+            .chart{width:500px;height: 400px;}
+         </style>
+     </head>
+     <body>
+         <div class='wrapper'>
+             <div class='header'>
+                 <p class='title'>Users Report <br>
+                   <span style="font-size: 0.8em;">{{today | date:'d-m-Y'}}</span>
+                 </p>
+             </div>
+         <div>
+         <div class='details'>
+            <table class="table table-bordered table-hover datatable-header-footer" style="border:0.5px solid #ddd;"> 
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>User Role</th>
+                  </tr>
+                </thead>
+                <tbody id="tb">           
+               {% if users %}
+                  {% for user in users%}
+                  <tr class='clickable-row' id="{{user.pk }}">
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                     <!-- product name -->
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.name}}</td>
+                    <!-- product category -->
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.email}}
+                    </td>
+                    <!-- role -->
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}"> 
+                    {% if user.is_superuser == True %}admin{% else %} staff {% endif %}</td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                   <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
+               {% endif %}
+                  </tbody>
+           </table>
+         </div>
+         <div class="foot">
+             <p style="text-align: center;">Report Pulled by: {% if puller.email %}{{ puller.email }} {% else %} {{ puller.name }}{% endif %}</p>
+         </div>
+         <div class="chart">
+         hello
+              <iframe id="myChart" width="400" height="400"></iframe>
+         </div>
+        <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/chart.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
+        <script type="text/javascript">
+          $(document).ready(function(){
+            $('.chart').html('mamabo');
+              var ctx = document.getElementById("myChart").getContext('2d');
+              var myChart = new Chart(ctx, {
+                  type: 'doughnut',
+                  data: {
+                      labels: ['mon','tue','wed','thurs','fri','sat'],
+                      datasets: [{
+                          label: 'Amount of sale',
+                          data: [23,12,43,1,23,56],
+                          backgroundColor: [
+                              'rgba(255, 99, 132, 0.2)',
+                              'rgba(54, 162, 235, 0.2)',
+                              'rgba(255, 206, 86, 0.2)',
+                              'rgba(75, 192, 192, 0.2)',
+                              'rgba(153, 102, 255, 0.2)',
+                              'rgba(255, 159, 64, 0.2)'
+                          ],
+                          borderColor: [
+                              'rgba(255,99,132,1)',
+                              'rgba(54, 162, 235, 1)',
+                              'rgba(255, 206, 86, 1)',
+                              'rgba(75, 192, 192, 1)',
+                              'rgba(153, 102, 255, 1)',
+                              'rgba(255, 159, 64, 1)'
+                          ],
+                          borderWidth: 1
+                      }]
+                  },
+                  options:{
+                    animation:false
+                  }
+              });
+          });
+        </script>
+
+     </body>
+ </html>

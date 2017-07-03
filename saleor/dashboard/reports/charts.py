@@ -23,6 +23,8 @@ from django.utils.dateformat import DateFormat
 import logging
 import random
 from decimal import Decimal
+from calendar import monthrange
+from django_xhtml2pdf.utils import generate_pdf
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -30,8 +32,9 @@ from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem
 from ...product.models import Product, ProductVariant
 from ...decorators import permission_decorator, user_trail
+from ...utils import render_to_pdf, convert_html_to_pdf
 
-from .hours_chart import get_hours_results, get_hours_results_range
+from .hours_chart import get_hours_results, get_hours_results_range, get_date_results_range, get_date_results
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -40,6 +43,17 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def sales_date_chart(request):
 	return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_date.html', {})
+
+
+def chart_pdf(request):
+	users = User.objects.all()
+	data = {
+		'today': date.today(), 
+		'users': users,
+		'puller': request.user
+		}
+	pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
+	return HttpResponse(pdf, content_type='application/pdf')
 
 def get_sales_charts(request):
 	label = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"]
@@ -56,6 +70,7 @@ def get_sales_charts(request):
 		 "todays_sales": serializers.serialize('json', todays_sales),
 	}
 	return JsonResponse(data)
+
 def get_sales_by_date(request):
 	date = request.GET.get('date')
 	if date:
@@ -79,9 +94,6 @@ def get_sales_by_date(request):
 
 			no_of_customers = Sales.objects.filter(created__contains=date).count()
 			prevno_of_customers = Sales.objects.filter(created__contains=prevdate).count()
-			# if no_of_customers is None and prevno_of_customers is None:
-			# 	customer_diff = 0
-			# else:
 			try:
 				customer_diff = int(((Decimal(no_of_customers) - Decimal(prevno_of_customers))/Decimal(prevno_of_customers))*100)
 			except:
@@ -201,19 +213,81 @@ def get_sales_by_week(request):
 	d_to = request.GET.get('to')
 	date = d_to
 
-	day_s = d_to.split('-')[-1]
-	day_one = int(day_s)+1
+	d = d_to.split('-')[-1]
+	day_one = int(d)+1
 
-	if len(str(day_one)) == 1:
-		date_to = date2.replace(d_to[-2:], str('0'+str(day_one)))
+	m = d_to.split('-')[-2]
+	y = d_to.split('-')[-3]
+
+	lastday_of_month = monthrange(int(y),int(m))[1]
+	'''
+		** - subtract number of days
+	'''
+	firstday_of_thisweek = datetime.datetime.strptime(date_from, '%Y-%m-%d')
+	lastday_of_lastweek = firstday_of_thisweek - timedelta(days=(firstday_of_thisweek.weekday())+1)
+	firstday_of_lastweek = lastday_of_lastweek - timedelta(days=7)
+	# day differeces
+	first_range_date = datetime.datetime.strptime(date_from, '%Y-%m-%d')
+	second_range_date = datetime.datetime.strptime(d_to, '%Y-%m-%d')
+	onedd = first_range_date + timedelta(days=1)
+	'''
+		s = Sales.objects.filter(created__year='2017', created__month='06', created__month__lte='08')
+	'''
+	date_range_diff = (second_range_date - first_range_date).days
+	default3 = []
+	labels3 = []
+	print date_range_diff
+	if date_range_diff <= 8:
+		for i in reversed(range(0, (date_range_diff)+1, 1)):
+			p = (second_range_date) - timedelta(days=i)
+			print str(p)+'on '+ str(p.strftime("%A"))
+			amount = get_date_results(DateFormat(p).format('Y-m-d'))
+			day = str(p.strftime("%A")[0:3])+ ' ('+str(DateFormat(p).format('jS F'))+')'
+			labels3.append(day)
+			default3.append(amount)
+		print labels3
+		print default3
+
+	elif 8 < date_range_diff <= 10:
+		for i in reversed(range(0, (date_range_diff)+1, 1)):
+			p = (second_range_date) - timedelta(days=i)
+			print str(p)+'on '+ str(p.strftime("%A"))
+			amount = get_date_results(DateFormat(p).format('Y-m-d'))
+			day = str(p.strftime("%A")[0:3])+ ' (*'+str(DateFormat(p).format('jS'))+')'
+			labels3.append(day)
+			default3.append(amount)
+		print labels3
+		print default3
+	elif 20 < date_range_diff <= 31:
+		for i in reversed(range(0, (date_range_diff)+1, 1)):
+			p = (second_range_date) - timedelta(days=i)
+			print str(p)+'on '+ str(p.strftime("%A"))
+			amount = get_date_results(DateFormat(p).format('Y-m-d'))
+			day =  str(DateFormat(p).format('jS'))
+			labels3.append(day)
+			default3.append(amount)
+		print labels3
+		print default3
+
+	elif 360 < date_range_diff <= 365:
+		date_range_diff
+
+	if len(str(int(d))) == 1:
+		date_to = date.replace(d_to[-2:], str('0'+str(day_one)))
 	else:
-		date_to = date.replace(d_to[-2:], str(day_one))
+		if int(d) == lastday_of_month:
+			date_to = date.replace(d_to[-2:], str(d))
+		else:
+			date_to = date.replace(d_to[-2:], str(day_one))
 
 	try:
-		td_sales = Sales.objects.filter(created__range=[date_from, date_to]).order_by('-id')[:1]
-		for dt in td_sales:
-			seld = dt.created
-		selected_sales_date = DateFormat(seld).format('jS F Y')
+		td_sales = Sales.objects.filter(created__contains=date).order_by('-id')[:1]
+		if td_sales:
+			for dt in td_sales:
+				seld = dt.created
+			selected_sales_date = DateFormat(seld).format('jS F Y')
+		else:
+			selected_sales_date = date
 		prev_sales = Sales.objects.filter(created__lte=date)[:1]
 		if prev_sales:
 			for dt in prev_sales:
@@ -225,12 +299,18 @@ def get_sales_by_week(request):
 			previous_sales_date = selected_sales_date
 
 		no_of_customers = Sales.objects.filter(created__range=[date_from, date_to]).count()
-		prevno_of_customers = Sales.objects.filter(created__contains=prevdate).count()
-		customer_diff = int(((Decimal(no_of_customers) - Decimal(prevno_of_customers))/Decimal(prevno_of_customers))*100)
+		prevno_of_customers = Sales.objects.filter(created__month=str(int(m)-1)).count()
+		try:
+			customer_diff = int(((Decimal(no_of_customers) - Decimal(prevno_of_customers))/Decimal(prevno_of_customers))*100)
+		except:
+			customer_diff = 0
 
 		date_total_sales = Sales.objects.filter(created__range=[date_from, date_to]).aggregate(Sum('total_net'))['total_net__sum']
-		prevdate_total_sales = Sales.objects.filter(created__contains=prevdate).aggregate(Sum('total_net'))['total_net__sum']
-		sales_diff = int(((Decimal(date_total_sales) - Decimal(prevdate_total_sales))/Decimal(prevdate_total_sales))*100)
+		prevdate_total_sales = Sales.objects.filter(created__range=[(DateFormat(firstday_of_lastweek).format('Y-m-d')), (DateFormat(lastday_of_lastweek).format('Y-m-d')) ]).aggregate(Sum('total_net'))['total_net__sum']
+		try:
+			sales_diff = int(((Decimal(date_total_sales) - Decimal(prevdate_total_sales))/Decimal(prevdate_total_sales))*100)
+		except:
+			sales_diff = 0
 
 		items = SoldItem.objects.filter(sales__created__range=[date_from, date_to])
 		# to get all items and their totals
@@ -323,6 +403,8 @@ def get_sales_by_week(request):
 			"default":default,
 			"labels2":labels2,
 			"default2":default2,
+			"labels3":labels3,
+			"default3":default3,
 			"cashiers":users_that_day,
 			"users":users,
 			"top_items":top_items,
@@ -331,9 +413,9 @@ def get_sales_by_week(request):
 			"customer_percent":customer_diff,
 			"prevdate_total_sales":prev_sales
 		}
-		return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html',data)
+		return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date_range.html',data)
 	except ObjectDoesNotExist as e:
-		return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html',{"error":e, "date":date})
+		return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date_range.html',{"error":e, "date":date})
 
 
 
