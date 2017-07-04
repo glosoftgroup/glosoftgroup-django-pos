@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import messages, auth
-# from django.contrib.auth import views as django_views
+from django.contrib.auth import views as django_views
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
@@ -30,7 +30,6 @@ def login(request):
 		if user.is_active:
 			auth.login(request, user)
 			user_trail(request.user,"logged in ", "login")
-			# return redirect('dashboard:index')
 			return HttpResponse('success')
 		else: 
 			return HttpResponse('cannot login')

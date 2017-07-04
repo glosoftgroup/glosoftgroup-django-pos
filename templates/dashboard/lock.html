@@ -1,15 +1,13 @@
-
+<!DOCTYPE html>
 {% load staticfiles i18n %}
 {% load render_bundle from webpack_loader %}
 {% load version %}
-{% load bootstrap_form from bootstrap3 %}
 
-<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}" class="no-js">
   <head>
     <title>
       {% block title %}
-        {% trans "Change Password" context "Password reset from key page title" %}
+        {% trans "Locked" context "Dashboard default page title" %}
       {% endblock %}
     </title>
     {% block meta %}
@@ -19,6 +17,10 @@
 
     {% include 'favicon.html' %}
     
+    
+   
+    
+
     <!-- Global stylesheets -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/icons/icomoon/styles.css' %}" rel="stylesheet" type="text/css">
@@ -31,6 +33,8 @@
    <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
   <!--image preview -->
   <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">
+  <!-- bootstrap select -->
+  <!-- <link href="{% static 'backend/js/plugins/ui/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" type="text/css"> -->
   
   
   <!-- /global stylesheets -->
@@ -52,34 +56,43 @@
         <!-- Content area -->
         <div class="content">
 
-
-          {% if token_fail %}
-              <div class="col-sm-12">
-                <h2>{% trans "Bad Token" %}</h2>
-                {% url 'account_reset_password' as passwd_reset_url %}
-                <p>{% blocktrans trimmed context "Password reset text if key is invalid" %}
-                  The password reset link was invalid, possibly
-                  because it has already been used.<br>
-                  Please request a
-                  <a href="{{ passwd_reset_url }}">new password reset</a>.{% endblocktrans %}
-                </p>
+          <!-- Simple login form -->
+          <form name="loginForm" id="loginForm">
+            {% csrf_token %} 
+            <div class="panel panel-body login-form animated bounceIn">
+              <div class="text-center">
+                <img src="{{request.user.image.url }}" alt="" class="img-circle" style="width: 150px;height: 150px;margin-top: 7px;" />
+                 <h6 class="content-group text-center text-semibold no-margin-top">{{ request.user.name }} <small class="display-block">Unlock your account</small></h6>
+                 <h6></h6>
               </div>
-            {% else %}
-              <form method="post" novalidate>
-                  {% csrf_token %}
-                <div class="panel panel-body login-form">
-                  <div class="text-center">
-                    <div class="icon-object border-info text-info"><i class="icon-pencil4"></i></div>
-                    <h5 class="content-group">{% trans "Password Reset" context "Password reset from key form title" %} <small class="display-block"><p>{% trans "Now you can set new password for you account." context "Password reset from key form title" %}</p></small></h5>
-                  </div>
+              <div id="status" class="alert bg-danger animated slideInUp" style="display: none;">
+                <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                <span class="status_text">Oops! Wrong Password.</span>
+              </div>
 
-                  {% bootstrap_form form %}
-
-                  <button type="submit" class="btn bg-info-400 btn-block legitRipple">{% trans "Continue" context "Password reset from key form primary action" %} <i class="icon-arrow-right14 position-right"></i></button>
+              <div class="form-group has-feedback has-feedback-left">
+                <input type="password" name="password" class="form-control password" placeholder="Password">
+                <div class="form-control-feedback">
+                  <i class="icon-user-lock text-muted"></i>
                 </div>
-              </form>
+              </div>
+              <input type="hidden" name="email" value="{{request.user.email}}">
+              <input type="hidden" name="next" value="{{ request.GET.next }}">
 
-            {% endif %}
+              <div class="form-group">
+                <button type="submit" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i><br><i class="fa fa-spinner fa-spin fa-2x fa-fw position-right spinner" style="display: none;"></i></button>
+              </div>
+              <div class="text-center">
+                <a class="link--styled" href="{% url 'account_reset_password' %}">
+                  {% trans "Forgot password?" context "Login form secondary link" %}
+                </a><br>
+                <a class="link--styled" href="{% url 'account_logout' %}">
+                  {% trans "Log Out" context "Login Out" %}
+                </a>
+              </div>
+            </div>
+          </form>
+          <!-- /simple login form -->
 
         </div>
         <!-- /content area -->
@@ -133,11 +146,51 @@
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
-  <!-- <script type="text/javascript" src="{% static 'backend/js/pages/components_pagination.js' %}"></script> -->
-    <!-- <script type="text/javascript" src="{% static 'backend/js/chart.js'%}"></script> -->
+   
+    
+    {% include "dashboard/includes/_messages.html" %}
+    <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
     {% block custom_js %}{% endblock %}
+    <script type="text/javascript">
+         $("#loginForm").submit(function(e)
+          {
+              $('.spinner').show();
+              var postData = $(this).serializeArray();
+              var formURL = "{% url 'lock_process' %}";
+
+              $.ajax(
+              {
+                  url : formURL,
+                  type: "POST",
+                  crossDomain: true,
+                  data : postData,
+                  success:function(data, textStatus, jqXHR) 
+                  {
+                      if(data == 'error login' || data == 'wrong credentials')
+                      {
+                          $('#status').show();
+                          $('.spinner').hide();
+                      }else{ 
+                         window.location = data;
+                         $('.email').val('');
+                         $('.password').val('');
+                         $('.spinner').hide();
+                       }
+
+                  },
+                  error: function(data) 
+                  {
+                    console.log(data);
+                      $('#status').show();
+                      $('.spinner').hide();  
+                  }
+              });
+              e.preventDefault(); //STOP default action
+          });
+
+        
+       // });
+    </script>
    </div>
   </body>
 </html>
-
-

@@ -59,17 +59,25 @@ if not EMAIL_URL and SENDGRID_USERNAME and SENDGRID_PASSWORD:
 		SENDGRID_USERNAME, SENDGRID_PASSWORD)
 email_config = dj_email_url.parse(EMAIL_URL or 'console://')
 
-EMAIL_FILE_PATH = email_config['EMAIL_FILE_PATH']
-EMAIL_HOST_USER = email_config['EMAIL_HOST_USER']
-EMAIL_HOST_PASSWORD = email_config['EMAIL_HOST_PASSWORD']
-EMAIL_HOST = email_config['EMAIL_HOST']
-EMAIL_PORT = email_config['EMAIL_PORT']
-EMAIL_BACKEND = email_config['EMAIL_BACKEND']
-EMAIL_USE_TLS = email_config['EMAIL_USE_TLS']
-EMAIL_USE_SSL = email_config['EMAIL_USE_SSL']
+# EMAIL_FILE_PATH = email_config['EMAIL_FILE_PATH']
+# EMAIL_HOST_USER = email_config['EMAIL_HOST_USER']
+# EMAIL_HOST_PASSWORD = email_config['EMAIL_HOST_PASSWORD']
+# EMAIL_HOST = email_config['EMAIL_HOST']
+# EMAIL_PORT = email_config['EMAIL_PORT']
+# EMAIL_BACKEND = email_config['EMAIL_BACKEND']
+# EMAIL_USE_TLS = email_config['EMAIL_USE_TLS']
+# EMAIL_USE_SSL = email_config['EMAIL_USE_SSL']
 
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
-ORDER_FROM_EMAIL = os.getenv('ORDER_FROM_EMAIL', DEFAULT_FROM_EMAIL)
+EMAIL_HOST_USER = 'alexkiburu@gmail.com'
+EMAIL_HOST_PASSWORD = 'unicorn-tech'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'alexkiburu@gmail.com'
+
+# DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+# ORDER_FROM_EMAIL = os.getenv('ORDER_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 
 
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
@@ -285,7 +293,7 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'userprofile.User'
 
-LOGIN_URL = '/account/login/'
+LOGIN_URL = '/'
 
 DEFAULT_COUNTRY = 'KE'
 DEFAULT_CURRENCY = 'KES'
