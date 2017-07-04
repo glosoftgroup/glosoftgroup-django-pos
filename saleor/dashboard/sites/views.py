@@ -20,13 +20,10 @@ def update(request, site_id=None):
     site = get_object_or_404(SiteSettings, pk=site_id)
     form = SiteSettingForm(request.POST or None, instance=site)
     authorization_qs = AuthorizationKey.objects.filter(site_settings=site)
-    formset = AuthorizationKeyFormSet(
-        request.POST or None, queryset=authorization_qs,
-        initial=[{'site_settings': site}])
-    if all([form.is_valid(), formset.is_valid()]):
+    if all([form.is_valid()]):
         site = form.save()
-        formset.save()
+        
         messages.success(request, _('Updated site %s') % site)
         return redirect('dashboard:site-update', site_id=site.id)
-    ctx = {'site': site, 'form': form, 'formset': formset}
+    ctx = {'site': site, 'form': form}
     return TemplateResponse(request, 'dashboard/sites/detail.html', ctx)

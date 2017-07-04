@@ -15,6 +15,7 @@ from ...sale.models import (
 			Sales, 
 			SoldItem,
 			Terminal)
+from ...site.models import SiteSettings
 from ...product.models import (
 			Product,
 			ProductVariant,
@@ -90,19 +91,17 @@ class SalesSerializer(serializers.ModelSerializer):
 
 	def create(self,validated_data):
 		# add sold amount to drawer	
-		total_net = validated_data.get('total_net')
+		total_net = Decimal(validated_data.get('total_net'))
 		terminal = Terminal.objects.get(pk=self.terminal_id)	
-		terminal.amount += Decimal(total_net)
-		# add terminal history	
-
-		terminal.save()
-		print terminal.pk
+		terminal.amount += Decimal(total_net)		
+		terminal.save()		
 		# calculate loyalty_points
 		customer = validated_data.get('customer')		
 		invoice_number = validated_data.get('invoice_number')
 		if customer:
 			total_net = validated_data.get('total_net')
-			points_eq = settings.LOYALTY_POINT_EQUIVALENCE
+			points_eq = SiteSettings.objects.get(pk=1)		
+			points_eq = points_eq.loyalty_point_equiv #settings.LOYALTY_POINT_EQUIVALENCE
 			loyalty_points = total_net/points_eq			
 			customer.loyalty_points += loyalty_points
 			customer.save()

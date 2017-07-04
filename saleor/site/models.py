@@ -4,6 +4,8 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import pgettext_lazy
 
 from . import AuthenticationBackends
+from decimal import Decimal
+from django.core.validators import MinValueValidator
 
 
 @python_2_unicode_compatible
@@ -11,13 +13,14 @@ class SiteSettings(models.Model):
     domain = models.CharField(
         pgettext_lazy('Site field', 'domain'), max_length=100,
         validators=[_simple_domain_name_validator], unique=True)
-
     name = models.CharField(pgettext_lazy('Site field', 'name'), max_length=50)
     header_text = models.CharField(
         pgettext_lazy('Site field', 'header text'), max_length=200, blank=True)
     description = models.CharField(
         pgettext_lazy('Site field', 'site description'), max_length=500,
         blank=True)
+    loyalty_point_equiv = models.IntegerField( pgettext_lazy('Site field', 'loyalty points equivalency'),
+        validators=[MinValueValidator(0)], default=Decimal(0)) 
 
     def __str__(self):
         return self.name
