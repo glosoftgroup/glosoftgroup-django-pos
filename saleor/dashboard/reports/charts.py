@@ -236,38 +236,28 @@ def get_sales_by_week(request):
 	date_range_diff = (second_range_date - first_range_date).days
 	default3 = []
 	labels3 = []
-	print date_range_diff
 	if date_range_diff <= 8:
 		for i in reversed(range(0, (date_range_diff)+1, 1)):
 			p = (second_range_date) - timedelta(days=i)
-			print str(p)+'on '+ str(p.strftime("%A"))
 			amount = get_date_results(DateFormat(p).format('Y-m-d'))
 			day = str(p.strftime("%A")[0:3])+ ' ('+str(DateFormat(p).format('jS F'))+')'
 			labels3.append(day)
 			default3.append(amount)
-		print labels3
-		print default3
 
 	elif 8 < date_range_diff <= 10:
 		for i in reversed(range(0, (date_range_diff)+1, 1)):
 			p = (second_range_date) - timedelta(days=i)
-			print str(p)+'on '+ str(p.strftime("%A"))
 			amount = get_date_results(DateFormat(p).format('Y-m-d'))
 			day = str(p.strftime("%A")[0:3])+ ' (*'+str(DateFormat(p).format('jS'))+')'
 			labels3.append(day)
 			default3.append(amount)
-		print labels3
-		print default3
 	elif 20 < date_range_diff <= 31:
 		for i in reversed(range(0, (date_range_diff)+1, 1)):
 			p = (second_range_date) - timedelta(days=i)
-			print str(p)+'on '+ str(p.strftime("%A"))
 			amount = get_date_results(DateFormat(p).format('Y-m-d'))
 			day =  str(DateFormat(p).format('jS'))
 			labels3.append(day)
 			default3.append(amount)
-		print labels3
-		print default3
 
 	elif 360 < date_range_diff <= 365:
 		date_range_diff
