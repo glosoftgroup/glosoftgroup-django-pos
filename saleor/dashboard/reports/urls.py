@@ -10,6 +10,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
 		url(r'^$', views.sales_reports, name='sales_reports'),
+		url(r'^sales/$', views.sales_list, name='sales_list'),
+		url(r'^detail/(?P<pk>[0-9]+)/$', views.sales_detail, name='sale-detail'),
 		url(r'^product_reports/$', views.product_reports, name='products_reports'),
 		url( r'^products_search/$', views.products_search, name = 'products_search' ),
 		url( r'^products_paginate/$', views.products_paginate, name = 'products_paginate' ),

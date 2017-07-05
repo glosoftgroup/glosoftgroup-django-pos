@@ -85,15 +85,13 @@
       <div class="panel-body">
         <div class="row">
           <div class="col-md-12">
-            <div class="table-responsives">     
+            <div class="table-responsives">
                 <table class="table table-bordered datatable-header-footer">
                   <caption style="margin-bottom: 10px;">
-                   </caption> 
+                   </caption>
                       <thead style="border-top:1px solid #ddd;">
                         <tr>
                           <th>Transaction Date</th>
-                          <th>Receipt No</th>
-                          <th>Client Name</th>
                           <th>Item Name</th>
                           <th>Unit Cost</th>
                           <th>Quantity</th>
@@ -105,8 +103,6 @@
                         {% for item in items %}
                           <tr>
                             <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
-                            <td>{{item.sales.invoice_number }}</td>
-                            <td>{% if item.sales.user.email %}{{item.sales.user.email}}{% else %}{{item.sales.user.name}}{% endif %}</td>
                             <td>{{item.product_name}}</td>
                             <td>{{item.unit_cost}}</td>
                             <td>{{item.quantity}}</td>
@@ -132,21 +128,15 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Todays Sales: Kshs 
-                    {% if tsum.total_net__sum %}
-                       {{tsum.total_net__sum}} 
-                    {% else %}
-                       0.00<br />
-                    {% endif %}<br />
-                   Total Sales: Kshs {{total_sales.total_net__sum}}<br />
-                   Total Tax: Kshs {{ total_tax.total_tax__sum}}
+                   Total Sales: Kshs {{total_sales_amount}}<br />
+                   Total Tax: Kshs {{ total_tax_amount}}
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
                   <span>Report pullled by User</span></p>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
                   <!--<button class="btn btn-primary ck">Click</button> -->
-                  
+
               </div>
              </div>
             </div>
@@ -161,7 +151,7 @@
 
 {% endblock%}
 {% block custom_js %}
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
@@ -173,7 +163,7 @@ $(document).ready(function(){
     $.ajax({ url: "{% url 'dashboard:sales_reports' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
          pagination_totalsize = data;
-    }}); 
+    }});
 
      $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
@@ -184,9 +174,9 @@ $(document).ready(function(){
             $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
-    }).children('.pagination').addClass('pagination-flat pagination-sm'); 
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
 
-    $('.daterange-single').daterangepicker({ 
+    $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true
@@ -236,7 +226,7 @@ $(document).ready(function(){
 
     $('.search_user').keyup(function() {
       var search_text = $(this).val();
-      delay(function(){ 
+      delay(function(){
          var url = "{% url 'dashboard:sales_search' %}";
          $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
                 $('#pagination-div').html(data);

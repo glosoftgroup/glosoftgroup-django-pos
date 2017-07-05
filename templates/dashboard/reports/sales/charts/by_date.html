@@ -139,13 +139,15 @@
                 <tr>
                   <td colspan="3"> <h6 style="font-weight: bold;font-size:1.0em;">Least Sold Item</h6></td>
                 </tr>
+                {% for lowest in lowest_item%}
                 <tr>
                   <td>1</td>
-                  <td>{{lowest_item.product_name}}</td>
+                  <td>{{lowest.product_name}}</td>
                   <td>
-                    <div><span style="font-size: 0.7em;">Ksh.</span>{{lowest_item.total_cost__sum}}</div>
+                    <div><span style="font-size: 0.7em;">Ksh.</span>{{lowest.total_cost__sum}}</div>
                   </td>
                 </tr>
+              {% endfor %}
               </tbody>
             </table>
           </div>

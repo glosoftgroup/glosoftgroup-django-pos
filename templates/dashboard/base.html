@@ -13,7 +13,7 @@
     {% block meta %}
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-      <meta http-equiv="refresh" content = "120; url=/lock/?next={{request.path}}">
+      <meta http-equiv="refresh" content = "1200; url=/lock/?next={{request.path}}">
     {% endblock meta %}
 
     {% include 'favicon.html' %}    
@@ -265,11 +265,12 @@
                       <a href="search_videos.html#" class="has-ul legitRipple">
                       <i class='icon-cash3'></i>Sales</a>
                       <ul>
-                        <li class="{% block menu_report_class %}{% endblock %}"><a href="{% url 'dashboard:sales_reports' %}" class="legitRipple">Sales List</a></li>
-                        <li class="{% block sales_by_date_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_date_chart' %}" class="legitRipple">Sales by date Chart</a></li>
-                        <li class="{% block sales_by_product_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_product_chart' %}" class="legitRipple">Sales by product Chart</a></li>
-                        <li class="{% block sales_by_user_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_user_chart' %}" class="legitRipple">Sales by user Chart</a></li>
-                        <li class="{% block sales_by_teller_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_teller_chart' %}" class="legitRipple">Sales by teller Chart</a></li>
+                        <li class="{% block menu_report_class %}{% endblock %}"><a href="{% url 'dashboard:sales_list' %}" class="legitRipple">List</a></li>
+                        <li class="{% block sales_by_date_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_date_chart' %}" class="legitRipple">By date Chart</a></li>
+                        <li><a href="javascript:;">Trending</a></li>
+                        <li class="{% block sales_by_product_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_product_chart' %}" class="legitRipple">By product Chart</a></li>
+                        <li class="{% block sales_by_user_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_user_chart' %}" class="legitRipple">By user Chart</a></li>
+                        <li class="{% block sales_by_teller_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_teller_chart' %}" class="legitRipple">By teller Chart</a></li>
 
                       </ul>
                     </li>

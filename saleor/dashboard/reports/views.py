@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
@@ -31,6 +32,32 @@ from ...decorators import permission_decorator, user_trail
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
+
+@staff_member_required
+def sales_list(request):
+	try:
+		last_sale = Sales.objects.latest('id')
+		last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
+		all_sales = Sales.objects.filter(created__contains=last_date_of_sales)
+		total_sales_amount = all_sales.aggregate(Sum('total_net'))
+		total_tax_amount = all_sales.aggregate(Sum('total_tax'))
+		total_sales = []
+		for sale in all_sales:
+			quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+			setattr(sale, 'quantity', quantity['c'])
+			total_sales.append(sale)
+		return TemplateResponse(request, 'dashboard/reports/sales/sales_list.html',{'sales': total_sales, "total_sales_amount":total_sales_amount, "total_tax_amount":total_tax_amount,"date":last_date_of_sales})
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
+
+@staff_member_required
+def sales_detail(request, pk=None):
+	try:
+		sale = Sales.objects.get(pk=pk)
+		items = SoldItem.objects.filter(sales=sale)
+		return TemplateResponse(request, 'dashboard/reports/sales/details.html',{'items': items, "total_sales_amount":sale.total_net, "total_tax_amount":sale.total_tax})
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
 
 @staff_member_required
 # @permission_required('userprofile.view_user', raise_exception=True)
