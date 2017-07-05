@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+{% load staticfiles i18n %}
+{% load render_bundle from webpack_loader %}
+{% load version %}
+
+<html lang="{{ LANGUAGE_CODE }}" class="no-js">
+  <head>
+    <title>
+      {% block title %}
+        {% trans "Dashboard - Saleor" context "Dashboard default page title" %}
+      {% endblock %}
+    </title>
+    {% block meta %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    {% endblock meta %}
+
+    {% include 'favicon.html' %}
+    
+    
+   
+    
+
+    <!-- Global stylesheets -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/icons/icomoon/styles.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/icons/fontawesome/styles.min.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/bootstrap.css' %}" rel="stylesheet" type="text/css">
+
+  <link href="{% static 'backend/css/core.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/components.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/colors.css' %}" rel="stylesheet" type="text/css">
+   <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
+  <!--image preview -->
+  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">
+  <!-- bootstrap select -->
+  <!-- <link href="{% static 'backend/js/plugins/ui/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" type="text/css"> -->
+  
+  
+  <!-- /global stylesheets -->
+
+    {% block custom_css %}
+       <style type="text/css">
+       </style>
+    {% endblock %}
+  </head>
+
+  <body class="{% block body_class %}{% endblock %} login-container">
+    
+     <!-- Page container -->
+  <div class="page-container">
+    <!-- Page content -->
+    <div class="page-content">
+      <!-- Main content -->
+      <div class="content-wrapper">
+        <!-- Content area -->
+        <div class="content">
+            {% csrf_token %} 
+              <div id="status" class="col-md-6 col-md-offset-3 alert bg-danger animated slideInUp">
+                <span class="status_text">Oops! Something went wrong.</span>
+              </div>
+        </div>
+        <!-- /content area -->
+      </div>
+      <!-- /main content -->
+    </div>
+    <!-- /page content -->
+  </div>
+  <!-- /page container -->
+ 
+    {% include "dashboard/includes/_messages.html" %}
+    <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
+    <!-- <script type="text/javascript" src="{% static 'backend/js/chart.js'%}"></script> -->
+    {% block custom_js %}{% endblock %}
+    <script type="text/javascript">
+
+    </script>
+   </div>
+  </body>
+</html>

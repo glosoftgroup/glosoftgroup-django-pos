@@ -6,6 +6,11 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 from django.utils import timezone
+from django.shortcuts import render_to_response, render
+from django.template import RequestContext
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -20,23 +25,14 @@ def permission_decorator(argument):
 				return function(request, *args, **kwargs)
 			else:
 				debug_logger.debug('status: 403, '+ str(argument)+' permission denied for '+str(request.user))				
-				return HttpResponse('permission denied')
+				raise PermissionDenied()
 		return wrap
 	return permitted_users_only
 
 def user_trail(name, action, tag=None):
-	# try:
-	# 	record = UserTrail(name=name, action=action)
-	# 	record.save()
-	# 	info_logger.info(str(name)+' - '+str(action))
-	# except:
-	# 	HttpResponse('error saving action')
-	# 	info_logger.info('status: 400, not able to add action')
 	record = UserTrail(name=name, action=action, crud= tag, date=date.today())
 	record.save()
 
-from django.conf import settings
-from django.contrib.auth import get_user_model
 
 class EmailOrUsernameModelBackend(object):
 	"""

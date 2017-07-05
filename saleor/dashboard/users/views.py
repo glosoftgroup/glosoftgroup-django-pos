@@ -13,7 +13,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 import os
 
 from ...core.utils import get_paginator_items
@@ -218,7 +218,6 @@ def user_paginate(request):
 		return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
 
 
-@staff_member_required
 @permission_decorator('userprofile.add_user')
 def user_add(request):
 	try:
@@ -270,19 +269,20 @@ def user_process(request):
 @staff_member_required
 def user_detail(request, pk):
 	user = get_object_or_404(User, pk=pk)
-	permissions = Permission.objects.filter(user=user)
+	user_permissions = Permission.objects.filter(user=user)
 	groups = user.groups.all()
+	permissions = Permission.objects.filter(group__in=[group for group in groups]).distinct()
+	all_permissions = list(set(user_permissions).union(set(permissions)))
 	if request.user == user:
 		user_trail(request.user.name, 'viewed self profile ','view')
 		info_logger.info('User: '+str(request.user)+' viewed self profile')
 	else:
 		user_trail(request.user.name, 'viewed '+str(user.name)+ '`s profile','view')
 		info_logger.info('User: '+str(request.user.name)+' viewed '+str(user.name)+'`s profile')
-	return TemplateResponse(request, 'dashboard/users/detail.html', {'user':user,'permissions':permissions,'groups':groups})
+	return TemplateResponse(request, 'dashboard/users/detail.html', {'user':user,'all_permissions':all_permissions,'groups':groups})
 
 def user_delete(request, pk):
 	user = get_object_or_404(User, pk=pk)
-	default_p = 'C:\Users\kibur\Desktop\fresh install\glosoftgroup-django-pos\media\staff\user.png '
 	if request.method == 'POST':
 		user.delete()		
 		user_trail(request.user.name, 'deleted user: '+ str(user.name),'delete')
@@ -292,8 +292,10 @@ def user_delete(request, pk):
 def user_edit(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	permissions = Permission.objects.all()
+	groups = Group.objects.all()
+	user_groups = user.groups.all()
 	user_permissions = Permission.objects.filter(user=user)
-	ctx = {'user': user,'permissions':permissions, 'user_permissions':user_permissions}
+	ctx = {'user': user,'permissions':permissions, 'user_permissions':user_permissions, 'groups':groups, 'user_groups':user_groups}
 	user_trail(request.user.name, 'accessed edit page for user '+ str(user.name),'view')
 	info_logger.info('User: '+str(request.user.name)+' accessed edit page for user: '+str(user.name))
 	return TemplateResponse(request, 'dashboard/users/edit_user.html', ctx)
@@ -301,6 +303,10 @@ def user_edit(request, pk):
 @staff_member_required
 def user_update(request, pk):
 	user = get_object_or_404(User, pk=pk)
+	user_permissions = Permission.objects.filter(user=user)
+	user_groups = user.groups.all()
+	permissions_in_user_groups = Permission.objects.filter(group__in=[group for group in user_groups])
+
 	if request.method == 'POST':
 		name = request.POST.get('user_name')
 		email = request.POST.get('user_email')
@@ -308,6 +314,8 @@ def user_update(request, pk):
 		nid = request.POST.get('user_nid')
 		mobile = request.POST.get('user_mobile')
 		image= request.FILES.get('image')
+		groups = request.POST.getlist('groups[]')
+
 		if password == user.password:
 			encr_password = user.password
 		else:
@@ -322,6 +330,24 @@ def user_update(request, pk):
 			user.save()
 			user_trail(request.user.name, 'updated user: '+ str(user.name),'update')
 			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name))
+			if len(groups) == 0:
+				user.groups.remove(*user_groups)
+				groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
+				user.user_permissions.remove(*groups_permissions)
+			else: 
+				if user_groups in groups:
+					not_in_user_groups = list(set(groups) - set(user_groups))
+					group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+					user.groups.add(*groups)
+					user.user_permissions.add(*group_permissions)
+				else:
+					not_in_user_groups = list(set(groups) - set(user_groups))
+					group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+					user.groups.remove(*user_groups)
+					user.groups.add(*groups_diff)
+					user.user_permissions.remove(*permissions_in_user_groups)
+					user.user_permissions.add(*group_permissions)
+			return HttpResponse("success without image")
 			return HttpResponse("success with image")
 		else:
 			user.name = name
@@ -332,7 +358,27 @@ def user_update(request, pk):
 			user.save()
 			user_trail(request.user.name, 'updated user: '+ str(user.name), 'update')
 			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name),'update')
+			if len(groups) == 0:
+				user.groups.remove(*user_groups)
+				groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
+				user.user_permissions.remove(*groups_permissions)
+			else: 
+				if user_groups in groups:
+					not_in_user_groups = list(set(groups) - set(user_groups))
+					group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+					user.groups.add(*groups)
+					user.user_permissions.add(*group_permissions)
+				else:
+					not_in_user_groups = list(set(groups) - set(user_groups))
+					group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+					user.groups.remove(*user_groups)
+					user.groups.add(*groups_diff)
+					user.user_permissions.remove(*permissions_in_user_groups)
+					user.user_permissions.add(*group_permissions)
 			return HttpResponse("success without image")
+
+
+
 
 @staff_member_required
 @csrf_exempt
