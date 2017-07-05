@@ -57,14 +57,24 @@ def user_process(request):
 		email = request.POST.get('email')
 		# password = request.POST.get('password')
 		# encr_password = make_password(password)
-		nid = request.POST.get('nid')
+		code = request.POST.get('code')
+		fax = request.POST.get('fax')
+		city = request.POST.get('city')
+		website = request.POST.get('website')
+		street1 = request.POST.get('street1')
+		street2 = request.POST.get('street2')
 		mobile = request.POST.get('mobile')
 		image= request.FILES.get('image')
 		groups = request.POST.getlist('groups[]')
 		new_user = Customer.objects.create(
 			name = name,
 			email = email,			
-			nid = nid,
+			code = code,
+			fax = fax,
+			city = city,
+			website = website,
+			street1 = street1,
+			street2 = street2,
 			mobile = mobile,
 			image = image
 		)
@@ -106,13 +116,13 @@ def user_update(request, pk):
 	if request.method == 'POST':
 		name = request.POST.get('name')
 		email = request.POST.get('email')		
-		nid = request.POST.get('nid')
+		code = request.POST.get('code')
 		mobile = request.POST.get('mobile')
 		image= request.FILES.get('image')		
 		if image :
 			user.name = name
 			user.email = email			
-			user.nid = nid
+			user.code = code
 			user.mobile = mobile
 			user.image = image
 			user.save()
@@ -122,7 +132,7 @@ def user_update(request, pk):
 		else:
 			user.name = name
 			user.email = email			
-			user.nid = nid
+			user.code = code
 			user.mobile = mobile
 			user.save()
 			user_trail(request.user.name, 'updated user: '+ str(user.name))
