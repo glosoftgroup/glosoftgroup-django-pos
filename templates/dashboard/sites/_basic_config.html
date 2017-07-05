@@ -1,0 +1,54 @@
+{% load i18n %}
+{% load materializecss %}
+<div class="row">
+      <div class="panel-body">
+        <form method="post" id="form-category" enctype="multipart/form-data" novalidate>
+          <div class="card-content card-content-form">
+            {% csrf_token %}
+             <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.name|materializecss }}
+                </div>
+                <div class="form-group">
+                  {{ form.domain|materializecss }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.header_text|materializecss }}
+                </div>
+                <div class="form-group">
+                  {{ form.description|materializecss }}
+                </div>
+             </div>
+
+             <div class="col-md-12">
+               <div class="text-center content-text-muted content-divider">
+                  <span class="pt-10 pb-10 text-bold">
+                  Sales Settings
+                 </span>  
+               </div> 
+             </div> 
+             <!-- sdlfj       -->
+             <div class="col-md-3">
+                <div class="form-group">
+                  {{ form.loyalty_point_equiv|materializecss }}
+                </div>
+                <div class="form-group">
+                  
+                </div>
+             </div>
+          </div>
+
+          
+          <div class="col-md-12 text-right" >
+            <a class="btn btn-flat" href="{% url "dashboard:index" %}" traget="_blank">
+              {% trans "Cancel" context "Dashboard cancel action" %}
+            </a>
+            <button type="submit" class="btn  btn-primary waves-effect waves-light">
+              {% trans "Update" context "Dashboard update action" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>

@@ -23,6 +23,7 @@ from ..discount.models import Voucher
 from ..product.models import Product
 from ..userprofile.models import Address
 from ..customer.models import Customer
+from ..site.models import SiteSettings
 
 from . import OrderStatus
 from . import TransactionStatus
@@ -50,6 +51,9 @@ class Terminal(models.Model):
 		return len(self.terminals.all())
 	def get_sales(self):
 		return len(self.terminal_sales.all())
+	def get_loyalty_points(self):
+		points = SiteSettings.objects.get(pk=1)
+		return points.loyalty_point_equiv
 
 
 @python_2_unicode_compatible

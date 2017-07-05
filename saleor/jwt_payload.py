@@ -12,6 +12,11 @@ def jwt_response_payload_handler(token, user=None, request=None):
             'user': UserSerializer(user, context={'request': request}).data
             }
 
+def jwt_get_username_from_payload_handler(payload):
+    """
+    Override this function if username is formatted differently in payload
+    """
+    return payload.get('name')
 
 def custom_exception_handler(exc, context):
     # Call REST framework's default exception handler first,

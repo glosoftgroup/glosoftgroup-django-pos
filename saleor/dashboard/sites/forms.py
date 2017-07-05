@@ -7,6 +7,11 @@ class SiteSettingForm(forms.ModelForm):
     class Meta:
         model = SiteSettings
         exclude = []
+    def __init__(self, *args, **kwargs):        
+        super(SiteSettingForm, self).__init__(*args, **kwargs)        
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+        
 
 
 class AuthorizationKeyForm(forms.ModelForm):

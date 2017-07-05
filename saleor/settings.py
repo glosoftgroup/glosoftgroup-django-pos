@@ -510,4 +510,6 @@ JWT_AUTH = {
     'saleor.jwt_payload.jwt_response_payload_handler',
     'JWT_EXPIRATION_DELTA':
      timedelta(days=2),
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER':
+    'saleor.jwt_payload.jwt_get_username_from_payload_handler',
 }
