@@ -68,6 +68,14 @@ EMAIL_BACKEND = email_config['EMAIL_BACKEND']
 EMAIL_USE_TLS = email_config['EMAIL_USE_TLS']
 EMAIL_USE_SSL = email_config['EMAIL_USE_SSL']
 
+# EMAIL_HOST_USER = 'alexkiburu@gmail.com'
+# EMAIL_HOST_PASSWORD = 'unicorn-tech'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# DEFAULT_FROM_EMAIL = 'alexkiburu@gmail.com'
+
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 ORDER_FROM_EMAIL = os.getenv('ORDER_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 
@@ -285,7 +293,7 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'userprofile.User'
 
-LOGIN_URL = '/account/login/'
+LOGIN_URL = '/'
 
 DEFAULT_COUNTRY = 'KE'
 DEFAULT_CURRENCY = 'KES'

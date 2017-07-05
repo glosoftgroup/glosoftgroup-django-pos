@@ -13,6 +13,7 @@
     {% block meta %}
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+      <meta http-equiv="refresh" content = "120; url=/lock/?next={{request.path}}">
     {% endblock meta %}
 
     {% include 'favicon.html' %}    
@@ -422,7 +423,6 @@
     
     {% include "dashboard/includes/_messages.html" %}
     <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
-    <!-- <script type="text/javascript" src="{% static 'backend/js/chart.js'%}"></script> -->
     {% block custom_js %}{% endblock %}
    </div>
   </body>
