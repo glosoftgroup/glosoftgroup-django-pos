@@ -1,0 +1,26 @@
+{% load i18n %}
+{% load mptt_tags %}
+
+<form method="post" id="form-category" class="form-async" action="{% url 'dashboard:contact-delete' pk=address.pk %}" novalidate>
+  {% csrf_token %}
+  <div class="modal-body">
+    <div class="">
+      <div class="col s12">
+        <h5>
+          {% blocktrans with category=category trimmed context "Delete contact modal title" %}
+            Are you sure you want to delete the address contact {{ address }}?
+          {% endblocktrans %}
+        </h5>
+      </div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="modal-action btn btn-primary">
+      {% trans "Delete" context "Dashboard delete action" %}
+    </button>
+    <a href="#!" data-dismiss="modal" class="modal-action modal-close btn btn-flat">
+      {% trans "Cancel" context "Dashboard cancel action" %}
+    </a>
+  </div>
+</form>
