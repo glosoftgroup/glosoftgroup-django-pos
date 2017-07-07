@@ -40,7 +40,7 @@
 
             <div class="col-md-10 col-md-offset-1">
                 <canvas id="dateChart" width="900" height="400"></canvas>
-                <div class="text-center"><span style="color: #72726d;">Hours in {{date}}</span></div>
+                <div class="text-center"><span style="color: #72726d;">Hours</span></div>
             </div>
 
           </div>
@@ -56,173 +56,43 @@
     <div class="panel-body">
      <div class="row">
         <h3 style="padding-left: 20px;">Daily Gross Sales</h3>
-              <p class="text-centers" style="padding-left: 20px;">Gross Sales on {{date}} were <span class="text-primary">KShs. {{date_total_sales}}</span>. 
-                {% if prevdate_total_sales %}
-                  This was 
-                  {% if sales_percent < 0 %}
-                      <span class="text-danger">down {{sales_percent}} %</span>
-                   {% elif sales_percent > 0 %}
-                      <span class="text-success">up {{sales_percent}} %</span>
-                   {% endif %}
-                   from the prior sales of date {{prevdate}}
-                {% endif %}
+              <p class="text-centers" style="padding-left: 20px;">Gross Sales from {{date_from}} to {{date_to}} were <span class="text-primary">KShs. {{date_total_sales}}</span>.
               </p>
      </div>
-      <div class="row">    
+      <div class="row">
           <div class="col-md-10">
-              <div id="canvas-holder1" width="900" height="400">
-                <canvas id="chart1"></canvas>
+              <div id="canvas-holder1">
+                <canvas id="chart1" width="900" height="300"></canvas>
                 <div class="chartjs-tooltip" id="tooltip-0"></div>
-                <div class="chartjs-tooltip" id="tooltip-1"></div>
                 <div class="text-center"><span style="color: #72726d;">Hours</span></div>
               </div>
           </div>
           <div class="col-md-2">
 
             <div class="col-md-12">
-              <div class="panel bg-success-600">
-                <div class="panel-body">
-                  <h5 class="no-margin text-center">Total Sales</h5>
-                  <h5 class="no-margin text-center"><span style="font-size: 0.8em;">Kshs.</span> {{date_total_sales}}</h5>
-                  <h6 class="no-margin text-center">
-                   {% if sales_percent < 0 %}
-                      ({{sales_percent}} % dec <i class="icon-stats-decline2"></i> )
-                   {% elif sales_percent > 0 %}
-                      ({{sales_percent}} % inc <i class="icon-stats-growth2"></i> )
-                   {% else %}
-                      
-                   {% endif %}
-                  </h6>
+                <h6 class="no-margin text-center">Total Sales</h6>
+                <div class="col-sm-12 text-center">
+                  <span class="label label-primary label-rounded" style="padding:10px;font-size:1.0em;">
+                     Kshs. {{date_total_sales}}
+                  </span>
                 </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-            </div><!-- total sales -->
+            </div>
 
-            <div class="col-md-12">
-              <div class="panel bg-purple-600">
-                <div class="panel-body">
-                  <h5 class="no-margin text-center">Customers Visited</h5>
-                  <h5 class="no-margin text-center">{{no_of_customers}}</h5>
-                  <h6 class="no-margin text-center">
-                    {% if customer_percent < 0 %}
-                      ({{customer_percent}} % dec <i class="icon-stats-decline2"></i> )
-                   {% elif sales_percent > 0 %}
-                      ({{customer_percent}} % inc <i class="icon-stats-growth2"></i> )
-                   {% else %}
-                      
-                   {% endif %}
-                  </h6>
+           <div class="col-md-12" style="margin-top:10px;">
+                <h6 class="no-margin text-center">Customers<br> Visited</h6>
+                <div class="col-sm-12 text-center">
+                  <span class="label bg-purple-600 label-rounded" style="padding:10px;font-size:1.0em">
+                        {{no_of_customers}}
+                  </span>
                 </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-            </div><!-- customers visited -->
+            </div>
+
           </div>
       </div>
     </div>
   </div>
 </div>
-<div class="col-md-12">
-<div class="row">
-  <div class="col-md-4">
-    <div class="panel panel-flat">
-      <div class="panel-heading">
-          <h6 class="panel-title">Top Items By Sales</h6>
-          <div class="heading-elements">
-            <ul class="icons-list">
-              <li><a data-action="collapse"></a></li>
-              <li><a data-action="reload"></a></li>
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
-      </div>
-      <div class="panel-body">
-          <div class="data-table-container">
-            <table class="table bordered highlight responsive data-table">
-              <tbody>
-                {% for item in top_items %}
-                  <tr>
-                    <td>
-                      {{ forloop.counter }}
-                    </td>
-                    <td class="right-align">
-                      {{ item.product_name }}
-                    </td>
-                    <td class="right-align">  
-                      <div><span style="font-size: 0.7em;">Ksh.</span>{{ item.total_cost__sum }}</div>
-                    </td>
-                  </tr>
-                {% endfor %}
-                <tr>
-                  <td colspan="3"> <h6 style="font-weight: bold;font-size:1.0em;">Least Sold Item</h6></td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>{{lowest_item.product_name}}</td>
-                  <td>
-                    <div><span style="font-size: 0.7em;">Ksh.</span>{{lowest_item.total_cost__sum}}</div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-8">
-    <div class="panel panel-flat">
-      <div class="panel-heading">
-          <h6 class="panel-title">Top Categories By Sales</h6>
-          <div class="heading-elements">
-            <ul class="icons-list">
-              <li><a data-action="collapse"></a></li>
-              <li><a data-action="reload"></a></li>
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
-      </div>
-      <div class="panel-body">
-        <div class="col-md-6">
-           <canvas id="catChart" width="400" height="400"></canvas>
-        </div>
-        <div class="col-md-6">
-          <div class="data-table-container">
-            <table class="table bordered highlight responsive data-table">
-              <tbody>
-              {% if sales_by_category %}
-               {% for sales in sales_by_category %}
-                  <tr data-action-go="">
-                    <td>
-                      <div class="sqaure" style="width: 15px;height: 15px;border-radius: 50%;background-color: {{sales.color}};">
-                      </div>
-                    </td>
-                    <td> 
-                       {{sales.product_category}}
-                    </td>
-                    <td>
-                         <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
-                    </td>
-                    <td>
-                      {{ sales.percentage }}% 
-                    </td>
-                  </tr>
-                  {% endfor %}
-                {% endif %}
 
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-</div>
   <div class="col-md-12">
       <div class="panel panel-flat">
         <div class="panel-heading">
@@ -240,7 +110,7 @@
 
             <div class="card">
 
-              {% if cashiers %}
+              {% if date_total_sales  %}
                 <div class="data-table-container">
                   <table class="table bordered highlight responsive data-table">
                     <thead>
@@ -456,13 +326,6 @@ $(document).ready(function(){
         // pointBackgroundColor: window.chartColors.red,
         fill: false,
         data: [{% for d in default %} {{ d }}, {% endfor %}]
-      }, {
-        label: "Previous Sales of {{prevdate}}",
-        backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
-        borderColor: window.chartColors.blue,
-        // pointBackgroundColor: window.chartColors.blue,
-        fill:false,
-        data: [{% for d in default2 %} {{ d }}, {% endfor %}]
       }]
     };
 
@@ -477,7 +340,7 @@ $(document).ready(function(){
             text: "Hourly Sales"
           },
           legend: {
-              display: true,
+              display: false,
           },
           tooltips: {
             enabled: false,
@@ -493,27 +356,6 @@ $(document).ready(function(){
         }
       });
 //-----chart**/
-//**@ doughnut chart
-  // function setChart(){
-    var defaultData2 = [{% for d in sales_by_category %} {{ d.total_cost__sum }}, {% endfor %}];
-    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}", {% endfor %}];
-    var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
-    // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
-      var ctx = document.getElementById("catChart").getContext('2d');
-      var myChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-              labels: labels2,
-              datasets: [{
-                  label: 'Amount of sale',
-                  data: defaultData2,
-                  backgroundColor:backColor,
-                  borderWidth: 1
-              }]
-          }
-      });
-  // }
-//---------------doghnut chart**/
 
 });
 </script>

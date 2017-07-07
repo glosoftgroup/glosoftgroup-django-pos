@@ -10,6 +10,7 @@
 {% block breadcrumbs %}
      <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
      <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
+     <li>Invoice</li>
  {% endblock %}
 
 {% block menu_report_class %}active{% endblock %}
@@ -22,63 +23,14 @@
  {% endblock %}
 
 {% block content %}
-<div class="row animated fadeIn">
-    <div class="col-md-12">
-      <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Sales Reports</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12" style="margin-bottom:10px;">
+        <a class="btn btn-primary pull-left" href="{% url 'dashboard:sales_list' %}"><i class="icon-arrow-left13 position-left"></i> Back To Sales List</a>
+        <a class="btn btn-primary pull-right" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
         </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
-            <div class="col-md-6">
-             <label>Search Sales</label>
-              <div class="form-group form-group-material has-feedback">
-                <input class="form-control search_user" placeholder="Search details" type="text">
-                <div class="form-control-feedback">
-                  <i class="icon-search4 text-size-base"></i>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-2">
-              <label>display list size</label>
-              <div class="form-group">
-                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="0" selected>No:</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                  </select>
-              </div>
-            </div>
-            <div class="col-md-2">
-              <label>pick a date</label>
-              <div class="form-group">
-                <div class="input-group">
-                  <input class="form-control daterange-single" type="text">
-                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-2">
-             <label>Export</label>
-              <div class="form-group">
-                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
-                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
-                  </select>
-              </div>
-            </div>
-      </div>
-   </div>
-   </div>
-
+    </div>
+</div>
 <div class="col-md-12">
    <div id="pagination-div">
     <div class="panel panel-flat">
@@ -87,8 +39,14 @@
           <div class="col-md-12">
             <div class="table-responsives">
                 <table class="table table-bordered datatable-header-footer">
-                  <caption style="margin-bottom: 10px;">
-                   </caption>
+                    <caption>
+                      <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
+
+                        <img src="{{sale.user.image.url}}" class="center-block circle teal img-responsive img-circle" style="width: 60px;height: 60px;"/>
+                        <h6 class="">Cashier: {{sale.user.name}}</h6>
+                          <h5 class="">Invoice Number: {{sale.invoice_number}}</h5>
+                      </div>
+                    </caption>
                       <thead style="border-top:1px solid #ddd;">
                         <tr>
                           <th>Transaction Date</th>
@@ -116,33 +74,22 @@
 
                  </table>
               </div>
-              <div class="my-paginate">
-                <div class="text-center bootpag-callback" style="padding:20px;">
-                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav">Page 1</div>
-                </div>
-                <input type="hidden" id="page_size" val="">
-              </div>
              </div>
             </div>
             <div class="row">
-              <div class="col-md-10 col-md-offset-1">
-                 <p class="text-center" style="margin: 20px 0px;">
-                   Total Sales: Kshs {{total_sales_amount}}<br />
-                   Total Tax: Kshs {{ total_tax_amount}}
-                 </p>
-                  <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
+              <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
+                  <span>
+                   Total Sales: Kshs {{sale.total_net}}<br />
+                   Total Tax: Kshs {{sale.total_tax}}
+                 </span><br>
+                  <span> Thank you for partnering with us.<br />
+                  <span>Report pullled by {{request.user.name}}</span></span>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
-                  <!--<button class="btn btn-primary ck">Click</button> -->
 
               </div>
              </div>
             </div>
-<!--       <div class="panel-footer">
-      <button class="btn btn-primary disabled">checki this</button>
-      </div> -->
     </div>
    </div><!--pagination div-->
   </div>
@@ -151,92 +98,4 @@
 
 {% endblock%}
 {% block custom_js %}
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
-<script type="text/javascript">
-$(document).ready(function(){
-
-    var pagination_totalsize;
-    var status;
-    //**@ get
-    $.ajax({ url: "{% url 'dashboard:sales_reports' %}",type: 'GET',data: {initial:'initial'},
-        async:false,success: function(data){
-         pagination_totalsize = data;
-    }});
-
-     $('.bootpag-callback').bootpag({
-        total: parseInt(pagination_totalsize),
-        maxVisible: 3,
-        leaps: false
-        }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){
-               $('#tb').html(data);
-            });
-    }).children('.pagination').addClass('pagination-flat pagination-sm');
-
-    $('.daterange-single').daterangepicker({
-        singleDatePicker: true,
-        locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true
-    }).on('change',function(){
-      var date = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
-    });
-
-   $('.export-sz').selectpicker({
-          iconBase: 'fa',
-          tickIcon: 'fa-dot-circle-o',
-          pdfIcon:'fa-file-pdf-o',
-          excelIcon:'fa-file-excel-o'
-    }).on('change',function(){
-         $('.setValue').val($(this).val());
-         $('.setName').val('export');
-         // $('.set').value = $(this).val();
-    });
-    $('.ck').click(function(){
-      var name = $('.setName').val();
-      var vl = $('.setValue').val();
-        if( !name || !vl || vl == 'none'){
-           alert('nothing');
-        }else{
-         alert(name +' and '+ vl);
-        }
-    });
-    //**@ display size select
-    $('.list-sz').selectpicker().on('change', function(){
-        var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
-     });
-
-
-
-      var delay = (function(){
-    var timer = 0;
-    return function(callback, ms){
-        clearTimeout (timer);
-        timer = setTimeout(callback, ms);
-      };
-    })();
-
-    $('.search_user').keyup(function() {
-      var search_text = $(this).val();
-      delay(function(){
-         var url = "{% url 'dashboard:sales_search' %}";
-         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
-                $('#pagination-div').html(data);
-         }});
-      }, 500 );
-
-    });
-
-
-});
-
-</script>
 {% endblock %}

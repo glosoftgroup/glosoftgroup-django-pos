@@ -104,143 +104,226 @@
    </div>
    </div>
 <div class="p-sales">
-  <div class="col-md-12">
-   <div class="panel panel-flat">
-    <div class="panel-heading">
-        <h6 class="panel-title">Sale summary of Date info 12/12/2019</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-
-     <div class="panel-body">
-          <!-- Quick stats boxes -->
-          <div class="row animated fadeIn">
-            <div class="col-lg-3">
-              <!-- Date Sales -->
-              <div class="panel bg-info-300">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-
-                  <h3 class="no-margin">KShs. 23202</h3>
-                  Total Sales 
-                  <!-- <div class="popular">
-                   Popular product: Unga
-                  </div> -->
-                  <div class="popular">
-                   Popular products: <button class="btn btn-sm btn-default" onclick="alert('clicked ')" style="padding: 2px 5px;font-size: 10px;">View</button>
-                  </div>
-                </div>
-
-                <div id="server-load"></div>
-              </div>
-              <!-- /date sales -->
-            </div>
-            
-            <div class="col-lg-3">
-              <!-- Highest Sold -->
-              <div class="panel bg-success-700">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-                  <h3 class="no-margin">KShs. 3,450</h3>
-                  Highest Sold Product 
-                  <div class="high_product">
-                      Rice    
-                  </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /highest sold -->
-            </div>
-
-            <div class="col-lg-3">
-              <!-- Lowest Sold-->
-              <div class="panel bg-danger-600">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-                  <h3 class="no-margin">KShs.3,450</h3>
-                  Lowest Sold Product 
-                  <div class="low_product">
-                      Spanner    
-                  </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /lowest sold -->
-            </div>
-
-            <div class="col-lg-3">
-              <!-- Customers Visited -->
-              <div class="panel bg-purple-600">
-                <div class="panel-body">
-                  <h3 class="no-margin">3,450</h3>
-                  Customers Visited
-                  <div class="any" style="visibility: hidden;">
-                   1000 customers
-                  </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /customers visited -->
-            </div>
-
-          </div>
-          <!-- /quick stats boxes -->
-     </div>
-   </div>
- </div>
-<div class="col-md-12">
+    <div class="col-md-12">
   <div class="panel panel-flat">
     <div class="panel-body">
      <div class="row">
-        <h3 style="padding-left: 20px;">Dail Gross Sales</h3>
+        <h3 style="padding-left: 20px;">Daily Gross Sales</h3>
+              <p class="text-centers" style="padding-left: 20px;">Gross Sales on {{date}} were <span class="text-primary">KShs. {{date_total_sales}}</span>.
+                {% if prevdate_total_sales %}
+                  This was
+                  {% if sales_percent < 0 %}
+                      <span class="text-danger">down {{sales_percent}} %</span>
+                   {% elif sales_percent > 0 %}
+                      <span class="text-success">up {{sales_percent}} %</span>
+                   {% endif %}
+                  from <span class="text-primary">Kshs {{previous_sales}}</span> the prior sales of date {{prevdate}}
+                {% endif %}
+              </p>
      </div>
-      <div class="row">    
+      <div class="row">
           <div class="col-md-10">
-              <div id="canvas-holder1" style="width:100%;">
-                <canvas id="chart1"></canvas>
+              <div id="canvas-holder1">
+                <canvas id="chart1" width="900" height="300"></canvas>
                 <div class="chartjs-tooltip" id="tooltip-0"></div>
-                <div class="chartjs-tooltip" id="tooltip-1"></div>
+                <div class="text-center"><span style="color: #72726d;">Hours</span></div>
               </div>
           </div>
           <div class="col-md-2">
-            <ul><li>yes</li><li>no</li></ul>
+
+            <div class="col-md-12">
+                <h6 class="no-margin text-center">Total Sales</h6>
+                <div class="col-sm-12 text-center">
+                  <span class="label label-primary label-rounded" style="padding:10px;font-size:1.0em;">
+                     Kshs. {{date_total_sales}}<br>
+                    {% if sales_percent < 0 %}
+                      ({{sales_percent}} % ) dec <i class="icon-stats-decline2"></i>
+                   {% elif sales_percent > 0 %}
+                      ({{sales_percent}} % ) inc <i class="icon-stats-growth2"></i>
+                   {% else %}
+                   {% endif %}
+                  </span>
+                </div>
+            </div>
+
+           <div class="col-md-12" style="margin-top:10px;">
+                <h6 class="no-margin text-center">Customers<br> Visited</h6>
+                <div class="col-sm-12 text-center">
+                  <span class="label bg-purple-600 label-rounded" style="padding:10px;font-size:1.0em">
+                        {{no_of_customers}}<br>
+                       {% if customer_percent < 0 %}
+                          ({{customer_percent}} % ) dec <i class="icon-stats-decline2"></i>
+                       {% elif sales_percent > 0 %}
+                          ({{customer_percent}} % ) inc <i class="icon-stats-growth2"></i>
+                       {% else %}
+                       {% endif %}
+                  </span>
+                </div>
+            </div>
+
           </div>
       </div>
     </div>
   </div>
 </div>
-<div class="col-md-12">
-   <div id="pagination-div">
-    <div class="panel panel-flat">
-      <div class="panel-body">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="col-md-6 col-md-offset-3">
-              <canvas id="myChart" width="400" height="400"></canvas>
+
+  <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">
+          <h6 class="panel-title">Sales Summary</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+        <div class="panel-body">
+
+            <div class="card">
+
+              {% if cashiers %}
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead>
+                      <tr>
+                        <th>
+                        </th>
+                        <th class="right-align">
+                          Sales
+                        </th>
+                        <th> Refund </th>
+                        <th> Net </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-action-go="">
+                          <td>
+                            <span style="font-weight: bold;">Gross Sales</span>
+                          </td>
+                          <td class="right-align">
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                          <td class="right-align">
+                            <span style="font-weight: bold;">0.00</span>
+                          </td>
+                          <td>
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Discounts</td>
+                          <td class="right-align">0.00</td>
+                          <td>0.00</td>
+                          <td>0.00</td>
+                        </tr>
+                        <tr>
+                          <td>Tax</td>
+                          <td class="right-align">0.00</td>
+                          <td>0.00</td>
+                          <td>0.00</td>
+                        </tr>
+                        <tr data-action-go="">
+                          <td>
+                            <span style="font-weight: bold;">Net Sales</span>
+                          </td>
+                          <td class="right-align">
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                          <td class="right-align">
+                            <span style="font-weight: bold;">0.00</span>
+                          </td>
+                          <td>
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                  </p>
+                </div>
+              {% endif %}
             </div>
           </div>
-
         </div>
 
-      </div>
     </div>
-   </div><!--pagination div-->
-  </div>
- </div>
+
+  <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">
+          <h6 class="panel-title">Cashiers in Terminals</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+        <div class="panel-body">
+
+            <div class="card">
+
+              {% if cashiers %}
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead>
+                      <tr>
+                        <th>
+                          Cashier Name
+                        </th>
+                        <th class="right-align">
+                          Terminal
+                        </th>
+                        <th> Total Sales</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for user in users %}
+                        <tr data-action-go="">
+                          <td>
+                            {{ user.user__name }} - {{user.user__email}}
+                          </td>
+                          <td class="right-align">
+                            {{ user.terminal }}
+                          </td>
+                          <td class="right-align">
+                            <div><span style="font-size: 0.7em;">Ksh. </span>{{ user.total_net__sum }}</div>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+    </div>
+</div>
 </div>
 
 
@@ -252,61 +335,13 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
 <script type="text/javascript">
 $(document).ready(function(){
-  var endpoint = "{% url 'dashboard:chart' %}";
-  var defaultData = [];
-  var labels = [];
-
-  $.ajax({
-    method:"GET",
-    url:endpoint,
-    success:function(data){
-      labels = data.label;
-      defaultData = data.default;
-      setChart();
-    },
-    error:function(error_data){
-
-    }
-  });
-
-  function setChart(){
-      var ctx = document.getElementById("myChart").getContext('2d');
-      var myChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-              labels: labels,
-              datasets: [{
-                  label: 'Amount of sale',
-                  data: defaultData,
-                  backgroundColor: [
-                      'rgba(255, 99, 132, 0.2)',
-                      'rgba(54, 162, 235, 0.2)',
-                      'rgba(255, 206, 86, 0.2)',
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                      'rgba(255, 159, 64, 0.2)'
-                  ],
-                  borderColor: [
-                      'rgba(255,99,132,1)',
-                      'rgba(54, 162, 235, 1)',
-                      'rgba(255, 206, 86, 1)',
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(153, 102, 255, 1)',
-                      'rgba(255, 159, 64, 1)'
-                  ],
-                  borderWidth: 1
-              }]
-          }
-      });
-  }
-
     $('.daterange-single').daterangepicker({ 
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true
     }).on('change',function(){
       var date = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:date },success: function(data){
+        $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:date },success: function(data){
               $('.p-sales').html(data);
         }});
     });
@@ -356,7 +391,7 @@ $(document).ready(function(){
       var from = picker.startDate.format('YYYY-MM-DD'), to = picker.endDate.format('YYYY-MM-DD');
         if(from == to ){
             $(this).val(from);
-            $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:from },success: function(data){
+            $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:from },success: function(data){
                     $('.p-sales').html(data);
             }});
          }else{
@@ -398,10 +433,10 @@ $(document).ready(function(){
 
       if (tooltip.dataPoints.length > 0) {
         tooltip.dataPoints.forEach(function (dataPoint) {
-          var content = [dataPoint.xLabel, dataPoint.yLabel].join(": ");
+          var content = [dataPoint.xLabel, '(Kshs) '+dataPoint.yLabel].join(": ");
           var $tooltip = $("#tooltip-" + dataPoint.datasetIndex);
 
-          $tooltip.html(content);
+          $tooltip.html('Sales '+content);
           $tooltip.css({
             opacity: 1,
             top: positionY + dataPoint.y + "px",
@@ -413,59 +448,32 @@ $(document).ready(function(){
     var color = Chart.helpers.color;
   // alert(x.substring(0,3));
     var lineChartData = {
-      labels: ["Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.", "Jul.","Aug.","Sep.","Oct.","Nov.","Dec."],
+      labels: [{% for i in labels2 %} "{{ i }}", {% endfor %}],
       datasets: [{
-        label: "This Week",
+        label: "Sales of {{date}}",
         backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
         borderColor: window.chartColors.red,
-        // pointBackgroundColor: window.chartColors.red,
-        fill: false,
-        data: [
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor()
-        ]
-      }, {
-        label: "Last Week",
-        backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
-        borderColor: window.chartColors.blue,
-        // pointBackgroundColor: window.chartColors.blue,
-        fill:false,
-        data: [
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(), 
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor()
-        ]
+        fill: true,
+        data: [{% for d in default %} {{ d }}, {% endfor %}],
+        pointRadius:4,
+        pointBorderColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointBackgroundColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointHoverBackgroundColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointHoverBorderColor:  color(window.chartColors.red).alpha(0.2).rgbString()
       }]
     };
 
-    window.onload = function() {
-      var chartEl = document.getElementById("chart1");
+      var chartEl = document.getElementById("chart1").getContext('2d');
       var chart = new Chart(chartEl, {
-        type: "line",
+        type: "bar",
         data: lineChartData,
         options: {
           title:{
-            display: true,
-            text: "Chart demo"
+            display: false,
+            text: "Hourly Sales"
+          },
+          legend: {
+              display: true,
           },
           tooltips: {
             enabled: false,
@@ -476,11 +484,41 @@ $(document).ready(function(){
           elements: {
             line: {
               tension: 0.000001
+            },
+            point:{
+                pointStyle:'circle'
             }
+          },
+          scales: {
+                yAxes: [{
+                    ticks: {
+                        fontColor: "rgba(0,0,0,0.5)",
+                        fontStyle: "bold",
+                        beginAtZero: true,
+                        maxTicksLimit: 5,
+                        padding: 20
+                    },
+                    gridLines: {
+                        drawTicks: false,
+                        display: false
+                    }
+
+                }],
+                xAxes: [{
+                    gridLines: {
+                        zeroLineColor: "transparent"
+                    },
+                    ticks: {
+                        padding: 20,
+                        fontColor: "rgba(0,0,0,0.5)",
+                        fontStyle: "bold",
+                        beginAtZero: true,
+                        maxTicksLimit: 10
+                    }
+                }]
           }
         }
       });
-    };
 //-----chart**/
 });
 

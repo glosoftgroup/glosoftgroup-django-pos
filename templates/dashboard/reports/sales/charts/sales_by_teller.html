@@ -5,7 +5,7 @@
 {% load prices_i18n %}
 
 {% block title %}
-  Sales Report
+  Sales Terminals Report
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -38,27 +38,17 @@
         </div>
       <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
-            <div class="col-md-6">
-             <label>Search Sales</label>
-              <div class="form-group form-group-material has-feedback">
-                <input class="form-control search_user" placeholder="Search details" type="text">
-                <div class="form-control-feedback">
-                  <i class="icon-search4 text-size-base"></i>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-2">
-              <label>display list size</label>
+            <div class="col-md-3">
+              <label>Terminals</label>
               <div class="form-group">
                  <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="0" selected>No:</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
+                     {% for terminal in terminals %}
+                     <option value="{{terminal.id}}" selected>{{terminal.terminal_name}}</option>
+                     {% endfor %}
                   </select>
               </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <label>pick a date</label>
               <div class="form-group">
                 <div class="input-group">
@@ -80,25 +70,26 @@
       </div>
    </div>
    </div>
+<div class="p-sales">
+    <div class="col-md-12">
+       <div id="pagination-div">
+        <div class="panel panel-flat">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-12">
 
-<div class="col-md-12">
-   <div id="pagination-div">
-    <div class="panel panel-flat">
-      <div class="panel-body">
-        <div class="row">
-          <div class="col-md-12">
+                <div class="col-md-6 col-md-offset-3">
+                  <canvas id="myChart" width="400" height="400"></canvas>
+                </div>
 
-            <div class="col-md-6 col-md-offset-3">
-              <canvas id="myChart" width="400" height="400"></canvas>
+              </div>
             </div>
 
           </div>
         </div>
-
+       </div><!--pagination div-->
       </div>
     </div>
-   </div><!--pagination div-->
-  </div>
 </div>
 
 
@@ -109,6 +100,37 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
+    $('.list-sz').selectpicker().on('change', function(){
+        alert($(this).val());
+        /*$.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:date },success: function(data){-->
+              $('.p-sales').html(data);
+        }});*/
+    });
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change',function(){
+         $('.setValue').val($(this).val());
+         $('.setName').val('export');
+         // $('.set').value = $(this).val();
+         if($(this).val() == 'pdf'){
+            window.location = "{% url 'dashboard:chart_pdf' %}";
+         }
+    });
+
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:get_sales_by_date' %}",type: 'GET',data: {date:date },success: function(data){
+              $('.p-sales').html(data);
+        }});
+    });
+
   var endpoint = "{% url 'dashboard:chart' %}";
   var defaultData = [];
   var labels = [];

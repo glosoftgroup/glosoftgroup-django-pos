@@ -29,7 +29,6 @@ urlpatterns = [
 		url( r'^productchart/$', charts.sales_product_chart, name = 'sales_product_chart' ),
 		url( r'^userchart/$', charts.sales_user_chart, name = 'sales_user_chart' ),
 		url( r'^tellerchart/$', charts.sales_teller_chart, name = 'sales_teller_chart' ),
-		url( r'^datefilter/$', charts.get_sales_by_date, name = 'get_sales_by_date' ),
 		url( r'^weekfilter/$', charts.get_sales_by_week, name = 'get_sales_by_week' ),
 		
 		# url(r'^$', permission_required('userprofile.view_user', login_url='account_login'))     

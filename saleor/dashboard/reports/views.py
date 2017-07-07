@@ -55,7 +55,7 @@ def sales_detail(request, pk=None):
 	try:
 		sale = Sales.objects.get(pk=pk)
 		items = SoldItem.objects.filter(sales=sale)
-		return TemplateResponse(request, 'dashboard/reports/sales/details.html',{'items': items, "total_sales_amount":sale.total_net, "total_tax_amount":sale.total_tax})
+		return TemplateResponse(request, 'dashboard/reports/sales/details.html',{'items': items, "sale":sale})
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
 
