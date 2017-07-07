@@ -51,6 +51,8 @@ class Terminal(models.Model):
 		return len(self.terminals.all())
 	def get_sales(self):
 		return len(self.terminal_sales.all())
+	def get_todaySales(self):
+		return len(self.terminal_sales.filter(created=now()))
 	def get_loyalty_points(self):
 		points = SiteSettings.objects.get(pk=1)
 		return points.loyalty_point_equiv

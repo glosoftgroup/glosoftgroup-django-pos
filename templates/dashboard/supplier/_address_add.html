@@ -1,6 +1,6 @@
  <div class="panel panel-flat">
     <div class="panel-heading">
-      <h5 class="panel-title">Product Stock</h5>
+      <h5 class="panel-title">#{{user.pk}} {{user}}</h5>
       <div class="heading-elements">
         <ul class="icons-list">
           <li><a data-action="collapse"></a></li>
@@ -111,7 +111,7 @@
           }
           if (formData) {
                 $.ajax({
-                    url: "{% url 'dashboard:address-add' pk=user.pk %}",
+                    url: "{% url 'dashboard:address-add' pk=supplier_pk %}",
                     type: "POST",
                     data: formData,
                     processData: false,
@@ -120,7 +120,7 @@
                        console.log(data);
                        $("#contact_name").val('');
 
-                       refreshData(data)
+                       done_func();
                        $('#modal_instance2').modal('hide');
 
                        $.jGrowl('Address added successfully,', {

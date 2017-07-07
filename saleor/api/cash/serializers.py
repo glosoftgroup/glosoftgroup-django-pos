@@ -5,8 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import (
 					SerializerMethodField,
-					ValidationError,
-					
+					ValidationError,					
 				 )
 
 from django.contrib.auth import get_user_model
@@ -14,7 +13,19 @@ User = get_user_model()
 from ...sale.models import DrawerCash, Terminal, TerminalHistoryEntry
 from ...decorators import user_trail
 
-
+class TerminalListSerializer(serializers.ModelSerializer):
+	todaySales = SerializerMethodField()
+	class Meta:
+		model = Terminal
+		fields = ('id',
+				 'terminal_name', 
+				 'terminal_number',
+				 'amount',
+				 'todaySales'
+				 )
+	def get_todaySales(self,obj):
+		return obj.get_todaySales()
+		
 class UserAuthorizationSerializer(serializers.Serializer):
 	email = serializers.EmailField()
 	password = serializers.CharField(max_length=200)
@@ -117,7 +128,7 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 					' from TERMINAL:'+str(terminal)
 		print trail
 		if trans_type == 'deposit':
-		    #trail += '<br>Initial amount'+str('amount')			
+			#trail += '<br>Initial amount'+str('amount')			
 			self.terminal.amount += Decimal(amount)			
 			self.terminal.save()
 			TerminalHistoryEntry.objects.create(

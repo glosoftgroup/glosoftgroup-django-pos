@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
@@ -197,8 +198,7 @@ def user_assign_permission(request):
 @staff_member_required
 def address_add(request,pk):
 	if request.is_ajax():
-		if request.method == 'GET':
-			pk = 0
+		if request.method == 'GET':			
 			if pk:
 				pk = pk
 			ctx = {'supplier_pk':pk}
@@ -223,17 +223,25 @@ def address_add(request,pk):
 								contact_name=contact_name,
 								job_position=job_position
 								)
-			address.save()
+			address.save()			
+
 			supplier.addresses.add(address)			
-			snippet = "<tr><td>"+str(contact_name)+"</td>"+\
-					  "<td>"+str(email)+"</td>"+\
-					  "<td>"+str(phone)+"</td>"+\
-					  "<td>"+str(address)+"</td>"+\
-					  "<td>"+str(city)+' '+str(postal_code)+"</td>"+\
-					  "<td>"+str(job_position)+"</td></tr>"
-
-			return HttpResponse(snippet)
-
+			
+			ctx = {'address': address}
+    		return TemplateResponse(request,
+                            'dashboard/supplier/_newContact.html',
+                            ctx)
+			
+@staff_member_required
+def refresh_contact(request, pk=None):
+	if request.method == 'GET':
+		if pk:
+			user = get_object_or_404(Supplier, pk=pk)
+			ctx = {'user': user}
+			return TemplateResponse(request,
+                            'dashboard/supplier/_newContact.html',
+                            ctx)
+	return HttpResponse('Post request not accepted')
 @staff_member_required
 def contact_delete(request, pk):
     address = get_object_or_404(AddressBook, pk=pk)
@@ -243,7 +251,10 @@ def contact_delete(request, pk):
             request,
             pgettext_lazy(
                 'Dashboard message', 'Deleted contact %s') % address)
-       
+        if pk:
+            if request.is_ajax():
+            	script = "'#tr"+str(pk)+"'"
+                return HttpResponse(script)
     ctx = {'address': address}
     return TemplateResponse(request,
                             'dashboard/supplier/modal_delete.html',
