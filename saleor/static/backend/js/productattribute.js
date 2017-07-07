@@ -44,9 +44,12 @@ $(function() {
         $('#add_value').empty().append( data );
         $('#action').html('Add more Value');
       }
-      
+      $('#add_value').removeClass('hidden');
       $('#attr_name').attr('disabled','disabled');            
       notify('New category added successfully','bg-success');
+    });
+    posting.fail(function() {
+      notify('Error added successfully. Dublicates are not allowed','bg-danger');
     });
     //alert('sdfalsdf');
   });
