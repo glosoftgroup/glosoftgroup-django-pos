@@ -116,13 +116,13 @@ def user_update(request, pk):
 	if request.method == 'POST':
 		name = request.POST.get('name')
 		email = request.POST.get('email')		
-		code = request.POST.get('code')
+		nid = request.POST.get('nid')
 		mobile = request.POST.get('mobile')
 		image= request.FILES.get('image')		
 		if image :
 			user.name = name
 			user.email = email			
-			user.code = code
+			user.nid = nid
 			user.mobile = mobile
 			user.image = image
 			user.save()
@@ -132,7 +132,7 @@ def user_update(request, pk):
 		else:
 			user.name = name
 			user.email = email			
-			user.code = code
+			user.nid = nid
 			user.mobile = mobile
 			user.save()
 			user_trail(request.user.name, 'updated user: '+ str(user.name))

@@ -18,6 +18,7 @@ urlpatterns = [
         url(r'user_trail/$', views.user_trails, name='user_trail'),
         url(r'^delete/(?P<pk>[0-9]+)/$', views.user_delete, name='supplier-delete'),
         url(r'^delete/contact/(?P<pk>[0-9]+)/$', views.contact_delete, name='contact-delete'),
+        url(r'^refresh/contact/(?P<pk>[0-9]+)/$', views.refresh_contact, name='refresh-contact'),
         url(r'^edit/(?P<pk>[0-9]+)/$', views.user_edit, name='supplier-edit'),
         url(r'^supplier_update(?P<pk>[0-9]+)/$', views.user_update, name='supplier-update'),
         url(r'^user_assign_permission/$', views.user_assign_permission, name='user_assign_permission'),

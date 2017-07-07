@@ -153,12 +153,10 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
   <script type="text/javascript">
   $(document).ready(function() {    
-
     var sz;
     var total_pages;
     var visiblePages = $('.list-size').val();   
     localStorage.setItem('visiblePages', parseInt(visiblePages));
-
     var search_text = $('.search_sku').val();
     
     function getVisiblePages(){
@@ -166,7 +164,6 @@
         localStorage.setItem('visiblePages', parseInt(visiblePages));
         return localStorage.getItem('visiblePages');
     }
-
     function getSearchtext(){
       var search_text = $('.search_sku').val();
        //alert(search_text);
@@ -192,9 +189,7 @@
     return  localStorage.getItem('total_pages');    
     }
     getPages();
-
     // end totalPages   
-
     var $pagination = $('#pagination-demo');
     var defaultOpts = {
         totalPages: getPages(),
@@ -219,7 +214,6 @@
         var visiblePages = $(this).val();
         var ts = visiblePages;        
         var search_text = getSearchtext();
-
         // changecontent        
         $.get("{% url 'dashboard:product_filter' %}",
           {
@@ -242,7 +236,6 @@
            localStorage.setItem('total_pages',parseInt(data));         
            
         } });
-
         // destroy and create new pagination
         var totalPages = getPages();
         
@@ -253,7 +246,6 @@
                 totalPages: totalPages
             }));
     });
-
     //change content
     function changecontent(){
       $.get("{% url 'dashboard:product_filter' %}",
@@ -289,7 +281,6 @@
                 totalPages: totalPages
             }));
           }
-
     var delay = (function(){
       var timer = 0;
       return function(callback, ms){
@@ -306,8 +297,6 @@
         createNewPagination();
       }, 800 );
   });  
-
   });
-
 </script>
 {% endblock %}

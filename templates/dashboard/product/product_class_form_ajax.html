@@ -34,13 +34,15 @@
     });
     
   function refresh(){
-    var url = "{% url 'dashboard:product-class-add' %}";
-    var posting = $.get( url, {});
-    posting.done(function(data) {
-      $('#refresh-content').empty().append( data );
-    });
+    window.location.reload();
+    // var url = "{% url 'dashboard:product-class-add' %}";
+    // var posting = $.get( url, {});
+    // posting.done(function(data) {
+    //   $('#refresh-content').empty().append( data );
+    // });
   }
   $('#refresh_content').on('click', function(){
     refresh();
+    window.location.reload();
   });
 </script>

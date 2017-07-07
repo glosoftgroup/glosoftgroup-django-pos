@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load mptt_tags %}
 
-<form method="post" id="form-category" class="form-async" action="{% url 'dashboard:contact-delete' pk=address.pk %}" novalidate>
+<form method="post" onsubmit="return false;" id="contact-delete" class="form-async" action="#" novalidate>
   {% csrf_token %}
   <div class="modal-body">
     <div class="">
@@ -16,7 +16,7 @@
     
   </div>
   <div class="modal-footer">
-    <button type="submit" class="modal-action btn btn-primary">
+    <button type="submit" id='delete-contact' onclick="delete_contact();" class="modal-action btn btn-primary">
       {% trans "Delete" context "Dashboard delete action" %}
     </button>
     <a href="#!" data-dismiss="modal" class="modal-action modal-close btn btn-flat">
@@ -24,3 +24,25 @@
     </a>
   </div>
 </form>
+<script type="text/javascript">
+  function delete_contact(){
+   
+    var url = "{% url 'dashboard:contact-delete' pk=address.pk %}";
+    var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+    var request = $.ajax({
+                  url: url,
+                  method: "POST",
+                  data: { csrfmiddlewaretoken:csrf_token },
+                  dataType: "html"
+    });
+    request.done(function( msg ) {
+      done_func();
+    });
+     
+    request.fail(function( jqXHR, textStatus ) {
+      alert( "Request failed: " + textStatus );
+    });
+    return false;
+  }
+    
+</script>

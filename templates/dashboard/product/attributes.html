@@ -1,5 +1,10 @@
 <div class="form-group" id='div_attributes'>
 	<label>Product Attributes</label>
+	<span>
+	  <a href="">
+		<i class="icon-plus">{{class_pk}}+</i>
+	  </a>
+	</span>
 	{% for attribute_field in product_form.iter_attribute_fields %}
 	<div class="">
 	<label>{{ attribute_field.label }}</label>

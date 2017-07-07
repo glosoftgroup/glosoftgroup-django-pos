@@ -6,7 +6,7 @@ from django.utils.translation import pgettext_lazy
 from . import AuthenticationBackends
 from decimal import Decimal
 from django.core.validators import MinValueValidator
-
+from datetime import datetime
 
 @python_2_unicode_compatible
 class SiteSettings(models.Model):
@@ -21,7 +21,10 @@ class SiteSettings(models.Model):
         blank=True)
     loyalty_point_equiv = models.IntegerField( pgettext_lazy('Site field', 'loyalty points equivalency'),
         validators=[MinValueValidator(0)], default=Decimal(0)) 
-
+    opening_time = models.TimeField(pgettext_lazy('Site field', 'opening time'),
+        auto_now=False, null=True, blank=True)
+    closing_time = models.TimeField(pgettext_lazy('Site field', 'closing time'),
+        auto_now=False, null=True, blank=True)
     def __str__(self):
         return self.name
 
