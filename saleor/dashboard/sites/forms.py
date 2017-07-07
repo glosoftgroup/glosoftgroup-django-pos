@@ -11,6 +11,12 @@ class SiteSettingForm(forms.ModelForm):
         super(SiteSettingForm, self).__init__(*args, **kwargs)        
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+        field = self.fields['closing_time'] 
+        field.widget.attrs['class'] = 'form-control pickatime-editable'
+        closing_time = forms.TimeField(widget=forms.TimeInput(format='%H:%M %p'))
+        
+        field = self.fields['opening_time'] 
+        field.widget.attrs['class'] = 'form-control pickatime-editable'
         
 
 
