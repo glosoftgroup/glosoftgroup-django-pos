@@ -30,42 +30,23 @@
     /* chart*/
   </style>
  {% endblock %}
-<div class="col-md-12">
-   <div id="pagination-div">
-    <div class="panel panel-flat">
-      <div class="panel-body">
-        <div class="row">
-
-          <div class="col-md-12">
-
-            <div class="col-md-10 col-md-offset-1">
-                <canvas id="dateChart" width="900" height="400"></canvas>
-                <div class="text-center"><span style="color: #72726d;">Hours</span></div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    </div>
-   </div>
-  </div>
 
 <div class="col-md-12">
   <div class="panel panel-flat">
     <div class="panel-body">
      <div class="row">
-        <h3 style="padding-left: 20px;">Daily Gross Sales</h3>
+        <h3 style="padding-left: 20px;">Range Gross Sales</h3>
               <p class="text-centers" style="padding-left: 20px;">Gross Sales from {{date_from}} to {{date_to}} were <span class="text-primary">KShs. {{date_total_sales}}</span>.
               </p>
      </div>
       <div class="row">
           <div class="col-md-10">
-              <div id="canvas-holder1">
-                <canvas id="chart1" width="900" height="300"></canvas>
-                <div class="chartjs-tooltip" id="tooltip-0"></div>
-                <div class="text-center"><span style="color: #72726d;">Hours</span></div>
-              </div>
+              <!--<div id="canvas-holder1">-->
+                <!--<canvas id="chart1" width="900" height="300"></canvas>-->
+                <!--<div class="chartjs-tooltip" id="tooltip-0"></div>-->
+                <!--<div class="text-center"><span style="color: #72726d;">Hours</span></div>-->
+              <!--</div>-->
+              <canvas id="dateChart" width="900" height="300"></canvas>
           </div>
           <div class="col-md-2">
 
@@ -282,6 +263,28 @@ $(document).ready(function(){
                 ],
                 borderWidth: 1
             }]
+        },
+        options:{
+         legend: {
+              display: false,
+              position:"bottom"
+          },
+          scales: {
+                yAxes: [{
+                    ticks: {
+                        fontColor: "rgba(0,0,0,0.5)",
+                        fontStyle: "bold",
+                        beginAtZero: true,
+                        maxTicksLimit: 5,
+                        padding: 20
+                    },
+                    gridLines: {
+                        drawTicks: true,
+                        display: true
+                    }
+
+                }]
+          }
         }
 
     });
@@ -329,7 +332,7 @@ $(document).ready(function(){
       }]
     };
 
-      var chartEl = document.getElementById("chart1").getContext('2d');
+      /*var chartEl = document.getElementById("chart1").getContext('2d');
       var chart = new Chart(chartEl, {
         type: "line",
         data: lineChartData,
@@ -354,7 +357,7 @@ $(document).ready(function(){
             }
           }
         }
-      });
+      });*/
 //-----chart**/
 
 });
@@ -364,7 +367,7 @@ $(document).ready(function(){
    <div class="panel bg-danger-600">
      <div class="panel-body">
        <div style="text-align: center;font-size:16px;">
-       No sales summary available for {{date}}
+       No sales summary available from {{date_from}} to {{date_to}}
        </div>
       </div>
     </div>

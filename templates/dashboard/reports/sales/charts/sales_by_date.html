@@ -66,7 +66,7 @@
         </div>
       <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
-
+         <div class="row">
             <div class="col-md-3">
               <label>select single date to search</label>
               <div class="form-group">
@@ -76,7 +76,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-6">
               <label>select a date range and click search button for results</label>
               <div class="form-group">
                  <div class="col-md-8">
@@ -85,7 +85,6 @@
                         <i class="icon-calendar22"></i>
                       </span>
                       <input class="form-control daterange-to to" type="text" placeholder="to">
-                      
                     </div>
                  </div>
               </div>
@@ -100,6 +99,7 @@
                   </select>
               </div>
             </div>
+        </div>
       </div>
    </div>
    </div>
@@ -371,7 +371,7 @@ $(document).ready(function(){
             showCustomRangeLabel: true,
             linkedCalendars:false,
             locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
-            opens: 'right',
+            opens: 'left',
             applyClass: 'btn-small bg-slate',
             cancelClass: 'btn-small btn-default',
             ranges: {

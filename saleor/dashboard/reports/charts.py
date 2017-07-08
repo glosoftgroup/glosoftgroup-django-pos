@@ -41,6 +41,10 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
+def sales_category_chart(request):
+	return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {})
+
+@staff_member_required
 def sales_date_chart(request):
 	get_date = request.GET.get('date')
 	if get_date:
@@ -196,43 +200,84 @@ def get_sales_by_week(request):
 			labels3.append(day)
 			default3.append(amount)
 
-	elif 8 < date_range_diff <= 10:
-		for i in reversed(range(0, (date_range_diff)+1, 1)):
+	elif date_range_diff > 9 and date_range_diff <= 20:
+		for i in reversed(range(0, (date_range_diff)+1, 4)):
 			p = (second_range_date) - timedelta(days=i)
 			amount = get_date_results(DateFormat(p).format('Y-m-d'))
 			day = str(p.strftime("%A")[0:3])+ ' (*'+str(DateFormat(p).format('jS'))+')'
 			labels3.append(day)
 			default3.append(amount)
 
-	elif date_range_diff >= 60:
-		c = [first_range_date+timedelta(days=i) for i in range(0,(date_range_diff+1),30)]
+	elif date_range_diff > 20 and date_range_diff <= 30:
+		c = [first_range_date+timedelta(days=i) for i in range(0,(date_range_diff+1),4)]
 		r = (second_range_date-c[-1]).days
 		if r == 0:
-			for i in range(0, (date_range_diff) + 1, 30):
+			for i in range(0, (date_range_diff) + 1, 4):
 				p = first_range_date + timedelta(days=i)
-				p_next = p + timedelta(days=30)
+				p_next = p + timedelta(days=4)
 				amount = get_date_results_range(DateFormat(p).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
-				r = str((DateFormat(p).format('d/m'))) + ' - ' + str(DateFormat(p_next).format('d/m'))
+				r = str((DateFormat(p).format('d/m'))) + ' -0 ' + str(DateFormat(p_next).format('d/m'))
 				labels3.append(r)
 				default3.append(amount)
 		else:
-			# c.append(second_range_date)
+			last = c[-1]
+			c.remove(last)
 			for i in c:
-				# p = first_range_date + timedelta(days=i)
-				p_next = i + timedelta(days=30)
+				p_next = i + timedelta(days=3)
 				amount = get_date_results_range(DateFormat(i).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
-				r = str((DateFormat(i).format('d/m'))) + ' - ' + str(DateFormat(p_next).format('d/m'))
+				r = str((DateFormat(i).format('d/m'))) + ' -! ' + str(DateFormat(p_next).format('d/m'))
 				labels3.append(r)
 				default3.append(amount)
 
+			if last == second_range_date:
+				r = str((DateFormat(last).format('d/m'))) + ' -!! ' + str(DateFormat(second_range_date).format('d/m'))
+				amount_that_date = get_date_results(DateFormat(last).format('Y-m-d'))
+				default3.append(amount_that_date)
+				labels3.append(r)
+			else:
+				r = str((DateFormat(last).format('d/m'))) + ' -!!! ' + str(DateFormat(second_range_date).format('d/m'))
+				amount_that_date = get_date_results_range(DateFormat(last).format('Y-m-d'), DateFormat(second_range_date).format('Y-m-d'))
+				default3.append(amount_that_date)
+				labels3.append(r)
 
+	elif date_range_diff > 30 and date_range_diff <= 60:
+		c = [first_range_date+timedelta(days=i) for i in range(0,(date_range_diff+1),8)]
+		r = (second_range_date-c[-1]).days
+		if r == 0:
+			for i in range(0, (date_range_diff) + 1, 8):
+				p = first_range_date + timedelta(days=i)
+				p_next = p + timedelta(days=8)
+				amount = get_date_results_range(DateFormat(p).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
+				r = str((DateFormat(p).format('d/m'))) + ' -* ' + str(DateFormat(p_next).format('d/m'))
+				labels3.append(r)
+				default3.append(amount)
+		else:
+			last = c[-1]
+			c.remove(last)
+			for i in c:
+				p_next = i + timedelta(days=30)
+				amount = get_date_results_range(DateFormat(i).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
+				r = str((DateFormat(i).format('d/m'))) + ' -* ' + str(DateFormat(p_next).format('d/m'))
+				labels3.append(r)
+				default3.append(amount)
 
-	elif date_range_diff >= 150:
+			if last == second_range_date:
+				r = str((DateFormat(last).format('d/m'))) + ' -** ' + str(DateFormat(second_range_date).format('d/m'))
+				amount_that_date = get_date_results(DateFormat(last).format('Y-m-d'))
+				default3.append(amount_that_date)
+				labels3.append(r)
+			else:
+				r = str((DateFormat(last).format('d/m'))) + ' -*** ' + str(DateFormat(second_range_date).format('d/m'))
+				amount_that_date = get_date_results_range(DateFormat(last).format('Y-m-d'), DateFormat(second_range_date).format('Y-m-d'))
+				default3.append(amount_that_date)
+				labels3.append(r)
+
+	elif date_range_diff > 60 and date_range_diff <= 350:
 		for i in range(0, (date_range_diff)+1, 30):
 			p = (first_range_date) + timedelta(days=i)
 			p_next = p+timedelta(days=30)
 			amount = get_date_results_range(DateFormat(p).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
-			r = str((DateFormat(p).format('d'))) +'.'+str(p.strftime("%b")[0:2])+' - '+str(DateFormat(p_next).format('d')+'.'+str(p_next.strftime("%b")[0:2]))
+			r = str((DateFormat(p).format('d'))) +'.'+str(p.strftime("%b")[0:3])
 			labels3.append(r)
 			default3.append(amount)
 

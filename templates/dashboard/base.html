@@ -266,8 +266,9 @@
                       <i class='icon-cash3'></i>Sales</a>
                       <ul>
                         <li class="{% block menu_report_class %}{% endblock %}"><a href="{% url 'dashboard:sales_list' %}" class="legitRipple">List</a></li>
-                        <li class="{% block sales_by_date_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_date_chart' %}" class="legitRipple">By date Chart</a></li>
+                        <li class="{% block sales_by_date_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_date_chart' %}" class="legitRipple">Sales Summary</a></li>
                         <li><a href="javascript:;">Trending</a></li>
+                          <li class="{% block sales_by_category_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_category_chart' %}" class="legitRipple">Category Sales</a></li>
                         <li class="{% block sales_by_product_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_product_chart' %}" class="legitRipple">By Item</a></li>
                         <li class="{% block sales_by_user_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_user_chart' %}" class="legitRipple">By user</a></li>
                         <li class="{% block sales_by_teller_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_teller_chart' %}" class="legitRipple">By Terminal</a></li>
