@@ -27,59 +27,44 @@
 <div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Sales Reports</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
-            <div class="col-md-6">
-             <label>Search Sales</label>
-              <div class="form-group form-group-material has-feedback">
-                <input class="form-control search_user" placeholder="Search details" type="text">
-                <div class="form-control-feedback">
-                  <i class="icon-search4 text-size-base"></i>
-                </div>
+          <div class="panel-heading">
+              <h6 class="panel-title">Last recorded top category sales</h6>
+              <div class="heading-elements">
+                <ul class="icons-list">
+                  <li><a data-action="collapse"></a></li>
+                  <li><a data-action="reload"></a></li>
+                  <li><a data-action="close"></a></li>
+                </ul>
               </div>
-            </div>
-            <div class="col-md-2">
-              <label>display list size</label>
-              <div class="form-group">
-                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="0" selected>No:</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                  </select>
+            <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+          </div>
+          <div class="panel-body">
+              <div class="row">
+                  <div class="col-md-8">
+                      <label>Select User for details</label>
+                      <div class="form-group">
+                       <select class="bootstrap-select user" data-live-search="true" data-width="100%" tabindex="-98">
+                            {% for user in all_users %}
+                            <option value="{{user.user__id}}">{{user.user__name}}</option>
+                            {% endfor %}
+                        </select>
+                       </div>
+                  </div>
+                  <div class="col-md-4">
+                      <label>Export</label>
+                      <div class="form-group">
+                         <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                            <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                            <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                            <option value="excel" data-icon="fa-file-excel-o" onclick="alert('hi')">export excel</option>
+                          </select>
+                      </div>
+                  </div>
               </div>
-            </div>
-            <div class="col-md-2">
-              <label>pick a date</label>
-              <div class="form-group">
-                <div class="input-group">
-                  <input class="form-control daterange-single" type="text">
-                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-2">
-             <label>Export</label>
-              <div class="form-group">
-                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
-                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
-                  </select>
-              </div>
-            </div>
+
+          </div>
       </div>
-   </div>
-   </div>
+    </div>
 
 <div class="col-md-12">
    <div id="pagination-div">
@@ -101,6 +86,66 @@
   </div>
 </div>
 
+<div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-heading">
+          <h6 class="panel-title">Cashiers in Last Sales Recorded date</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+        <div class="panel-body">
+
+            <div class="card">
+
+              {% if users %}
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead>
+                      <tr>
+                        <th>
+                          Cashier Name
+                        </th>
+                        <th class="right-align">
+                          Terminal
+                        </th>
+                        <th> Total Sales</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for user in users %}
+                        <tr data-action-go="">
+                          <td>
+                            {{ user.user__name }} - {{user.user__email}}
+                          </td>
+                          <td class="right-align">
+                            {{ user.terminal }}
+                          </td>
+                          <td class="right-align">
+                            <div><span style="font-size: 0.7em;">Ksh. </span>{{ user.total_net__sum }}</div>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+    </div>
+
 
 {% endblock%}
 {% block custom_js %}
@@ -109,6 +154,28 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
+    $('.user').selectpicker().on('change',function(){
+      var user = $(this).val();
+      alert(user);
+        /*$.ajax({ url: "{% url 'dashboard:get_category_sale_details' %}",type: 'GET',data: {category:category },success: function(data){
+              $('.p-sales').html(data);
+        }});*/
+    });
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change',function(){
+         $('.setValue').val($(this).val());
+         $('.setName').val('export');
+         // $('.set').value = $(this).val();
+         if($(this).val() == 'pdf'){
+            window.location = "{% url 'dashboard:chart_pdf' %}";
+         }
+    });
+
   var endpoint = "{% url 'dashboard:chart' %}";
   var defaultData = [];
   var labels = [];

@@ -11,12 +11,13 @@
 {% block breadcrumbs %}
      <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
      <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
-     <li><a href="{% url 'dashboard:sales_date_chart' %}">Sales Category Chart</a></li>
+     <li><a href="{% url 'dashboard:sales_category_chart' %}">Sales Category Chart</a></li>
  {% endblock %}
 
 {% block sales_by_category_chart_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
+   .td:hover{cursor:pointer}
     label.error{
       color: #FF5722;
     }
@@ -53,193 +54,112 @@
 
 {% block content %}
 <div class="row animated fadeIn">
-  <div class="col-md-12">
+    <div class="col-md-12">
+      <div class="panel panel-flat">
+          <div class="panel-heading">
+              <h6 class="panel-title">Filter Categories</h6>
+              <div class="heading-elements">
+                <ul class="icons-list">
+                  <li><a data-action="collapse"></a></li>
+                  <li><a data-action="reload"></a></li>
+                  <li><a data-action="close"></a></li>
+                </ul>
+              </div>
+            <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+          </div>
+          <div class="panel-body">
+              <div class="row">
+                  <div class="col-md-8">
+                      <label>Select Category for details</label>
+                      <div class="form-group">
+                       <select class="bootstrap-select cat" data-live-search="true" data-width="100%" tabindex="-98">
+                            {% for cat in categs %}
+                            <option value="{{cat}}">{{cat}}</option>
+                            {% endfor %}
+                        </select>
+                       </div>
+                  </div>
+                  <div class="col-md-4">
+                      <label>Export</label>
+                      <div class="form-group">
+                         <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                            <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                            <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                            <option value="excel" data-icon="fa-file-excel-o" onclick="alert('hi')">export excel</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+    </div>
+<div class="p-sales">
+    <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
-        <h6 class="panel-title">Sales Reports Charts by Date</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
-
-            <div class="col-md-3">
-              <label>select single date to search</label>
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                  <input class="form-control daterange-single" type="text">
-                </div>
-              </div>
-            </div>
-            <div class="col-md-7">
-              <label>select a date range and click search button for results</label>
-              <div class="form-group">
-                 <div class="col-md-8">
-                    <div class="input-group">
-                    <span class="input-group-addon">
-                        <i class="icon-calendar22"></i>
-                      </span>
-                      <input class="form-control daterange-to to" type="text" placeholder="to">
-
-                    </div>
-                 </div>
-              </div>
-            </div>
-            <div class="col-md-2">
-             <label>Export</label>
-              <div class="form-group">
-                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
-                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                    <option value="excel" data-icon="fa-file-excel-o" onclick="alert('hi')">export excel</option>
-                  </select>
-              </div>
-            </div>
+          <h6 class="panel-title" style="text-align:center;">Top category sales</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
       </div>
-   </div>
-   </div>
-<div class="p-sales">
-  <div class="col-md-12">
-   <div class="panel panel-flat">
-    <div class="panel-heading">
-        <h6 class="panel-title">Sale summary of Date info 12/12/2019</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-
-     <div class="panel-body">
-          <!-- Quick stats boxes -->
-          <div class="row animated fadeIn">
-            <div class="col-lg-3">
-              <!-- Date Sales -->
-              <div class="panel bg-info-300">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-
-                  <h3 class="no-margin">KShs. 23202</h3>
-                  Total Sales
-                  <!-- <div class="popular">
-                   Popular product: Unga
-                  </div> -->
-                  <div class="popular">
-                   Popular products: <button class="btn btn-sm btn-default" onclick="alert('clicked ')" style="padding: 2px 5px;font-size: 10px;">View</button>
-                  </div>
-                </div>
-
-                <div id="server-load"></div>
-              </div>
-              <!-- /date sales -->
-            </div>
-
-            <div class="col-lg-3">
-              <!-- Highest Sold -->
-              <div class="panel bg-success-700">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-                  <h3 class="no-margin">KShs. 3,450</h3>
-                  Highest Sold Product
-                  <div class="high_product">
-                      Rice
-                  </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /highest sold -->
-            </div>
-
-            <div class="col-lg-3">
-              <!-- Lowest Sold-->
-              <div class="panel bg-danger-600">
-                <div class="panel-body">
-                  <div class="heading-elements">
-                  </div>
-                  <h3 class="no-margin">KShs.3,450</h3>
-                  Lowest Sold Product
-                  <div class="low_product">
-                      Spanner
-                  </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /lowest sold -->
-            </div>
-
-            <div class="col-lg-3">
-              <!-- Customers Visited -->
-              <div class="panel bg-purple-600">
-                <div class="panel-body">
-                  <h3 class="no-margin">3,450</h3>
-                  Customers Visited
-                  <div class="any" style="visibility: hidden;">
-                   1000 customers
-                  </div>
-                </div>
-                <div class="container-fluid">
-                  <div id="members-online"></div>
-                </div>
-              </div>
-              <!-- /customers visited -->
-            </div>
-
-          </div>
-          <!-- /quick stats boxes -->
-     </div>
-   </div>
- </div>
-<div class="col-md-12">
-  <div class="panel panel-flat">
-    <div class="panel-body">
-     <div class="row">
-        <h3 style="padding-left: 20px;">Dail Gross Sales</h3>
-     </div>
-      <div class="row">
-          <div class="col-md-10">
-              <div id="canvas-holder1" style="width:100%;">
-                <canvas id="chart1"></canvas>
-                <div class="chartjs-tooltip" id="tooltip-0"></div>
-                <div class="chartjs-tooltip" id="tooltip-1"></div>
-              </div>
-          </div>
-          <div class="col-md-2">
-            <ul><li>yes</li><li>no</li></ul>
-          </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="col-md-12">
-   <div id="pagination-div">
-    <div class="panel panel-flat">
       <div class="panel-body">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="col-md-6 col-md-offset-3">
-              <canvas id="myChart" width="400" height="400"></canvas>
+        <div class="col-md-6">
+           <canvas id="catChart" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="canvas-holder1" style="width:100%;">
+                        <canvas id="chart1"></canvas>
+                        <div class="chartjs-tooltip" id="tooltip-0"></div>
+                        <div class="chartjs-tooltip" id="tooltip-1"></div>
+                    </div>
+                </div>
             </div>
-          </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h6 class="text-center">Top 5 Categories in last sales</h6>
+                     <div class="data-table-container">
+                        <table class="table bordered highlight responsive data-table">
+                          <tbody>
+                          {% if sales_by_category %}
+                           {% for sales in sales_by_category %}
+                              <tr data-action-go="">
+                                <td class="td" data-href="{{sales.product_category}}">
+                                  <div class="sqaure" style="width: 15px;height: 15px;border-radius: 50%;background-color: {{sales.color}};">
+                                  </div>
+                                </td>
+                                <td class="td" data-href="{{sales.product_category}}">
+                                    {{forloop.counter }}.
+                                   {{sales.product_category}}
+                                </td>
+                                <td class="td" data-href="{{sales.product_category}}">
+                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
+                                </td>
+                                <td class="td" data-href="{{sales.product_category}}">
+                                  {{ sales.percentage }}%
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            {% endif %}
+
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+            </div>
 
         </div>
-
       </div>
     </div>
-   </div><!--pagination div-->
   </div>
+
  </div>
 </div>
 
@@ -310,6 +230,18 @@ $(document).ready(function(){
               $('.p-sales').html(data);
         }});
     });
+    $('.cat').selectpicker().on('change',function(){
+      var category = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:get_category_sale_details' %}",type: 'GET',data: {category:category },success: function(data){
+              $('.p-sales').html(data);
+        }});
+    });
+    $(".td").click(function(){
+         var category = $(this).data("href");
+         $.ajax({ url: "{% url 'dashboard:get_category_sale_details' %}",type: 'GET',data: {category:category },success: function(data){
+             $('.p-sales').html(data);
+          }});
+      });
 
     $('.export-sz').selectpicker({
           iconBase: 'fa',
@@ -415,27 +347,7 @@ $(document).ready(function(){
     var lineChartData = {
       labels: ["Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.", "Jul.","Aug.","Sep.","Oct.","Nov.","Dec."],
       datasets: [{
-        label: "This Week",
-        backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
-        borderColor: window.chartColors.red,
-        // pointBackgroundColor: window.chartColors.red,
-        fill: false,
-        data: [
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor()
-        ]
-      }, {
-        label: "Last Week",
+        label: "Average current month sales",
         backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
         borderColor: window.chartColors.blue,
         // pointBackgroundColor: window.chartColors.blue,
@@ -465,13 +377,16 @@ $(document).ready(function(){
         options: {
           title:{
             display: true,
-            text: "Chart demo"
+            text: "Average Category Sales"
           },
           tooltips: {
             enabled: false,
             mode: 'index',
             intersect: false,
             custom: customTooltips
+          },
+          legend:{
+          display:false
           },
           elements: {
             line: {
@@ -482,6 +397,27 @@ $(document).ready(function(){
       });
     };
 //-----chart**/
+//**@ doughnut chart
+  // function setChart(){
+    var defaultData2 = [{% for d in sales_by_category %} {{ d.total_cost__sum }}, {% endfor %}];
+    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}", {% endfor %}];
+    var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
+    // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
+      var ctx = document.getElementById("catChart").getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: labels2,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData2,
+                  backgroundColor:backColor,
+                  borderWidth: 1
+              }]
+          }
+      });
+  // }
+//---------------doghnut chart**/
 });
 
 </script>

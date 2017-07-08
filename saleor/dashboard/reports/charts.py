@@ -30,7 +30,7 @@ from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, Terminal
-from ...product.models import Product, ProductVariant
+from ...product.models import Product, ProductVariant, Category
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, convert_html_to_pdf
 
@@ -42,7 +42,109 @@ error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 def sales_category_chart(request):
-	return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {})
+	get_date = request.GET.get('date')
+	if get_date:
+		date = get_date
+	else:
+		last_sale = Sales.objects.latest('id')
+		date = DateFormat(last_sale.created).format('Y-m-d')
+	if date:
+		try:
+			sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
+				c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
+			sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+			new_sales = []
+			for sales in sales_by_category:
+				color = "#%03x" % random.randint(0, 0xFFF)
+				sales['color'] = color
+				percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+				percentage = round(percent, 2)
+				sales['percentage'] = percentage
+				for s in range(0, sales_by_category.count(), 1):
+					sales['count'] = s
+				new_sales.append(sales)
+			categs = Category.objects.all()
+			data = {
+				"sales_by_category": new_sales,
+				"categs":categs
+			}
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', data)
+		except ObjectDoesNotExist as e:
+			return HttpResponse(e)
+
+def get_category_sale_details(request):
+	get_categ = request.GET.get('category')
+	today = datetime.datetime.now()
+	if get_categ:
+		try:
+			""" this year """
+			this_year_sales = SoldItem.objects.filter(product_category__contains=get_categ, sales__created__year=today.year
+												 ).aggregate(Sum('total_cost'))['total_cost__sum']
+			y_sales = SoldItem.objects.filter(sales__created__year=today.year).aggregate(Sum('total_cost'))['total_cost__sum']
+			try:
+				ty_percent = round((Decimal(this_year_sales) / Decimal(y_sales)) * 100, 2)
+				ty_others = 100 - ty_percent
+			except:
+				ty_percent = 0
+				ty_others = 0
+
+			""" this month """
+			this_month_sales = SoldItem.objects.filter(product_category__contains=get_categ, sales__created__year=today.year,
+													   sales__created__month=today.month).aggregate(Sum('total_cost'))['total_cost__sum']
+			m_sales = SoldItem.objects.filter(sales__created__year=today.year, sales__created__month=today.month).aggregate(Sum('total_cost'))['total_cost__sum']
+			try:
+				tm_percent = round((Decimal(this_month_sales) / Decimal(m_sales)) * 100, 2)
+				tm_others = 100 - tm_percent
+			except:
+				tm_percent = 0
+				tm_others = 0
+
+			""" last year """
+			last_year_sales = SoldItem.objects.filter(product_category__contains=get_categ, sales__created__year=(today.year - 1)
+													  ).aggregate(Sum('total_cost'))['total_cost__sum']
+			ly_sales = SoldItem.objects.filter(sales__created__year=(today.year - 1)).aggregate(Sum('total_cost'))['total_cost__sum']
+			try:
+				ly_percent = round((Decimal(last_year_sales) / Decimal(ly_sales)) * 100, 2)
+				ly_others = 100 - ly_percent
+			except:
+				ly_percent = 0
+				ly_others = 0
+
+			""" last month """
+			last_month = today.month - 1 if today.month > 1 else 12
+			last_month_sales = SoldItem.objects.filter(product_category__contains=get_categ, sales__created__year=today.year,
+													   sales__created__month=last_month).aggregate(Sum('total_cost'))['total_cost__sum']
+
+			lm_sales = SoldItem.objects.filter(sales__created__year=today.year, sales__created__month=last_month).aggregate(Sum('total_cost'))['total_cost__sum']
+			try:
+				lm_percent = round((Decimal(last_month_sales) / Decimal(lm_sales)) * 100, 2)
+				lm_others = 100 - lm_percent
+			except:
+				lm_percent = 0
+				lm_others = 0
+
+			last_sales = SoldItem.objects.filter(product_category__contains=get_categ).values('product_category','sales__created').annotate(Sum('total_cost')).order_by().latest('sales__id')
+
+			data = {
+				"category":get_categ,
+				"this_year_sales": this_year_sales,
+				"this_month_sales":this_month_sales,
+				"last_year_sales":last_year_sales,
+				"last_month_sales":last_month_sales,
+				"ty_percent":ty_percent,
+				"ty_others":ty_others,
+				"tm_percent": tm_percent,
+				"tm_others": tm_others,
+				"ly_percent": ly_percent,
+				"ly_others": ly_others,
+				"lm_percent": lm_percent,
+				"lm_others": lm_others,
+				"last_sales":last_sales
+			}
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_category.html', data)
+		except ObjectDoesNotExist as e:
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_category.html',{})
+			# return HttpResponse(e)
 
 @staff_member_required
 def sales_date_chart(request):
@@ -352,7 +454,25 @@ def get_sales_by_week(request):
 
 
 def sales_user_chart(request):
-	return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html', {})
+	try:
+		last_sale = Sales.objects.latest('id')
+		date = DateFormat(last_sale.created).format('Y-m-d')
+		sales_that_day = Sales.objects.filter(created__contains=date)
+		d = ''
+		for s in sales_that_day:
+			d = s.created
+		users = Sales.objects.values('user__email', 'user__name', 'terminal').annotate(Count('user')).annotate(
+			Sum('total_net')).order_by().filter(created__contains=date)
+		all_users = Sales.objects.values('user__id','user__email', 'user__name').annotate(Count('user', distinct=True)).order_by()
+		data = {
+			"users": users,
+			"all_users":all_users,
+			"last_sale_date":DateFormat(d).format('jS F')
+		}
+		return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html', data)
+	except ObjectDoesNotExist as e:
+		return HttpResponse(e)
+		# return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html', data)
 
 def sales_product_chart(request):
 	return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html', {})
