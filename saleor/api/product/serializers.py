@@ -36,7 +36,6 @@ class CreateStockSerializer(ModelSerializer):
 
 class CustomerListSerializer(serializers.ModelSerializer):
 	url = HyperlinkedIdentityField(view_name='product-api:detail')
-
 	class Meta:
 		model = Customer
 		fields = ('id',

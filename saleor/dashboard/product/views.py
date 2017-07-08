@@ -15,7 +15,9 @@ from . import forms
 from ...core.utils import get_paginator_items
 from ...purchase.models import (
 								PurchaseOrder,
-								PurchaseItems)
+								PurchaseItems,
+								PurchaseProduct
+								)
 from ...supplier.models import Supplier
 from ...product.models import (Product, ProductAttribute, 
 							   ProductClass, AttributeChoiceValue,
@@ -358,8 +360,17 @@ def add_stock_ajax(request):
 			return HttpResponse('stock pk required')
 		old_quantity = stock.quantity
 		diff = int(quantity) - int(old_quantity)  
-		crud = 'Removed' if diff < 0 else "Added"     
+		crud = 'Removed' if diff < 0 else "Added"
 
+		if crud == 'Added':
+			supplier = stock.variant.product.product_supplier
+			PurchaseProduct.objects.create(
+							variant=stock.variant,
+							stock=stock,
+							cost_price=stock.cost_price,
+							quantity=diff,
+							supplier=supplier,
+				            )
 		try:
 			stock_list = request.session['stock_list']
 			if stock_pk in stock_list:
@@ -394,13 +405,24 @@ def stock_edit(request, product_pk, stock_pk=None):
 						   product=product)
 	if form.is_valid():
 		form.save()
+		
+		quantity = request.POST.get('quantity')		
+		cost_price = request.POST.get('cost_price')		
+		#try:
+		PurchaseProduct.objects.create(
+							variant=stock.variant,
+							stock=stock,
+							cost_price=cost_price,
+							quantity=quantity,
+							supplier=product.product_supplier,
+				            )
 		messages.success(
 			request, pgettext_lazy('Dashboard message', 'Saved stock'))
 		product_url = reverse(
 			'dashboard:product-update', kwargs={'pk': product_pk})
 		success_url = request.POST.get('success_url', product_url)
 		if is_safe_url(success_url, request.get_host()):
-			return redirect(success_url)
+			return redirect(success_url)			
 	errors = form.errors
 	ctx = {'form': form, 'product': product, 'stock': stock, 'errors':errors}
 	if request.is_ajax():
