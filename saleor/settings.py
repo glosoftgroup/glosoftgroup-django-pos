@@ -44,7 +44,6 @@ DATABASES = {
 
 
 TIME_ZONE = 'Africa/Nairobi'
-TIME_INPUT_FORMATS = ('%I:%M %p',)
 LANGUAGE_CODE = 'en-us'
 LOCALE_PATHS = [os.path.join(PROJECT_ROOT, 'locale')]
 USE_I18N = True
@@ -519,5 +518,6 @@ JWT_AUTH = {
     'saleor.jwt_payload.jwt_response_payload_handler',
     'JWT_EXPIRATION_DELTA':
      timedelta(days=2),
-         
+
 }
+

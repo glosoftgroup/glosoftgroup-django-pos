@@ -5,11 +5,11 @@
 {% load prices_i18n %}
 
 {% block title %}
-  Sales Report
+  Sales List Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
-     <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
+     <li><a href="{% url 'dashboard:sales_list' %}">Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_list' %}">Sales</a></li>
  {% endblock %}
 
 {% block menu_report_class %}active{% endblock %}
@@ -18,6 +18,7 @@
     label.error{
       color: #FF5722;
     }
+    .td{cursor:pointer}
   </style>
  {% endblock %}
 
@@ -37,7 +38,7 @@
       <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
             <div class="col-md-6">
-             <label>Search Sales</label>
+             <label>Search Sales (for date format: yyyy-mm-dd)</label>
               <div class="form-group form-group-material has-feedback">
                 <input class="form-control search_user" placeholder="Search details" type="text">
                 <div class="form-control-feedback">
@@ -85,32 +86,32 @@
       <div class="panel-body">
         <div class="row">
           <div class="col-md-12">
-            <div class="table-responsives">     
-                <table class="table table-bordered datatable-header-footer">
+            <div class="table-responsives">
+                <table class="table table-bordered datatable-header-footer table-hover">
                   <caption style="margin-bottom: 10px;">
-                   </caption> 
+                   </caption>
                       <thead style="border-top:1px solid #ddd;">
                         <tr>
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
                           <th>Client Name</th>
-                          <th>Item Name</th>
-                          <th>Unit Cost</th>
+                          <th>Cashier</th>
+                          <th>Terminal</th>
                           <th>Quantity</th>
                           <th>Total Sales</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
-                        {% if items %}
-                        {% for item in items %}
-                          <tr>
-                            <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
-                            <td>{{item.sales.invoice_number }}</td>
-                            <td>{% if item.sales.user.email %}{{item.sales.user.email}}{% else %}{{item.sales.user.name}}{% endif %}</td>
-                            <td>{{item.product_name}}</td>
-                            <td>{{item.unit_cost}}</td>
-                            <td>{{item.quantity}}</td>
-                            <td>{{item.total_cost}}</td>
+                        {% if sales %}
+                        {% for sale in sales %}
+                          <tr class='clickable-row' id="{{sale.pk }}">
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
+                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.terminal}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
                           </tr>
                         {% endfor %}
                         {% else %}
@@ -132,21 +133,21 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Todays Sales: Kshs 
-                    {% if tsum.total_net__sum %}
-                       {{tsum.total_net__sum}} 
+                   Last Sales Sales: Kshs
+                    {% if total_sales_amount.total_net__sum %}
+                       {{total_sales_amount.total_net__sum}}
                     {% else %}
                        0.00<br />
                     {% endif %}<br />
-                   Total Sales: Kshs {{total_sales.total_net__sum}}<br />
-                   Total Tax: Kshs {{ total_tax.total_tax__sum}}
+                   Total Sales: Kshs {{total_sales_amount.total_net__sum}}<br />
+                   Total Tax: Kshs {{ total_tax_amount.total_tax__sum}}
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by {{request.user.name}}</span></p>
+                  <span>Report pullled by User</span></p>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
                   <!--<button class="btn btn-primary ck">Click</button> -->
-                  
+
               </div>
              </div>
             </div>
@@ -161,19 +162,24 @@
 
 {% endblock%}
 {% block custom_js %}
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 
+    $(".td").click(function(){
+          window.location = $(this).data("href");
+      });
+
+
     var pagination_totalsize;
     var status;
     //**@ get
-    $.ajax({ url: "{% url 'dashboard:sales_reports' %}",type: 'GET',data: {initial:'initial'},
+    $.ajax({ url: "{% url 'dashboard:sales_list' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
          pagination_totalsize = data;
-    }}); 
+    }});
 
      $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
@@ -184,9 +190,9 @@ $(document).ready(function(){
             $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
-    }).children('.pagination').addClass('pagination-flat pagination-sm'); 
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
 
-    $('.daterange-single').daterangepicker({ 
+    $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true
@@ -236,7 +242,7 @@ $(document).ready(function(){
 
     $('.search_user').keyup(function() {
       var search_text = $(this).val();
-      delay(function(){ 
+      delay(function(){
          var url = "{% url 'dashboard:sales_search' %}";
          $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
                 $('#pagination-div').html(data);

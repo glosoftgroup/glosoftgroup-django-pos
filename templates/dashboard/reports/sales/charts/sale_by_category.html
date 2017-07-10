@@ -11,10 +11,10 @@
 {% block breadcrumbs %}
      <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
      <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
-     <li><a href="{% url 'dashboard:sales_user_chart' %}">Sales User Chart</a></li>
+     <li><a href="{% url 'dashboard:sales_category_chart' %}">Sales Category Chart</a></li>
  {% endblock %}
 
-{% block sales_by_user_chart_class %}active{% endblock %}
+{% block sales_by_category_chart_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
    .td:hover{cursor:pointer}
@@ -57,7 +57,7 @@
     <div class="col-md-12">
       <div class="panel panel-flat">
           <div class="panel-heading">
-              <h6 class="panel-title">Filter Users</h6>
+              <h6 class="panel-title">Filter Categories</h6>
               <div class="heading-elements">
                 <ul class="icons-list">
                   <li><a data-action="collapse"></a></li>
@@ -70,11 +70,11 @@
           <div class="panel-body">
               <div class="row">
                   <div class="col-md-8">
-                      <label>Select User for details</label>
+                      <label>Select Category for details</label>
                       <div class="form-group">
                        <select class="bootstrap-select cat" data-live-search="true" data-width="100%" tabindex="-98">
                             {% for cat in categs %}
-                            <option value="{{cat.user__name}}">{{cat.user__name}}</option>
+                            <option value="{{cat}}">{{cat}}</option>
                             {% endfor %}
                         </select>
                        </div>
@@ -98,7 +98,7 @@
     <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
-          <h6 class="panel-title" style="text-align:center;">Top User sales</h6>
+          <h6 class="panel-title" style="text-align:center;">Top category sales</h6>
           <div class="heading-elements">
             <ul class="icons-list">
               <li><a data-action="collapse"></a></li>
@@ -124,25 +124,25 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <h6 class="text-center">Top 5 Users in last sales</h6>
+                    <h6 class="text-center">Top 5 Categories in last sales</h6>
                      <div class="data-table-container">
                         <table class="table bordered highlight responsive data-table">
                           <tbody>
                           {% if sales_by_category %}
                            {% for sales in sales_by_category %}
                               <tr data-action-go="">
-                                <td class="td" data-href="{{sales.user__name}}">
+                                <td class="td" data-href="{{sales.product_category}}">
                                   <div class="sqaure" style="width: 15px;height: 15px;border-radius: 50%;background-color: {{sales.color}};">
                                   </div>
                                 </td>
-                                <td class="td" data-href="{{sales.user__name}}">
+                                <td class="td" data-href="{{sales.product_category}}">
                                     {{forloop.counter }}.
-                                   {{sales.user__name}}
+                                   {{sales.product_category}}
                                 </td>
-                                <td class="td" data-href="{{sales.user__name}}">
-                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_net__sum}}</div>
+                                <td class="td" data-href="{{sales.product_category}}">
+                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
                                 </td>
-                                <td class="td" data-href="{{sales.user__name}}">
+                                <td class="td" data-href="{{sales.product_category}}">
                                   {{ sales.percentage }}%
                                 </td>
                               </tr>
@@ -198,17 +198,15 @@ $(document).ready(function(){
               $('.p-sales').html(data);
         }});
     });
-
     $('.cat').selectpicker().on('change',function(){
-      var user = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:get_user_sale_details' %}",type: 'GET',data: {user:user },success: function(data){
+      var category = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:get_category_sale_details' %}",type: 'GET',data: {category:category },success: function(data){
               $('.p-sales').html(data);
         }});
     });
-
     $(".td").click(function(){
-         var user = $(this).data("href");
-         $.ajax({ url: "{% url 'dashboard:get_user_sale_details' %}",type: 'GET',data: {user:user },success: function(data){
+         var category = $(this).data("href");
+         $.ajax({ url: "{% url 'dashboard:get_category_sale_details' %}",type: 'GET',data: {category:category },success: function(data){
              $('.p-sales').html(data);
           }});
       });
@@ -334,7 +332,7 @@ $(document).ready(function(){
         options: {
           title:{
             display: true,
-            text: "Average User Sales for {{hcateg}}"
+            text: "Average Category Sales for {{hcateg}}"
           },
           tooltips: {
             enabled: false,
@@ -356,8 +354,8 @@ $(document).ready(function(){
     };
 //-----chart**/
 //**@ doughnut chart
-    var defaultData2 = [{% for d in sales_by_category %} {{ d.total_net__sum }}, {% endfor %}];
-    var labels2 = [{% for d in sales_by_category %} "{{ d.user__name }}", {% endfor %}];
+    var defaultData2 = [{% for d in sales_by_category %} {{ d.total_cost__sum }}, {% endfor %}];
+    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}", {% endfor %}];
     var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
     // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
       var ctx = document.getElementById("catChart").getContext('2d');

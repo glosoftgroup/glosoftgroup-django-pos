@@ -1,0 +1,101 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Sales Report
+{% endblock %}
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
+     <li>Invoice</li>
+ {% endblock %}
+
+{% block menu_report_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12" style="margin-bottom:10px;">
+        <a class="btn btn-primary pull-left" href="{% url 'dashboard:sales_list' %}"><i class="icon-arrow-left13 position-left"></i> Back To Sales List</a>
+        <a class="btn btn-primary pull-right" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
+        </div>
+    </div>
+</div>
+<div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsives">
+                <table class="table table-bordered datatable-header-footer">
+                    <caption>
+                      <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
+
+                        <img src="{{sale.user.image.url}}" class="center-block circle teal img-responsive img-circle" style="width: 60px;height: 60px;"/>
+                        <h6 class="">Cashier: {{sale.user.name}}</h6>
+                          <h5 class="">Invoice Number: {{sale.invoice_number}}</h5>
+                      </div>
+                    </caption>
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr>
+                          <th>Transaction Date</th>
+                          <th>Item Name</th>
+                          <th>Unit Cost</th>
+                          <th>Quantity</th>
+                          <th>Total Sales</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tb">
+                        {% if items %}
+                        {% for item in items %}
+                          <tr>
+                            <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
+                            <td>{{item.product_name}}</td>
+                            <td>{{item.unit_cost}}</td>
+                            <td>{{item.quantity}}</td>
+                            <td>{{item.total_cost}}</td>
+                          </tr>
+                        {% endfor %}
+                        {% else %}
+                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                        {% endif %}
+                        </tbody>
+
+                 </table>
+              </div>
+             </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
+                  <span>
+                   Total Sales: Kshs {{sale.total_net}}<br />
+                   Total Tax: Kshs {{sale.total_tax}}
+                 </span><br>
+                  <span> Thank you for partnering with us.<br />
+                  <span>Report pullled by {{request.user.name}}</span></span>
+                  <input type="hidden" class="setValue">
+                  <input type="hidden" class="setName">
+
+              </div>
+             </div>
+            </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+</div>
+
+
+{% endblock%}
+{% block custom_js %}
+{% endblock %}

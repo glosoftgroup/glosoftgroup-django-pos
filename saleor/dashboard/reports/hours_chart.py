@@ -103,3 +103,51 @@ def get_date_results(date):
 	except ObjectDoesNotExist:
 		amount = 0
 		return amount
+
+def get_category_results(category, year, month):
+	try:
+		amount = SoldItem.objects.filter(product_category__contains=category, sales__created__year = year, sales__created__month = month).aggregate(Sum('total_cost'))['total_cost__sum']
+		if amount is not None:
+			return amount
+		else:
+			amount = 0
+			return amount
+	except ObjectDoesNotExist:
+		amount = 0
+		return amount
+
+def get_item_results(item, year, month):
+	try:
+		amount = SoldItem.objects.filter(product_name__contains=item, sales__created__year = year, sales__created__month = month).aggregate(Sum('total_cost'))['total_cost__sum']
+		if amount is not None:
+			return amount
+		else:
+			amount = 0
+			return amount
+	except ObjectDoesNotExist:
+		amount = 0
+		return amount
+
+def get_user_results(user, year, month):
+	try:
+		amount = Sales.objects.filter(user__name__contains=user, created__year = year, created__month = month).aggregate(Sum('total_net'))['total_net__sum']
+		if amount is not None:
+			return amount
+		else:
+			amount = 0
+			return amount
+	except ObjectDoesNotExist:
+		amount = 0
+		return amount
+
+def get_terminal_results(terminal, year, month):
+	try:
+		amount = Sales.objects.filter(terminal__terminal_name__contains=terminal, created__year = year, created__month = month).aggregate(Sum('total_net'))['total_net__sum']
+		if amount is not None:
+			return amount
+		else:
+			amount = 0
+			return amount
+	except ObjectDoesNotExist:
+		amount = 0
+		return amount
