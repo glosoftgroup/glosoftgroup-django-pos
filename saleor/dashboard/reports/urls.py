@@ -15,6 +15,9 @@ urlpatterns = [
 		url(r'^product_reports/$', views.product_reports, name='products_reports'),
 		url( r'^products_search/$', views.products_search, name = 'products_search' ),
 		url( r'^products_paginate/$', views.products_paginate, name = 'products_paginate' ),
+		url(r'^prd/$', views.product_reorder, name='products_reorder'),
+		url( r'^prs/$', views.products_reorder_search, name = 'products_reorder_search' ),
+		url( r'^prp/$', views.products_reorder_paginate, name = 'products_reorder_paginate' ),
 
 		url(r'^purchases_reports/$', views.purchases_reports, name='purchases_reports'),
 		url(r'^balancesheet_reports/$', views.balancesheet_reports, name='balancesheet_reports'),
@@ -27,12 +30,15 @@ urlpatterns = [
 
 		url( r'^datechart/$', charts.sales_date_chart, name = 'sales_date_chart' ),
 		url( r'^productchart/$', charts.sales_product_chart, name = 'sales_product_chart' ),
+		url( r'^ptd/$', charts.get_product_sale_details, name = 'get_product_sale_details' ),
 		url( r'^category/$', charts.sales_category_chart, name = 'sales_category_chart' ),
 		url( r'^catd/$', charts.get_category_sale_details, name = 'get_category_sale_details' ),
 		url( r'^userchart/$', charts.sales_user_chart, name = 'sales_user_chart' ),
-		url( r'^tellerchart/$', charts.sales_teller_chart, name = 'sales_teller_chart' ),
+		url( r'^utd/$', charts.get_user_sale_details, name = 'get_user_sale_details' ),
+		url( r'^tellerchart/$', charts.sales_terminal_chart, name = 'sales_terminal_chart' ),
+		url( r'^ttd/$', charts.get_terminal_sale_details, name = 'get_terminal_sale_details' ),
 		url( r'^weekfilter/$', charts.get_sales_by_week, name = 'get_sales_by_week' ),
-		
+
 		# url(r'^$', permission_required('userprofile.view_user', login_url='account_login'))     
 ]
 

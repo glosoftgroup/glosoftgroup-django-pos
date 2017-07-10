@@ -35,7 +35,7 @@
         <div class="col-md-12">
             <div class="alert bg-primary">
                 <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
-                <span class="text-semibold">Category: {{category}}</span> Last Date sales made were {{last_sales.total_cost__sum}} on date {{last_sales.sales__created}}
+                <span class="text-semibold">User: {{category}}</span> Last Date sales made were {{last_sales.total_net__sum}} on date {{last_sales.created}}
             </div>
 
         </div>
@@ -110,25 +110,6 @@
 
     </div>
 </div>
-<!--<div class="col-md-12">-->
-    <!--<div class="panel panel-flat">-->
-        <!--<div class="panel-body">-->
-            <!--<div class="row">-->
-                <!--<div class="col-md-12">-->
-                    <!--<h2>Year Sales {{this_year_sales}} - ly {{last_year_sales}}</h2>-->
-                      <!--<div class="col-md-3">-->
-                        <!--<div class="panel text-center">-->
-                            <!--<div class="panel-body">-->
-                                <!--<div class="content-group-sm svg-center position-relative" id="goal-progress"><svg width="76" height="76"><g transform="translate(38,38)"><path class="d3-progress-background" d="M0,38A38,38 0 1,1 0,-38A38,38 0 1,1 0,38M0,36A36,36 0 1,0 0,-36A36,36 0 1,0 0,36Z" style="fill: rgb(238, 238, 238);"></path><path class="d3-progress-foreground" filter="url(#blur)" style="fill: rgb(92, 107, 192); stroke: rgb(92, 107, 192);" d="M2.326828918379971e-15,-38A38,38 0 1,1 -34.3834279937087,-16.179613079472855L-32.573773888776664,-15.328054496342704A36,36 0 1,0 2.204364238465236e-15,-36Z"></path><path class="d3-progress-front" style="fill: rgb(92, 107, 192); fill-opacity: 1;" d="M2.326828918379971e-15,-38A38,38 0 1,1 -34.3834279937087,-16.179613079472855L-32.573773888776664,-15.328054496342704A36,36 0 1,0 2.204364238465236e-15,-36Z"></path></g></svg><h2 class="mt-15 mb-5">82%</h2><i class="icon-trophy3 text-indigo-400 counter-icon" style="top: 22px"></i><div>Productivity goal</div><div class="text-size-small text-muted">87% average</div></div>-->
-                                <!--<div id="goal-bars"><svg width="119.33332824707031" height="40"><g width="119.33332824707031"><rect class="d3-random-bars" width="3.437585587364165" x="1.4732509660132138" style="fill: rgb(92, 107, 192);" height="27.36842105263158" y="12.631578947368421"></rect><rect class="d3-random-bars" width="3.437585587364165" x="6.384087519390593" style="fill: rgb(92, 107, 192);" height="35.78947368421053" y="4.210526315789473"></rect><rect class="d3-random-bars" width="3.437585587364165" x="11.294924072767973" style="fill: rgb(92, 107, 192);" height="21.052631578947366" y="18.947368421052634"></rect><rect class="d3-random-bars" width="3.437585587364165" x="16.205760626145352" style="fill: rgb(92, 107, 192);" height="23.157894736842106" y="16.842105263157894"></rect><rect class="d3-random-bars" width="3.437585587364165" x="21.11659717952273" style="fill: rgb(92, 107, 192);" height="27.36842105263158" y="12.631578947368421"></rect><rect class="d3-random-bars" width="3.437585587364165" x="26.02743373290011" style="fill: rgb(92, 107, 192);" height="31.578947368421055" y="8.421052631578945"></rect><rect class="d3-random-bars" width="3.437585587364165" x="30.93827028627749" style="fill: rgb(92, 107, 192);" height="25.263157894736842" y="14.736842105263158"></rect><rect class="d3-random-bars" width="3.437585587364165" x="35.849106839654866" style="fill: rgb(92, 107, 192);" height="25.263157894736842" y="14.736842105263158"></rect><rect class="d3-random-bars" width="3.437585587364165" x="40.759943393032245" style="fill: rgb(92, 107, 192);" height="25.263157894736842" y="14.736842105263158"></rect><rect class="d3-random-bars" width="3.437585587364165" x="45.670779946409624" style="fill: rgb(92, 107, 192);" height="40" y="0"></rect><rect class="d3-random-bars" width="3.437585587364165" x="50.581616499787" style="fill: rgb(92, 107, 192);" height="40" y="0"></rect><rect class="d3-random-bars" width="3.437585587364165" x="55.49245305316438" style="fill: rgb(92, 107, 192);" height="21.052631578947366" y="18.947368421052634"></rect><rect class="d3-random-bars" width="3.437585587364165" x="60.40328960654176" style="fill: rgb(92, 107, 192);" height="31.578947368421055" y="8.421052631578945"></rect><rect class="d3-random-bars" width="3.437585587364165" x="65.31412615991914" style="fill: rgb(92, 107, 192);" height="35.78947368421053" y="4.210526315789473"></rect><rect class="d3-random-bars" width="3.437585587364165" x="70.22496271329652" style="fill: rgb(92, 107, 192);" height="33.68421052631579" y="6.315789473684212"></rect><rect class="d3-random-bars" width="3.437585587364165" x="75.1357992666739" style="fill: rgb(92, 107, 192);" height="23.157894736842106" y="16.842105263157894"></rect><rect class="d3-random-bars" width="3.437585587364165" x="80.04663582005128" style="fill: rgb(92, 107, 192);" height="27.36842105263158" y="12.631578947368421"></rect><rect class="d3-random-bars" width="3.437585587364165" x="84.95747237342866" style="fill: rgb(92, 107, 192);" height="25.263157894736842" y="14.736842105263158"></rect><rect class="d3-random-bars" width="3.437585587364165" x="89.86830892680604" style="fill: rgb(92, 107, 192);" height="29.473684210526315" y="10.526315789473685"></rect><rect class="d3-random-bars" width="3.437585587364165" x="94.77914548018342" style="fill: rgb(92, 107, 192);" height="29.473684210526315" y="10.526315789473685"></rect><rect class="d3-random-bars" width="3.437585587364165" x="99.6899820335608" style="fill: rgb(92, 107, 192);" height="37.89473684210526" y="2.10526315789474"></rect><rect class="d3-random-bars" width="3.437585587364165" x="104.60081858693817" style="fill: rgb(92, 107, 192);" height="37.89473684210526" y="2.10526315789474"></rect><rect class="d3-random-bars" width="3.437585587364165" x="109.51165514031555" style="fill: rgb(92, 107, 192);" height="33.68421052631579" y="6.315789473684212"></rect><rect class="d3-random-bars" width="3.437585587364165" x="114.42249169369293" style="fill: rgb(92, 107, 192);" height="23.157894736842106" y="16.842105263157894"></rect></g></svg></div>-->
-                           <!--<a class="heading-elements-toggle"><i class="icon-more"></i></a></div>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</div>-->
 
    <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/chart.min.js' %}"></script>
    <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>

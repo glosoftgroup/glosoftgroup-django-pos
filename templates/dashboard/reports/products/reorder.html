@@ -12,7 +12,7 @@
      <li class="active"><a href="{% url 'dashboard:products_reports' %}">Products</a></li>
  {% endblock %}
 
-{% block menu_product_report_class %}active{% endblock %}
+{% block menu_product_reorder_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -26,7 +26,7 @@
     <div class="col-md-12">
       <div class="panel panel-flat">
         <div class="panel-heading">
-          <h6 class="panel-title">Products Reports</h6>
+          <h6 class="panel-title">Low Stock Products Reports</h6>
           <div class="heading-elements">
             <ul class="icons-list">
               <li><a data-action="collapse"></a></li>
@@ -76,42 +76,45 @@
       <div class="panel-body">
         <div class="row">
           <div class="col-md-12">
-            <div class="table-responsives">     
-                <table class="table table-bordered datatable-header-footer">
-                      <thead>
-                        <tr>
-                          <th>sku</th>
-                          <th>Product Name</th>
-                          <th>Type</th>
-                          <th>Category</th>
-                          <th>Reorder-level</th>
-                          <th>Current Quantity <span style="font-size:.9em;">(units)</span></th>
-                          <th>Unit Cost</th>
-                          <th>Total Cost</th>
+                            {% if low_stock %}
+                <div class="table-responsives">
+                  <table class="table table-bordered datatable-header-footer">
+                    <thead>
+                      <tr>
+                        <th>
+                          {% trans "Product name" context "Low stock product list" %}
+                        </th>
+                        <th class="right-align">
+                          {% trans "Stock left" context "Low stock product list" %}
+                        </th>
+                        <th> Low stock Threshold</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for product in low_stock %}
+                        <tr data-action-go="{% url "dashboard:product-update" pk=product.pk %}#stock">
+                          <td>
+                            {{ product }}
+                          </td>
+                          <td class="right-align">
+                            {{ product.total_stock }}
+                          </td>
+                          <td class="right-align">
+                            {{ product.low_stock_threshold }}
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody id="tb">
-                        {% if items %}
-                        {% for item in items %}
-                          <tr>
-                            <td>{{item.sku}}</td>
-                            <td>{{item.display_product}}</td>
-                            <td>{{item.product.get_first_category}}</td>
-                            <td>{{item.product.product_class.name}}</td>
-                            <td>{{item.product.low_stock_threshold}}</td>
-                            
-                            <td>{{item.get_stock_quantity}}</td>
-                             <td>{{item.get_price_per_item.gross}}</td>
-                            <td>{{item.get_total_price_cost}}</td>
-                          </tr>
-                        {% endfor %}
-                        {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no products available</h2></td></tr>
-                        {% endif %}
-                        </tbody>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                  </p>
+                </div>
+              {% endif %}
 
-                 </table>
-              </div>
               <div class="my-paginate">
                 <div class="text-center bootpag-callback" style="padding:20px;">
                   <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -121,20 +124,7 @@
               </div>
              </div>
             </div>
-            <div class="row">
-              <div class="col-md-10 col-md-offset-1">
-                 <p class="text-center" style="margin: 20px 0px;">
-                   Total Product Valuation: Kshs {{total_cost}}<br />
-                 </p>
-                  <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
-                  
-              </div>
-             </div>
             </div>
-<!--       <div class="panel-footer">
-      <button class="btn btn-primary disabled">checki this</button>
-      </div> -->
     </div>
   </div>
   </div>
@@ -143,7 +133,7 @@
 
 {% endblock%}
 {% block custom_js %}
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
@@ -151,10 +141,10 @@ $(document).ready(function(){
     var pagination_totalsize;
     var status;
     //**@ get
-    $.ajax({ url: "{% url 'dashboard:products_reports' %}",type: 'GET',data: {initial:'initial'},
+    $.ajax({ url: "{% url 'dashboard:products_reorder' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
          pagination_totalsize = data;
-    }}); 
+    }});
 
      $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
@@ -162,18 +152,18 @@ $(document).ready(function(){
         leaps: false
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get("{% url 'dashboard:products_paginate' %}",{page:parseInt(num)},function(data){
+            $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
-    }).children('.pagination').addClass('pagination-flat pagination-sm'); 
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
 
-    $('.daterange-single').daterangepicker({ 
+    $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true
     }).on('change',function(){
       var date = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:products_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+        $.ajax({ url: "{% url 'dashboard:products_reorder_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
     });
@@ -187,7 +177,7 @@ $(document).ready(function(){
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:products_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+        $.ajax({ url: "{% url 'dashboard:products_reorder_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
      });
@@ -204,8 +194,8 @@ $(document).ready(function(){
 
     $('.search_user').keyup(function() {
       var search_text = $(this).val();
-      delay(function(){ 
-         var url = "{% url 'dashboard:products_search' %}";
+      delay(function(){
+         var url = "{% url 'dashboard:products_reorder_search' %}";
          $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
                 $('#pagination-div').html(data);
          }});

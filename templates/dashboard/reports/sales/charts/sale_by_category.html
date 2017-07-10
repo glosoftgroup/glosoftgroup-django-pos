@@ -182,43 +182,11 @@ $(document).ready(function(){
     success:function(data){
       labels = data.label;
       defaultData = data.default;
-      setChart();
     },
     error:function(error_data){
 
     }
   });
-
-  function setChart(){
-      var ctx = document.getElementById("myChart").getContext('2d');
-      var myChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-              labels: ['somko','ased'],
-              datasets: [{
-                  label: 'Amount of sale',
-                  data: [23, 97],
-                  backgroundColor: [
-                      'rgba(255, 99, 132, 0.2)',
-                      'rgba(54, 162, 235, 0.2)'
-                      /*'rgba(255, 206, 86, 0.2)',
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                      'rgba(255, 159, 64, 0.2)'*/
-                  ],
-                  borderColor: [
-                      'rgba(255,99,132,1)',
-                      'rgba(54, 162, 235, 1)'
-                      /*'rgba(255, 206, 86, 1)',
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(153, 102, 255, 1)',
-                      'rgba(255, 159, 64, 1)'*/
-                  ],
-                  borderWidth: 1
-              }]
-          }
-      });
-  }
 
     $('.daterange-single').daterangepicker({
         singleDatePicker: true,
@@ -345,27 +313,14 @@ $(document).ready(function(){
     var color = Chart.helpers.color;
   // alert(x.substring(0,3));
     var lineChartData = {
-      labels: ["Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.", "Jul.","Aug.","Sep.","Oct.","Nov.","Dec."],
+     labels:[{% for d in labels %} "{{ d }}", {% endfor %}],
       datasets: [{
         label: "Average current month sales",
         backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
         borderColor: window.chartColors.blue,
         // pointBackgroundColor: window.chartColors.blue,
         fill:false,
-        data: [
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor(),
-          randomScalingFactor()
-        ]
+        data: [{% for df in default %} {{ df }}, {% endfor %}]
       }]
     };
 
@@ -377,7 +332,7 @@ $(document).ready(function(){
         options: {
           title:{
             display: true,
-            text: "Average Category Sales"
+            text: "Average Category Sales for {{hcateg}}"
           },
           tooltips: {
             enabled: false,
@@ -390,21 +345,21 @@ $(document).ready(function(){
           },
           elements: {
             line: {
-              tension: 0.000001
-            }
+              //tension: 0.000001
+            },
+            bezierCurve : true
           }
         }
       });
     };
 //-----chart**/
 //**@ doughnut chart
-  // function setChart(){
     var defaultData2 = [{% for d in sales_by_category %} {{ d.total_cost__sum }}, {% endfor %}];
     var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}", {% endfor %}];
     var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
     // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
       var ctx = document.getElementById("catChart").getContext('2d');
-      var myChart = new Chart(ctx, {
+      var catChart = new Chart(ctx, {
           type: 'doughnut',
           data: {
               labels: labels2,
@@ -416,7 +371,6 @@ $(document).ready(function(){
               }]
           }
       });
-  // }
 //---------------doghnut chart**/
 });
 

@@ -1,41 +1,45 @@
 {% load staticfiles %}
       <div class="panel panel-flat">
-        <div class="table-responsive">
-         
-                <table class="table table-bordered datatable-header-footer table-hover">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered datatable-header-footer">
                   <caption style="margin-bottom: 10px;">
-                   </caption> 
+                   </caption>
                       <thead style="border-top:1px solid #ddd;">
                         <tr>
-                          <th>Transaction Date</th>
-                          <th>Receipt No</th>
-                          <th>Client Name</th>
-                          <th>Cashier</th>
-                          <th>Terminal</th>
-                          <th>Quantity</th>
-                          <th>Total Sales</th>
-                        </tr>
+                            <th>
+                              Product name
+                            </th>
+                            <th class="right-align">
+                              Stock left
+                            </th>
+                            <th> Low stock Threshold</th>
+                      </tr>
                       </thead>
                       <tbody id="p-tb">
-                        {% if sales %}
-                        {% for sale in sales %}
-                          <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.terminal}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
-                          </tr>
-                        {% endfor %}
+                      {% if items %}
+                          {% for product in items %}
+                            <tr data-action-go="{% url 'dashboard:product-update' pk=product.pk %}#stock">
+                              <td>
+                                {{ product }}
+                              </td>
+                              <td class="right-align">
+                                {{ product.total_stock }}
+                              </td>
+                              <td class="right-align">
+                                {{ product.low_stock_threshold }}
+                              </td>
+                            </tr>
+                          {% endfor %}
                         {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                         <tr><td colspan="6"><h2 class="text-center">no items available</h2></td></tr>
                         {% endif %}
+                        </tbody>
                         </tbody>
 
                  </table>
-
         </div>
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
@@ -43,33 +47,44 @@
               <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
+          </div>
+        </div>
       </div>
+    </div>
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
  <script type="text/javascript">
    $(document).ready(function(){
-
-       $(".td").click(function(){
-          window.location = $(this).data("href");
-      });
-
         $('.p2-pag').bootpag({
             total: parseInt('{{pn}}'),
             maxVisible: 3,
             leaps: false
             }).on("page", function(event, num){
-                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}');
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                      console.log('without gid '+data);
+                    });
+                }else{
+                    if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
+                        $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('action is '+'{{gid}}');
+                    }else{
+                        $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('date is'+gid);
+                    }
+                }
 
-                $.get("{% url 'dashboard:sales_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
-                   $('#p-tb').html(data);
-                });
         }).children('.pagination').addClass('pagination-flat pagination-sm')
 
-      $(".td").click(function() {
-         window.location = $(this).data("href");
-      });
 
       $('.modal-trigger').on('click', function (e) {
 
@@ -97,9 +112,9 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success:function(data){        
+                    success:function(data){
                       $('#modal_instance').modal('hide');
-                      $('#tb #'+id).remove();            
+                      $('#tb #'+id).remove();
                       $.jGrowl('User deleted successfully', {
                         header: 'Well done!',
                         theme: 'bg-success'

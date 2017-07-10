@@ -5,11 +5,11 @@
 {% load prices_i18n %}
 
 {% block title %}
-  Sales Report
+  Sales List Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
-     <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
+     <li><a href="{% url 'dashboard:sales_list' %}">Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_list' %}">Sales</a></li>
  {% endblock %}
 
 {% block menu_report_class %}active{% endblock %}
@@ -38,7 +38,7 @@
       <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
             <div class="col-md-6">
-             <label>Search Sales</label>
+             <label>Search Sales (for date format: yyyy-mm-dd)</label>
               <div class="form-group form-group-material has-feedback">
                 <input class="form-control search_user" placeholder="Search details" type="text">
                 <div class="form-control-feedback">
@@ -176,7 +176,7 @@ $(document).ready(function(){
     var pagination_totalsize;
     var status;
     //**@ get
-    $.ajax({ url: "{% url 'dashboard:sales_reports' %}",type: 'GET',data: {initial:'initial'},
+    $.ajax({ url: "{% url 'dashboard:sales_list' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
          pagination_totalsize = data;
     }});
