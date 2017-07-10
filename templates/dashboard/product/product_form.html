@@ -187,6 +187,15 @@
                       <!-- product attributes -->
                       <div class="form-group" id='div_attributes'>
                         <label>Product Attributes</label>
+                        <span>
+    <a href="">
+      <button id="add-new-attribute" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
+              href="#modal_attribute">
+    <i class="icon-plus">+</i>    
+    </button>
+    </a>
+    <i class="icon-database-refresh" onclick="refreshAttributes()"></i>
+  </span>
                          {% for attribute_field in product_form.iter_attribute_fields %}
                          <div class="">
                          <label>{{ attribute_field.label }}</label>
@@ -742,6 +751,7 @@
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
+ {% include "dashboard/includes/_modal_attribute_choice.html"  %}
 {% endblock %}
 
  {% block custom_js %}
@@ -770,6 +780,8 @@
 <script type="text/javascript" src="{% static 'backend/js/category.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/productclass.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/productattribute.js' %}"></script>
+
 <script type="text/javascript">
  
 
@@ -934,7 +946,53 @@
     $('.bootstrap-select').selectpicker();
   </script>
   <script>
-  $( "select[name*='product_class']").change(function() {
+
+  function getProductClass()
+  {
+    var pclass = $( "select[name*='product_class']").val();
+    localStorage.setItem('product_class', parseInt(pclass));
+    return parseInt(pclass);
+  }
+  getProductClass();
+  // content locader
+  // content wait loader
+   function content_loader(val) {   
+    var block = $(val).parent().parent().parent().parent().parent();
+    
+        $(block).block({ 
+            message: '<i class="icon-spinner2 spinner"></i><br><span class="align-center">Please wait</span>',
+            overlayCSS: {
+                backgroundColor: '#fff',
+                opacity: 0.8,
+                cursor: 'wait',
+                'box-shadow': '0 0 0 1px #ddd'
+            },
+            css: {
+                border: 0,
+                padding: 0,
+                backgroundColor: 'none'
+            }
+        });
+   }   
+  // end conttent blocker
+  
+  // refreshAttributes func
+  function refreshAttributes() {  
+   {% url "dashboard:fetch-variants" as url %} 
+   var url = "{{ url }}";
+   var class_pk = getProductClass();
+   content_loader('#div_attributes');   
+   var posting = $.post( url, {class_pk:class_pk} );
+     // Put the results in a div
+   posting.done(function( data ) {    
+    $( "#div_attributes" ).empty().append( data ); 
+    var block = $('#div_attributes').parent().parent().parent().parent().parent();   
+      $(block).unblock(); 
+  });
+
+  }
+  // end refreshAttributes
+  $( "select[name*='product_class']").change(function refreshAttributes() {
   // Check input( $( this ).val() ) for validity here
   
    {% url "dashboard:fetch-variants" as url %} 

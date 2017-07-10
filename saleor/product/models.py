@@ -112,7 +112,7 @@ class ProductTax(models.Model):
         pgettext_lazy('Label on invoices', 'Short text printed on invoices'),
         max_length=128, blank=True)
     tax = models.IntegerField( pgettext_lazy('Product Tax', 'tax %'),
-        validators=[MinValueValidator(0)], default=Decimal(0)) 
+        validators=[MinValueValidator(0)], unique=True, default=Decimal(0)) 
     def __str__(self):
         return self.tax_name +' '+str(self.tax)+' %'
     def get_tax(self):

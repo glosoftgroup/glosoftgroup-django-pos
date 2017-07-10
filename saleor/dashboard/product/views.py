@@ -70,7 +70,7 @@ def add_reorder_stock(request,pk=None):
 												product_name=str(li['name']))
 					x.save()
 
-			          
+					  
 			return HttpResponse('success!')
 		variant_id = request.POST.get('variant_id')
 		#return HttpResponse(variant_id)
@@ -87,8 +87,8 @@ def request_order(request):
 		purchase_order = PurchaseOrder.objects.get(pk=int(request.POST.get('order_id')))		
 
 		send_email = emailit.api.send_mail(
-            supplier.email, context, 'order/emails/confirm_email',
-            from_email=settings.ORDER_FROM_EMAIL)
+			supplier.email, context, 'order/emails/confirm_email',
+			from_email=settings.ORDER_FROM_EMAIL)
 		# if send_email:
 		# 	if purchase_order:
 		# 	         purchase_order.change_status('sent')
@@ -370,7 +370,7 @@ def add_stock_ajax(request):
 							cost_price=stock.cost_price,
 							quantity=diff,
 							supplier=supplier,
-				            )
+							)
 		try:
 			stock_list = request.session['stock_list']
 			if stock_pk in stock_list:
@@ -415,7 +415,7 @@ def stock_edit(request, product_pk, stock_pk=None):
 							cost_price=cost_price,
 							quantity=quantity,
 							supplier=product.product_supplier,
-				            )
+							)
 		messages.success(
 			request, pgettext_lazy('Dashboard message', 'Saved stock'))
 		product_url = reverse(
@@ -594,6 +594,7 @@ def attribute_list(request):
 	return TemplateResponse(request, 'dashboard/product/attributes/list.html',
 							ctx)
 
+
 @staff_member_required
 def attribute_add(request,pk=None):
 	if request.method == 'POST':
@@ -612,6 +613,12 @@ def attribute_add(request,pk=None):
 			ProductAttribute.objects.create(slug=name,name=name);        
 			last_id = ProductAttribute.objects.latest('id')
 			return HttpResponse(last_id.pk)
+	elif request.method == 'GET':
+			if pk:
+				product_class = get_object_or_404(ProductClass, pk=pk)
+				attributes = product_class.product_attributes.all()
+				ctx = {'product_type':product_class,'attributes':attributes}			
+			return TemplateResponse(request,'dashboard/product/attributes/_edit_values.html',ctx)
 	return HttpResponse('bad request')
 @staff_member_required
 def attribute_edit(request, pk=None):
