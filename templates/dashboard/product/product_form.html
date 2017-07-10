@@ -144,7 +144,7 @@
                     {% endif %}
                     <!-- product name -->
                       <div class="form-group">
-                        <label>Product Name:<i class='text-muted'>required</i></label>
+                        <label>Product Name:<i class='text-danger'> *</i></label>
                         {{ product_form.name}}
                       </div>
                       <!-- product category -->
@@ -161,8 +161,7 @@
                         </div>
                         <div class="col-md-4">
                           <button href="#modal_add_category" class="btn btn-flat" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
-                          <i class=" icon-stack-plus"></i>
-                          Add category
+                          <i class=" icon-stack-plus"></i>                      
                           </button>
                         </div>
                        </div>
@@ -176,8 +175,7 @@
                       {{ product_form.product_class}}
                          <div class="input-group-btn">
                             <button type="button"  id="add-new-type" href="#modal_add_category" class="btn btn-flat" data-title="Add New category" data-href='{% url "dashboard:product-class-add-new" 12 %}' data-csrf="{% csrf_token %}" onclick='return false;'>
-                            <i class=" icon-stack-plus"></i>
-                            Add new
+                            <i class=" icon-stack-plus"></i>                   
                             </button>
                           </div>
                       </div>
@@ -191,7 +189,7 @@
     <a href="">
       <button id="add-new-attribute" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
               href="#modal_attribute">
-    <i class="icon-plus">+</i>    
+    <i class=" icon-stack-plus"></i>   
     </button>
     </a>
     <i class="icon-database-refresh" onclick="refreshAttributes()"></i>
@@ -205,7 +203,7 @@
                       </div>
                       </div>
                       <div class="form-group">
-                        <label>Product Description:<i class='text-muted'>required</i></label>
+                        <label>Product Description:<i class='text-danger'> *</i></label>
                        {{ product_form.description }}
                       </div>                  
                     </fieldset>
@@ -225,7 +223,7 @@
                             <div class="input-group">
                             {{ product_form.product_tax }}
                               <div class="input-group-btn">
-                                <button type="button" class="btn btn-info" id="add-new-tax">Add new</button>
+                                <button type="button" class="btn btn-flat" id="add-new-tax"><i class=" icon-stack-plus"></i></button>
                               </div>
                              </div>
                           </div>
@@ -870,7 +868,8 @@
       var taxvalue = $( this ).val();         
       {% url "dashboard:tax-add-ajax" as url %} 
       var url = "{{ url }}";
-      var posting = $.post( url, {} );
+      var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+      var posting = $.post( url, {csrfmiddlewaretoken:csrf_token} );
       // Put the results in a div
       posting.done(function( data ) {    
         $("#add_tax_form" ).empty().append( data ); 
@@ -975,7 +974,7 @@
         });
    }   
   // end conttent blocker
-  
+
   // refreshAttributes func
   function refreshAttributes() {  
    {% url "dashboard:fetch-variants" as url %} 
