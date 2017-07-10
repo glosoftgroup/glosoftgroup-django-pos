@@ -20,12 +20,46 @@ from satchless.item import ItemLine, ItemSet
 from datetime import date
 
 from ..discount.models import Voucher
-from ..product.models import Product
+from ..product.models import (
+							Product,
+							ProductVariant,
+							Stock)
 from ..userprofile.models import Address
 from ..customer.models import Customer
 from ..supplier.models import Supplier
 
 from . import OrderStatus
+
+@python_2_unicode_compatible
+class PurchaseProduct(models.Model):
+	variant = models.ForeignKey(
+		ProductVariant, related_name='purchase_variant',
+		verbose_name=pgettext_lazy('PurchaseProduct item field', 'variant'))    
+	stock = models.ForeignKey(
+		Stock, related_name='purchase_stock',
+		verbose_name=pgettext_lazy('PurchaseProduct item field', 'stock'))    	
+	quantity = models.IntegerField(
+		pgettext_lazy('PurchaseProduct item field', 'quantity'),
+		validators=[MinValueValidator(0)], default=Decimal(1))
+	cost_price = PriceField(
+		pgettext_lazy('PurchaseProduct item field', 'cost price'),
+		currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+		blank=True, null=True)
+	supplier = models.ForeignKey(
+		Supplier, related_name='purchase_supplier',
+		verbose_name=pgettext_lazy('PurchaseProduct item field', 'supplier')
+		,null=True,blank=True)
+	created = models.DateTimeField(
+		pgettext_lazy('PurchaseProduct field', 'created'),
+		default=now, editable=False)
+
+	class Meta:		
+		verbose_name = pgettext_lazy('PurchaseProduct model', 'PurchaseProduct')
+		verbose_name_plural = pgettext_lazy('PurchaseProduct model', 'PurchaseProducts')	
+	
+	def __str__(self):
+		return str(self.variant)+' '+str(self.stock)
+	
 
 @python_2_unicode_compatible
 class PurchaseOrder(models.Model):

@@ -107,6 +107,12 @@
             <div class="form-group">
               {{ form.cost_price|materializecss }}
             </div>
+            <div class="form-group">
+              <div class="col-md-6">
+               <label>Total Cost</label>
+               <input type="number"  name="total_cost" id='total_cost' class="form-control">
+              </div>
+            </div>
          </div>
          <!-- action buttons -->
          <div class="text-right">
@@ -135,7 +141,39 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
   // Basic select
-    $('.bootstrap-select').selectpicker();
+  $('.bootstrap-select').selectpicker();
+
+  
+  $("#total_cost").on("change keyup paste keydown", function(event) { 
+    var total_cost = $('#total_cost').val();
+    var unit_cost = $('#id_cost_price').val();
+    var quantity = $('#id_quantity').val();
+    
+    unit_cost = parseInt(total_cost)/parseInt(quantity);
+    $('#id_cost_price').val(unit_cost);    
+
+  });
+  $("#id_cost_price").on("change keyup paste keydown", function(event) { 
+    var total_cost = $('#total_cost').val();
+    var unit_cost = $('#id_cost_price').val();
+    var quantity = $('#id_quantity').val();
+    
+    total_cost = parseInt(unit_cost)*parseInt(quantity);
+    $('#total_cost').val(total_cost);    
+
+  });
+  $("#id_quantity").on("change keyup paste keydown", function(event) { 
+    var total_cost = $('#total_cost').val();
+    var unit_cost = $('#id_cost_price').val();
+    var quantity = $('#id_quantity').val();
+    
+    total_cost = parseInt(unit_cost)*parseInt(quantity);
+    $('#total_cost').val(total_cost);
+    unit_cost = parseInt(total_cost)/parseInt(quantity);
+    $('#id_cost_price').val(unit_cost);
+
+
+  });
 </script>
 
 {% endblock %}

@@ -1,0 +1,89 @@
+<div class="modal-body">         
+<!-- form  -->
+  <div class="panel panel-flat">
+    <div class="panel-heading">
+      <h5 class="panel-title">Product Attribute</h5>
+      <div class="heading-elements">
+        <ul class="icons-list">
+          <li><a data-action="collapse"></a></li>
+          <li><a data-action="reload"></a></li>
+          <li><a data-action="close"></a></li>
+        </ul>
+      </div>
+    </div> 
+    <div class="panel-body">
+    <div class="row">
+    <form method="post" enctype="multipart/form-data">    
+         <div class="col-md-12">
+            <div class="form-group">
+             <label>Name</label>
+             <input type="text" id="attr_name" class="form-control" disabled="disabled" value="{{product_type}}" name="slug">
+             <input type="hidden" class="product_type" value="{{product_type.pk}}" name="product_type">
+             <span class="help-block">Attribute name e.g Brand</span>
+            </div>
+          </div>            <hr>
+
+          <div class="col-md-12">
+           {% for attr in attributes %}
+           <div class="col-md-12">
+            <hr><label>Name: {{ attr }}</label><br>
+            </div>
+            <div class="col-md-6">
+             <div class="input-group">
+              <input type="text" placeholder="New value" name="choice" class="form-control" id="choice{{attr.pk}}">
+              <span class="input-group-btn">
+                <button class="btn btn-xs bg-primary legitRipple" type="button" id="cbtn{{attr.pk}}">add</button>
+              </span>
+            </div> 
+            </div>
+
+            <div class="col-md-6 add_value{{attr.pk}}">
+              {% for v in attr.values.all %}     
+
+               <span class="text-mute label label-success"> {{ v }},
+
+               </span>             
+              {% endfor %}
+               </div>
+               <script type="text/javascript">
+              $('#cbtn{{attr.pk}}').on('click',function(){
+                var value = $('#choice{{attr.pk}}').val();
+                if(!value){ 
+                notify('add a valid attribute name');
+                return false; 
+              }
+              var url ='{% url "dashboard:product-attr-add-value" attr.pk %}';
+              var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();          
+              var posting = $.post( url, {       
+                value:value,                
+                csrfmiddlewaretoken:csrf_token,
+              });    
+              posting.done(function(data) {       
+                  $('.add_value{{attr.pk}}').empty().append( data );
+                  $('#choice{{attr.pk}}').val('');
+                  $('#add_value').addClass('hidden');
+                           
+                notify('New category added successfully','bg-success');
+              });
+
+              posting.fail(function(){
+                notify('Oops! Try another value.','bg-warning');
+              });
+                
+              });
+            </script>
+           {% endfor %}
+
+          </div>
+          
+      <!-- action buttons -->
+         <div class="text-right">
+     </div>
+      </form>
+    </div>
+   
+    </div>
+
+   </div>
+           <!-- end form -->
+          </div>

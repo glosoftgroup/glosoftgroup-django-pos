@@ -15,7 +15,9 @@ from . import forms
 from ...core.utils import get_paginator_items
 from ...purchase.models import (
 								PurchaseOrder,
-								PurchaseItems)
+								PurchaseItems,
+								PurchaseProduct
+								)
 from ...supplier.models import Supplier
 from ...product.models import (Product, ProductAttribute, 
 							   ProductClass, AttributeChoiceValue,
@@ -68,7 +70,7 @@ def add_reorder_stock(request,pk=None):
 												product_name=str(li['name']))
 					x.save()
 
-			          
+					  
 			return HttpResponse('success!')
 		variant_id = request.POST.get('variant_id')
 		#return HttpResponse(variant_id)
@@ -85,8 +87,8 @@ def request_order(request):
 		purchase_order = PurchaseOrder.objects.get(pk=int(request.POST.get('order_id')))		
 
 		send_email = emailit.api.send_mail(
-            supplier.email, context, 'order/emails/confirm_email',
-            from_email=settings.ORDER_FROM_EMAIL)
+			supplier.email, context, 'order/emails/confirm_email',
+			from_email=settings.ORDER_FROM_EMAIL)
 		# if send_email:
 		# 	if purchase_order:
 		# 	         purchase_order.change_status('sent')
@@ -358,8 +360,17 @@ def add_stock_ajax(request):
 			return HttpResponse('stock pk required')
 		old_quantity = stock.quantity
 		diff = int(quantity) - int(old_quantity)  
-		crud = 'Removed' if diff < 0 else "Added"     
+		crud = 'Removed' if diff < 0 else "Added"
 
+		if crud == 'Added':
+			supplier = stock.variant.product.product_supplier
+			PurchaseProduct.objects.create(
+							variant=stock.variant,
+							stock=stock,
+							cost_price=stock.cost_price,
+							quantity=diff,
+							supplier=supplier,
+							)
 		try:
 			stock_list = request.session['stock_list']
 			if stock_pk in stock_list:
@@ -394,13 +405,24 @@ def stock_edit(request, product_pk, stock_pk=None):
 						   product=product)
 	if form.is_valid():
 		form.save()
+		
+		quantity = request.POST.get('quantity')		
+		cost_price = request.POST.get('cost_price')		
+		#try:
+		PurchaseProduct.objects.create(
+							variant=stock.variant,
+							stock=stock,
+							cost_price=cost_price,
+							quantity=quantity,
+							supplier=product.product_supplier,
+							)
 		messages.success(
 			request, pgettext_lazy('Dashboard message', 'Saved stock'))
 		product_url = reverse(
 			'dashboard:product-update', kwargs={'pk': product_pk})
 		success_url = request.POST.get('success_url', product_url)
 		if is_safe_url(success_url, request.get_host()):
-			return redirect(success_url)
+			return redirect(success_url)			
 	errors = form.errors
 	ctx = {'form': form, 'product': product, 'stock': stock, 'errors':errors}
 	if request.is_ajax():
@@ -572,6 +594,7 @@ def attribute_list(request):
 	return TemplateResponse(request, 'dashboard/product/attributes/list.html',
 							ctx)
 
+
 @staff_member_required
 def attribute_add(request,pk=None):
 	if request.method == 'POST':
@@ -590,6 +613,12 @@ def attribute_add(request,pk=None):
 			ProductAttribute.objects.create(slug=name,name=name);        
 			last_id = ProductAttribute.objects.latest('id')
 			return HttpResponse(last_id.pk)
+	elif request.method == 'GET':
+			if pk:
+				product_class = get_object_or_404(ProductClass, pk=pk)
+				attributes = product_class.product_attributes.all()
+				ctx = {'product_type':product_class,'attributes':attributes}			
+			return TemplateResponse(request,'dashboard/product/attributes/_edit_values.html',ctx)
 	return HttpResponse('bad request')
 @staff_member_required
 def attribute_edit(request, pk=None):

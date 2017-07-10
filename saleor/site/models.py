@@ -36,7 +36,7 @@ class SiteSettings(models.Model):
 class AuthorizationKey(models.Model):
     site_settings = models.ForeignKey(SiteSettings)
     name = models.CharField(
-        pgettext_lazy('Authentiaction field', 'name'), max_length=20,
+        pgettext_lazy('Authentication field', 'name'), max_length=20,
         choices=AuthenticationBackends.BACKENDS)
     key = models.TextField(pgettext_lazy('Authentication field', 'key'))
     password = models.TextField(
