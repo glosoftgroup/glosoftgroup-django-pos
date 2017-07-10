@@ -1,5 +1,6 @@
 from rest_framework.views import exception_handler
 from .api.product.serializers import UserSerializer
+
 import logging
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -42,7 +43,8 @@ def jwt_response_payload_handler(token, user=None, request=None):
      if not check_work_period():
         return {
                'error': "working period closed"
-        }
+          }
+
      # Override to return a custom response such as including 
      # the serialized representation of the User.
      return {
