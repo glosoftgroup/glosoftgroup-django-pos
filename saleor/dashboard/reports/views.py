@@ -24,7 +24,7 @@ import logging
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User
-from ...sale.models import Sales, SoldItem
+from ...sale.models import Sales, SoldItem, DrawerCash
 from ...product.models import Product, ProductVariant
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
@@ -276,7 +276,6 @@ def product_reports(request):
 		total_cost = 0
 		for i in items:
 			total_cost+=i.get_total_price_cost()
-		# total_tax = ProductVariant.objects.aggregate(Sum('product_tax'))
 		page = request.GET.get('page', 1)
 		paginator = Paginator(items, 10)
 		try:
@@ -413,14 +412,45 @@ def purchases_reports(request):
 	return TemplateResponse(request, 'dashboard/reports/purchase/purchases.html', {'users':users})
 
 def balancesheet_reports(request):
-	users = User.objects.all().order_by('id')
-	return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html', {'users':users})
+	""" Debit """
+	petty_cash = 30000
+	drawer = DrawerCash.objects.annotate(c=Count('terminal', distinct=True)).annotate(
+		total_amount=Sum('amount'))['total_amount']
+	print drawer
+	# stock = 23000 #from purchases
+	items = ProductVariant.objects.all().order_by('-id')
+	stock = 0
+	for i in items:
+		stock += i.get_total_price_cost()
+
+	sales_cash = Sales.objects.filter(created__contains='2017-07-07').aggregate(Sum('total_net'))['total_net__sum']
+	cash_in_hand = drawer + sales_cash
+
+	debit_total = petty_cash + stock + cash_in_hand
+
+	""" Credit """
+	accounts_payable = petty_cash + stock
+	notes_payable = drawer
+	revenues = sales_cash
+	# expenses = 1233
+	credit_total = accounts_payable + notes_payable + revenues
+	data = {
+		"petty_cash":petty_cash,
+		"cash_in_hand":cash_in_hand,
+		"stock":stock,
+		"debit_total":debit_total,
+
+		"accounts_payable":accounts_payable,
+		"notes_payable":notes_payable,
+		"revenues":revenues,
+		"credit_total":credit_total
+	}
+	return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html', data)
 
 def get_dashboard_data(request):
 	label = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"]
 	default = [12, 19, 3, 5, 2, 3]
 	total_sales = Sales.objects.all()
-	# total_sales = 
 	today = datetime.date.today()
 	todays_sales = Sales.objects.filter(created=today).annotate(Sum('total_net'))
 
