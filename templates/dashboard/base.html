@@ -421,6 +421,11 @@
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
   <!-- <script type="text/javascript" src="{% static 'backend/js/pages/components_pagination.js' %}"></script> -->
+  <script type="text/javascript">
+  $( document ).ready(function() {
+    $( "label" ).addClass( "text-bold" );
+  });
+  </script>
    
     
     {% include "dashboard/includes/_messages.html" %}

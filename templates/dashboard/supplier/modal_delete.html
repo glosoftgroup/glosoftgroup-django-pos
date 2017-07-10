@@ -1,0 +1,48 @@
+{% load i18n %}
+{% load mptt_tags %}
+
+<form method="post" onsubmit="return false;" id="contact-delete" class="form-async" action="#" novalidate>
+  {% csrf_token %}
+  <div class="modal-body">
+    <div class="">
+      <div class="col s12">
+        <h5>
+          {% blocktrans with category=category trimmed context "Delete contact modal title" %}
+            Are you sure you want to delete the address contact {{ address }}?
+          {% endblocktrans %}
+        </h5>
+      </div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="submit" id='delete-contact' onclick="delete_contact();" class="modal-action btn btn-primary">
+      {% trans "Delete" context "Dashboard delete action" %}
+    </button>
+    <a href="#!" data-dismiss="modal" class="modal-action modal-close btn btn-flat">
+      {% trans "Cancel" context "Dashboard cancel action" %}
+    </a>
+  </div>
+</form>
+<script type="text/javascript">
+  function delete_contact(){
+   
+    var url = "{% url 'dashboard:contact-delete' pk=address.pk %}";
+    var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+    var request = $.ajax({
+                  url: url,
+                  method: "POST",
+                  data: { csrfmiddlewaretoken:csrf_token },
+                  dataType: "html"
+    });
+    request.done(function( msg ) {
+      done_func();
+    });
+     
+    request.fail(function( jqXHR, textStatus ) {
+      alert( "Request failed: " + textStatus );
+    });
+    return false;
+  }
+    
+</script>

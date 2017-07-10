@@ -22,8 +22,7 @@ $(function() {
   });
   
   // update modal content from ajax results
-  $( ".modal-trigger-ajax").on('click',function() {   
-       
+  $( ".modal-trigger-ajax").on('click',function() {        
     var url = $(this).data('href')
     var prompt_text = $(this).data('title');
     var modal = $(this).attr('href');

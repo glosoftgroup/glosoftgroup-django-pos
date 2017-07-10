@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
@@ -16,7 +17,8 @@ from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...customer.models import Customer
-from ...supplier.models import Supplier
+from ...supplier.models import Supplier, AddressBook
+
 from ...decorators import permission_decorator, user_trail
 import logging
 
@@ -31,7 +33,9 @@ def users(request):
 		users = Supplier.objects.all().order_by('-id')
 		#user_trail(request.user.name, 'accessed users list page')
 		#info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
-		return TemplateResponse(request, 'dashboard/supplier/users.html', {'users':users})
+		
+		ctx = {'users':users}
+		return TemplateResponse(request, 'dashboard/supplier/users.html', ctx)
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
@@ -56,16 +60,24 @@ def user_process(request):
 	if request.method == 'POST':
 		name = request.POST.get('name')
 		email = request.POST.get('email')
-		# password = request.POST.get('password')
-		# encr_password = make_password(password)
-		nid = request.POST.get('nid')
+		code = request.POST.get('code')
+		fax = request.POST.get('fax')
+		city = request.POST.get('city')
+		website = request.POST.get('website','')		
+		street1 = request.POST.get('street1')
+		street2 = request.POST.get('street2')
 		mobile = request.POST.get('mobile')
 		image= request.FILES.get('image')
 		groups = request.POST.getlist('groups[]')
 		new_user = Supplier.objects.create(
 			name = name,
 			email = email,			
-			nid = nid,
+			code = code,
+			fax = fax,
+			city = city,
+			website = website,
+			street1 = street1,
+			street2 = street2,
 			mobile = mobile,
 			image = image
 		)
@@ -96,7 +108,8 @@ def user_delete(request, pk):
 		user_trail(request.user.name, 'deleted supplier: '+ str(user.name))
 		return HttpResponse('success')
 def user_edit(request, pk):
-	user = get_object_or_404(Supplier, pk=pk)		
+	user = get_object_or_404(Supplier, pk=pk)
+	#addresses = user.get_address()		
 	ctx = {'user': user}
 	user_trail(request.user.name, 'accessed edit page for supplier '+ str(user.name),'update')
 	info_logger.info('User: '+str(request.user.name)+' accessed edit page for supplier: '+str(user.name))
@@ -107,13 +120,23 @@ def user_update(request, pk):
 	if request.method == 'POST':
 		name = request.POST.get('name')
 		email = request.POST.get('email')		
-		nid = request.POST.get('nid')
+		code = request.POST.get('code')
+		fax = request.POST.get('fax')
+		city = request.POST.get('city')
+		website = request.POST.get('website','')		
+		street1 = request.POST.get('street1')
+		street2 = request.POST.get('street2')
 		mobile = request.POST.get('mobile')
 		image= request.FILES.get('image')		
 		if image :
 			user.name = name
 			user.email = email			
-			user.nid = nid
+			user.code = code
+			user.fax = fax
+			user.city = city
+			user.website = website
+			user.street2 = street2
+			user.street1 = street1
 			user.mobile = mobile
 			user.image = image
 			user.save()
@@ -123,7 +146,12 @@ def user_update(request, pk):
 		else:
 			user.name = name
 			user.email = email			
-			user.nid = nid
+			user.code = code
+			user.fax = fax
+			user.city = city
+			user.website = website
+			user.street2 = street2
+			user.street1 = street1
 			user.mobile = mobile
 			user.save()
 			user_trail(request.user.name, 'updated supplier: '+ str(user.name))
@@ -167,6 +195,70 @@ def user_assign_permission(request):
 				info_logger.info('User: '+str(request.user.name)+' assigned permissions for user: '+str(user.name))
 				return HttpResponse('permissions updated')
 
+@staff_member_required
+def address_add(request,pk):
+	if request.is_ajax():
+		if request.method == 'GET':			
+			if pk:
+				pk = pk
+			ctx = {'supplier_pk':pk}
+			return TemplateResponse(request, 'dashboard/supplier/_address_add.html', ctx)
+		if request.method == 'POST':
+			city = request.POST.get('city')
+			email = request.POST.get('email')
+			postal_code = request.POST.get('postal_code')
+			phone = request.POST.get('phone')
+			first_name = request.POST.get('first_name')
+			last_name = request.POST.get('last_name')
+			contact_name = request.POST.get('contact_name')
+			job_position = request.POST.get('job_position')
+			supplier = get_object_or_404(Supplier, pk=pk)
+			address = AddressBook.objects.create(
+								city=city,
+								email=email,
+								postal_code =postal_code,
+								phone = phone,
+								first_name=first_name,
+								last_name=last_name,
+								contact_name=contact_name,
+								job_position=job_position
+								)
+			address.save()			
+
+			supplier.addresses.add(address)			
+			
+			ctx = {'address': address}
+    		return TemplateResponse(request,
+                            'dashboard/supplier/_newContact.html',
+                            ctx)
+			
+@staff_member_required
+def refresh_contact(request, pk=None):
+	if request.method == 'GET':
+		if pk:
+			user = get_object_or_404(Supplier, pk=pk)
+			ctx = {'user': user}
+			return TemplateResponse(request,
+                            'dashboard/supplier/_newContact.html',
+                            ctx)
+	return HttpResponse('Post request not accepted')
+@staff_member_required
+def contact_delete(request, pk):
+    address = get_object_or_404(AddressBook, pk=pk)
+    if request.method == 'POST':
+        address.delete()
+        messages.success(
+            request,
+            pgettext_lazy(
+                'Dashboard message', 'Deleted contact %s') % address)
+        if pk:
+            if request.is_ajax():
+            	script = "'#tr"+str(pk)+"'"
+                return HttpResponse(script)
+    ctx = {'address': address}
+    return TemplateResponse(request,
+                            'dashboard/supplier/modal_delete.html',
+                            ctx)			
 def user_trails(request):
 	users = UserTrail.objects.all().order_by('id')
 	user_trail(request.user.name, 'accessed user trail page')

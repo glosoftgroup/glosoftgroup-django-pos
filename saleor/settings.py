@@ -520,3 +520,4 @@ JWT_AUTH = {
      timedelta(days=2),
 
 }
+

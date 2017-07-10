@@ -1,7 +1,7 @@
 {% extends 'dashboard/base.html' %}
 {% load i18n %}
 {% load materializecss %}
-
+{% load static %}
 {% block title %}
   {% if site.pk %}
     {{ site }}
@@ -75,4 +75,7 @@ $( document ).ready(function() {
   $( "label" ).addClass( "text-bold" );
 });
 </script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pickers/anytime.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/picker_date.js' %}"></script>
 {% endblock %}

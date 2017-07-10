@@ -1,0 +1,158 @@
+ <div class="panel panel-flat">
+    <div class="panel-heading">
+      <h5 class="panel-title">#{{user.pk}} {{user}}</h5>
+      <div class="heading-elements">
+        <ul class="icons-list">
+          <li><a data-action="collapse"></a></li>
+          <li><a data-action="reload"></a></li>
+          <li><a data-action="close"></a></li>
+        </ul>
+      </div>
+    </div> 
+    <div class="panel-body">
+    <div class="row">
+    <form method="post" id="address-form" enctype="multipart/form-data">
+    {% csrf_token %} 
+         <div class="col-md-6">
+            <div class="form-group">
+              <label>Contact Name</label>
+              <input type="text" id="contact_name" name="contact_name" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Job Position</label>
+              <input type="text" id="job_position" name="job_position" class="form-control">
+            </div>
+            <div class="form-group">
+             <div class="row">
+             	<div class="col-md-6">
+             		<label>First Name</label>
+              		<input type="text" id='first_name' name="first_name" class="form-control">
+             	</div>
+             	<div class="col-md-6">
+             		<label>Last Name</label>
+              		<input type="text" id='last_name' name="last_name" class="form-control">
+             	</div>
+             </div>
+             
+            </div>
+         </div>
+         <div class="col-md-6">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id='email' name="email" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="text" id="phone" name="phone" class="form-control">
+            </div>
+            <div class="form-group">
+             <div class="row">
+             	<div class="col-md-6">
+             		<label>City</label>
+              		<input type="text" id='city' name="city" class="form-control">
+             	</div>
+             	<div class="col-md-6">
+             		<label>Postal Code</label>
+              		<input type="text" id='postal_code' name="postal_code" class="form-control">
+              		<input type="hidden" name="supplier_id" value="{{ supplier_pk }}">
+             	</div>
+             </div>
+             
+            </div>
+         </div>
+		  <!-- action buttons -->
+         <div class="text-right">
+           <button type="submit"  id="submit">Add address</button>
+		 </div>
+      </form>
+    </div>
+   <div>
+   	
+   </div>
+    </div>
+
+   </div>
+
+
+   <!-- scritps -->
+   <script type="text/javascript">
+   	$( document ).ready(function() {
+    // validate
+    $('#address-form').validate({
+    rules:{
+        contact_name: {
+          required:true,
+          minlength:3
+        },
+        email: {
+          required:true,
+          minlength:3
+        },
+        phone: {
+          required:true,
+          minlength:6
+        },      
+
+    },
+    messages:{
+      contact_name:{
+        required: "please provide a name",
+        minlength: "name must be atleast 3 characters long"
+      },      
+    },
+    submitHandler: function() { 
+      
+      if(1 != ''){
+          var f = document.getElementById('address-form');
+          var formData = new FormData(f);
+          var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+          for (var pair of formData.entries()) {
+              console.log(pair[0]+ ', ' + pair[1]); 
+          }
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:address-add' pk=supplier_pk %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       console.log(data);
+                       $("#contact_name").val('');
+
+                       done_func();
+                       $('#modal_instance2').modal('hide');
+
+                       $.jGrowl('Address added successfully,', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+                       
+                      localStorage.setItem('user_id', data);
+                      $('.user_id').val(localStorage.getItem("user_id"));
+                      //window.location = "{% url 'dashboard:terminals'%}";
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try submitting again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            } 
+      }else{
+        $.jGrowl('Image is empty fill and try submitting again', {
+            header: 'Oh snap!',
+            theme: 'bg-danger'
+        });
+      }
+    }
+  });
+    // end validate
+  });
+  function refreshData(data)
+  {
+  	$("#contact-list").append(data)
+  } 
+   </script>

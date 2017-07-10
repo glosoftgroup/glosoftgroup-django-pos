@@ -8,12 +8,14 @@ User = get_user_model()
 from ...payment.models import MpesaPayment
 from .serializers import (
 	 UserTransactionSerializer,
-	 UserAuthorizationSerializer  
+	 UserAuthorizationSerializer ,
+	 TerminalListSerializer 
 	 )
 from rest_framework import generics 
 from rest_framework.response import Response
 from django.contrib import auth
 from ...decorators import user_trail
+from ...sale.models import Terminal
 import logging
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -69,5 +71,17 @@ class UserTransactionAPIView(generics.CreateAPIView,):
 		user_trail(self.request.user.name,'Drawer Cash:#'+str(serializer.data['amount'])+' added '+str(self.request.user.name),'add')
 		info_logger.info('User: '+str(self.request.user)+' Drawer Cash:'+str(serializer.data['amount']))
 
+class TerminalListAPIView(generics.ListAPIView):
+    pagination_class = PostLimitOffsetPagination
+    serializer_class = TerminalListSerializer
 
+    def get_queryset(self, *args, **kwargs):        
+        queryset_list = Terminal.objects.all()
+        query = self.request.GET.get('q')
+        if query:
+            queryset_list = queryset_list.filter(
+                Q(terminal_name__icontains=query)|
+                Q(terminal_number__icontains=query)               
+                ).order_by('-id')
+        return queryset_list
 

@@ -48,16 +48,17 @@
         <div class="tabbable">
           <ul class="nav nav-tabs nav-tabs-highlight">
             <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">add supplier profile</a></li>
+            <li class="" id="contacts-tab"><a href="#contacts" data-toggle="tab" class="legitRipple" aria-expanded="false">Contacts</a></li>
           </ul>
 
           <div class="tab-content">
-
+            
             <div class="tab-pane animated fadeIn active" id="profile">
               <form class="form" enctype="multipart/form-data" id="user-details" name="user-details">
                 {% csrf_token %}
                   <div class="row">
                     <div class="col-md-4">
-                    <label for="exampleInputEmail1">Supplier Image</label>
+                    <label for="exampleInputEmail1">Supplier Logo</label>
                       <div class="form-group">
                         <!-- <label for="exampleInputEmail1">User Image</label> -->
                         <div class="fileinput fileinput-new" data-provides="fileinput">
@@ -79,14 +80,27 @@
                           <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" class="form-control" name="name" id="name" placeholder="Name">
+                          </div>  
+                          <div class="form-group">
+                            <label for="name">Address</label>
+                            <input type="text" class="form-control" name="street1" id="street1" placeholder="Street 1">
+                            <input type="text" class="form-control" name="street2" id="street2" placeholder="Street 2">
+                            <div class="row">
+                             <div class="col-md-3">
+                              <input type="text" class="form-control" name="city" id="city" placeholder="city">
+                             </div>
+                             <div class="col-md-3">
+                             <input type="text" class="form-control" name="county" id="county" placeholder="county">
+                             </div>
+                             <div class="col-md-3">
+                             <input type="number" class="form-control" name="code" id="code" placeholder="Code">
+                             </div>
+                            </div>
                           </div>
-                         <!--  <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control" name="password" id="password" placeholder="Password">
-                           </div> -->
+
                            <div class="form-group">
-                            <label for="exampleInputPassword1">National ID No:</label>
-                            <input type="text" class="form-control" name="nid" id="nid" placeholder="Id No">
+                            <label for="exampleInputPassword1">Website:</label>
+                            <input type="url" class="form-control" name="website" id="website" placeholder="http://www.example.com">
                            </div>
                            
                         </div>
@@ -95,17 +109,17 @@
                               <label for="email">Email address</label>
                               <input type="email" class="form-control" name="email" id="email" placeholder="Email">
                            </div>
-                          <!--  <div class="form-group">
-                            <label for="confirm_password">Confirm Password</label>
-                            <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="Confirm Password">
-                           </div> -->
+                          
                            <div class="form-group">
                             <label for="mobile">Phone</label>
                             <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile">
                            </div>
+                           <div class="form-group">
+                            <label for="mobile">Fax</label>
+                            <input type="text" class="form-control" name="fax" id="fax" placeholder="Fax">
+                           </div>
                         </div>
-                      </div>
-                      
+                      </div>            
                      
                     </div>
                   </div>
@@ -113,7 +127,7 @@
                     <div class="col-md-12">
                      <div class="pull-right" style="margin-top:40px;">
                       <a href="{% url 'dashboard:supplier' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
-                      <!-- <button class="btn btn-primary waves-effect waves-light" onclick="return false" id="submit" type="submit">Create User <i class="icon-arrow-right14 position-right"></i></button> -->
+                      
                       <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create supplier <i class="icon-arrow-right14 position-right"></i></button>
                      </div>
                     </div>
@@ -125,9 +139,7 @@
           </div>
         </div>
       </div>
-<!--       <div class="panel-footer">
-      <button class="btn btn-primary disabled">checki this</button>
-      </div> -->
+
     </div>
   </div>
 </div>
@@ -137,6 +149,7 @@
 
  
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+  
 <script type="text/javascript">
 /* disable th permissions tab code */
 $('#next-tab').click(function(){
@@ -145,69 +158,7 @@ $('#next-tab').click(function(){
 function disable_profile_tab(){
   $('#rofile-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
 }
-/* code to move to next tab */
-function next_tab(){
-  $('#profile').removeClass('active');
-  $('#profile-tab').removeClass('active');
-  $('#permissions').addClass('active');
-  $('#permissions-tab').addClass('active');
-}
-/* if not login permission */
-$("#can-login").click(function () {
-  var checked = $(this).is(':checked');
-  if(checked){
-      $('.check').each(function(){
-          $(this).prop("checked", true);          
-          $(this).parent().parent().removeClass('disabled');
-          $(this).parent().parent().parent().parent().removeClass('disabled');
-          $(this).parent().addClass('checked');
-          $(this).removeAttr('disabled');
-      });
-  }else{
-      $('.check').each(function(){
-          $(this).prop("checked", false);
-          $(this).parent().parent().parent().siblings('span').hide();
-          $(this).parent().parent().addClass('disabled');
-          $(this).parent().parent().parent().parent().addClass('disabled');
-          $(this).parent().removeClass('checked');
-          $(this).attr('disabled', 'disabled');
-      });
-  }
-});
-/* end login */
-/* check all */
-$("#checkAll").click(function () {
-  var checked = $(this).is(':checked');
-  if(checked){
-      $('.check').each(function(){
-          $(this).prop("checked", true);
-          $(this).parent().parent().parent().siblings('span').show();
-          $(this).parent().parent().parent().siblings('span').text('(granted)');
-          $(this).parent().addClass('checked');
-      });
-  }else{
-      $('.check').each(function(){
-          $(this).prop("checked", false);
-          $(this).parent().parent().parent().siblings('span').hide();
-          $(this).parent().removeClass('checked');
-      });
-  }
-});
-/* endcheck all */
-/* on each check */
-$( ".check" ).on( "click", function(){
-  var checked = $(this).is(':checked');
-  if(checked){
-    $(this).prop("checked", true);
-    $(this).parent().parent().parent().siblings('span').show();
-    $(this).parent().parent().parent().siblings('span').text('(granted)');      
-  }else{
-    $(this).prop("checked", false);
-    $(this).parent('span').removeClass('checked');
-    $(this).parent().parent().parent().siblings('span').hide();
-  }
-} );
-/* end each check*/
+
   $('#user-details').validate({
     rules:{
         name: {
@@ -218,24 +169,26 @@ $( ".check" ).on( "click", function(){
           required: true,
           email:true
         },
-        password:{
+        city:{
           required:true,
-          minlength: 6
+          minlength: 3
         },
-        confirm_password:{
-          required:true,
-          minlength:6,
-          equalTo: "#password"
+        street2:{
+          required:false,
+          minlength:3,          
         },
-        nid:{
-          required:true,
-          digits: true,
-          minlength: 6
+        code:{
+          required:false,
+          digits: true,          
         },
         mobile:{
           required:true,
           digits: true,
           minlength: 6
+        },
+      website:{
+          required:false,          
+          minlength: 5
         }
 
     },
@@ -283,9 +236,13 @@ $( ".check" ).on( "click", function(){
                     success:function(data){
                        console.log(data);
                        $("#name").val('');
-                       $("#email").val('');              
-                       $("#nid").val('');
-                       $("#mobile").val('');              
+                       $("#email").val('');         
+                       $("#code").val('');
+                       $("#mobile").val('');
+                       $("#website").val('');
+                       $("#street2").val('');
+                       $("#street1").val('');
+                       $("#city").val('');           
 
                        $.jGrowl('Supplier added successfully, now add permissioins', {
                           header: 'Well done!',

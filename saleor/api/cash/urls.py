@@ -5,6 +5,7 @@ from .views import (
     UserAuthorizationAPIView,
     logout,
     login,
+    TerminalListAPIView
     )
 
 
@@ -16,7 +17,8 @@ urlpatterns = [
     	UserAuthorizationAPIView.as_view(),
     	name='authorization'),
     url(r'^login/',login, name='login'),
-    url(r'^logout/',logout, name='logout'),  
+    url(r'^logout/',logout, name='logout'),
+    url(r'^terminals/',TerminalListAPIView.as_view(),name='terminal-list')  
     
 ]
 
