@@ -79,7 +79,7 @@
       </div>
    </div>
    </div>
-
+{% if sales %}
 <div class="col-md-12">
    <div id="pagination-div">
     <div class="panel panel-flat">
@@ -157,6 +157,19 @@
     </div>
    </div><!--pagination div-->
   </div>
+
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+       No sales summary available for {{date}}
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}
+
 </div>
 
 
