@@ -1,0 +1,132 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Sales Report
+{% endblock %}
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:balancesheet_reports' %}">Purchases</a></li>
+ {% endblock %}
+
+{% block menu_balancesheet_report_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+    .b-details{padding:0px 10px;}
+    .blist{
+      list-style: none;
+    }
+    .blist li{font-size: 1.1em;}
+    .hs{border-bottom: 2px solid #ddd;}
+    .total-text{padding-left:50px;}
+    .total-amount{border-top:1px solid #ddd;border-bottom: 1px solid #ddd;}
+    .total-b-texts{}
+    .total-b-amount{border-bottom:2px solid #999;}
+    .totals{margin-top: 10px;}
+    .address-block{font-size: 1.1em}
+  </style>
+ {% endblock %}
+
+{% block content %}
+{% if status %}
+<div class="row animated fadeIn">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+
+      <div class="panel-body">
+        <div class="row" style="margin-top:0px; padding-top: 0px;">
+            <div class="col-md-4 col-md-offset-4" style="margin-top:0px; padding-top: 0px;">
+              <img src="{% static 'backend/images/cp-logo2.jpg' %}" class="img-responsive center-block" style="height: 100px;width: auto; ">
+               <p class="text-center address-block"> 
+                Company Name.<br />
+                P.O Box 23333-00100, Nairobi, Kenya<br />
+                Balance Sheet<br/>
+                As at: 04/09/2016
+               </p>
+            </div>
+        </div>
+            <div class="row">
+             <div class="col-md-10 col-md-offset-1">
+              <div class="col-md-6">
+                 <h3 class="text-centers hs">Assets</h3>
+                 <div class="b-details">
+                   <h5>Current Assets</h5>
+                   <p>
+                     <ul class="blist">
+                       <li>Cash (in hand & sales)<span class="pull-right"> {{cash_in_hand}}</span></li>
+                       <li>Petty Cash <span class="pull-right"> {{petty_cash}}</span></li>
+                       <li>Inventory <span class="pull-right"> {{stock}}</span></li>
+                       <!--<li>Supplies <span class="pull-right"> 5435</span></li>-->
+                     </ul>
+                     <p><span class="total-text">Total</span> <span class="pull-right total-amount">Kshs {{debit_total}}</span></p>
+                   </p>
+                 </div>
+              </div>
+              <div class="col-md-6">
+                 <h3 class="text-centers hs">Liabilities</h3>
+                 <div class="b-details">
+                   <h5>Current Liabilities</h5>
+                   <p>
+                     <ul class="blist">
+                       <li>Accounts Payable <span class="pull-right"> {{accounts_payable}}</span></li>
+                       <li>Notes Payable <span class="pull-right"> {{notes_payable}}</span></li>
+                       <li>Revenues <span class="pull-right"> {{revenues}}</span></li>
+                     </ul>
+                     <p><span class="total-text">Total</span> <span class="pull-right total-amount">Kshs {{credit_total}}</span></p>
+                   </p>
+                 </div>
+              </div>
+              <div class="col-md-12 totals">
+                <div class="col-md-6">
+                  <div class="b-details">
+                  <p><span class="total-b-texts">Total Assets</span> <span class="pull-right total-b-amount">Kshs {{debit_total}}</span></p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="b-details">
+                  <p><span class="total-b-texts">Total Liabilites & Equity</span> <span class="total-b-amount pull-right">Kshs {{credit_total}}</span></p>
+                  </div>
+                </div>
+              </div>
+             </div>
+            </div>
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                  <p class="text-center" style="margin: 20px 0px;"> Thank you for partnering with us.<br />
+                  <span>Report pullled by User</span></p>
+                  
+              </div>
+             </div>
+            </div>
+    </div>
+  </div>
+</div>
+ {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+          No balancesheet report available
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}
+
+{% endblock%}
+{% block custom_js %}
+<script type="text/javascript">
+    // Show calendars on left
+    $('.daterange-left').daterangepicker({
+        opens: 'left',
+        applyClass: 'bg-slate-600',
+        cancelClass: 'btn-default'
+    });
+</script>
+{% endblock %}
