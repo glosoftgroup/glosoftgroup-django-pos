@@ -105,7 +105,7 @@
                         {% for item in items %}
                           <tr>
                             <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
-                            <td>{{item.sku}}</td>
+                            <td>{{item.sales.invoice_number }}</td>
                             <td>{% if item.sales.user.email %}{{item.sales.user.email}}{% else %}{{item.sales.user.name}}{% endif %}</td>
                             <td>{{item.product_name}}</td>
                             <td>{{item.unit_cost}}</td>
@@ -142,7 +142,7 @@
                    Total Tax: Kshs {{ total_tax.total_tax__sum}}
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
+                  <span>Report pullled by {{request.user.name}}</span></p>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
                   <!--<button class="btn btn-primary ck">Click</button> -->

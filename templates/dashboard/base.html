@@ -13,6 +13,7 @@
     {% block meta %}
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+      <meta http-equiv="refresh" content = "1200; url=/lock/?next={{request.path}}">
     {% endblock meta %}
 
     {% include 'favicon.html' %}    
@@ -265,11 +266,13 @@
                       <a href="search_videos.html#" class="has-ul legitRipple">
                       <i class='icon-cash3'></i>Sales</a>
                       <ul>
-                        <li class="{% block menu_report_class %}{% endblock %}"><a href="{% url 'dashboard:sales_reports' %}" class="legitRipple">Sales List</a></li>
-                        <li class="{% block sales_by_date_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_date_chart' %}" class="legitRipple">Sales by date Chart</a></li>
-                        <li class="{% block sales_by_product_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_product_chart' %}" class="legitRipple">Sales by product Chart</a></li>
-                        <li class="{% block sales_by_user_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_user_chart' %}" class="legitRipple">Sales by user Chart</a></li>
-                        <li class="{% block sales_by_teller_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_teller_chart' %}" class="legitRipple">Sales by teller Chart</a></li>
+                        <li class="{% block menu_report_class %}{% endblock %}"><a href="{% url 'dashboard:sales_list' %}" class="legitRipple">List</a></li>
+                        <li class="{% block sales_by_date_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_date_chart' %}" class="legitRipple">Sales Summary</a></li>
+                        <li><a href="javascript:;">Trending</a></li>
+                          <li class="{% block sales_by_category_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_category_chart' %}" class="legitRipple">Category Sales</a></li>
+                        <li class="{% block sales_by_product_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_product_chart' %}" class="legitRipple">By Item</a></li>
+                        <li class="{% block sales_by_user_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_user_chart' %}" class="legitRipple">By user</a></li>
+                        <li class="{% block sales_by_terminal_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_terminal_chart' %}" class="legitRipple">By Terminal</a></li>
 
                       </ul>
                     </li>
@@ -279,9 +282,9 @@
                       <i class='icon-drawer3'></i>Products</a>
                       <ul>
                         <li class="{% block menu_product_report_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:products_reports' %}">Products</a>
+                          <a href="{% url 'dashboard:products_reports' %}">Stock List</a>
                         </li>
-                        <li><a href="sidebar_dual.html" class="legitRipple">CHarts</a></li>
+                        <li class="{% block menu_product_reorder_class %}{% endblock %}"><a href="{% url 'dashboard:products_reorder' %}" class="legitRipple">Stock Reorder</a></li>
                       </ul>
                     </li>
 
@@ -428,7 +431,6 @@
     
     {% include "dashboard/includes/_messages.html" %}
     <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
-    <!-- <script type="text/javascript" src="{% static 'backend/js/chart.js'%}"></script> -->
     {% block custom_js %}{% endblock %}
    </div>
   </body>

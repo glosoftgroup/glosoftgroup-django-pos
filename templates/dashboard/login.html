@@ -7,7 +7,7 @@
   <head>
     <title>
       {% block title %}
-        {% trans "Dashboard - Saleor" context "Dashboard default page title" %}
+        {% trans "Log In" context "Dashboard default page title" %}
       {% endblock %}
     </title>
     {% block meta %}
@@ -61,7 +61,7 @@
             {% csrf_token %} 
             <div class="panel panel-body login-form animated bounceIn">
               <div class="text-center">
-                <div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>
+                <div class="icon-object border-pink-400 text-pink-400"><i class="icon-reading"></i></div>
                 <h5 class="content-group">Login to your account <small class="display-block">Enter your credentials below</small></h5>
               </div>
               <div id="status" class="alert bg-danger animated slideInUp" style="display: none;">
@@ -85,6 +85,11 @@
 
               <div class="form-group">
                 <button type="submit" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i><br><i class="fa fa-spinner fa-spin fa-2x fa-fw position-right spinner" style="display: none;"></i></button>
+              </div>
+              <div class="text-center">
+                <a class="link--styled" href="{% url 'account_reset_password' %}">
+                  {% trans "Forgot password?" context "Login form secondary link" %}
+                </a>
               </div>
             </div>
           </form>

@@ -58,12 +58,12 @@
                    <h5>Current Assets</h5>
                    <p>
                      <ul class="blist">
-                       <li>Cash <span class="pull-right"> 20000</span></li>
-                       <li>Petty Cash <span class="pull-right"> 300</span></li>
-                       <li>Inventory <span class="pull-right"> 14302</span></li>
-                       <li>Supplies <span class="pull-right"> 5435</span></li>
+                       <li>Cash (in hand & sales)<span class="pull-right"> {{cash_in_hand}}</span></li>
+                       <li>Petty Cash <span class="pull-right"> {{petty_cash}}</span></li>
+                       <li>Inventory <span class="pull-right"> {{stock}}</span></li>
+                       <!--<li>Supplies <span class="pull-right"> 5435</span></li>-->
                      </ul>
-                     <p><span class="total-text">Total</span> <span class="pull-right total-amount">Kshs 200000</span></p>
+                     <p><span class="total-text">Total</span> <span class="pull-right total-amount">Kshs {{debit_total}}</span></p>
                    </p>
                  </div>
               </div>
@@ -73,23 +73,23 @@
                    <h5>Current Liabilities</h5>
                    <p>
                      <ul class="blist">
-                       <li>Accounts Payable <span class="pull-right"> 23100</span></li>
-                       <li>Wages Payable <span class="pull-right"> 80000</span></li>
-                       <li>Taxes Payable <span class="pull-right"> 100000</span></li>
+                       <li>Accounts Payable <span class="pull-right"> {{accounts_payable}}</span></li>
+                       <li>Notes Payable <span class="pull-right"> {{notes_payable}}</span></li>
+                       <li>Revenues <span class="pull-right"> {{revenues}}</span></li>
                      </ul>
-                     <p><span class="total-text">Total</span> <span class="pull-right total-amount">Kshs 232300</span></p>
+                     <p><span class="total-text">Total</span> <span class="pull-right total-amount">Kshs {{credit_total}}</span></p>
                    </p>
                  </div>
               </div>
               <div class="col-md-12 totals">
                 <div class="col-md-6">
                   <div class="b-details">
-                  <p><span class="total-b-texts">Total Assets</span> <span class="pull-right total-b-amount">Kshs 232300</span></p>
+                  <p><span class="total-b-texts">Total Assets</span> <span class="pull-right total-b-amount">Kshs {{debit_total}}</span></p>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="b-details">
-                  <p><span class="total-b-texts">Total Liabilites & Equity</span> <span class="total-b-amount pull-right">Kshs 232300</span></p>
+                  <p><span class="total-b-texts">Total Liabilites & Equity</span> <span class="total-b-amount pull-right">Kshs {{credit_total}}</span></p>
                   </div>
                 </div>
               </div>

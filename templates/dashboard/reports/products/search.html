@@ -9,8 +9,8 @@
                         <tr>
                           <th>sku</th>
                           <th>Product Name</th>
-                          <th>Category</th>
                           <th>Type</th>
+                          <th>Category</th>
                           <th>Reorder-level</th>
                           <th>Current Quantity <span style="font-size:.9em;">(units)</span></th>
                           <th>Unit Cost</th>
@@ -22,17 +22,18 @@
                         {% for item in items %}
                           <tr>
                             <td>{{item.sku}}</td>
-                            <td>{{item.name}}</td>
+                            <td>{{item.display_product}}</td>
+                            <td>{{item.product.get_first_category}}</td>
                             <td>{{item.product.product_class.name}}</td>
-                            <td>{{item.product.categories.name}}</td>
                             <td>{{item.product.low_stock_threshold}}</td>
-                            <td>200 kgs</td>
-                            <td>Kshs 20</td>
-                            <td>Ksh. 4000</td>
+
+                            <td>{{item.get_stock_quantity}}</td>
+                             <td>{{item.get_price_per_item.gross}}</td>
+                            <td>{{item.get_total_price_cost}}</td>
                           </tr>
                         {% endfor %}
                         {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                         <tr><td colspan="6"><h2 class="text-center">no products available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
