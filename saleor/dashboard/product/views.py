@@ -59,7 +59,6 @@ def add_reorder_stock(request,pk=None):
 														user=request.user,)
 
 				items = json.loads(variants)
-				print purchase_order
 				for li in items:
 					var = ProductVariant.objects.get(pk=int(li['id']))
 					sku = var.sku
@@ -110,7 +109,6 @@ def re_order_form(request, pk):
 		for q in qset:
 			qset = q
 			items = PurchaseItems.objects.filter(purchase_order=q)
-			print items
 		ctx = {'items':items,'order':qset,"product":product,'suppliers':suppliers,'variants':variants,'attributes':attributes}
 	else:
 		ctx = {"product":product,'suppliers':suppliers,'variants':variants,'attributes':attributes}

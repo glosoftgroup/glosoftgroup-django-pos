@@ -93,8 +93,7 @@ def terminal_edit(request, pk):
 def terminal_update(request, pk):
 	terminal = get_object_or_404(Terminal, pk=pk)
 	if request.method == 'POST':
-		name = request.POST.get('name')	
-		print name			
+		name = request.POST.get('name')
 		nid = request.POST.get('nid')		
 		terminal.terminal_name = name				
 		terminal.terminal_number = nid		
