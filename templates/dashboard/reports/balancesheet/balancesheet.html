@@ -34,6 +34,7 @@
  {% endblock %}
 
 {% block content %}
+{% if status %}
 <div class="row animated fadeIn">
 <div class="col-md-12">
     <div class="panel panel-flat">
@@ -106,7 +107,17 @@
     </div>
   </div>
 </div>
-
+ {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+          No balancesheet report available
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}
 
 {% endblock%}
 {% block custom_js %}

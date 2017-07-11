@@ -22,10 +22,15 @@ from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
 import random
+import csv
+from django.utils.encoding import smart_str
 from decimal import Decimal
 from calendar import monthrange
 import calendar
 from django_xhtml2pdf.utils import generate_pdf
+
+import re
+import base64
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -48,8 +53,11 @@ def sales_category_chart(request):
 	if get_date:
 		date = get_date
 	else:
-		last_sale = Sales.objects.latest('id')
-		date = DateFormat(last_sale.created).format('Y-m-d')
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 	if date:
 		try:
 			sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
@@ -90,7 +98,9 @@ def sales_category_chart(request):
 			}
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', data)
 		except ObjectDoesNotExist as e:
-			return HttpResponse(e)
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e":e, "date":date})
+		except IndexError as e:
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e": e, "date":date})
 
 def get_category_sale_details(request):
 	get_categ = request.GET.get('category')
@@ -172,8 +182,11 @@ def sales_date_chart(request):
 	if get_date:
 		date = get_date
 	else:
-		last_sale = Sales.objects.latest('id')
-		date = DateFormat(last_sale.created).format('Y-m-d')
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
 	if date:
 		try:
@@ -257,18 +270,56 @@ def sales_date_chart(request):
 			else:
 				return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_date.html',data)
 		except ObjectDoesNotExist as e:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_date.html',{"error":e, "date":date})
+			if get_date:
+				return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_date.html',{"error":e, "date":date})
+			else:
+				return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html',
+										{"error": e, "date": date})
 
+def chart_pdf(request, image):
+	dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+	ImageData = image
+	ImageData = dataUrlPattern.match(ImageData).group(2)
 
-def chart_pdf(request):
 	users = User.objects.all()
 	data = {
-		'today': date.today(), 
+		'today': date.today(),
 		'users': users,
-		'puller': request.user
+		'puller': request.user,
+		'image':ImageData
 		}
 	pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
 	return HttpResponse(pdf, content_type='application/pdf')
+
+def sales_export_csv(request, image):
+	dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+	ImageData = image
+	ImageData = dataUrlPattern.match(ImageData).group(2)
+	fh = open("imageToSave.png", "wb")
+	fh.write(ImageData.decode('base64'))
+	fh.close()
+
+
+	pdfname = 'users'+str(random.random())
+	response = HttpResponse(content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+	qs = User.objects.all()
+	writer = csv.writer(response, csv.excel)
+	response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+	writer.writerow([
+		smart_str(u"ID"),
+		smart_str(u"Name"),
+		smart_str(u"Email"),
+		smart_str(u"Image"),
+	])
+	for obj in qs:
+		writer.writerow([
+			smart_str(obj.pk),
+			smart_str(obj.name),
+			smart_str(obj.email),
+			smart_str(fh),
+		])
+	return response
 
 def get_sales_charts(request):
 	label = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"]
@@ -478,8 +529,12 @@ def get_sales_by_week(request):
 
 def sales_user_chart(request):
 	today = datetime.datetime.now()
-	last_sale = Sales.objects.latest('id')
-	date = DateFormat(last_sale.created).format('Y-m-d')
+	try:
+		last_sale = Sales.objects.latest('id')
+		date = DateFormat(last_sale.created).format('Y-m-d')
+	except:
+		date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
 	if date:
 		try:
 			users = Sales.objects.values('user__email', 'user__name', 'terminal').annotate(Count('user')).annotate(
@@ -518,8 +573,10 @@ def sales_user_chart(request):
 				"hcateg": highest_user_sales
 			}
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html', data)
-		except ObjectDoesNotExist as e:
-			return HttpResponse(e)
+		except ObjectDoesNotExist:
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
+		except IndexError:
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
 
 def get_user_sale_details(request):
 	get_categ = request.GET.get('user')
@@ -597,8 +654,12 @@ def get_user_sale_details(request):
 
 def sales_terminal_chart(request):
 	today = datetime.datetime.now()
-	last_sale = Sales.objects.latest('id')
-	date = DateFormat(last_sale.created).format('Y-m-d')
+	try:
+		last_sale = Sales.objects.latest('id')
+		date = DateFormat(last_sale.created).format('Y-m-d')
+	except:
+		date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
 	if date:
 		try:
 			terminals = Sales.objects.values('terminal__terminal_name', 'terminal').annotate(Count('terminal')).annotate(
@@ -637,8 +698,10 @@ def sales_terminal_chart(request):
 				"hcateg": highest_user_sales
 			}
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_teller.html', data)
-		except ObjectDoesNotExist as e:
-			return HttpResponse(e)
+		except ObjectDoesNotExist:
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_teller.html')
+		except IndexError:
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
 
 def get_terminal_sale_details(request):
 	get_categ = request.GET.get('terminal')
@@ -719,8 +782,11 @@ def sales_product_chart(request):
 	if get_date:
 		date = get_date
 	else:
-		last_sale = Sales.objects.latest('id')
-		date = DateFormat(last_sale.created).format('Y-m-d')
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 	if date:
 		try:
 			sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
@@ -761,7 +827,9 @@ def sales_product_chart(request):
 			}
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html', data)
 		except ObjectDoesNotExist as e:
-			return HttpResponse(e)
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html')
+		except IndexError as e:
+			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html')
 
 def get_product_sale_details(request):
 	get_categ = request.GET.get('item')

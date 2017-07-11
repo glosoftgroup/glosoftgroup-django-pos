@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% if sales %}
       <div class="panel panel-flat">
       <div class="panel-body">
         <div class="row">
@@ -163,3 +164,14 @@
 
    });
  </script>
+{% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+       No sales summary available for {{date}}
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}

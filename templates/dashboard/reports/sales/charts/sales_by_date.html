@@ -103,6 +103,7 @@
       </div>
    </div>
    </div>
+{% if date_total_sales %}
 <div class="p-sales">
     <div class="col-md-12">
   <div class="panel panel-flat">
@@ -325,6 +326,17 @@
     </div>
 </div>
 </div>
+{% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+       No sales summary available for {{date}}
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
 
 
 {% endblock%}
@@ -332,9 +344,10 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
+
     $('.daterange-single').daterangepicker({ 
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
@@ -355,8 +368,28 @@ $(document).ready(function(){
          $('.setValue').val($(this).val());
          $('.setName').val('export');
          // $('.set').value = $(this).val();
+         $('#chart1').get(0).toBlob(function(blob) {
+    		//saveAs(blob, "chart_1.png");
+    		console.log(blob);
+         });
+         var img = document.getElementById('chart1').toDataURL("image/png");
+         /*$.ajax({
+              url:'',
+              type:'GET',
+              data:{image:img},
+              success:function(data){
+                console.log('success');
+                 $('.p-sales').html(data);
+              },error:function(data){
+                console.log('error');
+              }
+         });*/
          if($(this).val() == 'pdf'){
-            window.location = "{% url 'dashboard:chart_pdf' %}";
+            var url = "/dashboard/reports/cpdf/"+img;
+            window.open(url, '_blank');
+         }else if($(this).val() == 'excel'){
+             var url ="/dashboard/reports/csv/"+img;
+             window.open(url, '_blank');
          }
     });
     //**@ daterange from
@@ -451,7 +484,7 @@ $(document).ready(function(){
       labels: [{% for i in labels2 %} "{{ i }}", {% endfor %}],
       datasets: [{
         label: "Sales of {{date}}",
-        backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+        backgroundColor:"pink",
         borderColor: window.chartColors.red,
         fill: true,
         data: [{% for d in default %} {{ d }}, {% endfor %}],
@@ -492,8 +525,7 @@ $(document).ready(function(){
           scales: {
                 yAxes: [{
                     ticks: {
-                        fontColor: "rgba(0,0,0,0.5)",
-                        fontStyle: "bold",
+                        fontColor: "rgba(0,0,0,1)",
                         beginAtZero: true,
                         maxTicksLimit: 5,
                         padding: 20
@@ -510,8 +542,7 @@ $(document).ready(function(){
                     },
                     ticks: {
                         padding: 20,
-                        fontColor: "rgba(0,0,0,0.5)",
-                        fontStyle: "bold",
+                        fontColor: "rgba(0,0,0,1)",
                         beginAtZero: true,
                         maxTicksLimit: 10
                     }
@@ -520,6 +551,40 @@ $(document).ready(function(){
         }
       });
 //-----chart**/
+        // Define a plugin to provide data labels
+        Chart.plugins.register({
+            afterDatasetsDraw: function(chart, easing) {
+                // To only draw at the end of animation, check for easing === 1
+                var ctx = chart.ctx;
+
+                chart.data.datasets.forEach(function (dataset, i) {
+                    var meta = chart.getDatasetMeta(i);
+                    if (!meta.hidden) {
+                        meta.data.forEach(function(element, index) {
+                            // Draw the text in black, with the specified font
+                            ctx.fillStyle = 'rgba(0, 0, 0,0.8)';
+
+                            var fontSize = 10;
+                            var fontStyle = 'normal';
+                            var fontFamily = 'Helvetica Neue';
+                            ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+                            // Just naively convert to string for now
+                            var dataString = dataset.data[index].toString();
+
+                            // Make sure alignment settings are correct
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+
+                            var padding = 5;
+                            var position = element.tooltipPosition();
+                            ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
+                        });
+                    }
+                });
+            }
+        });
+
 });
 
 </script>

@@ -94,6 +94,7 @@
           </div>
       </div>
     </div>
+{% if sales_by_category %}
 <div class="p-sales">
     <div class="col-md-12">
     <div class="panel panel-flat">
@@ -161,6 +162,17 @@
   </div>
 
  </div>
+ {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+          No report for Sales by Items
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}
 </div>
 
 
