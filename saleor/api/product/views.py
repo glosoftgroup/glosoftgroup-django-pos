@@ -12,7 +12,10 @@ from ...product.models import (
     ProductVariant,
     Stock,
     )
-from ...sale.models import (Sales, Terminal, TerminalHistoryEntry)
+from ...sale.models import (Sales, 
+                            Terminal, 
+                            TerminalHistoryEntry,
+                            DrawerCash)
 from ...customer.models import Customer
 from .serializers import (
     CreateStockSerializer,
@@ -72,6 +75,12 @@ class SalesCreateAPIView(generics.CreateAPIView):
                             crud='deposit',
                             user=self.request.user
                         )
+        drawer = DrawerCash.objects.create(manager=self.request.user,                                        
+                                           user = self.request.user,
+                                           terminal=terminal,
+                                           amount=serializer.data['total_net'],
+                                           trans_type='sale')
+        
 
 
 class SalesListAPIView(generics.ListAPIView):
