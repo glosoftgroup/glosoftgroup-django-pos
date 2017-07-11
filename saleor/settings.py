@@ -521,3 +521,5 @@ JWT_AUTH = {
 
 }
 
+TIME_INPUT_FORMATS = ['%H:%M %p']
+			
