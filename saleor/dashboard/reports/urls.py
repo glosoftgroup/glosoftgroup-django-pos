@@ -24,8 +24,10 @@ urlpatterns = [
 		url(r'^chart/$', views.get_dashboard_data, name='chart'), 
 		url( r'^sales_search/$', views.sales_search, name = 'sales_search' ),
 		url( r'^sales_paginate/$', views.sales_paginate, name = 'sales_paginate' ),
-		url( r'^chart_pdf/$', charts.chart_pdf, name = 'chart_pdf' ),
-		# url(r'^pdf/$', PDFTemplateView.as_view(template_name='dashboard/reports/sales/charts/pdf/pdf.html',filename='my_pdf.pdf'), 
+		# url( r'^chart_pdf/$', charts.chart_pdf, name = 'chart_pdf' ),
+		url(r'^cpdf/(?P<image>.+)/$', charts.chart_pdf, name='chart_pdf'),
+		url(r'^csv/(?P<image>.+)/$', charts.sales_export_csv, name='chart_csv'),
+		# url(r'^pdf/$', PDFTemplateView.as_view(template_name='dashboard/reports/sales/charts/pdf/pdf.html',filename='my_pdf.pdf'),
 			# name='chart_pdf'),
 
 		url( r'^datechart/$', charts.sales_date_chart, name = 'sales_date_chart' ),
