@@ -28,9 +28,33 @@
 {% url "dashboard:search-sku" as url %}
 {% include "dashboard/includes/_sku_search_filter.html" with url=url%}
 </div>
+<div class="panel panel-default">  
+   <div class='table-responsive'>
+    <table class="table table-striped table-hover fixed_headers">
+    <thead>
+      <tr class="bg-primary">        
+        <th>Product Name/sku</th>            
+        <th>Retail price</th> 
+        <th>Supplier</th>
+        <th>Current Quantity</th>
+        <th>stock in</th>
+        <th>Tax %</th>         
+      </tr>
+    </thead>    
+    <tbody id="stock_content">
+    <tr>
+        <td colspan="6">
+        <div class="text-bold text-center">
+         <i class="icon-spinner2 spinner"></i>
+         Loading stock ....
+        </div>
+        </td>
+    </tr>
+    </tbody>
+    </table>
+   </div>
+  </div>
 
-
-<div id="stock_content"></div>
 <div class="text-center">
 	<div class="col-md-10">
 		 <span  id='pagination-demo'></span>
@@ -39,7 +63,7 @@
 		<span class="text-right" id='pag_nav'></span>
 	</div>	
 </div>
-
+{% include "dashboard/includes/_modal_add_stock.html"  %}
 <!-- /search field -->
 {% endblock %}
 {% block custom_js %}
@@ -56,8 +80,7 @@
     });	
 </script>
 <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+ 
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {  	
