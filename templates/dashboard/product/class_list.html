@@ -83,7 +83,7 @@
                     <tr>
                       <!-- has variants   -->
                       <td>
-                        <span class="text-bold text-strong"> {% trans "Variants" context "Dashboard variants" %}: </span>
+                        
                         {% if has_variants %}
                           {% trans "Yes" %}
                         {% else %}
@@ -95,13 +95,13 @@
                       <!-- variant attributes  -->
                       <td>
                         {% if variant_attributes %}
-                         <br/><span class="text-bold text-strong"> {% trans "Variant attributes" context "Product type item list text" %}:</span><br/> {{ variant_attributes|join:", " }}
+                         <br/>{{ variant_attributes|join:", " }}
                         {% endif %}
                       </td>
                       <!-- product attributes -->
                       <td>
                         {% if product_attributes %}
-                       <span class="text-bold text-strong">{% trans "Product attributes" context "Product type item list text" %}:</span><br/> {{ product_attributes|join:", " }}
+                       {{ product_attributes|join:", " }}
                       {% endif %}
                       </td>
                       <!-- actions -->

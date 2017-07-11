@@ -29,35 +29,40 @@
 
 {% block content %}
   <div class="row">
-    
-      {% if locations %}
-      <div class="row">
-        <div class="col-md-12">
-          {% for location in locations %}
-          <div class="col-md-3">
-           <div class="panel border-lg border-danger border-left-lg border-left-danger">
-            <span class="panel text-center">
-                <a href="{% url 'dashboard:product-stock-location-edit' location.pk %}">
-                  <p class="list-item-name--single">
-                    {{ location }}
-                  </p>
-                </a>
-            </span>
-            </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="not-found">
-          <p class="grey-text">
-            {% trans "No locations found." context "Empty stock location list message" %}
-          </p>
-        </div>
-      </div>>
-      {% endif %}
-    </div>
+    <div class='table-responsive'>
+  <table class="table table-striped table-hover fixed_headers">
+    <thead>
+      <tr class="bg-primary">    
+        <th>#</th>    
+        <th>Location Name</th>                 
+      </tr>
+    </thead>    
+    <tbody>
+    {% if locations %}
+    {% for location in locations %}
+      <tr class="td" data-href="{% url 'dashboard:product-stock-location-edit' location.pk %}">
+        <td>#{{ forloop.counter }}</td>
+        <td>{{ location }}</td>
+      </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+    </table>
   </div>
+      
+    </div>
+ 
 
 {% endblock %}
-
+{% block custom_js %}
+<style type="text/css">
+  .td { cursor: pointer; }
+</style>
+<script type="text/javascript">
+  $('.td').on('click',function(){
+     var href = $(this).data('href');
+     window.location=href;
+  });
+</script>
+{% endblock %}
 

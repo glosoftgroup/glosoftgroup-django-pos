@@ -1,17 +1,31 @@
-{% if product_results %} 
-{% load product_first_image from product_images %}
+{% extends "dashboard/base.html" %}
 {% load i18n %}
 {% load prices_i18n %}
-<!-- search count -->
-  
-  {% if search_count %} 
-  <div class="text-center content-text-muted content-divider">
-  <span class="pt-10 pb-10">
-   {{ search_count }} results of {{ products_count  }}
-   </span>  
-   </div>
-  {% endif %}
-  
+{% load materializecss %}
+{% load static %}
+{% load product_first_image from product_images %}
+
+{% block title %}
+  {% trans "Discount Details" %} - {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %} 
+    <li >
+    <a href="{% url 'dashboard:sale-list' %}">
+    {% trans "Discounts" context "Dashboard sales (discounts) list." %}
+    </a>
+    </li>
+    <li class="active">
+      {% if discount %}
+       {{discount}}
+      {% endif %}
+    </li> 
+{% endblock %}
+
+{% block content %} 
+{% if product_results %} 
+
+ 
 <div class="panel panel-default">
   <div class="table-responsive">  
         
@@ -65,7 +79,8 @@
 {% else %}
  <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>
 {% endif %}
-{% load static %}
+{% endblock %}
+{% block custom_js %}
  <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
 <script type="text/javascript">
@@ -89,3 +104,4 @@
     
    });
   </script>
+{% endblock %}

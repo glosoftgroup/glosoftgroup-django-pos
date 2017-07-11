@@ -54,6 +54,19 @@ def user_add(request):
 		return HttpResponse('error accessing add users page')
 
 @staff_member_required
+def supplier_add(request):
+	try:
+		return TemplateResponse(request, 'dashboard/supplier/add_supplier.html',{})
+	except TypeError as e:
+		error_logger.error(e)
+		return HttpResponse('error accessing add users page')
+
+@staff_member_required
+def fetch_suppliers(request):
+	suppliers = Supplier.objects.all()
+	ctx = {'suppliers':suppliers}
+	return TemplateResponse(request, 'dashboard/supplier/refreshed_supplier.html',ctx)
+@staff_member_required
 @csrf_exempt
 def user_process(request):
 	user = Supplier.objects.all()
