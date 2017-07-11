@@ -1,0 +1,135 @@
+{% load staticfiles %}
+      <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered datatable-header-footer">
+                  <caption style="margin-bottom: 10px;">
+                   </caption>
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr>
+                            <th>
+                              Product name
+                            </th>
+                            <th class="right-align">
+                              Stock left
+                            </th>
+                            <th> Low stock Threshold</th>
+                      </tr>
+                      </thead>
+                      <tbody id="p-tb">
+                      {% if items %}
+                          {% for product in items %}
+                            <tr data-action-go="{% url 'dashboard:product-update' pk=product.pk %}#stock">
+                              <td>
+                                {{ product }}
+                              </td>
+                              <td class="right-align">
+                                {{ product.total_stock }}
+                              </td>
+                              <td class="right-align">
+                                {{ product.low_stock_threshold }}
+                              </td>
+                            </tr>
+                          {% endfor %}
+                        {% else %}
+                         <tr><td colspan="6"><h2 class="text-center">no items available</h2></td></tr>
+                        {% endif %}
+                        </tbody>
+                        </tbody>
+
+                 </table>
+        </div>
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            leaps: false
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}');
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                      console.log('without gid '+data);
+                    });
+                }else{
+                    if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
+                        $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('action is '+'{{gid}}');
+                    }else{
+                        $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('date is'+gid);
+                    }
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+        /* clicked the submit button */
+        $('.del').on('click', function (e) {
+                var f = document.getElementById('delform');
+                var formData = new FormData(f);
+                var id = $(this).data('id');
+                var url = $(this).data('href');
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                      $('#modal_instance').modal('hide');
+                      $('#tb #'+id).remove();
+                      $.jGrowl('User deleted successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                      });
+                      window.location.reload();
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Error deleting Staff', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            });
+
+   });
+ </script>
