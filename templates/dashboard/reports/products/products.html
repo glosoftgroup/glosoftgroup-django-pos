@@ -46,6 +46,15 @@
               </div>
             </div>
             <div class="col-md-2">
+                <label>categories</label>
+              <div class="form-group">
+                 <select class="bootstrap-select products-category" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="list">stock list</option>
+                     <option value="reorder">stock reorder</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
               <label>display list size</label>
               <div class="form-group">
                  <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
@@ -177,6 +186,14 @@ $(document).ready(function(){
               $('#pagination-div').html(data);
         }});
     });
+  $('.products-category').selectpicker().on('change', function(){
+        var sv = $(this).val();
+        if(sv == 'list'){
+            window.location = "{% url 'dashboard:products_reports' %}";
+        }else if(sv == 'reorder'){
+            window.location = "{% url 'dashboard:products_reorder' %}";
+        }
+  });
 
    $('.export-sz').selectpicker({
           iconBase: 'fa',

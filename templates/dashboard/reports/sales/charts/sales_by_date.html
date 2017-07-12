@@ -14,7 +14,7 @@
      <li><a href="{% url 'dashboard:sales_date_chart' %}">Sales Date Chart</a></li>
  {% endblock %}
 
-{% block sales_by_date_chart_class %}active{% endblock %}
+{% block menu_report_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -67,8 +67,8 @@
       <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
          <div class="row">
-            <div class="col-md-3">
-              <label>select single date to search</label>
+            <div class="col-md-2">
+              <label>select single date</label>
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="icon-calendar22"></i></span>
@@ -90,6 +90,19 @@
               </div>
             </div>
             <div class="col-md-2">
+                <label>categories</label>
+              <div class="form-group">
+                 <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="summary">sales summary</option>
+                     <option value="list">sales list</option>
+                    <option value="category">by category</option>
+                    <option value="items">by items</option>
+                    <option value="user">by user</option>
+                     <option value="terminal">by terminal</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
              <label>Export</label>
               <div class="form-group">
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
@@ -106,7 +119,7 @@
 {% if date_total_sales %}
 <div class="p-sales">
     <div class="col-md-12">
-  <div class="panel panel-flat">
+  <div class="panel panel-flat" id="st">
     <div class="panel-body">
      <div class="row">
         <h3 style="padding-left: 20px;">Daily Gross Sales</h3>
@@ -169,7 +182,7 @@
 </div>
 
   <div class="col-md-12">
-      <div class="panel panel-flat">
+      <div class="panel panel-flat" id="ss">
         <div class="panel-heading">
           <h6 class="panel-title">Sales Summary</h6>
           <div class="heading-elements">
@@ -265,7 +278,7 @@
     </div>
 
   <div class="col-md-12">
-      <div class="panel panel-flat">
+      <div class="panel panel-flat" id="ct">
         <div class="panel-heading">
           <h6 class="panel-title">Cashiers in Terminals</h6>
           <div class="heading-elements">
@@ -345,6 +358,7 @@
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/html2canvas.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 
@@ -358,6 +372,22 @@ $(document).ready(function(){
               $('.p-sales').html(data);
         }});
     });
+  $('.sales-category').selectpicker().on('change', function(){
+        var sv = $(this).val();
+        if(sv == 'list'){
+            window.location = "{% url 'dashboard:sales_list' %}";
+        }else if(sv == 'summary'){
+            window.location = "{% url 'dashboard:sales_date_chart' %}";
+        }else if(sv == 'category'){
+            window.location = "{% url 'dashboard:sales_category_chart' %}";
+        }else if(sv == 'items'){
+            window.location = "{% url 'dashboard:sales_product_chart' %}";
+        }else if(sv == 'user'){
+            window.location = "{% url 'dashboard:sales_user_chart' %}";
+        }else if(sv == 'terminal'){
+            window.location = "{% url 'dashboard:sales_terminal_chart' %}";
+        }
+  });
 
     $('.export-sz').selectpicker({
           iconBase: 'fa',
@@ -368,24 +398,18 @@ $(document).ready(function(){
          $('.setValue').val($(this).val());
          $('.setName').val('export');
          // $('.set').value = $(this).val();
-         $('#chart1').get(0).toBlob(function(blob) {
-    		//saveAs(blob, "chart_1.png");
-    		console.log(blob);
-         });
-         var img = document.getElementById('chart1').toDataURL("image/png");
-         /*$.ajax({
-              url:'',
-              type:'GET',
-              data:{image:img},
-              success:function(data){
-                console.log('success');
-                 $('.p-sales').html(data);
-              },error:function(data){
-                console.log('error');
-              }
-         });*/
+
          if($(this).val() == 'pdf'){
-            var url = "/dashboard/reports/cpdf/"+img;
+             /*html2canvas($("#st"), {
+                    onrendered: function(canvas) {
+                        var myImage = canvas.toDataURL("image/png");
+                        //window.open(myImage);
+                        var url = "/dashboard/reports/cpdf/"+myImage;
+                        window.open(url, '_blank');
+                    }
+                });*/
+            var img = document.getElementById('chart1').toDataURL("image/png");
+            var url = "/dashboard/reports/datechartimage/"+img;
             window.open(url, '_blank');
          }else if($(this).val() == 'excel'){
              var url ="/dashboard/reports/csv/"+img;
@@ -404,7 +428,7 @@ $(document).ready(function(){
             showCustomRangeLabel: true,
             linkedCalendars:false,
             locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
-            opens: 'left',
+            opens: 'right',
             applyClass: 'btn-small bg-slate',
             cancelClass: 'btn-small btn-default',
             ranges: {
@@ -551,39 +575,39 @@ $(document).ready(function(){
         }
       });
 //-----chart**/
-        // Define a plugin to provide data labels
-        Chart.plugins.register({
-            afterDatasetsDraw: function(chart, easing) {
-                // To only draw at the end of animation, check for easing === 1
-                var ctx = chart.ctx;
+    // Define a plugin to provide data labels
+    Chart.plugins.register({
+        afterDatasetsDraw: function(chart, easing) {
+            // To only draw at the end of animation, check for easing === 1
+            var ctx = chart.ctx;
 
-                chart.data.datasets.forEach(function (dataset, i) {
-                    var meta = chart.getDatasetMeta(i);
-                    if (!meta.hidden) {
-                        meta.data.forEach(function(element, index) {
-                            // Draw the text in black, with the specified font
-                            ctx.fillStyle = 'rgba(0, 0, 0,0.8)';
+            chart.data.datasets.forEach(function (dataset, i) {
+                var meta = chart.getDatasetMeta(i);
+                if (!meta.hidden) {
+                    meta.data.forEach(function(element, index) {
+                        // Draw the text in black, with the specified font
+                        ctx.fillStyle = 'rgba(0, 0, 0,0.8)';
 
-                            var fontSize = 10;
-                            var fontStyle = 'normal';
-                            var fontFamily = 'Helvetica Neue';
-                            ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+                        var fontSize = 10;
+                        var fontStyle = 'normal';
+                        var fontFamily = 'Helvetica Neue';
+                        ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
 
-                            // Just naively convert to string for now
-                            var dataString = dataset.data[index].toString();
+                        // Just naively convert to string for now
+                        var dataString = dataset.data[index].toString();
 
-                            // Make sure alignment settings are correct
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
+                        // Make sure alignment settings are correct
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
 
-                            var padding = 5;
-                            var position = element.tooltipPosition();
-                            ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
-                        });
-                    }
-                });
-            }
-        });
+                        var padding = 5;
+                        var position = element.tooltipPosition();
+                        ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
+                    });
+                }
+            });
+        }
+    });
 
 });
 

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 from . import views
 from . import charts
+from . import pdfs
 from django.conf import settings
 from django.conf.urls.static import static
 # from wkhtmltopdf.views import PDFTemplateView
@@ -25,15 +26,17 @@ urlpatterns = [
 		url( r'^sales_search/$', views.sales_search, name = 'sales_search' ),
 		url( r'^sales_paginate/$', views.sales_paginate, name = 'sales_paginate' ),
 		# url( r'^chart_pdf/$', charts.chart_pdf, name = 'chart_pdf' ),
-		url(r'^cpdf/(?P<image>.+)/$', charts.chart_pdf, name='chart_pdf'),
-		url(r'^csv/(?P<image>.+)/$', charts.sales_export_csv, name='chart_csv'),
+		url(r'^cpdf/(?P<image>.+)/$', pdfs.chart_pdf, name='chart_pdf'),
+		url(r'^csv/(?P<image>.+)/$', pdfs.sales_export_csv, name='chart_csv'),
 		# url(r'^pdf/$', PDFTemplateView.as_view(template_name='dashboard/reports/sales/charts/pdf/pdf.html',filename='my_pdf.pdf'),
 			# name='chart_pdf'),
 
 		url( r'^datechart/$', charts.sales_date_chart, name = 'sales_date_chart' ),
+		url( r'^datechartimage/(?P<image>.+)/$', charts.sales_date_chart, name = 'sales_date_chart' ),
 		url( r'^productchart/$', charts.sales_product_chart, name = 'sales_product_chart' ),
 		url( r'^ptd/$', charts.get_product_sale_details, name = 'get_product_sale_details' ),
 		url( r'^category/$', charts.sales_category_chart, name = 'sales_category_chart' ),
+		url( r'^catimage/(?P<image>.+)/$', charts.sales_category_chart, name = 'sales_category_chart' ),
 		url( r'^catd/$', charts.get_category_sale_details, name = 'get_category_sale_details' ),
 		url( r'^userchart/$', charts.sales_user_chart, name = 'sales_user_chart' ),
 		url( r'^utd/$', charts.get_user_sale_details, name = 'get_user_sale_details' ),

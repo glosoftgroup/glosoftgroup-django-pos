@@ -26,6 +26,7 @@ from ..views import staff_member_required
 from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, DrawerCash
 from ...product.models import Product, ProductVariant
+from ...purchase.models import PurchaseProduct
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
 
@@ -414,21 +415,48 @@ def products_reorder_search(request):
 
 
 def purchases_reports(request):
-	users = User.objects.all().order_by('id')
-	return TemplateResponse(request, 'dashboard/reports/purchase/purchases.html', {'users':users})
+	get_date = request.GET.get('date')
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_purchase =  PurchaseProduct.objects.latest('id')
+			date = DateFormat(last_purchase.created).format('Y-m-d')
+		except:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+	try:
+		purchases = PurchaseProduct.objects.all().order_by('id')
+		return TemplateResponse(request, 'dashboard/reports/purchase/purchases.html', {'purchases':purchases})
+	except ObjectDoesNotExist as e :
+		error_logger.error(e)
+
 
 def balancesheet_reports(request):
+	get_date = request.GET.get('date')
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
 	try:
 		""" Debit """
 		petty_cash = 30000
-		drawer = DrawerCash.objects.annotate(c=Count('terminal', distinct=True)).aggregate(total_amount=Sum('amount'))['total_amount']
+		try:
+			ds = DrawerCash.objects.latest('id')
+			drawer = ds.objects.annotate(c=Count('terminal', distinct=True)).aggregate(total_amount=Sum('amount'))['total_amount']
+		except:
+			drawer = 0
 		# stock = 23000 #from purchases
 		items = ProductVariant.objects.all().order_by('-id')
 		stock = 0
 		for i in items:
 			stock += i.get_total_price_cost()
 
-		sales_cash = Sales.objects.filter(created__contains='2017-07-07').aggregate(Sum('total_net'))['total_net__sum']
+		sales_cash = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
 		cash_in_hand = drawer + sales_cash
 
 		debit_total = petty_cash + stock + cash_in_hand

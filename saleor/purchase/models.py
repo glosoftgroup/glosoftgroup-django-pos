@@ -49,6 +49,8 @@ class PurchaseProduct(models.Model):
 		Supplier, related_name='purchase_supplier',
 		verbose_name=pgettext_lazy('PurchaseProduct item field', 'supplier')
 		,null=True,blank=True)
+	invoice_number = models.CharField(
+		pgettext_lazy('PurchaseProduct', 'invoice_number'), null=True, max_length=36, )
 	created = models.DateTimeField(
 		pgettext_lazy('PurchaseProduct field', 'created'),
 		default=now, editable=False)
@@ -59,6 +61,11 @@ class PurchaseProduct(models.Model):
 	
 	def __str__(self):
 		return str(self.variant)+' '+str(self.stock)
+
+	def get_total_cost(self):
+		if self.cost_price:
+			return self.cost_price.gross * self.quantity
+		return None
 	
 
 @python_2_unicode_compatible
