@@ -47,7 +47,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-def sales_category_chart(request):
+def sales_category_chart(request, image=None):
 	get_date = request.GET.get('date')
 	today = datetime.datetime.now()
 	if get_date:
@@ -58,6 +58,35 @@ def sales_category_chart(request):
 			date = DateFormat(last_sale.created).format('Y-m-d')
 		except:
 			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	if image:
+		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+		ImageData = image
+		ImageData = dataUrlPattern.match(ImageData).group(2)
+
+		sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
+			c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
+		sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+		new_sales = []
+		for sales in sales_by_category:
+			color = "#%03x" % random.randint(0, 0xFFF)
+			sales['color'] = color
+			percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+			percentage = round(percent, 2)
+			sales['percentage'] = percentage
+			for s in range(0, sales_by_category.count(), 1):
+				sales['count'] = s
+			new_sales.append(sales)
+
+		data = {
+			'today': last_sale.created,
+			'sales_by_category': new_sales,
+			'puller': request.user,
+			'image': ImageData,
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/category_pdf.html', data)
+		return HttpResponse(pdf, content_type='application/pdf')
+
 	if date:
 		try:
 			sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
@@ -177,7 +206,7 @@ def get_category_sale_details(request):
 			# return HttpResponse(e)
 
 @staff_member_required
-def sales_date_chart(request):
+def sales_date_chart(request, image=None):
 	get_date = request.GET.get('date')
 	if get_date:
 		date = get_date
@@ -187,6 +216,24 @@ def sales_date_chart(request):
 			date = DateFormat(last_sale.created).format('Y-m-d')
 		except:
 			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	if image:
+		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+		ImageData = image
+		ImageData = dataUrlPattern.match(ImageData).group(2)
+
+		date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
+		users = Sales.objects.values('user__email', 'user__name', 'terminal__terminal_name').annotate(Count('user')).annotate(
+			Sum('total_net')).order_by().filter(created__contains=date)
+		data = {
+			'today': last_sale.created,
+			'users': users,
+			'puller': request.user,
+			'image': ImageData,
+			"date_total_sales": date_total_sales,
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
+		return HttpResponse(pdf, content_type='application/pdf')
 
 	if date:
 		try:
@@ -276,51 +323,7 @@ def sales_date_chart(request):
 				return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html',
 										{"error": e, "date": date})
 
-def chart_pdf(request, image):
-	dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
-	ImageData = image
-	ImageData = dataUrlPattern.match(ImageData).group(2)
-
-	users = User.objects.all()
-	data = {
-		'today': date.today(),
-		'users': users,
-		'puller': request.user,
-		'image':ImageData
-		}
-	pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
-	return HttpResponse(pdf, content_type='application/pdf')
-
-def sales_export_csv(request, image):
-	dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
-	ImageData = image
-	ImageData = dataUrlPattern.match(ImageData).group(2)
-	fh = open("imageToSave.png", "wb")
-	fh.write(ImageData.decode('base64'))
-	fh.close()
-
-
-	pdfname = 'users'+str(random.random())
-	response = HttpResponse(content_type='text/csv')
-	response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
-	qs = User.objects.all()
-	writer = csv.writer(response, csv.excel)
-	response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
-	writer.writerow([
-		smart_str(u"ID"),
-		smart_str(u"Name"),
-		smart_str(u"Email"),
-		smart_str(u"Image"),
-	])
-	for obj in qs:
-		writer.writerow([
-			smart_str(obj.pk),
-			smart_str(obj.name),
-			smart_str(obj.email),
-			smart_str(fh),
-		])
-	return response
-
+@staff_member_required
 def get_sales_charts(request):
 	label = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"]
 	default = [12, 19, 3, 5, 2, 3]
@@ -337,6 +340,7 @@ def get_sales_charts(request):
 	}
 	return JsonResponse(data)
 
+@staff_member_required
 def get_sales_by_week(request):
 	date_from = request.GET.get('from')
 	d_to = request.GET.get('to')
@@ -526,14 +530,44 @@ def get_sales_by_week(request):
 
 
 
-
+@staff_member_required
 def sales_user_chart(request):
+	image = request.POST.get('img')
 	today = datetime.datetime.now()
 	try:
 		last_sale = Sales.objects.latest('id')
 		date = DateFormat(last_sale.created).format('Y-m-d')
 	except:
 		date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	if image:
+		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+		ImageData = image
+		ImageData = dataUrlPattern.match(ImageData).group(2)
+
+		users = Sales.objects.values('user__email', 'user__name', 'terminal').annotate(Count('user')).annotate(
+			Sum('total_net')).order_by().filter(created__contains=date)
+		sales_by_category_totals = users.aggregate(Sum('total_net__sum'))['total_net__sum__sum']
+		new_sales = []
+		for sales in users:
+			color = "#%03x" % random.randint(0, 0xFFF)
+			sales['color'] = color
+			percent = (Decimal(sales['total_net__sum']) / Decimal(sales_by_category_totals)) * 100
+			percentage = round(percent, 2)
+			sales['percentage'] = percentage
+			for s in range(0, users.count(), 1):
+				sales['count'] = s
+			new_sales.append(sales)
+
+		data = {
+			'today': last_sale.created,
+			'sales_by_category': new_sales,
+			'puller': request.user,
+			'image': ImageData,
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/user_pdf.html', data)
+		return HttpResponse(pdf, content_type='application/pdf')
+
 
 	if date:
 		try:
@@ -561,7 +595,10 @@ def sales_user_chart(request):
 					m = str('0' + str(i))
 				else:
 					m = str(i)
-				amount = get_user_results(highest_user_sales, str(today.year), m)
+				try:
+					amount = get_user_results(highest_user_sales, str(today.year), m)
+				except:
+					amount = 0
 				labels.append(calendar.month_name[int(m)][0:3])
 				default.append(amount)
 
@@ -578,6 +615,7 @@ def sales_user_chart(request):
 		except IndexError:
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
 
+@staff_member_required
 def get_user_sale_details(request):
 	get_categ = request.GET.get('user')
 	today = datetime.datetime.now()
@@ -652,13 +690,44 @@ def get_user_sale_details(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_user.html',{})
 			# return HttpResponse(e)
 
+@staff_member_required
 def sales_terminal_chart(request):
+	image = request.POST.get('img')
 	today = datetime.datetime.now()
 	try:
 		last_sale = Sales.objects.latest('id')
 		date = DateFormat(last_sale.created).format('Y-m-d')
 	except:
 		date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	if image:
+		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+		ImageData = image
+		ImageData = dataUrlPattern.match(ImageData).group(2)
+
+		terminals = Sales.objects.values('terminal__terminal_name', 'terminal').annotate(Count('terminal')).annotate(
+			Sum('total_net')).order_by().filter(created__contains=date)
+		sales_by_category_totals = terminals.aggregate(Sum('total_net__sum'))['total_net__sum__sum']
+		new_sales = []
+		for sales in terminals:
+			color = "#%03x" % random.randint(0, 0xFFF)
+			sales['color'] = color
+			percent = (Decimal(sales['total_net__sum']) / Decimal(sales_by_category_totals)) * 100
+			percentage = round(percent, 2)
+			sales['percentage'] = percentage
+			for s in range(0, terminals.count(), 1):
+				sales['count'] = s
+			new_sales.append(sales)
+
+		data = {
+			'today': last_sale.created,
+			'sales_by_category': new_sales,
+			'puller': request.user,
+			'image': ImageData,
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/terminal_pdf.html', data)
+		return HttpResponse(pdf, content_type='application/pdf')
+
 
 	if date:
 		try:
@@ -703,6 +772,7 @@ def sales_terminal_chart(request):
 		except IndexError:
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
 
+@staff_member_required
 def get_terminal_sale_details(request):
 	get_categ = request.GET.get('terminal')
 	today = datetime.datetime.now()
@@ -776,8 +846,10 @@ def get_terminal_sale_details(request):
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_terminal.html',{})
 
+@staff_member_required
 def sales_product_chart(request):
 	get_date = request.GET.get('date')
+	image = request.POST.get('img')
 	today = datetime.datetime.now()
 	if get_date:
 		date = get_date
@@ -787,6 +859,34 @@ def sales_product_chart(request):
 			date = DateFormat(last_sale.created).format('Y-m-d')
 		except:
 			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	if image:
+		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+		ImageData = image
+		ImageData = dataUrlPattern.match(ImageData).group(2)
+
+		sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
+			c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
+		sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+		new_sales = []
+		for sales in sales_by_category:
+			color = "#%03x" % random.randint(0, 0xFFF)
+			sales['color'] = color
+			percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+			percentage = round(percent, 2)
+			sales['percentage'] = percentage
+			for s in range(0, sales_by_category.count(), 1):
+				sales['count'] = s
+			new_sales.append(sales)
+
+		data = {
+			'today': last_sale.created,
+			'sales_by_category': new_sales,
+			'puller': request.user,
+			'image': ImageData,
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/product_pdf.html', data)
+		return HttpResponse(pdf, content_type='application/pdf')
 	if date:
 		try:
 			sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
@@ -831,6 +931,7 @@ def sales_product_chart(request):
 		except IndexError as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html')
 
+@staff_member_required
 def get_product_sale_details(request):
 	get_categ = request.GET.get('item')
 	today = datetime.datetime.now()

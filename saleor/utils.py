@@ -14,7 +14,9 @@ def render_to_pdf(template_src, context_dict={}):
 	result = StringIO.StringIO()
 	pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("UTF-8")), dest=result, link_callback=fetch_resources )
 	if not pdf.err:
-		return HttpResponse(result.getvalue(), content_type='application/pdf')
+		response = HttpResponse(result.getvalue(), content_type='application/pdf')
+		response['Content-Disposition'] = 'attachment; filename="product_chart.pdf"'
+		return response
 	return HttpResponse('Gremlins ate your pdf! %s' % cgi.escape(html))
 
 def fetch_resources(uri, rel):

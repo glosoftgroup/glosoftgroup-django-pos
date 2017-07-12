@@ -14,7 +14,7 @@
      <li><a href="{% url 'dashboard:sales_user_chart' %}">Sales User Chart</a></li>
  {% endblock %}
 
-{% block sales_by_user_chart_class %}active{% endblock %}
+{% block menu_report_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
    .td:hover{cursor:pointer}
@@ -69,7 +69,7 @@
           </div>
           <div class="panel-body">
               <div class="row">
-                  <div class="col-md-8">
+                  <div class="col-md-6">
                       <label>Select User for details</label>
                       <div class="form-group">
                        <select class="bootstrap-select cat" data-live-search="true" data-width="100%" tabindex="-98">
@@ -79,7 +79,20 @@
                         </select>
                        </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-3">
+                    <label>categories</label>
+                  <div class="form-group">
+                     <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
+                         <option value="user">by user</option>
+                         <option value="list">sales list</option>
+                         <option value="summary">sales summary</option>
+                        <option value="category">by category</option>
+                        <option value="items">by items</option>
+                         <option value="terminal">by terminal</option>
+                      </select>
+                  </div>
+                </div>
+                  <div class="col-md-3">
                       <label>Export</label>
                       <div class="form-group">
                          <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
@@ -97,7 +110,7 @@
 {% if sales_by_category %}
 <div class="p-sales">
     <div class="col-md-12">
-    <div class="panel panel-flat">
+    <div class="panel panel-flat" id="catdiv">
       <div class="panel-heading">
           <h6 class="panel-title" style="text-align:center;">Top User sales</h6>
           <div class="heading-elements">
@@ -182,6 +195,7 @@
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/html2canvas.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
   var endpoint = "{% url 'dashboard:chart' %}";
@@ -225,17 +239,45 @@ $(document).ready(function(){
           }});
       });
 
+  $('.sales-category').selectpicker().on('change', function(){
+        var sv = $(this).val();
+        if(sv == 'list'){
+            window.location = "{% url 'dashboard:sales_list' %}";
+        }else if(sv == 'summary'){
+            window.location = "{% url 'dashboard:sales_date_chart' %}";
+        }else if(sv == 'category'){
+            window.location = "{% url 'dashboard:sales_category_chart' %}";
+        }else if(sv == 'items'){
+            window.location = "{% url 'dashboard:sales_product_chart' %}";
+        }else if(sv == 'user'){
+            window.location = "{% url 'dashboard:sales_user_chart' %}";
+        }else if(sv == 'terminal'){
+            window.location = "{% url 'dashboard:sales_terminal_chart' %}";
+        }
+  });
+
     $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
           pdfIcon:'fa-file-pdf-o',
           excelIcon:'fa-file-excel-o'
     }).on('change',function(){
-         $('.setValue').val($(this).val());
-         $('.setName').val('export');
-         // $('.set').value = $(this).val();
+
          if($(this).val() == 'pdf'){
-            window.location = "{% url 'dashboard:chart_pdf' %}";
+            html2canvas($("#catdiv"), {
+                allowTaint: true,
+                onrendered: function(canvas) {
+                    var img = canvas.toDataURL("image/png");
+                    $.ajax({ url: "/dashboard/reports/userchart/",
+                         type: 'POST',
+                         data: {img:img,  csrfmiddlewaretoken: '{{ csrf_token }}' },
+                         success: function(data){
+                             var nw = window.open("data:application/pdf," + escape(data), "width=900, height=900")
+                          },
+                          async:false
+                      });
+                }
+            });
          }
     });
     //**@ daterange from

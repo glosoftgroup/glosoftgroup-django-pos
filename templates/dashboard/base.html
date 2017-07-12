@@ -261,43 +261,18 @@
                     <i class="icon-notebook"></i> 
                     <span>Reports</span>
                   </a>
+
                   <ul>
-                    <li>
-                      <a href="search_videos.html#" class="has-ul legitRipple">
-                      <i class='icon-cash3'></i>Sales</a>
-                      <ul>
-                        <li class="{% block menu_report_class %}{% endblock %}"><a href="{% url 'dashboard:sales_list' %}" class="legitRipple">List</a></li>
-                        <li class="{% block sales_by_date_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_date_chart' %}" class="legitRipple">Sales Summary</a></li>
-                        <li><a href="javascript:;">Trending</a></li>
-                          <li class="{% block sales_by_category_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_category_chart' %}" class="legitRipple">Category Sales</a></li>
-                        <li class="{% block sales_by_product_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_product_chart' %}" class="legitRipple">By Item</a></li>
-                        <li class="{% block sales_by_user_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_user_chart' %}" class="legitRipple">By user</a></li>
-                        <li class="{% block sales_by_terminal_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_terminal_chart' %}" class="legitRipple">By Terminal</a></li>
-
-                      </ul>
+                      <li class="{% block menu_report_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:sales_list' %}"><i class='icon-cash3'></i>Sales</a>
+                    </li>
+                      <li class="{% block menu_product_report_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
+                    </li>
+                      <li class="{% block menu_purchase_report_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:purchases_reports' %}"><i class='icon-price-tag'></i>Purchases</a>
                     </li>
 
-                    <li>
-                      <a href="search_videos.html#" class="has-ul legitRipple">
-                      <i class='icon-drawer3'></i>Products</a>
-                      <ul>
-                        <li class="{% block menu_product_report_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:products_reports' %}">Stock List</a>
-                        </li>
-                        <li class="{% block menu_product_reorder_class %}{% endblock %}"><a href="{% url 'dashboard:products_reorder' %}" class="legitRipple">Stock Reorder</a></li>
-                      </ul>
-                    </li>
-
-                     <li>
-                      <a href="search_videos.html#" class="has-ul legitRipple">
-                      <i class='icon-price-tag'></i>Purchases</a>
-                      <ul>
-                         <li class="{% block menu_purchase_report_class %}{% endblock %}">
-                            <a href="{% url 'dashboard:purchases_reports' %}">Purchases</a>
-                          </li>
-                        <li><a href="sidebar_dual.html" class="legitRipple">CHarts</a></li>
-                      </ul>
-                    </li>
 
 
                    
