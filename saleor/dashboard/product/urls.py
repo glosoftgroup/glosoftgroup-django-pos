@@ -41,11 +41,12 @@ urlpatterns = [
     url(r'^search_productclass/$',
         views.search_productclass, name='search-type'),
     # pagination
-    url(r'^stocks/', views.stocks, name='stocks'),
-    url(r'^stock_paginate/', views.stock_paginate, name='stock_paginate'),
+    url(r'^stocks/$', views.stocks, name='stocks'),
+    url(r'^stock_paginate/$', views.stock_paginate, name='stock_paginate'),
     url(r'^stock_pages/$',
         views.stock_pages, name='stock_pages'),
-     url(r'^stock_filter/$',
+    url( r'^stock_search/$', views.stock_search, name = 'stock_search' ),
+    url(r'^stock_filter/$',
         views.stock_filter, name='stock_filter'),
      
      url(r'^product_pages/$',
