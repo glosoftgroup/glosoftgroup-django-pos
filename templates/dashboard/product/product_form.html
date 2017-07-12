@@ -151,7 +151,7 @@
                       <div class="form-group">
                         <label>
                         {{ product_form.categories.label }}:
-                        <i class='text-danger'> *</i>
+                        <i class='text-danger'> *</i><button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product category" data-trigger="hover" data-content=" products offering the same general functionality.E.g Flour would fall under Grocery category"> <i class="icon-info22 position-right"></i></button>
                         </label>
                        <div class="row">
                         <div class="col-md-8" id='category_field'>              
@@ -159,18 +159,19 @@
                             {{ product_form.categories }}
                           </div>                         
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                           <button href="#modal_add_category" class="btn btn-flat" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
-                          <i class=" icon-stack-plus"></i>                      
+                          <i class=" icon-stack-plus"></i>           
                           </button>
                         </div>
+                        
                        </div>
                       </div> 
 
                       <div id='productType'>
                       <!-- product type -->
                       <div class="form-group">
-                      <label>Product Type</label> 
+                      <label>Product Type</label> <button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product Type" data-trigger="hover" data-content="Think about it as template for your products. Multiple products can use same product class. E.g Flour, Electronics"> <i class="icon-info22 position-right"></i></button>
                       <div class="input-group">          
                       {{ product_form.product_class}}
                          <div class="input-group-btn">
@@ -185,6 +186,7 @@
                       <!-- product attributes -->
                       <div class="form-group" id='div_attributes'>
                         <label>Product Attributes</label>
+                        <button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product Type" data-trigger="hover" data-content="– it’s a characteristic of a product, shared with all product variants. Example: Manufacturer - all flour variants(1kg,2kg) are published by same company"> <i class="icon-info22 position-right"></i></button>
                         <span>
     <a href="">
       <button id="add-new-attribute" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
@@ -289,11 +291,18 @@
                            {{ product_form.low_stock_threshold }}
                           </div>
                         </div>
-                        <div class="col-md-12">
-                          <div class="form-group col-md-12">
-                            <label>Supplier:</label>
+                        <div class="col-md-12" id="div_supplier">
+                        <label>Supplier:</label>
+                         <div class="input-group">
+                           
                            {{ product_form.product_supplier }}
-                          </div>
+                          <span class="input-group-btn">
+                           <button id="add-supplier" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg"  data-href='{% url "dashboard:supplier-ajax-add"  %}'
+              href="#modal_attribute">
+    <i class=" icon-stack-plus"></i>   
+    </button>
+                          </span>
+                         </div>
                         </div>
                         <div class="col-md-12">
                           <div class="form-group col-md-12">
@@ -779,6 +788,7 @@
 <script type="text/javascript" src="{% static 'backend/js/productclass.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/productattribute.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
 
 <script type="text/javascript">
  
@@ -991,6 +1001,25 @@
 
   }
   // end refreshAttributes
+
+  // refreshsupplier func
+  function refreshSupplier() {  
+   {% url "dashboard:fetch_suppliers" as url %} 
+   var url = "{{ url }}";
+   var class_pk = getProductClass();
+   content_loader('#div_supplier');   
+   var posting = $.get( url, {} );
+     // Put the results in a div
+   posting.done(function( data ) {    
+    $( "#div_supplier" ).empty().append( data );
+    $('#modal_attribute').modal('hide'); 
+    var block = $('#div_supplier').parent().parent().parent().parent().parent();   
+      $(block).unblock(); 
+  });
+
+  }
+  // end refreshsupplier
+
   $( "select[name*='product_class']").change(function refreshAttributes() {
   // Check input( $( this ).val() ) for validity here
   

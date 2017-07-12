@@ -12,6 +12,10 @@ urlpatterns = [
         #     (views.users), name='users'),
         url(r'^add/$', permission_required('userprofile.add_user', login_url='account_login')
             (views.user_add), name='supplier-add'),
+        url(r'^add/suppier/', 
+            views.supplier_add, name='supplier-ajax-add'),
+        url(r'^fetch/suppliers/',views.fetch_suppliers,
+            name='fetch_suppliers'),
         url(r'^address/add/(?P<pk>[0-9]+)/$', views.address_add, name='address-add'),
         url(r'^supplier_process/$', views.user_process, name='supplier_process'),
         url(r'^detail/(?P<pk>[0-9]+)/$', views.user_detail, name='supplier-detail'),

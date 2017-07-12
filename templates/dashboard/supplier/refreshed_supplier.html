@@ -1,0 +1,30 @@
+
+{% if suppliers %}
+{% load static %} 
+ 	<label>Supplier:</label>
+     <div class="input-group"> 
+      <select class="form-control select select2-hidden-accessible" id="id_product_supplier" name="product_supplier">                  
+      {% for supplier in suppliers %}      
+      	<option value="{{supplier.pk}}">
+      		{{ supplier }}
+      	</option>     
+      {% endfor %}
+       </select>
+      <span class="input-group-btn">
+		   <button id="add-supplier" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg"  data-href='{% url "dashboard:supplier-ajax-add"  %}'
+		              href="#modal_attribute">
+		    <i class=" icon-stack-plus"></i>   
+		    </button>
+       </span>
+     </div>
+ 
+ 	<script type="text/javascript">
+ $('.select').select2({
+        minimumResultsForSearch: Infinity
+    });
+  // Select with search
+  $('.select-search').select2();
+</script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
+ </script>
+{% endif %}

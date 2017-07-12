@@ -21,7 +21,7 @@ def discount_detail(request,pk=None):
         if pk:
             instance = get_object_or_404(Sale, pk=pk)
             products = instance.products.all()
-            ctx = {'product_results':products}
+            ctx = {'product_results':products,'discount':instance}
             return TemplateResponse(request, 'dashboard/discount/discount_detail.html', ctx)
 
 @staff_member_required

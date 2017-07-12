@@ -3,31 +3,11 @@
 {% load i18n %}
 {% load prices_i18n %}
 {% load static %}
- {% if search_count %} 
-  <div class="text-center content-text-muted content-divider">
-  <span class="pt-10 pb-10">
-   {{ search_count }} results of {{ products_count  }}
-   </span>  
-   </div>
-  {% endif %}
+ 
 <!-- output data -->
-<div class="panel panel-default">
-  <div class="panelbody">
-   <div class='table-responsive'>
-	<table class="table table-striped table-hover fixed_headers">
-    <thead>
-      <tr class="bg-primary">        
-        <th>Product Name/sku</th>            
-        <th>Retail price</th> 
-        <th>Supplier</th>
-        <th>Current Quantity</th>
-        <th>stock in</th>
-        <th>Tax %</th>         
-      </tr>
-    </thead>
+
+   
     
-    <tbody>
-    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/editable/editable.min.js' %}"></script>
     {% for variant in product_results %}
     <tr>
     <!-- product name/sku -->    
@@ -143,12 +123,8 @@
 	</script>
 	
 	{% endfor %}
-	</tbody>
-	</table>	
-	</div>
-	</div>
-	<!-- / .table responsive -->
-</div>
+		
+	
 <style type="text/css">
 	.modal-trigger-ajax { cursor: pointer; }
 </style>
@@ -180,7 +156,7 @@
    });
 </script>
 <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
-{% include "dashboard/includes/_modal_add_stock.html"  %}
+
 {% else %}
  <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>
  <script type="text/javascript">
@@ -192,4 +168,5 @@
       }
       notify();
  </script>
+ <script type="text/javascript" src="{% static 'backend/js/plugins/forms/editable/editable.min.js' %}"></script>
 {% endif %}
