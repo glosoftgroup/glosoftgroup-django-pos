@@ -70,7 +70,8 @@
       <div class="panel">
        <table class="table table-striped table-hover fixed_headers">          <!-- Header and footer fixed -->
                   <thead>         
-                    <tr class="bg-primary">   
+                    <tr class="bg-primary"> 
+                      <th>#</th>  
                       <th>Has varaints</th>   
                       <th>Name</th>    
                       <th>Variant attribute</th>   
@@ -81,6 +82,7 @@
                   <tbody id='content-search'>
                    {% for pk, name, has_variants, product_attributes, variant_attributes in product_classes %}
                     <tr>
+                      <td>#{{ forloop.counter }}</td>
                       <!-- has variants   -->
                       <td>
                         

@@ -26,9 +26,7 @@
 {% block header_extra %}
     {% if not root %}
     <!-- search field -->
-    {% url "dashboard:search-category" as url %}
-    {% include "dashboard/includes/_search_filter.html" with url=url  %}
-    <!-- end search -->
+   
     {% endif %}
     <li>&nbsp;&nbsp;&nbsp;</li>
   <li>
