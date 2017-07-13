@@ -1,22 +1,22 @@
 from django.conf.urls import url
-
+from django.contrib.auth.decorators import login_required, permission_required
 from . import api
 from . import views
 
 
 urlpatterns = [
-    url(r'^$',
-        views.product_list, name='product-list'),
-    url(r'^(?P<pk>[0-9]+)/update/$',
-        views.product_edit, name='product-update'),
-    url(r'^(?P<pk>[0-9]+)/delete/$',
-        views.product_delete, name='product-delete'),
-    url(r'^add/(?P<class_pk>[0-9]+)/$',
-        views.product_create, name='product-add'),
-    url(r'^add/$',
-        views.product_create, name='product-add'),
-    url(r'^fetch_variants/$',
-        views.fetch_variants, name='fetch-variants'),
+    url(r'^$',permission_required('product.view_product', login_url='not_found')
+    (views.product_list), name='product-list'),
+    url(r'^(?P<pk>[0-9]+)/update/$', permission_required('product.change_product', login_url='not_found')
+        (views.product_edit), name='product-update'),
+    url(r'^(?P<pk>[0-9]+)/delete/$', permission_required('product.delete_product', login_url='not_found')
+        (views.product_delete), name='product-delete'),
+    url(r'^add/(?P<class_pk>[0-9]+)/$', permission_required('product.add_product', login_url='not_found')
+        (views.product_create), name='product-add'),
+    url(r'^add/$', permission_required('product.add_product', login_url='not_found')
+    (views.product_create), name='product-add'),
+    url(r'^fetch_variants/$', permission_required('product.view_product', login_url='not_found')
+        (views.fetch_variants), name='fetch-variants'),
     # tax routes
     url(r'^tax/$',
         views.tax_list, name='tax-list'),

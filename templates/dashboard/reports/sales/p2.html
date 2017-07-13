@@ -97,10 +97,6 @@
                       console.log('without gid '+data);
                     });
                 }else{
-                //     $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid},function(data){
-                //    $('#p-tb').html(data);
-                //    console.log('with gid '+data);
-                // });
                     if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
                         $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
                            $('#p-tb').html(data);

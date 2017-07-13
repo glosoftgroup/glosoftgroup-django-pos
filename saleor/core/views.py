@@ -41,3 +41,6 @@ def lock_process(request):
 @staff_member_required
 def styleguide(request):
 	return TemplateResponse(request, 'styleguide.html')
+
+def not_found(request):
+	return TemplateResponse(request, '404.html')

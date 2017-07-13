@@ -37,13 +37,26 @@
         </div>
       <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
-            <div class="col-md-6">
+            <div class="col-md-4">
              <label>Search Sales (for date format: yyyy-mm-dd)</label>
               <div class="form-group form-group-material has-feedback">
                 <input class="form-control search_user" placeholder="Search details" type="text">
                 <div class="form-control-feedback">
                   <i class="icon-search4 text-size-base"></i>
                 </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+                <label>categories</label>
+              <div class="form-group">
+                 <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="list">sales list</option>
+                     <option value="summary">sales summary</option>
+                    <option value="category">by category</option>
+                    <option value="items">by items</option>
+                    <option value="user">by user</option>
+                     <option value="terminal">by terminal</option>
+                  </select>
               </div>
             </div>
             <div class="col-md-2">
@@ -215,6 +228,22 @@ $(document).ready(function(){
               $('#pagination-div').html(data);
         }});
     });
+  $('.sales-category').selectpicker().on('change', function(){
+        var sv = $(this).val();
+        if(sv == 'list'){
+            window.location = "{% url 'dashboard:sales_list' %}";
+        }else if(sv == 'summary'){
+            window.location = "{% url 'dashboard:sales_date_chart' %}";
+        }else if(sv == 'category'){
+            window.location = "{% url 'dashboard:sales_category_chart' %}";
+        }else if(sv == 'items'){
+            window.location = "{% url 'dashboard:sales_product_chart' %}";
+        }else if(sv == 'user'){
+            window.location = "{% url 'dashboard:sales_user_chart' %}";
+        }else if(sv == 'terminal'){
+            window.location = "{% url 'dashboard:sales_terminal_chart' %}";
+        }
+  });
 
    $('.export-sz').selectpicker({
           iconBase: 'fa',
@@ -222,9 +251,7 @@ $(document).ready(function(){
           pdfIcon:'fa-file-pdf-o',
           excelIcon:'fa-file-excel-o'
     }).on('change',function(){
-         $('.setValue').val($(this).val());
-         $('.setName').val('export');
-         // $('.set').value = $(this).val();
+           //var svalue = $(this).val();
     });
     $('.ck').click(function(){
       var name = $('.setName').val();
@@ -245,7 +272,7 @@ $(document).ready(function(){
 
 
 
-      var delay = (function(){
+    var delay = (function(){
     var timer = 0;
     return function(callback, ms){
         clearTimeout (timer);

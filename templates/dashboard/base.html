@@ -133,7 +133,8 @@
                     <span>Dashboard</span>
                   </a>
                 </li>
-                                <li>
+                {% if perms.userprofile.view_user %}
+                <li>
                   <a href="javascript:;">
                     <i class="icon-users"></i> 
                     <span>User Management</span>
@@ -144,36 +145,43 @@
                       <a href="{% url 'dashboard:users' %}"><i class='icon-users2'></i>users</a>
                     </li>
                     {% endif %}
-                    {% if perms.userprofile.view_usertrail %}
+                    {% if perms.auth.view_group %}
                     <li class="{% block menu_perm_class %}{% endblock %}">
                       <a href="{% url 'dashboard:groups' %}"><i class='icon-users4'></i>Groups</a>
                     </li>
                     {% endif %}
-                    {% if perms.userprofile.view_product %}  
+                    {% if perms.userprofile.view_trail %}
                       <li class="{% block menu_trail_class %}{% endblock %}">
                       <a href="{% url 'dashboard:user_trail' %}"><i class='icon-history'></i>User Trail</a>
                     </li>
                     {% endif  %}
                   </ul>
                 </li>
+                  {% endif %}
+                {% if perms.product.view_product %}
                 <li id="first">
                   <a href="{% url 'dashboard:product-list' %}"><i class="icon-stack"></i> <span>
                      {% trans "Inventory Management" context "Dashboard catalogue" %}
                   </span></a>
                   <ul>
-                   {% if perms.userprofile.view_product %}
+                   {% if perms.product.view_product %}
                     <li class="{% block menu_products_class %}{% endblock %}">
                     <a href="{% url 'dashboard:product-list' %}"><i class='icon-bag'></i>{% trans "Products" context "Dashboard products list" %}</a>
                     </li>
                     {% endif %}
+                    {% if perms.product.view_stock %}
                     <li class="{% block menu_purchase_list %}{% endblock %}">
                     <a href="{% url 'dashboard:purchase-list' %}"><i class=' icon-coin-dollar'></i>
                     Add Stock</a>
                     </li>
+                    {% endif %}
+                      {% if perms.product.view_category %}
                     <!-- categories -->
                      <li class="{% block menu_categories_class %}{% endblock %}">
                     <a href="{% url 'dashboard:category-list' %}"><i class='icon-package'></i> {% trans "Categories" context "Dashboard categories list" %}</a>
                     </li>
+                      {% endif %}
+                      {% if perms.product.view_productclass %}
                     <!-- product type -->
                     <li class="{% block menu_product_classes_class %}{% endblock %}">
                     <a href="{% url 'dashboard:product-class-list' %}">
@@ -181,6 +189,8 @@
                        {% trans "Product types" context "Dashboard product types list" %}
                     </a>
                     </li>
+                      {% endif %}
+                      {% if perms.product.view_productattribute %}
                     <!-- product attributes -->
                     <li class="{% block menu_attributes_class %}{% endblock %}">
                     <a href="{% url 'dashboard:product-attributes' %}">
@@ -188,21 +198,28 @@
                         {% trans "Product Attributes" context "Dashboard attributes list" %}
                     </a>
                     </li>
+                      {% endif %}
+                      {% if perms.product.view_stocklocation %}
                     <!-- stock location -->
                     <li class="{% block menu_location_class %}{% endblock %}">
                     <a href="{% url 'dashboard:product-stock-location-list' %}"><i class="icon-location4"></i>
-                       {% trans "Stock locations" context "Dashboard stock loactions list" %}
+                       {% trans "Stock locations" context "Dashboard stock locations list" %}
                     </a>
                     </li>
                     <!-- stock reorder -->
+                      {% endif %}
+                       {% if perms.product.view_stocklocation %}
                     <li class="{% block menu_reorder_class %}{% endblock %}">
                     <a href="{% url 'dashboard:re_order' %}"><i class="icon-toggle"></i>
                        {% trans "Stock Reorder" context "Dashboard stock reorder list" %}
                     </a>
                     </li>
+                      {% endif %}
                     
                   </ul>
                 </li>
+                  {% endif %}
+                   {% if perms.customer.view_customer %}
                 <li id="">
                   <a href="{% url 'dashboard:customers' %}"><i class="icon-theater"></i> <span>
                     Customer Management
@@ -215,6 +232,8 @@
                     </li>
                   </ul>
                 </li>
+                  {% endif %}
+                   {% if perms.supplier.view_supplier %}
                 <li id="">
                   <a href="{% url 'dashboard:supplier' %}"><i class="icon-collaboration"></i> <span>
                     Supplier Management
@@ -227,6 +246,7 @@
                     </li>
                   </ul>
                 </li>
+                  {% endif %}
                 <li><a href="#"><i class="icon-coins"></i> <span>{% trans "Customer Rewards" context "Dashboard discounts list" %}</span></a>
                   <ul>
                     <li class="{% block menu_sales_class %}{% endblock %}">
@@ -261,51 +281,27 @@
                     <i class="icon-notebook"></i> 
                     <span>Reports</span>
                   </a>
+
                   <ul>
-                    <li>
-                      <a href="search_videos.html#" class="has-ul legitRipple">
-                      <i class='icon-cash3'></i>Sales</a>
-                      <ul>
-                        <li class="{% block menu_report_class %}{% endblock %}"><a href="{% url 'dashboard:sales_list' %}" class="legitRipple">List</a></li>
-                        <li class="{% block sales_by_date_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_date_chart' %}" class="legitRipple">Sales Summary</a></li>
-                        <li><a href="javascript:;">Trending</a></li>
-                          <li class="{% block sales_by_category_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_category_chart' %}" class="legitRipple">Category Sales</a></li>
-                        <li class="{% block sales_by_product_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_product_chart' %}" class="legitRipple">By Item</a></li>
-                        <li class="{% block sales_by_user_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_user_chart' %}" class="legitRipple">By user</a></li>
-                        <li class="{% block sales_by_terminal_chart_class %}{% endblock %}"><a href="{% url 'dashboard:sales_terminal_chart' %}" class="legitRipple">By Terminal</a></li>
-
-                      </ul>
+                      <li class="{% block menu_report_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:sales_list' %}"><i class='icon-cash3'></i>Sales</a>
                     </li>
-
-                    <li>
-                      <a href="search_videos.html#" class="has-ul legitRipple">
-                      <i class='icon-drawer3'></i>Products</a>
-                      <ul>
-                        <li class="{% block menu_product_report_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:products_reports' %}">Stock List</a>
-                        </li>
-                        <li class="{% block menu_product_reorder_class %}{% endblock %}"><a href="{% url 'dashboard:products_reorder' %}" class="legitRipple">Stock Reorder</a></li>
-                      </ul>
+                      <li class="{% block menu_product_report_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
                     </li>
-
-                     <li>
-                      <a href="search_videos.html#" class="has-ul legitRipple">
-                      <i class='icon-price-tag'></i>Purchases</a>
-                      <ul>
-                         <li class="{% block menu_purchase_report_class %}{% endblock %}">
-                            <a href="{% url 'dashboard:purchases_reports' %}">Purchases</a>
-                          </li>
-                        <li><a href="sidebar_dual.html" class="legitRipple">CHarts</a></li>
-                      </ul>
+                      <li class="{% block menu_purchase_report_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:purchases_reports' %}"><i class='icon-price-tag'></i>Purchases</a>
                     </li>
 
 
-                   
+
+                   {% if perms.product.view_producttax %}
                     <li class="{% block menu_tax_list %}{% endblock %}">
                     <a href="{% url 'dashboard:tax-list' %}">
                     <i class="icon-drawer-out"></i>Tax
                     </a>
                     </li>
+                      {% endif %}
                     <li class="{% block menu_balancesheet_report_class %}{% endblock %}">
                       <a href="{% url 'dashboard:balancesheet_reports' %}"><i class='icon-book'></i>Balance Sheet</a>
                     </li>

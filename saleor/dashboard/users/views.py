@@ -481,11 +481,11 @@ def usertrail_search( request ):
 
 			return TemplateResponse(request, 'dashboard/users/trail/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
-@staff_member_required			
+@staff_member_required
 def users_pdf(request):
 	users = User.objects.all()
 	data = {
-		'today': date.today(), 
+		'today': date.today(),
 		'users': users,
 		'puller': request.user
 		}

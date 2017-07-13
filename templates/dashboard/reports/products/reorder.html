@@ -12,7 +12,7 @@
      <li class="active"><a href="{% url 'dashboard:products_reports' %}">Products</a></li>
  {% endblock %}
 
-{% block menu_product_reorder_class %}active{% endblock %}
+{% block menu_product_report_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -43,6 +43,15 @@
                 <div class="form-control-feedback">
                   <i class="icon-search4 text-size-base"></i>
                 </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+                <label>categories</label>
+              <div class="form-group">
+                 <select class="bootstrap-select products-category" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="reorder">stock reorder</option>
+                     <option value="list">stock list</option>
+                  </select>
               </div>
             </div>
             <div class="col-md-2">
@@ -167,6 +176,15 @@ $(document).ready(function(){
               $('#pagination-div').html(data);
         }});
     });
+
+      $('.products-category').selectpicker().on('change', function(){
+            var sv = $(this).val();
+            if(sv == 'list'){
+                window.location = "{% url 'dashboard:products_reports' %}";
+            }else if(sv == 'reorder'){
+                window.location = "{% url 'dashboard:products_reorder' %}";
+            }
+      });
 
    $('.export-sz').selectpicker({
           iconBase: 'fa',

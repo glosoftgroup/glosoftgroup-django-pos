@@ -136,3 +136,5 @@ class PurchaseItems(models.Model):
 	def __unicode__(self):
 		return '%s: %s' % (self.sku,self.product_name)
 
+
+
