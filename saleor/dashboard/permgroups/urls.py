@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.contrib.auth.decorators import login_required, permission_required
 
 from . import views
 from django.conf import settings
@@ -6,7 +7,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-        url(r'^$', views.groups, name='groups'),
+        url(r'^$', permission_required('group.view_group', login_url='not_found')(views.groups), name='groups'),
         url(r'^groups/$', views.perms, name='perms'),
         url(r'^add_group/$', views.create_group, name='add_group'),
         url(r'^group_assign_permission/$', views.group_assign_permission, name='group_assign_permission'),
