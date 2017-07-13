@@ -50,7 +50,7 @@ class PurchaseProduct(models.Model):
 		verbose_name=pgettext_lazy('PurchaseProduct item field', 'supplier')
 		,null=True,blank=True)
 	invoice_number = models.CharField(
-		pgettext_lazy('PurchaseProduct', 'invoice_number'), null=True, max_length=36, )
+		pgettext_lazy('PurchaseProduct', 'invoice_number'), null=True, max_length=36,)	
 	created = models.DateTimeField(
 		pgettext_lazy('PurchaseProduct field', 'created'),
 		default=now, editable=False)
@@ -66,7 +66,11 @@ class PurchaseProduct(models.Model):
 		if self.cost_price:
 			return self.cost_price.gross * self.quantity
 		return None
-	
+
+	def get_cost_price(self):
+		if not self.cost_price:
+			return self.stock.cost_price
+		return self.cost_price
 
 @python_2_unicode_compatible
 class PurchaseOrder(models.Model):
@@ -131,4 +135,6 @@ class PurchaseItems(models.Model):
 
 	def __unicode__(self):
 		return '%s: %s' % (self.sku,self.product_name)
+
+
 

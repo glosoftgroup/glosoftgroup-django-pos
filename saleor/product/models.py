@@ -412,6 +412,9 @@ class Stock(models.Model):
     quantity = models.IntegerField(
         pgettext_lazy('Stock item field', 'quantity'),
         validators=[MinValueValidator(0)], default=Decimal(1))
+    invoice_number = models.CharField(
+        pgettext_lazy('Stock item field', 'invoice_number'), null=True, max_length=36,)  
+    
     quantity_allocated = models.IntegerField(
         pgettext_lazy('Stock item field', 'allocated quantity'),
         validators=[MinValueValidator(0)], default=Decimal(0))

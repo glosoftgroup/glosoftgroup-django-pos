@@ -136,8 +136,10 @@
     });	
 </script>
 <!-- add stock modal trigger script -->
-<script type="text/javascript">
-	$( ".modal-trigger-ajax").on('click',function() {        
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
+<script type="text/javascript"> 
+    
+	$( ".modal-trigger-ajax").on('click',function() {	       
     var url = $(this).data('href')
     var prompt_text = $(this).data('title');
     var modal = $(this).attr('href');
@@ -156,10 +158,21 @@
    });
 </script>
 <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+ <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
+
 
 {% else %}
  <div class="alert-warning" style="padding: 12px"><h5 class="text-center">No result matches your search <i class="icon-heart-broken2"></i></h5></div>
+
  <script type="text/javascript">
+
+   //var currentPage = $pagination.twbsPagination('getCurrentPage');
+   //$pagination.twbsPagination('destroy');
+   // $pagination.twbsPagination($.extend({}, defaultOpts, {
+   //              startPage: currentPage,
+   //              totalPages: parseInt('{{pn}}')
+   //          }));
+
  	function notify() {
           new PNotify({
               text: 'No result matches your search',

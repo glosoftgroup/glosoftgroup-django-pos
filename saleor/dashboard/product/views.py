@@ -19,7 +19,7 @@ from ...purchase.models import (
 								PurchaseProduct
 								)
 from ...supplier.models import Supplier
-from ...product.models import (Product, ProductAttribute, 
+from ...product.models import (Product, ProductAttribute, Category,
 							   ProductClass, AttributeChoiceValue,
 							   ProductImage, ProductVariant, Stock,
 							   StockLocation, ProductTax, StockHistoryEntry)
@@ -408,10 +408,12 @@ def stock_edit(request, product_pk, stock_pk=None):
 		
 		quantity = request.POST.get('quantity')		
 		cost_price = request.POST.get('cost_price')		
+		invoice_number = request.POST.get('invoice_number')
 		#try:
 		PurchaseProduct.objects.create(
 							variant=stock.variant,
 							stock=stock,
+							invoice_number=invoice_number,
 							cost_price=cost_price,
 							quantity=quantity,
 							supplier=product.product_supplier,
@@ -857,7 +859,102 @@ def stock_pages(request):
 		queryset = paginator.page(paginator.num_pages)
 	return HttpResponse(paginator.num_pages)
 
+@staff_member_required
+def stocks(request):
+	try:
+		product_results = ProductVariant.objects.all().order_by('-id')		
+		page = request.GET.get('page', 1)
+		categories = Category.objects.all()
+		paginator = Paginator(product_results, 10)
+		try:
+			product_results = paginator.page(page)
+		except PageNotAnInteger:
+			product_results = paginator.page(1)
+		except InvalidPage:
+			product_results = paginator.page(1)
+		except EmptyPage:
+			product_results = paginator.page(paginator.num_pages)
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			return TemplateResponse(request, 'dashboard/purchase/purchase_list.html', {'product_results':product_results,'categories':categories})
+	except TypeError as e:
+		error_logger.error(e)
+		return HttpResponse('error accessing users')
 
+@staff_member_required
+def stock_paginate(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+	if request.GET.get('gid'):
+		product_results = ProductVariant.objects.filter(product__categories=request.GET.get('gid'))
+		if p2_sz:
+			paginator = Paginator(product_results, int(p2_sz))
+			product_results = paginator.page(page)
+			return TemplateResponse(request,'dashboard/purchase/paginate.html',{'product_results':product_results})
+
+		paginator = Paginator(product_results, 10)
+		product_results = paginator.page(page)
+		return TemplateResponse(request,'dashboard/purchase/p2.html',{'product_results':product_results, 'pn':paginator.num_pages,'sz':10,'gid':request.GET.get('gid')})
+
+	else:
+		product_results = ProductVariant.objects.all().order_by('-id')
+		if list_sz:
+			paginator = Paginator(product_results, int(list_sz))
+			product_results = paginator.page(page)
+			print product_results
+			print 'sdflsdjflsdjf'
+			return TemplateResponse(request,'dashboard/purchase/p2.html',{'product_results':product_results, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0})
+		else:
+			paginator = Paginator(product_results, 10)
+		if p2_sz:
+			paginator = Paginator(product_results, int(p2_sz))
+			product_results = paginator.page(page)
+			return TemplateResponse(request,'dashboard/purchase/paginate.html',{'product_results':product_results})
+
+		try:
+			product_results = paginator.page(page)
+		except PageNotAnInteger:
+			product_results = paginator.page(1)
+		except InvalidPage:
+			groups = paginator.page(1)
+		except EmptyPage:
+			product_results = paginator.page(paginator.num_pages)
+		return TemplateResponse(request,'dashboard/purchase/paginate.html',{'product_results':product_results})
+
+
+@staff_member_required
+def stock_search( request ):
+	
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size',10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get( 'q' )
+		if list_sz is None:
+			sz = 10
+		else:
+			sz = list_sz
+		if q is not None:            
+			product_results = ProductVariant.objects.filter( 
+				Q(sku__icontains=q) |
+			    Q(product__name__icontains=q)).order_by('-id')
+			paginator = Paginator(product_results, 10)
+			try:
+				product_results = paginator.page(page)
+			except PageNotAnInteger:
+				product_results = paginator.page(1)
+			except InvalidPage:
+				product_results = paginator.page(1)
+			except EmptyPage:
+				product_results = paginator.page(paginator.num_pages)
+			if p2_sz:
+				product_results = paginator.page(page)
+				return TemplateResponse(request,'dashboard/purchase/paginate.html',{'product_results':product_results})
+
+			return TemplateResponse(request, 'dashboard/purchase/search.html', {'product_results':product_results, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 @staff_member_required
 def stock_filter(request):
@@ -882,7 +979,7 @@ def stock_filter(request):
 		# If page is out of range (e.g. 9999), deliver last page of results.
 		queryset = paginator.page(paginator.num_pages)
 	product_results = queryset    
-	ctx = {'products_count': products_count,'product_results': product_results,'search_count':len(product_results)}
+	ctx = {'pn':paginator.num_pages,'products_count': products_count,'product_results': product_results,'search_count':len(product_results)}
 	return TemplateResponse(
 	request, 'dashboard/includes/sku_search_results.html',
 	ctx)
