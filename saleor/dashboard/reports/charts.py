@@ -47,6 +47,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def sales_category_chart(request, image=None):
 	get_date = request.GET.get('date')
 	today = datetime.datetime.now()
@@ -131,6 +132,8 @@ def sales_category_chart(request, image=None):
 		except IndexError as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e": e, "date":date})
 
+@staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def get_category_sale_details(request):
 	get_categ = request.GET.get('category')
 	today = datetime.datetime.now()
@@ -206,6 +209,7 @@ def get_category_sale_details(request):
 			# return HttpResponse(e)
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def sales_date_chart(request, image=None):
 	get_date = request.GET.get('date')
 	if get_date:
@@ -324,6 +328,7 @@ def sales_date_chart(request, image=None):
 										{"error": e, "date": date})
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def get_sales_charts(request):
 	label = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"]
 	default = [12, 19, 3, 5, 2, 3]
@@ -341,6 +346,7 @@ def get_sales_charts(request):
 	return JsonResponse(data)
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def get_sales_by_week(request):
 	date_from = request.GET.get('from')
 	d_to = request.GET.get('to')
@@ -531,6 +537,7 @@ def get_sales_by_week(request):
 
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def sales_user_chart(request):
 	image = request.POST.get('img')
 	today = datetime.datetime.now()
@@ -616,6 +623,7 @@ def sales_user_chart(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def get_user_sale_details(request):
 	get_categ = request.GET.get('user')
 	today = datetime.datetime.now()
@@ -691,6 +699,7 @@ def get_user_sale_details(request):
 			# return HttpResponse(e)
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def sales_terminal_chart(request):
 	image = request.POST.get('img')
 	today = datetime.datetime.now()
@@ -773,6 +782,7 @@ def sales_terminal_chart(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def get_terminal_sale_details(request):
 	get_categ = request.GET.get('terminal')
 	today = datetime.datetime.now()
@@ -847,6 +857,7 @@ def get_terminal_sale_details(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_terminal.html',{})
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def sales_product_chart(request):
 	get_date = request.GET.get('date')
 	image = request.POST.get('img')
@@ -932,6 +943,7 @@ def sales_product_chart(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html')
 
 @staff_member_required
+@permission_decorator('reports.view_sales_reports')
 def get_product_sale_details(request):
 	get_categ = request.GET.get('item')
 	today = datetime.datetime.now()

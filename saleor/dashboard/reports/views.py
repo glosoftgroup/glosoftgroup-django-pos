@@ -35,6 +35,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
+@permission_decorator('sales.view_sales_reports')
 def sales_list(request):
 	try:
 		try:
@@ -72,6 +73,7 @@ def sales_list(request):
 		error_logger.error(e)
 
 @staff_member_required
+@permission_decorator('sales.view_sales_reports')
 def sales_detail(request, pk=None):
 	try:
 		sale = Sales.objects.get(pk=pk)
@@ -81,7 +83,7 @@ def sales_detail(request, pk=None):
 		error_logger.error(e)
 
 @staff_member_required
-# @permission_required('userprofile.view_user', raise_exception=True)
+@permission_decorator('sales.view_sales_reports')
 def sales_reports(request):
 	try:
 		today = datetime.date.today()
@@ -110,6 +112,7 @@ def sales_reports(request):
 		error_logger.error(e)
 		return HttpResponse('error accessing sales reports')
 
+@staff_member_required
 def sales_paginate(request):
 	page = int(request.GET.get('page'))
 	list_sz = request.GET.get('size')
@@ -239,6 +242,7 @@ def sales_paginate(request):
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/p2.html', {'date': date})
 
+@staff_member_required
 def sales_search(request):
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
@@ -277,6 +281,8 @@ def sales_search(request):
 
 			return TemplateResponse(request, 'dashboard/reports/sales/search.html', {'sales':sales, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
+@staff_member_required
+@permission_decorator('sales.view_products_reports')
 def product_reports(request):
 	try:
 		items = ProductVariant.objects.all().order_by('-id')
@@ -303,6 +309,7 @@ def product_reports(request):
 		error_logger.error(e)
 		return HttpResponse('error accessing products reports')
 
+@staff_member_required
 def products_paginate(request):
 	page = int(request.GET.get('page'))
 	list_sz = request.GET.get('size')
@@ -350,6 +357,7 @@ def products_paginate(request):
 			items = paginator.page(paginator.num_pages)
 		return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items})
 
+@staff_member_required
 def products_search(request):
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
@@ -381,6 +389,7 @@ def products_search(request):
 
 			return TemplateResponse(request, 'dashboard/reports/products/search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
+@staff_member_required
 def products_reorder_search(request):
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
@@ -412,8 +421,8 @@ def products_reorder_search(request):
 
 			return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
-
-
+@staff_member_required
+@permission_decorator('sales.view_purchase_reports')
 def purchases_reports(request):
 	get_date = request.GET.get('date')
 	if get_date:
@@ -430,7 +439,8 @@ def purchases_reports(request):
 	except ObjectDoesNotExist as e :
 		error_logger.error(e)
 
-
+@staff_member_required
+@permission_decorator('sales.view_balancesheet')
 def balancesheet_reports(request):
 	get_date = request.GET.get('date')
 	if get_date:
@@ -487,7 +497,7 @@ def balancesheet_reports(request):
 		error_logger.error(e)
 		return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html')
 
-
+@staff_member_required
 def get_dashboard_data(request):
 	label = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"]
 	default = [12, 19, 3, 5, 2, 3]
@@ -507,6 +517,8 @@ def get_dashboard_data(request):
 	}
 	return JsonResponse(data)
 
+@staff_member_required
+@permission_decorator('sales.view_products_reports')
 def product_reorder(request):
 	try:
 		low_stock = get_low_stock_products()
@@ -530,6 +542,7 @@ def product_reorder(request):
 		error_logger.error(e)
 		return HttpResponse('error accessing products reports')
 
+@staff_member_required
 def products_reorder_paginate(request):
 	page = int(request.GET.get('page'))
 	list_sz = request.GET.get('size')

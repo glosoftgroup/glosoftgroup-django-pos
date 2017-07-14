@@ -56,7 +56,7 @@
             <div class="col-md-2">
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
-                {% if perms.userprofile.add_user %}
+                {% if perms.group.add_group %}
                    <a href="{% url 'dashboard:perms' %}" class="btn btn-primary waves-effect waves-light">Add Group</a>
                 {% endif %}
               </div>
@@ -76,7 +76,7 @@
                  <tr>
                     <th>Id</th>
                     <th>Group Name</th>
-                    {% if perms.userprofile.change_group or perms.userprofile.delete_group %}
+                    {% if perms.auth.change_group or perms.auth.delete_group %}
                     <th class="text-center">Actions</th>
                     {% endif %}
                   </tr>
@@ -90,19 +90,25 @@
                      <!-- group name -->
                     <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}">{{group.name}}</td>
                     <!-- actions -->
+                    {% if perms.auth.change_group or perms.auth.delete_group %}
                     <td class="text-center">
                       <ul class="icons-list">
+                        {% if perms.auth.change_group %}
                         <li>
                           <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
                          class="modal_trigger_edit btn btn-default btn-sm edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal" style="font-size: 11px;"></i> edit</a>
                         </li>
+                        {% endif %}
+                        {% if perms.auth.delete_group %}
                         <li>
                           <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
                          class="modal_trigger_delete btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
                          </a>
                         </li>
+                        {% endif %}
                       </ul>
                     </td>
+                    {% endif %}
                   </tr>
                   {% endfor %}
                 {% else %}

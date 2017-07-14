@@ -125,7 +125,7 @@ class SupplierManager(BaseUserManager):
         'Creates a User with the given username, email and password'
         email = SupplierManager.normalize_email(email)
         supplier = self.model(email=email, is_active=is_active,
-                           **extra_fields)        
+                           **extra_fields)
         supplier.save()
         return supplier
     

@@ -32,7 +32,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-# @permission_decorator('userprofile.view_user')
+@permission_decorator('userprofile.view_usertrail')
 def user_trails(request):   
 	try:
 		users = UserTrail.objects.all().order_by('-now')
@@ -58,7 +58,9 @@ def user_trails(request):
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
+
 @staff_member_required
+@permission_decorator('userprofile.view_user')
 def users(request):
 	try:
 		users = User.objects.all().order_by('-id')
@@ -82,6 +84,7 @@ def users(request):
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
+
 @staff_member_required
 def usertrail_paginate(request):
 	page = int(request.GET.get('page', 1))
@@ -217,7 +220,7 @@ def user_paginate(request):
 			users = paginator.page(paginator.num_pages)
 		return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
 
-
+@staff_member_required
 @permission_decorator('userprofile.add_user')
 def user_add(request):
 	try:
@@ -267,6 +270,7 @@ def user_process(request):
 		return HttpResponse(last_id.id)
 
 @staff_member_required
+@permission_decorator('userprofile.change_user')
 def user_detail(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	user_permissions = Permission.objects.filter(user=user)
@@ -281,6 +285,8 @@ def user_detail(request, pk):
 		info_logger.info('User: '+str(request.user.name)+' viewed '+str(user.name)+'`s profile')
 	return TemplateResponse(request, 'dashboard/users/detail.html', {'user':user,'all_permissions':all_permissions,'groups':groups})
 
+@staff_member_required
+@permission_decorator('userprofile.delete_user')
 def user_delete(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.method == 'POST':
@@ -289,6 +295,7 @@ def user_delete(request, pk):
 		return HttpResponse('success')
 
 @staff_member_required
+@permission_decorator('userprofile.change_user')
 def user_edit(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	permissions = Permission.objects.all()
