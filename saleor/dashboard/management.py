@@ -25,14 +25,30 @@ def add_view_permissions(sender, **kwargs):
 		url_content_type = ContentType.objects.create(app_label='sales', model='unused')
 		Permission.objects.create(name='can make sales', content_type=url_content_type,codename='make_sale')
 
+	if not ContentType.objects.filter(model='reports') \
+			and not Permission.objects.filter(codename='view_sale_reports') \
+			and not Permission.objects.filter(codename='view_products_reports') \
+			and not Permission.objects.filter(codename='view_purchase_reports'):
+		url_content_type = ContentType.objects.create(app_label='reports', model='reports')
+		Permission.objects.create(name='view sales reports', content_type=url_content_type,codename='view_sale_reports')
+		Permission.objects.create(name='view products reports', content_type=url_content_type, codename='view_products_reports')
+		Permission.objects.create(name='view purchase reports', content_type=url_content_type, codename='view_purchase_reports')
+		Permission.objects.create(name='view balancesheet', content_type=url_content_type, codename='view_balancesheet')
+
 	view_unused = Permission.objects.filter(codename='view_unused')
 	view_unused.delete()
+
+	view_reports = Permission.objects.filter(codename='view_reports')
+	view_reports.delete()
+
 	add_usertrail = Permission.objects.filter(codename='add_usertrail')
 	delete_usertrail = Permission.objects.filter(codename='delete_usertrail')
 	change_usertrail = Permission.objects.filter(codename='change_usertrail')
 	add_usertrail.delete()
 	delete_usertrail.delete()
 	change_usertrail.delete()
+
+
 
 # check for all our view permissions after a syncdb
 post_migrate.connect(add_view_permissions)

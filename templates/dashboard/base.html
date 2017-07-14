@@ -150,7 +150,7 @@
                       <a href="{% url 'dashboard:groups' %}"><i class='icon-users4'></i>Groups</a>
                     </li>
                     {% endif %}
-                    {% if perms.userprofile.view_trail %}
+                    {% if perms.userprofile.view_usertrail %}
                       <li class="{% block menu_trail_class %}{% endblock %}">
                       <a href="{% url 'dashboard:user_trail' %}"><i class='icon-history'></i>User Trail</a>
                     </li>
@@ -247,6 +247,7 @@
                   </ul>
                 </li>
                   {% endif %}
+                   {% if perms.sale.view_sale %}
                 <li><a href="#"><i class="icon-coins"></i> <span>{% trans "Customer Rewards" context "Dashboard discounts list" %}</span></a>
                   <ul>
                     <li class="{% block menu_sales_class %}{% endblock %}">
@@ -257,6 +258,8 @@
                     
                     </ul>
                 </li>
+                  {% endif %}
+                   {% if perms.sale.view_terminals %}
                  <li>
                   <a href="javascript:;">
                     <i class="icon-wallet"></i> 
@@ -276,6 +279,8 @@
                     </li>
                   </ul>
                 </li>
+                  {% endif %}
+                  {% if perms.reports.view_sale_reports or perms.reports.view_products_reports or perms.reports.view_purchase_reports or perms.reports.view_balancesheet %}
                 <li>
                   <a href="javascript:;">
                     <i class="icon-notebook"></i> 
@@ -283,30 +288,40 @@
                   </a>
 
                   <ul>
-                      <li class="{% block menu_report_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:sales_list' %}"><i class='icon-cash3'></i>Sales</a>
-                    </li>
-                      <li class="{% block menu_product_report_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
-                    </li>
-                      <li class="{% block menu_purchase_report_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:purchases_reports' %}"><i class='icon-price-tag'></i>Purchases</a>
-                    </li>
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_list' %}"><i class='icon-cash3'></i>Sales</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_products_reports %}
+                        <li class="{% block menu_product_report_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_purchase_reports %}
+                        <li class="{% block menu_purchase_report_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:purchases_reports' %}"><i class='icon-price-tag'></i>Purchases</a>
+                        </li>
+                      {% endif %}
 
 
 
                    {% if perms.product.view_producttax %}
-                    <li class="{% block menu_tax_list %}{% endblock %}">
-                    <a href="{% url 'dashboard:tax-list' %}">
-                    <i class="icon-drawer-out"></i>Tax
-                    </a>
-                    </li>
-                      {% endif %}
-                    <li class="{% block menu_balancesheet_report_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:balancesheet_reports' %}"><i class='icon-book'></i>Balance Sheet</a>
-                    </li>
+                        <li class="{% block menu_tax_list %}{% endblock %}">
+                            <a href="{% url 'dashboard:tax-list' %}">
+                            <i class="icon-drawer-out"></i>Tax
+                            </a>
+                        </li>
+                   {% endif %}
+                   {% if perms.reports.view_balancesheet %}
+                        <li class="{% block menu_balancesheet_report_class %}{% endblock %}">
+                             <a href="{% url 'dashboard:balancesheet_reports' %}"><i class='icon-book'></i>Balance Sheet</a>
+                        </li>
+                    {% endif %}
                   </ul>
                 </li>
+               {% endif %}
+               {% if request.user.is_superuser %}
                 <!-- configuration menu -->
                  <li><a href="#"><i class="icon-cogs"></i> <span> {% trans "Configuration"  context "Dashboard configuration" %}</span></a>
                   <ul>                 
@@ -319,7 +334,7 @@
                     </li>
                   </ul>
                 </li>
-
+                {% endif %}
                 <!-- /main -->
 
               </ul>

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import (
@@ -145,7 +144,7 @@ class Customer(models.Model):
 
 	def get_short_name(self):
 		return self.email
-=======
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django.db import models
@@ -181,5 +180,5 @@ class Staff(models.Model):
     # group = models.OneToOneField(Group, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
     image = models.FileField(upload_to='staff')
->>>>>>> d8f854b681ac445c501a2b7014024279cea52f9e
+
 
