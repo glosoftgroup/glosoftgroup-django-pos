@@ -247,6 +247,12 @@
                   </ul>
                 </li>
                   {% endif %}
+                   {% if perms.product.view_category %}
+                    <!-- categories -->
+                     <li class="{% block menu_messages_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:list-messages' %}"><i class='icon-phone'></i> Messages</a>
+                    </li>
+                      {% endif %}
                    {% if perms.sale.view_sale %}
                 <li><a href="#"><i class="icon-coins"></i> <span>{% trans "Customer Rewards" context "Dashboard discounts list" %}</span></a>
                   <ul>

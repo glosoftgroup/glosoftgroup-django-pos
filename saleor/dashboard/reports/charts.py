@@ -47,7 +47,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+# @permission_decorator('reports.view_sales_reports')
 def sales_category_chart(request, image=None):
 	get_date = request.GET.get('date')
 	today = datetime.datetime.now()

@@ -33,8 +33,7 @@ debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
-@staff_member_required
-def get_hours_results(date, l, h):
+def get_hours_results(request, date, l, h):
 	try:
 		sales_at_date = Sales.objects.filter(created__contains=date)
 		sales_at_h = sales_at_date.filter(created__hour__range=[l,h])
@@ -52,7 +51,6 @@ def get_hours_results(date, l, h):
 		amount = 0
 		return amount
 
-@staff_member_required
 def get_hours_results_range(date_from, date_to, l, h):
 	try:
 		sales_at_date = Sales.objects.filter(created__range=[date_from, date_to])
@@ -71,7 +69,6 @@ def get_hours_results_range(date_from, date_to, l, h):
 		amount = 0
 		return amount
 
-@staff_member_required
 def get_date_results_range(date_from, date_to):
 	try:
 		sales_at_date = Sales.objects.filter(created__range=[date_from, date_to])
@@ -89,7 +86,6 @@ def get_date_results_range(date_from, date_to):
 		amount = 0
 		return amount
 
-@staff_member_required
 def get_date_results(date):
 	try:
 		sales_at_date = Sales.objects.filter(created__contains=date)
@@ -107,7 +103,6 @@ def get_date_results(date):
 		amount = 0
 		return amount
 
-@staff_member_required
 def get_category_results(category, year, month):
 	try:
 		amount = SoldItem.objects.filter(product_category__contains=category, sales__created__year = year, sales__created__month = month).aggregate(Sum('total_cost'))['total_cost__sum']
@@ -120,7 +115,6 @@ def get_category_results(category, year, month):
 		amount = 0
 		return amount
 
-@staff_member_required
 def get_item_results(item, year, month):
 	try:
 		amount = SoldItem.objects.filter(product_name__contains=item, sales__created__year = year, sales__created__month = month).aggregate(Sum('total_cost'))['total_cost__sum']
@@ -133,7 +127,6 @@ def get_item_results(item, year, month):
 		amount = 0
 		return amount
 
-@staff_member_required
 def get_user_results(user, year, month):
 	try:
 		amount = Sales.objects.filter(user__name__contains=user, created__year = year, created__month = month).aggregate(Sum('total_net'))['total_net__sum']
@@ -146,7 +139,6 @@ def get_user_results(user, year, month):
 		amount = 0
 		return amount
 
-@staff_member_required
 def get_terminal_results(terminal, year, month):
 	try:
 		amount = Sales.objects.filter(terminal__terminal_name__contains=terminal, created__year = year, created__month = month).aggregate(Sum('total_net'))['total_net__sum']

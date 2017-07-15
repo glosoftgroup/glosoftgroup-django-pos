@@ -35,7 +35,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-@permission_decorator('sales.view_sales_reports')
+@permission_decorator('reports.view_sales_reports')
 def sales_list(request):
 	try:
 		try:
@@ -73,7 +73,7 @@ def sales_list(request):
 		error_logger.error(e)
 
 @staff_member_required
-@permission_decorator('sales.view_sales_reports')
+@permission_decorator('reports.view_sales_reports')
 def sales_detail(request, pk=None):
 	try:
 		sale = Sales.objects.get(pk=pk)
@@ -83,7 +83,7 @@ def sales_detail(request, pk=None):
 		error_logger.error(e)
 
 @staff_member_required
-@permission_decorator('sales.view_sales_reports')
+@permission_decorator('reports.view_sales_reports')
 def sales_reports(request):
 	try:
 		today = datetime.date.today()
@@ -282,7 +282,7 @@ def sales_search(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/search.html', {'sales':sales, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 @staff_member_required
-@permission_decorator('sales.view_products_reports')
+@permission_decorator('reports.view_products_reports')
 def product_reports(request):
 	try:
 		items = ProductVariant.objects.all().order_by('-id')
@@ -422,7 +422,7 @@ def products_reorder_search(request):
 			return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 @staff_member_required
-@permission_decorator('sales.view_purchase_reports')
+@permission_decorator('reports.view_purchase_reports')
 def purchases_reports(request):
 	get_date = request.GET.get('date')
 	if get_date:
@@ -440,7 +440,7 @@ def purchases_reports(request):
 		error_logger.error(e)
 
 @staff_member_required
-@permission_decorator('sales.view_balancesheet')
+@permission_decorator('reports.view_balancesheet')
 def balancesheet_reports(request):
 	get_date = request.GET.get('date')
 	if get_date:
@@ -518,7 +518,7 @@ def get_dashboard_data(request):
 	return JsonResponse(data)
 
 @staff_member_required
-@permission_decorator('sales.view_products_reports')
+@permission_decorator('reports.view_products_reports')
 def product_reorder(request):
 	try:
 		low_stock = get_low_stock_products()
