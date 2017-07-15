@@ -1,0 +1,272 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Messages
+{% endblock %}
+{% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:list-messages' %}">Messages</a></li>
+ {% endblock %}
+
+{% block menu_messages_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+    .td{cursor:pointer}
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+    <div class="col-md-12">
+      <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Messages</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+        <div class="panel-body">
+            <div class="col-md-4">
+             <label>Search Messages (for date format: yyyy-mm-dd)</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search details" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+                <label>choices</label>
+              <div class="form-group">
+                 <select class="bootstrap-select messages-category" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="inbox">inbox</option>
+                     <option value="outbox">outbox</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label style="visibility:hidden;">Compose</label>
+              <div class="form-group">
+                <a href="{% url 'dashboard:compose' %}" class="sm-block btn btn-primary">Compose</a>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                  </select>
+              </div>
+            </div>
+      </div>
+   </div>
+   </div>
+{% if not sales %}
+<div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsives">
+                <table class="table table-stripped datatable-header-footer table-hover">
+                  <caption style="margin-bottom: 10px;">
+                   </caption>
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr class="bg-primary-600">
+                          <th>Messages</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tb">
+                      <tr>
+                          <td>
+                              <div class="media-left">
+                                <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
+                                <span class="badge bg-danger-400 media-badge">8</span>
+                              </div>
+                              <div class="media-body">
+                                <a href="index.html#">
+                                    Jeremy Victorino
+                                    <span class="media-annotation pull-right">09:48</span>
+                                </a>
+
+                                <span class="display-block text-muted">Pert thickly mischievous clung frowned well...</span>
+                                <span class="display-block text-muted">read</span>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>
+                              <div class="media-left">
+                                <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
+                              </div>
+                              <div class="media-body">
+                                <a href="index.html#">
+                                    Jim Vavano
+                                    <span class="media-annotation pull-right">11:21</span>
+                                </a>
+
+                                <span class="display-block text-muted">Pert thickly mischievous clung frowned well...</span>
+                                <span class="display-block text-warning">unread</span>
+                              </div>
+                          </td>
+                      </tr>
+                        </tbody>
+
+                 </table>
+              </div>
+              <div class="my-paginate">
+                <div class="text-center bootpag-callback" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav">Page 1</div>
+                </div>
+                <input type="hidden" id="page_size" val="">
+              </div>
+             </div>
+            </div>
+            </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+       No sales Messages available
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}
+
+</div>
+
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+/*$(document).ready(function(){
+
+    $(".td").click(function(){
+          window.location = $(this).data("href");
+      });
+
+
+    var pagination_totalsize;
+    var status;
+    //**@ get
+    $.ajax({ url: "{% url 'dashboard:sales_list' %}",type: 'GET',data: {initial:'initial'},
+        async:false,success: function(data){
+         pagination_totalsize = data;
+    }});
+
+     $('.bootpag-callback').bootpag({
+        total: parseInt(pagination_totalsize),
+        maxVisible: 3,
+        leaps: false
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
+            $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+    });
+  $('.messages-category').selectpicker().on('change', function(){
+        var sv = $(this).val();
+        if(sv == 'inbox'){
+            //window.location = "{% url 'dashboard:sales_list' %}";
+            alert(sv);
+        }else if(sv == 'outbox'){
+            //window.location = "{% url 'dashboard:sales_date_chart' %}";
+            alert(sv);
+        }
+  });
+
+   $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change',function(){
+           //var svalue = $(this).val();
+    });
+    $('.ck').click(function(){
+      var name = $('.setName').val();
+      var vl = $('.setValue').val();
+        if( !name || !vl || vl == 'none'){
+           alert('nothing');
+        }else{
+         alert(name +' and '+ vl);
+        }
+    });
+    //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
+
+
+
+    var delay = (function(){
+    var timer = 0;
+    return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+    $('.search_user').keyup(function() {
+      var search_text = $(this).val();
+      delay(function(){
+         var url = "{% url 'dashboard:sales_search' %}";
+         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                $('#pagination-div').html(data);
+         }});
+      }, 500 );
+
+    });
+
+
+});   */
+
+</script>
+{% endblock %}
