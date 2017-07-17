@@ -338,6 +338,12 @@
                          {% trans "Site settings" context "Dashboard site settings" %}
                     </a>
                     </li>
+                       <li class="{% block menu_hr_default_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:hr-defaults' %}">
+                        <i class=" icon-earth"></i>
+                         hr defaults
+                    </a>
+                    </li>
                   </ul>
                 </li>
                 {% endif %}

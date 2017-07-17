@@ -27,3 +27,4 @@ def update(request, site_id=None):
         return redirect('dashboard:site-update', site_id=site.id)
     ctx = {'site': site, 'form': form}
     return TemplateResponse(request, 'dashboard/sites/detail.html', ctx)
+

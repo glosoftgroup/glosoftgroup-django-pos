@@ -50,3 +50,28 @@ class AuthorizationKey(models.Model):
 
     def key_and_secret(self):
         return self.key, self.password
+
+class BankBranch(models.Model):
+	name = models.CharField(max_length=100, null=True, blank=True)
+
+	def __str__(self):
+		return str(self.name)
+
+class Bank(models.Model):
+	name = models.CharField(max_length=100, null=True, blank=True)
+	branch = models.ManyToManyField(BankBranch, max_length=100, null=True, blank=True)
+
+	def __str__(self):
+		return str(self.name)
+
+class Department(models.Model):
+	name = models.CharField(max_length=100, null=True, blank=True)
+
+	def __str__(self):
+		return str(self.name)
+
+class UserRole(models.Model):
+	name = models.CharField(max_length=100, null=True, blank=True)
+
+	def __str__(self):
+		return str(self.name)

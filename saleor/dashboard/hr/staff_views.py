@@ -43,18 +43,18 @@ from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, convert_html_to_pdf
 
 
-def list_messages(request):
+def list_staff(request):
     users = User.objects.all()
     data = {
         "users":users
     }
-    return TemplateResponse(request, 'dashboard/messages/inbox/list.html',{})
+    return TemplateResponse(request, 'dashboard/hr/staff/list.html',{})
 
-def message_detail(request):
+def staff_detail(request):
     status = 'read'
-    return TemplateResponse(request, 'dashboard/messages/inbox/detail.html', {})
+    return TemplateResponse(request, 'dashboard/hr/staff/staff.html', {})
 
-def compose(request):
+def add_staff(request):
     suppliers = Supplier.objects.all()
     customers = Customer.objects.all()
     staff = User.objects.all()
@@ -63,4 +63,10 @@ def compose(request):
         "customers":customers,
         "staff":staff
     }
-    return TemplateResponse(request, 'dashboard/messages/compose.html', data)
+    return TemplateResponse(request, 'dashboard/hr/staff/add_staff.html', data)
+
+def staff_edit(request, pk=None):
+    return TemplateResponse(request, 'dashboard/hr/staff/edit_staff.html', {})
+
+def staff_delete(request, pk=None):
+    return TemplateResponse(request, 'dashboard/hr/staff/delete_staff.html', {})

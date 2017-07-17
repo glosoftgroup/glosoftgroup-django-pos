@@ -1,0 +1,459 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  System Defauls - HR
+{% endblock %}
+ {% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+     <li class="active"><a href="'{% url 'dashboard:hr-defaults' %}">manage defaults</a></li>
+ {% endblock %}
+{% block menu_hr_default_class %} active {% endblock %}}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Default Details Management</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+        <div class="tabbable">
+          <ul class="nav nav-tabs nav-tabs-highlight">
+            <li class="active" id="role-tab"><a href="#role" data-toggle="tab" class="legitRipple" aria-expanded="false">User Roles</a></li>
+            <li class="" id="department-tab"><a href="#department" data-toggle="tab" class="legitRipple" aria-expanded="true">Departments</a></li>
+            <li class="" id="bank-tab"><a href="#bank" data-toggle="tab" class="legitRipple" aria-expanded="true">Bank Details</a></li>
+          </ul>
+
+          <div class="tab-content">
+
+            <div class="tab-pane animated fadeIn active" id="role">
+                <form class="form" enctype="multipart/form-data" id="user-role-details" name="user-role-details">
+                {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="row">
+                            <div class="col-md-8">
+                              <div class="form-group">
+                                <label for="user_role">Role Name</label>
+                                <input type="text" class="form-control" name="user_role" id="user_role" placeholder="Name">
+                              </div>
+                            </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="name" style="visibility:hidden">Action</label>
+                                     <div class="pull-rights">
+                                      <button class="btn btn-primary waves-effect waves-light" id="role-submit" type="submit">Create User Role <i class="icon-arrow-right14 position-right"></i></button>
+                                     </div>
+                                </div>
+                              </div>
+                              <div class="col-md-12 roles">
+                                  <label for="user-roles">Users Roles</label>
+                                  <div class="role-div">
+                                  {% if user_roles %}
+                                  <div id="user-roles" class="table-responsive pre-scrollable user-roles" style="max-height: 290px;overflow-y:scroll">
+                                      <table class="table table-frameds" id="table-roles">
+                                        <thead>
+                                          <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Actions</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for role in user_roles %}
+                                          <tr class="animated fadeIn">
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                            {{ role.name }}
+                                            </td>
+                                            <td class="text-center">
+                                              <ul class="icons-list">
+                                                <li><a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
+                                                <li>
+                                                  <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:user-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                                                 class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                                                 </a>
+                                                </li>
+                                              </ul>
+                                            </td>
+                                          </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  {% else %}
+                                     <div class="animated fadeIn ">
+                                       <div class="panel bg-danger-600">
+                                         <div class="panel-body">
+                                           <div style="text-align: center;font-size:16px;">
+                                            No roles available
+                                           </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                  {% endif %}
+                                 </div>
+                              </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </form>
+
+            </div>
+            <div class="tab-pane animated fadeIn" id="department">
+                <form class="form" enctype="multipart/form-data" id="department-details" name="department-details">
+                {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="row">
+                            <div class="col-md-8">
+                              <div class="form-group">
+                                <label for="department_name">Department Name</label>
+                                <input type="text" class="form-control" name="department_name" id="department_name" placeholder="Name">
+                              </div>
+                            </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="name" style="visibility:hidden">Action</label>
+                                     <div class="pull-rights">
+                                      <button class="btn btn-primary waves-effect waves-light" id="department-submit" type="submit">Create Department<i class="icon-arrow-right14 position-right"></i></button>
+                                     </div>
+                                </div>
+                              </div>
+                              <div class="col-md-12">
+                                  <label for="user-roles">Departments</label>
+                                  {% if departments %}
+                                  <div id="departments" class="table-responsive pre-scrollable user-roles" name="departments" style="max-height: 290px;overflow-y:scroll">
+                                      <table class="table table-frameds">
+                                        <thead>
+                                          <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Actions</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for department in departments %}
+                                          <tr class="animated fadeIn">
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                            {{ department.name }}
+                                            </td>
+                                            <td class="text-center">
+                                              <ul class="icons-list">
+                                                <li><a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
+                                                <li>
+                                                  <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:user-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                                                 class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                                                 </a>
+                                                </li>
+                                              </ul>
+                                            </td>
+                                          </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  {% else %}
+                                     <div class="animated fadeIn ">
+                                       <div class="panel bg-danger-600">
+                                         <div class="panel-body">
+                                           <div style="text-align: center;font-size:16px;">
+                                            No departments available
+                                           </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                  {% endif %}
+                              </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </form>
+           </div>
+
+          <div class="tab-pane animated fadeIn" id="bank">
+          <form class="form" enctype="multipart/form-data" id="bank-details" name="bank-details">
+                {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="row">
+                            <div class="col-md-8">
+                              <div class="form-group">
+                                <label for="department_name">Bank Name</label>
+                                <input type="text" class="form-control" name="bank_name" id="bank_name" placeholder="Name">
+                              </div>
+                            </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="name" style="visibility:hidden">Action</label>
+                                     <div class="pull-rights">
+                                      <button class="btn btn-primary waves-effect waves-light" id="bank-submit" type="submit">Create Bank <i class="icon-arrow-right14 position-right"></i></button>
+                                     </div>
+                                </div>
+                              </div>
+                              <div class="col-md-12">
+                                  <label for="user-roles">Banks</label>
+                                  {% if banks %}
+                                  <div id="bank_names" class="table-responsive pre-scrollable" style="max-height: 290px;overflow-y:scroll">
+                                      <table class="table table-frameds">
+                                        <thead>
+                                          <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Actions</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for bank in banks %}
+                                          <tr class="animated fadeIn">
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                            {{ bank.name }}
+                                            </td>
+                                            <td class="text-center">
+                                              <ul class="icons-list">
+                                                <li><a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
+                                                <li>
+                                                  <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:user-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                                                 class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                                                 </a>
+                                                </li>
+                                              </ul>
+                                            </td>
+                                          </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  {% else %}
+                                     <div class="animated fadeIn ">
+                                       <div class="panel bg-danger-600">
+                                         <div class="panel-body">
+                                           <div style="text-align: center;font-size:16px;">
+                                            No banks available
+                                           </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                  {% endif %}
+                              </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+//** user role
+  $('#user-role-details').validate({
+    onkeyup: function(element) {$(element).valid()},
+    rules:{
+        user_role: {
+          required:true
+        }
+    },
+    messages:{
+      user_role:{
+        required: "please provide a role"
+      }
+    },
+    submitHandler: function() {
+      var f = document.getElementById('user-role-details');
+      var formData = new FormData(f);
+      if (formData) {
+            $.ajax({
+                url: "{% url 'dashboard:add_role' %}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success:function(data){
+                    var where_toshow_loader = ".roles";
+                    content_loader(where_toshow_loader);
+
+                   if(data != 'error'){
+                      $("#role-div" ).empty().append( data );
+                      $(where_toshow_loader).unblock();
+
+                      $.jGrowl('successfully created', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+                   }else{
+                      $(where_toshow_loader).unblock();
+
+                      $.jGrowl('error saving', {
+                          header: 'Well done!',
+                          theme: 'bg-danger'
+                       });
+                   }
+
+
+                },
+                error:function(error){
+                  console.log(error);
+                  $.jGrowl('Change a few things up and try sending again', {
+                      header: 'Oh snap!',
+                      theme: 'bg-danger'
+                  });
+                }
+            });
+        }
+    }
+  });
+
+//** bank
+  $('#bank-details').validate({
+    onkeyup: function(element) {$(element).valid()},
+    rules:{
+        bank_name: {
+          required:true
+        }
+    },
+    messages:{
+      user_role:{
+        required: "please provide the bank name"
+      }
+    },
+    submitHandler: function() {
+      var f = document.getElementById('bank-details');
+      var formData = new FormData(f);
+      if (formData) {
+            $.ajax({
+                url: "{% url 'dashboard:user_process' %}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success:function(data){
+                   $("#supplier-message").val('');
+
+                   $.jGrowl('message sent successfully', {
+                      header: 'Well done!',
+                      theme: 'bg-success'
+                   });
+                   // window.location = "{% url 'dashboard:users' %}";
+                  next_tab();
+                  disable_profile_tab()
+                  localStorage.setItem('user_id', data);
+                  $('.user_id').val(localStorage.getItem("user_id"));
+                },
+                error:function(error){
+                  console.log(error);
+                  $.jGrowl('Change a few things up and try sending again', {
+                      header: 'Oh snap!',
+                      theme: 'bg-danger'
+                  });
+                }
+            });
+        }
+    }
+  });
+
+//** department
+  $('#department-details').validate({
+    onkeyup: function(element) {$(element).valid()},
+    rules:{
+        department_name: {
+          required:true
+        }
+    },
+    messages:{
+      department_name:{
+        required: "please provide the department name"
+      }
+    },
+    submitHandler: function() {
+      var f = document.getElementById('department-details');
+      var formData = new FormData(f);
+      if (formData) {
+            $.ajax({
+                url: "{% url 'dashboard:user_process' %}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success:function(data){
+                   $("#supplier-message").val('');
+
+                   $.jGrowl('message sent successfully', {
+                      header: 'Well done!',
+                      theme: 'bg-success'
+                   });
+                   // window.location = "{% url 'dashboard:users' %}";
+                  next_tab();
+                  disable_profile_tab()
+                  localStorage.setItem('user_id', data);
+                  $('.user_id').val(localStorage.getItem("user_id"));
+                },
+                error:function(error){
+                  console.log(error);
+                  $.jGrowl('Change a few things up and try sending again', {
+                      header: 'Oh snap!',
+                      theme: 'bg-danger'
+                  });
+                }
+            });
+        }
+    }
+  });
+
+   // content wait loader
+   function content_loader(val) {
+    var block = $(val).parent().parent().parent().parent().parent();
+
+        $(val).block({
+            message: '<i class="icon-spinner2 spinner"></i><br><span class="align-center">Please wait</span>',
+            overlayCSS: {
+                backgroundColor: '#fff',
+                opacity: 0.8,
+                cursor: 'wait',
+                'box-shadow': '0 0 0 1px #ddd'
+            },
+            css: {
+                border: 0,
+                padding: 0,
+                backgroundColor: 'none'
+            }
+        });
+   }
+
+  });
+</script>
+{% endblock %}
