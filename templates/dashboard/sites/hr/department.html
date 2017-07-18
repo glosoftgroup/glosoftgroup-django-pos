@@ -1,0 +1,282 @@
+{% if departments %}
+<div id="departments" class="table-responsive pre-scrollable user-roles" name="departments" style="max-height: 290px;overflow-y:scroll">
+  <table class="table table-frameds">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for department in departments %}
+      <tr class="animated fadeIn">
+        <td>{{ forloop.counter }}</td>
+        <td>
+        {{ department.name }}
+        </td>
+        <td class="text-center">
+          <ul class="icons-list">
+            <li>
+                <!--<a href="{% url 'dashboard:department-edit' pk=department.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>-->
+                <a data-ta="#pedit_modal_instance" data-title="{{ department.name|capfirst }}" data-href="{% url 'dashboard:department-edit' pk=department.pk %}" data-name="{{ department.name }}" data-id="{{ department.pk }}"
+                   class="pedit_modal-trigger btn btn-default btn-sm edit-btn" data-cat="department" data-label="Department:"><i class="icon-pencil7" style="font-size: 11px;"></i> edit
+                 </a>
+            </li>
+            <li>
+                <a data-ta="#pmodal_instance" data-title="Delete department {{ department.name }} ?" data-href="{% url 'dashboard:department-delete' pk=department.pk %}" data-name="{{ department.name }}" data-id="{{ department.pk }}"
+             class="btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+             </a>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- edit modal -->
+ <div id="pedit_modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+         <div class="">
+         <form action="" class="pedit_form" method="post" id="peditform" novalidate>
+         {% csrf_token %}
+         <div class="">
+             <div class="form-group">
+                 <label class="cat_label"> </label>
+                 <input class="form-control edit_class" name="category" data-name=""/>
+             </div>
+             <input type="hidden" class="eitem-url"/>
+             <input type="hidden" class="eitem-id"/>
+           </div>
+
+         </div>
+       </div>
+
+       <div class="modal-footer">
+         <!--<button type="submit" id='modal_edit' class="btn pull-right bg-danger edit" onclick="return false" data-id="" data-href="">Update</button>-->
+           <button class="btn btn-primary waves-effect waves-light pull-right pdata_update"
+                   id='modal_edit' type="submit"  data-id="" data-href="">
+               Update
+               <i class="icon-arrow-right14 position-right"></i>
+           </button>
+         </form>
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /edit modal -->
+
+<!-- Blue modal -->
+ <div id="pmodal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+         <div class="">
+         <form action="" class="delete_form" method="post" id="pdelform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm delete!
+           </h5>
+             <input type="hidden" class="item-url"/>
+             <input type="hidden" class="item-id"/>
+           </div>
+
+         </div>
+       </div>
+
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger pdel" onclick="return false">Delete</button>
+         </form>
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <div class="info"></div>
+ <!-- /blue modal -->
+
+{% else %}
+ <div class="animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No departments available
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<script>
+    $(document).ready(function(){
+    alert('hello');
+        //** modal edit
+  $('.pedit_modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         var cat = $(this).data('cat');
+         var label = $(this).data('label');
+         $('.cat_label').html(label);
+
+         $('.eitem-url').val(url);
+         $('.eitem-id').val(id);
+
+         $('.modal-title').html(prompt_text);
+
+         $('.edit_class').attr('data-name', cat)
+         $('.edit_class').val(username);
+
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+  $('#peditform').validate({
+    onkeyup: function(element) {$(element).valid()},
+    rules:{
+       category: {
+          required:true
+        }
+    },
+    messages:{
+      category:{
+        required: "please fill in the required field"
+      }
+    },
+    submitHandler: function() {
+          var name = $('.edit_class').data('name');
+          var inputValue = $('.edit_class').val();
+          var f = document.getElementById('peditform');
+          var formData = new FormData(f);
+          formData.append(name, inputValue);
+          var url = $('.eitem-url').val();
+          var id = $('.eitem-id').val();
+
+          //alert('url: '+url+' -* category: -*'+name+' -* value: '+inputValue);
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $('#edit_modal_instance').modal('hide');
+                //$('#tb #'+id).remove();
+                $.jGrowl('Updated successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                //window.location.reload();
+             // $("#mydiv").load(location.href + " #mydiv");
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error Updating', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });
+    }
+  });
+      /* clicked the submit button */
+      $('.pdata_update').on('click', function (e) {
+          /*var f = document.getElementById('peditform');
+          var formData = new FormData(f);
+          var id = $(this).data('id');
+          var url = $(this).data('href');
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $('#pedit_modal_instance').modal('hide');
+                //$('#tb #'+id).remove();
+                $.jGrowl('Updated successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                //window.location.reload();
+             // $("#mydiv").load(location.href + " #mydiv");
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error Updating', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });*/
+      });
+
+
+  //** modal delete
+        $('.pmodal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+         $('.item-url').val(url);
+         $('.item-id').val(id);
+         //alert(url+'and '+id);
+         //alert($('.pdel').data('href'));
+      });
+
+      /* clicked the submit button */
+      $('.pdel').on('click', function (e) {
+          var f = document.getElementById('pdelform');
+          var formData = new FormData(f);
+          var id = $('.item-id').val();
+          var url  = $('.item-url').val();
+           alert(url+' and '+id)
+          /*$.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $('#modal_instance').modal('hide');
+                $('#tb #'+id).remove();
+                $.jGrowl('Deleted successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                window.location.reload();
+             // $("#mydiv").load(location.href + " #mydiv");
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error deleting', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });*/
+      });
+    });
+</script>

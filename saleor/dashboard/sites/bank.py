@@ -30,24 +30,14 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-def hr_defaults(request):
+def add_bank(request):
+	bank = request.POST.get('bank')
+	new_bank = Bank(name=bank)
 	try:
-		user_roles = UserRole.objects.all()
-		departments = Department.objects.all()
+		new_bank.save()
 		banks = Bank.objects.all()
-		data = {"user_roles":user_roles, "departments":departments, "banks":banks}
-		return TemplateResponse(request, 'dashboard/sites/hr/hr.html', data)
-	except ObjectDoesNotExist as e:
-		return HttpResponse(e)
-
-def add_role(request):
-	role = request.POST.get('user_role')
-	new_role = UserRole(name=role)
-	try:
-		new_role.save()
-		user_roles = UserRole.objects.all()
-		data = {"user_roles": user_roles}
-		return TemplateResponse(request, 'dashboard/sites/hr/roles.html', data)
+		data = {"banks": banks}
+		return TemplateResponse(request, 'dashboard/sites/hr/bank.html', data)
 	except IntegrityError as e:
 		error_logger.error(e)
 		return HttpResponse('error')
@@ -55,21 +45,18 @@ def add_role(request):
 		error_logger.error(e)
 		return HttpResponse('error')
 
-def role_delete(request, pk):
-	role = get_object_or_404(UserRole, pk=pk)
+def bank_delete(request, pk):
+	bank = get_object_or_404(Bank, pk=pk)
 	if request.method == 'POST':
-		role.delete()
-		user_trail(request.user.name, 'deleted user role: '+ str(role.name),'delete')
+		bank.delete()
+		user_trail(request.user.name, 'deleted bank role: '+ str(bank.name),'delete')
 		return HttpResponse('success')
 
-def role_edit(request, pk):
-	role = get_object_or_404(UserRole, pk=pk)
+def bank_edit(request, pk):
+	bank = get_object_or_404(Bank, pk=pk)
 	if request.method == 'POST':
-		new_role = request.POST.get('user_role')
-		role.name = new_role
-		try:
-			role.save()
-			user_trail(request.user.name, 'updated user role from: '+ str(role.name) + ' to: '+str(new_role),'update')
-			return HttpResponse('success')
-		except:
-			HttpResponse('error')
+		new_bank = request.POST.get('bank')
+		bank.name = new_bank
+		bank.save()
+		user_trail(request.user.name, 'updated bank from: '+ str(bank.name) + ' to: '+str(new_bank),'update')
+		return HttpResponse('success')

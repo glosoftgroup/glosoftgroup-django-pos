@@ -30,24 +30,14 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-def hr_defaults(request):
+def add_department(request):
+	department = request.POST.get('department')
+	new_department = Department(name=department)
 	try:
-		user_roles = UserRole.objects.all()
-		departments = Department.objects.all()
-		banks = Bank.objects.all()
-		data = {"user_roles":user_roles, "departments":departments, "banks":banks}
-		return TemplateResponse(request, 'dashboard/sites/hr/hr.html', data)
-	except ObjectDoesNotExist as e:
-		return HttpResponse(e)
-
-def add_role(request):
-	role = request.POST.get('user_role')
-	new_role = UserRole(name=role)
-	try:
-		new_role.save()
-		user_roles = UserRole.objects.all()
-		data = {"user_roles": user_roles}
-		return TemplateResponse(request, 'dashboard/sites/hr/roles.html', data)
+		new_department.save()
+		departments =Department.objects.all()
+		data = {"departments": departments}
+		return TemplateResponse(request, 'dashboard/sites/hr/department.html', data)
 	except IntegrityError as e:
 		error_logger.error(e)
 		return HttpResponse('error')
@@ -55,21 +45,18 @@ def add_role(request):
 		error_logger.error(e)
 		return HttpResponse('error')
 
-def role_delete(request, pk):
-	role = get_object_or_404(UserRole, pk=pk)
+def department_delete(request, pk):
+	department = get_object_or_404(Department, pk=pk)
 	if request.method == 'POST':
-		role.delete()
-		user_trail(request.user.name, 'deleted user role: '+ str(role.name),'delete')
+		department.delete()
+		user_trail(request.user.name, 'deleted department: '+ str(department.name),'delete')
 		return HttpResponse('success')
 
-def role_edit(request, pk):
-	role = get_object_or_404(UserRole, pk=pk)
+def department_edit(request, pk):
+	department = get_object_or_404(Department, pk=pk)
 	if request.method == 'POST':
-		new_role = request.POST.get('user_role')
-		role.name = new_role
-		try:
-			role.save()
-			user_trail(request.user.name, 'updated user role from: '+ str(role.name) + ' to: '+str(new_role),'update')
-			return HttpResponse('success')
-		except:
-			HttpResponse('error')
+		new_department = request.POST.get('department')
+		department.name = new_department
+		department.save()
+		user_trail(request.user.name, 'updated user role from: '+ str(department.name) + ' to: '+str(new_department),'update')
+		return HttpResponse('success')
