@@ -10,6 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import pgettext_lazy
 from django_countries.fields import Country, CountryField
 from ..search import index
+from ..site.models import Bank, BankBranch, UserRole, Department
 
 
 class AddressManager(models.Manager):
@@ -160,3 +161,45 @@ class UserTrail(models.Model):
 	now = models.DateTimeField(default=timezone.now)
 	date = models.DateField(default=date.today)
 	crud = models.CharField(max_length=100, null=True, blank=True)
+
+class Staff(models.Model):
+	name = models.CharField(max_length=100, null=True, blank=True)
+	gender = models.CharField(max_length=100, null=True, blank=True)
+	dob = models.CharField(max_length=100, null=True, blank=True)
+	national_id = models.CharField(max_length=100, null=True, blank=True)
+	mobile = models.CharField(max_length=100, null=True, blank=True)
+	date_recorded = models.DateTimeField(pgettext_lazy('User field', 'date joined'),
+		default=timezone.now, editable=False)
+	date_joined = models.CharField(max_length=100, null=True, blank=True)
+	work_type = models.CharField(max_length=100, null=True, blank=True)
+	role = models.ForeignKey(
+        UserRole, related_name='role',max_length=100, null=True, blank=True)
+	work_experience = models.CharField(max_length=100, null=True, blank=True)
+	specialization = models.CharField(max_length=100, null=True, blank=True)
+	department = models.ForeignKey(
+        Department, related_name='department',max_length=100, null=True, blank=True)
+	religion = models.CharField(max_length=100, null=True, blank=True)
+	image = models.ImageField(upload_to='staff', default='staff/user.png')
+	email = models.EmailField(pgettext_lazy('User field', 'email'), unique=True)
+	marital_status = models.CharField(max_length=100, null=True, blank=True)
+
+	#other details
+	last_workplace = models.CharField(max_length=100, null=True, blank=True)
+	last_workplace_designation = models.CharField(max_length=100, null=True, blank=True)
+	qualification = models.CharField(max_length=100, null=True, blank=True)
+	year_of_passing = models.CharField(max_length=100, null=True, blank=True)
+
+	#address details
+	town = models.CharField(max_length=100, null=True, blank=True)
+	county = models.CharField(max_length=100, null=True, blank=True)
+	subcounty = models.CharField(max_length=100, null=True, blank=True)
+	country = models.CharField(max_length=100, null=True, blank=True)
+	#statutory details
+	pin = models.CharField(max_length=100, null=True, blank=True)
+	bank_account = models.CharField(max_length=100, null=True, blank=True)
+	bank_name = models.ForeignKey(
+        Bank, related_name='bank',max_length=100, null=True, blank=True)
+	bank_branch = models.ForeignKey(
+        BankBranch, related_name='bankbranch',max_length=100, null=True, blank=True)
+	driving_license_no = models.CharField(max_length=100, null=True, blank=True)
+

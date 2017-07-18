@@ -57,24 +57,14 @@ def user_process(request):
 		email = request.POST.get('email')
 		# password = request.POST.get('password')
 		# encr_password = make_password(password)
-		code = request.POST.get('code')
-		fax = request.POST.get('fax')
-		city = request.POST.get('city')
-		website = request.POST.get('website')
-		street1 = request.POST.get('street1')
-		street2 = request.POST.get('street2')
+
 		mobile = request.POST.get('mobile')
 		image= request.FILES.get('image')
 		groups = request.POST.getlist('groups[]')
 		new_user = Customer.objects.create(
 			name = name,
 			email = email,			
-			code = code,
-			fax = fax,
-			city = city,
-			website = website,
-			street1 = street1,
-			street2 = street2,
+
 			mobile = mobile,
 			image = image
 		)

@@ -8,8 +8,8 @@
   Sms
 {% endblock %}
  {% block breadcrumbs %}
-     <li><a href="{% url 'dashboard:list-messages' %}">List Messages</a></li>
-     <li class="active"><a href="'{% url 'dashboard:compose' %}">Compose Sms</a></li>
+     <li><a href="{% url 'dashboard:list-messages' %}">staff</a></li>
+     <li class="active"><a href="'{% url 'dashboard:compose' %}">add staff</a></li>
  {% endblock %}
 {% block menu_user_class %}active{% endblock %}
  {% block custom_css %}
@@ -25,7 +25,7 @@
 <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
-        <h6 class="panel-title">Send SMS</h6>
+        <h6 class="panel-title">Add Staff</h6>
         <div class="heading-elements">
           <ul class="icons-list">
             <li><a data-action="collapse"></a></li>
@@ -40,8 +40,6 @@
           <ul class="nav nav-tabs nav-tabs-highlight">
             <li class="active" id="supplier-tab"><a href="#supplier" data-toggle="tab" class="legitRipple" aria-expanded="false">Supplier</a></li>
             <li class="" id="customer-tab"><a href="#customer" data-toggle="tab" class="legitRipple" aria-expanded="true">Customer</a></li>
-            <li class="" id="staff-tab"><a href="#staff" data-toggle="tab" class="legitRipple" aria-expanded="true">Staff</a></li>
-
           </ul>
 
           <div class="tab-content">
@@ -154,61 +152,6 @@
                   </div>
                 </form>
            </div>
-
-          <div class="tab-pane animated fadeIn" id="staff">
-          <form class="form" enctype="multipart/form-data" id="staff-details" name="user-details">
-            {% csrf_token %}
-              <div class="row">
-                <div class="col-md-8">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="name">message type</label>
-                        <select class="bootstrap-select staff-ms-type" data-width="100%" tabindex="-98" style="display: none;">
-                            <option value="order">order supply</option>
-                            <option value="lpo">lpo</option>
-                            <option value="market">market</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                       <div class="form-group">
-                          <label for="email">staff</label>
-                          <div class="multi-select-full">
-                          <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="multiple" placeholder="select a user...">
-                          {% for usr in staff %}
-                               <option value="{{usr.id}}">
-                                 {% if usr.name %}
-                                    {{usr.name | title}}
-                                 {% else %}
-                                    {{usr.email|title}}
-                                 {% endif %}
-                               </option>
-                          {% endfor %}
-                          </select>
-                        </div>
-                       </div>
-                    </div>
-                      <div class="col-md-12">
-                          <label for="staff-message">Message</label>
-                          <textarea class="form-control" name="stmessage" id="staff-message">
-                          </textarea>
-                      </div>
-                  </div>
-
-
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12">
-                 <div class="pull-left" style="margin-top:40px;">
-                  <a href="{% url 'dashboard:list-messages' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
-                  <button class="btn btn-primary waves-effect waves-light" id="supplier-submit" type="submit">Send Sms<i class="icon-arrow-right14 position-right"></i></button>
-                 </div>
-                </div>
-              </div>
-            </form>
-            </div>
 
           </div>
         </div>
