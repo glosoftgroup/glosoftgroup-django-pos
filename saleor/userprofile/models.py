@@ -117,14 +117,14 @@ class User(PermissionsMixin, AbstractBaseUser, index.Indexed):
 		Address, blank=True,
 		verbose_name=pgettext_lazy('User field', 'addresses'))
 	is_staff = models.BooleanField(
-		pgettext_lazy('User field', 'staff status'),
+		pgettext_lazy('User field', 'employee status'),
 		default=False)
 	is_active = models.BooleanField(
 		pgettext_lazy('User field', 'active'),
 		default=True)
 	nid = models.CharField(max_length=100, null=True,blank=True)
 	mobile = models.CharField(max_length=100, null=True, blank=True)
-	image = models.ImageField(upload_to='staff', default='staff/user.png')
+	image = models.ImageField(upload_to='employee', default='employee/user.png')
 	date_joined = models.DateTimeField(
 		pgettext_lazy('User field', 'date joined'),
 		default=timezone.now, editable=False)
@@ -179,7 +179,7 @@ class Staff(models.Model):
 	department = models.ForeignKey(
         Department, related_name='department',max_length=100, null=True, blank=True)
 	religion = models.CharField(max_length=100, null=True, blank=True)
-	image = models.ImageField(upload_to='staff', default='staff/user.png')
+	image = models.ImageField(upload_to='employee', default='employee/user.png')
 	email = models.EmailField(pgettext_lazy('User field', 'email'), unique=True)
 	marital_status = models.CharField(max_length=100, null=True, blank=True)
 

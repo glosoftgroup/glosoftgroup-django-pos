@@ -61,6 +61,6 @@ def compose(request):
     data = {
         "suppliers":suppliers,
         "customers":customers,
-        "staff":staff
+        "employee":staff
     }
     return TemplateResponse(request, 'dashboard/messages/compose.html', data)

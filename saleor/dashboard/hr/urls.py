@@ -1,14 +1,14 @@
 from django.conf.urls import url
 
-from . import staff_views
+from . import employees
 
 
 urlpatterns = [
-    url(r'^$', staff_views.list_staff, name='list-staff'),
-    url(r'^detail/(?P<pk>[0-9]+)/$', staff_views.staff_detail, name='staff-detail'),
-    url(r'^compose/$', staff_views.add_staff, name='add_staff'),
-    url(r'^edit/(?P<pk>[0-9]+)/$', staff_views.staff_edit,
-        name='staff-edit'),
+    url(r'^$', employees.employees, name='employees'),
+    url(r'^detail/(?P<pk>[0-9]+)/$', employees.detail, name='employee-detail'),
+    url(r'^compose/$', employees.add, name='add_employee'),
+    url(r'^edit/(?P<pk>[0-9]+)/$', employees.edit,
+        name='employee-edit'),
     url(r'^delete/(?P<pk>[0-9]+)/$',
-        staff_views.staff_delete, name='staff-delete'),
+        employees.delete, name='employee-delete'),
 ]

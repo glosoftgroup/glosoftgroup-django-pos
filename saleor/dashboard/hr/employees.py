@@ -41,32 +41,35 @@ from ...sale.models import Sales, SoldItem, Terminal
 from ...product.models import Product, ProductVariant, Category
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, convert_html_to_pdf
+from ...site.models import UserRole, Department, BankBranch, Bank
 
 
-def list_staff(request):
+def employees(request):
     users = User.objects.all()
     data = {
         "users":users
     }
-    return TemplateResponse(request, 'dashboard/hr/staff/list.html',{})
+    return TemplateResponse(request, 'dashboard/hr/employee/list.html',{})
 
-def staff_detail(request):
+def detail(request):
     status = 'read'
-    return TemplateResponse(request, 'dashboard/hr/staff/staff.html', {})
+    return TemplateResponse(request, 'dashboard/hr/employee/employee.html', {})
 
-def add_staff(request):
-    suppliers = Supplier.objects.all()
-    customers = Customer.objects.all()
-    staff = User.objects.all()
+def add(request):
+    departments = Department.objects.all()
+    roles = UserRole.objects.all()
+    banks = Bank.objects.all()
+    branches = BankBranch.objects.all()
     data = {
-        "suppliers":suppliers,
-        "customers":customers,
-        "staff":staff
+        "roles":roles,
+        "departments":departments,
+        "banks":banks,
+        "branches":branches
     }
-    return TemplateResponse(request, 'dashboard/hr/staff/add_staff.html', data)
+    return TemplateResponse(request, 'dashboard/hr/employee/add_employee.html', data)
 
-def staff_edit(request, pk=None):
-    return TemplateResponse(request, 'dashboard/hr/staff/edit_staff.html', {})
+def edit(request, pk=None):
+    return TemplateResponse(request, 'dashboard/hr/employee/edit_employee.html', {})
 
-def staff_delete(request, pk=None):
-    return TemplateResponse(request, 'dashboard/hr/staff/delete_staff.html', {})
+def delete(request, pk=None):
+    return TemplateResponse(request, 'dashboard/hr/employee/delete_employee.html', {})
