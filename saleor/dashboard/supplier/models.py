@@ -32,5 +32,5 @@ class Staff(models.Model):
     mobile = models.CharField(max_length=100, null=True, blank=True)
     # group = models.OneToOneField(Group, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
-    image = models.FileField(upload_to='staff')
+    image = models.FileField(upload_to='employee')
 

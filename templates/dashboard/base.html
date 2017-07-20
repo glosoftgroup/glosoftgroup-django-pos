@@ -158,6 +158,31 @@
                   </ul>
                 </li>
                   {% endif %}
+                  {% if perms.userprofile.view_user %}
+                <li>
+                  <a href="javascript:;">
+                    <i class="icon-height"></i>
+                    <span>Human Resource</span>
+                  </a>
+                  <ul>
+                    {% if perms.userprofile.view_user %}
+                    <li class="{% block menu_hremployees_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:employees' %}"><i class='icon-users2'></i>Manage Employees</a>
+                    </li>
+                    {% endif %}
+                    {% if perms.auth.view_group %}
+                    <li class="{% block menu_hrattendance_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:groups' %}"><i class='icon-users4'></i>Manage Attendance</a>
+                    </li>
+                    {% endif %}
+                    {% if perms.userprofile.view_usertrail %}
+                      <li class="{% block menu_hrleaves_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:user_trail' %}"><i class='icon-history'></i>Manage Leaves</a>
+                    </li>
+                    {% endif  %}
+                  </ul>
+                </li>
+                  {% endif %}
                 {% if perms.product.view_product %}
                 <li id="first">
                   <a href="{% url 'dashboard:product-list' %}"><i class="icon-stack"></i> <span>

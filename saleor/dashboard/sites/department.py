@@ -32,18 +32,32 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def add_department(request):
 	department = request.POST.get('department')
+	option = request.POST.get('option')
 	new_department = Department(name=department)
-	try:
-		new_department.save()
-		departments =Department.objects.all()
-		data = {"departments": departments}
-		return TemplateResponse(request, 'dashboard/sites/hr/department.html', data)
-	except IntegrityError as e:
-		error_logger.error(e)
-		return HttpResponse('error')
-	except ValidationError as e:
-		error_logger.error(e)
-		return HttpResponse('error')
+	if option:
+		try:
+			new_department.save()
+			departments = Department.objects.all()
+			data = {"departments": departments}
+			return TemplateResponse(request, 'dashboard/sites/hr/select_role.html', data)
+		except IntegrityError as e:
+			error_logger.error(e)
+			return HttpResponse('error')
+		except ValidationError as e:
+			error_logger.error(e)
+			return HttpResponse('error')
+	else:
+		try:
+			new_department.save()
+			departments =Department.objects.all()
+			data = {"departments": departments}
+			return TemplateResponse(request, 'dashboard/sites/hr/department.html', data)
+		except IntegrityError as e:
+			error_logger.error(e)
+			return HttpResponse('error')
+		except ValidationError as e:
+			error_logger.error(e)
+			return HttpResponse('error')
 
 def department_delete(request, pk):
 	department = get_object_or_404(Department, pk=pk)
