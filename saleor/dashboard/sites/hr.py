@@ -35,25 +35,41 @@ def hr_defaults(request):
 		user_roles = UserRole.objects.all()
 		departments = Department.objects.all()
 		banks = Bank.objects.all()
-		data = {"user_roles":user_roles, "departments":departments, "banks":banks}
+		branches = BankBranch.objects.all()
+		data = {"user_roles":user_roles, "departments":departments, "banks":banks, "branches": branches}
 		return TemplateResponse(request, 'dashboard/sites/hr/hr.html', data)
 	except ObjectDoesNotExist as e:
 		return HttpResponse(e)
 
 def add_role(request):
 	role = request.POST.get('user_role')
+	option = request.POST.get('option')
 	new_role = UserRole(name=role)
-	try:
-		new_role.save()
-		user_roles = UserRole.objects.all()
-		data = {"user_roles": user_roles}
-		return TemplateResponse(request, 'dashboard/sites/hr/roles.html', data)
-	except IntegrityError as e:
-		error_logger.error(e)
-		return HttpResponse('error')
-	except ValidationError as e:
-		error_logger.error(e)
-		return HttpResponse('error')
+
+	if option:
+		try:
+			new_role.save()
+			roles = UserRole.objects.all()
+			data = {"roles": roles}
+			return TemplateResponse(request, 'dashboard/sites/hr/select_role.html', data)
+		except IntegrityError as e:
+			error_logger.error(e)
+			return HttpResponse('error')
+		except ValidationError as e:
+			error_logger.error(e)
+			return HttpResponse('error')
+	else:
+		try:
+			new_role.save()
+			user_roles = UserRole.objects.all()
+			data = {"user_roles": user_roles}
+			return TemplateResponse(request, 'dashboard/sites/hr/roles.html', data)
+		except IntegrityError as e:
+			error_logger.error(e)
+			return HttpResponse('error')
+		except ValidationError as e:
+			error_logger.error(e)
+			return HttpResponse('error')
 
 def role_delete(request, pk):
 	role = get_object_or_404(UserRole, pk=pk)

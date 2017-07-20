@@ -34,7 +34,7 @@ import base64
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
-from ...userprofile.models import User
+from ...userprofile.models import User, Staff
 from ...supplier.models import Supplier
 from ...customer.models import Customer
 from ...sale.models import Sales, SoldItem, Terminal
@@ -43,13 +43,17 @@ from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, convert_html_to_pdf
 from ...site.models import UserRole, Department, BankBranch, Bank
 
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
+
 
 def employees(request):
-    users = User.objects.all()
+    staff = Staff.objects.all()
     data = {
-        "users":users
+        "users":staff
     }
-    return TemplateResponse(request, 'dashboard/hr/employee/list.html',{})
+    return TemplateResponse(request, 'dashboard/hr/employee/list.html',data)
 
 def detail(request):
     status = 'read'
@@ -67,6 +71,51 @@ def add(request):
         "branches":branches
     }
     return TemplateResponse(request, 'dashboard/hr/employee/add_employee.html', data)
+
+def add_process(request):
+    name = request.POST.get('name')
+    gender = request.POST.get('gender')
+    dob = request.POST.get('dob')
+    email = request.POST.get('email')
+    nid = request.POST.get('nid')
+    doj = request.POST.get('doj')
+    mobile = request.POST.get('phone')
+    work_time = request.POST.get('work_time')
+    role = request.POST.get('role')
+    department = request.POST.get('department')
+    account = request.POST.get('account')
+    bank = request.POST.get('bank')
+    branch = request.POST.get('branch')
+    krapin = request.POST.get('krapin')
+    nhif = request.POST.get('nhif')
+    nssf = request.POST.get('nssf')
+    location = request.POST.get('location')
+    religion = request.POST.get('religion')
+    marital_status = request.POST.get('marital_status')
+    image = request.FILES.get('image')
+    if image:
+        new_staff = Staff( name=name, email=email, gender=gender,
+                      dob=dob, date_joined=doj, mobile=mobile,
+                      national_id=nid, work_time=work_time, role=role,
+                      department=department, image=image, account=account,
+                      bank_name=bank, bank_branch=branch, pin=krapin,
+                      nssf=nssf, nhif=nhif, location=location,
+                      religion=religion, marital_status=marital_status)
+    else:
+        new_staff = Staff(name=name, email=email, gender=gender,
+                         dob=dob, date_joined=doj, mobile=mobile,
+                         national_id=nid, work_time=work_time, role=role,
+                         department=department, account=account,
+                         bank_name=bank, bank_branch=branch, pin=krapin,
+                         nssf=nssf, nhif=nhif, location=location,
+                         religion=religion, marital_status=marital_status)
+    try:
+        new_staff.save()
+        return HttpResponse('success')
+    except Exception as e:
+        error_logger.info('Error when saving ')
+        error_logger.error('Error when saving ')
+        return HttpResponse(e)
 
 def edit(request, pk=None):
     return TemplateResponse(request, 'dashboard/hr/employee/edit_employee.html', {})

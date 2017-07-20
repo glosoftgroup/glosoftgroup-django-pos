@@ -171,35 +171,20 @@ class Staff(models.Model):
 	date_recorded = models.DateTimeField(pgettext_lazy('User field', 'date joined'),
 		default=timezone.now, editable=False)
 	date_joined = models.CharField(max_length=100, null=True, blank=True)
-	work_type = models.CharField(max_length=100, null=True, blank=True)
-	role = models.ForeignKey(
-        UserRole, related_name='role',max_length=100, null=True, blank=True)
-	work_experience = models.CharField(max_length=100, null=True, blank=True)
-	specialization = models.CharField(max_length=100, null=True, blank=True)
-	department = models.ForeignKey(
-        Department, related_name='department',max_length=100, null=True, blank=True)
-	religion = models.CharField(max_length=100, null=True, blank=True)
+	work_time = models.CharField(max_length=100, null=True, blank=True)
+	role = models.CharField(max_length=100, null=True, blank=True)
+	department = models.CharField(max_length=100, null=True, blank=True)
 	image = models.ImageField(upload_to='employee', default='employee/user.png')
 	email = models.EmailField(pgettext_lazy('User field', 'email'), unique=True)
-	marital_status = models.CharField(max_length=100, null=True, blank=True)
 
-	#other details
-	last_workplace = models.CharField(max_length=100, null=True, blank=True)
-	last_workplace_designation = models.CharField(max_length=100, null=True, blank=True)
-	qualification = models.CharField(max_length=100, null=True, blank=True)
-	year_of_passing = models.CharField(max_length=100, null=True, blank=True)
-
-	#address details
-	town = models.CharField(max_length=100, null=True, blank=True)
-	county = models.CharField(max_length=100, null=True, blank=True)
-	subcounty = models.CharField(max_length=100, null=True, blank=True)
-	country = models.CharField(max_length=100, null=True, blank=True)
 	#statutory details
 	pin = models.CharField(max_length=100, null=True, blank=True)
-	bank_account = models.CharField(max_length=100, null=True, blank=True)
-	bank_name = models.ForeignKey(
-        Bank, related_name='bank',max_length=100, null=True, blank=True)
-	bank_branch = models.ForeignKey(
-        BankBranch, related_name='bankbranch',max_length=100, null=True, blank=True)
-	driving_license_no = models.CharField(max_length=100, null=True, blank=True)
+	account = models.CharField(max_length=100, null=True, blank=True)
+	bank_name = models.CharField(max_length=100, null=True, blank=True)
+	bank_branch = models.CharField(max_length=100, null=True, blank=True)
+	nhif = models.CharField(max_length=100, null=True, blank=True)
+	nssf = models.CharField(max_length=100, null=True, blank=True)
+	marital_status = models.CharField(max_length=100, null=True, blank=True)
+	religion = models.CharField(max_length=100, null=True, blank=True)
+	location = models.CharField(max_length=100, null=True, blank=True)
 

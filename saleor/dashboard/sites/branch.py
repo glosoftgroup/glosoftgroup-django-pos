@@ -30,16 +30,16 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-def add_bank(request):
-	bank = request.POST.get('bank')
+def add_branch(request):
+	branch = request.POST.get('branch')
 	option = request.POST.get('option')
-	new_bank = Bank(name=bank)
+	new_branch = BankBranch(name=branch)
 
 	if option:
 		try:
-			new_bank.save()
-			banks = Bank.objects.all()
-			data = {"banks": banks}
+			new_branch.save()
+			branches = BankBranch.objects.all()
+			data = {"branches": branches}
 			return TemplateResponse(request, 'dashboard/sites/hr/select_role.html', data)
 		except IntegrityError as e:
 			error_logger.error(e)
@@ -49,10 +49,10 @@ def add_bank(request):
 			return HttpResponse('error')
 	else:
 		try:
-			new_bank.save()
-			banks = Bank.objects.all()
-			data = {"banks": banks}
-			return TemplateResponse(request, 'dashboard/sites/hr/bank.html', data)
+			new_branch.save()
+			branches = BankBranch.objects.all()
+			data = {"branches": branches}
+			return TemplateResponse(request, 'dashboard/sites/hr/branch.html', data)
 		except IntegrityError as e:
 			error_logger.error(e)
 			return HttpResponse('error')
@@ -60,18 +60,18 @@ def add_bank(request):
 			error_logger.error(e)
 			return HttpResponse('error')
 
-def bank_delete(request, pk):
-	bank = get_object_or_404(Bank, pk=pk)
+def branch_delete(request, pk):
+	branch = get_object_or_404(BankBranch, pk=pk)
 	if request.method == 'POST':
-		bank.delete()
-		user_trail(request.user.name, 'deleted bank role: '+ str(bank.name),'delete')
+		branch.delete()
+		user_trail(request.user.name, 'deleted branch role: '+ str(branch.name),'delete')
 		return HttpResponse('success')
 
-def bank_edit(request, pk):
-	bank = get_object_or_404(Bank, pk=pk)
+def branch_edit(request, pk):
+	branch = get_object_or_404(BankBranch, pk=pk)
 	if request.method == 'POST':
-		new_bank = request.POST.get('bank')
-		bank.name = new_bank
-		bank.save()
-		user_trail(request.user.name, 'updated bank from: '+ str(bank.name) + ' to: '+str(new_bank),'update')
+		new_branch = request.POST.get('branch')
+		branch.name = new_branch
+		branch.save()
+		user_trail(request.user.name, 'updated branch from: '+ str(branch.name) + ' to: '+str(new_branch),'update')
 		return HttpResponse('success')

@@ -1,0 +1,83 @@
+{% load staticfiles i18n %}
+{% if roles %}
+    <div class="btn-group bootstrap-select input-group-btn" id="roles" style="width: 100%;">
+        <select class="ajax role sel required" id="roleSelect" name="role" data-width="100%"
+                tabindex="-98" style="display: none;">
+            <option value="">Choose...</option>
+              {% if roles %}
+                {% for role in roles %}
+                  <option value="{{role.id}}">{{role}}</option>
+                {% endfor %}
+              {% else %}
+                <option value="none">No roles</option>
+              {% endif %}
+             <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance"
+                     data-title="Add New Role" data-select="#roles"
+                     data-href="{% url 'dashboard:add_role' %}" data-cat="user_role" data-label="Role:">
+                 add new role</option>
+        </select>
+    </div>
+{% elif departments %}
+
+<div class="btn-group bootstrap-select input-group-btn" id="departments"style="width: 100%;">
+    <select class="ajax bootstrap-select sel department" data-width="100%" tabindex="-98"
+            style="display: none;">
+          {% if departments %}
+          {% for department in departments %}
+            <option value="{{department.id}}">{{department}}</option>
+          {% endfor %}
+          {% else %}
+          <option value="none">No departments</option>
+          {% endif %}
+         <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance"
+                 data-title="Add New Department" data-select="#departments"
+                data-href="{% url 'dashboard:add_department' %}" data-cat="department"
+                 data-label="Department:"> add new department</option>
+    </select>
+</div>
+{% elif banks %}
+<div class="btn-group bootstrap-select input-group-btn" id="banks" style="width: 100%;">
+    <select class="ajax bootstrap-select sel bank" data-width="100%" tabindex="-98" style="display: none;">
+          {% if banks %}
+          {% for bank in banks %}
+            <option value="{{bank.id}}">{{bank}}</option>
+          {% endfor %}
+          {% else %}
+          <option value="none">No banks</option>
+          {% endif %}
+         <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance"
+                 data-title="Add New Bank" data-select="#banks"
+                 data-href="{% url 'dashboard:add_bank' %}" data-cat="bank" data-label="Bank:">
+             add new bank</option>
+    </select>
+</div>
+{% elif branches %}
+<div class="btn-group bootstrap-select input-group-btn" id="branches" style="width: 100%;">
+    <select class="ajax bootstrap-select sel branch" data-width="100%" tabindex="-98" style="display: none;">
+          {% if branches %}
+          {% for branch in branches %}
+            <option value="{{branch.id}}">{{ branch}}</option>
+          {% endfor %}
+          {% else %}
+          <option value="none">No branches</option>
+          {% endif %}
+          <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Branch" data-select="#branches"
+                data-href="{% url 'dashboard:add_branch' %}" data-cat="branch" data-label="Branch:"> add new branch</option>
+    </select>
+</div>
+{% else %}
+<div class="alert alert-danger">
+    <span>Error loading data</span>
+</div>
+{% endif %}
+
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script>
+$(document).ready(function(){
+    //** general select
+    $('.ajax').selectpicker({
+        iconBase: 'fa',
+        addIcon:'fa-plus-circle'
+    });
+});
+</script>

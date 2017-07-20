@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . import views, hr, bank, department
+from . import views, hr, bank, department, branch
 
 urlpatterns = [
     url(r'^$', views.index, name='site-index'),
@@ -19,4 +19,8 @@ urlpatterns = [
     url(r'^bank/$', bank.add_bank, name='add_bank'),
     url(r'^bedit/(?P<pk>[0-9]+)/$', bank.bank_edit, name='bank-edit'),
     url(r'^bdelete/(?P<pk>[0-9]+)/$', bank.bank_delete, name='bank-delete'),
+
+    url(r'^branch/$', branch.add_branch, name='add_branch'),
+    url(r'^bredit/(?P<pk>[0-9]+)/$', branch.branch_edit, name='branch-edit'),
+    url(r'^brdelete/(?P<pk>[0-9]+)/$', branch.branch_delete, name='branch-delete'),
 ]

@@ -138,7 +138,7 @@
                     </td>
                     <!-- role -->
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
-                    {% if user.is_superuser == True %}admin{% else %} staff {% endif %}</td>
+                    {{ user.role }}</td>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <!-- actions -->
                     <td class="text-center">
