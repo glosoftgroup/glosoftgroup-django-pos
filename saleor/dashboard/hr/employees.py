@@ -53,6 +53,8 @@ def employees(request):
     data = {
         "users":staff
     }
+    user_trail(request.user.name, 'accessed employees', 'views')
+    info_logger.info('User: ' + str(request.user.name) + 'accessed employee page')
     return TemplateResponse(request, 'dashboard/hr/employee/list.html',data)
 
 def detail(request):
@@ -70,6 +72,8 @@ def add(request):
         "banks":banks,
         "branches":branches
     }
+    user_trail(request.user.name, 'viewed add employee page', 'view')
+    info_logger.info('User: ' + str(request.user.name) + 'viewed add employee page')
     return TemplateResponse(request, 'dashboard/hr/employee/add_employee.html', data)
 
 def add_process(request):
@@ -111,6 +115,8 @@ def add_process(request):
                          religion=religion, marital_status=marital_status)
     try:
         new_staff.save()
+        user_trail(request.user.name, 'created employee : ' + str(name), 'add')
+        info_logger.info('User: ' + str(request.user.name) + 'created employee:' + str(ame))
         return HttpResponse('success')
     except Exception as e:
         error_logger.info('Error when saving ')

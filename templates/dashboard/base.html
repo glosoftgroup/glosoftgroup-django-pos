@@ -311,6 +311,19 @@
                   </ul>
                 </li>
                   {% endif %}
+                   {% if perms.sale.view_sale %}
+                <li><a href="#"><i class="icon-coins"></i> <span>Accounting</span></a>
+                  <ul>
+                    <li class="{% block menu_expenses_class %}{% endblock %}">
+                    <a href="{% url 'accounts:expenses' %}">
+                    <i class="icon-price-tags"></i>Expenses
+                    </a>
+                    </li>
+
+                    </ul>
+                </li>
+                  {% endif %}
+
                   {% if perms.reports.view_sale_reports or perms.reports.view_products_reports or perms.reports.view_purchase_reports or perms.reports.view_balancesheet %}
                 <li>
                   <a href="javascript:;">

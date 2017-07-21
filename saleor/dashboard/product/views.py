@@ -39,6 +39,8 @@ error_logger = logging.getLogger('error_logger')
 def re_order(request):
 	low_stock = get_low_stock_products()
 	ctx = {"low_stock":low_stock}
+	user_trail(request.user.name, 'accessed reorder page', 'view')
+	info_logger.info('User: '+str(request.user.name)+' accessed reorder page')
 	return TemplateResponse(request, 'dashboard/re_order/re_order.html', ctx)    
 
 import json
@@ -77,6 +79,8 @@ def add_reorder_stock(request,pk=None):
 		#return HttpResponse(variant_id)
 		variant = ProductVariant.objects.get(pk=int(variant_id))
 		ctx = {"variant":variant}
+		user_trail(request.user.name, 'added reorder level', 'add')
+		info_logger.info('User: ' + str(request.user.name) + ' added reorder level')
 		return TemplateResponse(request, 'dashboard/re_order/_order.html', ctx)    
 
 
@@ -212,6 +216,8 @@ def product_list(request):
 	products = get_paginator_items(products, 30, request.GET.get('page'))
 	ctx = {'form': form, 'products': products,
 		   'product_classes': product_classes}
+	user_trail(request.user.name, 'accessed the products page', 'view')
+	info_logger.info('User: '+str(request.user.name)+' accessed the products page')
 	return TemplateResponse(request, 'dashboard/product/list.html', ctx)
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 @staff_member_required

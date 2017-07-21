@@ -195,7 +195,6 @@ def group_assign_permission(request):
 					error_logger.error(e)
 					return HttpResponse('custom is - '+str(e))
 
-@staff_member_required
 def refine_users_permissions(users_in_group, permission_list):
 	for user in users_in_group:
 		user_has_permissions = Permission.objects.filter(user=user)
@@ -213,7 +212,6 @@ def refine_users_permissions(users_in_group, permission_list):
 			user.user_permissions.add(*not_in_user_permissions)
 			user.save()
 
-@staff_member_required
 def users_loop(status, users):
 	for user in users:
 		user.is_staff = status

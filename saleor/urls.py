@@ -7,6 +7,7 @@ from django.contrib.staticfiles.views import serve
 from django.views.i18n import javascript_catalog
 from graphene_django.views import GraphQLView
 
+from .accounts.urls import urlpatterns as accounts_urls
 from .api.cash.urls import urlpatterns as api_cash_urls
 from .api.payment.urls import urlpatterns as api_payment_urls
 from .api.product.urls import urlpatterns as api_urls
@@ -30,7 +31,7 @@ from . import decorators
 urlpatterns = [    
 	url(r'^', include(core_urls)),    
 	url(r'^account/', include(registration_urls)),
-
+	url(r'^accounts/', include(accounts_urls, namespace='accounts')),
 	url(r'^api/cash/', include(api_cash_urls, namespace='cash-api')),
 	url(r'^api/products/', include(api_urls, namespace='product-api')),
 	url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),
