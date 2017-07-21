@@ -417,7 +417,13 @@ $(document).ready(function(){
              $('.edit_class').attr('name', cat)
              $(modal).modal();
              $('.delete_form').attr('action',url);
-             //alert(url);
+
+             var form = $("#editform"), validator = form.validate();
+             validator.resetForm();
+             form.find(".error").removeClass("error");
+
+             $("#editform input[name='" + cat + "']").rules("add", {required:true});
+
        }
 
     });
@@ -517,15 +523,16 @@ $(document).ready(function(){
 
          $('.eitem-url').val(url);
          $('.eitem-select').val(select);
-
          $('.modal-title').html(prompt_text);
-
          $('.edit_class').attr('name', cat)
-
          $(modal).modal();
          $('.delete_form').attr('action',url);
-      });
 
+         var form = $("#editform"), validator = form.validate();
+         validator.resetForm();
+         form.find(".error").removeClass("error");
+         $("#editform input[name='" + cat + "']").rules("add", {required:true});
+      });
   $('#editform').validate({
     onkeyup: function(element) {$(element).valid()},
     rules:{

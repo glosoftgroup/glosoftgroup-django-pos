@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . import employees
+from . import employees, attendance
 
 
 urlpatterns = [
@@ -12,4 +12,9 @@ urlpatterns = [
         name='employee-edit'),
     url(r'^delete/(?P<pk>[0-9]+)/$',
         employees.delete, name='employee-delete'),
+
+    url(r'^attendance/$', attendance.attendance, name='attendance'),
+    url(r'^a/detail/(?P<pk>[0-9]+)/$', attendance.detail, name='attendance-detail'),
+    url(r'^fill/$', attendance.add, name='add_attendance'),
+    url(r'^a/process/$', attendance.add_process, name='add_attendance_process'),
 ]

@@ -188,3 +188,10 @@ class Staff(models.Model):
 	religion = models.CharField(max_length=100, null=True, blank=True)
 	location = models.CharField(max_length=100, null=True, blank=True)
 
+class Attendance(models.Model):
+	name = models.CharField(max_length=100, null=True, blank=True)
+	time_in = models.CharField(max_length=100, null=True, blank=True)
+	time_out = models.CharField(max_length=100, null=True, blank=True)
+	date = models.CharField(max_length=100, null=True, blank=True)
+	department = models.CharField(max_length=100, null=True, blank=True)
+

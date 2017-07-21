@@ -172,7 +172,7 @@
                     {% endif %}
                     {% if perms.auth.view_group %}
                     <li class="{% block menu_hrattendance_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:groups' %}"><i class='icon-users4'></i>Manage Attendance</a>
+                      <a href="{% url 'dashboard:attendance' %}"><i class='icon-users4'></i>Manage Attendance</a>
                     </li>
                     {% endif %}
                     {% if perms.userprofile.view_usertrail %}
