@@ -28,8 +28,8 @@ error_logger = logging.getLogger('error_logger')
 def users(request):
 	try:
 		users = Customer.objects.all().order_by('-id')
-		#user_trail(request.user.name, 'accessed users list page')
-		#info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
+		user_trail(request.user.name, 'accessed customers page', 'view')
+		info_logger.info('User: ' + str(request.user.name) + 'view customers')
 		return TemplateResponse(request, 'dashboard/customer/users.html', {'users':users})
 	except TypeError as e:
 		error_logger.error(e)
@@ -39,10 +39,8 @@ def users(request):
 @permission_decorator('userprofile.add_user')
 def user_add(request):
 	try:
-		# permissions = Permission.objects.all()
-		# groups = Group.objects.all()
-		# user_trail(request.user.name, 'accessed add customer page')
-		# info_logger.info('User: '+str(request.user.name)+' accessed user create page')
+		user_trail(request.user.name, 'accessed add customer page', 'view')
+		info_logger.info('User: ' + str(request.user.name) + 'accessed add customer page')
 		return TemplateResponse(request, 'dashboard/customer/add_user.html',{'permissions':"permissions", 'groups':"groups"})
 	except TypeError as e:
 		error_logger.error(e)
@@ -79,26 +77,27 @@ def user_process(request):
 			gps = Group.objects.filter(name__in=groups)
 			last_id.groups.add(*gps)
 			last_id.save()
-		user_trail(request.user.name, 'created user: '+str(name),'add')
-		info_logger.info('User: '+str(request.user.name)+' created user:'+str(name))
+		user_trail(request.user.name, 'created customer: '+str(name),'add')
+		info_logger.info('User: '+str(request.user.name)+' created customer:'+str(name))
 		return HttpResponse(last_id.id)
 
 def user_detail(request, pk):
 	user = get_object_or_404(Customer, pk=pk)
-	
+	user_trail(request.user.name, 'accessed detail page to view customer: ' + str(user.name), 'view')
+	info_logger.info('User: ' + str(request.user.name) + ' accessed detail page to view customer:' + str(user.name))
 	return TemplateResponse(request, 'dashboard/customer/detail.html', {'user':user})
 
 def user_delete(request, pk):
 	user = get_object_or_404(Customer, pk=pk)
 	if request.method == 'POST':
 		user.delete()
-		user_trail(request.user.name, 'deleted user: '+ str(user.name))
+		user_trail(request.user.name, 'deleted customer: '+ str(user.name))
 		return HttpResponse('success')
 def user_edit(request, pk):
 	user = get_object_or_404(Customer, pk=pk)		
 	ctx = {'user': user}
-	user_trail(request.user.name, 'accessed edit page for user '+ str(user.name),'update')
-	info_logger.info('User: '+str(request.user.name)+' accessed edit page for user: '+str(user.name))
+	user_trail(request.user.name, 'accessed edit page for customer '+ str(user.name),'update')
+	info_logger.info('User: '+str(request.user.name)+' accessed edit page for customer: '+str(user.name))
 	return TemplateResponse(request, 'dashboard/customer/edit_user.html', ctx)
 
 def user_update(request, pk):
@@ -116,8 +115,8 @@ def user_update(request, pk):
 			user.mobile = mobile
 			user.image = image
 			user.save()
-			user_trail(request.user.name, 'updated user: '+ str(user.name))
-			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name))
+			user_trail(request.user.name, 'updated customer: '+ str(user.name))
+			info_logger.info('User: '+str(request.user.name)+' updated customer: '+str(user.name))
 			return HttpResponse("success with image")
 		else:
 			user.name = name
@@ -125,52 +124,10 @@ def user_update(request, pk):
 			user.nid = nid
 			user.mobile = mobile
 			user.save()
-			user_trail(request.user.name, 'updated user: '+ str(user.name))
-			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name))
+			user_trail(request.user.name, 'updated customer: '+ str(user.name))
+			info_logger.info('User: '+str(request.user.name)+' updated customer: '+str(user.name))
 			return HttpResponse("success without image")
 
-@csrf_exempt
-def user_assign_permission(request):
-	if request.method == 'POST':
-		user_id = request.POST.get('user_id')
-		user = get_object_or_404(User, pk=user_id)
-		user_has_permissions = Permission.objects.filter(user=user)
-		login_status = request.POST.get('check_login')
-		permission_list = request.POST.getlist('checklist[]')
-		if login_status == 'inactive':
-			user.is_staff = False
-			user.is_active = False
-			user.user_permissions.remove(*user_has_permissions)
-			user.save()
-			user_trail(request.user.name, 'deactivated and removed all permissions for user: '+ str(user.name))
-			info_logger.info('User: '+str(request.user.name)+' deactivated and removed all permissions for user: '+str(user.name))
-			return HttpResponse('deactivated')
-		else:
-			if user_has_permissions in permission_list:
-				not_in_user_permissions = list(set(permission_list) - set(user_has_permissions))
-				user.is_staff = True
-				user.is_active = True
-				user.user_permissions.add(*not_in_user_permissions)
-				user.save()
-				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name))
-				info_logger.info('User: '+str(request.user)+' assigned permissions for user: '+str(user.name))
-				return HttpResponse('permissions added')
-			else:
-				not_in_user_permissions = list(set(permission_list) - set(user_has_permissions))
-				user.is_staff = True
-				user.is_active = True
-				user.user_permissions.remove(*user_has_permissions)
-				user.user_permissions.add(*not_in_user_permissions)
-				user.save()
-				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name))
-				info_logger.info('User: '+str(request.user.name)+' assigned permissions for user: '+str(user.name))
-				return HttpResponse('permissions updated')
-
-def user_trails(request):
-	users = UserTrail.objects.all().order_by('id')
-	user_trail(request.user.name, 'accessed user trail page')
-	info_logger.info('User: '+str(request.user.name)+' accessed the user trail page')
-	return TemplateResponse(request, 'dashboard/users/trail.html', {'users':users})
 
 
 

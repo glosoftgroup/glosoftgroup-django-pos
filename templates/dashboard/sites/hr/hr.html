@@ -9,9 +9,9 @@
 {% endblock %}
  {% block breadcrumbs %}
      <li><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
-     <li class="active"><a href="'{% url 'dashboard:hr-defaults' %}">manage defaults</a></li>
+     <li class="active"><a href="{% url 'dashboard:hr-defaults' %}">manage defaults</a></li>
  {% endblock %}
-{% block menu_hr_default_class %} active {% endblock %}}
+{% block menu_hr_default_class %} active {% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -21,6 +21,37 @@
  {% endblock %}
 
 {% block content %}
+<div class="row animated fadeIn">
+    <div class="col-md-12">
+        <div class="row">
+            <a href="{% url 'dashboard:view_bank' %}" class="col-md-4">
+                <div class="panel panel-flat bg-success-800">
+                    <div class="panel-body text-center">
+                        <i class="icon-city" style="font-size:2.1em;"></i><br>
+                        <span style="font-size:2.0em;">Bank</span>
+                    </div>
+                </div>
+            </a>
+            <a href="{% url 'dashboard:view_department' %}" class="col-md-4">
+                <div class="panel panel-flat bg-brown-600">
+                    <div class="panel-body text-center">
+                        <i class="icon-office" style="font-size:2.1em;"></i><br>
+                        <span style="font-size:2.0em;">Department</span>
+                    </div>
+                </div>
+            </a>
+            <a href="{% url 'dashboard:view_roles' %}" class="col-md-4">
+                <div class="panel panel-flat bg-warning-800">
+                    <div class="panel-body text-center">
+                        <i class="icon-paint-format" style="font-size:2.1em;"></i><br>
+                        <span style="font-size:2.0em;">User Role</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+</div>
 <div class="row animated fadeIn">
 <div class="col-md-12">
     <div class="panel panel-flat">

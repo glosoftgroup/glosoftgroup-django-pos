@@ -6,13 +6,20 @@ from django.template.response import TemplateResponse
 from django.utils.translation import pgettext_lazy
 
 from ...discount.models import Sale, Voucher
+from ...decorators import permission_decorator, user_trail
 from . import forms
+import logging
 
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 def sale_list(request):
     sales = Sale.objects.prefetch_related('products')
     ctx = {'sales': sales}
+    user_trail(request.user.name, 'accessed discount page', 'view')
+    info_logger.info('User: ' + str(request.user.name) + 'accessed discount page')
     return TemplateResponse(request, 'dashboard/discount/sale_list.html', ctx)
 
 @staff_member_required
@@ -22,6 +29,8 @@ def discount_detail(request,pk=None):
             instance = get_object_or_404(Sale, pk=pk)
             products = instance.products.all()
             ctx = {'product_results':products,'discount':instance}
+            user_trail(request.user.name, 'accessed discount detail page for '+str(instance.name), 'view')
+            info_logger.info('User: ' + str(request.user.name) + 'accessed discount detail page for '+str(instance.name))
             return TemplateResponse(request, 'dashboard/discount/discount_detail.html', ctx)
 
 @staff_member_required
@@ -38,6 +47,8 @@ def sale_edit(request, pk=None):
             'Sale (discount) message', 'Updated sale') if pk else pgettext_lazy(
                 'Sale (discount) message', 'Added sale')
         messages.success(request, msg)
+        user_trail(request.user.name, 'updated discount : ' + str(instance.name), 'update')
+        info_logger.info('User: ' + str(request.user.name) + ' updated discount:' + str(instance.name))
         return redirect('dashboard:sale-update', pk=instance.pk)
     ctx = {'sale': instance, 'form': form}
     return TemplateResponse(request, 'dashboard/discount/sale_form.html', ctx)
@@ -51,6 +62,8 @@ def sale_delete(request, pk):
         messages.success(
             request,
             pgettext_lazy('Sale (discount) message', 'Deleted sale %s') % (instance.name,))
+        user_trail(request.user.name, 'deleted discount : ' + str(instance.name), 'delete')
+        info_logger.info('User: ' + str(request.user.name) + ' deleted discount:' + str(instance.name))
         return redirect('dashboard:sale-list')
     ctx = {'sale': instance}
     return TemplateResponse(

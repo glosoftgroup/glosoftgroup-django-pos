@@ -41,8 +41,73 @@ def hr_defaults(request):
 	except ObjectDoesNotExist as e:
 		return HttpResponse(e)
 
+
+@staff_member_required
+def view_roles(request):
+	try:
+		roles = UserRole.objects.all().order_by('-id')
+		page = request.GET.get('page', 1)
+		paginator = Paginator(roles, 10)
+		try:
+			roles = paginator.page(page)
+		except PageNotAnInteger:
+			roles = paginator.page(1)
+		except InvalidPage:
+			roles = paginator.page(1)
+		except EmptyPage:
+			roles = paginator.page(paginator.num_pages)
+		user_trail(request.user.name, 'accessed the roles page','view')
+		info_logger.info('User: '+str(request.user.name)+' accessed the roles page page')
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			return TemplateResponse(request, 'dashboard/sites/hr/roles/view.html', {'roles':roles, 'totalp':paginator.num_pages})
+	except TypeError as e:
+		error_logger.error(e)
+		return HttpResponse('error accessing users')
+
+def roles_paginate(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+
+	try:
+		roles = UserRole.objects.all().order_by('-id')
+		if list_sz:
+			paginator = Paginator(roles, int(list_sz))
+			roles = paginator.page(page)
+			data = {
+				'roles':roles,
+				'pn': paginator.num_pages,
+				'sz': list_sz,
+				'gid': 0
+			}
+			return TemplateResponse(request, 'dashboard/sites/hr/roles/p2.html', data)
+		else:
+			paginator = Paginator(roles, 10)
+			if p2_sz:
+				paginator = Paginator(roles, int(p2_sz))
+			roles = paginator.page(page)
+			data = {
+				"roles": roles
+			}
+			return TemplateResponse(request, 'dashboard/sites/hr/roles/paginate.html', data)
+
+		try:
+			roles = paginator.page(page)
+		except PageNotAnInteger:
+			roles = paginator.page(1)
+		except InvalidPage:
+			roles = paginator.page(1)
+		except EmptyPage:
+			roles = paginator.page(paginator.num_pages)
+		return TemplateResponse(request, 'dashboard/sites/hr/roles/paginate.html', {"roles": roles})
+	except Exception, e:
+		return  HttpResponse()
+
 def add_role(request):
-	role = request.POST.get('user_role')
+	role = request.POST.get('role')
 	option = request.POST.get('option')
 	new_role = UserRole(name=role)
 
@@ -61,9 +126,9 @@ def add_role(request):
 	else:
 		try:
 			new_role.save()
-			user_roles = UserRole.objects.all()
-			data = {"user_roles": user_roles}
-			return TemplateResponse(request, 'dashboard/sites/hr/roles.html', data)
+			roles = UserRole.objects.all()
+			data = {"roles": roles}
+			return TemplateResponse(request, 'dashboard/sites/hr/roles/view.html', data)
 		except IntegrityError as e:
 			error_logger.error(e)
 			return HttpResponse('error')
@@ -89,3 +154,33 @@ def role_edit(request, pk):
 			return HttpResponse('success')
 		except:
 			HttpResponse('error')
+@staff_member_required
+def search(request):
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
+            roles = UserRole.objects.filter(
+                Q(name__icontains=q)).order_by('-id')
+            paginator = Paginator(roles, 10)
+            try:
+                roles = paginator.page(page)
+            except PageNotAnInteger:
+                roles = paginator.page(1)
+            except InvalidPage:
+                roles = paginator.page(1)
+            except EmptyPage:
+                roles = paginator.page(paginator.num_pages)
+            if p2_sz:
+                roles = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/sites/hr/roles/paginate.html', {'roles': roles})
+
+            return TemplateResponse(request, 'dashboard/sites/hr/roles/search.html',
+                                    {'roles':roles, 'pn': paginator.num_pages, 'sz': sz, 'q': q})

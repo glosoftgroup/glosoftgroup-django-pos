@@ -166,6 +166,7 @@ INSTALLED_APPS = [
 	'django.contrib.postgres',
 
 	# Local apps
+	'saleor.accounts',
 	'saleor.userprofile',
 	'saleor.discount',
 	'saleor.product',

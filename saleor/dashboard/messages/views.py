@@ -20,7 +20,6 @@ from django.core.exceptions import ObjectDoesNotExist
 import datetime
 from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
-import logging
 import random
 import csv
 from django.utils.encoding import smart_str
@@ -41,6 +40,11 @@ from ...sale.models import Sales, SoldItem, Terminal
 from ...product.models import Product, ProductVariant, Category
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, convert_html_to_pdf
+import logging
+
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 
 def list_messages(request):
@@ -48,10 +52,14 @@ def list_messages(request):
     data = {
         "users":users
     }
+    user_trail(request.user.name, 'accessed messages list : ', 'view')
+    info_logger.info('User: ' + str(request.user.name) + 'accessed messages list')
     return TemplateResponse(request, 'dashboard/messages/inbox/list.html',{})
 
 def message_detail(request):
     status = 'read'
+    user_trail(request.user.name, 'viewed details of a message: ', 'view')
+    info_logger.info('User: ' + str(request.user.name) + ' viewed details of a message')
     return TemplateResponse(request, 'dashboard/messages/inbox/detail.html', {})
 
 def compose(request):
@@ -63,4 +71,6 @@ def compose(request):
         "customers":customers,
         "employee":staff
     }
+    user_trail(request.user.name, 'accessed compose an sms page: ', 'view')
+    info_logger.info('User: ' + str(request.user.name) + 'accessed compose an sms page')
     return TemplateResponse(request, 'dashboard/messages/compose.html', data)

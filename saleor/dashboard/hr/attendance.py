@@ -49,11 +49,13 @@ error_logger = logging.getLogger('error_logger')
 
 
 def attendance(request):
-    staff = Staff.objects.all()
-    data = {
-        "users":staff
-    }
-    return TemplateResponse(request, 'dashboard/hr/attendance/list.html',data)
+	staff = Staff.objects.all()
+	data = {
+		"users":staff
+	}
+	user_trail(request.user.name, 'accessed attendance', 'view')
+	info_logger.info('User: ' + str(request.user.name) + ' acccess attenndance')
+	return TemplateResponse(request, 'dashboard/hr/attendance/list.html',data)
 
 def detail(request):
     status = 'read'
@@ -70,6 +72,8 @@ def add(request):
 		"banks":banks,
 		"branches":branches
 	}
+	user_trail(request.user.name, 'accessed attendance filling page', 'view')
+	info_logger.info('User: ' + str(request.user.name) + 'accessed attendance filling page')
 	return TemplateResponse(request, 'dashboard/hr/attendance/fill_attendance.html', data)
 
 def add_process(request):
@@ -81,8 +85,10 @@ def add_process(request):
     new_attendance = Attendance( name=name, time_in=time_in,
                       time_out=time_out, date=date, department=department)
     try:
-        new_attendance.save()
-        return HttpResponse('success')
+		new_attendance.save()
+		user_trail(request.user.name, 'filled in attendance', 'add')
+		info_logger.info('User: ' + str(request.user.name) + 'filled in attendance')
+		return HttpResponse('success')
     except Exception as e:
         error_logger.info('Error when saving ')
         error_logger.error('Error when saving ')

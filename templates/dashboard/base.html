@@ -180,6 +180,12 @@
                       <a href="{% url 'dashboard:user_trail' %}"><i class='icon-history'></i>Manage Leaves</a>
                     </li>
                     {% endif  %}
+                    <li class="{% block menu_hr_default_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:hr-defaults' %}">
+                        <i class=" icon-earth"></i>
+                         settings
+                    </a>
+                    </li>
                   </ul>
                 </li>
                   {% endif %}
@@ -311,6 +317,19 @@
                   </ul>
                 </li>
                   {% endif %}
+                   {% if perms.sale.view_sale %}
+                <li><a href="#"><i class="icon-coins"></i> <span>Accounting</span></a>
+                  <ul>
+                    <li class="{% block menu_expenses_class %}{% endblock %}">
+                    <a href="{% url 'accounts:expenses' %}">
+                    <i class="icon-price-tags"></i>Expenses
+                    </a>
+                    </li>
+
+                    </ul>
+                </li>
+                  {% endif %}
+
                   {% if perms.reports.view_sale_reports or perms.reports.view_products_reports or perms.reports.view_purchase_reports or perms.reports.view_balancesheet %}
                 <li>
                   <a href="javascript:;">
@@ -361,12 +380,6 @@
                     <a href="{% url 'dashboard:site-index' %}">
                         <i class=" icon-earth"></i>
                          {% trans "Site settings" context "Dashboard site settings" %}
-                    </a>
-                    </li>
-                       <li class="{% block menu_hr_default_class %}{% endblock %}">
-                    <a href="{% url 'dashboard:hr-defaults' %}">
-                        <i class=" icon-earth"></i>
-                         hr defaults
                     </a>
                     </li>
                   </ul>

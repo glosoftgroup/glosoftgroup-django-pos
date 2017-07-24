@@ -51,14 +51,16 @@ class AuthorizationKey(models.Model):
     def key_and_secret(self):
         return self.key, self.password
 
-class BankBranch(models.Model):
+
+class Bank(models.Model):
 	name = models.CharField(max_length=100, null=True, blank=True)
 
 	def __str__(self):
 		return str(self.name)
 
-class Bank(models.Model):
+class BankBranch(models.Model):
 	name = models.CharField(max_length=100, null=True, blank=True)
+	bank =  models.ForeignKey(Bank, related_name='branch', max_length=100, null=True, blank=True)
 
 	def __str__(self):
 		return str(self.name)
