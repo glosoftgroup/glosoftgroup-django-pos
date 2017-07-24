@@ -66,12 +66,12 @@
                   <select class="bootstrap-select group-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
                   {% if groups %}
                   {% for group in groups %}
-                       <option value="{{group.id}}">
+                       <option value="{{group.name}}">
                             {{group.name}}
                        </option>
                   {% endfor %}
                   {% else %}
-                   <option value="none" data-icon="fa-dot-circle-o">No groups</option>
+                   <option value="none" data-icon="fa-dot-circle-o">No roles yet</option>
                   {% endif %}
                   </select>
               </div>
@@ -144,11 +144,11 @@
                     <td class="text-center">
                       <ul class="icons-list">
                        {% if perms.userprofile.change_user %}
-                        <li><a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
+                        <li><a href="{% url 'dashboard:employee-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
                         {% endif %}
                          {% if perms.userprofile.delete_user %}
                         <li>
-                          <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:user-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                          <a data-ta="#modal_instance" data-title="Delete Staff {{ user.name }} ?" data-href="{% url 'dashboard:employee-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
                          class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
                          </a>
                         </li>
@@ -200,7 +200,7 @@
          {% csrf_token %}
          <div class="">
            <h5 class="text-center">
-             Confirm user delete!
+             Confirm Staff delete!
            </h5>
            <input type="hidden" class="item-id" />
            </div>
@@ -248,14 +248,14 @@
     var pagination_totalsize;
     var status;
     //**@ get
-    $.ajax({ url: "{% url 'dashboard:users' %}",type: 'GET',data: {initial:'initial'},
+    $.ajax({ url: "{% url 'dashboard:employees' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
          pagination_totalsize = data;
     }});
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+        $.ajax({ url: "{% url 'dashboard:employees_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
      });
@@ -266,7 +266,7 @@
         leaps: false
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
-            $.get("{% url 'dashboard:user_paginate' %}",{page:num},function(data){
+            $.get("{% url 'dashboard:employees_paginate' %}",{page:num},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm')
@@ -277,7 +277,7 @@
           tickIcon: 'fa-dot-circle-o'
     }).on('change', function(){
        var group_id = $(this).val();
-        $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
+        $.get("{% url 'dashboard:employees_paginate' %}",{page:1,gid:group_id},function(data){
              $('#pagination-div').html(data);
         });
     });
@@ -345,7 +345,7 @@
       $('.search_user').keyup(function() {
         var search_text = $(this).val();
         delay(function(){
-           var url = "{% url 'dashboard:user_search' %}";
+           var url = "{% url 'dashboard:employees_search' %}";
            $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
                   $('#pagination-div').html(data);
            }});

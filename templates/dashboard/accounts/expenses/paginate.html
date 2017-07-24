@@ -1,0 +1,85 @@
+             {% load staticfiles %}
+               {% for expense in expenses %}
+                  <tr class='clickable-row'>
+                    <td>{{ expense.expense_date }}</td>
+                    <td>{{expense.expense_type}}</td>
+                    <td>{{expense.paid_to}}</td>
+                    <td>{{expense.payment_mode}}
+                    </td>
+                    <td>
+                    {{ expense.amount }}</td>
+                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                    <!-- actions -->
+                    <td class="text-center">
+                      <ul class="icons-list">
+                         {% if perms.accounts.delete_expense %}
+                        <li>
+                          <a data-ta="#modal_instance" data-title="Delete user {{ expense.expense_type }} ?" data-href="{% url 'accounts:expense-delete' pk=expense.pk %}" data-name="{{ expense.expense_type}}" data-id="{{ expense.pk }}"
+                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                         </a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </td>
+                    {% endif %}
+                  </tr>
+                  {% endfor %}
+                 
+
+
+            <script type="text/javascript">
+                 $(document).ready(function(){
+
+                    $('.click').alert('hey');
+                    $(".td").click(function() {
+                       window.location = $(this).data("href");
+                    });
+
+                    $('.modal-trigger').on('click', function (e) {
+
+                       var url = $(this).data('href')
+                       var prompt_text = $(this).data('title');
+                       var username = $(this).data('name');
+                       var modal = $(this).data('ta');
+                       var id = $(this).data('id');
+                       $('.del').attr('data-id', id);
+                       $('.del').attr('data-href', url);
+                       $('.modal-title').html(prompt_text);
+                       $(modal).modal();
+                       $('.delete_form').attr('action',url);
+                    });
+
+                    /* clicked the submit button */
+                    $('.del').on('click', function (e) {
+                        var f = document.getElementById('delform');
+                        var formData = new FormData(f);
+                        var id = $(this).data('id');
+                        var url = $(this).data('href');
+                        $.ajax({
+                            url: url,
+                            type: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success:function(data){        
+                              $('#modal_instance').modal('hide');
+                              $('#tb #'+id).remove();            
+                              $.jGrowl('User deleted successfully', {
+                                header: 'Well done!',
+                                theme: 'bg-success'
+                              });
+                              window.location.reload();
+                           // $("#mydiv").load(location.href + " #mydiv");
+                            },
+                            error:function(error){
+                              console.log(error);
+                              $.jGrowl('Error deleting Staff', {
+                                  header: 'Oh snap!',
+                                  theme: 'bg-danger'
+                              });
+                            }
+                        });
+                    });
+      
+                 });
+               </script>
