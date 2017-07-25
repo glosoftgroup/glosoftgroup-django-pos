@@ -154,10 +154,16 @@ class ProductForm(forms.ModelForm):
         field.widget.attrs['class'] = 'styled' 
 
         field = self.fields['product_class'] 
-        field.widget.attrs['class'] = 'form-control select'
+        field.widget.attrs['class'] = 'form-control bootstrap-select input-group-btn'
+        field.widget.attrs['data-live-search'] = 'true'
+        field.widget.attrs['data-width'] = '100%'
+        field.widget.attrs['tabindex'] = '-98'
 
         field = self.fields['product_supplier'] 
-        field.widget.attrs['class'] = 'form-control select'        
+        field.widget.attrs['class'] = 'form-control bootstrap-select input-group-btn'
+        field.widget.attrs['data-live-search'] = 'true'
+        field.widget.attrs['data-width'] = '100%'
+        field.widget.attrs['tabindex'] = '-98'       
         
         field = self.fields['available_on'] 
         field.widget.attrs['class'] = 'form-control pickadate-selectors'

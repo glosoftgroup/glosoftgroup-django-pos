@@ -145,6 +145,7 @@ def product_class_create(request,new_window=None):
 	form = forms.ProductClassForm(request.POST or None,
 								  instance=product_class)
 	if form.is_valid():
+		print('nikii mani')
 		product_class = form.save()
 		msg = pgettext_lazy(
 			'Dashboard message', 'Added product type %s') % product_class
@@ -156,11 +157,7 @@ def product_class_create(request,new_window=None):
 	if request.is_ajax():
 		return TemplateResponse(request, 'dashboard/product/product_class_form_ajax.html',
 							ctx)
-	if new_window:
-		return TemplateResponse(
-		request, 
-		'dashboard/product/modal_product_class_form.html',
-		 ctx)    
+    
 	return TemplateResponse(
 		request, 'dashboard/product/product_class_form.html', ctx)
 
@@ -221,7 +218,6 @@ def product_list(request):
 	return TemplateResponse(request, 'dashboard/product/list.html', ctx)
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 @staff_member_required
-@permission_decorator('product.view_productvariants')
 @csrf_exempt
 def fetch_variants(request):
 	if request.method == 'POST':
@@ -643,10 +639,12 @@ def attribute_add(request,pk=None):
 			last_id = ProductAttribute.objects.latest('id')
 			return HttpResponse(last_id.pk)
 	elif request.method == 'GET':
+			ctx = {}
 			if pk:
 				product_class = get_object_or_404(ProductClass, pk=pk)
 				attributes = product_class.product_attributes.all()
 				ctx = {'product_type':product_class,'attributes':attributes}			
+
 			return TemplateResponse(request,'dashboard/product/attributes/_edit_values.html',ctx)
 	return HttpResponse('bad request')
 
@@ -979,7 +977,7 @@ def stock_search( request ):
 		if q is not None:            
 			product_results = ProductVariant.objects.filter( 
 				Q(sku__icontains=q) |
-			    Q(product__name__icontains=q)).order_by('-id')
+				Q(product__name__icontains=q)).order_by('-id')
 			paginator = Paginator(product_results, 10)
 			try:
 				product_results = paginator.page(page)

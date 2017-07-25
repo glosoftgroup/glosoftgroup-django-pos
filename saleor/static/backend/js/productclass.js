@@ -13,8 +13,13 @@ $(function() {
   	var title_text = $(this).data('title');
   	$('.modal-title').html(title_text);
   	var modal = $(this).attr('href');
-  	//$(modal).modal();
-    window.open(url, "unicorn", "width=400, height=600, screenX=100"); 
+  	$(modal).modal();
+    var posting = $.get( url,{} );
+    posting.done(function( data ) {    
+        $("#modal_type_results" ).html( data ); 
+             
+      });
+    //window.open(url, "unicorn", "width=400, height=600, screenX=100"); 
 
   });
 
