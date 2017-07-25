@@ -39,10 +39,13 @@ error_logger = logging.getLogger('error_logger')
 def re_order(request):
 	low_stock = get_low_stock_products()
 	ctx = {"low_stock":low_stock}
+	user_trail(request.user.name, 'accessed reorder page', 'view')
+	info_logger.info('User: '+str(request.user.name)+' accessed reorder page')
 	return TemplateResponse(request, 'dashboard/re_order/re_order.html', ctx)    
 
 import json
 @staff_member_required
+@permission_decorator('product.add_stock')
 def add_reorder_stock(request,pk=None):	
 	if request.is_ajax():
 		if request.POST.getlist('variants[]'):			
@@ -76,6 +79,8 @@ def add_reorder_stock(request,pk=None):
 		#return HttpResponse(variant_id)
 		variant = ProductVariant.objects.get(pk=int(variant_id))
 		ctx = {"variant":variant}
+		user_trail(request.user.name, 'added reorder level', 'add')
+		info_logger.info('User: ' + str(request.user.name) + ' added reorder level')
 		return TemplateResponse(request, 'dashboard/re_order/_order.html', ctx)    
 
 
@@ -117,6 +122,7 @@ def re_order_form(request, pk):
 	return TemplateResponse(request, 'dashboard/re_order/re_order_form.html', ctx)    
 
 @staff_member_required
+@permission_decorator('product.view_productclass')
 def product_class_list(request):
 	classes = ProductClass.objects.all().prefetch_related(
 		'product_attributes', 'variant_attributes').order_by('-id')
@@ -133,6 +139,7 @@ def product_class_list(request):
 
 
 @staff_member_required
+@permission_decorator('product.add_productclass')
 def product_class_create(request,new_window=None):
 	product_class = ProductClass()
 	form = forms.ProductClassForm(request.POST or None,
@@ -159,6 +166,7 @@ def product_class_create(request,new_window=None):
 
 
 @staff_member_required
+@permission_decorator('product.change_productclass')
 def product_class_edit(request, pk):
 	product_class = get_object_or_404(
 		ProductClass, pk=pk)
@@ -177,6 +185,7 @@ def product_class_edit(request, pk):
 
 
 @staff_member_required
+@permission_decorator('product.delete_productclass')
 def product_class_delete(request, pk):
 	product_class = get_object_or_404(ProductClass, pk=pk)
 	products = [str(p) for p in product_class.products.all()]
@@ -195,6 +204,7 @@ def product_class_delete(request, pk):
 
 
 @staff_member_required
+@permission_decorator('product.view_product')
 def product_list(request):
 	products = Product.objects.prefetch_related('images').order_by('-id')
 	product_classes = ProductClass.objects.all()
@@ -206,9 +216,12 @@ def product_list(request):
 	products = get_paginator_items(products, 30, request.GET.get('page'))
 	ctx = {'form': form, 'products': products,
 		   'product_classes': product_classes}
+	user_trail(request.user.name, 'accessed the products page', 'view')
+	info_logger.info('User: '+str(request.user.name)+' accessed the products page')
 	return TemplateResponse(request, 'dashboard/product/list.html', ctx)
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 @staff_member_required
+@permission_decorator('product.view_productvariants')
 @csrf_exempt
 def fetch_variants(request):
 	if request.method == 'POST':
@@ -233,6 +246,7 @@ def fetch_variants(request):
 		request, 'dashboard/product/attributes.html', ctx)
 
 @staff_member_required
+@permission_decorator('product.add_product')
 def product_create(request):
 	product_classes = ProductClass.objects.order_by('pk')
 	form_classes = forms.ProductClassSelectorForm(
@@ -277,6 +291,7 @@ def product_create(request):
 
 
 @staff_member_required
+@permission_decorator('product.change_product')
 def product_edit(request, pk):
 	product = get_object_or_404(
 		Product.objects.prefetch_related(
@@ -323,6 +338,7 @@ def product_edit(request, pk):
 
 
 @staff_member_required
+@permission_decorator('product.delete_product')
 def product_delete(request, pk):
 	product = get_object_or_404(Product, pk=pk)
 	if request.method == 'POST':
@@ -336,6 +352,7 @@ def product_delete(request, pk):
 		{'product': product})
 
 @staff_member_required
+@permission_decorator('product.view_stock')
 def stock_history(request,stock_pk=None):
 	if request.method == 'GET':
 		if stock_pk:
@@ -395,6 +412,7 @@ def add_stock_ajax(request):
 
 
 @staff_member_required
+@permission_decorator('product.change_stock')
 def stock_edit(request, product_pk, stock_pk=None):
 	product = get_object_or_404(Product, pk=product_pk)
 	if stock_pk:
@@ -433,6 +451,7 @@ def stock_edit(request, product_pk, stock_pk=None):
 
 
 @staff_member_required
+@permission_decorator('product.delete_stock')
 def stock_delete(request, product_pk, stock_pk):
 	product = get_object_or_404(Product, pk=product_pk)
 	stock = get_object_or_404(Stock, pk=stock_pk)
@@ -449,6 +468,7 @@ def stock_delete(request, product_pk, stock_pk):
 
 
 @staff_member_required
+@permission_decorator('product.delete_stock')
 @require_http_methods(['POST'])
 def stock_bulk_delete(request, product_pk):
 	product = get_object_or_404(Product, pk=product_pk)
@@ -464,6 +484,7 @@ def stock_bulk_delete(request, product_pk):
 
 
 @staff_member_required
+@permission_decorator('product.change_productimage')
 def product_image_edit(request, product_pk, img_pk=None):
 	product = get_object_or_404(Product, pk=product_pk)
 	if img_pk:
@@ -494,6 +515,7 @@ def product_image_edit(request, product_pk, img_pk=None):
 
 
 @staff_member_required
+@permission_decorator('product.delete_productimage')
 def product_image_delete(request, product_pk, img_pk):
 	product = get_object_or_404(Product, pk=product_pk)
 	product_image = get_object_or_404(product.images, pk=img_pk)
@@ -514,6 +536,7 @@ def product_image_delete(request, product_pk, img_pk):
 
 
 @staff_member_required
+@permission_decorator('product.change_productvariants')
 def variant_edit(request, product_pk, variant_pk=None):
 	product = get_object_or_404(Product.objects.all(),
 								pk=product_pk)
@@ -551,6 +574,7 @@ def variant_edit(request, product_pk, variant_pk=None):
 
 
 @staff_member_required
+@permission_decorator('product.delete_productvariants')
 def variant_delete(request, product_pk, variant_pk):
 	product = get_object_or_404(Product, pk=product_pk)
 	variant = get_object_or_404(product.variants, pk=variant_pk)
@@ -572,6 +596,7 @@ def variant_delete(request, product_pk, variant_pk):
 
 
 @staff_member_required
+@permission_decorator('product.delete_productvariants')
 @require_http_methods(['POST'])
 def variants_bulk_delete(request, product_pk):
 	product = get_object_or_404(Product, pk=product_pk)
@@ -588,6 +613,7 @@ def variants_bulk_delete(request, product_pk):
 
 
 @staff_member_required
+@permission_decorator('product.view_productattribute')
 def attribute_list(request):
 	attributes = [
 		(attribute.pk, attribute.name, attribute.values.all())
@@ -598,6 +624,7 @@ def attribute_list(request):
 
 
 @staff_member_required
+@permission_decorator('product.add_productattribute')
 def attribute_add(request,pk=None):
 	if request.method == 'POST':
 		if pk:
@@ -622,7 +649,9 @@ def attribute_add(request,pk=None):
 				ctx = {'product_type':product_class,'attributes':attributes}			
 			return TemplateResponse(request,'dashboard/product/attributes/_edit_values.html',ctx)
 	return HttpResponse('bad request')
+
 @staff_member_required
+@permission_decorator('product.change_productattribute')
 def attribute_edit(request, pk=None):
 	if pk:
 		attribute = get_object_or_404(ProductAttribute, pk=pk)
@@ -646,6 +675,7 @@ def attribute_edit(request, pk=None):
 
 
 @staff_member_required
+@permission_decorator('product.delete_productattribute')
 def attribute_delete(request, pk):
 	attribute = get_object_or_404(ProductAttribute, pk=pk)
 	if request.method == 'POST':
@@ -662,6 +692,7 @@ def attribute_delete(request, pk):
 
 
 @staff_member_required
+@permission_decorator('product.view_stocklocation')
 def stock_location_list(request):
 	stock_locations = StockLocation.objects.all()
 	ctx = {'locations': stock_locations}
@@ -670,6 +701,7 @@ def stock_location_list(request):
 
 
 @staff_member_required
+@permission_decorator('product.change_stocklocation')
 def stock_location_edit(request, location_pk=None):
 	if location_pk:
 		location = get_object_or_404(StockLocation, pk=location_pk)
@@ -690,6 +722,7 @@ def stock_location_edit(request, location_pk=None):
 
 
 @staff_member_required
+@permission_decorator('product.delete_stocklocation')
 def stock_location_delete(request, location_pk):
 	location = get_object_or_404(StockLocation, pk=location_pk)
 	stock_count = location.stock_set.count()
@@ -705,7 +738,9 @@ def stock_location_delete(request, location_pk):
 		request, 'dashboard/product/stock_locations/modal_confirm_delete.html',
 		ctx)
 from .forms import ProductTaxForm
+
 @staff_member_required
+@permission_decorator('product.view_producttax')
 def tax_list(request):
 	form = ProductTaxForm(request)
 	ctx = {'tax': ProductTax.objects.all()}
@@ -713,6 +748,7 @@ def tax_list(request):
 		request, 'dashboard/product/tax_list.html',
 		ctx)
 
+@staff_member_required
 def refresh_producttype(request):
 	product = Product()
 	class_pk = 1
@@ -761,6 +797,7 @@ def tax_add_ajax(request):
 				ctx)
 
 @staff_member_required
+@permission_decorator('product.add_producttax')
 def tax_add(request):
 	product_tax = ProductTax()
 	formadd = ProductTaxForm(request.POST or None,
@@ -779,6 +816,7 @@ def tax_add(request):
 		ctx)
 
 @staff_member_required
+@permission_decorator('product.change_producttax')
 def tax_edit(request, pk=None):
 	if pk:
 		instance = get_object_or_404(ProductTax, pk=pk)
@@ -797,6 +835,7 @@ def tax_edit(request, pk=None):
 	return TemplateResponse(request, 'dashboard/product/tax_form.html', ctx)
 
 @staff_member_required
+@permission_decorator('product.delete_producttax')
 def tax_delete(request, pk):
 	instance = get_object_or_404(ProductTax, pk=pk)
 	if request.method == 'POST':
@@ -985,6 +1024,7 @@ def stock_filter(request):
 	ctx)
 
 @staff_member_required
+@permission_decorator('product.view_product')
 def product_pages(request):
 	queryset_list = Product.objects.all()
 	size = request.GET.get('size',10)

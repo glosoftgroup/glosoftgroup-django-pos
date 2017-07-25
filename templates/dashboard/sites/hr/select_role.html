@@ -1,0 +1,101 @@
+{% load staticfiles i18n %}
+{% if roles %}
+    <div class="btn-group bootstrap-select input-group-btn" id="roles" style="width: 100%;">
+        <select class="ajax role sel required" id="roleSelect" name="role" data-width="100%"
+                tabindex="-98" style="display: none;">
+            <option value="">Choose...</option>
+              {% if roles %}
+                {% for role in roles %}
+                  <option value="{{role.name}}">{{role}}</option>
+                {% endfor %}
+              {% else %}
+                <option value="none">No roles</option>
+              {% endif %}
+             <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance"
+                     data-title="Add New Role" data-select="#roles"
+                     data-href="{% url 'dashboard:add_role' %}" data-cat="user_role" data-label="Role:">
+                 add new role</option>
+        </select>
+    </div>
+{% elif expense_types %}
+
+    <div class="btn-group bootstrap-select input-group-btn" id="expense_types" style="width: 100%;">
+        <select class="ajax sel required expense_type" name="expense_type" data-width="100%"
+                tabindex="-98" style="display: none;">
+            <option value="">Choose...</option>
+              {% if expense_types %}
+                {% for type in expense_types %}
+                  <option value="{{type.name}}">{{type.name}}</option>
+                {% endfor %}
+              {% else %}
+                <option value="none">No Expense Types</option>
+              {% endif %}
+             <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance"
+                     data-title="Add New Expense Type" data-select="#expense_types"
+                     data-href="{% url 'accounts:add_expense_type' %}" data-cat="expense_type" data-label="Role:">
+                 add new expense type</option>
+        </select>
+    </div>
+{% elif departments %}
+<div class="btn-group bootstrap-select input-group-btn" id="departments" style="width: 100%;">
+    <select class="ajax bootstrap-select sel department" data-width="100%" tabindex="-98"
+            style="display: none;">
+          {% if departments %}
+          {% for department in departments %}
+            <option value="{{department.name}}">{{department}}</option>
+          {% endfor %}
+          {% else %}
+          <option value="none">No departments</option>
+          {% endif %}
+         <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance"
+                 data-title="Add New Department" data-select="#departments"
+                data-href="{% url 'dashboard:add_department' %}" data-cat="department"
+                 data-label="Department:"> add new department</option>
+    </select>
+</div>
+{% elif banks %}
+<div class="btn-group bootstrap-select input-group-btn" id="banks" style="width: 100%;">
+    <select class="ajax bootstrap-select sel bank" data-width="100%" tabindex="-98" style="display: none;">
+          {% if banks %}
+          {% for bank in banks %}
+            <option value="{{bank.name}}">{{bank}}</option>
+          {% endfor %}
+          {% else %}
+          <option value="none">No banks</option>
+          {% endif %}
+         <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance"
+                 data-title="Add New Bank" data-select="#banks"
+                 data-href="{% url 'dashboard:add_bank' %}" data-cat="bank" data-label="Bank:">
+             add new bank</option>
+    </select>
+</div>
+{% elif branches %}
+<div class="btn-group bootstrap-select input-group-btn" id="branches" style="width: 100%;">
+    <select class="ajax bootstrap-select sel branch" data-width="100%" tabindex="-98" style="display: none;">
+          {% if branches %}
+          {% for branch in branches %}
+            <option value="{{branch.name}}">{{ branch}}</option>
+          {% endfor %}
+          {% else %}
+          <option value="none">No branches</option>
+          {% endif %}
+          <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Branch" data-select="#branches"
+                data-href="{% url 'dashboard:add_branch' %}" data-cat="branch" data-label="Branch:"> add new branch</option>
+    </select>
+</div>
+{% else %}
+<div class="alert alert-danger">
+    <span>Error loading data</span>
+</div>
+{% endif %}
+
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script>
+$(document).ready(function(){
+    //** general select
+    $('.ajax').selectpicker({
+        iconBase: 'fa',
+        addIcon:'fa-plus-circle'
+    });
+});
+</script>

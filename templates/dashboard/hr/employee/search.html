@@ -1,0 +1,157 @@
+{% load staticfiles %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+     tr.nb td{border:0px;}
+     .nb{border:0px;}
+     .table{border:1px solid #ccc}
+   </style>
+  {% if users %}
+      <div class="panel panel-flat">
+        <div class="table-responsive">
+         
+  <div class="panel-body">
+          <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
+                <thead>
+                  <tr class="bg-primary">
+                    <th>Id</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>User Role</th>
+                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                    <th class="text-center">Actions</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody id="p-tb">           
+                    {% for user in users %}
+                      <tr class='clickable-row' id="{{user.pk }}">
+                        <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                        <!-- image -->
+                       <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
+                       {% if user.image %}
+                          <img src="{{user.image.url }}" alt="" class="circle teal img-responsive img-circle" style="width: 40px;height: 40px;"/>
+                       {% else %}
+                          <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
+                       {% endif %}
+                       </td>
+                         <!-- product name -->
+                        <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.name}}</td>
+                        <!-- product category -->
+                        <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.email}}
+                        </td>
+                        <!-- role -->
+                        <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
+                        {{ user.role }}</td>
+                        {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                        <!-- actions -->
+                        <td class="text-center">
+                          <ul class="icons-list">
+                           {% if perms.userprofile.change_user %}
+                            <li><a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
+                            {% endif %}
+                             {% if perms.userprofile.delete_user %}
+                            <li>
+                              <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:employee-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                             class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                             </a>
+                            </li>
+                            {% endif %}
+                          </ul>
+                        </td>
+                        {% endif %}
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+           </table>
+          </div>
+        </div>
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+      </div>
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No Employees to display
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            leaps: false
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+
+                $.get("{% url 'dashboard:employees_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                   $('#p-tb').html(data);
+                });
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+      $(".td").click(function() {
+         window.location = $(this).data("href");
+      });
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+        /* clicked the submit button */
+        $('.del').on('click', function (e) {
+                var f = document.getElementById('delform');
+                var formData = new FormData(f);
+                var id = $(this).data('id');
+                var url = $(this).data('href');
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){        
+                      $('#modal_instance').modal('hide');
+                      $('#tb #'+id).remove();            
+                      $.jGrowl('User deleted successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                      });
+                      window.location.reload();
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Error deleting Staff', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            });
+
+   });
+ </script>

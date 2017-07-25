@@ -97,6 +97,7 @@
         </div>
       </div>
    </div>
+  {% if users %}
   <div class="col-md-12">
    <div id="pagination-div">
       <!-- Header and footer fixed -->
@@ -118,9 +119,8 @@
                     {% endif %}
                   </tr>
                 </thead>
-                <tbody id="tb">           
-               {% if users %}
-                  {% for user in users%}
+                <tbody id="tb">
+                  {% for user in users %}
                   <tr class='clickable-row' id="{{user.pk }}">
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
                     <!-- image -->
@@ -139,6 +139,7 @@
                     <!-- role -->
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}"> 
                     {% if user.is_superuser == True %}admin{% else %} staff {% endif %}</td>
+                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <!-- actions -->
                     <td class="text-center">
                       <ul class="icons-list">
@@ -154,11 +155,9 @@
                         {% endif %}
                       </ul>
                     </td>
+                    {% endif %}
                   </tr>
                   {% endfor %}
-                {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
-               {% endif %}
                   </tbody>
            </table>
 
@@ -174,6 +173,17 @@
       </div>
     </div><!-- pagination -->
   </div>
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No users to display
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
 </div>
 
 <!-- Blue modal -->
@@ -296,6 +306,7 @@
           var formData = new FormData(f);
           var id = $(this).data('id');
           var url = $(this).data('href');
+
           $.ajax({
               url: url,
               type: "POST",

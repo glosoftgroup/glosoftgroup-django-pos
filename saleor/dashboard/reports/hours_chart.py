@@ -33,8 +33,7 @@ debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
-
-def get_hours_results(date, l, h):
+def get_hours_results(request, date, l, h):
 	try:
 		sales_at_date = Sales.objects.filter(created__contains=date)
 		sales_at_h = sales_at_date.filter(created__hour__range=[l,h])

@@ -124,9 +124,9 @@
                    
                        <!-- 2 columns form -->
         <form method="post" class="form-horizontal" id="form-product" enctype="multipart/form-data" novalidate>
-          {% csrf_token %}         
+          {% csrf_token %}
             <div class="panelpanel-flat">
-             
+
               <div class="panel-body">
               
                 {% if errors %}
@@ -134,7 +134,7 @@
                   {{errors}} 
                   </div>             
                 {% endif %}
-              
+
                 <div class="row">
                   <div class="col-md-6">
                     {% if product.pk %}

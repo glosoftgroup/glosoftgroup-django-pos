@@ -6,6 +6,8 @@ from .customer.urls import urlpatterns as customer_urls
 from .drawercash.urls import urlpatterns as drawercash_urls
 from .order.urls import urlpatterns as order_urls
 from .product.urls import urlpatterns as product_urls
+from .messages.urls import urlpatterns as messages_urls
+from .hr.urls import urlpatterns as hr_urls
 from .discount.urls import urlpatterns as discount_urls
 from .search.urls import urlpatterns as search_urls
 from .sites.urls import urlpatterns as site_urls
@@ -22,6 +24,8 @@ urlpatterns = [
     url(r'^drawercash/', include(drawercash_urls)),    
     url(r'^orders/', include(order_urls)),
     url(r'^products/', include(product_urls)),
+    url(r'^messages/', include(messages_urls)),
+    url(r'^hr/', include(hr_urls)),
     url(r'^customers/', include(customer_urls)),
     url(r'^discounts/', include(discount_urls)),
     url(r'^search/', include(search_urls)),

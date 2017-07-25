@@ -1,0 +1,47 @@
+{% if branches %}
+<div id="bank_names" class="table-responsive pre-scrollable" style="max-height: 290px;overflow-y:scroll">
+  <table class="table table-frameds">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for branch in branches %}
+      <tr class="animated fadeIn">
+        <td>{{ forloop.counter }}</td>
+        <td>
+        {{ branch.name }}
+        </td>
+        <td class="text-center">
+          <ul class="icons-list">
+            <li>
+                <a data-ta="#edit_modal_instance" data-title="{{ branch.name|capfirst }}" data-href="{% url 'dashboard:branch-edit' pk=branch.pk %}" data-name="{{ branch.name }}" data-id="{{ branch.pk }}"
+                   class="edit_modal-trigger btn btn-default btn-sm edit-btn" data-cat="branch" data-label="Branch:"><i class="icon-pencil7" style="font-size: 11px;"></i> edit
+                 </a>
+            </li>
+            <li>
+              <a data-ta="#modal_instance" data-title="Delete branch {{ branch.name }} ?" data-href="{% url 'dashboard:branch-delete' pk=branch.pk %}" data-name="{{ branch.name }}" data-id="{{ branch.pk }}"
+             class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+             </a>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+ <div class="animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No banks available
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}

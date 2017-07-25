@@ -24,7 +24,6 @@ urlpatterns = [
                 (views.user_delete), name='user-delete'),
     
         url(r'^edit/(?P<pk>[0-9]+)/$', permission_required('userprofile.change_user', login_url='not_found')(views.user_edit), name='user-edit'),
-        # url(r'^edit/(?P<pk>[0-9]+)/$', views.user_edit, name='user-edit'),
         url(r'^user_update(?P<pk>[0-9]+)/$', permission_required('userprofile.change_user', login_url='not_found')
                 (views.user_update), name='user-update'),
         url(r'^user_assign_permission/$', views.user_assign_permission, name='user_assign_permission'),
@@ -34,6 +33,5 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    # urlpatterns += [ url(r'^static/(?P<path>.*)$', serve)] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

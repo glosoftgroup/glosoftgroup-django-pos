@@ -1,0 +1,587 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Add Employee
+{% endblock %}
+ {% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:employees' %}">Employees</a></li>
+     <li class="active"><a href="{% url 'dashboard:add_employee' %}">Add Employee</a></li>
+ {% endblock %}
+{% block menu_hremployees_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Add Employee</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+          <form class="form" enctype="multipart/form-data" id="employee-details" name="employee-details">
+                {% csrf_token %}
+        <div class="tabbable">
+          <ul class="nav nav-tabs nav-tabs-highlight">
+            <li class="active" id="supplier-tab"><a href="#master" data-toggle="tab" class="legitRipple" aria-expanded="false">Master Details</a></li>
+            <li class="" id="customer-tab"><a href="#other" data-toggle="tab" class="legitRipple" aria-expanded="true">Other Details</a></li>
+          </ul>
+
+          <div class="tab-content">
+
+            <div class="tab-pane animated fadeIn active" id="master">
+
+                  <div class="row">
+                      <div class="col-md-4">
+                    <label for="image">Employee Image</label>
+                      <div class="form-group">
+                        <!-- <label for="exampleInputEmail1">User Image</label> -->
+                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                          <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                            <img data-src="holder.js/100%x100%" alt="..." src="{% static 'images/user.png' %}">
+                          </div>
+                          <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                          <div style="text-align: center;">
+                            <span class="btn btn-warning btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="image" id="image"></span>
+                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="col-md-8">
+                      <div class="row">
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="name">Name</label>
+                                   <input class="form-control" name="name" placeholder="Enter: name"/>
+                               </div>
+                          </div>
+                          <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select class="bootstrap-select gender" name="gender" data-width="100%" tabindex="-98" style="display: none;">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                          </div>
+                        </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="dob">Date of Birth</label>
+                                   <div class="input-group">
+                                      <input class="form-control daterange-single dob" type="text" name="dob" placeholder="Enter: yyy-mm-dd">
+                                      <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                                   </div>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="email">Email</label>
+                                   <input class="form-control" type="text" name="email" placeholder="Enter: email"/>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="nid">National ID</label>
+                                   <input class="form-control" name="nid" id="nid" placeholder="Enter: national id"/>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="doj">Date of Joining</label>
+                                   <div class="input-group">
+                                      <input class="form-control daterange-single doj" type="text" name="doj" placeholder="Enter: yyy-mm-dd">
+                                      <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                                   </div>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="phone">Mobile Number</label>
+                                   <input class="form-control" type="text" name="phone" placeholder="Enter: mobile no"/>
+                               </div>
+                          </div>
+
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="name">Employee type</label>
+                            <select class="bootstrap-select time" name="work_time" data-width="100%" tabindex="-98" style="display: none;">
+                                <option value="ft">Full Time</option>
+                                <option value="pt">Part Time</option>
+                            </select>
+                          </div>
+                        </div>
+                          <div class="col-md-4">
+                              <div class="form-group">
+										<label>User Role</label>
+										<div class="input-group">
+											<div class="btn-group bootstrap-select input-group-btn" id="roles" style="width: 100%;">
+                                                <select class="bootstrap-select sel required" id="roleSelect" name="role" data-width="100%" tabindex="-98" style="display: none;">
+                                                    <option value="">Choose...</option>
+                                                      {% if roles %}
+                                                        {% for role in roles %}
+                                                          <option value="{{role.name}}">{{role}}</option>
+                                                        {% endfor %}
+                                                      {% else %}
+                                                        <option value="none">No roles</option>
+                                                      {% endif %}
+                                                      <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Role" data-select="#roles"
+                                                        data-href="{% url 'dashboard:add_role' %}" data-cat="user_role" data-label="Role:"> add new role</option>
+                                                </select>
+                                            </div>
+
+											<div class="input-group-btn">
+												<button type="button" class="btn bg-indigo btn-icon legitRipple edit_modal-trigger edit-btn"
+                                                        data-popup="tooltip" data-original-title="Add New Role" data-placement="top"
+                                                        data-ta="#edit_modal_instance" data-title="Add New Role" data-select="#roles"
+                                                        data-href="{% url 'dashboard:add_role' %}" data-cat="user_role" data-label="Role:">
+                                                    <i class="icon-plus-circle2"></i>
+                                                </button>
+											</div>
+										</div>
+									</div>
+                          </div>
+
+                          <div class="col-md-4">
+                              <div class="form-group">
+                                    <label>Department</label>
+                                    <div class="input-group">
+                                        <div class="btn-group bootstrap-select input-group-btn" id="departments"style="width: 100%;">
+                                            <select class="bootstrap-select sel department" name="department" data-width="100%" tabindex="-98" style="display: none;">
+                                                  {% if departments %}
+                                                  {% for department in departments %}
+                                                    <option value="{{department.name}}">{{department}}</option>
+                                                  {% endfor %}
+                                                  {% else %}
+                                                  <option value="none">No departments</option>
+                                                  {% endif %}
+                                                 <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Department" data-select="#departments"
+                                                        data-href="{% url 'dashboard:add_department' %}" data-cat="department" data-label="Department:"> add new department</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-group-btn">
+                                            <button type="button" class="btn bg-indigo btn-icon legitRipple edit_modal-trigger"
+                                                    data-popup="tooltip" data-original-title="Add New Department" data-placement="top"
+                                                    data-ta="#edit_modal_instance" data-title="Add New Department" data-select="#departments"
+                                                    data-href="{% url 'dashboard:add_department' %}" data-cat="department"
+                                                    data-label="Department:">
+                                                <i class="icon-plus-circle2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                          </div>
+                      </div>
+
+
+
+                    </div>
+                  </div>
+
+            </div>
+            <div class="tab-pane animated fadeIn" id="other">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="row">
+                        <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="bc">Bank A/C No</label>
+                                   <input class="form-control" type="text" name="account" placeholder="Enter: account no"/>
+                               </div>
+                        </div>
+
+                          <div class="col-md-4">
+                              <div class="form-group">
+                                    <label>Bank</label>
+                                    <div class="input-group">
+                                        <div class="btn-group bootstrap-select input-group-btn" id="banks" style="width: 100%;">
+
+                                            <select class="bootstrap-select sel bank" name="bank" data-width="100%" tabindex="-98" style="display: none;">
+                                                  {% if banks %}
+                                                  {% for bank in banks %}
+                                                    <option value="{{bank.name}}">{{bank}}</option>
+                                                  {% endfor %}
+                                                  {% else %}
+                                                  <option value="none">No banks</option>
+                                                  {% endif %}
+                                                 <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Bank" data-select="#banks"
+                                                        data-href="{% url 'dashboard:add_bank' %}" data-cat="bank" data-label="Bank:"> add new bank</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-group-btn">
+                                            <button type="button" class="btn bg-indigo btn-icon legitRipple edit_modal-trigger"
+                                                    data-popup="tooltip" data-original-title="Add New Bank" data-placement="top"
+                                                    data-ta="#edit_modal_instance" data-title="Add New Bank" data-select="#banks"
+                                                    data-href="{% url 'dashboard:add_bank' %}" data-cat="bank" data-label="Bank:">
+                                                <i class="icon-plus-circle2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                          </div>
+
+                          <div class="col-md-4">
+                              <div class="form-group">
+                                    <label>Bank Branch</label>
+                                    <div class="input-group">
+                                        <div class="btn-group bootstrap-select input-group-btn" id="branches" style="width: 100%;">
+
+                                            <select class="bootstrap-select sel branch" name="branch" data-width="100%" tabindex="-98" style="display: none;">
+                                                  {% if branches %}
+                                                  {% for branch in branches %}
+                                                    <option value="{{branch.name}}">{{ branch}}</option>
+                                                  {% endfor %}
+                                                  {% else %}
+                                                  <option value="none">No branches</option>
+                                                  {% endif %}
+                                                  <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Branch" data-select="#branches"
+                                                        data-href="{% url 'dashboard:add_branch' %}" data-cat="branch" data-label="Branch:"> add new branch</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-group-btn">
+                                            <button type="button" class="btn bg-indigo btn-icon legitRipple edit_modal-trigger"
+                                                    data-popup="tooltip" data-original-title="Add New Branch" data-placement="top"
+                                                    data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Branch" data-select="#branches"
+                                                    data-href="{% url 'dashboard:add_branch' %}" data-cat="branch" data-label="Branch:">
+                                                <i class="icon-plus-circle2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="pin">KRA PIN</label>
+                                   <input class="form-control" type="text" name="krapin" placeholder="Enter: pin no"/>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="nhif">NHIF NO</label>
+                                   <input class="form-control" type="text" name="nhif" placeholder="Enter: nhif no"/>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="nssf">NSSF</label>
+                                   <input class="form-control" type="text" name="nssf" placeholder="Enter: nssf no"/>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="location">Location</label>
+                                   <input class="form-control" type="text" name="location" placeholder="exa: bima rd, Kahawa West, Nairobi"/>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="bc">Religion</label>
+                                   <select class="bootstrap-select religion" name="religion" data-width="100%" tabindex="-98" style="display: none;">
+                                        <option value="christian">Christian</option>
+                                        <option value="muslim">Muslim</option>
+                                       <option value="hindu">Hindu</option>
+                                   </select>
+                               </div>
+                          </div>
+
+                          <div class="col-md-4">
+                               <div class="form-group">
+                                  <label for="bc">Marital Status</label>
+                                   <select class="bootstrap-select mstatus" name="marital_status" data-width="100%" tabindex="-98" style="display: none;">
+                                        <option value="single">Single</option>
+                                        <option value="married">Married</option>
+                                   </select>
+                               </div>
+                          </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+           </div>
+
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                 <div class="text-center" style="margin-top:40px;">
+                  <a href="{% url 'dashboard:employees' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                  <button class="btn btn-primary waves-effect waves-light" id="supplier-submit" type="submit">Create Employee<i class="icon-arrow-right14 position-right"></i></button>
+                 </div>
+            </div>
+        </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- edit modal -->
+ <div id="edit_modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <form action="" class="edit_form" method="post" id="editform" novalidate>
+           <div class="modal-body">
+            {% csrf_token %}
+                 <div class="form-group">
+                     <label class="cat_label"> </label>
+                     <input class="form-control edit_class" name=""/>
+                 </div>
+                  <input type="hidden" class="eitem-url"/>
+                  <input type="hidden" class="eitem-select"/>
+                 <input type="hidden" name="option" value="option"/>
+
+           </div>
+           <div class="modal-footer">
+               <button class="btn btn-primary waves-effect waves-light pull-right data_update"
+                       id='modal_edit' type="submit">
+                   Create
+                   <i class="icon-arrow-right14 position-right"></i>
+               </button>
+
+             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+           </div>
+       </form>
+     </div>
+   </div>
+ </div>
+ <!-- /edit modal -->
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    //** general select
+    $('.bootstrap-select').selectpicker({
+        iconBase: 'fa',
+        addIcon:'fa-plus-circle'
+    });
+
+    //** role change
+    //**$('.input-group').on('change', '#roleSelect', function(){
+
+    $('.input-group').on('change', '.sel', function(){
+       var v = $(this).val();
+
+       if(v == 'add'){
+             var selected = $(this).find('option:selected');
+
+             var url = selected.data('href')
+             var prompt_text = selected.data('title');
+             var modal = selected.data('ta');
+             var select = selected.data('select');
+             var cat = selected.data('cat');
+             var label = selected.data('label');
+             $('.cat_label').html(label);
+             $('.eitem-url').val(url);
+             $('.eitem-select').val(select);
+             $('.modal-title').html(prompt_text);
+             $('.edit_class').attr('name', cat)
+             $(modal).modal();
+             $('.delete_form').attr('action',url);
+
+             var form = $("#editform"), validator = form.validate();
+             validator.resetForm();
+             form.find(".error").removeClass("error");
+
+             $("#editform input[name='" + cat + "']").rules("add", {required:true});
+
+       }
+
+    });
+    //** general datepicker
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    });
+    //** dob
+    $('.dob').on('change',function(){
+        var date = $(this).val();
+        /*$.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});*/
+    });
+
+    //** doj
+    $('.doj').on('change',function(){
+      var date = $(this).val();
+        /*$.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});*/
+    });
+
+      //** validate form & submit
+      $('#employee-details').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+            name: { required:true, minlength:3 },
+            email: { required:true, email:true },
+            phone:{ required:true, digits: true,minlength: 6},
+            nid:{ required:true, digits: true, minlength: 6 },
+            role: {  required: true}
+        },
+        messages:{
+          name:{
+            required: "please provide a name",
+            minlength: "name must be atleast 3 characters long"
+          },
+           role: { required: "please select a role"}
+        },
+        submitHandler: function() {
+          var file = $('#image')[0].files[0];
+          var raw_groups = $(".supplier-ms-type :selected").map(function(){
+                   return $(this).val();
+                }).get();
+          var f = document.getElementById('employee-details');
+          var formData = new FormData(f);
+          for (var i = 0; i < raw_groups.length; i++) {
+              formData.append('groups[]', raw_groups[i]);
+          }
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:add_employee_process' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       $("#supplier-message").val('');
+
+                       $.jGrowl('message sent successfully', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+                       // window.location = "{% url 'dashboard:users' %}";
+                      next_tab();
+                      disable_profile_tab()
+                      localStorage.setItem('user_id', data);
+                      $('.user_id').val(localStorage.getItem("user_id"));
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try sending again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            }
+        }
+      });
+
+  //** modal functionality
+  //** modal edit
+  $('.edit_modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var modal = $(this).data('ta');
+         var select = $(this).data('select');
+
+         var cat = $(this).data('cat');
+         var label = $(this).data('label');
+         $('.cat_label').html(label);
+
+         $('.eitem-url').val(url);
+         $('.eitem-select').val(select);
+         $('.modal-title').html(prompt_text);
+         $('.edit_class').attr('name', cat)
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+
+         var form = $("#editform"), validator = form.validate();
+         validator.resetForm();
+         form.find(".error").removeClass("error");
+         $("#editform input[name='" + cat + "']").rules("add", {required:true});
+      });
+  $('#editform').validate({
+    onkeyup: function(element) {$(element).valid()},
+    rules:{
+       category: {
+          required:true
+        }
+    },
+    messages:{
+      category:{
+        required: "please fill in the required field"
+      }
+    },
+    submitHandler: function() {
+          var name = $('.edit_class').data('name');
+          var inputValue = $('.edit_class').val();
+          var f = document.getElementById('editform');
+          var formData = new FormData(f);
+          //formData.append(name, inputValue);
+          var url = $('.eitem-url').val();
+          var selectClass = $('.eitem-select').val();
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $('#edit_modal_instance').modal('hide');
+                $('.edit_class').val('');
+                var replaceDiv = $('.eitem-select').val()
+                $(replaceDiv).replaceWith(data);
+                $.jGrowl('Created successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                //window.location.reload();
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error Updating', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });
+    }
+  });
+
+
+  });
+</script>
+{% endblock %}

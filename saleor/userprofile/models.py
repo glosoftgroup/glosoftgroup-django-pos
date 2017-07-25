@@ -10,6 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import pgettext_lazy
 from django_countries.fields import Country, CountryField
 from ..search import index
+from ..site.models import Bank, BankBranch, UserRole, Department
 
 
 class AddressManager(models.Manager):
@@ -116,14 +117,14 @@ class User(PermissionsMixin, AbstractBaseUser, index.Indexed):
 		Address, blank=True,
 		verbose_name=pgettext_lazy('User field', 'addresses'))
 	is_staff = models.BooleanField(
-		pgettext_lazy('User field', 'staff status'),
+		pgettext_lazy('User field', 'employee status'),
 		default=False)
 	is_active = models.BooleanField(
 		pgettext_lazy('User field', 'active'),
 		default=True)
 	nid = models.CharField(max_length=100, null=True,blank=True)
 	mobile = models.CharField(max_length=100, null=True, blank=True)
-	image = models.ImageField(upload_to='staff', default='staff/user.png')
+	image = models.ImageField(upload_to='employee', default='employee/user.png')
 	date_joined = models.DateTimeField(
 		pgettext_lazy('User field', 'date joined'),
 		default=timezone.now, editable=False)
@@ -160,3 +161,37 @@ class UserTrail(models.Model):
 	now = models.DateTimeField(default=timezone.now)
 	date = models.DateField(default=date.today)
 	crud = models.CharField(max_length=100, null=True, blank=True)
+
+class Staff(models.Model):
+	name = models.CharField(max_length=100, null=True, blank=True)
+	gender = models.CharField(max_length=100, null=True, blank=True)
+	dob = models.CharField(max_length=100, null=True, blank=True)
+	national_id = models.CharField(max_length=100, null=True, blank=True)
+	mobile = models.CharField(max_length=100, null=True, blank=True)
+	date_recorded = models.DateTimeField(pgettext_lazy('User field', 'date joined'),
+		default=timezone.now, editable=False)
+	date_joined = models.CharField(max_length=100, null=True, blank=True)
+	work_time = models.CharField(max_length=100, null=True, blank=True)
+	role = models.CharField(max_length=100, null=True, blank=True)
+	department = models.CharField(max_length=100, null=True, blank=True)
+	image = models.ImageField(upload_to='employee', default='employee/user.png')
+	email = models.EmailField(pgettext_lazy('User field', 'email'), unique=True)
+
+	#statutory details
+	pin = models.CharField(max_length=100, null=True, blank=True)
+	account = models.CharField(max_length=100, null=True, blank=True)
+	bank_name = models.CharField(max_length=100, null=True, blank=True)
+	bank_branch = models.CharField(max_length=100, null=True, blank=True)
+	nhif = models.CharField(max_length=100, null=True, blank=True)
+	nssf = models.CharField(max_length=100, null=True, blank=True)
+	marital_status = models.CharField(max_length=100, null=True, blank=True)
+	religion = models.CharField(max_length=100, null=True, blank=True)
+	location = models.CharField(max_length=100, null=True, blank=True)
+
+class Attendance(models.Model):
+	name = models.CharField(max_length=100, null=True, blank=True)
+	time_in = models.CharField(max_length=100, null=True, blank=True)
+	time_out = models.CharField(max_length=100, null=True, blank=True)
+	date = models.CharField(max_length=100, null=True, blank=True)
+	department = models.CharField(max_length=100, null=True, blank=True)
+

@@ -27,6 +27,8 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def transactions(request):
 	transactions = DrawerCash.objects.all().order_by('-id')
+	user_trail(request.user.name, 'accessed transaction', 'view')
+	info_logger.info('User: ' + str(request.user.name) + 'accessed transaction:')
 	return TemplateResponse(request, 
 							'dashboard/cashmovement/transactions.html', 
 							{'transactions':transactions})
@@ -36,8 +38,8 @@ def transactions(request):
 def terminals(request):
 	try:
 		users = Terminal.objects.all().order_by('-id')
-		#user_trail(request.user.name, 'accessed users list page')
-		#info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
+		user_trail(request.user.name, 'accessed Terminals', 'view')
+		info_logger.info('User: ' + str(request.user.name) + ' accessed terminals')
 		return TemplateResponse(request, 'dashboard/terminal/terminals.html', {'users':users})
 	except TypeError as e:
 		error_logger.error(e)
@@ -47,6 +49,8 @@ def terminals(request):
 @permission_decorator('userprofile.add_terminal')
 def terminal_add(request):
 	try:
+		user_trail(request.user.name, 'accessed add terminal page', 'view')
+		info_logger.info('User: ' + str(request.user.name) + 'accessed terminal add page')
 		return TemplateResponse(request, 'dashboard/terminal/add_terminal.html',{})
 	except TypeError as e:
 		error_logger.error(e)
@@ -65,23 +69,25 @@ def terminal_process(request):
 		)
 		try:
 			new_user.save()
-		except:
-			error_logger.info('Error when saving ')
-		last_id = Terminal.objects.latest('id')		
-		user_trail(request.user.name, 'created Terminal: '+str(terminal_name),'add')
-		info_logger.info('User: '+str(request.user.name)+' created terminal:'+str(terminal_name))
+			user_trail(request.user.name, 'created Terminal: ' + str(terminal_name), 'add')
+			info_logger.info('User: ' + str(request.user.name) + ' created terminal:' + str(terminal_name))
+		except Exception as e:
+			error_logger.info(e)
+		last_id = Terminal.objects.latest('id')
 		return HttpResponse(last_id.id)
 
 def terminal_detail(request, pk):
 	user = get_object_or_404(Terminal, pk=pk)
-	
+	user_trail(request.user.name, 'accessed terminal: ' + str(user.terminal_name), 'view')
+	info_logger.info('User: ' + str(request.user.name) + ' accessed terminal:' + str(user.terminal_name))
 	return TemplateResponse(request, 'dashboard/terminal/detail.html', {'user':user})
 
 def terminal_delete(request, pk):
 	terminal = get_object_or_404(Terminal, pk=pk)
 	if request.method == 'POST':
 		terminal.delete()
-		user_trail(request.user.name, 'deleted user: '+ str(terminal.terminal_name))
+		user_trail(request.user.name, 'deleted terminal: '+ str(terminal.terminal_name), 'delete')
+		info_logger.info('User: ' + str(request.user.name) + ' deleted terminal:' + str(terminal.terminal_name))
 		return HttpResponse('success')
 def terminal_edit(request, pk):
 	terminal = get_object_or_404(Terminal, pk=pk)		
@@ -93,13 +99,12 @@ def terminal_edit(request, pk):
 def terminal_update(request, pk):
 	terminal = get_object_or_404(Terminal, pk=pk)
 	if request.method == 'POST':
-		name = request.POST.get('name')	
-		print name			
+		name = request.POST.get('name')
 		nid = request.POST.get('nid')		
 		terminal.terminal_name = name				
 		terminal.terminal_number = nid		
 		terminal.save()
-		user_trail(request.user.name, 'updated Terminal: '+ str(terminal.terminal_name))
+		user_trail(request.user.name, 'updated terminal: '+ str(terminal.terminal_name))
 		info_logger.info('User: '+str(request.user.name)+' updated terminal: '+str(terminal.terminal_name))
 		return HttpResponse("success")
 
@@ -147,6 +152,8 @@ def terminal_history(request,pk=None):
 			instance = get_object_or_404(Terminal, pk=pk)
 			terminal_history = TerminalHistoryEntry.objects.filter(terminal=instance).order_by('-id')
 			ctx = {'terminal_history':terminal_history}
+			user_trail(request.user.name, 'accessed terminal history for terminal: ' + str(instance.terminal_name), 'view')
+			info_logger.info('User: ' + str(request.user.name) + 'accessed terminal history for terminal for:' + str(user.terminal_name))
 			return TemplateResponse(request, 'dashboard/includes/_terminal_history.html', ctx)
 			
 

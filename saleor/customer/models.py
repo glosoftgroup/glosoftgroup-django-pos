@@ -119,7 +119,7 @@ class Customer(models.Model):
         pgettext_lazy('Customer field', 'loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
     nid = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
-    image = models.FileField(upload_to='staff', blank=True, null=True)
+    image = models.FileField(upload_to='employee', blank=True, null=True)
     date_joined = models.DateTimeField(
         pgettext_lazy('Customer field', 'date joined'),
         default=timezone.now, editable=False)

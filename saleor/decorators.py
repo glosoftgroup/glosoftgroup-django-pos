@@ -40,6 +40,7 @@ class EmailOrUsernameModelBackend(object):
 
 	"""
 	def authenticate(self, username=None, password=None):
+		username = username.lower()
 		if '@' in username:
 			kwargs = {'email': username}
 		else:

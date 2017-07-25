@@ -27,6 +27,8 @@ debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
+@staff_member_required
+@permission_decorator('group.view_group')
 def groups(request):
 	users = User.objects.all().order_by('id')
 	permissions = Permission.objects.all()
@@ -55,6 +57,7 @@ def groups(request):
 		return TemplateResponse(request, 'dashboard/permissions/group_list.html', 
 			{'users':users, 'permissions':permissions, 'groups':groups})
 
+@staff_member_required
 def group_paginate(request):
 	groups = Group.objects.all().order_by('-id')
 	page = int(request.GET.get('page', 1))
@@ -82,6 +85,7 @@ def group_paginate(request):
 		groups = paginator.page(paginator.num_pages)
 	return TemplateResponse(request,'dashboard/permissions/paginate.html',{'groups':groups})
 
+@staff_member_required
 def group_search( request ):
 
 	if request.is_ajax():
@@ -112,7 +116,7 @@ def group_search( request ):
 
 			return TemplateResponse(request, 'dashboard/permissions/search.html', {'groups':groups, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
-
+@staff_member_required
 def perms(request):
 	users = User.objects.all().order_by('-id')
 	permissions = Permission.objects.all()
@@ -126,6 +130,8 @@ def perms(request):
 	return TemplateResponse(request, 'dashboard/permissions/list.html', 
 		{'users':users, 'permissions':permissions, 'groups':groups})
 
+@staff_member_required
+@permission_decorator('group.add_group')
 @csrf_exempt
 def create_group(request):
 	if request.method == 'POST':
@@ -146,6 +152,8 @@ def create_group(request):
 			user_trail(request.user.name, 'added group '+group_name, 'add')
 			return JsonResponse({"id":last_id_group.id, "name":last_id_group.name})
 
+@staff_member_required
+@permission_decorator('group.add_group')
 @csrf_exempt
 def group_assign_permission(request):
 	if request.method == 'POST':
@@ -210,6 +218,7 @@ def users_loop(status, users):
 		user.is_active = status
 		user.save()
 
+@staff_member_required
 def get_search_users(request):
 	if request.is_ajax() and request.method == 'POST': 
 		group_id = request.POST.get('id')
@@ -217,6 +226,8 @@ def get_search_users(request):
 		html = render_to_string('dashboard/permissions/group_users.html', {'users':users})
 		return HttpResponse(html)
 
+@staff_member_required
+@permission_decorator('group.change_group')
 def group_edit(request):
 	group_id = request.POST.get('id')
 	group = Group.objects.get(id=group_id)
@@ -227,12 +238,16 @@ def group_edit(request):
 	user_trail(request.user.name, 'updated group '+group.name, 'update')
 	return HttpResponse(html)
 
+@staff_member_required
+@permission_decorator('group.view_group')
 def group_detail(request, pk):
 	group = Group.objects.get(id=pk)
 	group_permissions = Permission.objects.filter(group=group)
 	users_in_group = User.objects.filter(groups__name=group.name)
 	return HttpResponse('error deleting')
 
+@staff_member_required
+@permission_decorator('group.delete_group')
 def group_delete(request, pk):
 	group = Group.objects.get(id=pk)
 	group_permissions = Permission.objects.filter(group=group)
@@ -248,6 +263,7 @@ def group_delete(request, pk):
 	else:
 		return HttpResponse('error deleting')
 
+@staff_member_required
 def group_manage(request):
 	group_id = request.POST.get('id')
 	group = Group.objects.get(id=group_id)
@@ -258,14 +274,14 @@ def group_manage(request):
 	html = render_to_string('dashboard/permissions/edit_group_permissions.html', ctx)
 	return HttpResponse(html)
 
+@staff_member_required
 def get_group_users(request):
 	group_id = request.POST.get('id')
 	group = Group.objects.get(id=group_id)
 	users = User.objects.filter(groups__name=group.name)
-	 # construct a list which will contain all of the data for the response
+
 	to_json = []
 	for user in users:
-		# for each object, construct a dictionary containing the data you wish to return
 		user_dict = {}
 		user_dict['id'] = user.id
 		if user.name:
@@ -276,14 +292,12 @@ def get_group_users(request):
 			user_dict['image'] = str(user.image)
 		else:
 			user_dict['image'] = "/static/images/user.png"
-		# append the dictionary of each dog to the list
 		to_json.append(user_dict)
-	# convert the list to JSON
 	response_data = simplejson.dumps(to_json)
-	# return an HttpResponse with the JSON and the correct MIME type
 	return HttpResponse(response_data, content_type='application/json')
 
-
+@staff_member_required
+@permission_decorator('group.change_group')
 def group_update(request):
 	if request.method == 'POST':
 		group_id = request.POST.get('id')
@@ -335,6 +349,7 @@ def group_update(request):
 					error_logger.error(e)
 					return HttpResponse(str(e)+"That group already exists")
 
+@staff_member_required
 #** filter and save users in order
 def user_manage(users, group_has_users, group):
 	if group_has_users in users:

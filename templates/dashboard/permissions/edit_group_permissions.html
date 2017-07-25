@@ -66,7 +66,7 @@
 			 <div class="col-md-12">
 				<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">product</label>
+						<label class="display-block text-semibold">Product</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'product' %}
 								
@@ -105,7 +105,7 @@
 				
 				<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">category</label>
+						<label class="display-block text-semibold">Category</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'category' %}
 									{% if permission in group_permissions %}                          
@@ -144,7 +144,7 @@
 			 <div class="col-md-12">
 									<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">product attribute</label>
+						<label class="display-block text-semibold">Product Attribute</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'productattribute' %}
 																		{% if permission in group_permissions %}                          
@@ -180,7 +180,7 @@
 				</div>
 				<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">product class(type)</label>
+						<label class="display-block text-semibold">Product Class(type)</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'productclass' %}
 																		{% if permission in group_permissions %}                          
@@ -219,7 +219,7 @@
 			 <div class="col-md-12">
 									<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">product image</label>
+						<label class="display-block text-semibold">Product Image</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'productimage' %}
 																		{% if permission in group_permissions %}                          
@@ -255,7 +255,7 @@
 				</div>
 				<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">product tax</label>
+						<label class="display-block text-semibold">Product Tax</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'producttax' %}
 																		{% if permission in group_permissions %}                          
@@ -294,7 +294,7 @@
 			 <div class="col-md-12">
 									<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">product variants</label>
+						<label class="display-block text-semibold">Product Variants</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'productvariant' %}
 																		{% if permission in group_permissions %}                          
@@ -331,7 +331,7 @@
 
 				<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">product variant image</label>
+						<label class="display-block text-semibold">Product Variant Image</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'variantimage' %}
 																		{% if permission in group_permissions %}                          
@@ -370,7 +370,7 @@
 			 <div class="col-md-12">
 									<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">stock</label>
+						<label class="display-block text-semibold">Stock</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'stock' %}
 																		{% if permission in group_permissions %}                          
@@ -406,7 +406,7 @@
 				</div>
 				<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">stock location</label>
+						<label class="display-block text-semibold">Stock Location</label>
 						{% for permission in permissions%}
 						 {% if permission.content_type.model ==  'stocklocation' %}
 																		{% if permission in group_permissions %}                          
@@ -448,7 +448,7 @@
 			 <div class="col-md-12">
 				<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">users</label>
+						<label class="display-block text-semibold">Users</label>
 						{% for permission in permissions %}
 						 {% if permission.content_type.model ==  'user' %}
 																		{% if permission in group_permissions %}                          
@@ -484,7 +484,7 @@
 				</div>
 				<div class="col-md-6">
 					<div class="form-group">
-						<label class="display-block text-semibold">group</label>
+						<label class="display-block text-semibold">Group</label>
 						{% for permission in permissions %}
 						 {% if permission.content_type.model ==  'group' %}
 								{% if permission in  group_permissions %}                          
@@ -522,7 +522,7 @@
 			 <div class="col-md-12">
 			   <div class="col-md-6">
           <div class="form-group">
-            <label class="display-block text-semibold">customer</label>
+            <label class="display-block text-semibold">Customer</label>
             {% for permission in permissions %}
              {% if permission.content_type.model ==  'customer' %}
                                     {% if permission in group_permissions %}                          
@@ -558,7 +558,7 @@
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label class="display-block text-semibold">supplier</label>
+            <label class="display-block text-semibold">Supplier</label>
             {% for permission in permissions %}
              {% if permission.content_type.model ==  'supplier' %}
                                     {% if permission in group_permissions %}                          
@@ -593,6 +593,133 @@
           </div>
         </div>
 			 </div>
+		<div class="col-md-12">
+			<div class="col-md-6">
+				<div class="col-md-12">
+					<h5>Drawer Cash</h5>
+				</div>
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="display-block text-semibold">Terminal</label>
+						{% for permission in permissions %}
+						 {% if permission.content_type.model ==  'terminal' %}
+							{% if permission in group_permissions %}
+											<div class="checkbox">
+												<label>
+												<div class="checker">
+													<span class="checked">
+														<input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+													</span>
+													</div>
+													{{permission.name}}
+												</label>
+												<span id="granted" class="granted text-success">(granted)</span>
+											</div>
+									{% else %}
+										 <div class="checkbox">
+										 <label>
+										 <div class="checker">
+												<span class="">
+												 <input class="styled check" type="checkbox"
+												value="{{permission.id}}">
+												</span>
+											</div>
+												 {{permission.name}}
+										 </label>
+										 <span id="granted" class="granted text-success"></span>
+										 </div>
+									{% endif %}
+							{% else %}
+							{% endif %}
+							{% endfor %}
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="col-md-12">
+					<h5>Discount</h5>
+				</div>
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="display-block text-semibold">Voucher</label>
+						{% for permission in permissions %}
+						 {% if permission.content_type.model ==  'voucher' %}
+							{% if permission in group_permissions %}
+											<div class="checkbox">
+												<label>
+												<div class="checker">
+													<span class="checked">
+														<input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+													</span>
+													</div>
+													{{permission.name}}
+												</label>
+												<span id="granted" class="granted text-success">(granted)</span>
+											</div>
+									{% else %}
+										 <div class="checkbox">
+										 <label>
+										 <div class="checker">
+												<span class="">
+												 <input class="styled check" type="checkbox"
+												value="{{permission.id}}">
+												</span>
+											</div>
+												 {{permission.name}}
+										 </label>
+										 <span id="granted" class="granted text-success"></span>
+										 </div>
+									{% endif %}
+							{% else %}
+							{% endif %}
+							{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="col-md-6">
+				<div class="col-md-12">
+					<h5>Reports</h5>
+				</div>
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="display-block text-semibold">Access Reports</label>
+						{% for permission in permissions %}
+						 {% if permission.content_type.model ==  'reports' %}
+							{% if permission in group_permissions %}
+											<div class="checkbox">
+												<label>
+												<div class="checker">
+													<span class="checked">
+														<input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+													</span>
+													</div>
+													{{permission.name}}
+												</label>
+												<span id="granted" class="granted text-success">(granted)</span>
+											</div>
+									{% else %}
+										 <div class="checkbox">
+										 <label>
+										 <div class="checker">
+												<span class="">
+												 <input class="styled check" type="checkbox"
+												value="{{permission.id}}">
+												</span>
+											</div>
+												 {{permission.name}}
+										 </label>
+										 <span id="granted" class="granted text-success"></span>
+										 </div>
+									{% endif %}
+							{% else %}
+							{% endif %}
+							{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
 			 <script type="text/javascript">
 		/*--- if not login permission checked ---*/
 $("#edit-can-login").on("click",function () {

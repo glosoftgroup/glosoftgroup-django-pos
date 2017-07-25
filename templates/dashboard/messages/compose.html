@@ -1,0 +1,416 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Sms
+{% endblock %}
+ {% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:list-messages' %}">List Messages</a></li>
+     <li class="active"><a href="'{% url 'dashboard:compose' %}">Compose Sms</a></li>
+ {% endblock %}
+{% block menu_user_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Send SMS</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+        <div class="tabbable">
+          <ul class="nav nav-tabs nav-tabs-highlight">
+            <li class="active" id="supplier-tab"><a href="#supplier" data-toggle="tab" class="legitRipple" aria-expanded="false">Supplier</a></li>
+            <li class="" id="customer-tab"><a href="#customer" data-toggle="tab" class="legitRipple" aria-expanded="true">Customer</a></li>
+            <li class="" id="staff-tab"><a href="#staff" data-toggle="tab" class="legitRipple" aria-expanded="true">Staff</a></li>
+
+          </ul>
+
+          <div class="tab-content">
+
+            <div class="tab-pane animated fadeIn active" id="supplier">
+              <form class="form" enctype="multipart/form-data" id="supplier-details" name="user-details">
+                {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="name">message type</label>
+                            <select class="bootstrap-select supplier-ms-type" data-width="100%" tabindex="-98" style="display: none;">
+                                <option value="order">order supply</option>
+                                <option value="lpo">lpo</option>
+                                <option value="market">market</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                           <div class="form-group">
+                              <label for="email">suppliers</label>
+                              <div class="multi-select-full">
+                              <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="multiple" placeholder="select a user...">
+                              {% for usr in suppliers %}
+                                   <option value="{{usr.id}}">
+                                     {% if usr.name %}
+                                        {{usr.name}}
+                                     {% else %}
+                                        {{usr.email}}
+                                     {% endif %}
+                                   </option>
+                              {% endfor %}
+                              </select>
+                            </div>
+                           </div>
+                        </div>
+                          <div class="col-md-12">
+                              <label for="supplier-message">Message</label>
+                              <textarea class="form-control" name="smessage" id="supplier-message">
+                              </textarea>
+                          </div>
+                      </div>
+
+
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                     <div class="pull-left" style="margin-top:40px;">
+                      <a href="{% url 'dashboard:list-messages' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                      <button class="btn btn-primary waves-effect waves-light" id="supplier-submit" type="submit">Send Sms<i class="icon-arrow-right14 position-right"></i></button>
+                     </div>
+                    </div>
+                  </div>
+                </form>
+            </div>
+            <div class="tab-pane animated fadeIn" id="customer">
+                <form class="form" enctype="multipart/form-data" id="customer-details" name="user-details">
+                {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="name">message type</label>
+                            <select class="bootstrap-select customer-ms-type" data-width="100%" tabindex="-98" style="display: none;">
+                                <option value="discounts">discounts</option>
+                                <option >lpo</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                           <div class="form-group">
+                              <label for="email">customers</label>
+                              <div class="multi-select-full">
+                              <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="multiple" placeholder="select a user...">
+                              {% for usr in customers %}
+                                   <option value="{{usr.id}}">
+                                     {% if usr.name %}
+                                        {{usr.name}}
+                                     {% else %}
+                                        {{usr.email}}
+                                     {% endif %}
+                                   </option>
+                              {% endfor %}
+                              </select>
+                            </div>
+                           </div>
+                        </div>
+                          <div class="col-md-12">
+                              <label for="customer-message">Message</label>
+                              <textarea class="form-control" name="cmessage" id="customer-message">
+
+                              </textarea>
+                          </div>
+                      </div>
+
+
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                     <div class="pull-left" style="margin-top:40px;">
+                      <a href="{% url 'dashboard:list-messages' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                      <button class="btn btn-primary waves-effect waves-light" id="customer-submit" type="submit">Send Sms <i class="icon-arrow-right14 position-right"></i></button>
+                     </div>
+                    </div>
+                  </div>
+                </form>
+           </div>
+
+          <div class="tab-pane animated fadeIn" id="staff">
+          <form class="form" enctype="multipart/form-data" id="staff-details" name="user-details">
+            {% csrf_token %}
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="name">message type</label>
+                        <select class="bootstrap-select staff-ms-type" data-width="100%" tabindex="-98" style="display: none;">
+                            <option value="order">order supply</option>
+                            <option value="lpo">lpo</option>
+                            <option value="market">market</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                       <div class="form-group">
+                          <label for="email">staff</label>
+                          <div class="multi-select-full">
+                          <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="user_select" id="multiple" placeholder="select a user...">
+                          {% for usr in staff %}
+                               <option value="{{usr.id}}">
+                                 {% if usr.name %}
+                                    {{usr.name | title}}
+                                 {% else %}
+                                    {{usr.email|title}}
+                                 {% endif %}
+                               </option>
+                          {% endfor %}
+                          </select>
+                        </div>
+                       </div>
+                    </div>
+                      <div class="col-md-12">
+                          <label for="staff-message">Message</label>
+                          <textarea class="form-control" name="stmessage" id="staff-message">
+                          </textarea>
+                      </div>
+                  </div>
+
+
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                 <div class="pull-left" style="margin-top:40px;">
+                  <a href="{% url 'dashboard:list-messages' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                  <button class="btn btn-primary waves-effect waves-light" id="supplier-submit" type="submit">Send Sms<i class="icon-arrow-right14 position-right"></i></button>
+                 </div>
+                </div>
+              </div>
+            </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+//** supplier
+      $('.supplier-ms-type').selectpicker().on('change',function(){
+          var v = $(this).val();
+
+          if(v == 'order'){
+            $('#supplier-message').val('please supplier the following {item(s)} by {date}')
+          }else if(v == 'lpo'){
+            $('#supplier-message').val('please see you mail for items details and their prices')
+          }else if (v == 'market'){
+            $('#supplier-message').val('Great rate interest for our suppliers')
+          }
+      });
+      $('#supplier-details').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+            smessage: {
+              required:true,
+              minlength:3
+            }
+        },
+        messages:{
+          smessage:{
+            required: "please provide a name",
+            minlength: "name must be atleast 3 characters long"
+          }
+        },
+        submitHandler: function() {
+          var file = $('#image')[0].files[0];
+          var raw_groups = $(".supplier-ms-type :selected").map(function(){
+                   return $(this).val();
+                }).get();
+          var f = document.getElementById('supplier-details');
+          var formData = new FormData(f);
+          for (var i = 0; i < raw_groups.length; i++) {
+              formData.append('groups[]', raw_groups[i]);
+          }
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:user_process' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       $("#supplier-message").val('');
+
+                       $.jGrowl('message sent successfully', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+                       // window.location = "{% url 'dashboard:users' %}";
+                      next_tab();
+                      disable_profile_tab()
+                      localStorage.setItem('user_id', data);
+                      $('.user_id').val(localStorage.getItem("user_id"));
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try sending again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            }
+        }
+      });
+
+//** customer
+      $('.customer-ms-type').selectpicker();
+      $('#customer-details').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+            cmessage: {
+              required:true,
+              minlength:3
+            }
+
+        },
+        messages:{
+          cmessage:{
+            required: "please provide a name",
+            minlength: "name must be atleast 3 characters long"
+          }
+        },
+        submitHandler: function() {
+          var file = $('#image')[0].files[0];
+          var raw_groups = $(".customer-ms-type :selected").map(function(){
+                   return $(this).val();
+                }).get();
+
+              var f = document.getElementById('customer-details');
+              var formData = new FormData(f);
+              for (var i = 0; i < raw_groups.length; i++) {
+                  formData.append('groups[]', raw_groups[i]);
+              }
+              if (formData) {
+                    $.ajax({
+                        url: "{% url 'dashboard:user_process' %}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success:function(data){
+                           console.log(data);
+                           $("#customer-message").val('');
+
+                           $.jGrowl('message sent successfully', {
+                              header: 'Well done!',
+                              theme: 'bg-success'
+                           });
+                           // window.location = "{% url 'dashboard:users' %}";
+                          next_tab();
+                          disable_profile_tab()
+                          localStorage.setItem('user_id', data);
+                          $('.user_id').val(localStorage.getItem("user_id"));
+                        },
+                        error:function(error){
+                          console.log(error);
+                          $.jGrowl('Change a few things up and try sending again', {
+                              header: 'Oh snap!',
+                              theme: 'bg-danger'
+                          });
+                        }
+                    });
+                }
+
+        }
+      });
+
+//** customer
+      $('.staff-ms-type').selectpicker();
+      $('#staff-details').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+            stmessage: {
+              required:true,
+              minlength:3
+            }
+
+        },
+        messages:{
+          stmessage:{
+            required: "please provide a name",
+            minlength: "name must be atleast 3 characters long"
+          }
+        },
+        submitHandler: function() {
+          var raw_groups = $(".staff-ms-type :selected").map(function(){
+                   return $(this).val();
+                }).get();
+
+              var f = document.getElementById('staff-details');
+              var formData = new FormData(f);
+              for (var i = 0; i < raw_groups.length; i++) {
+                  formData.append('groups[]', raw_groups[i]);
+              }
+              if (formData) {
+                    $.ajax({
+                        url: "{% url 'dashboard:user_process' %}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success:function(data){
+                           console.log(data);
+                           $("#staff-message").val('');
+
+                           $.jGrowl('message sent successfully', {
+                              header: 'Well done!',
+                              theme: 'bg-success'
+                           });
+                           // window.location = "{% url 'dashboard:users' %}";;
+                        },
+                        error:function(error){
+                          console.log(error);
+                          $.jGrowl('Change a few things up and try sending again', {
+                              header: 'Oh snap!',
+                              theme: 'bg-danger'
+                          });
+                        }
+                    });
+                }
+
+        }
+      });
+
+  });
+</script>
+{% endblock %}

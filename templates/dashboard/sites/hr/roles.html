@@ -1,0 +1,53 @@
+{% if user_roles %}
+<div id="user-roles" class="table-responsive pre-scrollable user-roles" style="max-height: 290px;overflow-y:scroll">
+  <table class="table table-frameds" id="table-roles">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for role in user_roles %}
+      <tr class="animated fadeIn">
+        <td>{{ forloop.counter }}</td>
+        <td>
+        {{ role.name }}
+        </td>
+        <td class="text-center">
+          <ul class="icons-list">
+            <li>
+                <a data-ta="#edit_modal_instance" data-title="{{ role.name|capfirst }}" data-href="{% url 'dashboard:role-edit' pk=role.pk %}" data-name="{{ role.name }}" data-id="{{ role.pk }}"
+             class="edit_modal-trigger btn btn-default btn-sm edit-btn" data-cat="user_role" data-label="User Role:"><i class="icon-pencil7" style="font-size: 11px;"></i> edit
+                 </a>
+            </li>
+            <li>
+              <a data-ta="#modal_instance" data-title="Delete role {{ role.name }} ?" data-href="{% url 'dashboard:role-delete' pk=role.pk %}" data-name="{{ role.name }}" data-id="{{ role.pk }}"
+             class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+             </a>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+ <div class="animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No roles available
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<script>
+    $(document).ready(function(){
+
+    });
+</script>

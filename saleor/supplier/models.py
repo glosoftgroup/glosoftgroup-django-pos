@@ -125,7 +125,7 @@ class SupplierManager(BaseUserManager):
         'Creates a User with the given username, email and password'
         email = SupplierManager.normalize_email(email)
         supplier = self.model(email=email, is_active=is_active,
-                           **extra_fields)        
+                           **extra_fields)
         supplier.save()
         return supplier
     
@@ -148,7 +148,7 @@ class Supplier(models.Model):
         default=True)
     code = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
-    image = models.FileField(upload_to='staff', blank=True, null=True)
+    image = models.FileField(upload_to='employee', blank=True, null=True)
     date_joined = models.DateTimeField(
         pgettext_lazy('Supplier field', 'date joined'),
         default=timezone.now, editable=False)
