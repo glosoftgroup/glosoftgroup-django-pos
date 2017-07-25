@@ -1,22 +1,13 @@
 {% load static %}
-<div class="form-group" id='div_attributes'>
-	<label>Product Attributes</label>
-	<span>
-	  <a href="">
-	    <button id="add-new-attribute" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" class_pk %}'
-              href="#modal_attribute">
-		<i class=" icon-stack-plus"></i>		
-		</button>
-	  </a>
-	  <i class="icon-database-refresh" id="refreshAttributes" onclick="refreshAttributes()"></i>
-	</span>
+
+	
 	{% for attribute_field in product_form.iter_attribute_fields %}
-	<div class="">
+	<div class="col-md-4">
 	<label>{{ attribute_field.label }}</label>
 	{{ attribute_field }}
 	</div>
 	{% endfor %}
-</div>
+
 <script type="text/javascript">
  $('.select').select2({
         minimumResultsForSearch: Infinity

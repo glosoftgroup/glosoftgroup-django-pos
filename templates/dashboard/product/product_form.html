@@ -62,7 +62,9 @@
 
 {% block menu_catalogue_class %} active{% endblock %}
 
+
 {% block content %}
+
 <div id='results'></div>
 <div class="row">
     <div class="col-md-12">
@@ -79,7 +81,7 @@
               </div>
 
               <div class="panel-body">
-                <div class="tabbable tab-content-bordered">
+                <div class="tabbable ">
                   <ul class="nav nav-tabs nav-tabs-highlight">
                   <!-- general settings tab -->
                    {% if request.GET.tab %}                   
@@ -123,10 +125,10 @@
                     {% endif %}
                    
                        <!-- 2 columns form -->
-        <form method="post" class="form-horizontal" id="form-product" enctype="multipart/form-data" novalidate>
-          {% csrf_token %}
+        <form method="post" class="form-horizontals" id="form-product" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}         
             <div class="panelpanel-flat">
-
+             
               <div class="panel-body">
               
                 {% if errors %}
@@ -134,208 +136,221 @@
                   {{errors}} 
                   </div>             
                 {% endif %}
+              
+      
+  <!-- panel -->   
+   
+    <!-- body -->
+    <div class="row">
 
-                <div class="row">
-                  <div class="col-md-6">
-                    {% if product.pk %}
-                    <fieldset id='fieldset1' > 
-                    {% else %}
-                    <fieldset>
-                    {% endif %}
-                    <!-- product name -->
-                      <div class="form-group">
-                        <label>Product Name:<i class='text-danger'> *</i></label>
-                        {{ product_form.name}}
-                      </div>
-                      <!-- product category -->
-                      <div class="form-group">
-                        <label>
-                        {{ product_form.categories.label }}:
-                        <i class='text-danger'> *</i><button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product category" data-trigger="hover" data-content=" products offering the same general functionality.E.g Flour would fall under Grocery category"> <i class="icon-info22 position-right"></i></button>
-                        </label>
-                       <div class="row">
-                        <div class="col-md-10" id='category_field'>              
-                          <div class="multi-select-full">   
-                            {{ product_form.categories }}
-                          </div>                         
-                        </div>
-                        <div class="col-md-2">
-                          <button href="#modal_add_category" class="btn btn-flat" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
-                          <i class=" icon-stack-plus"></i>           
-                          </button>
-                        </div>
-                        
-                       </div>
-                      </div> 
-
-                      <div id='productType'>
-                      <!-- product type -->
-                      <div class="form-group">
-                      <label>Product Type</label> <button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product Type" data-trigger="hover" data-content="Think about it as template for your products. Multiple products can use same product class. E.g Flour, Electronics"> <i class="icon-info22 position-right"></i></button>
-                      <div class="input-group">          
-                      {{ product_form.product_class}}
-                         <div class="input-group-btn">
-                            <button type="button"  id="add-new-type" href="#modal_add_category" class="btn btn-flat" data-title="Add New category" data-href='{% url "dashboard:product-class-add-new" 12 %}' data-csrf="{% csrf_token %}" onclick='return false;'>
-                            <i class=" icon-stack-plus"></i>                   
-                            </button>
-                          </div>
-                      </div>
-                       <!-- {{ form_classes }} -->
-                      </div>
-
-                      <!-- product attributes -->
-                      <div class="form-group" id='div_attributes'>
-                        <label>Product Attributes</label>
-                        <button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product Type" data-trigger="hover" data-content="– it’s a characteristic of a product, shared with all product variants. Example: Manufacturer - all flour variants(1kg,2kg) are published by same company"> <i class="icon-info22 position-right"></i></button>
-                        <span>
-    <a href="">
-      <button id="add-new-attribute" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
-              href="#modal_attribute">
-    <i class=" icon-stack-plus"></i>   
-    </button>
-    </a>
-    <i class="icon-database-refresh" onclick="refreshAttributes()"></i>
-  </span>
-                         {% for attribute_field in product_form.iter_attribute_fields %}
-                         <div class="">
-                         <label>{{ attribute_field.label }}</label>
-                          {{ attribute_field }}
-                        </div>
-                        {% endfor %}
-                      </div>
-                      </div>
-                      <div class="form-group">
-                        <label>Product Description:<i class='text-danger'> *</i></label>
-                       {{ product_form.description }}
-                      </div>                  
-                    </fieldset>
+     <div class="col-md-12">
+       <!-- Product Details -->
+        <div class="col-md-12">
+          <h5>Product Details</h5>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Product Name:<i class='text-danger'> *</i></label>
+                {{ product_form.name}}
+            </div>
+         </div>
+            <div class="col-md-4">
+              <div class="form-group" >
+                <label>Product Category: </label>
+                <div class="input-group">
+                             
+                      <div class="multi-select-full input-group-btn" id='category_field' >   
+                        {{ product_form.categories }}
+                      </div>                         
+                  
+                  <div class="input-group-btn">
+                     <button type="button" class="btn bg-indigo btn-icon legitRipple edit_modal-trigger" data-popup="tooltip" 
+                    data-original-title="Add New category"
+                    href="#modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                       <i class="icon-plus-circle2"></i>
+                     </button>
+                   </div>
+                 </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group" id='productType'>
+                <label>Product Type: % </label>
+                <div class="input-group">
+              
+              {{ product_form.product_class}}
+            
+                 <div class="input-group-btn">
+                    <button type="button"  id="add-new-type" href="#modal_type" class="btn bg-indigo btn-icon " data-title="Add New category" data-href='{% url "dashboard:product-class-add-new" 12 %}' data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip" data-original-title="Add New Type">
+                   <i class="icon-plus-circle2"></i>                   
+                    </button>
                   </div>
+              </div>
+              </div>
+            </div>
+        
+      
+     </div>
 
-                  <div class="col-md-6">
-                    {% if product.pk %}
-                    <fieldset id='fieldset2'> 
-                    {% else %}
-                    <fieldset>
-                    {% endif %} 
-                      <div class="">
-                      <!-- Tax -->
-                       <div class="col-md-12">
-                          <div class="form-group col-md-12" id='tax_field'>
-                            <label>Tax: % </label>
-                            <div class="input-group">
-                            {{ product_form.product_tax }}
-                              <div class="input-group-btn">
-                                <button type="button" class="btn btn-flat" id="add-new-tax"><i class=" icon-stack-plus"></i></button>
-                              </div>
-                             </div>
-                          </div>
-                        </div>
-                        <!-- Retail price exclusive tax -->
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="col-md-12">Retail Price:<i class='text-danger'>*</i><span class="text-muted text-small">(Inclusive Tax)</span></label>
-                            {{ product_form.price }}                
-                          </div>
-                        </div>
-                        <!-- wholesale price exclusive tax -->
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="col-md-12">wholesale Price:<span class="text-muted text-small">(Inclusive Tax)</span></label>
-                            {{ product_form.wholesale_price }}                     
-                          </div>
-                        </div>
+     <!-- product attributes -->
+     <div class="col-md-12">
+       <!-- Product attributes -->
+        <div class="col-md-12">
+          
+         <div class="form-group">
+          <label>Product Attributes</label>
+          <button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product Type" data-trigger="hover" data-content="– it’s a characteristic of a product, shared with all product variants. Example: Manufacturer - all flour variants(1kg,2kg) are published by same company"> <i class="icon-info22 position-right"></i></button>
+          <span>
+            <a href="">
+              <input type="hidden" value='{% url "dashboard:product-attr-add-value" 1 %}' id="link-pk" name="link-pk">
+              <button id="add-new-attribute" onclick="return false;" class="btn bg-indigo btn-icon  text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
+                      href="#modal_attribute"  data-popup="tooltip" 
+            data-original-title="Edit attributes">
 
-                        <!-- disabled display -->
-                        <div class="col-md-6 divider">
-                          <div class="form-group">
-                            <label class="col-md-12 text-muted">Retail Price:<span class="text-muted text-small">(Before Tax)</span></label>
-                          <span class="col-md-12">
-                           <input type="disabled" name="retail_plus_tax" id="retail_plus_tax" class="form-control" value="" disabled="">
-                           </span>                  
-                          </div>                    
-                        </div>
-                        <!-- wholesale disabled -->
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="col-md-12 text-muted">wholesale Price:(Before Tax)</label>
-                            <span class="col-md-12">
-                           <input type="disabled" name="wholesale_plus_tax" id="wholesale_plus_tax" class="form-control" value="" disabled="">
-                           </span>                  
-                          </div>                    
-                        </div>
-                        <!-- tax in KES -->
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="col-md-12 text-muted">Retail Tax:</label>
-                            <span class="col-md-12">
-                           <input type="disabled" name="retail_tax" id="retail_tax" class="form-control" value="" disabled="">
-                           </span>                  
-                          </div>                    
-                        </div>
-                        <!-- wholesale tax -->
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="col-md-12 text-muted">Wholesale Tax:</label>
-                            <span class="col-md-12">
-                           <input type="disabled" name="wholesale_tax" id="wholesale_tax" class="form-control" value="" disabled="">
-                           </span>                  
-                          </div>                    
-                        </div>
-                        
-                      </div>
-
-                      <div class="">
-                        <div class="col-md-12">
-                          <div class="form-group col-md-12">
-                            <label>Reorder Stock Threshold:</label>
-                           {{ product_form.low_stock_threshold }}
-                          </div>
-                        </div>
-                        <div class="col-md-12" id="div_supplier">
-                        <label>Supplier:</label>
-                         <div class="input-group">
-                           
-                           {{ product_form.product_supplier }}
-                          <span class="input-group-btn">
-                           <button id="add-supplier" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg"  data-href='{% url "dashboard:supplier-ajax-add"  %}'
-              href="#modal_attribute">
-    <i class=" icon-stack-plus"></i>   
-    </button>
-                          </span>
-                         </div>
-                        </div>
-                        <div class="col-md-12">
-                          <div class="form-group col-md-12">
-                            <label>Available From:</label>
-                           {{ product_form.available_on }}
-                          </div>
-                        </div>
-                        <div class="col-md-12">
-                          <div class="form-group">
-                             {% if not product.product_class.has_variants %}
-                                <div class="">
-                                  {{ variant_form.sku }}
-                                </div>
-                             {% endif %}
-                          </div>
-                        </div>
-                        <!-- <div class='col-md-6'>
-                          <div class='form-group'>
-                           <label class="checkbox-inline">
-                            {{ product_form.is_featured }}
-                            {{ product_form.is_featured.label }}
-                            &nbsp;
-                          </label>
-                           
-                          </div>
-                        </div> -->
-                      </div>
-                    </fieldset>
-                  </div>                  
-                </div>
+            <i class="icon-pencil7"></i>   
+            </button>
+            </a>
+          </span>
+          </div>
+        </div>
+      <!-- product attribute -->
+      <div class="col-md-12">
+        <!-- product attributes -->
+        <div class="form-group" id='div_attributes'>          
+          
                 
+           {% for attribute_field in product_form.iter_attribute_fields %}
+          <div class="col-md-4">
+           <label>{{ attribute_field.label }}</label>
+            {{ attribute_field }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <!-- ./product attribute -->
+     
+     </div>
 
-                <div class="text-right">
+     <!-- stock reorder limit -->
+     <div class="col-md-12">       
+        <div class="col-md-12">
+          <h5>stock reorder limit</h5>
+        </div>
+      <!-- stock reorder limit -->
+      <div class="col-md-6">
+        <div class="form-group">
+            <label>Reorder Stock Threshold:</label>
+           {{ product_form.low_stock_threshold }}
+        </div>
+      </div>
+      <!-- ./stock reorder limit -->
+      <!-- supplier -->
+      <div class="col-md-6">
+        <div class="form-group" id="div_supplier">
+          <label>Supplier:</label>
+           <div class="input-group">
+             
+             {{ product_form.product_supplier }}
+             <span class="input-group-btn">
+             <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-indigo "  data-href='{% url "dashboard:supplier-ajax-add"  %}' href="#modal_attribute"  data-popup="tooltip"  data-original-title="Add New Supplier">
+              <i class=" icon-plus-circle2"></i>   
+             </a>
+            </span>
+           </div>
+          </div>
+      </div>
+      <!-- ./supplier -->     
+     </div>
+
+     <!-- Product Pricing Details -->
+     <div class="col-md-12">       
+        <div class="col-md-12">
+          <h5>Product Pricing Details</h5>
+        </div>
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group" id='tax_field'>
+                <label>Tax: % </label>
+                <div class="input-group">
+                {{ product_form.product_tax }}
+                  <div class="input-group-btn">
+                    <button type="button" class="btn btn-icon bg-indigo" id="add-new-tax"  data-popup="tooltip" data-original-title="Add New Tax">
+                    <i class=" icon-plus-circle2"></i></button>
+                  </div>
+                 </div>
+              </div>
+            </div>
+          </div>
+          
+
+        </div>
+      <!-- Retail price inclusive tax -->
+      <div class="col-md-4">
+        <div class="form-group">
+            <label class="col-md-12">Retail Price:<i class='text-danger'>*</i><span class="text-muted text-small">(Inclusive Tax)</span></label>
+            {{ product_form.price }}                
+        </div>
+      </div>
+      <!-- -->
+      <!-- Retail Tax -->
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="col-md-12 text-muted">Retail Tax:</label>
+            <span class="col-md-12">
+           <input type="disabled" name="retail_tax" id="retail_tax" class="form-control" value="" disabled="">
+           </span>                  
+        </div>
+      </div>
+
+      <!-- (Before Tax) -->
+      <div class="col-md-4">
+         <div class="form-group">
+          <label class="col-md-12 text-muted">Retail Price:<span class="text-muted text-small">(Before Tax)</span></label>
+          <span class="col-md-12">
+           <input type="disabled" name="retail_plus_tax" id="retail_plus_tax" class="form-control" value="" disabled="">
+          </span>                  
+        </div>
+      </div> 
+      <!--  -->
+
+      <!-- wholesale Price: -->
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="col-md-12">wholesale Price:<span class="text-muted text-small">(Inclusive Tax)</span></label>
+          {{ product_form.wholesale_price }}                     
+        </div>
+      </div> 
+ 
+      <!-- Wholesale Tax: -->
+      <div class="col-md-4">
+        <div class="form-group">
+            <label class="col-md-12 text-muted">Wholesale Tax:</label>
+            <span class="col-md-12">
+           <input type="disabled" name="wholesale_tax" id="wholesale_tax" class="form-control" value="" disabled="">
+           </span>                  
+          </div>
+      </div>
+
+      <!-- wholesale price before tax  -->
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="col-md-12 text-muted">wholesale Price:(Before Tax)</label>
+          <span class="col-md-12">
+            <input type="disabled" name="wholesale_plus_tax" id="wholesale_plus_tax" class="form-control" value="" disabled="">
+         </span>                  
+        </div> 
+      </div>      
+     </div>
+
+    </div>
+    <!-- ./body --> 
+  
+  <!-- ./panel -->
+ 
+
+
+                <div class="text-center p-10">
                   {% if product.pk %}
               <a href="{% url 'dashboard:product-list' %}" class="btn btn-flat ">
                 {% trans "Cancel" context "Dashboard cancel action" %}
@@ -670,7 +685,7 @@
                   <div class="caption-overflow">
                     <span>
                       <a href="{{ image.image.crop.255x255 }}" data-popup="lightbox" class="btn border-white text-white btn-flat btn-icon btn-rounded"><i class="icon-plus3"></i></a>
-                      <a href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=image.pk %}" class="btn border-white text-white btn-flat btn-icon btn-rounded ml-5"><i class="icon-pencil7"></i></a>
+                      <a href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=image.pk %}" class="btn border-white text-white btn-flat btn-icon btn-rounded "><i class="icon-pencil7"></i></a>
                     </span>
                   </div>
                 </div>
@@ -759,6 +774,7 @@
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
  {% include "dashboard/includes/_modal_attribute_choice.html"  %}
+ {% include "dashboard/includes/_modal_type.html"  %}
 {% endblock %}
 
  {% block custom_js %}
@@ -789,7 +805,11 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/productattribute.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
-
+ <script type="text/javascript">
+  $( document ).ready(function() {
+    $( "h5" ).addClass( "text-bold" );
+  });
+  </script>
 <script type="text/javascript">
  
 
@@ -966,7 +986,7 @@
   // content locader
   // content wait loader
    function content_loader(val) {   
-    var block = $(val).parent().parent().parent().parent().parent();
+    var block = $(val).parent();
     
         $(block).block({ 
             message: '<i class="icon-spinner2 spinner"></i><br><span class="align-center">Please wait</span>',
@@ -995,11 +1015,12 @@
      // Put the results in a div
    posting.done(function( data ) {    
     $( "#div_attributes" ).empty().append( data ); 
-    var block = $('#div_attributes').parent().parent().parent().parent().parent();   
+    var block = $('#div_attributes').parent();   
       $(block).unblock(); 
   });
 
   }
+  
   // end refreshAttributes
 
   // refreshsupplier func
@@ -1022,7 +1043,12 @@
 
   $( "select[name*='product_class']").change(function refreshAttributes() {
   // Check input( $( this ).val() ) for validity here
-  
+   //alert(getProductClass());
+   var link = '{% url "dashboard:product-attr-add" %}';
+   var link = link+getProductClass()+'/';
+   //alert(link);
+   $('#add-new-attribute').attr('data-href',link);
+   $('#link-pk').val(link);
    {% url "dashboard:fetch-variants" as url %} 
    var url = "{{ url }}";
    var class_pk = $( this ).val();

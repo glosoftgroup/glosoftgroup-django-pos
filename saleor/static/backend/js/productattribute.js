@@ -1,12 +1,14 @@
 
 $(function() {
   //add  product attribute
+
   $('#add-new-attribute').on('click',function(){
-  	var url = $(this).data('href');
+  	var url = $('#link-pk').val(); //$(this).data('href');
   	var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
   	var title_text = $(this).data('title');
   	$('.modal-title').html(title_text);
   	var modal = $(this).attr('href');
+    
   	$(modal).modal();
   	//get form
   	var posting = $.get( url, 
@@ -31,6 +33,7 @@ $(function() {
   
   //var url = $("#add-new-attribute").data('href');
   var attr_pk = 0
+  var url = $('#add-new-attribute').data('href');
   
   // submit choice 
   $('#add_attrChoice_btn').on('click',function(){
@@ -63,7 +66,8 @@ $(function() {
 
   $('#add_attr_btn').on('click',function(){
     var attr_name = $('#attr_name').val();
-    var value = $('#value').val();
+    var value = $('#value').val(); 
+    alert(attr_name);   
     if(!attr_name){ 
       notify('add a valid attribute name');
       return false; 
@@ -79,6 +83,7 @@ $(function() {
         attr_pk = parseInt(data);
         url = url+attr_pk+'/';
         $('#action').html('Add Value');
+        $('#add_value').removeClass('hidden');
       }else{
         $('#add_value').empty().append( data );
         $('#action').html('Add more Value');
