@@ -1,17 +1,4 @@
-<div class="modal-body">         
-<!-- form  -->
-  <div class="panel panel-flat">
-    <div class="panel-heading">
-      <h5 class="panel-title">Product Attribute</h5>
-      <div class="heading-elements">
-        <ul class="icons-list">
-          <li><a data-action="collapse"></a></li>
-          <li><a data-action="reload"></a></li>
-          <li><a data-action="close"></a></li>
-        </ul>
-      </div>
-    </div> 
-    <div class="panel-body">
+<div class="modal-body">
     <div class="row">
     <form method="post" enctype="multipart/form-data">    
          <div class="col-md-12">
@@ -28,12 +15,13 @@
             
              <span class="help-block">Attribute name e.g Brand</span>
             </div>
-          </div>            <hr>
+          </div>
 
           <div class="col-md-12">
+              <div class="row">
            {% for attr in attributes %}
            <div class="col-md-12">
-            <hr><label>Name: {{ attr }}</label><br>
+            <label>Name: {{ attr }}</label><br>
             </div>
             <div class="col-md-6">
              <div class="input-group">
@@ -45,12 +33,17 @@
             </div>
 
             <div class="col-md-6 add_value{{attr.pk}}">
-              {% for v in attr.values.all %}     
+                 <div class="tokenfield form-control">
+                    <input class="form-control token-field" value="California,Washington" placeholder="- Bootstrap Tokenfield" style="position: absolute; left: -10000px;" tabindex="-1" type="text">
+                    <input style="position: absolute; left: -10000px;" tabindex="-1" type="text">
+                  {% for v in attr.values.all %}
+                    <div class="token bg-success">
+                        <span class="token-label" style="max-width: 457px;padding: 8px 20px 8px 16px;">{{ v }}</span>
+                        <!--<a href="#" class="close" tabindex="-1">×</a>-->
+                    </div>
+                  {% endfor %}
+                </div>
 
-               <span class="text-mute label label-success"> {{ v }},
-
-               </span>             
-              {% endfor %}
                </div>
                <script type="text/javascript">
               $('#cbtn{{attr.pk}}').on('click',function(){
@@ -82,7 +75,7 @@
               });
             </script>
            {% endfor %}
-
+          </div>
           </div>
           
       <!-- action buttons -->
@@ -90,9 +83,7 @@
      </div>
       </form>
     </div>
-   
-    </div>
-
-   </div>
-           <!-- end form -->
-          </div>
+  </div>
+<div class="modal-footer text-center">
+    <button type="button" id='refresh_content' onclick="refreshAttributes()" class="btn btn-block btn-lg btn-default" data-dismiss="modal">Close</button>
+</div>

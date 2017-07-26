@@ -2,13 +2,9 @@
 {% load i18n %}
 {% load mptt_tags %}
 {% load staticfiles %}
- <div class="well well-sm">
-    
-    <div class="panel-body">
     <div class="row">
      <form method="post" id="form-category" enctype="multipart/form-data" novalidate>      
             {% csrf_token %}
-           
          <div class="col-md-6 col-md-offset-3">
             <div class="form-group">
                <label>Category Name (required)</label>
@@ -21,15 +17,34 @@
             <div class="form-group">
             {{ form.hidden|materializecss:"input-field s12" }}
             </div>
-            
-     
-         </div>         
-         
-     
+         </div>
       </form>
     </div>
-   
-    </div>
-
-   </div>
   <div class="col m12 l3 help-box"></div>
+<script>
+    $(document).ready(function(){
+        $("#form-category").validate({
+         onkeyup: function(element) {$(element).valid()},
+             rules:{
+                cat_name: {
+                  required:true,
+                  minlength:3
+                },
+                cat_description: {
+                  required:true,
+                  minlength:3
+                },
+              },
+              messages:{
+                  cat_name:{
+                    required: "please provide a category name",
+                    minlength: "name must be atleast 6 characters long"
+                  },
+                  cat_description:{
+                    required: "please add a description",
+                    minlength: "password must be atleast 6 characters long"
+                  },
+                }
+        });
+    });
+</script>

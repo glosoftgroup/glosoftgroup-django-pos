@@ -4,7 +4,7 @@
       <div class="modal-content">
         <div class="modal-header bg-blue">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h6 class="modal-title text-white"></h6>
+          <h6 class="modal-title text-white text-center"></h6>
         </div>
 
         <div class="modal-body">
@@ -23,10 +23,12 @@
         </div>
         
         <div class="modal-footer">
-          <button onclick='return false' id='modal_add_category_btn' class="btn  bg-primary">
-            <i class='text-white'>Create</i>
-          </button>
-          <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+          <div class="col-md-6 col-md-offset-3">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            <button onclick='return false' id='modal_add_category_btn' class="btn  bg-primary pull-right">
+              Create
+            </button>
+          </div>
         </form>
           
         </div>
