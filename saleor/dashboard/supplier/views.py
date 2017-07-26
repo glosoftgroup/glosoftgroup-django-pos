@@ -54,13 +54,18 @@ def user_add(request):
 		return HttpResponse('error accessing add users page')
 
 @staff_member_required
+def supplier_add_modal(request):
+	try:
+		return TemplateResponse(request, 'dashboard/supplier/_modal_add_supplier.html', {})
+	except Exception as e:
+		error_logger.error(e)
+		return HttpResponse('error accessing add suppliers page')
 def supplier_add(request):
 	try:
 		return TemplateResponse(request, 'dashboard/supplier/add_supplier.html',{})
-	except TypeError as e:
+	except Exception as e:
 		error_logger.error(e)
-		return HttpResponse('error accessing add users page')
-
+		return HttpResponse('error accessing add suppliers page')
 @staff_member_required
 def fetch_suppliers(request):
 	suppliers = Supplier.objects.all()

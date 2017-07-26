@@ -121,6 +121,8 @@ urlpatterns = [
         (views.attribute_edit), name='product-attribute-update'),
     url(r'attributes/add/$', permission_required('product.add_productattribute', login_url='not_found')
         (views.attribute_edit), name='product-attribute-add'),
+    url(r'attributes/add/modal/$', permission_required('product.add_productattribute', login_url='not_found')
+    (views.attribute_add_modal), name='product-attribute-add-modal'),
     url(r'attributes/(?P<pk>[0-9]+)/delete/$', permission_required('product.delete_productattribute', login_url='not_found')
         (views.attribute_delete), name='product-attribute-delete'),
 

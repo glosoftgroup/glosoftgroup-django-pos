@@ -19,6 +19,92 @@
 
 {% block menu_products_class %}active{% endblock %}
 
+{% block custom_css %}
+    <style>
+    /* The first modal translateZ value*/
+    .container {
+      margin: 5em auto;
+    }
+    .modal.in {
+      -webkit-perspective: 2000px;
+      -moz-perspective: 2000px;
+      -ms-perspective: 2000px;
+      -o-perspective: 2000px;
+      perspective: 2000px;
+    }
+    .modal.in .modal-dialog.aside {
+      -webkit-transform: -340px;
+      -moz-transform: -340px;
+      -ms-transform: -340px;
+      -o-transform: -340px;
+      transform: -340px;
+      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
+      -ms-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
+      -o-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
+      transform: scale(0.8) rotateY(45deg) translateZ(-340px);
+      -webkit-transform-style: preserve-3d;
+      -ms-transform-style: preserve-3d;
+      -o-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+    }
+    .modal.in .modal-dialog.aside.aside-1 {
+      -webkit-transform: calc(-300px);
+      -moz-transform: calc(-300px);
+      -ms-transform: calc(-300px);
+      -o-transform: calc(-300px);
+      transform: calc(-300px);
+      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
+      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
+      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
+      transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
+    }
+    .modal.in .modal-dialog.aside.aside-2 {
+      -webkit-transform: calc(-260px);
+      -moz-transform: calc(-260px);
+      -ms-transform: calc(-260px);
+      -o-transform: calc(-260px);
+      transform: calc(-260px);
+      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
+      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
+      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
+      transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
+    }
+    .modal.in .modal-dialog.aside.aside-3 {
+      -webkit-transform: calc(-220px);
+      -moz-transform: calc(-220px);
+      -ms-transform: calc(-220px);
+      -o-transform: calc(-220px);
+      transform: calc(-220px);
+      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
+      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
+      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
+      transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
+    }
+    .modal.in .modal-dialog.aside.aside-4 {
+      -webkit-transform: calc(-180px);
+      -moz-transform: calc(-180px);
+      -ms-transform: calc(-180px);
+      -o-transform: calc(-180px);
+      transform: calc(-180px);
+      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
+      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
+      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
+      transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
+    }
+    .modal.in .modal-dialog.aside.aside-5 {
+      -webkit-transform: calc(-140px);
+      -moz-transform: calc(-140px);
+      -ms-transform: calc(-140px);
+      -o-transform: calc(-140px);
+      transform: calc(-140px);
+      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
+      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
+      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
+      transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
+    }
+
+    </style>
+{% endblock %}
 {% block header_menu %}
   {% url "dashboard:product-list" as url %}
   {% include "dashboard/includes/_back-link.html" with url=url %}
@@ -64,7 +150,6 @@
 
 
 {% block content %}
-
 <div id='results'></div>
 <div class="row">
     <div class="col-md-12">
@@ -146,7 +231,7 @@
      <div class="col-md-12">
        <!-- Product Details -->
         <div class="col-md-12">
-          <h5>Product Details</h5>
+          <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Product Details</h5>
         </div>
         <div class="col-md-4">
             <div class="form-group">
@@ -178,10 +263,13 @@
                 <label>Product Type: % </label>
                 <div class="input-group">
               
-              {{ product_form.product_class}}
+                {{ product_form.product_class}}
             
                  <div class="input-group-btn">
-                    <button type="button"  id="add-new-type" href="#modal_type" class="btn bg-indigo btn-icon " data-title="Add New category" data-href='{% url "dashboard:product-class-add-new" 12 %}' data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip" data-original-title="Add New Type">
+                    <button type="button"  id="add-new-type" data-modal="#modal_type" href="#modal_types" class="btn bg-indigo btn-icon "
+                            data-title="Add New Type" data-href='{% url "dashboard:product-class-add-new" 12 %}'
+                            data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip"
+                            data-original-title="Add New Type">
                    <i class="icon-plus-circle2"></i>                   
                     </button>
                   </div>
@@ -205,16 +293,16 @@
               <input type="hidden" value='{% url "dashboard:product-attr-add-value" 1 %}' id="link-pk" name="link-pk">
               <button id="add-new-attribute" onclick="return false;" class="btn bg-indigo btn-icon  text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
                       href="#modal_attribute"  data-popup="tooltip" 
-            data-original-title="Edit attributes">
+            data-original-title="Add attributes" data-title="Add attributes">
 
-            <i class="icon-pencil7"></i>   
+            <i class="icon-plus-circle2"></i>
             </button>
             </a>
           </span>
           </div>
         </div>
       <!-- product attribute -->
-      <div class="col-md-12">
+      <div class="col-md-12" style="margin-bottom:20px;">
         <!-- product attributes -->
         <div class="form-group" id='div_attributes'>          
           
@@ -234,7 +322,7 @@
      <!-- stock reorder limit -->
      <div class="col-md-12">       
         <div class="col-md-12">
-          <h5>stock reorder limit</h5>
+          <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Stock Reorder Limit</h5>
         </div>
       <!-- stock reorder limit -->
       <div class="col-md-6">
@@ -252,7 +340,10 @@
              
              {{ product_form.product_supplier }}
              <span class="input-group-btn">
-             <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-indigo "  data-href='{% url "dashboard:supplier-ajax-add"  %}' href="#modal_attribute"  data-popup="tooltip"  data-original-title="Add New Supplier">
+             <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-indigo "
+                data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
+                href="#modal_attribute"  data-popup="tooltip"
+                data-original-title="Add New Supplier" data-title="Add New Supplier">
               <i class=" icon-plus-circle2"></i>   
              </a>
             </span>
@@ -265,7 +356,7 @@
      <!-- Product Pricing Details -->
      <div class="col-md-12">       
         <div class="col-md-12">
-          <h5>Product Pricing Details</h5>
+          <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Product Pricing Details</h5>
         </div>
         <div class="col-md-12">
           <div class="row">
@@ -286,6 +377,7 @@
 
         </div>
       <!-- Retail price inclusive tax -->
+      <div class="row" style="margin-bottom:20px;">
       <div class="col-md-4">
         <div class="form-group">
             <label class="col-md-12">Retail Price:<i class='text-danger'>*</i><span class="text-muted text-small">(Inclusive Tax)</span></label>
@@ -313,7 +405,8 @@
         </div>
       </div> 
       <!--  -->
-
+      </div>
+     <div class="row" style="margin-bottom:20px;">
       <!-- wholesale Price: -->
       <div class="col-md-4">
         <div class="form-group">
@@ -340,7 +433,8 @@
             <input type="disabled" name="wholesale_plus_tax" id="wholesale_plus_tax" class="form-control" value="" disabled="">
          </span>                  
         </div> 
-      </div>      
+      </div>
+        </div>
      </div>
 
     </div>
@@ -350,19 +444,19 @@
  
 
 
-                <div class="text-center p-10">
+                <div class="col-md-6 col-md-offset-3 text-center p-10" style="margin-top:20px;">
                   {% if product.pk %}
-              <a href="{% url 'dashboard:product-list' %}" class="btn btn-flat ">
+              <a href="{% url 'dashboard:product-list' %}" class="btn btn-default pull-left">
                 {% trans "Cancel" context "Dashboard cancel action" %}
               </a>
-              <button type="submit" class="btn btn-primary waves-effect waves-light">
+              <button type="submit" class="btn btn-primary waves-effect waves-light pull-right">
                 {% trans "Update" context "Dashboard update action" %}
               </button>
             {% else %}
-              <a href="{% url 'dashboard:product-list' %}" class="btn   btn-flat">
+              <a href="{% url 'dashboard:product-list' %}" class="btn btn-default pull-left">
                 {% trans "Cancel" context "Dashboard cancel action" %}
               </a>
-              <button type="submit" class="btn btn-primary  waves-effect waves-light">
+              <button type="submit" class="btn btn-primary waves-effect waves-light pull-right">
                 {% trans "Create" context "Dashboard create action" %}
               </button>
             {% endif %}
@@ -769,7 +863,60 @@
             </div>
           </div>                
 </div>
- 
+ <!-- other modals -->
+    <div id="stack1" class="modal hide fade" tabindex="-1" data-focus-on="input:first">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Stack One</h3>
+      </div>
+      <div class="modal-body">
+        <p>One fine body…</p>
+        <p>One fine body…</p>
+        <p>One fine body…</p>
+        <input data-tabindex="1" type="text">
+        <input data-tabindex="2" type="text">
+        <button class="btn" data-toggle="modal" href="#stack2">Launch modal</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn">Close</button>
+        <button type="button" class="btn btn-primary">Ok</button>
+      </div>
+    </div>
+
+    <div id="stack2" class="modal hide fade" tabindex="-1" data-focus-on="input:first">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Stack Two</h3>
+      </div>
+      <div class="modal-body">
+        <p>One fine body…</p>
+        <p>One fine body…</p>
+        <input data-tabindex="1" type="text">
+        <input data-tabindex="2" type="text">
+        <button class="btn" data-toggle="modal" href="#stack3">Launch modal</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn">Close</button>
+        <button type="button" class="btn btn-primary">Ok</button>
+      </div>
+    </div>
+
+    <div id="stack3" class="modal hide fade" tabindex="-1" data-focus-on="input:first">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Stack Three</h3>
+      </div>
+      <div class="modal-body">
+        <p>One fine body…</p>
+        <input data-tabindex="1" type="text">
+        <input data-tabindex="2" type="text">
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn">Close</button>
+        <button type="button" class="btn btn-primary">Ok</button>
+      </div>
+    </div>
+<!-- end other modals -->
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
@@ -778,7 +925,6 @@
 {% endblock %}
 
  {% block custom_js %}
-
 
  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
 
@@ -808,6 +954,29 @@
  <script type="text/javascript">
   $( document ).ready(function() {
     $( "h5" ).addClass( "text-bold" );
+
+    $('.btn[data-toggle=modal]').on('click', function(){
+          var $btn = $(this);
+          var currentDialog = $btn.closest('.modal-dialog'),
+          targetDialog = $($btn.attr('data-target'));;
+          if (!currentDialog.length)
+            return;
+          targetDialog.data('previous-dialog', currentDialog);
+          currentDialog.addClass('aside');
+          var stackedDialogCount = $('.modal.in .modal-dialog.aside').length;
+          if (stackedDialogCount <= 5){
+            currentDialog.addClass('aside-' + stackedDialogCount);
+          }
+    });
+
+    $('.modal').on('hide.bs.modal', function(){
+          var $dialog = $(this);
+          var previousDialog = $dialog.data('previous-dialog');
+          if (previousDialog){
+            previousDialog.removeClass('aside');
+            $dialog.data('previous-dialog', undefined);
+          }
+    });
   });
   </script>
 <script type="text/javascript">
@@ -896,7 +1065,7 @@
   
   $( "#add-new-tax").on('click',function() {   
       var taxvalue = $( this ).val();         
-      {% url "dashboard:tax-add-ajax" as url %} 
+      {% url "dashboard:tax-add-ajax" as url %}
       var url = "{{ url }}";
       var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
       var posting = $.post( url, {csrfmiddlewaretoken:csrf_token} );
@@ -1003,7 +1172,7 @@
             }
         });
    }   
-  // end conttent blocker
+  // end content blocker
 
   // refreshAttributes func
   function refreshAttributes() {  

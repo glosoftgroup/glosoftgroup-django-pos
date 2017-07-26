@@ -618,6 +618,27 @@ def attribute_list(request):
 	return TemplateResponse(request, 'dashboard/product/attributes/list.html',
 							ctx)
 
+@staff_member_required
+@permission_decorator('product.add_productattribute')
+def attribute_add_modal(request):
+	attribute_name = request.POST.get("attribute")
+	values = request.POST.getlist("values")
+
+	try:
+		print values
+		ProductAttribute.objects.create(slug=attribute_name, name=attribute_name);
+		last_attribute = ProductAttribute.objects.latest('id')
+
+		for i in values:
+			p = AttributeChoiceValue.objects.create(attribute=last_attribute,
+													slug = i, name = i)
+			p.save()
+
+		attributes = ProductAttribute.objects.all()
+		ctx = {'attributes': attributes}
+		return TemplateResponse(request, 'dashboard/product/attributes/select.html', ctx)
+	except Exception, e:
+		return HttpResponse(e)
 
 @staff_member_required
 @permission_decorator('product.add_productattribute')

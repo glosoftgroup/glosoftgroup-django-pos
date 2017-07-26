@@ -4,13 +4,6 @@
 {% load materializecss %}
 {% load staticfiles %}
 {% load attributes %}
-
-<script type="text/javascript">
-  function showModal(){
-      $('#att-div').slideDown();
-        
-    }
-</script>
 <!-- Pager -->
     <form method="post" id="form-product-type" enctype="multipart/form-data" name="form-product-type"> 
     <div class="modal-body">
@@ -26,23 +19,21 @@
             <div id='refresh-content'>
             <div class="form-group">
              <label>{{ form.product_attributes.label }}</label>
-             <div class="multi-select-full">
+             <div class="multi-select-full new-attr">
                {{ form.product_attributes }}
               </div>
             </div>
             <div class="form-group">
              <label>{{ form.variant_attributes.label }}</label>
-             <div class="multi-select-full">
+             <div class="multi-select-full new-attr">
               {{ form.variant_attributes }}
               </div>
             </div>
             </div>
             <div class="form-group text-center">
-             <button id="add-new-attribute" onclick="showModal();" type="button" class="btn btn-primary text-bold btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add" %}'
-              href="#modal_attribute">
-             <i class="icon-file-plus"></i>
-             Add Attributes
-             </button>
+                <button id="atb" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#test-modal">
+                    <i class="icon-file-plus"></i> Add More Attributes
+                </button>
             </div> 
             <div class="form-group">
               <div id="att-div" style="display: none;">
@@ -149,46 +140,26 @@
           <!-- ./form left -->
       <!-- action buttons -->
          <div class="modal-footer">
-
-          {% if product_class.pk %}
-              <a onclick="closeme()" class="btn btn-flat">
-                {% trans "Cancel" context "Dashboard cancel action" %}
-              </a>
-              <button type="submit" class="btn btn-primary">
+            <div class="col-md-6 col-md-offset-3">
+            {% if product_class.pk %}
+               <a href="#!" data-dismiss="modal" class="btn btn-default modal-action modal-close pull-left">
+                  {% trans "Cancel" context "Dashboard cancel action" %}
+                </a>
+              <button type="submit" class="btn btn-primary pull-right">
                 {% trans "Update" context "Dashboard update action" %}
               </button>
             {% else %}
-              <a href="#">
+               <a href="#!" data-dismiss="modal" class="btn modal-action modal-close btn-default pull-left">
                 {% trans "Cancel" context "Dashboard cancel action" %}
-              </a>
-              <button type="submit"  class="btn waves-effect waves-light">
+               </a>
+              <button type="submit"  class="btn btn-primary waves-effect waves-light pull-right">
                 {% trans "Create" context "Dashboard create action" %}
               </button>
             {% endif %}
+            </div>
          </div>
       </form>
       
-
-   
-  <div id="modal_att" class="modal fade">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header bg-blue">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h6 class="modal-title text-white">Add product attribute</h6>
-        </div>
-        <div class="results">
-         Loading.....
-        </div>
-        <div class="modal-footer">
-            <button type="button" id='refresh_content' class="btn btn-link" data-dismiss="modal">Close</button>
-            <button type="button" id="add_attr_btn" onclick="return false;" class="btn btn-primary"><span id='action'>Add Attribute</span></button>
-          </div>       
-      </div>
-    </div>
-  </div>
-
-
 
             
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
@@ -284,5 +255,21 @@
     refresh();
     window.location.reload();
   });
+
+   $('#atb').on('click', function(){
+
+          var $btn = $(this);
+          var currentDialog = $btn.closest('.modal-dialog'),
+          targetDialog = $($btn.attr('data-target'));
+
+          if (!currentDialog.length)
+            return;
+          targetDialog.data('previous-dialog', currentDialog);
+          currentDialog.addClass('aside');
+          var stackedDialogCount = $('.modal.in .modal-dialog.aside').length;
+          if (stackedDialogCount <= 5){
+            currentDialog.addClass('aside-' + stackedDialogCount);
+          }
+        });
 </script>
 

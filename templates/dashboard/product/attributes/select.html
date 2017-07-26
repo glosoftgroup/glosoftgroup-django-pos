@@ -1,0 +1,5 @@
+<select class="form-control multiselect" multiple="multiple">
+  {% for at in attributes %}
+    <option>{{ at.name }}</option>
+{% endfor %}
+</select>
