@@ -32,3 +32,6 @@ class Expenses(models.Model):
 
 class ExpenseType(models.Model):
 	name = models.CharField(max_length=100, null=True, blank=True)
+
+class PettyCash(models.Model):
+	amount = models.DecimalField(max_digits=6, decimal_places=2, null=True)

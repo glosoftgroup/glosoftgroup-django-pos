@@ -1,0 +1,65 @@
+{% load staticfiles %}
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% for product in product_results %}
+    <tr data-title=" {{ product.name }} " class="clickable-row">
+      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">#{{ product.id }}</td>
+      <!-- image -->
+      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}"
+       srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"
+       alt="" class="circle teal"></td>
+       <!-- product name -->
+      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.name }}</td>
+      <!-- product category -->
+      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+        {% with product.get_first_category as category %}
+        {% if category %}
+        {{ category }}
+        {% endif %}
+        {% endwith %}
+      </td>
+      <!-- price -->
+      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> {% gross product.price html=True %}</td>
+      <!-- variants -->
+      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+
+      {{ product.get_variants_count }}
+
+      </td>
+  <!-- actions -->
+      <td class="action-data">
+          <!-- Single button -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Action <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu edit-dropdown">
+            <li>
+                <a href="{% url 'dashboard:product-update' pk=product.pk %}">
+                    <i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me">
+                    </i> EDIT
+                </a>
+            </li>
+            <li>
+                <a href="#modal_instance" data-title='Remove {{ product.name }}' data-href="{% url 'dashboard:product-delete' pk=product.pk %}"
+            class="modal-trigger-ajax">
+                    <i class="icon-trash position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Delete me">
+                    </i> REMOVE
+                </a>
+            </li>
+          </ul>
+        </div>
+
+      </td>
+    </tr>
+   {% endfor %}
+                 
+
+
+<script type="text/javascript">
+ $(document).ready(function(){
+
+
+ });
+</script>

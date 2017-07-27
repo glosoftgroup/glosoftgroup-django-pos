@@ -42,7 +42,7 @@ from ..product.models import Product, ProductVariant, Category
 from ..decorators import permission_decorator, user_trail
 from ..utils import render_to_pdf, convert_html_to_pdf
 from ..site.models import Bank, BankBranch, UserRole, Department
-from .models import ExpenseType, Expenses
+from .models import ExpenseType, Expenses, PettyCash
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
@@ -121,7 +121,7 @@ def detail(request):
 
 def add(request):
     expense_types =ExpenseType.objects.all()
-    staff = Staff.objects.all()
+    staff = User.objects.all()
     data = {
         "expense_types":expense_types,
         "staff":staff
@@ -145,6 +145,19 @@ def add_process(request):
                         amount=amount, authorized_by=authorized_by, paid_to=paid_to,
                         received_by=received_by, phone=phone, payment_mode=payment_mode,
                         description=description)
+
+    petty_cash = get_object_or_404(PettyCash, pk=1)
+    petty_cash_amount = petty_cash.amount
+    try:
+        petty_cash_amount -= int(amount)
+        petty_cash.amount = petty_cash_amount
+        petty_cash.save()
+        user_trail(request.user.name,'petty cash balance: ' + str(petty_cash.amount)
+                   + ' removed from expense ' + str(amount) + ' balance ' + str(petty_cash_amount) + ', total',
+                   'update')
+    except Exception, e:
+        error_logger.error(e)
+
     try:
         new_expense.save()
         user_trail(request.user.name, 'created expense type : ' + str(expense_type), 'add')

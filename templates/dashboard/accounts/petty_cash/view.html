@@ -1,0 +1,127 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Add Petty Cash Amount
+{% endblock %}
+ {% block breadcrumbs %}
+     <li class="active"><a href="{% url 'accounts:petty_cash' %}">Petty Cash</a></li>
+ {% endblock %}
+{% block menu_petty_cash_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h4 class="panel-title text-center">Add Petty Cash Amount</h4>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+          <form class="form" enctype="multipart/form-data" id="petty_cash" name="petty_cash">
+             {% csrf_token %}
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <div class="row">
+                              <div class="col-md-6 col-md-offset-3">
+                                  <div class="form-group">
+                                       <label for="amount">Current Balance</label>
+                                      <div class="alert bg-info div-amount"><span style="font-size:1.1em;">KShs. {{ amount }}</span></div>
+                                   </div>
+                                   <div class="form-group">
+                                      <label for="amount">Amount</label>
+                                       <input class="form-control amount" name="amount" placeholder="Enter: amount"/>
+                                   </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                    <div class="col-md-12">
+                         <div class="text-center" style="margin-top:40px;">
+                          <button class="btn btn-primary waves-effect waves-light" id="supplier-submit" type="submit">
+                              Add Amount<i class="icon-arrow-right14 position-right"></i>
+                          </button>
+                         </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#petty_cash').validate({
+    onkeyup: function(element) {$(element).valid()},
+    rules:{
+       amount: {
+          required:true,
+          digits: true
+        }
+    },
+    messages:{
+      amount:{
+        required: "please fill in the required field"
+      }
+    },
+    submitHandler: function() {
+          var f = document.getElementById('petty_cash');
+          var formData = new FormData(f);
+          $.ajax({
+          url: "{% url 'accounts:petty_cash_add' %}",
+          type: "POST",
+          data: formData,
+          processData: false,
+              contentType: false,
+              success:function(data){
+                $('.amount').val('');
+                $('.div-amount').html(data);
+                $.jGrowl('Amount Updated successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                //window.location.reload();
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error Updating', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });
+    }
+  });
+
+
+  });
+</script>
+{% endblock %}

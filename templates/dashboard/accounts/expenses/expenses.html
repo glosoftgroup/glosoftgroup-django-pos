@@ -107,7 +107,11 @@
                                     <label for="gender">Authorized By</label>
                                     <select class="bootstrap-select gender" name="authorized_by" data-width="100%" tabindex="-98" style="display: none;">
                                         {% for user in staff %}
-                                        <option value="{{user.name}}">{{user.name}}</option>
+                                        <option value="{{user.name}}">{% if user.name %}
+                                            {{ user.name }}
+                                        {% else %}
+                                        {{ user.email }}
+                                        {% endif %}</option>
                                         {% endfor %}
                                     </select>
                                   </div>
@@ -157,17 +161,15 @@
                             <textarea class="form-control" name="description"></textarea>
                         </div>
                   </div>
+                    <div class="col-md-12">
+                         <div class="text-center" style="margin-top:40px;">
+                          <a href="{% url 'accounts:expenses' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                          <button class="btn btn-primary waves-effect waves-light" id="supplier-submit" type="submit">Create Expense<i class="icon-arrow-right14 position-right"></i></button>
+                         </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            <div class="row">
-                <div class="col-md-12">
-                     <div class="text-center" style="margin-top:40px;">
-                      <a href="{% url 'accounts:expenses' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
-                      <button class="btn btn-primary waves-effect waves-light" id="supplier-submit" type="submit">Create Expense<i class="icon-arrow-right14 position-right"></i></button>
-                     </div>
-                </div>
-            </div>
           </form>
       </div>
 
@@ -275,13 +277,20 @@ $(document).ready(function(){
               $('#pagination-div').html(data);
         }});*/
     });
+    var petty_cash_balance;
+    $.ajax({ url: "{% url 'accounts:petty_cash_balance' %}",type: 'GET', async:false,success: function(data){
+              petty_cash_balance = data;
+        }});
+    jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+        return this.optional(element) || (parseFloat(value) <= petty_cash_balance);
+    }, "* more than petty cash amount (KShs."+ petty_cash_balance +" )");
 
       //** validate form & submit
       $('#expenses').validate({
         onkeyup: function(element) {$(element).valid()},
         rules:{
             voucher: { required:true },
-            amount: { required:true },
+            amount: { required:true, digits:true, greaterThanZero : true },
             paid_to:{required:true},
             received_by:{required:true},
             description:{required:true, minlength:10},
@@ -303,7 +312,7 @@ $(document).ready(function(){
           },
           description:{
             required: "please provide a description",
-            minlength: "name must be atleast 3 characters long"
+            minlength: "name must be atleast 10 characters long"
           },
           phone:{
             required: "please provide the phone number",
