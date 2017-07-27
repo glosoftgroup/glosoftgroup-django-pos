@@ -14,13 +14,21 @@
     </li>
 
 {% endblock %}
-{% block header_extra %}
-<li style=''>
-	<!-- <a class="" href=""><i class="icon-plus"></i>
-	 Purchase item
-	</a> -->
-</li>
-{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+     tr.nb td{border:0px;}
+     .nb{border:0px;}
+     .table{border:1px solid #ccc}
+     .edit-dropdown{
+         min-width:150px;
+         padding-top:0px;
+         padding-bottom:0px;
+     }
+   </style>
+ {% endblock %}
 {% block menu_reorder_class %}active{% endblock %}
 {% block content %}
 <!-- Search field -->
@@ -29,7 +37,7 @@
 <div class="data-table-container">
   <table class="table bordered highlight responsive data-table">
     <thead>
-      <tr>
+      <tr class="bg-primary">
         <th>
           {% trans "Product name" context "Low stock product list" %}
         </th>
@@ -52,12 +60,36 @@
           <td class="right-align">
             {{ product.low_stock_threshold }}
           </td>
-          <td>
-              <a href="{% url 'dashboard:re_order_form' pk=product.pk %}">
-              <span class="label label-success">
-                  Order
-              </span>
-              </a>
+          <!--<td>-->
+              <!--<a href="{#{% url 'dashboard:re_order_form' pk=product.pk %}#}">-->
+              <!--<span class="label label-success">-->
+                  <!--Order-->
+              <!--</span>-->
+              <!--</a>-->
+          <!--</td>-->
+          <td class="action-data">
+              <!-- Single button -->
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Action <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu edit-dropdown">
+                <li>
+                    <a href="javascript:;">
+                        <i class="icon-comments" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Edit me">
+                        </i> Sms
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;" data-title='Remove {{ product.name }}' data-href="{% url 'dashboard:product-delete' pk=product.pk %}"
+                class="modal-trigger-ajax">
+                        <i class="icon-mail5 position-left" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Delete me">
+                        </i> Email
+                    </a>
+                </li>
+              </ul>
+            </div>
+
           </td>
         </tr>
       {% endfor %}

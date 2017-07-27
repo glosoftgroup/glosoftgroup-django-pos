@@ -113,7 +113,7 @@
 {% block breadcrumbs %}
  
     <li>
-      <a href="{% url "dashboard:product-list" %}" >
+      <a href="{% url 'dashboard:product-list' %}" >
         {% trans "Products" context "Dashboard products list" %}
       </a>
     </li>
@@ -260,16 +260,16 @@
             </div>
             <div class="col-md-4">
               <div class="form-group" id='productType'>
-                <label>Product Type: % </label>
+                <label>Product Sub-Category: % </label>
                 <div class="input-group">
               
                 {{ product_form.product_class}}
             
                  <div class="input-group-btn">
                     <button type="button"  id="add-new-type" data-modal="#modal_type" href="#modal_types" class="btn bg-indigo btn-icon "
-                            data-title="Add New Type" data-href='{% url "dashboard:product-class-add-new" 12 %}'
+                            data-title="Add New Sub-Category" data-href='{% url "dashboard:product-class-add-new" 12 %}'
                             data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip"
-                            data-original-title="Add New Type">
+                            data-original-title="Add New Sub-Category">
                    <i class="icon-plus-circle2"></i>                   
                     </button>
                   </div>
@@ -366,8 +366,12 @@
                 <div class="input-group">
                 {{ product_form.product_tax }}
                   <div class="input-group-btn">
-                    <button type="button" class="btn btn-icon bg-indigo" id="add-new-tax"  data-popup="tooltip" data-original-title="Add New Tax">
-                    <i class=" icon-plus-circle2"></i></button>
+                    <!--<button type="button" class="btn btn-icon bg-indigo" id="add-new-tax" data-title="Add New Tax">-->
+                    <!--<i class=" icon-plus-circle2"></i></button>-->
+                      <a id="add-new-tax" onclick="return false;" class="btn btn-icon bg-indigo "
+                        href="#modal_attributes"  data-title="Add New Tax">
+                      <i class=" icon-plus-circle2"></i>
+                     </a>
                   </div>
                  </div>
               </div>
@@ -863,60 +867,6 @@
             </div>
           </div>                
 </div>
- <!-- other modals -->
-    <div id="stack1" class="modal hide fade" tabindex="-1" data-focus-on="input:first">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3>Stack One</h3>
-      </div>
-      <div class="modal-body">
-        <p>One fine body…</p>
-        <p>One fine body…</p>
-        <p>One fine body…</p>
-        <input data-tabindex="1" type="text">
-        <input data-tabindex="2" type="text">
-        <button class="btn" data-toggle="modal" href="#stack2">Launch modal</button>
-      </div>
-      <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn">Close</button>
-        <button type="button" class="btn btn-primary">Ok</button>
-      </div>
-    </div>
-
-    <div id="stack2" class="modal hide fade" tabindex="-1" data-focus-on="input:first">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3>Stack Two</h3>
-      </div>
-      <div class="modal-body">
-        <p>One fine body…</p>
-        <p>One fine body…</p>
-        <input data-tabindex="1" type="text">
-        <input data-tabindex="2" type="text">
-        <button class="btn" data-toggle="modal" href="#stack3">Launch modal</button>
-      </div>
-      <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn">Close</button>
-        <button type="button" class="btn btn-primary">Ok</button>
-      </div>
-    </div>
-
-    <div id="stack3" class="modal hide fade" tabindex="-1" data-focus-on="input:first">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3>Stack Three</h3>
-      </div>
-      <div class="modal-body">
-        <p>One fine body…</p>
-        <input data-tabindex="1" type="text">
-        <input data-tabindex="2" type="text">
-      </div>
-      <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn">Close</button>
-        <button type="button" class="btn btn-primary">Ok</button>
-      </div>
-    </div>
-<!-- end other modals -->
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
@@ -1071,7 +1021,8 @@
       var posting = $.post( url, {csrfmiddlewaretoken:csrf_token} );
       // Put the results in a div
       posting.done(function( data ) {    
-        $("#add_tax_form" ).empty().append( data ); 
+        $("#add_tax_form" ).empty().append( data );
+         $('#modal_add_tax .modal-title').html('Add New Tax');
         $('#modal_add_tax').modal(); 
       });
     

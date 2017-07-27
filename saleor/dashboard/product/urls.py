@@ -1,12 +1,16 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 from . import api
-from . import views
+from . import views, products
 
 
 urlpatterns = [
+    # url(r'^$',permission_required('product.view_product', login_url='not_found')
+    # (views.product_list), name='product-list'),
     url(r'^$',permission_required('product.view_product', login_url='not_found')
-    (views.product_list), name='product-list'),
+    (products.view), name='product-list'),
+    url(r'^list-paginate/$', products.paginate, name='product-list-paginate'),
+    url(r'^list/search/$', products.search, name='product-list-search'),
     url(r'^(?P<pk>[0-9]+)/update/$', permission_required('product.change_product', login_url='not_found')
         (views.product_edit), name='product-update'),
     url(r'^(?P<pk>[0-9]+)/delete/$', permission_required('product.delete_product', login_url='not_found')
