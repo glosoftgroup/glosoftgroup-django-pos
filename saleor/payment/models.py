@@ -9,6 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
 from django_prices.models import PriceField
+from django.core.validators import MinValueValidator
 
 from datetime import date
 
@@ -16,7 +17,10 @@ from datetime import date
 class MpesaPayment(models.Model):
 	created = models.DateTimeField(
 		pgettext_lazy('MpesaPayment field', 'created'),
-		default=now, editable=False)    
+		default=now, editable=False) 
+	# (1. for not used) and (2. for not used)
+	status = models.IntegerField( pgettext_lazy('Status', 'status'),
+        validators=[MinValueValidator(0)], default=int(1))   
 	ref_number = models.CharField(
 		pgettext_lazy('MpesaPayment field', 'terminal'), 
 		null=True, max_length=100,)
