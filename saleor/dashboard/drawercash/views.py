@@ -152,8 +152,8 @@ def terminal_history(request,pk=None):
 			instance = get_object_or_404(Terminal, pk=pk)
 			terminal_history = TerminalHistoryEntry.objects.filter(terminal=instance).order_by('-id')
 			ctx = {'terminal_history':terminal_history}
-			user_trail(request.user.name, 'accessed terminal history for terminal: ' + str(instance.terminal_name), 'view')
-			info_logger.info('User: ' + str(request.user.name) + 'accessed terminal history for terminal for:' + str(user.terminal_name))
+			#user_trail(request.user.name, 'accessed terminal history for terminal: ' + str(instance.terminal_name), 'view')
+			#info_logger.info('User: ' + str(request.user.name) + 'accessed terminal history for terminal for:' + str(user.terminal_name))
 			return TemplateResponse(request, 'dashboard/includes/_terminal_history.html', ctx)
 			
 
