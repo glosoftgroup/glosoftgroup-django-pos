@@ -4,37 +4,26 @@
       <div class="modal-content">
         <div class="modal-header bg-blue">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h6 class="modal-title text-white"></h6>
+          <h4 class="modal-title text-white text-center"></h4>
         </div>
-
+        <form action="" class="delete_form" method="post" novalidate>
+          {% csrf_token %}
         <div class="modal-body">
           <div class="">
-          <form action="" class="delete_form" method="post" novalidate>
-          {% csrf_token %}
-          <div class="alert alert-warning alert-styled-left  alert-bordered">
-          <button class="close" type="button" data-dismiss="alert">
-              <span>×</span>
-              <span class="sr-only">Close</span>
-          </button>
-           
-             <span class="text-semibold"> Are you sure?</span>
-           
-            </div>
-            
+
+             <h5 class="text-semibold text-center"> Are you sure?</h5>
           </div>
         </div>
         
         <div class="modal-footer">
-          <button type="submit" id='modal_delete' class="btn  bg-danger">
-            <i class='text-white'>Delete</i>
-          </button> 
-          </form>
-
-          
-          <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
-
-          
+          <div class="col-md-6 col-md-offset-3">
+            <button type="submit" id='modal_delete' class="btn  bg-danger pull-right">
+              Delete
+            </button>
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          </div>
         </div>
+             </form>
       </div>
     </div>
   </div>

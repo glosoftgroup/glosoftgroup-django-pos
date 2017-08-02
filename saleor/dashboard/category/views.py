@@ -12,21 +12,138 @@ from ..views import staff_member_required
 from .forms import CategoryForm, ProductForm
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @staff_member_required
 def category_list(request, root_pk=None):
     root = None
     path = None
     categories = Category.tree.root_nodes().order_by('-id')
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(categories, 10)
+    try:
+        categories = paginator.page(page)
+    except PageNotAnInteger:
+        categories = paginator.page(1)
+    except InvalidPage:
+        categories = paginator.page(1)
+    except EmptyPage:
+        categories = paginator.page(paginator.num_pages)
+
     if root_pk:
         root = get_object_or_404(Category, pk=root_pk)
         path = root.get_ancestors(include_self=True) if root else []
         categories = root.get_children().order_by('-id')
-        ctx = {'categories': categories, 'path': path, 'root': root}
+        page = request.GET.get('page', 1)
+        paginator = Paginator(categories, 10)
+        try:
+            categories = paginator.page(page)
+        except PageNotAnInteger:
+            categories = paginator.page(1)
+        except InvalidPage:
+            categories = paginator.page(1)
+        except EmptyPage:
+            categories = paginator.page(paginator.num_pages)
+        ctx = {'categories': categories, 'path': path, 'root': root, 'totalp': paginator.num_pages}
         return TemplateResponse(request, 'dashboard/category/list_subcategories.html', ctx)
 
-    ctx = {'categories': categories, 'path': path, 'root': root}
-    return TemplateResponse(request, 'dashboard/category/list.html', ctx)
+    ctx = {'categories': categories, 'path': path, 'root': root, 'totalp':paginator.num_pages}
+    # return TemplateResponse(request, 'dashboard/category/list.html', ctx)
+    return TemplateResponse(request, 'dashboard/category/pagination/view.html', ctx)
+
+def paginate_category(request, root_pk=None):
+    root = None
+    path = None
+
+    page = int(request.GET.get('page', 1))
+    list_sz = request.GET.get('size')
+    p2_sz = request.GET.get('psize')
+    select_sz = request.GET.get('select_size')
+
+    try:
+        if root_pk:
+            root = get_object_or_404(Category, pk=root_pk)
+            path = root.get_ancestors(include_self=True) if root else []
+            categories = root.get_children().order_by('-id')
+            paginator = Paginator(categories, 10)
+        else:
+            categories = Category.tree.root_nodes().order_by('-id')
+            paginator = Paginator(categories, 10)
+
+        if list_sz:
+            paginator = Paginator(categories, int(list_sz))
+            categories = paginator.page(page)
+            data = {
+                'categories': categories,
+                'pn': paginator.num_pages,
+                'sz': list_sz,
+                'gid': 0,
+                'root': root
+            }
+            return TemplateResponse(request, 'dashboard/category/pagination/p2.html', data)
+        else:
+            paginator = Paginator(categories, 10)
+            if p2_sz:
+                paginator = Paginator(categories, int(p2_sz))
+            categories = paginator.page(page)
+            data = {
+                'categories': categories,
+                'root': root
+            }
+            return TemplateResponse(request, 'dashboard/category/pagination/paginate.html', data)
+
+        try:
+            categories = paginator.page(page)
+        except PageNotAnInteger:
+            categories = paginator.page(1)
+        except InvalidPage:
+            categories = paginator.page(1)
+        except EmptyPage:
+            categories = paginator.page(paginator.num_pages)
+
+        return TemplateResponse(request, 'dashboard/category/pagination/paginate.html', {'categories': categories})
+    except Exception, e:
+        return  HttpResponse()
+
+@staff_member_required
+def category_search(request, root_pk=None):
+    if request.is_ajax():
+        root = None
+        path = None
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
+            if root_pk:
+                root = get_object_or_404(Category, pk=root_pk)
+                path = root.get_ancestors(include_self=True) if root else []
+                categories = root.get_children().filter(name__icontains=q).order_by('-id')
+            else:
+                categories = Category.tree.root_nodes().filter(name__icontains=q).order_by('-id')
+
+            paginator = Paginator(categories, 10)
+
+            try:
+                categories = paginator.page(page)
+            except PageNotAnInteger:
+                categories = paginator.page(1)
+            except InvalidPage:
+                categories = paginator.page(1)
+            except EmptyPage:
+                categoriest = paginator.page(paginator.num_pages)
+            if p2_sz:
+                categories = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/category/pagination/paginate.html', {'categories': categories,'root': root})
+
+            return TemplateResponse(request, 'dashboard/category/pagination/search.html',
+                                    {'categories':categories, 'pn': paginator.num_pages, 'sz': sz, 'q': q,'root': root})
 
 @staff_member_required
 def category_create(request, root_pk=None):

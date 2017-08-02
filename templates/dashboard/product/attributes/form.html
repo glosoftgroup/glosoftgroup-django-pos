@@ -22,14 +22,6 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% if attribute.pk %}
-   <li>    
-     <a href="#modal_instance" data-title='Remove attribute {{ attribute.name }} Product type' data-href="{% url 'dashboard:product-attribute-delete' pk=attribute.pk %}" class="modal-trigger-ajax"><i class="icon-trash position-left"></i> 
-       {% trans "Remove attribute" context "Attribute detail action" %}
-      </a>          
-   </li>    
-   
-  {% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}

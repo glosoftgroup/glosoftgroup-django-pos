@@ -11,15 +11,6 @@
 
 {% block menu_attributes_class %}active{% endblock %}
 
-{% block header_extra %}
-    <!-- search field -->
-    
-    <!-- end search -->
-  <li>&nbsp;&nbsp;&nbsp;</li>
- <li>              
-    <a href="{% url 'dashboard:product-attribute-add' %}"><i class="icon-plus3 position-left"></i> Add attribute</a></li>
-  
-{% endblock %}
 
 {% block breadcrumbs %}
   
@@ -52,10 +43,10 @@
     {% include "dashboard/includes/_search_filter.html" with url=url  %}
             </div>
             <!--  -->
-            <div class="col-md-3">             
+            <div class="col-md-2">
               <div class="form-group">
                 {% if perms.userprofile.add_user %}
-                   <a href="{% url 'dashboard:product-attribute-add' %}" class="btn-block btn-primary btn-lg">Add attributes</a>
+                   <a href="{% url 'dashboard:product-attribute-add' %}" class="btn-block btn-primary btn-lg text-center">ADD ATTRIBUTE</a>
                 {% endif %}
               </div>
             </div> 
@@ -72,7 +63,7 @@
         <th>#</th>   
         <th>Name</th>    
         <th>Value</th>                 
-        <th class="text-center"></th>    
+        <th class="text-center">Actions</th>
       </tr>   
     </thead>                     
     <tbody id='content-search'>
@@ -83,17 +74,36 @@
         <td>{{ name }}</td>
         <!-- values -->
         <td>
+        {% if values %}
           {% for value in values %}
               {{ value }}
               {% if not forloop.last %}, {% endif %}
           {% endfor %}
+        {% else %}
+            None
+        {% endif %}
         </td>
-        <!-- action -->
-        <td>
-          <a href="{% url 'dashboard:product-attribute-update' pk=pk %}" class="btn bg-blue">
-          <i class="icon-pencil"></i>
-          </a>
-        </td>
+          <td class="text-center">
+                  <!-- Single button -->
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Action <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu edit-dropdown">
+                 {% if perms.product.change_product %}
+                    <li><a href="{% url 'dashboard:product-attribute-update' pk=pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                 {% endif %}
+                 {% if perms.product.delete_product %}
+                      <li>
+                         <a href="#modal_instance" data-title='Remove attribute {{ name }}' data-href="{% url 'dashboard:product-attribute-delete' pk=pk %}" class="modal-trigger-ajax"><i class="icon-trash position-left"></i>
+                           REMOVE
+                          </a>
+                       </li>
+                 {% endif %}
+                  </ul>
+                </div>
+
+              </td>
       </tr>
     {% endfor %}
     </tbody>
@@ -102,16 +112,41 @@
     
 
   {% else %}
-    <div class="not-found">
-      <p class="grey-text">
-        {% trans "No attributes found." context "Empty attribute list message" %}
-      </p>
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No Attributes to display
+       </div>
+      </div>
     </div>
+  </div>
   {% endif %}
+{% include "dashboard/includes/_modal_template.html"  %}
 {% endblock %}
 {% block custom_js %}
 <script type="text/javascript">
   $(document).ready(function() {
+
+  // update modal content from ajax results
+  $( ".modal-trigger-ajax").on('click',function() {
+    var url = $(this).data('href')
+    var prompt_text = $(this).data('title');
+    var modal = $(this).attr('href');
+    var csrf_token = $(this).data('csrf_token')
+
+    $('.modal-title').html(prompt_text);
+    $(".results" ).empty().append('<span class="text-center" style="padding:23px">Loading...<i class=" icon-spinner"></i></span>');
+    $(modal).modal();
+      var posting = $.get( url, {'csrfmiddlewaretoken':csrf_token });
+      // Put the results in a div
+      posting.done(function( data ) {
+      $(".results" ).empty().append( data );
+
+      });
+
+   });
+
     var maxHeight = 0;
     $(".equalize").each(function() {
         if ($(this).height() > maxHeight) {

@@ -10,7 +10,7 @@
 * ---------------------------------------------------------------------------- */
 
 $(function() {  
-  $('.modal-trigger').on('click', function (e) {
+  $('body').on('click','.modal-trigger', function (e) {
     let that = this;  
     var url = $(this).data('href'); 
     var prompt_text = $(this).data('title');

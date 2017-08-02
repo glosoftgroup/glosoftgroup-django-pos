@@ -48,7 +48,7 @@
         <div class="tabbable">
           <ul class="nav nav-tabs nav-tabs-highlight">
             <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">add supplier profile</a></li>
-            <li class="" id="contacts-tab"><a href="#contacts" data-toggle="tab" class="legitRipple" aria-expanded="false">Contacts</a></li>
+            <!--<li class="" id="contacts-tab"><a href="#contacts" data-toggle="tab" class="legitRipple" aria-expanded="false">Contacts</a></li>-->
           </ul>
 
           <div class="tab-content">
@@ -58,7 +58,7 @@
                 {% csrf_token %}
                   <div class="row">
                     <div class="col-md-4">
-                    <label for="exampleInputEmail1">Supplier Logo</label>
+                    <label for="exampleInputEmail1" class="text-center">Supplier Logo</label>
                       <div class="form-group">
                         <!-- <label for="exampleInputEmail1">User Image</label> -->
                         <div class="fileinput fileinput-new" data-provides="fileinput">
@@ -84,18 +84,6 @@
                           <div class="form-group">
                             <label for="name">Address</label>
                             <input type="text" class="form-control" name="street1" id="street1" placeholder="Street 1">
-                            <input type="text" class="form-control" name="street2" id="street2" placeholder="Street 2">
-                            <div class="row">
-                             <div class="col-md-3">
-                              <input type="text" class="form-control" name="city" id="city" placeholder="city">
-                             </div>
-                             <div class="col-md-3">
-                             <input type="text" class="form-control" name="county" id="county" placeholder="county">
-                             </div>
-                             <div class="col-md-3">
-                             <input type="number" class="form-control" name="code" id="code" placeholder="Code">
-                             </div>
-                            </div>
                           </div>
 
                            <div class="form-group">
@@ -114,21 +102,17 @@
                             <label for="mobile">Phone</label>
                             <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile">
                            </div>
-                           <div class="form-group">
-                            <label for="mobile">Fax</label>
-                            <input type="text" class="form-control" name="fax" id="fax" placeholder="Fax">
-                           </div>
                         </div>
                       </div>            
                      
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col-md-12">
-                     <div class="pull-right" style="margin-top:40px;">
-                      <a href="{% url 'dashboard:supplier' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                    <div class="col-md-6 col-md-offset-3">
+                     <div class="pull-rights" style="margin-top:40px;">
+                      <a href="{% url 'dashboard:supplier' %}" class="pull-left btn btn-default waves-effect waves-light">Cancel</a>
                       
-                      <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create supplier <i class="icon-arrow-right14 position-right"></i></button>
+                      <button class="btn btn-primary waves-effect waves-light pull-right" id="submit" type="submit">Create supplier <i class="icon-arrow-right14 position-right"></i></button>
                      </div>
                     </div>
                   </div>
@@ -160,6 +144,7 @@ function disable_profile_tab(){
 }
 
   $('#user-details').validate({
+  onkeyup: function(element) {$(element).valid()},
     rules:{
         name: {
           required:true,

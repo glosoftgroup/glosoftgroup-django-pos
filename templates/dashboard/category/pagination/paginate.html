@@ -1,0 +1,59 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+{% for node in categories %}
+<tr>
+   <!-- ## -->
+    <td class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+    >{{ node.pk }}</td>
+    <!-- name -->
+    <td class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+    >{{ node.name }}</td>
+    <!-- description\ -->
+    <td class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+    >{{ node.description|slice:":60" }}...</td>
+    <!-- products count-->
+    <td class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+    >
+      <span class="badge bg-indigo">
+        {{ node.get_product_num }}
+      </span>
+    </td>
+    <!-- actions -->
+   <td class="text-center">
+          <!-- Single button -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Action <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu edit-dropdown">
+            <li><a href="{% url 'dashboard:category-list' root_pk=node.pk %}" data-csrf_token='{{ csrf_token }}'>
+                <i class="icon-eye position-left"></i>DETAILS
+            </a></li>
+         {% if perms.product.change_category %}
+            <li><a href="#modal_instance" data-title="Edit {{ node.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-edit' root_pk=node.pk %}"
+            class="modal-trigger-ajax"><i class="icon-pencil7 position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom"  data-original-title="Edit me"></i>EDIT
+            </a></li>
+         {% endif %}
+         {% if perms.product.delete_category %}
+              <li>
+                 <a href="#modal_instance" data-title="Delete {{ node.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-delete' pk=node.pk %}"
+                    class="modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>REMOVE
+                    </a>
+               </li>
+         {% endif %}
+          </ul>
+        </div>
+
+      </td>
+   </tr>
+{% endfor %}
+                 
+
+
+<script type="text/javascript">
+ $(document).ready(function(){
+
+
+ });
+</script>

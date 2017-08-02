@@ -110,13 +110,13 @@
         </div>
         <div class="panel-body">
             <div class="col-md-6">
-    {% url "dashboard:search-category" as url %}
-    {% include "dashboard/includes/_search_filter.html" with url=url  %}
+            {% url "dashboard:search-category" as url %}
+            {% include "dashboard/includes/_search_filter.html" with url=url  %}
             </div>
             <!--  -->
             <div class="col-md-3">             
               <div class="form-group">
-                {% if perms.userprofile.add_user %}
+                {% if perms.userprofile.add_category %}
                    <a href="{% url 'dashboard:category-add' %}" class="btn-block btn-primary btn-lg">Add Category</a>
                 {% endif %}
               </div>

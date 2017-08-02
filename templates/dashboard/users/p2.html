@@ -1,11 +1,11 @@
 {% load staticfiles %}
       <div class="panel panel-flat">
-        <div class="table-responsive">
+        <div class="table-responsives">
          
   <div class="panel-body">
-          <table class="table table-bordered table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
+          <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
-                  <tr>
+                  <tr class="bg-primary">
                     <th>Id</th>
                     <th>Image</th>
                     <th>Name</th>
@@ -38,20 +38,30 @@
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}"> 
                     {% if user.is_superuser == True %}admin{% else %} staff {% endif %}</td>
                     <!-- actions -->
-                    <td class="text-center">
-                      <ul class="icons-list">
-                       {% if perms.userprofile.change_user %}
-                        <li><a href="{% url 'dashboard:user-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
-                        {% endif %}
+                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                    <!-- actions -->
+                     <td class="text-center">
+                          <!-- Single button -->
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu edit-dropdown">
+                         {% if perms.userprofile.change_user %}
+                            <li><a href="{% url 'dashboard:user-edit' pk=user.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                         {% endif %}
                          {% if perms.userprofile.delete_user %}
-                        <li>
-                          <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:user-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
-                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                            <li>
+                                <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:user-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                         class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> REMOVE
                          </a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </td>
+                            </li>
+                         {% endif %}
+                          </ul>
+                        </div>
+
+                      </td>
+                    {% endif %}
                   </tr>
                   {% endfor %}
                 {% else %}

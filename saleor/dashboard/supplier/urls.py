@@ -10,6 +10,9 @@ urlpatterns = [
         url(r'^$', views.users, name='supplier'),
         # url(r'^$', permission_required('userprofile.view_user', login_url='account_login')
         #     (views.users), name='users'),
+        url(r'^supplier/paginate/', views.user_paginate, name='supplier_paginate'),
+        url(r'^ssupplier/search/$', views.user_search, name='supplier_search'),
+
         url(r'^add/$', permission_required('supplier.add_supplier', login_url='account_login')
             (views.user_add), name='supplier-add'),
         url(r'^add/supplier/$',  permission_required('supplier.add_supplier', login_url='account_login')
@@ -32,6 +35,7 @@ urlpatterns = [
         url(r'^supplier_update(?P<pk>[0-9]+)/$', views.user_update, name='supplier-update'),
         url(r'^user_assign_permission/$', views.user_assign_permission, name='user_assign_permission'),
         # url(r'^add/', permission_required('userprofile.add_user', login_url='account_login')(views.user_add)),
+
         
 ]
 

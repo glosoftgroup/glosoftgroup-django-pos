@@ -1,0 +1,51 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+{% for pk, name, values in attributes %}
+  <tr>
+    <td>{{ pk }}</td>
+    <!-- names -->
+    <td>{{ name }}</td>
+    <!-- values -->
+    <td>
+    {% if values %}
+      {% for value in values %}
+          {{ value }}
+          {% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    {% else %}
+        None
+    {% endif %}
+    </td>
+      <td class="text-center">
+              <!-- Single button -->
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Action <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu edit-dropdown">
+             {% if perms.product.change_product %}
+                <li><a href="{% url 'dashboard:product-attribute-update' pk=pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+             {% endif %}
+             {% if perms.product.delete_product %}
+                  <li>
+                     <a href="#modal_instance" data-title='Remove attribute {{ name }}' data-href="{% url 'dashboard:product-attribute-delete' pk=pk %}" class="modal-trigger-ajax"><i class="icon-trash position-left"></i>
+                       REMOVE
+                      </a>
+                   </li>
+             {% endif %}
+              </ul>
+            </div>
+
+          </td>
+  </tr>
+{% endfor %}
+                 
+
+
+<script type="text/javascript">
+ $(document).ready(function(){
+
+
+ });
+</script>

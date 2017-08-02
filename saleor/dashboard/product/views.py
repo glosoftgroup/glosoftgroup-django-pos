@@ -121,43 +121,172 @@ def re_order_form(request, pk):
 		ctx = {"product":product,'suppliers':suppliers,'variants':variants,'attributes':attributes}
 	return TemplateResponse(request, 'dashboard/re_order/re_order_form.html', ctx)    
 
-@staff_member_required
-@permission_decorator('product.view_productclass')
-def product_class_list(request):
-	classes = ProductClass.objects.all().prefetch_related(
-		'product_attributes', 'variant_attributes').order_by('-id')
-	form = forms.ProductClassForm(request.POST or None)
-	if form.is_valid():
-		return redirect('dashboard:product-class-add')
-	classes = get_paginator_items(classes, 30, request.GET.get('page'))
-	classes.object_list = [
-		(pc.pk, pc.name, pc.has_variants, pc.product_attributes.all(),
-		 pc.variant_attributes.all())
-		for pc in classes.object_list]
-	ctx = {'form': form, 'product_classes': classes}
-	return TemplateResponse(request, 'dashboard/product/class_list.html', ctx)
+# @staff_member_required
+# @permission_decorator('product.view_productclass')
+# def product_class_list(request):
+# 	classes = ProductClass.objects.all().prefetch_related(
+# 		'product_attributes', 'variant_attributes').order_by('-id')
+# 	form = forms.ProductClassForm(request.POST or None)
+# 	if form.is_valid():
+# 		return redirect('dashboard:product-class-add')
+# 	classes = get_paginator_items(classes, 30, request.GET.get('page'))
+# 	classes.object_list = [
+# 		(pc.pk, pc.name, pc.has_variants, pc.product_attributes.all(),
+# 		 pc.variant_attributes.all())
+# 		for pc in classes.object_list]
+# 	ctx = {'form': form, 'product_classes': classes}
+# 	return TemplateResponse(request, 'dashboard/product/class_list.html', ctx)
 
+@staff_member_required
+def class_list_view(request):
+	try:
+		queryset_list = ProductClass.objects.all().prefetch_related(
+			'product_attributes', 'variant_attributes').order_by('-id')
+
+		page = request.GET.get('page', 1)
+		paginator = Paginator(queryset_list, 10)
+		try:
+			queryset_list = paginator.page(page)
+		except PageNotAnInteger:
+			queryset_list = paginator.page(1)
+		except InvalidPage:
+			queryset_list = paginator.page(1)
+		except EmptyPage:
+			queryset_list = paginator.page(paginator.num_pages)
+		product_results = queryset_list
+		product_results.object_list = [
+			(pc.pk, pc.name, pc.has_variants, pc.product_attributes.all(),
+			 pc.variant_attributes.all())
+			for pc in product_results.object_list]
+		user_trail(request.user.name, 'accessed the roles page','view')
+		info_logger.info('User: '+str(request.user.name)+' accessed the roles page page')
+
+		data ={
+			'classes':product_results,
+			'totalp':paginator.num_pages
+			   }
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			return TemplateResponse(request, 'dashboard/product/subcategory/view.html', data)
+	except TypeError as e:
+		error_logger.error(e)
+		return HttpResponse('error accessing users')
+
+def paginate_class_list(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+
+	try:
+		queryset_list =ProductClass.objects.all().prefetch_related(
+			'product_attributes', 'variant_attributes').order_by('-id')
+
+		if list_sz:
+			paginator = Paginator(queryset_list, int(list_sz))
+			queryset_list = paginator.page(page)
+			product_results = queryset_list
+			product_results.object_list = [
+				(pc.pk, pc.name, pc.has_variants, pc.product_attributes.all(),
+				 pc.variant_attributes.all())
+				for pc in product_results.object_list]
+			data = {
+				'classes': product_results,
+				'pn': paginator.num_pages,
+				'sz': list_sz,
+				'gid': 0
+			}
+			return TemplateResponse(request, 'dashboard/product/subcategory/p2.html', data)
+		else:
+			paginator = Paginator(queryset_list, 10)
+			if p2_sz:
+				paginator = Paginator(queryset_list, int(p2_sz))
+			queryset_list = paginator.page(page)
+			product_results = queryset_list
+			product_results.object_list = [
+				(pc.pk, pc.name, pc.has_variants, pc.product_attributes.all(),
+				 pc.variant_attributes.all())
+				for pc in product_results.object_list]
+			data = {
+				'classes': product_results,
+			}
+			return TemplateResponse(request, 'dashboard/product/subcategory/paginate.html', data)
+
+		try:
+			queryset_list = paginator.page(page)
+		except PageNotAnInteger:
+			queryset_list = paginator.page(1)
+		except InvalidPage:
+			queryset_list = paginator.page(1)
+		except EmptyPage:
+			queryset_list = paginator.page(paginator.num_pages)
+		product_results = queryset_list
+		product_results.object_list = [
+			(pc.pk, pc.name, pc.has_variants, pc.product_attributes.all(),
+			 pc.variant_attributes.all())
+			for pc in product_results.object_list]
+		return TemplateResponse(request, 'dashboard/product/subcategory/paginate.html', {'classes': product_results})
+	except Exception, e:
+		return  HttpResponse()
 
 @staff_member_required
-@permission_decorator('product.add_productclass')
+def search_class_list(request):
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
+			queryset_list = ProductClass.objects.filter(name__icontains=q).prefetch_related(
+				'product_attributes', 'variant_attributes').order_by('-id')
+			paginator = Paginator(queryset_list, 10)
+
+			try:
+				queryset_list = paginator.page(page)
+			except PageNotAnInteger:
+				queryset_list = paginator.page(1)
+			except InvalidPage:
+				queryset_list = paginator.page(1)
+			except EmptyPage:
+				queryset_list = paginator.page(paginator.num_pages)
+			product_results = queryset_list
+			product_results.object_list = [
+				(pc.pk, pc.name, pc.has_variants, pc.product_attributes.all(),
+				 pc.variant_attributes.all())
+				for pc in product_results.object_list]
+			if p2_sz:
+				queryset_list = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/product/subcategory/paginate.html', {'classes': product_results})
+
+			return TemplateResponse(request, 'dashboard/product/subcategory/search.html',
+									{'classes':product_results, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+@staff_member_required
 def product_class_create(request,new_window=None):
 	product_class = ProductClass()
 	form = forms.ProductClassForm(request.POST or None,
 								  instance=product_class)
 	if form.is_valid():
-		print('nikii mani')
-		product_class = form.save()
+		try:
+			product_class = form.save()
+			return HttpResponse('success')
+		except Exception, e:
+			return HttpResponse(e)
 		msg = pgettext_lazy(
-			'Dashboard message', 'Added product type %s') % product_class
+			'Dashboard message', 'Added product sub category %s') % product_class
 		messages.success(request, msg)
 		if new_window:
 			return HttpResponse('<script>function closeme(){ window.opener.refreshProductType(); window.close();} closeme();</script>')
-		return redirect('dashboard:product-class-list')
+		# return redirect('dashboard:product-class-list')
 	ctx = {'form': form, 'product_class': product_class}
 	if request.is_ajax():
-		return TemplateResponse(request, 'dashboard/product/product_class_form_ajax.html',
-							ctx)
-    
+		return TemplateResponse(request, 'dashboard/product/product_class_form_ajax.html', ctx)
 	return TemplateResponse(
 		request, 'dashboard/product/product_class_form.html', ctx)
 
@@ -257,6 +386,20 @@ def product_create(request):
 
 	product.product_class = product_class
 	product_form = forms.ProductForm(request.POST or None, instance=product)
+	ajax_sub = request.GET.get('ajax_subcategory')
+	sub_category = request.GET.get('sub_category')
+	sup= request.GET.get('supplier')
+	tx = request.GET.get('tax')
+	if ajax_sub:
+		data = {
+			'product_form': product_form,
+			'sub_category':sub_category,
+			'supplier':sup,
+			'tax':tx
+		}
+		return TemplateResponse(request, 'dashboard/product/subcategory/sub_refresh.html',
+								data)
+
 	if create_variant:
 		variant = ProductVariant(product=product)
 		variant_form = forms.ProductVariantForm(request.POST or None,
@@ -279,9 +422,13 @@ def product_create(request):
 						pk=product.pk)
 	else:
 		errors = product_form.errors
+		product_cl = ProductClass()
+		form = forms.ProductClassForm(request.POST or None,
+									  instance=product_cl)
 
 		ctx = {'product_form': product_form, 'variant_form': variant_form,
-		   'product': product,'form_classes':form_classes, 'errors':errors}
+		   'product': product,'form_classes':form_classes, 'errors':errors,
+			   'form':form, 'product_class':product_cl}
 	return TemplateResponse(
 		request, 'dashboard/product/product_form.html', ctx)
 
@@ -607,16 +754,95 @@ def variants_bulk_delete(request, product_pk):
 			return redirect(success_url)
 	return redirect('dashboard:product-update', pk=product.pk)
 
-
 @staff_member_required
-@permission_decorator('product.view_productattribute')
-def attribute_list(request):
-	attributes = [
-		(attribute.pk, attribute.name, attribute.values.all())
-		for attribute in ProductAttribute.objects.prefetch_related('values').order_by('-id')]
-	ctx = {'attributes': attributes}    
-	return TemplateResponse(request, 'dashboard/product/attributes/list.html',
-							ctx)
+def view_attr(request):
+	try:
+		queryset_list = [
+			(attribute.pk, attribute.name, attribute.values.all())
+			for attribute in ProductAttribute.objects.prefetch_related('values').order_by('-id')]
+
+		page = request.GET.get('page', 1)
+		paginator = Paginator(queryset_list, 10)
+		try:
+			queryset_list = paginator.page(page)
+		except PageNotAnInteger:
+			queryset_list = paginator.page(1)
+		except InvalidPage:
+			queryset_list = paginator.page(1)
+		except EmptyPage:
+			queryset_list = paginator.page(paginator.num_pages)
+		product_results = queryset_list
+		user_trail(request.user.name, 'accessed the roles page','view')
+		info_logger.info('User: '+str(request.user.name)+' accessed the roles page page')
+
+		data ={
+			'attributes': product_results,
+			'totalp':paginator.num_pages
+			   }
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			return TemplateResponse(request, 'dashboard/product/attributes/pagination/view.html', data)
+	except TypeError as e:
+		error_logger.error(e)
+		return HttpResponse('error accessing users')
+
+def paginate_attr(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+
+	try:
+		queryset_list = [
+			(attribute.pk, attribute.name, attribute.values.all())
+			for attribute in ProductAttribute.objects.prefetch_related('values').order_by('-id')]
+
+		if list_sz:
+			paginator = Paginator(queryset_list, int(list_sz))
+			queryset_list = paginator.page(page)
+			product_results = queryset_list
+			data = {
+				'attributes': product_results,
+				'pn': paginator.num_pages,
+				'sz': list_sz,
+				'gid': 0
+			}
+			return TemplateResponse(request, 'dashboard/product/attributes/pagination/p2.html', data)
+		else:
+			paginator = Paginator(queryset_list, 10)
+			if p2_sz:
+				paginator = Paginator(queryset_list, int(p2_sz))
+			queryset_list = paginator.page(page)
+			product_results = queryset_list
+			data = {
+				'attributes': product_results,
+			}
+			return TemplateResponse(request, 'dashboard/product/attributes/pagination/paginate.html', data)
+
+		try:
+			queryset_list = paginator.page(page)
+		except PageNotAnInteger:
+			queryset_list = paginator.page(1)
+		except InvalidPage:
+			queryset_list = paginator.page(1)
+		except EmptyPage:
+			queryset_list = paginator.page(paginator.num_pages)
+		product_results = queryset_list
+		return TemplateResponse(request, 'dashboard/product/attributes/pagination/paginate.html', {'attributes': product_results})
+	except Exception, e:
+		return  HttpResponse()
+
+
+# @staff_member_required
+# @permission_decorator('product.view_productattribute')
+# def attribute_list(request):
+# 	attributes = [
+# 		(attribute.pk, attribute.name, attribute.values.all())
+# 		for attribute in ProductAttribute.objects.prefetch_related('values').order_by('-id')]
+# 	ctx = {'attributes': attributes}
+# 	return TemplateResponse(request, 'dashboard/product/attributes/list.html',
+# 							ctx)
 
 @staff_member_required
 @permission_decorator('product.add_productattribute')
@@ -625,7 +851,6 @@ def attribute_add_modal(request):
 	values = request.POST.getlist("values")
 
 	try:
-		print values
 		ProductAttribute.objects.create(slug=attribute_name, name=attribute_name);
 		last_attribute = ProductAttribute.objects.latest('id')
 
@@ -635,7 +860,11 @@ def attribute_add_modal(request):
 			p.save()
 
 		attributes = ProductAttribute.objects.all()
-		ctx = {'attributes': attributes}
+		product_cl = ProductClass()
+		form = forms.ProductClassForm(request.POST or None,
+									  instance=product_cl)
+		ctx = {'attributes': attributes, 'form':form}
+
 		return TemplateResponse(request, 'dashboard/product/attributes/select.html', ctx)
 	except Exception, e:
 		return HttpResponse(e)
@@ -1156,3 +1385,37 @@ def search_attribute(request):
 			return TemplateResponse(
 		request, 'dashboard/includes/attribute_search_results.html',
 		ctx)
+
+@staff_member_required
+def search_attribute(request):
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
+			queryset_list = [
+				(attribute.pk, attribute.name, attribute.values.all())
+			for attribute in ProductAttribute.objects.filter(name__icontains=q).prefetch_related('values')]
+			paginator = Paginator(queryset_list, 10)
+
+			try:
+				queryset_list = paginator.page(page)
+			except PageNotAnInteger:
+				queryset_list = paginator.page(1)
+			except InvalidPage:
+				queryset_list = paginator.page(1)
+			except EmptyPage:
+				queryset_list = paginator.page(paginator.num_pages)
+			product_results = queryset_list
+			if p2_sz:
+				queryset_list = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/product/attributes/pagination/paginate.html', {'attributes': product_results})
+
+			return TemplateResponse(request, 'dashboard/product/attributes/pagination/search.html',
+									{'attributes':product_results, 'pn': paginator.num_pages, 'sz': sz, 'q': q})

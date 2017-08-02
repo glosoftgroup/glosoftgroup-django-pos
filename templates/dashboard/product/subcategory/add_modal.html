@@ -1,0 +1,275 @@
+
+{% load prices_i18n %}
+{% load i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+{% load attributes %}
+<!-- Pager -->
+    <form method="post" id="form-product-type" enctype="multipart/form-data" name="form-product-type">
+    <div class="modal-body">
+    <div class="row">
+
+        {% csrf_token %}
+         <div class="col-md-6">
+            <div class="form-group">
+               <label>Product Type Name:</label>
+               <!-- form.name }} -->
+               <input type="text" class="form-control pname" placeholder="Product Type Name" name="pname">
+            </div>
+            <div id='refresh-content'>
+            <div class="form-group">
+             <label>{{ form.product_attributes.label }}</label>
+             <div class="multi-select-full new-attr">
+               {{ form.product_attributes }}
+              </div>
+            </div>
+            <div class="form-group">
+             <label>{{ form.variant_attributes.label }}</label>
+             <div class="multi-select-full new-attr">
+              {{ form.variant_attributes }}
+              </div>
+            </div>
+            </div>
+            <div class="form-group text-center">
+                <button id="atb" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#test-modal">
+                    <i class="icon-file-plus"></i> Add More Attributes
+                </button>
+            </div>
+            <div class="form-group">
+              <div id="att-div" style="display: none;">
+        <div class="row">
+          <form method="post" enctype="multipart/form-data">
+         <div class="col-md-12">
+            <div class="form-group">
+             <label>Name</label>
+             {% if product_type %}
+              <input type="text" id="attr_name" class="form-control" disabled="disabled" value="{{product_type}}" name="slug">
+             <input type="hidden" class="product_type" value="{{product_type.pk}}" name="product_type">
+             {% else %}
+              <input type="text" id="attr_name" class="form-control" value="" name="slug">
+             <input type="hidden" class="product_type" value="" name="product_type">
+             {% endif %}
+
+
+             <span class="help-block">Attribute name e.g Brand</span>
+            </div>
+          </div>            <hr>
+
+          <div class="col-md-12">
+           {% for attr in attributes %}
+           <div class="col-md-12">
+            <hr><label>Name: {{ attr }}</label><br>
+            </div>
+            <div class="col-md-6">
+             <div class="input-group">
+              <input type="text" placeholder="New value" name="choice" class="form-control" id="choice{{attr.pk}}">
+              <span class="input-group-btn">
+                <button class="btn btn-xs bg-primary legitRipple" type="button" id="cbtn{{attr.pk}}">add</button>
+              </span>
+            </div>
+            </div>
+
+            <div class="col-md-6 add_value{{attr.pk}}">
+              {% for v in attr.values.all %}
+
+               <span class="text-mute label label-success"> {{ v }},
+
+               </span>
+              {% endfor %}
+               </div>
+               <script type="text/javascript">
+              $('#cbtn{{attr.pk}}').on('click',function(){
+                var value = $('#choice{{attr.pk}}').val();
+                if(!value){
+                notify('add a valid attribute name');
+                return false;
+              }
+              var url ='{% url "dashboard:product-attr-add-value" attr.pk %}';
+              var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+              var posting = $.post( url, {
+                value:value,
+                csrfmiddlewaretoken:csrf_token,
+              });
+              posting.done(function(data) {
+                  $('.add_value{{attr.pk}}').empty().append( data );
+                  $('#choice{{attr.pk}}').val('');
+                  //$('#add_value').addClass('hidden');
+
+                notify('New category added successfully','bg-success');
+                refreshAttributes()
+
+              });
+
+              posting.fail(function(){
+                notify('Oops! Try another value.','bg-warning');
+              });
+
+              });
+            </script>
+           {% endfor %}
+
+          </div>
+
+      <!-- action buttons -->
+         <div class="text-right">
+     </div>
+      </form>
+        </div>
+      </div>
+            </div>
+
+         </div>
+          <!-- form left -->
+          <div class="col-md-6">
+             <!-- <div class="form-group">
+              <label class="checkbox-inline">
+               {{ form.is_shipping_required }}
+               {{ form.is_shipping_required.label }}
+              </label>
+             </div> -->
+              <div class="form-group">
+               <label class="checkbox-inline">
+                {{ form.has_variants }}
+                {{ form.has_variants.label }}
+               </label>
+             </div>
+          </div>
+          </div>
+          </div>
+
+          <!-- ./form left -->
+      <!-- action buttons -->
+         <div class="modal-footer">
+            <div class="col-md-6 col-md-offset-3">
+            {% if product_class.pk %}
+               <a href="#!" data-dismiss="modal" class="btn btn-default modal-action modal-close pull-left">
+                  {% trans "Cancel" context "Dashboard cancel action" %}
+                </a>
+              <button type="submit" class="btn btn-primary pull-right">
+                {% trans "Update" context "Dashboard update action" %}
+              </button>
+            {% else %}
+               <a href="#!" data-dismiss="modal" class="btn modal-action modal-close btn-default pull-left">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+               </a>
+              <button type="submit"  class="btn btn-primary waves-effect waves-light pull-right">
+                {% trans "Create" context "Dashboard create action" %}
+              </button>
+            {% endif %}
+            </div>
+         </div>
+      </form>
+
+
+
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript">
+  $( document ).ready(function() {
+
+    // validate
+    $('#form-product-type').validate({
+      onkeyup: function(element) {$(element).valid()},
+    rules:{
+        pname: {
+          required:true,
+          minlength:3
+        },
+
+    },
+    messages:{
+      pname:{
+        required: "please provide a name",
+        minlength: "name must be atleast 6 characters long"
+      },
+    },
+    submitHandler: function() {
+
+      if(1 != ''){
+          var f = document.getElementById('form-product-type');
+          var formData = new FormData(f);
+          formData.append('name',$('.pname').val());
+          for (var pair of formData.entries()) {
+              console.log(pair[0]+ ', ' + pair[1]);
+          }
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:product-class-add' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       console.log(data);
+
+                       $.jGrowl('Terminal added successfully,', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+
+                      localStorage.setItem('user_id', data);
+
+                      //window.location = "{% url 'dashboard:terminals'%}";
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try submitting again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            }
+      }else{
+        $.jGrowl('Image is empty fill and try submitting again', {
+            header: 'Oh snap!',
+            theme: 'bg-danger'
+        });
+      }
+    }
+  });
+    // end validate
+  });
+
+</script>
+<script type="text/javascript">
+   // Checkboxes/radios (Uniform)
+    // ------------------------------
+
+    // Default initialization
+    $(".styled, .multiselect-container input").uniform({
+        radioClass: 'choice'
+    });
+
+  function refresh(){
+    window.location.reload();
+    // var url = "{% url 'dashboard:product-class-add' %}";
+    // var posting = $.get( url, {});
+    // posting.done(function(data) {
+    //   $('#refresh-content').empty().append( data );
+    // });
+  }
+  $('#refresh_content').on('click', function(){
+    refresh();
+    window.location.reload();
+  });
+
+   $('#atb').on('click', function(){
+
+          var $btn = $(this);
+          var currentDialog = $btn.closest('.modal-dialog'),
+          targetDialog = $($btn.attr('data-target'));
+
+          if (!currentDialog.length)
+            return;
+          targetDialog.data('previous-dialog', currentDialog);
+          currentDialog.addClass('aside');
+          var stackedDialogCount = $('.modal.in .modal-dialog.aside').length;
+          if (stackedDialogCount <= 5){
+            currentDialog.addClass('aside-' + stackedDialogCount);
+          }
+        });
+</script>
+

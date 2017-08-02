@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
@@ -12,6 +13,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -26,19 +28,103 @@ debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
-@staff_member_required
-# @permission_decorator('userprofile.view_user')
+
 def users(request):
 	try:
 		users = Supplier.objects.all().order_by('-id')
-		#user_trail(request.user.name, 'accessed users list page')
-		#info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
-		
-		ctx = {'users':users}
-		return TemplateResponse(request, 'dashboard/supplier/users.html', ctx)
+		page = request.GET.get('page', 1)
+		paginator = Paginator(users, 10)
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except InvalidPage:
+			users = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
+		user_trail(request.user.name, 'accessed suppliers list page', 'view')
+		info_logger.info('User: ' + str(request.user.name) + ' accessed the view users page')
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			ctx = {'users': users, 'pn': paginator.num_pages}
+			return TemplateResponse(request, 'dashboard/supplier/pagination/users2.html', ctx)
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
+
+@staff_member_required
+def user_paginate(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+	if request.GET.get('gid'):
+		users = Supplier.objects.filter(groups__id=request.GET.get('gid'))
+		if p2_sz:
+			paginator = Paginator(users, int(p2_sz))
+			users = paginator.page(page)
+			return TemplateResponse(request,'dashboard/supplier/pagination/paginate.html',{'users':users})
+
+		paginator = Paginator(users, 10)
+		users = paginator.page(page)
+		return TemplateResponse(request,'dashboard/supplier/pagination/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':10,'gid':request.GET.get('gid')})
+
+	else:
+		users = Supplier.objects.all().order_by('-id')
+		if list_sz:
+			paginator = Paginator(users, int(list_sz))
+			users = paginator.page(page)
+			return TemplateResponse(request,'dashboard/supplier/pagination/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0})
+		else:
+			paginator = Paginator(users, 10)
+		if p2_sz:
+			paginator = Paginator(users, int(p2_sz))
+			users = paginator.page(page)
+			return TemplateResponse(request,'dashboard/supplier/pagination/paginate.html',{'users':users})
+
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except InvalidPage:
+			groups = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
+		return TemplateResponse(request,'dashboard/supplier/pagination/paginate.html',{'users':users})
+
+
+@staff_member_required
+def user_search(request):
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size', 10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get('q')
+		if list_sz is None:
+			sz = 10
+		else:
+			sz = list_sz
+
+		if q is not None:
+			users = Supplier.objects.filter(
+				Q(name__icontains=q) |
+				Q(email__icontains=q) | Q(mobile__icontains=q)).order_by('id')
+			paginator = Paginator(users, 10)
+			try:
+				users = paginator.page(page)
+			except PageNotAnInteger:
+				users = paginator.page(1)
+			except InvalidPage:
+				users = paginator.page(1)
+			except EmptyPage:
+				users = paginator.page(paginator.num_pages)
+			if p2_sz:
+				users = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/supplier/pagination/paginate.html', {'users': users})
+
+			return TemplateResponse(request, 'dashboard/supplier/pagination/search.html',
+									{'users': users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 @staff_member_required
 @permission_decorator('userprofile.add_user')
@@ -60,6 +146,8 @@ def supplier_add_modal(request):
 	except Exception as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing add suppliers page')
+
+@staff_member_required
 def supplier_add(request):
 	try:
 		return TemplateResponse(request, 'dashboard/supplier/add_supplier.html',{})
