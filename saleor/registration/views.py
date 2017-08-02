@@ -23,9 +23,10 @@ from saleor.userprofile.models import User
 #     return django_views.login(request, **kwargs)
 # @find_and_assign_anonymous_cart()
 def login(request):
-	email = request.POST['email']
+	username = request.POST['email']
 	password = request.POST['password']
-	user = authenticate(username=email, password=password)
+
+	user = authenticate(username=username, password=password)
 	if user is not None:
 		if user.is_active:
 			auth.login(request, user)

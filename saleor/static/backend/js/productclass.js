@@ -6,9 +6,12 @@ $(function() {
               addclass: color
           });
       }
+
   //add  product type 
-  $('#add-new-type').on('click',function(){
-  	var url = $(this).data('href');
+  $('body').on('click', '#add-new-type', function(){
+    $('#modal_type').modal();
+     $('#modal_type .modal-title').html('Add Sub Category');
+  	/*var url = $(this).data('href');
   	var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
   	var title_text = $(this).data('title');
   	$('.mt1').html(title_text);
@@ -19,7 +22,7 @@ $(function() {
     posting.done(function( data ) {    
         $("#modal_type_results" ).html( data ); 
         $(modal).modal();
-      });
+      });*/
 
   });
 

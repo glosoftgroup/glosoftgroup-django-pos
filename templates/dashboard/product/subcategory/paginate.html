@@ -1,0 +1,47 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+{% for pk, name, has_variants, product_attributes, variant_attributes in classes %}
+        <tr>
+          <td>#{{ forloop.counter }}</td>
+          <!-- name -->
+          <td>{{ name }}</td>
+          <!-- product attributes -->
+          <td>
+            {% if product_attributes %}
+           {{ product_attributes|join:", " }}
+          {% endif %}
+          </td>
+          <!-- actions -->
+        <td class="text-center">
+              <!-- Single button -->
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Action <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu edit-dropdown">
+             {% if perms.product.change_productclass %}
+                <li><a href="{% url 'dashboard:product-class-update' pk=pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+             {% endif %}
+             {% if perms.product.delete_productclass %}
+                  <li>
+                     <a href="#modal_instance" data-title='Delete Sub Category {{ name }}' data-href="{% url 'dashboard:product-class-delete' pk=pk %}" class="modal-trigger"><i class="icon-trash position-left"></i>
+                       REMOVE
+                      </a>
+                   </li>
+             {% endif %}
+              </ul>
+            </div>
+
+          </td>
+        </tr>
+        {% endfor %}
+                 
+
+
+<script type="text/javascript">
+ $(document).ready(function(){
+
+
+ });
+</script>

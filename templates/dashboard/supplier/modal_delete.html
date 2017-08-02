@@ -6,7 +6,7 @@
   <div class="modal-body">
     <div class="">
       <div class="col s12">
-        <h5>
+        <h5 class="text-center">
           {% blocktrans with category=category trimmed context "Delete contact modal title" %}
             Are you sure you want to delete the address contact {{ address }}?
           {% endblocktrans %}
@@ -16,12 +16,14 @@
     
   </div>
   <div class="modal-footer">
-    <button type="submit" id='delete-contact' onclick="delete_contact();" class="modal-action btn btn-primary">
-      {% trans "Delete" context "Dashboard delete action" %}
-    </button>
-    <a href="#!" data-dismiss="modal" class="modal-action modal-close btn btn-flat">
-      {% trans "Cancel" context "Dashboard cancel action" %}
-    </a>
+    <div class="col-md-6 col-md-offset-3">
+      <button type="submit" id='delete-contact' onclick="delete_contact();" class="modal-action btn btn-danger pull-right">
+        {% trans "Delete" context "Dashboard delete action" %}
+      </button>
+      <a href="#!" data-dismiss="modal" class="modal-action modal-close btn btn-default pull-left">
+        {% trans "Cancel" context "Dashboard cancel action" %}
+      </a>
+    </div>
   </div>
 </form>
 <script type="text/javascript">

@@ -77,35 +77,7 @@
                </span>             
               {% endfor %}
                </div>
-               <script type="text/javascript">
-              $('#cbtn{{attr.pk}}').on('click',function(){
-                var value = $('#choice{{attr.pk}}').val();
-                if(!value){ 
-                notify('add a valid attribute name');
-                return false; 
-              }
-              var url ='{% url "dashboard:product-attr-add-value" attr.pk %}';
-              var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();          
-              var posting = $.post( url, {       
-                value:value,                
-                csrfmiddlewaretoken:csrf_token,
-              });    
-              posting.done(function(data) {       
-                  $('.add_value{{attr.pk}}').empty().append( data );
-                  $('#choice{{attr.pk}}').val('');
-                  //$('#add_value').addClass('hidden');
-                           
-                notify('New category added successfully','bg-success');
-                refreshAttributes()
-                
-              });
 
-              posting.fail(function(){
-                notify('Oops! Try another value.','bg-warning');
-              });
-                
-              });
-            </script>
            {% endfor %}
 
           </div>
@@ -167,8 +139,8 @@
 
 <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript">
-  $( document ).ready(function() {  
-    
+  $( document ).ready(function() {
+
     // validate
     $('#form-product-type').validate({
       onkeyup: function(element) {$(element).valid()},

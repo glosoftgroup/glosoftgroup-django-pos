@@ -80,7 +80,7 @@ def users(request):
 		if request.GET.get('initial'):
 			return HttpResponse(paginator.num_pages)
 		else:
-			return TemplateResponse(request, 'dashboard/users/users.html', {'groups':groups,'users':users})
+			return TemplateResponse(request, 'dashboard/users/users.html', {'groups':groups,'users':users, 'pn': paginator.num_pages})
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')

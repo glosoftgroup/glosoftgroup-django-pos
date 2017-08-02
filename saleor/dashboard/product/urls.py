@@ -7,6 +7,7 @@ from . import views, products
 urlpatterns = [
     # url(r'^$',permission_required('product.view_product', login_url='not_found')
     # (views.product_list), name='product-list'),
+
     url(r'^$',permission_required('product.view_product', login_url='not_found')
     (products.view), name='product-list'),
     url(r'^list-paginate/$', products.paginate, name='product-list-paginate'),
@@ -59,8 +60,14 @@ urlpatterns = [
      url(r'^product_filter/$',
         views.product_filter, name='product_filter'),
     # end search routes
+    # url(r'^classes/$', permission_required('product.view_productclass', login_url='not_found')
+    #     (views.product_class_list), name='product-class-list'),
     url(r'^classes/$', permission_required('product.view_productclass', login_url='not_found')
-        (views.product_class_list), name='product-class-list'),
+            (views.class_list_view), name='product-class-list'),
+    url(r'^classes/paginate/$', permission_required('product.view_productclass', login_url='not_found')
+            (views.paginate_class_list), name='paginate-class-list'),
+    url(r'^classes/search/$', permission_required('product.view_productclass', login_url='not_found')
+            (views.search_class_list), name='search-class-list'),
     url(r'^classes/add/$', permission_required('product.add_productclass', login_url='not_found')
         (views.product_class_create), name='product-class-add'),
     url(r'^classes/refresh/$',
@@ -116,8 +123,12 @@ urlpatterns = [
     url('^(?P<product_pk>[0-9]+)/images/upload/$', permission_required('product.add_productimage', login_url='not_found')
         (api.upload_image), name='product-images-upload'),
 
+    # url(r'attributes/$', permission_required('product.view_productattribute', login_url='not_found')
+    #     (views.attribute_list), name='product-attributes'),
     url(r'attributes/$', permission_required('product.view_productattribute', login_url='not_found')
-        (views.attribute_list), name='product-attributes'),
+        (views.view_attr), name='product-attributes'),
+    url(r'attributes/paginate/$', permission_required('product.view_productattribute', login_url='not_found')
+        (views.paginate_attr), name='attr_paginate'),
     url(r'attributes/search$',
         views.search_attribute, name='search-attribute'),
     

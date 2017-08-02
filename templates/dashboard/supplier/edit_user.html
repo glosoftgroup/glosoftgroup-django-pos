@@ -5,7 +5,7 @@
 {% load prices_i18n %}
 
 {% block title %}
-  users
+  Supplier Update
 {% endblock %}
 
 {% block menu_supplier_class %}active{% endblock %}
@@ -44,7 +44,7 @@
             <!-- contacts -->
              <div class="tab-pane animated fadeIn" id="contacts">
 
-               <a href="#modal_instance2" class="btn btn-primary text-white modal-trigger-ajax" data-title="{{ user }} History" data-href="{% url 'dashboard:address-add' pk=user.pk %}">
+               <a href="#modal_instance2" class="btn btn-primary text-white modal-trigger-ajax" data-title="Add Contact" data-href="{% url 'dashboard:address-add' pk=user.pk %}">
                       Create Contact
                   </a>             
                <div class="row">
@@ -83,7 +83,7 @@
                          </td>
                          <td>
                            <a href="#modal_instance" data-title="Delete contact" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:contact-delete' pk=address.pk %}"
-    class="modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>Remove category
+    class="btn btn-default modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>Remove
     </a>
                          </td>
                          
@@ -139,18 +139,6 @@
                           <div class="form-group">
                             <label for="name">Address</label>
                             <input type="text" class="form-control" name="street1" value="{{ user.street1 }}"  id="street1" placeholder="Street 1">
-                            <input type="text" value="{{ user.street2 }}"  class="form-control" name="street2" id="street2" placeholder="Street 2">
-                            <div class="row">
-                             <div class="col-md-3">
-                              <input type="text" class="form-control" name="city" value="{{ user.city }}"  id="city" placeholder="city">
-                             </div>
-                             <div class="col-md-3">
-                             <input type="text" class="form-control" name="county" value="{{ user.county }}"  id="county" placeholder="county">
-                             </div>
-                             <div class="col-md-3">
-                             <input type="number" class="form-control" name="code" value="{{ user.code }}"  id="code" placeholder="Code">
-                             </div>
-                            </div>
                           </div>
 
                            <div class="form-group">
@@ -169,21 +157,17 @@
                             <label for="mobile">Phone</label>
                             <input type="text" class="form-control" name="mobile" id="mobile" value="{{ user.mobile }}" placeholder="Mobile">
                            </div>
-                           <div class="form-group">
-                            <label for="mobile">Fax</label>
-                            <input type="text" class="form-control" name="fax" id="fax" value="{{ user.fax }}" placeholder="Fax">
-                           </div>
                         </div>
                       </div>            
                      
                     </div>
           </div>
           <div class="row">
-            <div class="col-md-12">
-             <div class="pull-right" style="margin-top:40px;">
-              <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+            <div class="col-md-6 col-md-offset-3">
+             <div class="pull-rights" style="margin-top:40px;">
+              <a href="{% url 'dashboard:users' %}" class="pull-left btn btn-default waves-effect waves-light">Cancel</a>
               
-              <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Update Supplier<i class="icon-arrow-right14 position-right"></i></button>
+              <button class="btn btn-primary waves-effect waves-light pull-right" id="submit" type="submit">Update Supplier<i class="icon-arrow-right14 position-right"></i></button>
              </div>
             </div>
           </div>

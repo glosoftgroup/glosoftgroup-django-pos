@@ -7,12 +7,18 @@
 <!-- scripts -->
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+  <!--<script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>-->
 <script type="text/javascript">
 	// Default initialization
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
     });
+    $('#id_categories').multiselect({
+        onChange: function() {
+            $.uniform.update();
+        }
+    });
+
     // Basic select
-    $('.bootstrap-select').selectpicker();
+    //$('.bootstrap-select').selectpicker();
 </script>

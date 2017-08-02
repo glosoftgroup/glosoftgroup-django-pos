@@ -1,16 +1,4 @@
- <div class="panel panel-flat">
-    <div class="panel-heading">
-      <h5 class="panel-title">#{{user.pk}} {{user}}</h5>
-      <div class="heading-elements">
-        <ul class="icons-list">
-          <li><a data-action="collapse"></a></li>
-          <li><a data-action="reload"></a></li>
-          <li><a data-action="close"></a></li>
-        </ul>
-      </div>
-    </div> 
-    <div class="panel-body">
-    <div class="row">
+<div class="row">
     <form method="post" id="address-form" enctype="multipart/form-data">
     {% csrf_token %} 
          <div class="col-md-6">
@@ -61,24 +49,22 @@
             </div>
          </div>
 		  <!-- action buttons -->
-         <div class="text-right">
-           <button type="submit"  id="submit">Add address</button>
+         <div class="row text-right">
+             <div class="col-md-6 col-md-offset-3">
+                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="submit"  class="btn btn-primary pull-right" id="submit">Add address</button>
+             </div>
 		 </div>
       </form>
     </div>
-   <div>
-   	
-   </div>
-    </div>
-
-   </div>
 
 
    <!-- scritps -->
    <script type="text/javascript">
    	$( document ).ready(function() {
     // validate
-    $('#address-form').validate({
+ $('#address-form').validate({
+    onkeyup: function(element) {$(element).valid()},
     rules:{
         contact_name: {
           required:true,
@@ -90,6 +76,7 @@
         },
         phone: {
           required:true,
+          digits:true,
           minlength:6
         },      
 

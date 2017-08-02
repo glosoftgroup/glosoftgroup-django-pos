@@ -159,35 +159,35 @@
                 </li>
                   {% endif %}
                   {% if perms.userprofile.view_user %}
-                <li>
-                  <a href="javascript:;">
-                    <i class="icon-height"></i>
-                    <span>Human Resource</span>
-                  </a>
-                  <ul>
-                    {% if perms.userprofile.view_user %}
-                    <li class="{% block menu_hremployees_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:employees' %}"><i class='icon-users2'></i>Manage Employees</a>
-                    </li>
-                    {% endif %}
-                    {% if perms.auth.view_group %}
-                    <li class="{% block menu_hrattendance_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:attendance' %}"><i class='icon-users4'></i>Manage Attendance</a>
-                    </li>
-                    {% endif %}
-                    {% if perms.userprofile.view_usertrail %}
-                      <li class="{% block menu_hrleaves_class %}{% endblock %}">
-                      <a href="{% url 'dashboard:user_trail' %}"><i class='icon-history'></i>Manage Leaves</a>
-                    </li>
-                    {% endif  %}
-                    <li class="{% block menu_hr_default_class %}{% endblock %}">
-                    <a href="{% url 'dashboard:hr-defaults' %}">
-                        <i class=" icon-earth"></i>
-                         settings
-                    </a>
-                    </li>
-                  </ul>
-                </li>
+                <!--<li>-->
+                  <!--<a href="javascript:;">-->
+                    <!--<i class="icon-height"></i>-->
+                    <!--<span>Human Resource</span>-->
+                  <!--</a>-->
+                  <!--<ul>-->
+                    <!--{% if perms.userprofile.view_user %}-->
+                    <!--<li class="{% block menu_hremployees_class %}{% endblock %}">-->
+                      <!--<a href="{% url 'dashboard:employees' %}"><i class='icon-users2'></i>Manage Employees</a>-->
+                    <!--</li>-->
+                    <!--{% endif %}-->
+                    <!--{% if perms.auth.view_group %}-->
+                    <!--<li class="{% block menu_hrattendance_class %}{% endblock %}">-->
+                      <!--<a href="{% url 'dashboard:attendance' %}"><i class='icon-users4'></i>Manage Attendance</a>-->
+                    <!--</li>-->
+                    <!--{% endif %}-->
+                    <!--{% if perms.userprofile.view_usertrail %}-->
+                      <!--<li class="{% block menu_hrleaves_class %}{% endblock %}">-->
+                      <!--<a href="{% url 'dashboard:user_trail' %}"><i class='icon-history'></i>Manage Leaves</a>-->
+                    <!--</li>-->
+                    <!--{% endif  %}-->
+                    <!--<li class="{% block menu_hr_default_class %}{% endblock %}">-->
+                    <!--<a href="{% url 'dashboard:hr-defaults' %}">-->
+                        <!--<i class=" icon-earth"></i>-->
+                         <!--settings-->
+                    <!--</a>-->
+                    <!--</li>-->
+                  <!--</ul>-->
+                <!--</li>-->
                   {% endif %}
                 {% if perms.product.view_product %}
                 <li id="first">
@@ -217,7 +217,7 @@
                     <li class="{% block menu_product_classes_class %}{% endblock %}">
                     <a href="{% url 'dashboard:product-class-list' %}">
                       <i class="icon-books"></i>
-                       {% trans "Product types" context "Dashboard product types list" %}
+                       {% trans "Sub Categories" context "Dashboard product types list" %}
                     </a>
                     </li>
                       {% endif %}

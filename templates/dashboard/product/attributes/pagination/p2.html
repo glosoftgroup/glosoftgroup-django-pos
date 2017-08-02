@@ -1,0 +1,114 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+     tr.nb td{border:0px;}
+     .nb{border:0px;}
+     .table{border:1px solid #ccc}
+   </style>
+{% if attributes %}
+      <div class="panel panel-flat">
+        <div class="table-responsives">
+         
+            <div class="panel-body">
+              <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
+                     <thead>
+                      <tr class="bg-primary">
+                         <th>#</th>
+                        <th>Name</th>
+                        <th>Value</th>
+                        <th class="text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="p-tb">
+                       {% for pk, name, values in attributes %}
+                  <tr>
+                    <td>{{ pk }}</td>
+                    <!-- names -->
+                    <td>{{ name }}</td>
+                    <!-- values -->
+                    <td>
+                    {% if values %}
+                      {% for value in values %}
+                          {{ value }}
+                          {% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    {% else %}
+                        None
+                    {% endif %}
+                    </td>
+                      <td class="text-center">
+                              <!-- Single button -->
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Action <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu edit-dropdown">
+                             {% if perms.product.change_product %}
+                                <li><a href="{% url 'dashboard:product-attribute-update' pk=pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                             {% endif %}
+                             {% if perms.product.delete_product %}
+                                  <li>
+                                     <a href="#modal_instance" data-title='Remove attribute {{ name }}' data-href="{% url 'dashboard:product-attribute-delete' pk=pk %}" class="modal-trigger-ajax"><i class="icon-trash position-left"></i>
+                                       REMOVE
+                                      </a>
+                                   </li>
+                             {% endif %}
+                              </ul>
+                            </div>
+
+                          </td>
+                  </tr>
+                {% endfor %}
+                    </tbody>
+               </table>
+            </div>
+        </div>
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+      </div>
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No attributes available
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            leaps: false
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:attr_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                    });
+                }else{
+                    $.get("{% url 'dashboard:attr_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
+                   $('#p-tb').html(data);
+                });
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+   });
+ </script>

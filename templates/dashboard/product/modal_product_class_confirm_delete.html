@@ -27,7 +27,7 @@
     </a>
   </div>
 {% else %}
-  <form action="{% url "dashboard:product-class-delete" pk=product_class.pk %}" method="post" novalidate>
+  <form action="{% url 'dashboard:product-class-delete' pk=product_class.pk %}" method="post" novalidate>
     {% csrf_token %}
     <div class="modal-content">
       <div class="row">

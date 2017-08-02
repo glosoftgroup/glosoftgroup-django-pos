@@ -208,7 +208,7 @@
                     {% else %}
                       <div class="tab-pane has-padding active" id="bordered-tab1">
                     {% endif %}
-                   
+
                        <!-- 2 columns form -->
         <form method="post" class="form-horizontals" id="form-product" enctype="multipart/form-data" novalidate>
           {% csrf_token %}         
@@ -221,10 +221,9 @@
                   {{errors}} 
                   </div>             
                 {% endif %}
-              
-      
-  <!-- panel -->   
-   
+
+  <!-- panel -->
+
     <!-- body -->
     <div class="row">
 
@@ -241,7 +240,7 @@
          </div>
             <div class="col-md-4">
               <div class="form-group" >
-                <label>Product Category: </label>
+                <label>Product Category:<i class='text-danger'> *</i> </label>
                 <div class="input-group">
                              
                       <div class="multi-select-full input-group-btn" id='category_field' >   
@@ -249,7 +248,7 @@
                       </div>                         
                   
                   <div class="input-group-btn">
-                     <button type="button" class="btn bg-indigo btn-icon legitRipple edit_modal-trigger" data-popup="tooltip" 
+                     <button type="button" class="btn bg-primary btn-icon legitRipple edit_modal-trigger" data-popup="tooltip"
                     data-original-title="Add New category"
                     href="#modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
                        <i class="icon-plus-circle2"></i>
@@ -260,13 +259,12 @@
             </div>
             <div class="col-md-4">
               <div class="form-group" id='productType'>
-                <label>Product Sub-Category: % </label>
-                <div class="input-group">
-              
-                {{ product_form.product_class}}
+                <label>Product Sub-Category:<i class='text-danger'> *</i> </label>
+                <div class="input-group sub-refresh">
+                    {{ product_form.product_class}}
             
                  <div class="input-group-btn">
-                    <button type="button"  id="add-new-type" data-modal="#modal_type" href="#modal_types" class="btn bg-indigo btn-icon "
+                    <button type="button"  id="add-new-type" data-modal="#modal_type" href="#modal_types" class="btn bg-primary btn-icon "
                             data-title="Add New Sub-Category" data-href='{% url "dashboard:product-class-add-new" 12 %}'
                             data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip"
                             data-original-title="Add New Sub-Category">
@@ -291,7 +289,7 @@
           <span>
             <a href="">
               <input type="hidden" value='{% url "dashboard:product-attr-add-value" 1 %}' id="link-pk" name="link-pk">
-              <button id="add-new-attribute" onclick="return false;" class="btn bg-indigo btn-icon  text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
+              <button id="add-new-attribute" onclick="return false;" class="btn bg-primary btn-icon  text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
                       href="#modal_attribute"  data-popup="tooltip" 
             data-original-title="Add attributes" data-title="Add attributes">
 
@@ -336,11 +334,10 @@
       <div class="col-md-6">
         <div class="form-group" id="div_supplier">
           <label>Supplier:</label>
-           <div class="input-group">
-             
+           <div class="input-group supplier-refresh">
              {{ product_form.product_supplier }}
              <span class="input-group-btn">
-             <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-indigo "
+             <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-primary "
                 data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
                 href="#modal_attribute"  data-popup="tooltip"
                 data-original-title="Add New Supplier" data-title="Add New Supplier">
@@ -363,12 +360,10 @@
             <div class="col-md-4">
               <div class="form-group" id='tax_field'>
                 <label>Tax: % </label>
-                <div class="input-group">
+                <div class="input-group tax-refresh">
                 {{ product_form.product_tax }}
                   <div class="input-group-btn">
-                    <!--<button type="button" class="btn btn-icon bg-indigo" id="add-new-tax" data-title="Add New Tax">-->
-                    <!--<i class=" icon-plus-circle2"></i></button>-->
-                      <a id="add-new-tax" onclick="return false;" class="btn btn-icon bg-indigo "
+                      <a id="add-new-tax" onclick="return false;" class="btn btn-icon bg-primary "
                         href="#modal_attributes"  data-title="Add New Tax">
                       <i class=" icon-plus-circle2"></i>
                      </a>
@@ -816,12 +811,14 @@
             {% trans "This product has no images yet." context "Empty image gallery message" %}
           </p>
         {% endif %}
+            {% if images|length > 4 %}
         <div class="col-md-12">
           <div class="text-right">
             <a class="btn btn-primary  waves-effect waves-light " id="images-bt" href="{% url 'dashboard:product-image-add' product_pk=product.pk %}" title=""> Add Image 
                </a>
           </div>
           </div>
+            {% endif %}
       </div>
       </form>
       <script type="application/template" id="template">
@@ -901,8 +898,10 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/productattribute.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
+
  <script type="text/javascript">
   $( document ).ready(function() {
+
     $( "h5" ).addClass( "text-bold" );
 
     $('.btn[data-toggle=modal]').on('click', function(){
@@ -930,7 +929,7 @@
   });
   </script>
 <script type="text/javascript">
- 
+
 
  {% if product.pk %}
  $("#edit-toggle").on('click',function(){
@@ -943,34 +942,34 @@
     }
    });
  {% endif %}
-  
+
 
  function roundOff(val){
   return Math.round(val * 100) / 100;
  }
  function getTax(){
     // get tax value
-    {% url "dashboard:tax-add-ajax" as url %} 
+    {% url "dashboard:tax-add-ajax" as url %}
     var url = "{{ url }}";
     var tax_id = $('#id_product_tax').val();
     var posting = $.post( url, {tax_id:tax_id,} );
-    posting.done(function( data ){       
+    posting.done(function( data ){
       if(data.length > 3)
       {
         localStorage.setItem('tax', parseInt(0));
       }else{
-       localStorage.setItem('tax', parseInt(data)); 
+       localStorage.setItem('tax', parseInt(data));
       }
       pricing()
-     });    
+     });
     return localStorage.getItem("tax");
-    
+
  }
  getTax()
  function pricing(){
   // fetch tax from the server
   var tax = localStorage.getItem("tax")
-  // calculate retail tax exclusive tax       
+  // calculate retail tax exclusive tax
   var retail = $('#id_price').val();
   var retail_plus_tax = (parseInt(retail)*100)/(parseInt(tax)+100);
   retail_plus_tax=roundOff(retail_plus_tax);
@@ -978,7 +977,7 @@
   $('#retail_plus_tax').attr('value',retail_plus_tax);
   //alert(retail_plus_tax);
   var tx = parseInt(retail)-parseInt(retail_plus_tax);
-  
+
   $('#retail_tax').attr('value',tx);
 
   // calculate wholesale price exclusive tax
@@ -990,102 +989,102 @@
    var wtx = parseInt(wholesale)-parseInt(wholesale_plus_tax);
    $('#wholesale_tax').attr('value',wtx);
   }
-  $("#id_price").on("change keyup paste keydown", function(event) {    
-      pricing();      
+  $("#id_price").on("change keyup paste keydown", function(event) {
+      pricing();
   });
-  $("#id_product_tax").on("change onbur keyup keydown", function(event) {     
-    getTax();   
-    // calculate exclusive tax price values    
-    pricing();  
+  $("body").on("change onbur keyup keydown", "#id_product_tax", function(event) {
+    getTax();
+    // calculate exclusive tax price values
+    pricing();
   });
-  $("#id_wholesale_price").on("change keyup paste keydown", function(event) {    
-    pricing();  
+  $("#id_wholesale_price").on("change keyup paste keydown", function(event) {
+    pricing();
   });
 </script>
   <script type="text/javascript" >
-  
+
     // Dynamic options
     // Tax field
 
     // Add options dynamically
     $(".selectbox-dynamic-options").selectBoxIt({
         autoWidth: false
-    });  
-    
-  
-  $( "#add-new-tax").on('click',function() {   
-      var taxvalue = $( this ).val();         
+    });
+
+
+  $('body').on('click','#add-new-tax',function() {
+      var taxvalue = $( this ).val();
       {% url "dashboard:tax-add-ajax" as url %}
       var url = "{{ url }}";
       var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
       var posting = $.post( url, {csrfmiddlewaretoken:csrf_token} );
       // Put the results in a div
-      posting.done(function( data ) {    
+      posting.done(function( data ) {
         $("#add_tax_form" ).empty().append( data );
          $('#modal_add_tax .modal-title').html('Add New Tax');
-        $('#modal_add_tax').modal(); 
+        $('#modal_add_tax').modal();
       });
-    
+
    });
-  
-  
+
+
    function notify(msg) {
           new PNotify({
               text: msg,
               addclass: 'bg-danger'
           });
       }
-  function refreshProductType()
+  /*function refreshProductType()
   {
     notify('I will refresh product type page ');
-    $('#productType').html('refresh me..!');    
+    $('#productType').html('refresh me..!');
     var url= "{% url 'dashboard:refresh_producttype' %}";
     var posting = $.get(url,{});
     posting.done(function(data){
-      $( "#productType" ).empty().append( data );     
+      $( "#productType" ).empty().append( data );
       notify('New product type added successfully','bg-success');
     });
-  }
-      
+  }*/
+
   $('#modal_add_tax_btn').on('click',function(){
-    var tax = $('#id_tax').val();
-    var tax_name = $('#id_tax_name').val();
-    if(!$.isNumeric(tax)){ 
-      notify('Enter a valid tax');
-      return false; 
-    }
-    // post form data using jquery
-    {% url "dashboard:tax-add-ajax" as url %} 
-    var url = "{{ url }}";    
-    // var csrf_token = "{% csrf_token %}";
-    var posting = $.post( url, {tax:tax,tax_name:tax_name,} );
-    // $('#modal_add_tax').modal('hide');
-    posting.done(function( data ) { 
-      
-      $( "#add_tax_form" ).empty().append( data ); 
-      
-      if ($('#added').val() == 'added')
-       {
-         $('#modal_add_tax').modal('hide');
-         $('#tax_field').empty().append(data);
-       }else
-       {                 
-        $('#modal_add_tax').modal();
-       }
-     
-      });
+       refresh_tax();
+        var tax = $('#id_tax').val();
+        var tax_name = $('#id_tax_name').val();
+
+        if(!$.isNumeric(tax)){
+          notify('Enter a valid tax');
+          return false;
+        }
+
+        //** post form data using jquery
+        var url = "{% url "dashboard:tax-add-ajax" %}";
+        var posting = $.post( url, {tax:tax,tax_name:tax_name,});
+        posting.done(function( data ) {
+            //if ($('#added').val() == 'added')
+            if(data)
+            {
+                $('#modal_add_tax').modal('hide');
+                refresh_tax();
+            }
+            else
+            {
+                notify('Error Adding Tax');
+            }
+
+        });
   });
+
   // end tax form
      // Dropdown selectors
     $('.pickadate-selectors').pickadate({
         format: 'yyyy-dd-mm',
-        editable: true,  
+        editable: true,
         selectYears: true,
         selectMonths: true,
         formatSubmit: 'yyyy-dd-mm',
 
     });
-    
+
     // Default initialization
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
@@ -1144,7 +1143,7 @@
   // end refreshAttributes
 
   // refreshsupplier func
-  function refreshSupplier() {  
+  /*function refreshSupplier() {
    {% url "dashboard:fetch_suppliers" as url %} 
    var url = "{{ url }}";
    var class_pk = getProductClass();
@@ -1158,15 +1157,27 @@
       $(block).unblock(); 
   });
 
-  }
+  }*/
   // end refreshsupplier
+  $('body').on('change', "select[name*='product_class']", function(){
+       var link = '{% url "dashboard:product-attr-add" %}';
+       var link = link+getProductClass()+'/';
+       $('#add-new-attribute').attr('data-href',link);
+       $('#link-pk').val(link);
+       {% url "dashboard:fetch-variants" as url %}
+       var url = "{{ url }}";
+       var class_pk = $( this ).val();
+       var posting = $.post( url, {class_pk:class_pk} );
+         // Put the results in a div
+       posting.done(function( data ) {
+        $( "#div_attributes" ).empty().append( data );
+       });
 
-  $( "select[name*='product_class']").change(function refreshAttributes() {
-  // Check input( $( this ).val() ) for validity here
-   //alert(getProductClass());
+    });
+
+  /*$( "select[name*='product_class']").change(function refreshAttributes() {
    var link = '{% url "dashboard:product-attr-add" %}';
    var link = link+getProductClass()+'/';
-   //alert(link);
    $('#add-new-attribute').attr('data-href',link);
    $('#link-pk').val(link);
    {% url "dashboard:fetch-variants" as url %} 
@@ -1177,7 +1188,7 @@
   posting.done(function( data ) {    
     $( "#div_attributes" ).empty().append( data );  });
 
-  });
+  });*/
 
   $('.switch-actions').on('change', function() {
   let $btnChecked = $(this).parents('form').find('.btn-show-when-checked');
@@ -1204,6 +1215,213 @@ $('#form-product').validate({
       }
     });
   </script>
+                  <script type="text/javascript">
+  $( document ).ready(function() {
+
+     //** remove a value
+     $('body').on( 'click', '.close-value', function(){
+        $(this).parent().parent().remove();
+     });
+
+     //** add a new value
+     $('#val-btn').on('click', function(e){
+         var value_input = '<div class="parent-value col-md-6">'+
+                            '<div class="col-md-10">'+
+                              '<input class="form-control pull-left the-value"/>'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                            '<button type="button" class="close-value close pull-right">&times;</button>'+
+                            '</div>'+
+                          '</div>'
+         $('#attr-values').append(value_input);
+      });
+
+    // validate
+    $('#attr-form').validate({
+      onkeyup: function(element) {$(element).valid()},
+      rules:{
+          attribute: {
+            required:true
+          }
+      },
+      messages:{
+        attribute:{
+          required: "please provide an attribute name",
+        },
+      },
+      submitHandler: function() {
+
+          values = [];
+          $(".the-value").each(function() {
+              vl = $(this).val();
+              values.push(vl);
+          });
+        var f = document.getElementById('attr-form');
+        var formData = new FormData(f);
+        for (var i = 0; i < values.length; i++) {
+            formData.append('values', values[i]);
+        }
+        if (formData) {
+              $.ajax({
+                  url: "{% url 'dashboard:product-attribute-add-modal' %}",
+                  type: "POST",
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success:function(data){
+                     console.log(data);
+                     $('.new-attr').html(data);
+                     $('#test-modal').modal('hide');
+                     $.jGrowl('Attribute added successfully,', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                     });
+                  },
+                  error:function(error){
+                    console.log(error);
+                    $.jGrowl('Change a few things up and try submitting again', {
+                        header: 'Oh snap!',
+                        theme: 'bg-danger'
+                    });
+                  }
+              });
+          }
+      }
+  });
+    // end validate
+  });
+
+</script>
+<script type="text/javascript">
+  $( document ).ready(function() {
+
+    // validate
+    $('#form-product-type').validate({
+      onkeyup: function(element) {$(element).valid()},
+    rules:{
+        pname: {
+          required:true,
+          minlength:3
+        },
+
+    },
+    messages:{
+      pname:{
+        required: "please provide a name",
+        minlength: "name must be atleast 6 characters long"
+      },
+    },
+    submitHandler: function() {
+      var f = document.getElementById('form-product-type');
+      var formData = new FormData(f);
+      formData.append('name',$('.pname').val());
+      for (var pair of formData.entries()) {
+          console.log(pair[0]+ ', ' + pair[1]);
+      }
+      if (formData) {
+            $.ajax({
+                url: "{% url 'dashboard:product-class-add' %}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success:function(data){
+                   console.log(data);
+                   if(data == 'success'){
+                     $.jGrowl('Subcategory added successfully,', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                      });
+                      $('#modal_type').modal('hide');
+                      //** update type select
+                      refresh_subcategories();
+                   }else{
+                       $.jGrowl('Change a few things up and try submitting again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                   }
+
+                },
+                error:function(error){
+                  console.log(error);
+                  $.jGrowl('Change a few things up and try submitting again', {
+                      header: 'Oh snap!',
+                      theme: 'bg-danger'
+                  });
+                }
+            });
+      }
+
+    }
+  });
+    // end validate
+  });
+
+</script>
+<script type="text/javascript">
+   // Checkboxes/radios (Uniform)
+    // ------------------------------
+
+    // Default initialization
+    /*$(".styled, .multiselect-container input").uniform({
+        radioClass: 'choice'
+    });*/
+
+  function refresh_subcategories(){
+    var url = "{% url 'dashboard:product-add' %}";
+    var posting = $.get( url, {'ajax_subcategory':'ajax_subcategory','sub_category':'sub_category'});
+    posting.done(function(data) {
+       $('.sub-refresh').replaceWith( data );
+    });
+  }
+
+  function refresh_suppliers(){
+    var url = "{% url 'dashboard:product-add' %}";
+    var posting = $.get( url, {'ajax_subcategory':'ajax_subcategory', 'supplier':'supplier'});
+    posting.done(function(data) {
+       $('.supplier-refresh').replaceWith( data );
+    });
+  }
+
+  function refresh_tax(){
+  alert('taxt');
+    var url = "{% url 'dashboard:product-add' %}";
+    var posting = $.get( url, {'ajax_subcategory':'ajax_subcategory', 'tax':'tax'});
+    posting.done(function(data) {
+       $('.tax-refresh').replaceWith( data );
+    });
+  }
+
+  /*function refresh(){
+    //window.location.reload();
+    var url = "{% url 'dashboard:product-class-add' %}";
+    var posting = $.get( url, {});
+    posting.done(function(data) {
+       $('#refresh-content').empty().append( data );
+    });
+  }
+  $('#refresh_content').on('click', function(){
+    refresh();
+    window.location.reload();
+  });*/
+
+   $('#atb').on('click', function(){
+
+          var $btn = $(this);
+          var currentDialog = $btn.closest('.modal-dialog'),
+          targetDialog = $($btn.attr('data-target'));
+
+          if (!currentDialog.length)
+            return;
+          targetDialog.data('previous-dialog', currentDialog);
+          currentDialog.addClass('aside');
+          var stackedDialogCount = $('.modal.in .modal-dialog.aside').length;
+          if (stackedDialogCount <= 5){
+            currentDialog.addClass('aside-' + stackedDialogCount);
+          }
+        });
+</script>
 <script type="text/javascript">
   $('#id_description').attr('required','required');
 </script>

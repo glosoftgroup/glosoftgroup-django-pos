@@ -54,10 +54,22 @@ def view(request):
 		user_trail(request.user.name, 'accessed the roles page','view')
 		info_logger.info('User: '+str(request.user.name)+' accessed the roles page page')
 		product_classes = ProductClass.objects.all()
+
+		product_class = ProductClass()
+		form = forms.ProductClassForm(request.POST or None,
+									  instance=product_class)
+		data = {
+			'product_classes':product_classes,
+			'product_results': product_results,
+			'totalp':paginator.num_pages,
+		    'form':form,
+			'product_class':product_class,
+			'hello':'hello'
+		}
 		if request.GET.get('initial'):
 			return HttpResponse(paginator.num_pages)
 		else:
-			return TemplateResponse(request, 'dashboard/product/roles/view.html', {'product_classes':product_classes, 'product_results': product_results, 'totalp':paginator.num_pages})
+			return TemplateResponse(request, 'dashboard/product/roles/view.html', data)
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')

@@ -1,25 +1,20 @@
 
 $(function() {
-  //add  product attribute
-  $('#add-supplier').on('click',function(){    
+  //add  supplier
+  $("body").on("click", "#add-supplier", function(){
     var url = $(this).data('href');
     var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
     var title_text = $(this).data('title');
     $('.modal-title').html(title_text);
     var modal = $(this).attr('href');
     $(modal).modal();
-    //get form
-    var posting = $.get( url, 
-      {} 
-      );
+
+    var posting = $.get( url, {});
 
     posting.done(function( data ) {    
         $(".results" ).empty().append( data );
-        // $('#modal_add_tax').modal('hide'); 
-        //$('#modal_add_category').modal(); 
       });
-    
-      // end post
+
   });  
 
  function notify(msg,color='bg-danger') {
@@ -28,7 +23,7 @@ $(function() {
               addclass: color
           });
       } 
-  
+
   //var url = $("#add-new-attribute").data('href');
   var attr_pk = 0
   
