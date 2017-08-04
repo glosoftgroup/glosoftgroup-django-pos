@@ -17,7 +17,7 @@
               <!-- Single button -->
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Action <span class="caret"></span>
+                action <span class="caret"></span>
               </button>
               <ul class="dropdown-menu edit-dropdown">
              {% if perms.product.change_productclass %}
@@ -26,7 +26,7 @@
              {% if perms.product.delete_productclass %}
                   <li>
                      <a href="#modal_instance" data-title='Delete Sub Category {{ name }}' data-href="{% url 'dashboard:product-class-delete' pk=pk %}" class="modal-trigger"><i class="icon-trash position-left"></i>
-                       REMOVE
+                       DELETE
                       </a>
                    </li>
              {% endif %}

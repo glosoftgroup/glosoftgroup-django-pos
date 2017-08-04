@@ -29,15 +29,17 @@
  <!-- dashboard\includes\_main_search_filter.html -->
 <div class="col-md-12">
       <div class="panel panel-flat">
-        <div class="panel-heading">      
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="panel-body">
+       
+        <div class="panel-body search-panel">
+            <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                    <a href="{% url 'dashboard:customer-add' %}" class="btn btn-primary  hvr-glow btn-raised legitRipple ">
+                    <i class="icon-plus3 position-left"></i>Add Customer</a>
+                {% endif %}
+              </div>
+            </div>
             <div class="col-md-6">
              <label>Search Customer</label>
               <div class="form-group form-group-material has-feedback">
@@ -59,14 +61,7 @@
                   </select>
               </div>
             </div>
-             <div class="col-md-2">
-              <label style="visibility: hidden;"> add</label>
-              <div class="form-group">
-                {% if perms.userprofile.add_user %}
-                    <a href="{% url 'dashboard:customer-add' %}" class="btn btn-primary waves-effect waves-light">Add Customer</a>
-                {% endif %}
-              </div>
-            </div> 
+              
         </div>
       </div>
    </div>

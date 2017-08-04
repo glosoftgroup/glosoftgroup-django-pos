@@ -25,7 +25,7 @@
                           <!-- Single button -->
                         <div class="btn-group">
                           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Action <span class="caret"></span>
+                            action <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu edit-dropdown">
                          {% if perms.userprofile.change_user %}
@@ -34,7 +34,7 @@
                          {% if perms.userprofile.delete_user %}
                             <li>
                                 <a data-ta="#modal_instance" data-title="Delete user {{ user.name }} ?" data-href="{% url 'dashboard:user-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
-                         class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> REMOVE
+                         class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
                          </a>
                             </li>
                          {% endif %}

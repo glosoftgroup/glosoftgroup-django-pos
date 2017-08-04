@@ -34,17 +34,18 @@
  <div class="row animated fadeIn">
    <div class="col-md-12">
       <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Categories</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
+      
+        <div class="panel-body search-panel">
+          <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.product.add_category %}
+                 <a class="btn btn-primary text-white btn-xs hvr-glow btn-raised legitRipple waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:category-add' %}" title="{% trans 'Add attribute' context 'Product Attribute add button text' %}">
+                 <i class="icon-plus3 position-left"></i> Add Category
+                </a>
+                {% endif %}
+              </div>
+            </div>
             <div class="col-md-4">
              <label>Search Categories</label>
               <div class="form-group form-group-material has-feedback">
@@ -65,16 +66,7 @@
                   </select>
               </div>
             </div>
-            <div class="col-md-2">
-              <label style="visibility: hidden;"> add</label>
-              <div class="form-group">
-                {% if perms.product.add_category %}
-                 <a class="btn btn-primary text-white btn-xs waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:category-add' %}" title="{% trans 'Add attribute' context 'Product Attribute add button text' %}">
-                  Add Category
-                </a>
-                {% endif %}
-              </div>
-            </div>
+           
         </div>
       </div>
    </div>
@@ -92,7 +84,7 @@
                     <th>Name</th>
                     <th>Description</th>
                     <th>Products</th>
-                    <th>Actions</th>
+                    <th>Options</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -123,7 +115,7 @@
                           <!-- Single button -->
                         <div class="btn-group">
                           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Action <span class="caret"></span>
+                            action <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu edit-dropdown">
                             <li><a href="{% url 'dashboard:category-list' root_pk=node.pk %}" data-csrf_token='{{ csrf_token }}'>
@@ -137,7 +129,7 @@
                          {% if perms.product.delete_category %}
                               <li>
                                  <a href="#modal_instance" data-title="Delete {{ node.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-delete' pk=node.pk %}"
-                                    class="modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>REMOVE
+                                    class="modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>DELETE
                                     </a>
                                </li>
                          {% endif %}

@@ -25,16 +25,9 @@
 {% block content %}
  <div class="row animated fadeIn">
     <div class="col-md-12">
-      <div class="panel panel-flat">
-        <div class="panel-heading">      
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="panel-body">
+      <div class="panel panel-white animated zoomIn">
+        
+        <div class="panel-body search-panel">
             <div class="col-md-6">
              <label>Search Details</label>
               <div class="form-group form-group-material has-feedback">
@@ -83,9 +76,9 @@
     <div id="pagination-div">
       <div class="panel panel-flat">
         <div class="table-responsive">     
-        	<table class="table table-bordered datatable-header-footer" style="border-bottom:1px solid #ddd;">
+        	<table class="table table-striped table-hover datatable-header-footer fixed-header" style="border-bottom:1px solid #ddd;">
                 <thead>
-                  <tr>
+                  <tr class="bg-primary">
                     <th>Id</th>
                     <th>Name</th>
                     <th>action</th>
@@ -228,5 +221,7 @@
 
   });
 
+ 
 </script>
+
 {% endblock %}

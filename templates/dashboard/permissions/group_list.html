@@ -18,22 +18,26 @@
      .clickable-row td.td{
       cursor: pointer;
      }
+     /* Grow */
+
    </style>
  {% endblock %}
 
 {% block content %}
  <div class="row animated fadeIn">
      <div class="col-md-12">
-      <div class="panel panel-flat">
-        <div class="panel-heading">      
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="panel-body">
+      <div class="panel panel-flat">       
+        <div class="panel-body search-panel">
+          <div class="col-md-2">
+                <label style="visibility: hidden;"> add</label>
+                <div class="form-group">
+                  {% if perms.group.add_group %}
+                     <a href="{% url 'dashboard:perms' %}" class="btn btn-primary hvr-glow btn-raised legitRipple">
+                     <i class="icon-plus3 position-left"></i>
+                     Add Group</a>
+                  {% endif %}
+                </div>
+              </div>
             <div class="col-md-6">
              <label>Search Groups</label>
               <div class="form-group form-group-material has-feedback">
@@ -53,14 +57,7 @@
                   </select>
               </div>
             </div>
-            <div class="col-md-2">
-              <label style="visibility: hidden;"> add</label>
-              <div class="form-group">
-                {% if perms.group.add_group %}
-                   <a href="{% url 'dashboard:perms' %}" class="btn btn-primary waves-effect waves-light">Add Group</a>
-                {% endif %}
-              </div>
-            </div>
+            
         </div>
       </div>
    </div> 
@@ -71,13 +68,13 @@
         <div class="panel-body">
         <div class="table-responsive">
          
-          <table class="table table-bordered datatable-header-footer" style="border-bottom:1px solid #ddd;">
+          <table class="table table-hover fixed_header datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
-                 <tr>
+                 <tr class="bg-primary">
                     <th>Id</th>
                     <th>Group Name</th>
                     {% if perms.auth.change_group or perms.auth.delete_group %}
-                    <th class="text-center">Actions</th>
+                    <th class="text-center">Options</th>
                     {% endif %}
                   </tr>
                 </thead>

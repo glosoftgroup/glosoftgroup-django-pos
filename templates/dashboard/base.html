@@ -29,15 +29,23 @@
   <link href="{% static 'backend/css/core.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/components.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/colors.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/hover-min.css' %}" rel="stylesheet" type="text/css">
    <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
   <!--image preview -->
   <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">  
   <!-- /global stylesheets -->
+  <style type="text/css">
+    .search-panel{padding: 6px;}
+  </style>
 
     {% block custom_css %}
     <style type="text/css">
       .error{ color: red; }
       #refreshAttributes { cursor: pointer; }
+      body {
+      position: relative;
+    }
+
     </style>
     {% endblock %}
     <link rel="stylesheet" type="text/css" href="{% static 'backend/css/fixed_table_header.css' %}">
@@ -65,18 +73,7 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-      <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog3 position-left"></i></i> Actions <span class="caret"></span></a>
-      <ul class="dropdown-menu">
-        <li><a href="{% url 'dashboard:product-add' %}">Add product</a></li>
-        <li class="divider"></li>
-        <li><a href="{% url 'dashboard:category-list' %}">Manage Product Category</a></li>
-        <li><a href="{% url 'dashboard:product-class-list' %}">Manage Product Types</a></li>
-        <li><a href="{% url 'dashboard:product-attributes' %}">Manage Product Attribute</a></li>
-        <li><a href="{% url 'dashboard:tax-list' %}">Manage Tax</a></li>
-        <li><a href="{% url 'dashboard:sale-list' %}">Manage Discounts</a></li>   
-      </ul>
-    </li>
+       
     <li>
            {% if request.user.image %}
               <img src="{{request.user.image.url }}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;" />
@@ -87,7 +84,7 @@
           <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 
-          {% if request.user.name %}{{ request.user.name }} {% else %} {{ request.user.email }}{% endif %}<span class="caret"></span></a>
+          {% if request.user.email %}{{ request.user.email }} {% else %} {{ request.user.name }}{% endif %}<span class="caret"></span></a>
           <ul class="dropdown-menu">
              <li>
                 <a href="{% url 'dashboard:user-detail' pk=user.id %}">
@@ -404,7 +401,7 @@
       <!-- Main content -->
       <div class="content-wrapper">
       <div class="page-header page-header-default">
-          <div class="breadcrumb-line">
+          <div class="breadcrumb-line fix-breadcrumb">
             <ul class="breadcrumb">
                <li><a href="{% url 'dashboard:index' %}"><span class="icon-home"></span data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Back to dashboard"> Home</a></li>
                {% block breadcrumbs %}
@@ -481,6 +478,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/jgrowl.min.js' %}"></script>
 
   <script type="text/javascript" src="{% static 'backend/js/pages/components_notifications_other.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/jquery.sticky.js' %}"></script>
 
   
     <!-- Core Scripts - Include with every page -->
@@ -491,12 +489,15 @@
   <script type="text/javascript">
   $( document ).ready(function() {
     $( "label" ).addClass( "text-bold" );
+    //$("#sticker").sticky({topSpacing:0});
   });
+  
   </script>
    
     
     {% include "dashboard/includes/_messages.html" %}
     <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
     {% block custom_js %}{% endblock %}
    </div>
   </body>

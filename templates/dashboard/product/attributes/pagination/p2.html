@@ -20,7 +20,7 @@
                          <th>#</th>
                         <th>Name</th>
                         <th>Value</th>
-                        <th class="text-center">Actions</th>
+                        <th class="text-center">Options</th>
                       </tr>
                     </thead>
                     <tbody id="p-tb">
@@ -44,7 +44,7 @@
                               <!-- Single button -->
                             <div class="btn-group">
                               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Action <span class="caret"></span>
+                                action <span class="caret"></span>
                               </button>
                               <ul class="dropdown-menu edit-dropdown">
                              {% if perms.product.change_product %}
@@ -53,7 +53,7 @@
                              {% if perms.product.delete_product %}
                                   <li>
                                      <a href="#modal_instance" data-title='Remove attribute {{ name }}' data-href="{% url 'dashboard:product-attribute-delete' pk=pk %}" class="modal-trigger-ajax"><i class="icon-trash position-left"></i>
-                                       REMOVE
+                                       DELETE
                                       </a>
                                    </li>
                              {% endif %}
@@ -112,3 +112,4 @@
 
    });
  </script>
+   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

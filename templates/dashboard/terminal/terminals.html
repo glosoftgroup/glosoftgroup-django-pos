@@ -29,15 +29,16 @@
  <!-- dashboard\includes\_main_search_filter.html -->
 <div class="col-md-12">
       <div class="panel panel-flat">
-        <div class="panel-heading">      
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="panel-body">
+       
+        <div class="panel-body search-panel">
+            <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                    <a href="{% url 'dashboard:terminal-add' %}" class="btn btn-primary hvr-glow btn-raised legitRipple waves-effect waves-light"><i class="icon-plus3 position-left"></i>Add Terminal</a>
+                {% endif %}
+              </div>
+            </div> 
             <div class="col-md-6">
              <label>Search Terminal</label>
               <div class="form-group form-group-material has-feedback">
@@ -59,14 +60,7 @@
                   </select>
               </div>
             </div>
-             <div class="col-md-2">
-              <label style="visibility: hidden;"> add</label>
-              <div class="form-group">
-                {% if perms.userprofile.add_user %}
-                    <a href="{% url 'dashboard:terminal-add' %}" class="btn btn-primary waves-effect waves-light">Add Terminal</a>
-                {% endif %}
-              </div>
-            </div> 
+             
         </div>
       </div>
    </div>
