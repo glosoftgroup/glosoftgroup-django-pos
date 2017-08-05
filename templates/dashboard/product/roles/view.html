@@ -187,6 +187,9 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+
+
+
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -242,17 +245,21 @@ $(document).ready(function() {
      });
 
     $('.bootpag-callback').bootpag({
-        total: parseInt({{totalp}}),
-        maxVisible: 3,
-        first: '←',
-        last: '→',        
-        activeClass: 'active',
-        disabledClass: 'disabled',
-        nextClass: 'next',
-        prevClass: 'prev',
-        lastClass: 'last',
-        firstClass: 'first',        
-        leaps: false
+         total: parseInt({{totalp}}),
+         maxVisible: 3,
+         leaps: true,
+         firstLastUse: true,
+         first: 'First',
+         last: 'Last',       
+         wrapClass: 'pagination',
+         activeClass: 'active',
+         disabledClass: 'disabled',
+         nextClass: 'next',
+         prevClass: 'prev',
+         lastClass: 'last',
+         firstClass: 'first',      
+
+        
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+{{totalp}}); // or some ajax content loading...
             $.get("{% url 'dashboard:product-list-paginate' %}",{page:num},function(data){

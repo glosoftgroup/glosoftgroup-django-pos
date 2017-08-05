@@ -303,18 +303,17 @@
 
     $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
-        maxVisible: 5,
-        leaps: true,
+        maxVisible: 4,
         firstLastUse: true,
-        first: '<span aria-hidden="true">&larr;</span>',
-        last: '<span aria-hidden="true">&rarr;</span>',
+        first: 'First',
+        last: 'Last',       
         wrapClass: 'pagination',
         activeClass: 'active',
         disabledClass: 'disabled',
         nextClass: 'next',
         prevClass: 'prev',
         lastClass: 'last',
-        firstClass: 'first'
+        firstClass: 'first',
         
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...

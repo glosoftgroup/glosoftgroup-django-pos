@@ -146,6 +146,7 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
 <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     var pagination_totalsize;
@@ -159,7 +160,17 @@ $(document).ready(function(){
      $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
         maxVisible: 3,
-        leaps: false
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
             $.get("{% url 'dashboard:products_paginate' %}",{page:parseInt(num)},function(data){

@@ -55,12 +55,23 @@
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
  <script type="text/javascript">
    $(document).ready(function(){
         $('.p2-pag').bootpag({
             total: parseInt('{{pn}}'),
             maxVisible: 3,
-            leaps: false
+            leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
             }).on("page", function(event, num){
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}');
                 var gid = '{{gid}}';

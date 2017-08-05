@@ -484,13 +484,29 @@
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
-  <!-- <script type="text/javascript" src="{% static 'backend/js/pages/components_pagination.js' %}"></script> -->
+   <script type="text/javascript" src="{% static 'backend/js/fixed_breadcrumb.js' %}"></script>
+  <style type="text/css">
+    .toper{top:50px;}
+  </style>
   <script type="text/javascript">
   $( document ).ready(function() {
+
+    var selector = $('.fix-breadcrumb');
     $( "label" ).addClass( "text-bold" );
-    //$("#sticker").sticky({topSpacing:0});
-  });
+    //selector.wrap('<div class="" style="top:51px"/>');
+    
+    //selector.sticky({zIndex:1,className:'toperkk'});
+    //$('.toper').css('margin-top','50px');
+    //selector.attr('')
+
+     // selector.on('sticky-start', function() { 
+     //  console.log("Started");
+     //  selector.addClass('toper');
+      });
+ 
+
   
   </script>
    

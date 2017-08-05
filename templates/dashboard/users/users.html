@@ -264,7 +264,18 @@
 
     $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
-        maxVisible: 3,
+        maxVisible: 5,
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
         leaps: false
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...

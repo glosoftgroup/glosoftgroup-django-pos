@@ -204,7 +204,16 @@ $(document).ready(function() {
     $('.bootpag-callback').bootpag({
         total: parseInt({{totalp}}),
         maxVisible: 3,
-        leaps: false
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+{{totalp}}); // or some ajax content loading...
             $.get("{% url 'dashboard:paginate-class-list' %}",{page:num},function(data){
