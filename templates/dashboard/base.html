@@ -73,7 +73,21 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
+      <!-- notifications -->
+      <ul class="nav navbar-nav">
        
+      <li class="">
+            <a href="{% url 'dashboard:notification_list' %}">
+            <i class="icon-bubbles4"></i>
+            <span class="visible-xs-inline-block position-right">messages</span>
+            <span class="badge status-mark22 bg-warning-400"></span>
+          </a>
+            
+            
+          </li>         
+        
+      </ul>
+      <!-- ./notifications --> 
     <li>
            {% if request.user.image %}
               <img src="{{request.user.image.url }}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;" />
@@ -514,6 +528,33 @@
     {% include "dashboard/includes/_messages.html" %}
     <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+    <script type="text/javascript">
+   
+  function getNotification() {
+    var dynamicData = {};    
+    return $.ajax({
+      url: "{% url 'dashboard:unread_count'%}",
+      type: "get",
+      data: dynamicData
+    });
+  }
+
+  $(document).ready(function(){
+      
+    
+  });
+
+  setTimeout(function() {
+      console.log('checking notifications');
+      getNotification().done(function(data) {
+        // Updates the UI based the ajax result
+        $(".status-mark22").text(data); 
+    });
+    },10);
+
+
+  
+  </script>
     {% block custom_js %}{% endblock %}
    </div>
   </body>

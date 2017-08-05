@@ -23,7 +23,7 @@ from .product.urls import urlpatterns as product_urls
 from .registration.urls import urlpatterns as registration_urls
 from .search.urls import urlpatterns as search_urls
 from .userprofile.urls import urlpatterns as userprofile_urls
-
+import notifications.urls
 from .api.product import views as api_views
 from . import decorators
 
@@ -40,6 +40,7 @@ urlpatterns = [
 	url(r'^dashboard/', include(dashboard_urls, namespace='dashboard')),
 	url(r'^graphql', GraphQLView.as_view(graphiql=settings.DEBUG)),
 	url(r'^jsi18n/$', javascript_catalog, name='javascript-catalog'),
+	url(r'^notifications/$', include(notifications.urls, namespace='notifications')),
 	url(r'^order/', include(order_urls, namespace='order')),
 	url(r'^payment/$', include(payment_urls, namespace='payment')),
 	url(r'^products/', include(product_urls, namespace='product')),

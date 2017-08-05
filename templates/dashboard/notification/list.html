@@ -1,0 +1,263 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load notifications_tags %} 
+
+
+{% block title %}
+  {% trans "Notifications " context "Dashboard customers list" %} - {{ block.super }}
+{% endblock %}
+
+
+{% block menu_notification_class %}active{% endblock %}
+
+{% block breadcrumbs %}
+  
+    <li class="active">
+      {% trans "Notifications" context "Dashboard Notifications list" %}
+    </li>
+  
+{% endblock %}
+
+{% block custom_css %}
+
+{% endblock %}
+{% block content %}
+<!-- Secondary sidebar -->
+			<div class="sidebar sidebar-secondary sidebar-default">
+				<div class="sidebar-content">
+
+					<!-- Actions -->
+					<div class="sidebar-category">
+						<div class="category-title">
+							<span>Actions</span>
+							<ul class="icons-list">
+								<li><a href="#" data-action="collapse"></a></li>
+							</ul>
+						</div>
+
+						<div class="category-content">
+							<a href="{% url 'dashboard:write' %}" class="btn bg-indigo-400 btn-block">Compose mail</a>
+						</div>
+					</div>
+					<!-- /actions -->
+
+
+					<!-- Sub navigation -->
+					<div class="sidebar-category">
+						<div class="category-title">
+							<span>Navigation</span>
+							<ul class="icons-list">
+								<li><a href="#" data-action="collapse"></a></li>
+							</ul>
+						</div>
+
+						<div class="category-content no-padding">
+							<ul class="navigation navigation-alt navigation-accordion no-padding-bottom">
+								<li class="navigation-header">Folders</li>
+								<li class="active"><a href="{% url 'dashboard:notification_list' %}"><i class="icon-drawer-in"></i> Inbox <span class="badge badge-success">{{total_notifications}}</span></a></li>
+								
+								<li><a href="{% url 'dashboard:notification_list_slug' 'sent' %}"><i class="icon-drawer-out"></i> Sent mail</a></li>
+								<li><a href="#"><i class="icon-stars"></i> Starred</a></li>
+								<li class="navigation-divider"></li>
+								<li><a href="{% url 'dashboard:notification_list_slug' 'read' %}"><i class="icon-envelope"></i> Read <span class="badge badge-success"></span></a></li>
+								<li><a href="{% url 'dashboard:notification_list_slug' 'trash' %}"><i class="icon-bin"></i> Trash<span class="badge badge-warning">{{deleted}}</span></a></li>
+							</ul>
+						</div>
+					</div>
+					<!-- /sub navigation -->
+
+
+
+
+
+
+
+				</div>
+			</div>
+			<!-- /secondary sidebar -->
+
+{% notifications_unread as unread_count %}
+
+			<!-- Main content -->
+			<div class="content-wrapper">
+
+
+				<!-- Content area -->
+				<div class="content">
+
+					<!-- Multiple lines -->
+					<div class="panel panel-white">
+						<div class="panel-heading">
+							<h6 class="panel-title">My Inbox</h6>
+
+							<div class="heading-elements not-collapsible">
+								<span class="label bg-blue heading-text">{{unread_count}} new </span>
+		                	</div>
+						</div>
+
+						<div class="panel-toolbar panel-toolbar-inbox">
+							<div class="navbar navbar-default">
+								<ul class="nav navbar-nav visible-xs-block no-border">
+									<li>
+										<a class="text-center collapsed" data-toggle="collapse" data-target="#inbox-toolbar-toggle-multiple">
+											<i class="icon-circle-down2"></i>
+										</a>
+									</li>
+								</ul>
+
+								<div class="navbar-collapse collapse" id="inbox-toolbar-toggle-multiple">
+
+
+									<div class="btn-group navbar-btn">
+
+										<a href="{% url 'dashboard:write' %}" type="button" class="btn btn-default"><i class="icon-pencil7"></i> <span class="hidden-xs position-right">Compose</span></a>
+										
+				                    	<button type="button" class="btn btn-default"><i class="icon-spam"></i> <span class="hidden-xs position-right">Spam</span></button>
+									</div>
+
+									<div class="navbar-right">
+										<p class="navbar-text"><span class="text-semibold">{{total_notifications}}</span></p>
+
+
+
+									</div>
+								</div>
+							</div>
+						</div>
+
+	<div class="table-responsive">
+		<table class="table table-inbox">
+			<tbody data-link="row" class="rowlink">
+			{% for notification in  notifications %}
+				<tr class="unread">
+					
+					<td class="table-inbox-star rowlink-skip">
+						<a href="{% url 'dashboard:read-notification' notification.id%}">
+						{% if notification.unread %}
+						<i class="icon-mail5 text-success"></i>
+						{% else %}
+						<i class="icon-mail-read text-muted"></i>
+						{% endif %}
+							
+						
+						</a>
+					</td>
+					<td class="table-inbox-image">
+						
+					</td>
+					<td class="table-inbox-name">
+						<a href="#">
+							<div class="letter-icon-title text-default">{{notification.verb}}</div>
+						</a>
+					</td>
+					<td class="table-inbox-message">
+						<div class="table-inbox-subject">{{ notification.verb}}</div>
+						{{notification.description |safe |slice:":50"}}
+					</td>
+					<td class="table-inbox-attachment">
+						
+					</td>
+					<td class="table-inbox-time">
+						{{notification.timestamp}}
+					</td>
+				</tr>
+			{% endfor %}
+
+			</tbody>
+		</table>
+	</div>
+</div>
+<!-- /multiple lines -->
+
+</div>
+<!-- /content area -->
+
+</div>
+<!-- /main content -->
+{% endblock %}
+{% block custom_js %}
+
+ <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switch.min.js' %}"></script>
+ <script type="text/javascript" src="{% static 'backend/js/pages/mail_list.js' %}"></script>
+
+
+<script type="text/javascript">
+// IIFE - Immediately Invoked Function Expression
+  (function($, window, document) {
+
+    // The $ is now locally scoped
+
+   // Listen for the jQuery ready event on the document
+   $(function() {
+
+     // The DOM is ready!
+     // Checkboxes/radios (Uniform)
+    // ------------------------------
+
+    // Default initialization
+    $(".styled, .multiselect-container input").uniform({
+        radioClass: 'choice'
+    });
+
+    // File input
+    $(".file-styled").uniform({
+        wrapperClass: 'bg-blue',
+        fileButtonHtml: '<i class="icon-file-plus"></i>'
+    });
+
+
+    //
+    // Contextual colors
+    //
+
+    // Primary
+    $(".control-primary").uniform({
+        radioClass: 'choice',
+        wrapperClass: 'border-primary-600 text-primary-800'
+    });
+
+    // Danger
+    $(".control-danger").uniform({
+        radioClass: 'choice',
+        wrapperClass: 'border-danger-600 text-danger-800'
+    });
+
+    // Success
+    $(".control-success").uniform({
+        radioClass: 'choice',
+        wrapperClass: 'border-success-600 text-success-800'
+    });
+
+    // Warning
+    $(".control-warning").uniform({
+        radioClass: 'choice',
+        wrapperClass: 'border-warning-600 text-warning-800'
+    });
+
+    // Info
+    $(".control-info").uniform({
+        radioClass: 'choice',
+        wrapperClass: 'border-info-600 text-info-800'
+    });
+
+    // Custom color
+    $(".control-custom").uniform({
+        radioClass: 'choice',
+        wrapperClass: 'border-indigo-600 text-indigo-800'
+    });
+
+
+
+
+
+});
+
+
+   // The rest of the code goes here!
+
+  }(window.jQuery, window, document));
+  // The global jQuery object is passed as a parameter
+</script>
+
+{% endblock %}

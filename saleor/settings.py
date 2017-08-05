@@ -202,7 +202,8 @@ INSTALLED_APPS = [
 	'webpack_loader',
 	'social_django',
 	'django_countries',
-	'rest_framework.authtoken'
+	'rest_framework.authtoken',
+	'notifications'
 ]
 
 LOGGING = {
@@ -523,4 +524,7 @@ JWT_AUTH = {
 }
 
 TIME_INPUT_FORMATS = ['%H:%M %p']
-			
+
+# notifications
+NOTIFICATION_TEST=1
+NOTIFICATIONS_SOFT_DELETE=True
