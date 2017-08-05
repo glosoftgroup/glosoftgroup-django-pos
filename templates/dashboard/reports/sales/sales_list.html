@@ -26,17 +26,8 @@
 <div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Sales Reports</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
+     
+        <div class="panel-body search-panel">
             <div class="col-md-4">
              <label>Search Sales (for date format: yyyy-mm-dd)</label>
               <div class="form-group form-group-material has-feedback">
@@ -104,7 +95,7 @@
                   <caption style="margin-bottom: 10px;">
                    </caption>
                       <thead style="border-top:1px solid #ddd;">
-                        <tr>
+                        <tr class="bg-primary">
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
                           <th>Client Name</th>
@@ -191,6 +182,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 
@@ -210,7 +202,17 @@ $(document).ready(function(){
      $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
         maxVisible: 3,
-        leaps: false
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
             $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){

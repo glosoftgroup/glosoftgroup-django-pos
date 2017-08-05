@@ -15,7 +15,7 @@
         <div class="table-responsives">
          
             <div class="panel-body">
-              <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
+              <table class="table table-striped table-hover fixed_headers datatable-header-footer" style="border-bottom:1px solid #ddd;">
                      <thead>
                       <tr class="bg-primary">
                          <th>Id</th>
@@ -24,7 +24,7 @@
                           <th>Category</th>
                           <th>Price</th>
                           <th>Current Stock</th>
-                          <th class="text-center">Actions</th>
+                          <th class="text-center">Options</th>
                       </tr>
                     </thead>
                     <tbody id="p-tb">
@@ -58,7 +58,7 @@
                           <!-- Single button -->
                         <div class="btn-group">
                           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Action <span class="caret"></span>
+                            action <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu edit-dropdown">
                             <li>
@@ -71,7 +71,7 @@
                                 <a href="#modal_instance" data-title='Remove {{ product.name }}' data-href="{% url 'dashboard:product-delete' pk=product.pk %}"
                             class="modal-trigger-ajax">
                                     <i class="icon-trash position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Delete me">
-                                    </i> REMOVE
+                                    </i> DELETE
                                 </a>
                             </li>
                           </ul>
@@ -106,12 +106,23 @@
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
  <script type="text/javascript">
    $(document).ready(function(){
         $('.p2-pag').bootpag({
             total: parseInt('{{pn}}'),
             maxVisible: 3,
-            leaps: false
+            leaps: true,
+           firstLastUse: true,
+           first: 'First',
+           last: 'Last',       
+           wrapClass: 'pagination',
+           activeClass: 'active',
+           disabledClass: 'disabled',
+           nextClass: 'next',
+           prevClass: 'prev',
+           lastClass: 'last',
+           firstClass: 'first',
             }).on("page", function(event, num){
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
                 var gid = '{{gid}}';
@@ -129,3 +140,5 @@
 
    });
  </script>
+ <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+    

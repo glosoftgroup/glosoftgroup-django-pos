@@ -25,17 +25,8 @@
 <div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
-        <div class="panel-heading">
-          <h6 class="panel-title">Low Stock Products Reports</h6>
-          <div class="heading-elements">
-            <ul class="icons-list">
-              <li><a data-action="collapse"></a></li>
-              <li><a data-action="reload"></a></li>
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
+        
+        <div class="panel-body search-panel">
             <div class="col-md-6">
              <label>Search Products</label>
               <div class="form-group form-group-material has-feedback">
@@ -87,9 +78,9 @@
           <div class="col-md-12">
                             {% if low_stock %}
                 <div class="table-responsives">
-                  <table class="table table-bordered datatable-header-footer">
+                  <table class="table datatable-header-footer">
                     <thead>
-                      <tr>
+                      <tr class="bg-primary">
                         <th>
                           {% trans "Product name" context "Low stock product list" %}
                         </th>
@@ -145,6 +136,7 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     var pagination_totalsize;
@@ -158,7 +150,17 @@ $(document).ready(function(){
      $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
         maxVisible: 3,
-        leaps: false
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
             $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:parseInt(num)},function(data){

@@ -29,17 +29,8 @@
  <div class="row animated fadeIn">
    <div class="col-md-12">
       <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Stock Display</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
+      
+        <div class="panel-body search-panel">
             <div class="col-md-4">
              <label>Search Stock</label>
               <div class="form-group form-group-material has-feedback">
@@ -312,8 +303,18 @@
 
     $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
-        maxVisible: 3,
-        leaps: false
+        maxVisible: 4,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
+        
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
             $.get("{% url 'dashboard:stock_paginate' %}",{page:num},function(data){

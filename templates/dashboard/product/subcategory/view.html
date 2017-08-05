@@ -34,17 +34,18 @@
  <div class="row animated fadeIn">
    <div class="col-md-12">
       <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Sub Category</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
+      
+        <div class="panel-body search-panel">
+             <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.product.add_productclass %}
+                 <a class="btn btn-primary  hvr-glow btn-raised legitRipple text-white btn-xs waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:product-class-add' %}" title="{% trans 'Add attribute' context 'Product Attribute add button text' %}">
+                 <i class="icon-plus3 position-left"></i> Add Sub-Category
+                </a>
+                {% endif %}
+              </div>
+            </div>
             <div class="col-md-4">
              <label>Search Sub Categories</label>
               <div class="form-group form-group-material has-feedback">
@@ -65,16 +66,7 @@
                   </select>
               </div>
             </div>
-            <div class="col-md-2">
-              <label style="visibility: hidden;"> add</label>
-              <div class="form-group">
-                {% if perms.product.add_productclass %}
-                 <a class="btn btn-primary text-white btn-xs waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:product-class-add' %}" title="{% trans 'Add attribute' context 'Product Attribute add button text' %}">
-                  Add Sub-Category
-                </a>
-                {% endif %}
-              </div>
-            </div>
+           
         </div>
       </div>
    </div>
@@ -91,7 +83,7 @@
                      <th>#</th>
                       <th>Name</th>
                       <th>Product attributes</th>
-                      <th class="text-center">Actions</th>
+                      <th class="text-center">Options</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -111,7 +103,7 @@
                               <!-- Single button -->
                             <div class="btn-group">
                               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Action <span class="caret"></span>
+                                action <span class="caret"></span>
                               </button>
                               <ul class="dropdown-menu edit-dropdown">
                              {% if perms.product.change_productclass %}
@@ -120,7 +112,7 @@
                              {% if perms.product.delete_productclass %}
                                   <li>
                                      <a href="#modal_instance" data-title='Delete Sub Category {{ name }}' data-href="{% url 'dashboard:product-class-delete' pk=pk %}" class="modal-trigger"><i class="icon-trash position-left"></i>
-                                       REMOVE
+                                       DELETE
                                       </a>
                                    </li>
                              {% endif %}
@@ -212,7 +204,16 @@ $(document).ready(function() {
     $('.bootpag-callback').bootpag({
         total: parseInt({{totalp}}),
         maxVisible: 3,
-        leaps: false
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+{{totalp}}); // or some ajax content loading...
             $.get("{% url 'dashboard:paginate-class-list' %}",{page:num},function(data){

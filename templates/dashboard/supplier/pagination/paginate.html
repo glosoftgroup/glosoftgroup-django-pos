@@ -23,12 +23,12 @@
                     <td class="text-center">
                       <ul class="icons-list">
                        {% if perms.userprofile.change_user %}
-                        <li><a href="{% url 'dashboard:supplier-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
+                        <li><a href="{% url 'dashboard:supplier-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> EDIT</a></li>
                         {% endif %}
                          {% if perms.userprofile.delete_user %}
                         <li>
                           <a data-ta="#modal_instance" data-title="Delete Supplier {{ user.name }} ?" data-href="{% url 'dashboard:supplier-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
-                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> DELETE
                          </a>
                         </li>
                         {% endif %}

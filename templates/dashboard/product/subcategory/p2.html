@@ -20,7 +20,7 @@
                           <th>#</th>
                           <th>Name</th>
                           <th>Product attributes</th>
-                          <th class="text-center">Actions</th>
+                          <th class="text-center">Options</th>
                       </tr>
                     </thead>
                     <tbody id="p-tb">
@@ -40,7 +40,7 @@
                               <!-- Single button -->
                             <div class="btn-group">
                               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Action <span class="caret"></span>
+                                action <span class="caret"></span>
                               </button>
                               <ul class="dropdown-menu edit-dropdown">
                              {% if perms.product.change_productclass %}
@@ -49,7 +49,7 @@
                              {% if perms.product.delete_productclass %}
                                   <li>
                                      <a href="#modal_instance" data-title='Delete Sub Category {{ name }}' data-href="{% url 'dashboard:product-class-delete' pk=pk %}" class="modal-trigger"><i class="icon-trash position-left"></i>
-                                       REMOVE
+                                       DELETE
                                       </a>
                                    </li>
                              {% endif %}
@@ -85,12 +85,23 @@
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
  <script type="text/javascript">
    $(document).ready(function(){
         $('.p2-pag').bootpag({
             total: parseInt('{{pn}}'),
             maxVisible: 3,
-            leaps: false
+            leaps: true,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
             }).on("page", function(event, num){
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
                 var gid = '{{gid}}';
@@ -108,3 +119,4 @@
 
    });
  </script>
+   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

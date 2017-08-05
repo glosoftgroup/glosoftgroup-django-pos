@@ -29,17 +29,16 @@
  <div class="row animated fadeIn">
    <div class="col-md-12">
       <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Suppliers Display</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-        <div class="panel-body">
+      
+        <div class="panel-body  search-panel">
+            <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.userprofile.add_user %}
+                   <a href="{% url 'dashboard:supplier-add' %}" class="btn-block btn btn-primary  hvr-glow btn-raised legitRipple" style="text-transform:uppercase;"><i class="icon-plus3 position-left"></i>Add Supplier</a>
+                {% endif %}
+              </div>
+            </div>
             <div class="col-md-4">
              <label>Search Supplier</label>
               <div class="form-group form-group-material has-feedback">
@@ -70,14 +69,7 @@
                   </select>
               </div>
             </div>
-            <div class="col-md-2">
-              <label style="visibility: hidden;"> add</label>
-              <div class="form-group">
-                {% if perms.userprofile.add_user %}
-                   <a href="{% url 'dashboard:supplier-add' %}" class="btn-block btn-primary btn-lg" style="text-transform:uppercase;">Add Supplier</a>
-                {% endif %}
-              </div>
-            </div>
+            
         </div>
       </div>
    </div>
@@ -99,7 +91,7 @@
                     <th>Email</th>
                     <th>Phone no.</th>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
-                    <th class="text-center">Actions</th>
+                    <th class="text-center">Options</th>
                     {% endif %}
                   </tr>
                 </thead>
@@ -127,7 +119,7 @@
                           <!-- Single button -->
                         <div class="btn-group">
                           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Action <span class="caret"></span>
+                            action <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu edit-dropdown">
                          {% if perms.userprofile.change_user %}
@@ -141,7 +133,7 @@
                          {% if perms.userprofile.delete_user %}
                             <li>
                                 <a data-ta="#modal_instance" data-title="Delete Supplier {{ user.name }} ?" data-href="{% url 'dashboard:supplier-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
-                                    class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> REMOVE
+                                    class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
                                 </a>
                             </li>
                          {% endif %}
@@ -256,7 +248,17 @@
     $('.bootpag-callback').bootpag({
         total: parseInt(pagination_totalsize),
         maxVisible: 3,
-        leaps: false
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
             $.get("{% url 'dashboard:supplier_paginate' %}",{page:num},function(data){
