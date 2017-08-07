@@ -23,36 +23,54 @@ from ...userprofile.models import User
 from notifications.signals import notify
 from notifications.models import Notification
 
-
+@staff_member_required
 def notification_list(request,status=None):
     # read users notifications
+    mark_read = True
+    delete_permanently = False
     if status == 'trash':
+        delete_permanently = True
         notifications = request.user.notifications.deleted()
     elif status == 'unread':
         notifications = request.user.notifications.unread()
     elif status == 'read':
         notifications = request.user.notifications.read()
     elif status == 'sent':
-        notifications = request.user.notifications.filter(actor_object_id=request.user.id)
+        mark_read = False
+        notifications = Notification.objects.filter(actor_object_id=request.user.id)
     else:
         notifications = request.user.notifications.active()
-    print notifications
-    users = User.objects.all().order_by('-id')
     ctx = {
-        'deleted':len(request.user.notifications.deleted()),
-        'notifications':notifications,
+        'delete_permanently': delete_permanently,
+        'mark_read': mark_read,
+        'status': status,
+        'deleted': len(request.user.notifications.deleted()),
+        'notifications': notifications,
         'total_notifications': len(notifications),
-        'users':User.objects.all()}
+        'users': User.objects.all()}
     return TemplateResponse(request,
                             'dashboard/notification/list.html',
                             ctx)
 
+
+@staff_member_required
 def unread_count(request):
     notification = request.user.notifications.unread()
     return HttpResponse(len(notification))
 
 
-def delete(request,pk=None):
+@staff_member_required
+def delete_permanently(request, pk=None):
+    if pk:
+        notification = get_object_or_404(Notification, pk=pk)
+        notification.delete()
+        return HttpResponse(str(notification.verb)+' Deleted successfully')
+    else:
+        return HttpResponse('Provide a correct Notification')
+
+
+@staff_member_required
+def delete(request, pk=None):
     if pk:
         notification = get_object_or_404(Notification, pk=pk)        
         notification.deleted = True
@@ -61,6 +79,9 @@ def delete(request,pk=None):
     else:
         return HttpResponse('Error deleting notification')
     return HttpResponse('error')
+
+
+@staff_member_required
 def read(request, pk=None):
     if pk:
         notification = get_object_or_404(Notification, pk=pk)        
@@ -81,12 +102,15 @@ def read(request, pk=None):
     return TemplateResponse(request,
                             'dashboard/notification/list.html',
                             ctx)
+
+
+@staff_member_required
 def write(request):
     if request.method == 'POST':
         subject = request.POST.get('subject')
-        emailList = json.loads(request.POST.get('emailList'))
+        email_list = json.loads(request.POST.get('emailList'))
         body = request.POST.get('body')
-        for email in emailList:
+        for email in email_list:
         	user = User.objects.filter(email=email['email'])
         	print('--------')
         	print('sending email to ')
