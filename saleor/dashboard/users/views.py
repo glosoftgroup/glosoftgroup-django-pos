@@ -324,7 +324,7 @@ def user_update(request, pk):
         mobile = request.POST.get('user_mobile')
         image= request.FILES.get('image')
         job_title = request.POST.get('job_title')
-        groups = request.POST.getlist('groups[]')
+        groups = request.POST.getlist('groups')
 
         if password == user.password:
             encr_password = user.password
@@ -341,9 +341,9 @@ def user_update(request, pk):
             user.save()
             user_trail(request.user.name, 'updated user: '+ str(user.name),'update')
             info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name))
-            if len(groups) == 0:
+            if not groups:
                 user.groups.remove(*user_groups)
-                groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
+                groups_permissions = Permission.objects.filter(group_name__in=[group['name'] for group in user_groups])
                 user.user_permissions.remove(*groups_permissions)
             else:
                 if user_groups in groups:
@@ -358,7 +358,6 @@ def user_update(request, pk):
                     user.groups.add(*not_in_user_groups)
                     user.user_permissions.remove(*permissions_in_user_groups)
                     user.user_permissions.add(*group_permissions)
-            return HttpResponse("success without image")
             return HttpResponse("success with image")
         else:
             user.name = name
@@ -374,6 +373,8 @@ def user_update(request, pk):
                 user.groups.remove(*user_groups)
                 groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
                 user.user_permissions.remove(*groups_permissions)
+                print groups
+                return HttpResponse('almost wrong')
             else:
                 if user_groups in groups:
                     not_in_user_groups = list(set(groups) - set(user_groups))
@@ -387,7 +388,7 @@ def user_update(request, pk):
                     user.groups.add(*not_in_user_groups)
                     user.user_permissions.remove(*permissions_in_user_groups)
                     user.user_permissions.add(*group_permissions)
-            return HttpResponse("success without image")
+                    return HttpResponse("success without images")
 
 
 
