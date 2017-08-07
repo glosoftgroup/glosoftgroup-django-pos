@@ -146,7 +146,8 @@ def create_group(request):
 				return HttpResponse('error')
 		except ObjectDoesNotExist:
 			group = Group.objects.create(name=group_name)
-			group.user_set.add(*users)
+			if users is not None:
+				group.user_set.add(*users)
 			group.save()
 			last_id_group = Group.objects.latest('id')
 			user_trail(request.user.name, 'added group '+group_name, 'add')
@@ -243,8 +244,16 @@ def group_edit(request):
 def group_detail(request, pk):
 	group = Group.objects.get(id=pk)
 	group_permissions = Permission.objects.filter(group=group)
-	users_in_group = User.objects.filter(groups__name=group.name)
-	return HttpResponse('error deleting')
+	try:
+		users_in_group = User.objects.filter(groups__name=group.name)
+		ctx = {"users":users_in_group, "group":group.name}
+		html = render_to_string('dashboard/permissions/group_detail.html', ctx)
+		return HttpResponse(html)
+	except Exception, e:
+		error_logger.error(e)
+		ctx = { "group": group.name}
+		html = render_to_string('dashboard/permissions/group_detail.html', ctx)
+		return HttpResponse(html)
 
 @staff_member_required
 @permission_decorator('group.delete_group')

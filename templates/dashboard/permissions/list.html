@@ -694,31 +694,22 @@ $( ".check" ).on( "click", function(){
 } );
 
  /*--- create group ---*/
- //**@ validator rule
- $.validator.addMethod("valueNotEquals", function(value, element, arg){
-  return arg != value;
- }, "Value must not equal arg.");
  //**@ validate form
   $('#group-form').validate({
     rules:{
         group_name: {
           required:true,
           minlength:3
-        },
-        user_select:{ valueNotEquals: "default" }
-
+        }
     },
     messages:{
-      name:{
+      group_name:{
         required: "please provide a group name",
         minlength: "name must be atleast 3 characters long"
-      },
-      user_select:{ valueNotEquals: "please select a user!" }
+      }
     },
-    submitHandler: function() { 
-          if(!$('#multiple').val()){
-            $('.select-error').text('This field is required');
-          }else{
+    submitHandler: function() {
+
           //**@ get group name and user array
           var group_name = $('#group_name').val();
           var raw_users = $("#multiple :selected").map(function(){
@@ -763,8 +754,6 @@ $( ".check" ).on( "click", function(){
                   });
                 }
             });
-
-       }
     }
   });
 

@@ -66,7 +66,7 @@
     <div id="pagination-div">
       <div class="panel panel-flat">
         <div class="panel-body">
-        <div class="table-responsive">
+        <div class="table-responsives">
          
           <table class="table table-hover fixed_header datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
@@ -83,27 +83,34 @@
                {% if groups %}
                   {% for group in groups %}
                   <tr class='clickable-row' id="{{group.id }}">
-                    <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}">#{{ forloop.counter }}</td>
+                    <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} Details" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{ forloop.counter }}.</td>
                      <!-- group name -->
-                    <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}">{{group.name}}</td>
+                    <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} Details" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{group.name}}</td>
                     <!-- actions -->
                     {% if perms.auth.change_group or perms.auth.delete_group %}
                     <td class="text-center">
-                      <ul class="icons-list">
-                        {% if perms.auth.change_group %}
-                        <li>
-                          <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
-                         class="modal_trigger_edit btn btn-default btn-sm edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal" style="font-size: 11px;"></i> edit</a>
-                        </li>
-                        {% endif %}
-                        {% if perms.auth.delete_group %}
-                        <li>
-                          <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
-                         class="modal_trigger_delete btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
-                         </a>
-                        </li>
-                        {% endif %}
-                      </ul>
+
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            action <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu edit-dropdown">
+                          {% if perms.auth.change_group %}
+                            <li>
+                              <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
+                             class="modal_trigger_edit edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> EDIT</a>
+                            </li>
+                         {% endif %}
+                          {% if perms.auth.delete_group %}
+                            <li>
+                              <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
+                             class="modal_trigger_delete del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                             </a>
+                            </li>
+                         {% endif %}
+                          </ul>
+                        </div>
+
                     </td>
                     {% endif %}
                   </tr>
@@ -259,6 +266,27 @@
    </div>
  </div>
  <!-- /delete modal -->
+
+<!-- detail modal -->
+ <div id="modal_detail" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body detail-body">
+
+       </div>
+
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default btn-block" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /delete modal -->
+
 {% endblock%}
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
@@ -341,7 +369,7 @@ $('document').ready(function () {
         
         table_body.detach().empty().each(function(i, val){
             for (var x = 0; x < remove_duplicates(names).length; x++){
-                $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
+                $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> delete</a></td></tr');
                 if (x == remove_duplicates(names).length - 1){
                     $(this).appendTo(parent);
                 }
@@ -620,5 +648,23 @@ $( ".check" ).on( "click", function(){
   }
 });
 
+$(".clickable-row .td").click(function(){
+      var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         var token = '{{ csrf_token }}';
+
+          //*@ get group permissions
+          $.post(url,{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"}, function(data){
+            $('.detail-body').html(data);
+            $(modal).modal();
+          });
+
+});
 </script>
 {% endblock %}
