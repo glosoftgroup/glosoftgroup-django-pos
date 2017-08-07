@@ -51,4 +51,25 @@
       {% endif %}
     {% endfor %}
   </script>
+
+  <script type="text/javascript">
+  function getNotification(csrf_token) {
+    var dynamicData = {'csrfmiddlewaretoken':csrf_token};    
+    return $.ajax({
+      url: "{% url 'dashboard:unread_count'%}",
+      type: "post",
+      data: dynamicData
+    });
+  }
+
+  $(document).ready(function(){
+      var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+
+    getNotification(csrf_token).done(function(data) {
+      // Updates the UI based the ajax result
+      $(".count_notification").text(data); 
+    });
+  });
+  
+  </script>
 {% endif %}

@@ -73,7 +73,21 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
+      <!-- notifications -->
+      <ul class="nav navbar-nav">
        
+      <li class="">
+            <a href="{% url 'dashboard:notification_list' %}">
+            <i class="icon-bubbles4"></i>
+            <span class="visible-xs-inline-block position-right">messages</span>
+            <span class="badge status-mark22 bg-warning-400"></span>
+          </a>
+            
+            
+          </li>         
+        
+      </ul>
+      <!-- ./notifications --> 
     <li>
            {% if request.user.image %}
               <img src="{{request.user.image.url }}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;" />
@@ -401,7 +415,7 @@
       <!-- Main content -->
       <div class="content-wrapper">
       <div class="page-header page-header-default">
-          <div class="breadcrumb-line fix-breadcrumb">
+          <div class="breadcrumb-line fix-breadcrumb" style="position: fixed;width: 100%;">
             <ul class="breadcrumb">
                <li><a href="{% url 'dashboard:index' %}"><span class="icon-home"></span data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Back to dashboard"> Home</a></li>
                {% block breadcrumbs %}
@@ -419,7 +433,7 @@
 
 
         <!-- Content area -->
-        <div class="content" id="content" style="margin-top: 12px">   
+        <div class="content" id="content" style="padding: 30px 20px 60px">   
 
                 {% block content %}{% endblock %}
             
@@ -478,7 +492,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/jgrowl.min.js' %}"></script>
 
   <script type="text/javascript" src="{% static 'backend/js/pages/components_notifications_other.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/jquery.sticky.js' %}"></script>
+  
 
   
     <!-- Core Scripts - Include with every page -->
@@ -495,15 +509,7 @@
 
     var selector = $('.fix-breadcrumb');
     $( "label" ).addClass( "text-bold" );
-    //selector.wrap('<div class="" style="top:51px"/>');
-    
-    //selector.sticky({zIndex:1,className:'toperkk'});
-    //$('.toper').css('margin-top','50px');
-    //selector.attr('')
-
-     // selector.on('sticky-start', function() { 
-     //  console.log("Started");
-     //  selector.addClass('toper');
+   
       });
  
 
@@ -514,6 +520,28 @@
     {% include "dashboard/includes/_messages.html" %}
     <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+    <script type="text/javascript">
+   
+  function getNotification() {
+    var dynamicData = {};    
+    return $.ajax({
+      url: "{% url 'dashboard:unread_count'%}",
+      type: "get",
+      data: dynamicData
+    });
+  }
+
+  $(document).ready(function(){
+    setInterval(function(){ getNotification().done(function (data) {
+       $(".status-mark22").text(data);
+    }) }, 20000);  
+    
+  });
+
+
+
+  
+  </script>
     {% block custom_js %}{% endblock %}
    </div>
   </body>

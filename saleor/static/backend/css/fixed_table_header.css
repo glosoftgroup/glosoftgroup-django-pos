@@ -1,6 +1,6 @@
 /*fixed table header styling*/
 .fixed{
-    top:0;
+    top:41px;
     position:fixed;
     width:auto;
     display:none;
