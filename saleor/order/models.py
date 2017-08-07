@@ -173,7 +173,6 @@ class Order(models.Model, ItemSet, index.Indexed):
         payment_url = build_absolute_uri(
             reverse('order:details', kwargs={'token': self.token}))
         context = {'payment_url': payment_url}
-
         emailit.api.send_mail(
             email, context, 'order/emails/confirm_email',
             from_email=settings.ORDER_FROM_EMAIL)

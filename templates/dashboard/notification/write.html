@@ -75,7 +75,24 @@
             <tr>
                 <td style="width: 50px">To:</td>
                 <td style="width: 100%" class="text-left">
-               <input type="text" value="" data-role="tagsinput" class="tagsinput-typeahead">
+                <div class="col-md-6">
+                    <input type="text" value="" data-role="tagsinput" placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                </div>
+                <div class="col-md-6">
+                    <div class="formgroup">
+                        <label class="display-block text-semibold">  Group email notification </label>
+                        <label class="checkbox-inline">
+                            <input id="supplier" name="supplier" type="checkbox" class="styled">
+                            Supplier
+                        </label>
+
+                        <label class="checkbox-inline">
+                            <input id="customers" name="customers" type="checkbox" class="styled">
+                            Customers
+                        </label>
+                    </div>
+                </div>
+               
                     <ul class="list-inline list-inline-separate no-margin">
 
                     </ul>
@@ -212,13 +229,25 @@ function sendNotification(emailList,subject,body) {
 var sendnot = $('#sendnot');
 var subject = $('#subject');
 var body = $('#body');
+var supplier = $('#supplier');
+var customers = $('#customers');
 
 sendnot.on('click',function(){
+    // if(supplier.is(":checked"))
+    // {
+    //     console.log('checked supplier');
+    // }
+    // if(customers.is(":checked"))
+    // {
+    //     console.log('checked customers');
+    // }
+    // return false;
     var subjectString = subject.val();
     var bodyText = body.val();
     var json = [];
     var to = selector1.val();
     var toSplit = to.split(",");
+
 
     // validate
     if(!to){
@@ -252,7 +281,7 @@ sendnot.on('click',function(){
                           header: 'Well done!',
                           theme: 'bg-success'
                        });
-     window.location.reload();
+     window.location.href = "{% url 'dashboard:notification_list_slug' 'sent' %}";
     });
     // ./send Notifications
 });

@@ -1,15 +1,8 @@
-from django.contrib import messages
-
+import emailit.api
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
 from ..views import staff_member_required
-
 from ...decorators import permission_decorator, user_trail
 import logging
 import json
@@ -35,6 +28,9 @@ def notification_list(request,status=None):
         notifications = request.user.notifications.unread()
     elif status == 'read':
         notifications = request.user.notifications.read()
+    elif status == 'emailed':
+        mark_read = False
+        notifications = Notification.objects.filter(actor_object_id=request.user.id,emailed=True)
     elif status == 'sent':
         mark_read = False
         notifications = Notification.objects.filter(actor_object_id=request.user.id)
@@ -111,14 +107,29 @@ def write(request):
         email_list = json.loads(request.POST.get('emailList'))
         body = request.POST.get('body')
         for email in email_list:
-        	user = User.objects.filter(email=email['email'])
+        	user = User.objects.get(email=email['email'])
         	print('--------')
         	print('sending email to ')
-        	print(user)
+        	print(user.name)
         	print '--------'
         	notify.send(request.user, recipient=user, verb=subject,description=body)
 
-        HttpResponse(emailList)
+        # send emails
+        for email in email_list:
+            user = User.objects.get(email=email['email'])
+            if user.send_mail:
+                context = {'user': user.name, 'body': body, 'subject': subject}
+                emailit.api.send_mail(user.email,
+                                      context,
+                                      'notification/emails/notification_email',
+                                      from_email=request.user.email)
+                notif = Notification(actor=request.user, recipient=user, verb=subject, description=body, emailed=True)
+                notif.save()
+            else:
+                notify.send(request.user, recipient=user, verb=subject, description=body)
+
+
+        HttpResponse(email_list)
 
 
     ctx = {'users':User.objects.all().order_by('-id')}

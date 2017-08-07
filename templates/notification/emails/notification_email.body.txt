@@ -1,0 +1,9 @@
+{% load i18n %}
+
+{% block content %}{% blocktrans context "Notification email" %}Hi {{user}}!
+
+
+{{ body }}
+
+Sincerely,
+Glosoft Team{% endblocktrans %}{% endblock %}
