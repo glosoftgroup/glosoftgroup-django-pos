@@ -57,7 +57,7 @@
 
             <div class="pull-right-lg">
                 <div class="btn-group navbar-btn">
-                    <button type="button" class="btn btn-default"><i class="icon-printer"></i> <span class="hidden-xs position-right">Print</span></button>
+                    <button type="button" class="btn btn-default" id="printBtn"><i class="icon-printer"></i> <span class="hidden-xs position-right">Print</span></button>
 
                 </div>
             </div>
@@ -68,7 +68,7 @@
 
 
 <!-- Mail details -->
-<div class="table-responsive mail-details-write">
+<div class="table-responsive mail-details-write" id="printme">
   {% csrf_token %}
     <table class="table">
         <tbody>

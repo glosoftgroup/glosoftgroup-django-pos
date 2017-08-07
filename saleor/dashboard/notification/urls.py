@@ -11,8 +11,9 @@ urlpatterns = [
      url(r'^list/(?P<status>[\w\-]+)$', views.notification_list, name='notification_list_slug'),
      url(r'^write/$', views.write, name='write'),
      url(r'^unread/count/$', views.unread_count, name='unread_count'),
-     url(r'^read/notifiction/(?P<pk>[0-9]+)$', views.read, name='read-notification'),
-     url(r'^delete/notifiction/(?P<pk>[0-9]+)$', views.delete, name='delete-notification'),
+     url(r'^read/notification/(?P<pk>[0-9]+)$', views.read, name='read-notification'),
+     url(r'^delete/notification/(?P<pk>[0-9]+)$', views.delete, name='delete-notification'),
+     url(r'^delete/permanently/(?P<pk>[0-9]+)$', views.delete_permanently, name='delete-permanently'),
 ]
 
 if settings.DEBUG:

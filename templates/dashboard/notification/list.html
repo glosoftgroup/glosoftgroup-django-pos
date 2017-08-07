@@ -12,9 +12,17 @@
 {% block menu_notification_class %}active{% endblock %}
 
 {% block breadcrumbs %}
-  
+    <li>
+      <a href="{% url 'dashboard:notification_list' %}">
+      	Notifications
+      </a>    	
+    </li>
     <li class="active">
-      {% trans "Notifications" context "Dashboard Notifications list" %}
+      {% if status %}
+        {{status|capfirst}}
+      {% else %}
+        Inbox
+      {% endif %}
     </li>
   
 {% endblock %}
@@ -54,25 +62,19 @@
 
 						<div class="category-content no-padding">
 							<ul class="navigation navigation-alt navigation-accordion no-padding-bottom">
-								<li class="navigation-header">Folders</li>
+								<li class="navigation-header">Mails</li>
 								<li class="active"><a href="{% url 'dashboard:notification_list' %}"><i class="icon-drawer-in"></i> Inbox <span class="badge badge-success">{{total_notifications}}</span></a></li>
 								
 								<li><a href="{% url 'dashboard:notification_list_slug' 'sent' %}"><i class="icon-drawer-out"></i> Sent mail</a></li>
-								<li><a href="#"><i class="icon-stars"></i> Starred</a></li>
+								
 								<li class="navigation-divider"></li>
-								<li><a href="{% url 'dashboard:notification_list_slug' 'read' %}"><i class="icon-envelope"></i> Read <span class="badge badge-success"></span></a></li>
+								<li><a href="{% url 'dashboard:notification_list_slug' 'unread' %}"><i class="icon-envelope"></i> Unread <span class="badge badge-success"></span></a></li>
+								<li><a href="{% url 'dashboard:notification_list_slug' 'read' %}"><i class="icon-mail-read"></i> Read <span class="badge badge-success"></span></a></li>
 								<li><a href="{% url 'dashboard:notification_list_slug' 'trash' %}"><i class="icon-bin"></i> Trash<span class="badge badge-warning">{{deleted}}</span></a></li>
 							</ul>
 						</div>
 					</div>
 					<!-- /sub navigation -->
-
-
-
-
-
-
-
 				</div>
 			</div>
 			<!-- /secondary sidebar -->
@@ -89,7 +91,13 @@
 					<!-- Multiple lines -->
 					<div class="panel panel-white">
 						<div class="panel-heading">
-							<h6 class="panel-title">My Inbox</h6>
+							<h6 class="panel-title">
+							{% if status %}
+						        {{status|capfirst}}
+						    {% else %}
+						        My Inbox
+						     {% endif %}
+						     </h6>
 
 							<div class="heading-elements not-collapsible">
 								<span class="label bg-blue heading-text">{{unread_count}} new </span>
@@ -113,7 +121,7 @@
 
 										<a href="{% url 'dashboard:write' %}" type="button" class="btn btn-default"><i class="icon-pencil7"></i> <span class="hidden-xs position-right">Compose</span></a>
 										
-				                    	<button type="button" class="btn btn-default"><i class="icon-spam"></i> <span class="hidden-xs position-right">Spam</span></button>
+				                    	
 									</div>
 
 									<div class="navbar-right">
@@ -133,7 +141,12 @@
 				<tr class="unread">
 					
 					<td class="table-inbox-star rowlink-skip">
-						<a href="{% url 'dashboard:read-notification' notification.id%}">
+					{% if mark_read %}
+					<a href="{% url 'dashboard:read-notification' notification.id%}">
+					{% else %}
+					<a href='#'>
+					{% endif %}
+						
 						{% if notification.unread %}
 						<i class="icon-mail5 text-success"></i>
 						{% else %}

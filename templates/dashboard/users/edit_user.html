@@ -85,32 +85,16 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" class="form-control" name="name" id="name" value="{% if user.name %}{{ user.name}} {% else %} ****** {% endif %}">
+                    <input type="text" class="form-control" autocomplete='off' placeholder="User Name" name="name" id="name" value="{{ user.name}}">
                   </div>
                   <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" class="form-control" name="password" id="password" placeholder="*******" pas="{{ user.password}}">
+                    <input type="password" class="form-control" autocomplete='off' name="password" id="password" placeholder="*******" pas="{{ user.password}}">
                    </div>
                    <div class="form-group">
                     <label for="exampleInputPassword1">National ID No:</label>
-                    <input type="text" class="form-control" name="nid" id="nid" value="{% if user.nid %}{{ user.nid}}{% else %}******{% endif %}">
+                    <input type="text" class="form-control" autocomplete='off' name="nid" id="nid" value="{% if user.nid %}{{ user.nid}}{% else %}******{% endif %}">
                    </div>
-                </div>
-                <div class="col-md-6">
-                   <div class="form-group">
-                      <label for="email">Email address</label>
-                      <input type="email" class="form-control" name="email" id="email" value="{{ user.email}}">
-                   </div>
-                   <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
-                    <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="*******">
-                   </div>
-                   <div class="form-group">
-                    <label for="mobile">Phone</label>
-                    <input type="text" class="form-control" name="mobile" id="mobile" value="{% if user.mobile %}{{ user.mobile}} {% else %} ****** {% endif %}">
-                   </div>
-                </div>
-                <div class="col-md-12">
                    <div class="form-group">
                     <label>Click to Select Groups</label>
                     <select multiple="" class="select-border-color border-warning select2-hidden-accessible" tabindex="-1" aria-hidden="true">
@@ -127,6 +111,27 @@
                         {% endif %}
                     </select>
                   </div>
+                </div>
+                <div class="col-md-6">
+                   <div class="form-group">
+                      <label for="email">Email address</label>
+                      <input type="email" class="form-control" autocomplete='off' name="email" id="email" value="{{ user.email}}">
+                   </div>
+                   <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="*******">
+                   </div>
+                   <div class="form-group">
+                    <label for="mobile">Phone</label>
+                    <input type="text" class="form-control" name="mobile" id="mobile" value="{% if user.mobile %}{{ user.mobile}} {% else %} ****** {% endif %}">
+                   </div>
+                   <div class="form-group">
+                      <label for="email">Job Title</label>
+                      <input type="text" class="form-control" name="job_title" id="id_job_title" value="{{user.job_title}}" placeholder="Job title (e.g Cashier)">
+                   </div>
+                </div>
+                <div class="col-md-12">
+                   
                 </div>
               </div>
               

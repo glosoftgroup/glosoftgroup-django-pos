@@ -107,7 +107,7 @@
                     <th>Image</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>User Role</th>
+                    <th>Job Title</th>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <th class="text-center">Options</th>
                     {% endif %}
@@ -116,7 +116,7 @@
                 <tbody id="tb">
                   {% for user in users %}
                   <tr class='clickable-row' id="{{user.pk }}">
-                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{ forloop.counter }}</td>
                     <!-- image -->
                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
                    {% if user.image %}
@@ -126,13 +126,26 @@
                    {% endif %}
                    </td>
                      <!-- product name -->
-                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.name}}</td>
+                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
+                    {% if not user.name %}
+                    <span class="text-center">&ndash;</span>
+                    {% else %}
+                    {{user.name}}
+                    {% endif %}
+                    
+                    </td>
                     <!-- product category -->
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{user.email}}
                     </td>
                     <!-- role -->
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}"> 
-                    {% if user.is_superuser == True %}admin{% else %} staff {% endif %}</td>
+                    {% if not user.job_title %}
+                    <span class="text-center">&ndash;</span>
+                    {% else %}
+                    {{ user.job_title }}
+                    {% endif %}
+                    
+                    </td>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <!-- actions -->
                      <td class="text-center">
