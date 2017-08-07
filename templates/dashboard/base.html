@@ -530,6 +530,9 @@
       data: dynamicData
     });
   }
+  getNotification().done(function (data) {
+       $(".status-mark22").text(data);
+    }); 
 
   $(document).ready(function(){
     setInterval(function(){ getNotification().done(function (data) {
