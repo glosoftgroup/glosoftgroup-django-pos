@@ -48,9 +48,9 @@ def notification_list(request,status=None):
                             ctx)
 
 def unread_count(request):
-    notif = request.user.notifications.unread()
-    print notif
-    return  HttpResponse(len(notif))
+    notification = request.user.notifications.unread()
+    return HttpResponse(len(notification))
+
 
 def delete(request,pk=None):
     if pk:

@@ -246,13 +246,15 @@ def user_process(request):
 		mobile = request.POST.get('mobile')
 		image= request.FILES.get('image')
 		groups = request.POST.getlist('groups[]')
+		job_title = request.POST.get('job_title')
 		new_user = User(
 			name = name,
 			email = email,
 			password = encr_password,
 			nid = nid,
 			mobile = mobile,
-			image = image
+			image = image,
+			job_title = job_title,
 		)
 		try:
 			new_user.save()
@@ -290,7 +292,7 @@ def user_detail(request, pk):
 def user_delete(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.method == 'POST':
-		user.delete()		
+		user.delete()
 		user_trail(request.user.name, 'deleted user: '+ str(user.name),'delete')
 		return HttpResponse('success')
 
@@ -321,6 +323,7 @@ def user_update(request, pk):
 		nid = request.POST.get('user_nid')
 		mobile = request.POST.get('user_mobile')
 		image= request.FILES.get('image')
+		job_title = request.POST.get('job_title')
 		groups = request.POST.getlist('groups[]')
 
 		if password == user.password:
@@ -333,6 +336,7 @@ def user_update(request, pk):
 			user.password = encr_password
 			user.nid = nid
 			user.mobile = mobile
+			user.job_title = job_title
 			user.image = image
 			user.save()
 			user_trail(request.user.name, 'updated user: '+ str(user.name),'update')
@@ -341,7 +345,7 @@ def user_update(request, pk):
 				user.groups.remove(*user_groups)
 				groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
 				user.user_permissions.remove(*groups_permissions)
-			else: 
+			else:
 				if user_groups in groups:
 					not_in_user_groups = list(set(groups) - set(user_groups))
 					group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
@@ -362,6 +366,7 @@ def user_update(request, pk):
 			user.password = encr_password
 			user.nid = nid
 			user.mobile = mobile
+			user.job_title = job_title
 			user.save()
 			user_trail(request.user.name, 'updated user: '+ str(user.name), 'update')
 			info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name),'update')
@@ -369,7 +374,7 @@ def user_update(request, pk):
 				user.groups.remove(*user_groups)
 				groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
 				user.user_permissions.remove(*groups_permissions)
-			else: 
+			else:
 				if user_groups in groups:
 					not_in_user_groups = list(set(groups) - set(user_groups))
 					group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
@@ -426,7 +431,7 @@ def user_assign_permission(request):
 				return HttpResponse('permissions updated')
 @staff_member_required
 def user_search( request ):
-	
+
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
 		list_sz = request.GET.get('size',10)
@@ -437,8 +442,8 @@ def user_search( request ):
 		else:
 			sz = list_sz
 
-		if q is not None:            
-			users = User.objects.filter( 
+		if q is not None:
+			users = User.objects.filter(
 				Q( name__icontains = q ) |
 				Q( email__icontains = q ) | Q( mobile__icontains = q ) ).order_by( 'id' )
 			paginator = Paginator(users, 10)
@@ -458,7 +463,7 @@ def user_search( request ):
 
 @staff_member_required
 def usertrail_search( request ):
-	
+
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
 		list_sz = request.GET.get('size',10)
@@ -469,8 +474,8 @@ def usertrail_search( request ):
 		else:
 			sz = list_sz
 
-		if q is not None:            
-			users = UserTrail.objects.filter( 
+		if q is not None:
+			users = UserTrail.objects.filter(
 				Q( name__icontains = q ) |
 				Q( action__icontains = q ) | Q( date__icontains = q ) ).order_by( '-now' )
 			paginator = Paginator(users, 10)
@@ -519,12 +524,11 @@ def users_export_csv(request):
 			smart_str(obj.email),
 		])
 	return response
-	
-
-			
 
 
 
 
 
-		
+
+
+

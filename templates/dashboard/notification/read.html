@@ -155,11 +155,11 @@
         deleteNot(csrf_token).done(function(data) 
         {    
         // notify
-        $.jGrowl('Notification deleted successfully', {
+        $.jGrowl('Notification moved to trash', {
                           header: 'Well done!',
                           theme: 'bg-success'
             });
-	     //window.location.reload();
+	     window.location.href = "{% url 'dashboard:notification_list' %}";
 	   
         // ./notify
         });
