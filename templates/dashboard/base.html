@@ -415,7 +415,7 @@
       <!-- Main content -->
       <div class="content-wrapper">
       <div class="page-header page-header-default">
-          <div class="breadcrumb-line fix-breadcrumb">
+          <div class="breadcrumb-line fix-breadcrumb" style="position: fixed;width: 100%;">
             <ul class="breadcrumb">
                <li><a href="{% url 'dashboard:index' %}"><span class="icon-home"></span data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Back to dashboard"> Home</a></li>
                {% block breadcrumbs %}
@@ -433,7 +433,7 @@
 
 
         <!-- Content area -->
-        <div class="content" id="content" style="margin-top: 12px">   
+        <div class="content" id="content" style="padding: 30px 20px 60px">   
 
                 {% block content %}{% endblock %}
             
@@ -492,7 +492,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/jgrowl.min.js' %}"></script>
 
   <script type="text/javascript" src="{% static 'backend/js/pages/components_notifications_other.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/jquery.sticky.js' %}"></script>
+  
 
   
     <!-- Core Scripts - Include with every page -->
@@ -509,15 +509,7 @@
 
     var selector = $('.fix-breadcrumb');
     $( "label" ).addClass( "text-bold" );
-    //selector.wrap('<div class="" style="top:51px"/>');
-    
-    //selector.sticky({zIndex:1,className:'toperkk'});
-    //$('.toper').css('margin-top','50px');
-    //selector.attr('')
-
-     // selector.on('sticky-start', function() { 
-     //  console.log("Started");
-     //  selector.addClass('toper');
+   
       });
  
 
@@ -540,17 +532,12 @@
   }
 
   $(document).ready(function(){
-      
+    setInterval(function(){ getNotification().done(function (data) {
+       $(".status-mark22").text(data);
+    }) }, 20000);  
     
   });
 
-  setTimeout(function() {
-      console.log('checking notifications');
-      getNotification().done(function(data) {
-        // Updates the UI based the ajax result
-        $(".status-mark22").text(data); 
-    });
-    },10);
 
 
   

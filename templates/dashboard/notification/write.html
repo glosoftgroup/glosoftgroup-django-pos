@@ -246,6 +246,8 @@ sendnot.on('click',function(){
     // send Notifications
     sendNotification(json,subjectString,bodyText).done(function(data) {    
      $(".tagsinput-typeahead").val('');
+     body.val('');
+     subject.val('');
      $.jGrowl('Notification sent successfully', {
                           header: 'Well done!',
                           theme: 'bg-success'
