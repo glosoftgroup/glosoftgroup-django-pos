@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block custom_css %}
-<link href="{% static 'backend/js/plugins/fastselect/fastselect.min.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 {% block content %}
 <div id="write-message"></div>
@@ -76,7 +76,7 @@
                 <td style="width: 50px">To:</td>
                 <td style="width: 100%" class="text-left">
                 <div class="col-md-6">
-                    <input type="text" value="" data-role="tagsinput" placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                    <select name='contacts' id="contacts" class="contacts"></select>
                 </div>
                 <div class="col-md-6">
                     <div class="formgroup">
@@ -149,68 +149,18 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/tags/tokenfield.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/prism.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
-
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
 
 <script>
+var url = "{% url 'dashboard:message-contacts' %}";
+$('.contacts').tokenize2({ dataSource:url});
 var emails = [
     {% for user in users %}
-    '{{user.email}}',
+    {% if user.mobile %}'{{user.mobile}}',{% endif %}
     {% endfor %}
     ];
-$(document).ready(function(){
-     // Data
-     
-
-    //
-    // Typeahead implementation
-    //
-
-    // Matcher
-    var substringMatcher = function(strs) {
-        return function findMatches(q, cb) {
-            var matches, substringRegex;
-
-            // an array that will be populated with substring matches
-            matches = [];
-
-            // regex used to determine if a string contains the substring `q`
-            substrRegex = new RegExp(q, 'i');
-
-            // iterate through the pool of strings and for any string that
-            // contains the substring `q`, add it to the `matches` array
-            $.each(strs, function(i, str) {
-                if (substrRegex.test(str)) {
-
-                    // the typeahead jQuery plugin expects suggestions to a
-                    // JavaScript object, refer to typeahead docs for more info
-                    matches.push({ value: str });
-                }
-            });
-            cb(matches);
-        };
-    };
-    // Attach typeahead
-    $('.tagsinput-typeahead').tagsinput('input').typeahead(
-        {
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-            name: 'emails',
-            displayKey: 'value',
-            source: substringMatcher(emails)
-        }
-    ).bind('typeahead:selected', $.proxy(function (obj, datum) {  
-        this.tagsinput('add', datum.value);
-        this.tagsinput('input').typeahead('val', '');
-    }, $('.tagsinput-typeahead')));
-});
-
-var selector1 = $('.tagsinput-typeahead');
-selector1.on('change',function(){
-    console.log(selector1.val());
-});
+$(document).ready(function(){     
 
 // ajax
 function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
@@ -230,87 +180,7 @@ function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
     });
   }
 
-var sendnot = $('#sendnot');
-var subject = $('#subject');
-var body = $('#body');
-var supplier = $('#supplier');
-var customers = $('#customers');
-var toSuppliers = 0;
-var toCustomers = 0;
-function updateCheckedBoxes()
-{
-   if(supplier.is(":checked"))
-    {
-        // send notification/mail to suppliers
-        toSuppliers = 1;
-    }else{ toSuppliers = 0;}
-    if(customers.is(":checked"))
-    {
-        // send notification/mail to customers
-        toCustomers = 1;
-    }else{ toCustomers = 0;} 
-}
-sendnot.on('click',function(){
-    updateCheckedBoxes();
-    // return false;
-    var subjectString = subject.val();
-    var bodyText = body.val();
-    var json = [];
-    var to = selector1.val();
-    var toSplit = to.split(",");
 
-
-    // validate
-    if(!to){
-        if(1==parseInt(toSuppliers))
-        {
-          console.log('supplier set');
-          //return true;  
-        } 
-        if(1==parseInt(toCustomers))
-        {
-          console.log('customer set');
-          //return true;  
-        }
-        else{
-          alert('Enter atleast one email!');
-          return false;  
-        } 
-        
-    }else{
-        for (var i = 0; i < toSplit.length; i++) 
-        {
-            if( emails.indexOf(toSplit[i]) > -1 ) {
-                console.log("success");
-                json.push({"email":toSplit[i]});
-            }
-       
-        }
-    }
-    if(!subjectString){
-        alert('subject required');
-        return false;
-    }
-    if(!bodyText){
-        alert('Message body required');
-        return false;
-    }
-    
-    
-
-    //console.log(json);
-    // send Notifications
-    sendNotification(json,subjectString,bodyText,toCustomers,toSuppliers).done(function(data) {    
-     $(".tagsinput-typeahead").val('');
-     body.val('');
-     subject.val('');
-     $.jGrowl('Notification sent successfully', {
-                          header: 'Well done!',
-                          theme: 'bg-success'
-                       });
-     window.location.href = "{% url 'dashboard:notification_list_slug' 'sent' %}";
-    });
-    // ./send Notifications
 });
 
 </script>

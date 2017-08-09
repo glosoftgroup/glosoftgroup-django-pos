@@ -1,76 +1,172 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
+import emailit.api
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max
-from django.core import serializers
-from django.template.defaultfilters import date
-from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-import datetime
-from datetime import date, timedelta
-from django.utils.dateformat import DateFormat
-import random
-import csv
-from django.utils.encoding import smart_str
-from decimal import Decimal
-from calendar import monthrange
-import calendar
-from django_xhtml2pdf.utils import generate_pdf
-
-import re
-import base64
-
-from ...core.utils import get_paginator_items
+from django.http import HttpResponse
 from ..views import staff_member_required
+from ...decorators import permission_decorator, user_trail
+import logging
+from django.http import JsonResponse
+import json
+
+
+debug_logger = logging.getLogger('debug_logger')
+info_logger  = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
+
+from django.contrib.auth import get_user_model
 from ...userprofile.models import User
 from ...supplier.models import Supplier
 from ...customer.models import Customer
-from ...sale.models import Sales, SoldItem, Terminal
-from ...product.models import Product, ProductVariant, Category
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf
-import logging
+from ...smessages.signals import sms as notify
+from ...smessages.models import SMessage as Notification
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+@staff_member_required
+def list_messages(request,status=None):
+    # read users messages
+    mark_read = True
+    delete_permanently = False
+    if status == 'trash':
+        delete_permanently = True
+        messages = request.user.notifications.deleted()
+    elif status == 'unread':
+        messages = request.user.notifications.unread()
+    elif status == 'read':
+        messages = request.user.notifications.read()
+    elif status == 'emailed':
+        mark_read = False
+        messages = Notification.objects.filter(actor_object_id=request.user.id,emailed=True)
+    elif status == 'sent':
+        mark_read = False
+        messages = Notification.objects.filter(actor_object_id=request.user.id)
+    else:
+        messages = request.user.notifications.active()
+    ctx = {
+        'delete_permanently': delete_permanently,
+        'mark_read': mark_read,
+        'status': status,
+        'deleted': len(request.user.notifications.deleted()),
+        'notifications': messages,
+        'total_notifications': len(messages),
+        'users': User.objects.all()}
+    return TemplateResponse(request,
+                            'dashboard/messages/list.html',
+                            ctx)
 
 
-def list_messages(request):
-    users = User.objects.all()
-    data = {
-        "users":users
-    }
-    user_trail(request.user.name, 'accessed messages list : ', 'view')
-    info_logger.info('User: ' + str(request.user.name) + 'accessed messages list')
-    return TemplateResponse(request, 'dashboard/messages/inbox/list.html',{})
+@staff_member_required
+def unread_count(request):
+    messages = request.user.notifications.unread()
+    return HttpResponse(len(messages))
 
-def message_detail(request):
-    status = 'read'
-    user_trail(request.user.name, 'viewed details of a message: ', 'view')
-    info_logger.info('User: ' + str(request.user.name) + ' viewed details of a message')
-    return TemplateResponse(request, 'dashboard/messages/inbox/detail.html', {})
 
-def compose(request):
-    suppliers = Supplier.objects.all()
-    customers = Customer.objects.all()
-    staff = User.objects.all()
-    data = {
-        "suppliers":suppliers,
-        "customers":customers,
-        "employee":staff
-    }
-    user_trail(request.user.name, 'accessed compose an sms page: ', 'view')
-    info_logger.info('User: ' + str(request.user.name) + 'accessed compose an sms page')
-    return TemplateResponse(request, 'dashboard/messages/compose.html', data)
+@staff_member_required
+def delete_permanently(request, pk=None):
+    if pk:
+        message = get_object_or_404(Notification, pk=pk)
+        message.delete()
+        return HttpResponse(str(message.verb)+' Deleted successfully')
+    else:
+        return HttpResponse('Provide a correct Notification')
+
+
+@staff_member_required
+def delete(request, pk=None):
+    if pk:
+        message = get_object_or_404(Notification, pk=pk)
+        message.deleted = True
+        message.save()
+        return HttpResponse('Added to spam box')
+    else:
+        return HttpResponse('Error deleting notification')
+    return HttpResponse('error')
+
+
+@staff_member_required
+def read(request, pk=None):
+    if pk:
+        message = get_object_or_404(Notification, pk=pk)
+        message.mark_as_read()
+        ctx = {
+              'notification':message,
+              'actor':message.actor.email[0]}
+        return TemplateResponse(request,
+                            'dashboard/notification/read.html',
+                            ctx)
+    else:
+        messages = request.user.notifications.unread()
+        ctx = {
+        'deleted':len(messages.deleted()),
+        'notifications':messages,
+        'total_notifications': len(messages),
+        'users':User.objects.all()}
+    return TemplateResponse(request,
+                            'dashboard/notification/list.html',
+                            ctx)
+
+
+@staff_member_required
+def write(request):
+    if request.method == 'POST':
+        # get form data
+        subject = request.POST.get('subject')
+        to_customers = request.POST.get('toCustomer',0)
+        to_suppliers = request.POST.get('toSupplier',0)
+        email_list = json.loads(request.POST.get('emailList'))
+        body = request.POST.get('body')
+        # for email in email_list:
+        # 	user = User.objects.get(email=email['email'])
+        # 	notify.send(request.user, recipient=user, verb=subject,description=body)
+
+        # send notification/emails
+        for email in email_list:
+            user = User.objects.get(email=email['email'])
+            if user.send_mail:
+                context = {'user': user.name, 'body': body, 'subject': subject}
+                emailit.api.send_mail(user.email,
+                                      context,
+                                      'notification/emails/notification_email',
+                                      from_email=request.user.email)
+                notif = Notification(actor=request.user, recipient=user, verb=subject, description=body, emailed=True)
+                notif.save()
+            else:
+                notify.send(request.user, recipient=user, verb=subject, description=body)
+
+        # check for bulk group mailing/notification
+        if 1 == int(to_customers):
+            customers = Customer.objects.all()
+            for customer in customers:
+                context = {'user': customer.name, 'body': body, 'subject': subject}
+                emailit.api.send_mail(customer.email,
+                                      context,
+                                      'notification/emails/notification_email',
+                                      from_email=request.user.email)
+                notif = Notification(actor=request.user, recipient=customer, verb=subject, description=body, emailed=True)
+                notif.save()
+        if 1 == int(to_suppliers):
+            suppliers = Supplier.objects.all()
+            for supplier in suppliers:
+                context = {'user': supplier.name, 'body': body, 'subject': subject}
+                emailit.api.send_mail(supplier.email,
+                                      context,
+                                      'notification/emails/notification_email',
+                                      from_email=request.user.email)
+                notif = Notification(actor=request.user, recipient=supplier, verb=subject, description=body, emailed=True)
+                notif.save()
+
+        HttpResponse(email_list)
+
+
+    ctx = {'users':User.objects.all().order_by('-id')}
+    return TemplateResponse(request,
+                            'dashboard/messages/write.html',
+                            ctx)
+
+
+def contacts(request):
+    users = User.objects.all().exclude(mobile=None)
+    contact = {}
+    for user in users:
+        # {"text": "Afghanistan", "value": "AF"},
+        contact['text']= user.name
+        contact['value'] = user.mobile
+    return JsonResponse(contact)

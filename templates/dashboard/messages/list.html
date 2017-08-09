@@ -9,7 +9,7 @@
 {% endblock %}
 
 
-{% block menu_notification_class %}active{% endblock %}
+{% block menu_messages_class %}active{% endblock %}
 
 {% block breadcrumbs %}
     <li>
@@ -45,7 +45,7 @@
 						</div>
 
 						<div class="category-content">
-							<a href="{% url 'dashboard:write' %}" class="btn  hvr-glow bg-indigo-400 btn-block">Compose mail</a>
+							<a href="{% url 'dashboard:compose_message' %}" class="btn  hvr-glow bg-indigo-400 btn-block">Compose SMS</a>
 						</div>
 					</div>
 					<!-- /actions -->
@@ -120,7 +120,7 @@
 
 									<div class="btn-group navbar-btn">
 
-										<a href="{% url 'dashboard:write' %}" type="button" class="btn btn-default  hvr-glow"><i class="icon-pencil7"></i> <span class="hidden-xs position-right">Compose</span></a>
+										<a href="{% url 'dashboard:compose_message' %}" type="button" class="btn btn-default  hvr-glow"><i class="icon-pencil7"></i> <span class="hidden-xs position-right">Compose</span></a>
 										
 				                    	
 									</div>

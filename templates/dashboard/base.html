@@ -288,13 +288,22 @@
                     </li>
                   </ul>
                 </li>
+                <!-- communications -->
+                <li>
+                  <a href="#"><i class=" icon-bubbles4"></i> <span>Communications</span></a>
+                  <ul>
+                    <li
+                    class="{% block menu_notification_class %}{% endblock %}"
+                    ><a href="{% url 'dashboard:notification_list' %}"><i class='icon-bell3'></i> Notifications</a></li>
+                    <li
+                    class="{% block menu_messages_class %}{% endblock %}"
+                    ><a href="{% url 'dashboard:message_list' %}">
+                    <i class="icon-mobile2"></i>Messages</a></li>                    
+                  </ul>
+                </li>
+                <!-- ./communications -->
                   {% endif %}
-                   {% if perms.product.view_category %}
-                    <!-- categories -->
-                     <li class="{% block menu_messages_class %}{% endblock %}">
-                    <a href="{% url 'dashboard:list-messages' %}"><i class='icon-phone'></i> Messages</a>
-                    </li>
-                      {% endif %}
+                   
                    {% if perms.sale.view_sale %}
                 <li><a href="#"><i class="icon-coins"></i> <span>{% trans "Customer Rewards" context "Dashboard discounts list" %}</span></a>
                   <ul>

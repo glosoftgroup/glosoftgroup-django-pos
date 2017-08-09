@@ -29,35 +29,35 @@ from . import decorators
 
 
 urlpatterns = [    
-	url(r'^', include(core_urls)),    
-	url(r'^account/', include(registration_urls)),
-	url(r'^accounts/', include(accounts_urls, namespace='accounts')),
-	url(r'^api/cash/', include(api_cash_urls, namespace='cash-api')),
-	url(r'^api/products/', include(api_urls, namespace='product-api')),
-	url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),
-	url(r'^cart/', include(cart_urls, namespace='cart')),
-	url(r'^checkout/', include(checkout_urls, namespace='checkout')),
-	url(r'^dashboard/', include(dashboard_urls, namespace='dashboard')),
-	url(r'^graphql', GraphQLView.as_view(graphiql=settings.DEBUG)),
-	url(r'^jsi18n/$', javascript_catalog, name='javascript-catalog'),
-	url(r'^notifications/$', include(notifications.urls, namespace='notifications')),
-	url(r'^order/', include(order_urls, namespace='order')),
-	url(r'^payment/$', include(payment_urls, namespace='payment')),
-	url(r'^products/', include(product_urls, namespace='product')),
-	url(r'^profile/', include(userprofile_urls, namespace='profile')),
-	url(r'^search/', include(search_urls, namespace='search')),
-	url(r'^feeds/', include(feed_urls, namespace='data_feeds')),
-	url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
-		name='django.contrib.sitemaps.views.sitemap'),
-	url(r'', include('payments.urls')),
-	url('', include('social_django.urls', namespace='social')),
-	#jwt post token code url
-	url(r'^api/auth/token/', obtain_jwt_token),
+    url(r'^', include(core_urls)),
+    url(r'^account/', include(registration_urls)),
+    url(r'^accounts/', include(accounts_urls, namespace='accounts')),
+    url(r'^api/cash/', include(api_cash_urls, namespace='cash-api')),
+    url(r'^api/products/', include(api_urls, namespace='product-api')),
+    url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),
+    url(r'^cart/', include(cart_urls, namespace='cart')),
+    url(r'^checkout/', include(checkout_urls, namespace='checkout')),
+    url(r'^dashboard/', include(dashboard_urls, namespace='dashboard')),
+    url(r'^graphql', GraphQLView.as_view(graphiql=settings.DEBUG)),
+    url(r'^jsi18n/$', javascript_catalog, name='javascript-catalog'),
+    url(r'^notifications/', include(notifications.urls, namespace='notifications')),
+    url(r'^order/', include(order_urls, namespace='order')),
+    url(r'^payment/', include(payment_urls, namespace='payment')),
+    url(r'^products/', include(product_urls, namespace='product')),
+    url(r'^profile/', include(userprofile_urls, namespace='profile')),
+    url(r'^search/', include(search_urls, namespace='search')),
+    url(r'^feeds/', include(feed_urls, namespace='data_feeds')),
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'),
+    url(r'', include('payments.urls')),
+    url('', include('social_django.urls', namespace='social')),
+    #jwt post token code url
+    url(r'^api/auth/token/', obtain_jwt_token),
 
 ]
 
 if settings.DEBUG:
-	# static files (images, css, javascript, etc.)
-	urlpatterns += [
-		url(r'^static/(?P<path>.*)$', serve)
-	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # static files (images, css, javascript, etc.)
+    urlpatterns += [
+        url(r'^static/(?P<path>.*)$', serve)
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -13,6 +13,8 @@ error_logger = logging.getLogger('error_logger')
 
 from django.contrib.auth import get_user_model
 from ...userprofile.models import User
+from ...supplier.models import Supplier
+from ...customer.models import Customer
 from notifications.signals import notify
 from notifications.models import Notification
 
@@ -103,18 +105,17 @@ def read(request, pk=None):
 @staff_member_required
 def write(request):
     if request.method == 'POST':
+        # get form data
         subject = request.POST.get('subject')
+        to_customers = request.POST.get('toCustomer',0)
+        to_suppliers = request.POST.get('toSupplier',0)
         email_list = json.loads(request.POST.get('emailList'))
         body = request.POST.get('body')
-        for email in email_list:
-        	user = User.objects.get(email=email['email'])
-        	print('--------')
-        	print('sending email to ')
-        	print(user.name)
-        	print '--------'
-        	notify.send(request.user, recipient=user, verb=subject,description=body)
+        # for email in email_list:
+        # 	user = User.objects.get(email=email['email'])        	
+        # 	notify.send(request.user, recipient=user, verb=subject,description=body)
 
-        # send emails
+        # send notification/emails
         for email in email_list:
             user = User.objects.get(email=email['email'])
             if user.send_mail:
@@ -128,6 +129,27 @@ def write(request):
             else:
                 notify.send(request.user, recipient=user, verb=subject, description=body)
 
+        # check for bulk group mailing/notification
+        if 1 == int(to_customers):
+            customers = Customer.objects.all()
+            for customer in customers:
+                context = {'user': customer.name, 'body': body, 'subject': subject}
+                emailit.api.send_mail(customer.email,
+                                      context,
+                                      'notification/emails/notification_email',
+                                      from_email=request.user.email)
+                notif = Notification(actor=request.user, recipient=customer, verb=subject, description=body, emailed=True)
+                notif.save()
+        if 1 == int(to_suppliers):
+            suppliers = Supplier.objects.all()
+            for supplier in suppliers:
+                context = {'user': supplier.name, 'body': body, 'subject': subject}
+                emailit.api.send_mail(supplier.email,
+                                      context,
+                                      'notification/emails/notification_email',
+                                      from_email=request.user.email)
+                notif = Notification(actor=request.user, recipient=supplier, verb=subject, description=body, emailed=True)
+                notif.save()
 
         HttpResponse(email_list)
 
