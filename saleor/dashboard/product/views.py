@@ -243,7 +243,10 @@ def search_class_list(request):
             sz = list_sz
 
         if q is not None:
-			queryset_list = ProductClass.objects.filter(name__icontains=q).prefetch_related(
+			queryset_list = ProductClass.objects.filter(
+				Q(name__icontains=q)|
+				Q(product_attributes__name__icontains=q)
+			).prefetch_related(
 				'product_attributes', 'variant_attributes').order_by('-id')
 			paginator = Paginator(queryset_list, 10)
 

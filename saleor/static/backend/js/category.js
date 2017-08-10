@@ -30,29 +30,33 @@ $(function() {
       }
    
   $('#modal_add_category_btn').on('click',function(){
-  $( "#category_field" ).empty().append( data );
-//  	var cat_description = $('#cat_description').val();
-//    var cat_name = $('#cat_name').val();
-//    var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
-//    if(!cat_name){
-//      notify('add a valid category');
-//      return false;
-//    }
-//
-//    // after validating category cat_name
-//    var url = $("#add-new-category").data('href');
-//    var modal = $("#add-new-category").attr('href');
-//    var posting = $.post( url, {
-//    					  name:cat_name,
-//    					  description:cat_description,
-//    					  csrfmiddlewaretoken:csrf_token,
-//    					});
-//    posting.done(function( data ) {
-//      $( "#category_field" ).empty().append( data );
-//      $(modal).modal('hide');
-//      notify('New category added successfully','bg-success');
-//    });
-  });
+        var cat_description = $('#cat_description').val();
+        var cat_name = $('#cat_name').val();
+        var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+        if(!cat_name){
+          notify('add a valid category');
+          return false;
+        }
 
+        // after validating category cat_name
+        var url = $("#add-new-category").data('href');
+        var modal = $("#add-new-category").attr('href');
+        var posting = $.post( url, {
+                              name:cat_name,
+                              description:cat_description,
+                              csrfmiddlewaretoken:csrf_token,
+                            });
+        posting.done(function( data ) {
+//          $( "#category_field" ).empty().append( data );
+          $( "#category_field" ).replaceWith( data );
+          $('.new_ajax').multiselect({
+              onChange: function() {
+                  $.uniform.update();
+              }
+          });
+          $(modal).modal('hide');
+          notify('New category added successfully','bg-success');
+        });
+  });
   
 });

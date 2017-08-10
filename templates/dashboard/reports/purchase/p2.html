@@ -1,0 +1,125 @@
+{% load staticfiles %}
+{% if purchases %}
+      <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table  datatable-header-footer">
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr class="bg-primary">
+                          <th>Transaction Date</th>
+                          <!--<th>Receipt No</th>-->
+                          <th>Supplier Name <span style="font-size: 0.9em;">(contact)</span></th>
+                          <th>Item Name</th>
+                          <th>Unit Cost</th>
+                          <th>Quantity (unit)</th>
+                          <th>Total Purchase</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tb">
+                      {% for purchase in purchases %}
+                      <tr>
+                          <td> {{purchase.created}}</td>
+                          <!--<td>{{purchase.invoice_number}}</td>-->
+                          <td>{{purchase.supplier}}</td>
+                          <td>{{purchase.stock.variant.display_product}}</td>
+                          <td>{{purchase.stock.variant.get_price_per_item.gross}}</td>
+                          <td>{{purchase.quantity}}</td>
+                          <td>{{purchase.get_total_cost}}</td>
+                      </tr>
+                      {% endfor %}
+                      </tbody>
+
+                 </table>
+        </div>
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+          </div>
+        </div>
+         <div class="row">
+             <div class="col-md-10 col-md-offset-1">
+                 <p class="text-center" style="margin: 20px 0px;">
+                   Total Purchases: Kshs {{ all_purchases}}<br />
+                 </p>
+                  <p class="text-center"> Thank you for partnering with us.<br />
+                  <span>Report pullled by
+                      {% if request.user.name %}
+                        {{request.user.name}}
+                      {% else %}
+                      {{ request.user.email}}
+                      {% endif %}
+                  </span></p>
+
+              </div>
+          </div>
+      </div>
+    </div>
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+
+       $(".td").click(function(){
+          window.location = $(this).data("href");
+      });
+
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            leaps: true,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:purchase_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                      console.log('without gid '+data);
+                    });
+                }else{
+                    if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
+                        $.get("{% url 'dashboard:purchase_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('action is '+'{{gid}}');
+                    }else{
+                        $.get("{% url 'dashboard:purchase_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('date is'+gid);
+                    }
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+
+   });
+ </script>
+{% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+       No purchases reports available {% if date %} for {{date}} {% endif %}
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}

@@ -9,7 +9,9 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:product-class-list' %}">Sub Categories</a></li>
+     <li><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+     <li><a href="{% url 'dashboard:category-list' %}">Categories</a></li>
+     <li class="active"><a href="{% url 'dashboard:cat-subcategories' pk=cat_pk %}">{{subcategory_name|title}}</a></li>
  {% endblock %}
 
 {% block menu_product_classes_class %}active{% endblock %}
@@ -70,7 +72,7 @@
         </div>
       </div>
    </div>
-  {% if classes %}
+  {% if product_classes %}
   <div class="col-md-12">
    <div id="pagination-div">
       <!-- Header and footer fixed -->
@@ -87,7 +89,7 @@
                   </tr>
                 </thead>
                 <tbody id="tb">
-                {% for pk, name, has_variants, product_attributes, variant_attributes in classes %}
+                {% for pk, name, has_variants, product_attributes, variant_attributes in product_classes %}
                     <tr>
                       <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">#{{ forloop.counter }}</td>
                       <!-- name -->
@@ -198,7 +200,7 @@ $(document).ready(function() {
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
         if(ts != '0'){
-            $.ajax({ url: "{% url 'dashboard:paginate-class-list' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+            $.ajax({ url: "{% url 'dashboard:cat-subcategories-paginate' %}",type: 'GET',data: {page:1, size:ts, cat_pk:'{{cat_pk}}'}, async:false,success: function(data){
                   $('#pagination-div').html(data);
             }});
         }
@@ -220,7 +222,7 @@ $(document).ready(function() {
         firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+{{totalp}}); // or some ajax content loading...
-            $.get("{% url 'dashboard:paginate-class-list' %}",{page:num},function(data){
+            $.get("{% url 'dashboard:cat-subcategories-paginate' %}",{page:num, cat_pk:'{{cat_pk}}'},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm')
@@ -236,8 +238,8 @@ $(document).ready(function() {
       $('.search_user').keyup(function() {
         var search_text = $(this).val();
         delay(function(){
-           var url = "{% url 'dashboard:search-class-list' %}";
-           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, },success: function(data){
+           var url = "{% url 'dashboard:search-category-subcategories' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, cat_pk:'{{cat_pk}}'},success: function(data){
                   $('#pagination-div').html(data);
            }});
         }, 500 );

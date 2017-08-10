@@ -5,7 +5,7 @@
 {% load prices_i18n %}
 
 {% block title %}
-  Sales Report
+  Purchases Report
 {% endblock %}
 {% block breadcrumbs %}
      <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
@@ -23,42 +23,55 @@
 
 {% block content %}
 <div class="row animated fadeIn">
- <div class="col-md-12">
-      <div class="panel panel-flat">      
+    <div class="panel panel-flat">
+
         <div class="panel-body search-panel">
             <div class="col-md-6">
-                     <label>Search Sales (for date format: yyyy-mm-dd)</label>
-                      <div class="form-group form-group-material has-feedback">
-                        <input class="form-control search_purchase" placeholder="Search details" type="text">
-                        <div class="form-control-feedback">
-                          <i class="icon-search4 text-size-base"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <label>select single date</label>
-                      <div class="form-group">
-                        <div class="input-group">
-                          <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                          <input class="form-control daterange-single" type="text">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                     <label>Export</label>
-                      <div class="form-group">
-                         <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
-                            <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
-                            <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                            <option value="excel" data-icon="fa-file-excel-o">export excel</option>
-                          </select>
-                      </div>
-                    </div>
-        </div>
+             <label>Search Purchases (for date format: yyyy-mm-dd)</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_purchase" placeholder="Search details" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2">
+              <label>pick a date</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control daterange-single" type="text">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
+                  </select>
+              </div>
+            </div>
       </div>
- </div>
+   </div>
+
 {% if purchases %}
 <div class="col-md-12">
+  <div id="pagination-div">
     <div class="panel panel-flat">
       <div class="panel-body">
         <div class="row">
@@ -66,21 +79,21 @@
             <div class="table-responsives">     
                 <table class="table  datatable-header-footer">
                       <thead style="border-top:1px solid #ddd;">
-                        <tr>
+                        <tr class="bg-primary">
                           <th>Transaction Date</th>
-                          <th>Receipt No</th>
+                          <!--<th>Receipt No</th>-->
                           <th>Supplier Name <span style="font-size: 0.9em;">(contact)</span></th>
                           <th>Item Name</th>
                           <th>Unit Cost</th>
                           <th>Quantity (unit)</th>
-                          <th>Total Sales</th>
+                          <th>Total Purchase</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
                       {% for purchase in purchases %}
                       <tr>
                           <td> {{purchase.created}}</td>
-                          <td>{{purchase.invoice_number}}</td>
+                          <!--<td>{{purchase.invoice_number}}</td>-->
                           <td>{{purchase.supplier}}</td>
                           <td>{{purchase.stock.variant.display_product}}</td>
                           <td>{{purchase.stock.variant.get_price_per_item.gross}}</td>
@@ -88,43 +101,46 @@
                           <td>{{purchase.get_total_cost}}</td>
                       </tr>
                       {% endfor %}
-                        <tr>
-                          <td>23/05/17 11:89</td>
-                          <td>123456</td>
-                          <td>Kingshop Suppliers <span style="font-size: 0.9em;">(0728000000)</span></td>
-                          <td>Unga</td>
-                          <td>Kshs. 300</td>
-                          <td>4 packets</td>
-                          <td>Ksh. 1200</td>
-                        </tr>
-                         <!-- <tr><td colspan="6"><h2 class="text-center">no groups available</h2></td></tr> -->
-                        </tbody>
+                      </tbody>
 
                  </table>
+              </div>
+              <div class="my-paginate">
+                <div class="text-center bootpag-callback" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav">Page 1 of {{totalp}}</div>
+                </div>
+                <input type="hidden" id="page_size" val="">
               </div>
              </div>
             </div>
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Total Sales: Kshs 1200<br />
-                   Total Tax: Kshs 200
+                   Total Purchases: Kshs {{ all_purchases}}<br />
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
+                  <span>Report pullled by
+                      {% if request.user.name %}
+                        {{request.user.name}}
+                      {% else %}
+                      {{ request.user.email}}
+                      {% endif %}
+                  </span></p>
                   
               </div>
              </div>
             </div>
     </div>
   </div>
+</div>
 
-     {% else %}
+{% else %}
   <div class="col-md-12 animated fadeIn ">
    <div class="panel bg-danger-600">
      <div class="panel-body">
        <div style="text-align: center;font-size:16px;">
-       No purchases recorded
+       No purchases reports available
        </div>
       </div>
     </div>
@@ -142,7 +158,48 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/html2canvas.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-    $('.export-sz').selectpicker({
+
+    var pagination_totalsize;
+    var status;
+    //**@ get
+    /*$.ajax({ url: "{% url 'dashboard:sales_list' %}",type: 'GET',data: {initial:'initial'},
+        async:false,success: function(data){
+         pagination_totalsize = data;
+    }});*/
+
+     $('.bootpag-callback').bootpag({
+        total: parseInt({{totalp}}),
+        maxVisible: 3,
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
+            $.get("{% url 'dashboard:purchase_paginate' %}",{page:parseInt(num)},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+    });
+
+   $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
           pdfIcon:'fa-file-pdf-o',
@@ -151,14 +208,17 @@ $(document).ready(function(){
            //var svalue = $(this).val();
     });
 
-    $('.daterange-single').daterangepicker({
-        singleDatePicker: true,
-        locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true
-    }).on('change',function(){
-    });
+    //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
 
-        var delay = (function(){
+
+
+    var delay = (function(){
     var timer = 0;
     return function(callback, ms){
         clearTimeout (timer);
@@ -169,13 +229,14 @@ $(document).ready(function(){
     $('.search_purchase').keyup(function() {
       var search_text = $(this).val();
       delay(function(){
-         //var url = "{% url 'dashboard:sales_search' %}";
-         //$.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
-              //  $('#pagination-div').html(data);
-        // }});
+         var url = "{% url 'dashboard:purchase_search' %}";
+         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                $('#pagination-div').html(data);
+         }});
       }, 500 );
 
     });
+
 
 });
 
