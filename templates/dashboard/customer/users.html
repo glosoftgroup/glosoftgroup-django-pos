@@ -65,88 +65,86 @@
         </div>
       </div>
    </div>
-  <div class="col-md-12">  
-    
+
+ {% if users %}
+  <div class="col-md-12">
       <!-- Header and footer fixed -->
       <div class="panel panel-flat">
-        <div class="panel-heading">        
-       
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
+          <div class="panel-body">
+            <div class="table-responsives">
+              <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
+                    <thead>
+                      <tr class="bg-primary">
+                        <th>Id</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Sales</th>
+                        <th>Loyalty Points</th>
+                        {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                        <th class="text-center">Actions</th>
+                        {% endif %}
+                      </tr>
+                    </thead>
+
+                    <tbody id="tb">
+                      {% for user in users%}
+                      <tr class='clickable-row' id="{{user.pk }}">
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                        <!-- image -->
+                       <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
+                       {% if user.image %}
+                          <img src="{{user.image.url }}" alt="" class="circle teal img-responsive img-circle" style="width: 40px;height: 40px;"/>
+                       {% else %}
+                          <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
+                       {% endif %}
+                         <!-- product name -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.name}}</td>
+                        <!-- product category -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.email}}
+                        </td>
+                        <td>{{ user.get_sales }}</td>
+                        <!-- loyalty points -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
+                        {{ user.loyalty_points }}
+                        </td>
+                        <!-- actions -->
+                        <td class="text-center">
+                          <ul class="icons-list">
+                           {% if perms.userprofile.change_user %}
+                            <li><a href="{% url 'dashboard:customer-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
+                            {% endif %}
+                             {% if perms.userprofile.delete_user %}
+                            <li>
+                              <a data-ta="#modal_instance" data-title="Delete Customer {{ user.name }} ?" data-href="{% url 'dashboard:customer-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                             class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                             </a>
+                            </li>
+                            {% endif %}
+                          </ul>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                      </tbody>
+
+               </table>
+
+            </div>
           </div>
-        </div>
-        <div class="table-responsive">
-         
-
-          <table class="table table-striped table-hover fixed_headers">
-           
-                <thead style="border-top:1px solid #ddd;">
-                  <tr class="bg-primary">
-                    <th>Id</th>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Sales</th>
-                    <th>Loyalty Points</th>
-                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
-                    <th class="text-center">Actions</th>
-                    {% endif %}
-                  </tr>
-                </thead>
-                
-                <tbody id="tb">           
-               {% if users %}
-                  {% for user in users%}
-                  <tr class='clickable-row' id="{{user.pk }}">
-                    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
-                    <!-- image -->
-                   <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
-                   {% if user.image %}
-                      <img src="{{user.image.url }}" alt="" class="circle teal img-responsive img-circle" style="width: 40px;height: 40px;"/>
-                   {% else %}
-                      <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
-                   {% endif %}
-                     <!-- product name -->
-                    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.name}}</td>
-                    <!-- product category -->
-                    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.email}}
-                    </td>
-                    <td>{{ user.get_sales }}</td>
-                    <!-- loyalty points -->
-                    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}"> 
-                    {{ user.loyalty_points }}
-                    </td>
-                    <!-- actions -->
-                    <td class="text-center">
-                      <ul class="icons-list">
-                       {% if perms.userprofile.change_user %}
-                        <li><a href="{% url 'dashboard:customer-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
-                        {% endif %}
-                         {% if perms.userprofile.delete_user %}
-                        <li>
-                          <a data-ta="#modal_instance" data-title="Delete Customer {{ user.name }} ?" data-href="{% url 'dashboard:customer-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
-                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
-                         </a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
-               {% endif %}
-                  </tbody>
-
-           </table>
-
-        </div>
       </div>
  
   </div>
+      {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No  Customers available
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
 </div>
 
 <!-- Blue modal -->

@@ -9,14 +9,13 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
      <li class="active"><a href="{% url 'dashboard:category-list' %}">Categories</a></li>
  {% endblock %}
 
 {% block menu_categories_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
-     .clickable-row td.td{
+     .td{
       cursor: pointer;
      }
      tr.nb td{border:0px;}
@@ -84,27 +83,23 @@
                     <th>Name</th>
                     <th>Description</th>
                     <th>Products</th>
-                    <th>Options</th>
+                    <th class="text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
                 {% for node in categories %}
                    <tr>
                    <!-- ## -->
-                    <td
-                    class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+                    <td class="td" data-href="{% url 'dashboard:cat-subcategories' pk=node.pk %}"
                     >{{ node.pk }}</td>
                     <!-- name -->
-                    <td
-                    class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+                    <td class="td" data-href="{% url 'dashboard:cat-subcategories' pk=node.pk %}"
                     >{{ node.name }}</td>
                     <!-- description\ -->
-                    <td
-                    class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+                    <td class="td" data-href="{% url 'dashboard:cat-subcategories' pk=node.pk %}"
                     >{{ node.description|slice:":60" }}...</td>
                     <!-- products count-->
-                    <td
-                    class="td" data-href="{% url 'dashboard:category-list' root_pk=node.pk %}"
+                    <td class="td" data-href="{% url 'dashboard:cat-subcategories' pk=node.pk %}"
                     >
                       <span class="badge bg-indigo">
                         {{ node.get_product_num }}
@@ -175,7 +170,10 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-
+  $('body').on('click', '.td', function(){
+    var url = $(this).data('href');
+    window.location = url;
+  });
   //** view product modal
   $( "body").on('click', '.modal-trigger-ajax', function() {
 

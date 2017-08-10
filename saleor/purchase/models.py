@@ -63,13 +63,15 @@ class PurchaseProduct(models.Model):
 		return str(self.variant)+' '+str(self.stock)
 
 	def get_total_cost(self):
-		if self.cost_price:
-			return self.cost_price.gross * self.quantity
-		return None
+		if not self.cost_price:
+			# return self.cost_price.gross * self.quantity
+			return self.stock.variant.get_price_per_item().gross * self.quantity
+		return 0
 
 	def get_cost_price(self):
 		if not self.cost_price:
-			return self.stock.cost_price
+			# return self.stock.cost_price
+			return self.stock.variant.get_price_per_item().gross
 		return self.cost_price
 
 @python_2_unicode_compatible

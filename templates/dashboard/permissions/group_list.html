@@ -74,7 +74,7 @@
                     <th>Id</th>
                     <th>Group Name</th>
                     {% if perms.auth.change_group or perms.auth.delete_group %}
-                    <th class="text-center">Options</th>
+                    <th class="text-center">Actions</th>
                     {% endif %}
                   </tr>
                 </thead>
@@ -442,7 +442,7 @@ $('#add_user_btn').on('click', function(e){
 
     var table_body = $('#group_user_table tbody');
     var parent = table_body.parent();
-    
+
     table_body.detach().empty().each(function(i, val){
         for (var x = 0; x < remove_duplicates(names).length; x++){
             $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');

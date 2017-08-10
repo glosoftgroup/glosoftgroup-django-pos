@@ -1,6 +1,6 @@
 {% load static %}
-<div class="col-md-12" id='category_field'>              
-  <div class="multi-select-full">   
+<div class="col-md-12" id='category_field'>
+  <div class="multi-select-full new_ajaxs">
     {{ product_form.categories }}
   </div>                         
 </div>
@@ -13,11 +13,14 @@
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
     });
-    $('#id_categories').multiselect({
-        onChange: function() {
-            $.uniform.update();
-        }
-    });
+
+    /*$('#category_field').load(function(){
+      $('.multi-select-full').multiselect({
+          onChange: function() {
+              $.uniform.update();
+          }
+      });
+    });*/
 
     // Basic select
     //$('.bootstrap-select').selectpicker();

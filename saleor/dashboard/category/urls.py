@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . import views
+from . import views, subcategories
 
 urlpatterns = [
     url(r'^$',
@@ -24,6 +24,11 @@ urlpatterns = [
         views.category_edit, name='category-edit'),
     url(r'^(?P<pk>[0-9]+)/delete/$',
         views.category_delete, name='category-delete'),
-    url(r'search/$',
-        views.search_category, name='search-category')
+
+    url(r'^subcats/(?P<pk>[0-9]+)/$',
+        subcategories.view, name='cat-subcategories'),
+    url(r'subcats/paginate/$',
+        subcategories.paginate, name='cat-subcategories-paginate'),
+    url(r'subcats/search/$',
+        subcategories.search, name='search-category-subcategories'),
 ]

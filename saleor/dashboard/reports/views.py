@@ -422,24 +422,6 @@ def products_reorder_search(request):
 			return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 @staff_member_required
-@permission_decorator('reports.view_purchase_reports')
-def purchases_reports(request):
-	get_date = request.GET.get('date')
-	if get_date:
-		date = get_date
-	else:
-		try:
-			last_purchase =  PurchaseProduct.objects.latest('id')
-			date = DateFormat(last_purchase.created).format('Y-m-d')
-		except:
-			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
-	try:
-		purchases = PurchaseProduct.objects.all().order_by('id')
-		return TemplateResponse(request, 'dashboard/reports/purchase/purchases.html', {'purchases':purchases})
-	except ObjectDoesNotExist as e :
-		error_logger.error(e)
-
-@staff_member_required
 @permission_decorator('reports.view_balancesheet')
 def balancesheet_reports(request):
 	get_date = request.GET.get('date')

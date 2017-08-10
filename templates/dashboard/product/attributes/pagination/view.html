@@ -9,7 +9,6 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
      <li class="active"><a href="{% url 'dashboard:product-attributes' %}">Products Attributes</a></li>
  {% endblock %}
 
@@ -83,7 +82,7 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>Value</th>
-                    <th class="text-center">Options</th>
+                    <th class="text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="tb">

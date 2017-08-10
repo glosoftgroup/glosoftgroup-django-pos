@@ -12,23 +12,14 @@
     <tr>
     <!-- product name/sku -->    
   <td>
-    <div class="media-left media-middle">
-      <a href="#">#</a>
-    </div>
     <div class="media-left">
       <div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibold"> {{ variant.display_product }} </a></div>
-      <div class="text-muted text-size-small">  {{ variant.sku }}
-      <span class="label label-success">
-        <a href="#modal_instance" class="text-white modal-trigger-ajax" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
-        History
-        </a>
-      </span>
-      </div>
+      <div class="text-muted text-size-small">  {{ variant.sku }} </div>
     </div>
   </td>
   
   <!-- Retail price -->
-  <td>
+  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
   <h6 class="text-semibold">
   {% if variant.get_price_per_item %}
    {% gross variant.get_price_per_item html=True %}
@@ -37,7 +28,7 @@
   </td>
   
   <!--current stock quantity -->
-  <td>  
+  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
     <span class="old_value{{ variant.get_stock_pk }}" data-quantity="{{ variant.get_stock_quantity }}"
     data-href="{% url 'dashboard:add_stock_ajax' %}">
     {{ variant.get_stock_quantity }}  
@@ -54,7 +45,7 @@
   {% endif %}   
   </td>
   <!-- product tax -->
-  <td>
+  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
   <span class="text-warning">
   {% if variant.product.get_product_tax %}
   {{ variant.product.get_product_tax }}
@@ -149,7 +140,7 @@
     
    });
 </script>
-<script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+
  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
 
 
