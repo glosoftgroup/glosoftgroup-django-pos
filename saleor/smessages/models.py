@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django import get_version
+from decimal import Decimal
 from django.utils import timezone
 
 from distutils.version import StrictVersion
@@ -139,9 +140,11 @@ class SMessagesQuerySet(models.query.QuerySet):
 class SMessage(models.Model):
    
     LEVELS = Choices('success', 'info', 'warning', 'error')
+    TO = Choices('supplier', 'customer', 'user', 'anonymous')
     note = models.CharField(max_length=255, blank=True, null=True)
     level = models.CharField(choices=LEVELS, default=LEVELS.info, max_length=20)
-
+    to = models.CharField(choices=TO, default=TO.anonymous, max_length=20)
+    sent_to = models.IntegerField(default=Decimal(0))
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, blank=False, related_name='smessages')
     unread = models.BooleanField(default=True, blank=False)
 

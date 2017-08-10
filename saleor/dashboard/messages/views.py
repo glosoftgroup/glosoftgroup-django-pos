@@ -5,8 +5,8 @@ from django.http import HttpResponse
 from ..views import staff_member_required
 from ...decorators import permission_decorator, user_trail
 import logging
-from django.http import JsonResponse
 import json
+from django.db.models import Q
 
 
 debug_logger = logging.getLogger('debug_logger')
@@ -109,52 +109,25 @@ def write(request):
     if request.method == 'POST':
         # get form data
         subject = request.POST.get('subject')
-        to_customers = request.POST.get('toCustomer',0)
-        to_suppliers = request.POST.get('toSupplier',0)
-        email_list = json.loads(request.POST.get('emailList'))
+        to_customers = request.POST.get('toCustomers',0)
+        to_suppliers = request.POST.get('toSuppliers',0)
+        user_contacts = json.loads(request.POST.get('userContacts'))
         body = request.POST.get('body')
-        # for email in email_list:
-        # 	user = User.objects.get(email=email['email'])
-        # 	notify.send(request.user, recipient=user, verb=subject,description=body)
-
-        # send notification/emails
-        for email in email_list:
-            user = User.objects.get(email=email['email'])
-            if user.send_mail:
-                context = {'user': user.name, 'body': body, 'subject': subject}
-                emailit.api.send_mail(user.email,
-                                      context,
-                                      'notification/emails/notification_email',
-                                      from_email=request.user.email)
-                notif = Notification(actor=request.user, recipient=user, verb=subject, description=body, emailed=True)
+        print user_contacts
+        print type(to_customers)
+        print to_suppliers
+        if user_contacts and user_contacts is not 'null':
+            for mobile in user_contacts:
+                user = User.objects.get(mobile=mobile)
+                #notify.send(request.user, sent_to=user, verb=subject, description=body)
+                notif = Notification(to='user', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
                 notif.save()
-            else:
-                notify.send(request.user, recipient=user, verb=subject, description=body)
-
-        # check for bulk group mailing/notification
-        if 1 == int(to_customers):
-            customers = Customer.objects.all()
-            for customer in customers:
-                context = {'user': customer.name, 'body': body, 'subject': subject}
-                emailit.api.send_mail(customer.email,
-                                      context,
-                                      'notification/emails/notification_email',
-                                      from_email=request.user.email)
-                notif = Notification(actor=request.user, recipient=customer, verb=subject, description=body, emailed=True)
+        if not to_customers:
+            for mobile in to_customers:
+                user = Customer.objects.get(mobile=mobile)
+                #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
+                notif = Notification(to='customer', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
                 notif.save()
-        if 1 == int(to_suppliers):
-            suppliers = Supplier.objects.all()
-            for supplier in suppliers:
-                context = {'user': supplier.name, 'body': body, 'subject': subject}
-                emailit.api.send_mail(supplier.email,
-                                      context,
-                                      'notification/emails/notification_email',
-                                      from_email=request.user.email)
-                notif = Notification(actor=request.user, recipient=supplier, verb=subject, description=body, emailed=True)
-                notif.save()
-
-        HttpResponse(email_list)
-
 
     ctx = {'users':User.objects.all().order_by('-id')}
     return TemplateResponse(request,
@@ -163,10 +136,33 @@ def write(request):
 
 
 def contacts(request):
-    users = User.objects.all().exclude(mobile=None)
+    search = request.GET.get('search')
+    group = request.GET.get('group')
+    if 'users' == str(group):
+        users = User.objects.all().filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+        ).exclude(mobile=None)
+    elif 'suppliers' == str(group):
+        users = Supplier.objects.all().filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+        ).exclude(mobile=None)
+    elif 'customers' == str(group):
+        users = Customer.objects.all().filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+        ).exclude(mobile=None)
+    else:
+        users = User.objects.all().filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+        ).exclude(mobile=None)
+
     contact = {}
+    l = []
     for user in users:
         # {"text": "Afghanistan", "value": "AF"},
-        contact['text']= user.name
-        contact['value'] = user.mobile
-    return JsonResponse(contact)
+        contact={'text':user.name,'value': user.mobile}
+        l.append(contact)
+    return HttpResponse(json.dumps(l), content_type='application/json')

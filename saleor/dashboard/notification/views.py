@@ -111,9 +111,6 @@ def write(request):
         to_suppliers = request.POST.get('toSupplier',0)
         email_list = json.loads(request.POST.get('emailList'))
         body = request.POST.get('body')
-        # for email in email_list:
-        # 	user = User.objects.get(email=email['email'])        	
-        # 	notify.send(request.user, recipient=user, verb=subject,description=body)
 
         # send notification/emails
         for email in email_list:

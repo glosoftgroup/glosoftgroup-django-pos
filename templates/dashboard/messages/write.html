@@ -36,7 +36,7 @@
 
 <!-- Mail toolbar -->
 <div class="panel-toolbar panel-toolbar-inbox">
-    <div class="navbar navbar-default">
+    <div class="navbar navbar-default" style="z-index: 8;">
         <ul class="nav navbar-nav visible-xs-block no-border">
             <li>
                 <a class="text-center collapsed" data-toggle="collapse" data-target="#inbox-toolbar-toggle-single">
@@ -47,7 +47,7 @@
 
         <div class="navbar-collapse collapse" id="inbox-toolbar-toggle-single">
             <div class="btn-group navbar-btn">
-                <button type="button" id="sendnot" class="btn bg-blue"><i class="icon-checkmark3 position-left"></i> Send mail</button>
+                <button type="button" id="sendSms" class="btn bg-blue hvr-bob"><i class="icon-checkmark3 position-left"></i> Send SMS</button>
             </div>
 
             <div class="btn-group navbar-btn">
@@ -76,19 +76,19 @@
                 <td style="width: 50px">To:</td>
                 <td style="width: 100%" class="text-left">
                 <div class="col-md-6">
-                    <select name='contacts' id="contacts" class="contacts"></select>
+                    <select name='contacts' multiple="multiple" id="contacts" class="contacts"></select>
                 </div>
                 <div class="col-md-6">
                     <div class="formgroup">
-                        <label class="display-block text-semibold">  Group email notification </label>
+                        <label class="checkbox-inline text-semibold">Select Group</label>
                         <label class="checkbox-inline">
-                            <input id="supplier" name="supplier" type="checkbox" class="styled">
-                            Supplier
+                            <button id="supplier" data-toggle="modal" data-target="#supplierModal" class="btn btn-xs hvr-bob btn-primary">
+                            <span class="badge badge-success" id="supplierCount"></span>&nbsp; Supplier</button>
                         </label>
 
                         <label class="checkbox-inline">
-                            <input id="customers" name="customers" type="checkbox" class="styled">
-                            Customers
+                            <button id="customer" data-toggle="modal" data-target="#customerModal" class="btn btn-xs btn-primary hvr-bob"><span class="badge badge-success" id="customerCount"></span>
+                            Customers</button>
                         </label>
                     </div>
                 </div>
@@ -134,7 +134,45 @@
     </div>
 </div>
 
-
+<!-- initailize modals -->
+<!-- supplier modal -->
+<div class="modal fade" id="supplierModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Select Suppliers</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label class="text-purple-800">Supplier(s)</label>
+                        <select class="getSupplier" multiple></select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        
+                    </div>
+                </div>
+            </div>
+</div>
+<!-- customer modal -->
+<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Select Customers</h4>
+            </div>
+            <div class="modal-body">
+                <label>Customer(s)</label>
+                <select class="getCustomer" multiple='multiple'></select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 {% block custom_js %}
@@ -153,33 +191,117 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
 
 <script>
+
 var url = "{% url 'dashboard:message-contacts' %}";
-$('.contacts').tokenize2({ dataSource:url});
-var emails = [
-    {% for user in users %}
-    {% if user.mobile %}'{{user.mobile}}',{% endif %}
-    {% endfor %}
-    ];
-$(document).ready(function(){     
+var sendSms = $('#sendSms');
+var getCustomer = $('.getCustomer');
+var getSupplier = $('.getSupplier');
+var userContacts = $('.contacts');
+var subject = $('#subject');
+var body = $('#body');
+var customerCount = $('#customerCount');
+var supplierCount = $('#supplierCount');
+
+// customer contacts
+getCustomer.tokenize2({
+    placeholder: 'Select customer(s)',
+    dataSource: function(search, object){
+        $.ajax(url, {
+            data: { search: search, start: 1,group:'customers' },
+            dataType: 'json',
+            success: function(data){
+                var $items = [];
+                $.each(data, function(k, v){
+                    $items.push(v);
+                });
+                object.trigger('tokenize:dropdown:fill', [$items]);
+            }
+        });
+    }
+});
+// supplier contacts
+getSupplier.tokenize2({
+    placeholder: 'Select supplier(s)',
+    dataSource: function(search, object){
+        $.ajax(url, {
+            data: { search: search, start: 1,group:'suppliers' },
+            dataType: 'json',
+            success: function(data){
+                var $items = [];
+                $.each(data, function(k, v){
+                    $items.push(v);
+                });
+                object.trigger('tokenize:dropdown:fill', [$items]);
+            }
+        });
+    }
+});
+
+// user contacts
+userContacts.tokenize2({
+    placeholder: 'Select user(s)',
+    sortable: true,
+    dataSource: function(search, object){
+        $.ajax(url, {
+            data: { search: search, start: 1, group:'users' },
+            dataType: 'json',
+            success: function(data){
+                var $items = [];
+                $.each(data, function(k, v){
+                    $items.push(v);
+                });
+                object.trigger('tokenize:dropdown:fill', [$items]);
+            }
+        });
+    }
+});
+
+// tokenize events
+$('#customerModal').on('hidden.bs.modal', function () {
+    customerCount.text(getCustomer.val().length);
+});
+$('#supplierModal').on('hidden.bs.modal', function () {
+    supplierCount.text(getSupplier.val().length);
+});
+
+
+
 
 // ajax
-function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
+function sendNotification(userContacts,subject,body,toCustomers,toSuppliers) {
     var dynamicData = {};
     console.log('sending data.....');
-    dynamicData["emailList"] = JSON.stringify(emailList);
+    dynamicData["userContacts"] = JSON.stringify(userContacts);
     dynamicData["subject"] = subject;
     dynamicData["body"] = body;
     dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
-    dynamicData['toCustomers'];
-    dynamicData['toSuppliers'];
-
+    dynamicData['toCustomers']= JSON.stringify(toCustomers);
+    dynamicData['toSuppliers']= JSON.stringify(toSuppliers);
     return $.ajax({
-      url: "{% url 'dashboard:write' %}",
+      url: "{% url 'dashboard:compose_message' %}",
       type: "post",
       data: dynamicData
     });
   }
+  // ./ end sendSms functions
+// listen to sendsms click
+sendSms.on('click',function(){   
+    var ucontacts = userContacts.val();
+    var scontacts = getSupplier.val();
+    var ccontacts = getCustomer.val();    
+    var what = body.val();
+    var verb = subject.val();
+    if(!ccontacts){ ccontacts = false; }
+    if(!scontacts){ scontacts = false; }    
+    sendNotification(ucontacts,verb,what,ccontacts,scontacts).done(function(data) {
+        $.jGrowl('Notification sent successfully', 
+        {header: 'Well done!',theme: 'bg-success'});
+    });
+});
+// ./ event click send button
 
+var emails = [];
+$(document).ready(function(){ 
 
 });
 
