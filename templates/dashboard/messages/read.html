@@ -5,15 +5,15 @@
 
 
 {% block title %}
-  {% trans "Notifications " context "Dashboard customers list" %} - {{ block.super }}
+  {% trans "Messages " context "Dashboard customers list" %} - {{ block.super }}
 {% endblock %}
 
 
-{% block menu_notification_class %}active{% endblock %}
+{% block menu_messages_class %}active{% endblock %}
 
 {% block breadcrumbs %}
     <li>
-    	<a href="{% url 'dashboard:notification_list' %}">Notifications</a>
+    	<a href="{% url 'dashboard:notification_list' %}">Messages</a>
     </li>
     <li class="active">
       {{notification.verb}}

@@ -18,8 +18,25 @@ from ...userprofile.models import User
 from ...supplier.models import Supplier
 from ...customer.models import Customer
 from ...smessages.signals import sms as notify
-from ...smessages.models import SMessage as Notification
+from ...smessages.models import SMessage as Notification, SmsTemplate
 
+@staff_member_required
+def get_template(request):
+    if request.method == 'GET':
+        sms_templates = SmsTemplate.objects.all()
+        ctx = {'sms_templates':sms_templates}
+        return TemplateResponse(request, 'dashboard/messages/includes/temp.html', ctx)
+@staff_member_required
+def add_template(request):
+    if request.method == 'POST':
+        t_name = request.POST.get('tname')
+        t_content = request.POST.get('tcontent','')
+        # print template_content
+        # print template_name
+        temp = SmsTemplate(name=t_name,content=t_content)
+        temp.save()
+        return HttpResponse(temp)
+    return HttpResponse('success')
 @staff_member_required
 def list_messages(request,status=None):
     # read users messages

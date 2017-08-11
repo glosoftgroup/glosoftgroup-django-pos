@@ -5,16 +5,16 @@
 
 
 {% block title %}
-  {% trans "Notifications " context "Dashboard customers list" %} - {{ block.super }}
+  {% trans "Messages " context "Dashboard customers list" %} - {{ block.super }}
 {% endblock %}
 
 
-{% block menu_notification_class %}active{% endblock %}
+{% block menu_messages_class %}active{% endblock %}
 
 {% block breadcrumbs %}
     <li>
-        <a href="{% url 'dashboard:notification_list' %}">
-            Notification
+        <a href="{% url 'dashboard:message_list' %}">
+            Messages
         </a>
     </li>
 
@@ -26,6 +26,8 @@
 
 {% block custom_css %}
 <link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'backend/js/plugins/editors/summernote/summernote.css' %}" rel="stylesheet" type="text/css">
+
 {% endblock %}
 {% block content %}
 <div id="write-message"></div>
@@ -97,7 +99,7 @@
 
                     </ul>
                 </td>
-                <td></td>
+                <!-- <td></td> -->
             </tr>
             <tr>
                 <td>Subject:</td>
@@ -114,8 +116,53 @@
 
 <!-- Mail container -->
 <div class="mail-container-write">
-    <div >
-        <textarea cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ..."></textarea>
+<div class="panel-group content-group-lg" id="accordion1">
+    <div class="panel panel-white">
+        <div class="panel-heading">
+            <h6 class="panel-title">
+                <a data-toggle="collapse" id="toggle-template" data-parent="#accordion1" href="#accordion-group1" class="text-semibold"><i class='toggleme icon-touch'></i>&nbsp;&nbsp;Select Template</a>
+            </h6>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                  <li id="add-template">
+                  <a href="#newTemplateModal" data-toggle="modal" data-target="#newTemplateModal" class="btn btn-xs btn-primary text-white" >Add New</a>
+                  </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div id="accordion-group1" class="panel-collapse collapse out bg-grey-300">
+            <div class="row p-15">
+              <div class="col-md-12">
+                <div class="col-sm-4 col-lg-2">
+                    <div class="panel">
+                        <div class="bg-purple demo-color" style="height:31px;"><span>purple</span></div>
+                        
+                        <div class="p-15">
+                            <div class="media-body">
+                                <strong><i class="icon-touch"></i></strong>
+                                <div class="text-muted mt-5">#673AB7</div>
+                            </div>
+
+                            <div class="media-right">
+                            <ul class="icons-list">
+                                <li><a href="#" data-toggle="modal" data-target="#purple_500"><i class="icon-eye"></i></a></li>
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div  style="height: 230px;">
+        <div class="form-group p-15">
+          <div class="form-control">
+            <label>Message Body:</label>
+            <textarea id="body" name="body" class="col-md-12 form-control" placeholder="Enter text ..."></textarea>
+         </div>
+        </div>
     </div>
 
 
@@ -135,177 +182,71 @@
 </div>
 
 <!-- initailize modals -->
-<!-- supplier modal -->
-<div class="modal fade" id="supplierModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Select Suppliers</h4>
-                    </div>
-                    <div class="modal-body">
-                        <label class="text-purple-800">Supplier(s)</label>
-                        <select class="getSupplier" multiple></select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        
-                    </div>
-                </div>
-            </div>
-</div>
-<!-- customer modal -->
-<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Select Customers</h4>
-            </div>
-            <div class="modal-body">
-                <label>Customer(s)</label>
-                <select class="getCustomer" multiple='multiple'></select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                
-            </div>
-        </div>
-    </div>
-</div>
+{% include "dashboard/messages/modals/contacts.html" %}
 
+<!-- page urls -->
+<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:message-contacts' %}" data-compose="{% url 'dashboard:compose_message' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
 {% endblock %}
 {% block custom_js %}
-
- <script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/wysihtml5.min.js' %}"></script>
- <script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/toolbar.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/parsers.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/locales/bootstrap-wysihtml5.ua-UA.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/pages/editor_wysihtml5.js' %}"></script>
-
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/tags/tagsinput.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/tags/tokenfield.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/prism.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
-<script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/compose_message.js' %}"></script>
+
+
 
 <script>
+function alertUser(msg,status)
+{
+    $.jGrowl(msg, 
+    {header: 'Well done!',theme: status});
+}
+    
+    var toggleTemplate = $('#toggle-template');
+    var toggleicon = $('.toggleme');
+    var tname = $('#tname');
+    var tcontent = $('#tcontent');
+    var turl = $('.pageUrls').data('turl');
+    var addTemplateBtn = $('#addTemplateBtn');
 
-var url = "{% url 'dashboard:message-contacts' %}";
-var sendSms = $('#sendSms');
-var getCustomer = $('.getCustomer');
-var getSupplier = $('.getSupplier');
-var userContacts = $('.contacts');
-var subject = $('#subject');
-var body = $('#body');
-var customerCount = $('#customerCount');
-var supplierCount = $('#supplierCount');
-
-// customer contacts
-getCustomer.tokenize2({
-    placeholder: 'Select customer(s)',
-    dataSource: function(search, object){
-        $.ajax(url, {
-            data: { search: search, start: 1,group:'customers' },
-            dataType: 'json',
-            success: function(data){
-                var $items = [];
-                $.each(data, function(k, v){
-                    $items.push(v);
-                });
-                object.trigger('tokenize:dropdown:fill', [$items]);
-            }
+    // ajax
+    function addTemplate(tname,tcontent) {
+        var dynamicData = {};
+        dynamicData['tname']=tname;
+        dynamicData['tcontent']=tcontent;
+        dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+    
+        return $.ajax({
+          url: turl,
+          type: "post",
+          data: dynamicData
         });
     }
-});
-// supplier contacts
-getSupplier.tokenize2({
-    placeholder: 'Select supplier(s)',
-    dataSource: function(search, object){
-        $.ajax(url, {
-            data: { search: search, start: 1,group:'suppliers' },
-            dataType: 'json',
-            success: function(data){
-                var $items = [];
-                $.each(data, function(k, v){
-                    $items.push(v);
-                });
-                object.trigger('tokenize:dropdown:fill', [$items]);
-            }
-        });
-    }
-});
 
-// user contacts
-userContacts.tokenize2({
-    placeholder: 'Select user(s)',
-    sortable: true,
-    dataSource: function(search, object){
-        $.ajax(url, {
-            data: { search: search, start: 1, group:'users' },
-            dataType: 'json',
-            success: function(data){
-                var $items = [];
-                $.each(data, function(k, v){
-                    $items.push(v);
-                });
-                object.trigger('tokenize:dropdown:fill', [$items]);
-            }
-        });
-    }
-});
-
-// tokenize events
-$('#customerModal').on('hidden.bs.modal', function () {
-    customerCount.text(getCustomer.val().length);
-});
-$('#supplierModal').on('hidden.bs.modal', function () {
-    supplierCount.text(getSupplier.val().length);
-});
-
-
-
-
-// ajax
-function sendNotification(userContacts,subject,body,toCustomers,toSuppliers) {
-    var dynamicData = {};
-    console.log('sending data.....');
-    dynamicData["userContacts"] = JSON.stringify(userContacts);
-    dynamicData["subject"] = subject;
-    dynamicData["body"] = body;
-    dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
-    dynamicData['toCustomers']= JSON.stringify(toCustomers);
-    dynamicData['toSuppliers']= JSON.stringify(toSuppliers);
-    return $.ajax({
-      url: "{% url 'dashboard:compose_message' %}",
-      type: "post",
-      data: dynamicData
+    addTemplateBtn.on('click',function(){
+        var templateName = tname.val();
+        var templateContent = tcontent.val();
+        if(!templateContent && !templateName)
+        {
+            alertUser('Both template name/content required','bg-danger');
+            return false;
+        }
+        addTemplate(templateName,templateContent).done(function(data) {
+        alertUser('Notification sent successfully', 'bg-success');
     });
-  }
-  // ./ end sendSms functions
-// listen to sendsms click
-sendSms.on('click',function(){   
-    var ucontacts = userContacts.val();
-    var scontacts = getSupplier.val();
-    var ccontacts = getCustomer.val();    
-    var what = body.val();
-    var verb = subject.val();
-    if(!ccontacts){ ccontacts = false; }
-    if(!scontacts){ scontacts = false; }    
-    sendNotification(ucontacts,verb,what,ccontacts,scontacts).done(function(data) {
-        $.jGrowl('Notification sent successfully', 
-        {header: 'Well done!',theme: 'bg-success'});
+
     });
-});
-// ./ event click send button
 
-var emails = [];
-$(document).ready(function(){ 
 
-});
 
+
+    toggleTemplate.on('hidden.bs.collapse',function(){
+        if(!$('.panel-collapse').hasClass('in')){
+            //console.log('collapsed');
+            toggleicon.removeClass('icon-touch').addClass('icon-cross');
+        }else{
+            toggleicon.removeClass('icon-cross').addClass('icon-touch');
+        }
+    });
 </script>
-
 
 {% endblock %}
