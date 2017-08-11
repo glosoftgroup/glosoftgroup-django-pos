@@ -1,6 +1,7 @@
 {% load staticfiles %}
 {% if purchases %}
       <div class="panel panel-flat">
+       <div class="panel-body">
         <div class="table-responsive">
             <table class="table  datatable-header-footer">
                   <thead style="border-top:1px solid #ddd;">
@@ -36,6 +37,7 @@
               <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
+      </div>
       </div>
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>

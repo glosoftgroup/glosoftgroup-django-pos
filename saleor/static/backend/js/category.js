@@ -49,11 +49,6 @@ $(function() {
         posting.done(function( data ) {
 //          $( "#category_field" ).empty().append( data );
           $( "#category_field" ).replaceWith( data );
-          $('.new_ajax').multiselect({
-              onChange: function() {
-                  $.uniform.update();
-              }
-          });
           $(modal).modal('hide');
           notify('New category added successfully','bg-success');
         });

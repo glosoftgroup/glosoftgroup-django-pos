@@ -660,10 +660,7 @@ $( ".check" ).on( "click", function(){
           for (var i = 0; i < raw_groups.length; i++) {
               formData.append('groups[]', raw_groups[i]);
           }
-          // formData.append('groups[]', raw_groups);
-          for (var pair of formData.entries()) {
-              console.log(pair[0]+ ', ' + pair[1]); 
-          }
+
           if (formData) {
                 $.ajax({
                     url: "{% url 'dashboard:user_process' %}",
