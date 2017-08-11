@@ -324,7 +324,7 @@ def user_update(request, pk):
         mobile = request.POST.get('user_mobile')
         image= request.FILES.get('image')
         job_title = request.POST.get('job_title')
-        groups = request.POST.getlist('groups')
+        groups = request.POST.getlist('groups[]')
 
         if password == user.password:
             encr_password = user.password
@@ -369,26 +369,48 @@ def user_update(request, pk):
             user.save()
             user_trail(request.user.name, 'updated user: '+ str(user.name), 'update')
             info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name),'update')
+
             if len(groups) == 0:
-                user.groups.remove(*user_groups)
-                groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
-                user.user_permissions.remove(*groups_permissions)
-                print groups
-                return HttpResponse('almost wrong')
+                # user.groups.remove(*user_groups)
+                # groups_permissions = Permission.objects.filter(group__name__in=[group.name for group in user_groups])
+                # user.user_permissions.remove(*groups_permissions)
+                # print 'group is '+ str(groups)
+                # print len(groups)
+                return HttpResponse('groups is zero')
             else:
-                if user_groups in groups:
-                    not_in_user_groups = list(set(groups) - set(user_groups))
-                    group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
-                    user.groups.add(*groups)
-                    user.user_permissions.add(*group_permissions)
-                else:
-                    not_in_user_groups = list(set(groups) - set(user_groups))
-                    group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+
+                # print (list(th_groups1) in list(user_groups))
+                # print list(set(user_groups).difference(set(th_groups1)))
+                # print 'user groups are '+str(user_groups) +' and incoming groups are '+str(th_groups1)
+
+                th_groups2 = Group.objects.filter(name__in=[group for group in groups])
+                print 'objetcs: '+str(th_groups2) +' and incoming: '+ str(groups) + 'and th: '+ str(th_groups2)
+                print set([group.name for group in user_groups])
+                print set(list(groups))
+                print set([group.name for group in user_groups]) - set(list(groups))
+                if set(user_groups).difference(set(th_groups2)) or set(th_groups2).difference(set(user_groups)):
+                #     not_in_user_groups = list(set(groups) - set(user_groups))
+                #     group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+                    group_permissions = Permission.objects.filter(group__name__in=[group for group in th_groups2])
                     user.groups.remove(*user_groups)
-                    user.groups.add(*not_in_user_groups)
+                    user.groups.add(*th_groups2)
                     user.user_permissions.remove(*permissions_in_user_groups)
                     user.user_permissions.add(*group_permissions)
-                    return HttpResponse("success without images")
+                    print 'user groups are ' + str(user.groups.all())
+                    return HttpResponse('user_groups in groups')
+                else:
+                    # not_in_user_groups = list(set(groups) - set(user_groups))
+                    # group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+                    # th_groups = Group.objects.filter(name__in=[group for group in groups])
+                    # user.groups.add(*th_groups)
+                    # user.groups.remove(*th_groups)
+                    # user.groups.add(*not_in_user_groups)
+                    # user.user_permissions.remove(*permissions_in_user_groups)
+                    # user.user_permissions.add(*group_permissions)
+                    # print 'This is also ' + str(not_in_user_groups)
+                    # print 'Their permissions are ' + str(group_permissions)
+                    print 'user groups are '+str(user.groups.all())
+                    return HttpResponse("user groups not in groups")
 
 
 
