@@ -341,6 +341,7 @@ def group_update(request):
 			else:
 				try:
 					not_in_group_permissions = list(set(permission_list) - set(group_has_permissions))
+					print ('not in group permissions'+ str(not_in_group_permissions))
 					group.permissions.remove(*group_has_permissions)
 					group.permissions.add(*not_in_group_permissions)
 					group.save()
@@ -358,15 +359,18 @@ def group_update(request):
 					error_logger.error(e)
 					return HttpResponse(str(e)+"That group already exists")
 
-@staff_member_required
 #** filter and save users in order
 def user_manage(users, group_has_users, group):
 	if group_has_users in users:
+		print ('group has users')
 		not_in_group_users = list(set(users) - set(group_has_users))
 		group.user_set.add(*not_in_group_users)
 		group.save()
+
 	else:
+		print ('no users in groups')
 		not_in_group_users = list(set(users) - set(group_has_users))
 		group.user_set.remove(*group_has_users)
 		group.user_set.add(*not_in_group_users)
 		group.save()
+

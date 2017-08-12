@@ -1,11 +1,12 @@
 {% load staticfiles %}
+{% if groups %}
       <div class="panel panel-flat">
        <div class="panel-body">
         <div class="table-responsive">      
 
-          <table class="table  datatable-header-footer" style="border-bottom:1px solid #ddd;">
+          <table class="table table-hover fixed_header datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
-                 <tr>
+                <tr class="bg-primary">
                     <th>Id</th>
                     <th>Group Name</th>
                     {% if perms.userprofile.change_group or perms.userprofile.delete_group %}
@@ -174,3 +175,16 @@
 
 
  </script>
+<script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No Groups to Display
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
