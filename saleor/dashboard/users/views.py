@@ -500,12 +500,14 @@ def users_export_csv(request):
         smart_str(u"ID"),
         smart_str(u"Name"),
         smart_str(u"Email"),
+        smart_str(u"Job Title"),
     ])
     for obj in qs:
         writer.writerow([
             smart_str(obj.pk),
             smart_str(obj.name),
             smart_str(obj.email),
+            smart_str(obj.job_title),
         ])
     return response
 
