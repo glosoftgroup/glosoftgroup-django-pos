@@ -21,11 +21,21 @@ from ...smessages.signals import sms as notify
 from ...smessages.models import SMessage as Notification, SmsTemplate
 
 @staff_member_required
-def get_template(request):
+def get_template(request,pk=None):
     if request.method == 'GET':
-        sms_templates = SmsTemplate.objects.all()
+        if request.is_ajax():
+            if request.GET.get('pk'):
+                stemplate = get_object_or_404(SmsTemplate,pk=(int(request.GET.get('pk'))))
+                ctx = {'template':stemplate}
+                if request.GET.get('template'):                
+                    template = request.GET.get('template')
+                    return TemplateResponse(request, 'dashboard/messages/includes/'+template+'.html', ctx)
+                
+                return TemplateResponse(request, 'dashboard/messages/includes/single-template.html', ctx)
+        sms_templates = SmsTemplate.objects.all().order_by('-id')
         ctx = {'sms_templates':sms_templates}
-        return TemplateResponse(request, 'dashboard/messages/includes/temp.html', ctx)
+        return TemplateResponse(request, 'dashboard/messages/includes/templates.html', ctx)
+
 @staff_member_required
 def add_template(request):
     if request.method == 'POST':
@@ -35,8 +45,8 @@ def add_template(request):
         # print template_name
         temp = SmsTemplate(name=t_name,content=t_content)
         temp.save()
-        return HttpResponse(temp)
-    return HttpResponse('success')
+        return HttpResponse(temp.pk)
+    return HttpResponse('Post request expected')
 @staff_member_required
 def list_messages(request,status=None):
     # read users messages
@@ -74,6 +84,15 @@ def list_messages(request,status=None):
 def unread_count(request):
     messages = request.user.notifications.unread()
     return HttpResponse(len(messages))
+
+
+@staff_member_required
+def delete_template(request,pk=None):
+    if pk:
+        template = get_object_or_404(SmsTemplate,pk=pk)
+        template.delete()
+        return HttpResponse('Template Deleted successfully')
+    return HttpResponse('Select template id')
 
 
 @staff_member_required
@@ -146,7 +165,8 @@ def write(request):
                 notif = Notification(to='customer', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
                 notif.save()
 
-    ctx = {'users':User.objects.all().order_by('-id')}
+    ctx = {'users':User.objects.all().order_by('-id'),
+           'templates':SmsTemplate.objects.all().order_by('-id')}
     return TemplateResponse(request,
                             'dashboard/messages/write.html',
                             ctx)
