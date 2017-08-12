@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% if users %}
       <div class="panel panel-flat">
         <div class="table-responsives">
          
@@ -16,8 +17,7 @@
                     {% endif %}
                   </tr>
                 </thead>
-                <tbody id="p-tb">           
-               {% if users %}
+                <tbody id="p-tb">
                   {% for user in users%}
                   <tr class='clickable-row' id="{{user.pk }}">
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
@@ -64,9 +64,6 @@
                     {% endif %}
                   </tr>
                   {% endfor %}
-                {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">no users available</h2></td></tr>
-               {% endif %}
                   </tbody>
            </table>
         </div>
@@ -155,3 +152,15 @@
    });
  </script>
   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No Users to Display
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}

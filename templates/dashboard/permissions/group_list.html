@@ -19,7 +19,7 @@
       cursor: pointer;
      }
      /* Grow */
-
+   .table{border:1px solid #ccc}
    </style>
  {% endblock %}
 
@@ -60,15 +60,15 @@
             
         </div>
       </div>
-   </div> 
+   </div>
+     {% if groups %}
   <div class="col-md-12">
-
     <div id="pagination-div">
       <div class="panel panel-flat">
         <div class="panel-body">
         <div class="table-responsives">
          
-          <table class="table table-hover fixed_header datatable-header-footer" style="border-bottom:1px solid #ddd;">
+          <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                  <tr class="bg-primary">
                     <th>Id</th>
@@ -79,13 +79,12 @@
                   </tr>
                 </thead>
  
-                <tbody id="tb">           
-               {% if groups %}
+                <tbody id="tb">
                   {% for group in groups %}
                   <tr class='clickable-row' id="{{group.id }}">
-                    <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} Details" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{ forloop.counter }}.</td>
+                    <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{ forloop.counter }}.</td>
                      <!-- group name -->
-                    <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} Details" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{group.name}}</td>
+                    <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{group.name}}</td>
                     <!-- actions -->
                     {% if perms.auth.change_group or perms.auth.delete_group %}
                     <td class="text-center">
@@ -115,9 +114,6 @@
                     {% endif %}
                   </tr>
                   {% endfor %}
-                {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">no groups available</h2></td></tr>
-               {% endif %}
                   </tbody>
 
            </table>
@@ -128,15 +124,23 @@
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav">Page 1</div>
             </div>
-            <div id="bootpag-callback2" class="text-center bootpag-callback2" style="padding:20px;display: none;">
-              <ul class="pagination2 bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav2">Page 1</div>
-            </div>
           </div>
       </div>
       </div><!-- pagination-div-->
- 
   </div>
+
+          {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No Groups to Display
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
 </div>
 
 
@@ -227,7 +231,7 @@
         </div>
        </div>    
        <div class="modal-footer">
-         <button type="submit" id='modal_delete' class="btn pull-right bg-danger update" onclick="submitGroupDetails()" data-id="" data-href="">Update</button>         
+         <button type="submit" id='modal_update' class="btn pull-right bg-danger update" onclick="submitGroupDetails()" data-id="" data-href="">Update</button>
          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
        </div>
      </div>
@@ -366,7 +370,6 @@ $('document').ready(function () {
         //*@ populate table
         var table_body = $('#group_user_table tbody');
         var parent = table_body.parent();
-        
         table_body.detach().empty().each(function(i, val){
             for (var x = 0; x < remove_duplicates(names).length; x++){
                 $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> delete</a></td></tr');
@@ -434,10 +437,9 @@ $('#add_user_btn').on('click', function(e){
                           image: $(this).data("image")
                       };
                   }).get();
+
     $.each(selected, function(i, val){
-      // var index = selected.findIndex(x=>x.name==val.name);
-      names.indexOf(val) === -1 ? names.push(val): console.log('already exists');
-      // index === -1 ? names.push(val): console.log('already exists');
+      names.indexOf(val) === -1 ? names.push(val) : console.log('already exists');
     });
 
     var table_body = $('#group_user_table tbody');
@@ -508,12 +510,13 @@ function submitGroupDetails(){
               });
           window.location.reload();
           user_ids=[];
+          names = [];
       }
-      ,error:function(){
-        $.jGrowl('something went wrong', {
-              header: 'Oops!',
-              theme: 'bg-danger'
-         });
+      ,error:function(error){
+            $.jGrowl('something went wrong somewhere', {
+                  header: 'Oops!',
+                  theme: 'bg-danger'
+             });
       }
     });
 }

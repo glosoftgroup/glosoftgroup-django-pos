@@ -19,15 +19,16 @@
      .clickable-row td.td{
       cursor: pointer;
      }
+      .table{border:1px solid #ccc}
    </style>
  {% endblock %}
 
 {% block content %}
  <div class="row animated fadeIn">
-    <div class="col-md-12">
-      <div class="panel panel-white animated zoomIn">
-        
+     <div class="col-md-12">
+      <div class="panel panel-flat">
         <div class="panel-body search-panel">
+
             <div class="col-md-6">
              <label>Search Details</label>
               <div class="form-group form-group-material has-feedback">
@@ -68,6 +69,7 @@
                 </div>
               </div>
             </div>
+
         </div>
       </div>
    </div>
@@ -75,7 +77,8 @@
   <div class="col-md-12">
     <div id="pagination-div">
       <div class="panel panel-flat">
-        <div class="table-responsive">     
+           <div class="panel-body">
+        <div class="table-responsives">
         	<table class="table table-striped table-hover datatable-header-footer fixed-header" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
@@ -112,6 +115,7 @@
             <input type="hidden" id="page_size" val="">
         </div>
       </div>
+    </div>
     </div>
  
   </div>
