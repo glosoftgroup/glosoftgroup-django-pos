@@ -1,0 +1,329 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load static %}
+
+
+
+{% block title %}
+  {% trans "Messages " context "Dashboard customers list" %} - {{ block.super }}
+{% endblock %}
+
+
+{% block menu_messages_class %}active{% endblock %}
+
+{% block breadcrumbs %}
+    <li>
+        <a href="{% url 'dashboard:message_list' %}">
+            Messages
+        </a>
+    </li>
+
+    <li class="active">
+      {% trans "Compose" context "Dashboard Notifications list" %}
+    </li>
+
+{% endblock %}
+
+{% block custom_css %}
+<link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'backend/js/plugins/editors/summernote/summernote.css' %}" rel="stylesheet" type="text/css">
+<style type="text/css">
+    .selectedTemp{ cursor: pointer; }
+    .toggleme{ cursor: pointer; }
+</style>
+{% endblock %}
+{% block content %}
+<div id="write-message"></div>
+<div class="container-detached">
+	<div class="content-detached">
+<!-- Single mail -->
+<div class="panel panel-white">
+
+<!-- Mail toolbar -->
+<div class="panel-toolbar panel-toolbar-inbox">
+    <div class="navbar navbar-default" style="z-index: 8;">
+        <ul class="nav navbar-nav visible-xs-block no-border">
+            <li>
+                <a class="text-center collapsed" data-toggle="collapse" data-target="#inbox-toolbar-toggle-single">
+                    <i class="icon-circle-down2"></i>
+                </a>
+            </li>
+        </ul>
+
+        <div class="navbar-collapse collapse" id="inbox-toolbar-toggle-single">
+            <div class="btn-group navbar-btn">
+                <button type="button" id="sendSms" class="btn bg-blue hvr-bob"><i class="icon-checkmark3 position-left"></i> Send SMS</button>
+            </div>
+
+            <div class="btn-group navbar-btn">
+
+
+            </div>
+
+            <div class="pull-right-lg">
+                <div class="btn-group navbar-btn">
+                    <button type="button" class="btn btn-default" id="printBtn"><i class="icon-printer"></i> <span class="hidden-xs position-right">Print</span></button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /mail toolbar -->
+
+
+<!-- Mail details -->
+<div class="table-responsive mail-details-write" id="printme">
+  {% csrf_token %}
+    <table class="table">
+        <tbody>
+            <tr>
+                <td style="width: 50px"><label>To:</label></td>
+                <td style="width: 100%" class="text-left">
+                <div class="col-md-6">
+                    <select name='contacts' multiple="multiple" id="contacts" class="contacts"></select>
+                </div>
+                <div class="col-md-6">
+                    <div class="formgroup">
+                        <div class="col-sm-4 text-semibold">Select Group
+                        </div>
+                        <div class="col-sm-4">
+                            <button id="supplier" data-toggle="modal" data-target="#supplierModal" class="btn btn-xs hvr-bob btn-primary">
+                            <span class="badge badge-success" id="supplierCount"></span>&nbsp; Supplier</button>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <button id="customer" data-toggle="modal" data-target="#customerModal" class="btn btn-xs btn-primary hvr-bob"><span class="badge badge-success" id="customerCount"></span>
+                            Customers</button>
+                        </div>
+                    </div>
+                </div>
+               
+                    <ul class="list-inline list-inline-separate no-margin">
+
+                    </ul>
+                </td>
+                <!-- <td></td> -->
+            </tr>
+            <tr>
+                <td><label>Subject:</label></td>
+                <td class="no-padding">
+                <input class="form-control" placeholder="Add subject" name="subject" value="" id='subject' type="text"></td>
+                <td>&nbsp;</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+<!-- /mail details -->
+
+
+<!-- Mail container -->
+<div class="mail-container-write">
+<div class="panel-group content-group-lg" id="accordion1">
+    <div class="panel panel-white">
+        <div class="panel-heading">
+            <h6 class="panel-title">
+                <a data-toggle="collapse" id="toggle-template" data-parent="#accordion1" href="#accordion-group1" class="text-semibold"><i class='toggleme icon-touch'></i>&nbsp;&nbsp;Select Template</a>
+            </h6>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                  <li id="add-template">
+                  <a href="#newTemplateModal" data-toggle="modal" data-target="#newTemplateModal" class="btn btn-xs btn-primary text-white" >Add New</a>
+                  </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div id="accordion-group1" class="panel-collapse collapse out bg-grey-300">
+            <div class="row p-15">
+              <div class="col-md-12">
+              <!-- append new template here -->
+               <div id="newTemplate"></div>
+               <!-- ./new temp -->
+               {% if templates %}
+               {% for template in templates %}
+               <!-- list templates -->
+                <div class="col-sm-4 col-lg-2 mb-15" id="trackDiv{{template.pk}}">
+                    <div class="panel">
+                        <div class="bg-purple demo-color" style="height:31px;"><span>{{template.name}}</span></div>
+                        
+                        <div class="p-15">
+                            <div class="media-body">
+                                <span><a href="#"
+                                data-href="{% url 'dashboard:template-detail' template.pk %}"
+                                data-spk='{{template.pk}}'
+                                class="stemplate text-purple" data-toggle="modal" data-target="#tempDetail"
+                                data-popup="tooltip"
+                                data-original-title="Preview"><i class="icon-eye"></i></a>
+                                </span>
+
+                                <span><a href="#"
+                                data-href="{% url 'dashboard:template-detail' template.pk %}"
+                                data-spk='{{template.pk}}'
+                                class="stemplate text-warning" data-toggle="modal" data-target="#tempDetail"
+                                data-popup="tooltip"
+                                data-original-title="Delete"><i class="icon-trash"></i></a>
+                                </span>                              
+                            </div>
+
+                            <div class="media-right">
+                            <ul class="icons-list">
+                                <li data-popup="tooltip"
+                                data-original-title="Select" class="text-bold selectedTemp" data-tid="{{template.pk}}"><i class="icon-touch"></i></li>
+                                
+
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ./templates -->
+                {% endfor %}
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div  style="height: 230px;">
+        <div class="form-group p-15">
+          <div class="form-control">
+            <label>Message Body:</label>
+            <textarea id="body" name="body" class="col-md-12 form-control" placeholder="Enter text ..."></textarea>
+         </div>
+        </div>
+    </div>
+
+
+
+    </div>
+</div>
+
+</div>
+<!-- /mail container -->
+
+
+
+
+</div>
+<!-- /single mail -->
+    </div>
+</div>
+
+<!-- initailize modals -->
+{% include "dashboard/messages/modals/contacts.html" %}
+
+<!-- page urls -->
+<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:message-contacts' %}" data-aurl="{% url 'dashboard:get-sms-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/compose_message.js' %}"></script>
+
+
+
+<script>
+function alertUser(msg,status)
+{
+    $.jGrowl(msg, 
+    {header: 'Well done!',theme: status});
+}
+    
+    var toggleTemplate = $('#toggle-template');
+    var toggleicon = $('.toggleme');
+    var tname = $('#tname');
+    var tcontent = $('#tcontent');
+    var turl = $('.pageUrls').data('turl');
+    var appendUrl = $('.pageUrls').data('aurl');
+    var addTemplateBtn = $('#addTemplateBtn');
+    var newTemplate = $('#newTemplate');
+    var stemplate = $('.stemplate');
+    var templateDetail = $('#tData');
+    var selectedTemp = $('.selectedTemp');
+    var deleteTemp = $('.deleteTempBtn');
+
+    
+    // select template
+    selectedTemp.on('click',function(){
+      url = $(this).data('href');
+      spk = $(this).data('tid'); 
+      appendTemplate(spk,'select',url).done(function(data){
+          $('#body').val(data); 
+          alertUser('Template selected','bg-success');
+          $('#accordion-group1').removeClass('in');
+        }); 
+    });
+    // .selectedTemp
+
+    stemplate.on('click',function(){
+        url = $(this).data('href');
+        spk = $(this).data('spk');
+        templateDetail.empty().html('Loading.....');
+        appendTemplate(spk,'detail',url).done(function(data){
+          templateDetail.empty().html(data);  
+        });
+    });
+
+
+    // ajax
+    function addTemplate(tname,tcontent) {
+        var dynamicData = {};
+        dynamicData['tname']=tname;
+        dynamicData['tcontent']=tcontent;
+        dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+    
+        return $.ajax({
+          url: turl,
+          type: "post",
+          data: dynamicData
+        });
+    }
+
+    // ajax
+    function appendTemplate(pk,template=false) {
+        var dynamicData = {};
+        dynamicData['pk']=pk;
+        if(template){
+            dynamicData['template'] = template;
+        }
+        return $.ajax({
+          url: appendUrl,
+          type: "get",
+          data: dynamicData
+        });
+    }
+
+    addTemplateBtn.on('click',function(){
+        var templateName = tname.val();
+        var templateContent = tcontent.val();
+        if(!templateContent && !templateName)
+        {
+            alertUser('Both template name/content required','bg-danger');
+            return false;
+        }
+        addTemplate(templateName,templateContent).done(function(data) {            
+        alertUser('Message Template added successfully', 'bg-success');
+        $('#newTemplateModal').modal('hide');
+        appendTemplate(data).done(function(data){
+            newTemplate.append(data);
+            $('#accordion-group1').addClass('in');
+        });
+    });
+
+    });
+
+
+
+
+    toggleTemplate.on('hidden.bs.collapse',function(){
+        if(!$('.panel-collapse').hasClass('in')){
+            //console.log('collapsed');
+            toggleicon.removeClass('icon-touch').addClass('icon-cross');
+        }else{
+            toggleicon.removeClass('icon-cross').addClass('icon-touch');
+        }
+    });
+</script>
+
+{% endblock %}

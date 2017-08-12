@@ -1,4 +1,3 @@
-
 $(function() {
   //add  product category 
   $('#add-new-category').on('click',function(){

@@ -1,0 +1,209 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load static %}
+
+
+
+{% block title %}
+  {% trans "Messages " context "Dashboard customers list" %} - {{ block.super }}
+{% endblock %}
+
+
+{% block menu_messages_class %}active{% endblock %}
+
+{% block breadcrumbs %}
+    <li>
+    	<a href="{% url 'dashboard:notification_list' %}">Messages</a>
+    </li>
+    <li class="active">
+      {{notification.verb}}
+    </li>
+
+{% endblock %}
+
+{% block custom_css %}
+<link href="{% static 'backend/js/plugins/fastselect/fastselect.min.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+<div id="write-message"></div>
+<div class="container-detached">
+	<div class="content-detached">
+<!-- Single mail -->
+<div class="panel panel-white">
+<!-- Single mail -->
+<div class="panel panel-white">
+
+	<!-- Mail toolbar -->
+	<div class="panel-toolbar panel-toolbar-inbox">
+		<div class="navbar navbar-default">
+			<ul class="nav navbar-nav visible-xs-block no-border">
+				<li>
+					<a class="text-center collapsed" data-toggle="collapse" data-target="#inbox-toolbar-toggle-single">
+						<i class="icon-circle-down2"></i>
+					</a>
+				</li>
+			</ul>
+
+			<div class="navbar-collapse collapse" id="inbox-toolbar-toggle-single">
+				<div class="btn-group navbar-btn">
+					<a href="{% url 'dashboard:write' %}" class="btn btn-default"><i class="icon-reply"></i> <span class="hidden-xs position-right">Reply</span></a>
+										
+					{% if notification.deleted %}
+					<a href="#" data-toggle="modal" data-target="#modal_mini" class="btn btn-danger"><i class="icon-bin"></i>
+					<span class="hidden-xs position-right">
+					  Delete permanently
+					 </span></a>
+					{% else %}
+					<a href="#" data-toggle="modal" data-target="#modal_mini" class="btn btn-default"><i class="icon-bin"></i> 
+					<span class="hidden-xs position-right">
+					  Move to trash
+					  <span class="hidden-xs position-right"></a>
+					{% endif %}
+					
+
+					
+				</div>
+
+				<div class="pull-right-lg">
+					<p class="navbar-text">{{notification.timestamp}}</p>
+					<div class="btn-group navbar-btn">
+						<a href="#" class="btn btn-default" id="printBtn"><i class="icon-printer"></i> <span class="hidden-xs position-right">Print</span></a>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /mail toolbar -->
+<!-- Mail details -->
+<div id="printme">
+<div class="media stack-media-onmobile mail-details-read navbar navbar-default p-10" >
+	<a href="#" class="media-left">
+		<span class="btn bg-teal-400 btn-rounded btn-icon btn-xlg">
+			<span class="letter-icon">{{ actor }}</span>
+		</span>
+	</a>
+
+	<div class="media-body">
+		<h6 class="media-heading">{{notification.verb}}</h6>
+		<div class="letter-icon-title text-semibold"> <a href="#">&lt;{{ notification.actor }}&gt;</a></div>
+	</div>
+
+	<div class="media-right media-middle text-nowrap p-10">
+		
+	</div>
+</div>
+<!-- /mail details -->
+	
+
+	<!-- Mail container -->
+	<div class="mail-container-read">
+
+	  <div class=" p-10">
+		{{ notification.description|safe  }}
+	  </div>
+
+	</div>
+	<!-- /mail container -->	
+ </div>
+</div>
+<!-- /single mail -->
+
+</div>
+<!-- /single mail -->
+    </div>
+</div>
+
+  <!-- Mini modal -->
+<div id="modal_mini" class="modal fade">
+	<div class="modal-dialog modal-xs">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h5 class="modal-title">
+				{% if notification.deleted %}
+				Delete permanently
+				{% else %}
+				Move to trash
+				{% endif %}
+				
+				</h5>
+			</div>
+           {% if notification.deleted %}
+<form action="{% url 'dashboard:delete-permanently' notification.id %}">
+		   {% else %}
+			<form action="{% url 'dashboard:delete-notification' notification.id %}">
+		   {% endif %}
+           <form action="{% url 'dashboard:delete-notification' notification.id %}">
+           {% csrf_token %}
+			<div class="modal-body">
+				<h6 class="text-semibold">Notification Title</h6>
+				<p>Are you sure you want to 
+				{% if notification.deleted %}
+				Delete permanently
+				{% else %}
+				Move to trash
+				{% endif %}
+				</p>
+				<hr>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+				<button type="button" id="deleteNot" class="btn btn-danger">
+				{% if notification.deleted %}
+				Delete
+				{% else %}
+				Trash
+				{% endif %}
+				</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!-- /mini modal -->
+
+
+
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+ function deleteNot(csrf_token) {
+    var dynamicData = {'csrfmiddlewaretoken':csrf_token};
+
+    {% if notification.deleted %}
+	var url = "{% url 'dashboard:delete-permanently' notification.id %}";
+	{% else %}
+	var url = "{% url 'dashboard:delete-notification' notification.pk %}";
+	{% endif %}
+        
+    return $.ajax({
+      url: url,
+      type: "post",
+      data: dynamicData
+    });
+  }
+
+	$(document).ready(function(){
+	   var selector = $('#deleteNot');
+	   var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+	   selector.on('click',function()
+	   {
+        deleteNot(csrf_token).done(function(data) 
+        {    
+        // notify
+        $.jGrowl('Notification moved to trash', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+            });
+	     window.location.href = "{% url 'dashboard:notification_list' %}";
+	   
+        // ./notify
+        });
+	   });
+	});
+
+</script> 
+
+{% endblock %}

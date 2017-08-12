@@ -75,7 +75,24 @@
             <tr>
                 <td style="width: 50px">To:</td>
                 <td style="width: 100%" class="text-left">
-               <input type="text" value="" data-role="tagsinput" class="tagsinput-typeahead">
+                <div class="col-md-6">
+                    <input type="text" value="" data-role="tagsinput" placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                </div>
+                <div class="col-md-6">
+                    <div class="formgroup">
+                        <label class="display-block text-semibold">  Group email notification </label>
+                        <label class="checkbox-inline">
+                            <input id="supplier" name="supplier" type="checkbox" class="styled">
+                            Supplier
+                        </label>
+
+                        <label class="checkbox-inline">
+                            <input id="customers" name="customers" type="checkbox" class="styled">
+                            Customers
+                        </label>
+                    </div>
+                </div>
+               
                     <ul class="list-inline list-inline-separate no-margin">
 
                     </ul>
@@ -196,12 +213,16 @@ selector1.on('change',function(){
 });
 
 // ajax
-function sendNotification(emailList,subject,body) {
+function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
     var dynamicData = {};
+    console.log('sending data.....');
     dynamicData["emailList"] = JSON.stringify(emailList);
     dynamicData["subject"] = subject;
     dynamicData["body"] = body;
     dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+    dynamicData['toCustomers'];
+    dynamicData['toSuppliers'];
+
     return $.ajax({
       url: "{% url 'dashboard:write' %}",
       type: "post",
@@ -212,18 +233,59 @@ function sendNotification(emailList,subject,body) {
 var sendnot = $('#sendnot');
 var subject = $('#subject');
 var body = $('#body');
-
+var supplier = $('#supplier');
+var customers = $('#customers');
+var toSuppliers = 0;
+var toCustomers = 0;
+function updateCheckedBoxes()
+{
+   if(supplier.is(":checked"))
+    {
+        // send notification/mail to suppliers
+        toSuppliers = 1;
+    }else{ toSuppliers = 0;}
+    if(customers.is(":checked"))
+    {
+        // send notification/mail to customers
+        toCustomers = 1;
+    }else{ toCustomers = 0;} 
+}
 sendnot.on('click',function(){
+    updateCheckedBoxes();
+    // return false;
     var subjectString = subject.val();
     var bodyText = body.val();
     var json = [];
     var to = selector1.val();
     var toSplit = to.split(",");
 
+
     // validate
     if(!to){
-        alert('Enter atleast one email!');
-        return false;
+        if(1==parseInt(toSuppliers))
+        {
+          console.log('supplier set');
+          //return true;  
+        } 
+        if(1==parseInt(toCustomers))
+        {
+          console.log('customer set');
+          //return true;  
+        }
+        else{
+          alert('Enter atleast one email!');
+          return false;  
+        } 
+        
+    }else{
+        for (var i = 0; i < toSplit.length; i++) 
+        {
+            if( emails.indexOf(toSplit[i]) > -1 ) {
+                console.log("success");
+                json.push({"email":toSplit[i]});
+            }
+       
+        }
     }
     if(!subjectString){
         alert('subject required');
@@ -234,17 +296,11 @@ sendnot.on('click',function(){
         return false;
     }
     
-    for (var i = 0; i < toSplit.length; i++) {
-        if( emails.indexOf(toSplit[i]) > -1 ) {
-            console.log("success");
-            json.push({"email":toSplit[i]});
-        }
-       
-    }
+    
 
-    console.log(json);
+    //console.log(json);
     // send Notifications
-    sendNotification(json,subjectString,bodyText).done(function(data) {    
+    sendNotification(json,subjectString,bodyText,toCustomers,toSuppliers).done(function(data) {    
      $(".tagsinput-typeahead").val('');
      body.val('');
      subject.val('');
@@ -252,7 +308,7 @@ sendnot.on('click',function(){
                           header: 'Well done!',
                           theme: 'bg-success'
                        });
-     window.location.reload();
+     window.location.href = "{% url 'dashboard:notification_list_slug' 'sent' %}";
     });
     // ./send Notifications
 });
