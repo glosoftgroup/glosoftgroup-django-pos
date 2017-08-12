@@ -1,9 +1,9 @@
 {% if stock_history %}
 
   <div class="tableresponsive">
-  	<table class="table table-striped table-hover fixed_headers">  	   
+  	<table class="table table-striped table-hover fixed_headers" style="border-bottom:1px solid #ddd;">
   		<thead>
-  		  <tr class="bg-primary">
+  		  <tr class="bg-grey">
   			<th>User</th>
   			<th>Action</th>
   			<th>Comment</th>
@@ -23,7 +23,7 @@
   	</table>
   </div>
  {% else %}
-  <div class="alert alert-warning">
+  <h4 class="text-center text-warning" style="font-weight:bold;">
   	No stock history
-  </div>
+  </h4>
 {% endif %}

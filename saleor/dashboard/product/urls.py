@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 from . import api
-from . import views, products
+from . import views, products, subcategory_products
 
 
 urlpatterns = [
@@ -80,6 +80,11 @@ urlpatterns = [
         (views.product_class_edit), name='product-class-update'),
     url(r'^classes/(?P<pk>[0-9]+)/delete/$', permission_required('product.delete_productclass', login_url='not_found')
         (views.product_class_delete), name='product-class-delete'),
+
+    url(r'^subcategory/(?P<pk>[0-9]+)/$', permission_required('product.view_productclass', login_url='not_found')
+        (subcategory_products.view), name='subcategory-products'),
+    url(r'^subcategory/products/paginate/$', subcategory_products.paginate, name='subcategory-products-paginate'),
+    url(r'^subcategory/products/search/$', subcategory_products.search, name='subcategory-products-search'),
 
     url(r'^(?P<product_pk>[0-9]+)/variants/(?P<variant_pk>[0-9]+)/$', permission_required('product.change_productvariants', login_url='not_found')
         (views.variant_edit), name='variant-update'),

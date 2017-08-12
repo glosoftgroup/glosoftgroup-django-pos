@@ -9,10 +9,11 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:product-list' %}">Products</a></li>
+    <li><a href="{% url 'dashboard:product-class-list' %}">Sub Categories</a></li>
+    <li class="active"><a href="{% url 'dashboard:subcategory-products' pk=product_pk %}">{{subcategory_name|title}}</a></li>
  {% endblock %}
 
-{% block menu_products_class %}active{% endblock %}
+{% block menu_product_classes_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
      .clickable-row td.td{
@@ -107,7 +108,7 @@
                        srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"
                        alt="" class="circle teal"></td>
                        <!-- product name -->
-                      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.name }}</td>
+                      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details"data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.name }}</td>
                       <!-- product category -->
                       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
                         {% with product.get_first_category as category %}
@@ -236,7 +237,8 @@ $(document).ready(function() {
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
         if(ts != '0'){
-            $.ajax({ url: "{% url 'dashboard:product-list-paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+            $.ajax({ url: "{% url 'dashboard:subcategory-products-paginate' %}",type: 'GET',data: {page:1, size:ts, product_pk:'{{product_pk}}' },
+            async:false,success: function(data){
                   $('#pagination-div').html(data);
             }});
         }
@@ -261,7 +263,8 @@ $(document).ready(function() {
         
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+{{totalp}}); // or some ajax content loading...
-            $.get("{% url 'dashboard:product-list-paginate' %}",{page:num},function(data){
+            $.get("{% url 'dashboard:subcategory-products-paginate' %}",{page:num, product_pk:'{{product_pk}}' },
+            function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm')
@@ -277,8 +280,9 @@ $(document).ready(function() {
       $('.search_user').keyup(function() {
         var search_text = $(this).val();
         delay(function(){
-           var url = "{% url 'dashboard:product-list-search' %}";
-           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, },success: function(data){
+           var url = "{% url 'dashboard:subcategory-products-search' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, product_pk:'{{product_pk}}' },
+           success: function(data){
                   $('#pagination-div').html(data);
            }});
         }, 500 );

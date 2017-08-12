@@ -167,6 +167,7 @@
 
               <div class="panel-body">
                 <div class="tabbable ">
+                    {% if product.pk %}
                   <ul class="nav nav-tabs nav-tabs-highlight">
                   <!-- general settings tab -->
                    {% if request.GET.tab %}                   
@@ -174,7 +175,8 @@
                     {% else %}
                       <li class="active">
                     {% endif %}
-                    <a href="#bordered-tab1" data-toggle="tab">General Settings</a></li>
+                        <a href="#bordered-tab1" data-toggle="tab">General Details</a>
+                      </li>
                     {% if product.pk %}
                     <!-- variant tab -->
                     {% if request.GET.tab == 'variants'  %}                   
@@ -201,7 +203,7 @@
                     {% endif %}
                     
                   </ul>
-
+                    {% endif %}
                   <div class="tab-content">
                   {% if request.GET.tab %}                   
                      <div class="tab-pane has-padding" id="bordered-tab1">            
@@ -229,9 +231,6 @@
 
      <div class="col-md-12">
        <!-- Product Details -->
-        <div class="col-md-12">
-          <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Product Details</h5>
-        </div>
         <div class="col-md-4">
             <div class="form-group">
                 <label>Product Name:<i class='text-danger'> *</i></label>
@@ -243,9 +242,9 @@
                 <label>Product Category:<i class='text-danger'> *</i> </label>
                 <div class="input-group">
                              
-                      <div class="multi-select-full input-group-btn" id='category_field' >   
+                      <div class="multi-select-full input-group-btn" id='category_field' >
                         {{ product_form.categories }}
-                      </div>                         
+                      </div>
                   
                   <div class="input-group-btn">
                      <button type="button" class="btn bg-primary btn-icon legitRipple edit_modal-trigger" data-popup="tooltip"
@@ -887,7 +886,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
-    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/core/libraries/jquery_ui/core.min.js' %}"></script>
 
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>

@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from . import views
 from . import charts
 from . import pdfs
+from . import purchase
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -16,17 +17,19 @@ urlpatterns = [
 			(views.sales_list), name='sales_list'),
 		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
 			(views.sales_detail), name='sale-detail'),
-		url(r'^product_reports/$',  permission_required('reports.view_products_reports', login_url='not_found')
+		url(r'^product/$',  permission_required('reports.view_products_reports', login_url='not_found')
 			(views.product_reports), name='products_reports'),
-		url( r'^products_search/$', views.products_search, name = 'products_search' ),
-		url( r'^products_paginate/$', views.products_paginate, name = 'products_paginate' ),
+		url( r'^product/search/$', views.products_search, name = 'products_search' ),
+		url( r'^products/paginate/$', views.products_paginate, name = 'products_paginate' ),
 		url(r'^prd/$',  permission_required('reports.view_products_reports', login_url='not_found')
 			(views.product_reorder), name='products_reorder'),
 		url( r'^prs/$', views.products_reorder_search, name = 'products_reorder_search' ),
 		url( r'^prp/$', views.products_reorder_paginate, name = 'products_reorder_paginate' ),
 
-		url(r'^purchases_reports/$',  permission_required('reports.view_purchase_reports', login_url='not_found')
-			(views.purchases_reports), name='purchases_reports'),
+		url(r'^purchases/$',  permission_required('reports.view_purchase_reports', login_url='not_found')
+			(purchase.purchase_reports), name='purchases_reports'),
+		url(r'^purchases/paginate$',  purchase.purchase_paginate, name='purchase_paginate'),
+		url(r'^purchases/search$',  purchase.purchase_search, name='purchase_search'),
 		url(r'^balancesheet_reports/$', permission_required('reports.view_balancesheet', login_url='not_found')
 			(views.balancesheet_reports), name='balancesheet_reports'),
 		url(r'^chart/$', views.get_dashboard_data, name='chart'), 

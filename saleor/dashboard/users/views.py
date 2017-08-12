@@ -341,24 +341,15 @@ def user_update(request, pk):
             user.save()
             user_trail(request.user.name, 'updated user: '+ str(user.name),'update')
             info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name))
-            if len(groups) == 0:
-                user.groups.remove(*user_groups)
-                groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
-                user.user_permissions.remove(*groups_permissions)
-            else:
-                if user_groups in groups:
-                    not_in_user_groups = list(set(groups) - set(user_groups))
-                    group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
-                    user.groups.add(*groups)
-                    user.user_permissions.add(*group_permissions)
-                else:
-                    not_in_user_groups = list(set(groups) - set(user_groups))
-                    group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+
+            if groups:
+                th_groups2 = Group.objects.filter(name__in=[group for group in groups])
+                if set(user_groups).difference(set(th_groups2)) or set(th_groups2).difference(set(user_groups)):
+                    group_permissions = Permission.objects.filter(group__name__in=[group for group in th_groups2])
                     user.groups.remove(*user_groups)
-                    user.groups.add(*not_in_user_groups)
+                    user.groups.add(*th_groups2)
                     user.user_permissions.remove(*permissions_in_user_groups)
                     user.user_permissions.add(*group_permissions)
-            return HttpResponse("success without image")
             return HttpResponse("success with image")
         else:
             user.name = name
@@ -370,21 +361,14 @@ def user_update(request, pk):
             user.save()
             user_trail(request.user.name, 'updated user: '+ str(user.name), 'update')
             info_logger.info('User: '+str(request.user.name)+' updated user: '+str(user.name),'update')
-            if len(groups) == 0:
-                user.groups.remove(*user_groups)
-                groups_permissions = Permission.objects.filter(group__name__in=[group['name'] for group in user_groups])
-                user.user_permissions.remove(*groups_permissions)
-            else:
-                if user_groups in groups:
-                    not_in_user_groups = list(set(groups) - set(user_groups))
-                    group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
-                    user.groups.add(*groups)
-                    user.user_permissions.add(*group_permissions)
-                else:
-                    not_in_user_groups = list(set(groups) - set(user_groups))
-                    group_permissions = Permission.objects.filter(group__name__in=[group for group in not_in_user_groups])
+
+
+            if groups:
+                th_groups2 = Group.objects.filter(name__in=[group for group in groups])
+                if set(user_groups).difference(set(th_groups2)) or set(th_groups2).difference(set(user_groups)):
+                    group_permissions = Permission.objects.filter(group__name__in=[group for group in th_groups2])
                     user.groups.remove(*user_groups)
-                    user.groups.add(*not_in_user_groups)
+                    user.groups.add(*th_groups2)
                     user.user_permissions.remove(*permissions_in_user_groups)
                     user.user_permissions.add(*group_permissions)
             return HttpResponse("success without image")

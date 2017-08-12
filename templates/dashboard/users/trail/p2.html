@@ -1,11 +1,10 @@
 {% load staticfiles %}
       <div class="panel panel-flat">
-        <div class="table-responsive">
-         
-
-          <table class="table fixed_headers  datatable-header-footer" style="border-bottom:1px solid #ddd;">
+        <div class="panel-body">
+        <div class="table-responsives">
+        	<table class="table table-striped table-hover datatable-header-footer fixed-header" style="border-bottom:1px solid #ddd;">
                 <thead>
-                  <tr>
+                  <tr class="bg-primary">
                     <th>Id</th>
                     <th>Name</th>
                     <th>action</th>
@@ -44,6 +43,7 @@
               <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
+        </div>
       </div>
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>

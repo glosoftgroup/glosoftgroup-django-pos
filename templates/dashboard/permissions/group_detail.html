@@ -1,0 +1,38 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% if users %}
+  <table class="table table-hover fixed_header table-striped">
+        <tbody id="tbs">
+          {% for user in users %}
+          <tr class='clickable-row' id="{{group.id }}">
+            <td class="tds" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{ forloop.counter }}. </td>
+            <td class="tds" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
+               {% if user.image %}
+                  <img src="{{user.image.url }}" alt="" class="circle teal img-responsive img-circle" style="width: 40px;height: 40px;"/>
+               {% else %}
+                  <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
+               {% endif %}
+            </td>
+            <td class="tds" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
+             {% if user.name %}
+                {{user.name}}
+             {% else %}
+                {{user.email}}
+             {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+   </table>
+<script>
+  $(".tds").click(function(){
+      window.location = $(this).data("href");
+  });
+</script>
+{% else %}
+
+<h4 class="text-center text-danger">No users in {{ group }}</h4>
+
+{% endif %}

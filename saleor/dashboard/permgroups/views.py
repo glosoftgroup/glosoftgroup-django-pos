@@ -146,7 +146,8 @@ def create_group(request):
 				return HttpResponse('error')
 		except ObjectDoesNotExist:
 			group = Group.objects.create(name=group_name)
-			group.user_set.add(*users)
+			if users is not None:
+				group.user_set.add(*users)
 			group.save()
 			last_id_group = Group.objects.latest('id')
 			user_trail(request.user.name, 'added group '+group_name, 'add')
@@ -243,8 +244,16 @@ def group_edit(request):
 def group_detail(request, pk):
 	group = Group.objects.get(id=pk)
 	group_permissions = Permission.objects.filter(group=group)
-	users_in_group = User.objects.filter(groups__name=group.name)
-	return HttpResponse('error deleting')
+	try:
+		users_in_group = User.objects.filter(groups__name=group.name)
+		ctx = {"users":users_in_group, "group":group.name}
+		html = render_to_string('dashboard/permissions/group_detail.html', ctx)
+		return HttpResponse(html)
+	except Exception, e:
+		error_logger.error(e)
+		ctx = { "group": group.name}
+		html = render_to_string('dashboard/permissions/group_detail.html', ctx)
+		return HttpResponse(html)
 
 @staff_member_required
 @permission_decorator('group.delete_group')
@@ -332,6 +341,7 @@ def group_update(request):
 			else:
 				try:
 					not_in_group_permissions = list(set(permission_list) - set(group_has_permissions))
+					print ('not in group permissions'+ str(not_in_group_permissions))
 					group.permissions.remove(*group_has_permissions)
 					group.permissions.add(*not_in_group_permissions)
 					group.save()
@@ -349,15 +359,18 @@ def group_update(request):
 					error_logger.error(e)
 					return HttpResponse(str(e)+"That group already exists")
 
-@staff_member_required
 #** filter and save users in order
 def user_manage(users, group_has_users, group):
 	if group_has_users in users:
+		print ('group has users')
 		not_in_group_users = list(set(users) - set(group_has_users))
 		group.user_set.add(*not_in_group_users)
 		group.save()
+
 	else:
+		print ('no users in groups')
 		not_in_group_users = list(set(users) - set(group_has_users))
 		group.user_set.remove(*group_has_users)
 		group.user_set.add(*not_in_group_users)
 		group.save()
+

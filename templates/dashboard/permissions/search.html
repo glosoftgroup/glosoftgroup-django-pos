@@ -1,11 +1,13 @@
 {% load staticfiles %}
+{% if groups %}
       <div class="panel panel-flat">
+        <div class="panel-body">
         <div class="table-responsive">
          
 
-          <table class="table  datatable-header-footer" style="border-bottom:1px solid #ddd;">
+          <table class="table table-hover fixed_header datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
-                 <tr>
+                 <tr class="bg-primary">
                     <th>Id</th>
                     <th>Group Name</th>
                     {% if perms.userprofile.change_group or perms.userprofile.delete_group %}
@@ -14,8 +16,7 @@
                   </tr>
                 </thead>
  
-                <tbody id="p-tb">           
-               {% if groups %}
+                <tbody id="p-tb">
                   {% for group in groups %}
                   <tr class='clickable-row' id="{{group.id }}">
                     <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}">#{{ forloop.counter }}</td>
@@ -37,9 +38,6 @@
                     </td>
                   </tr>
                   {% endfor %}
-                {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">no groups available</h2></td></tr>
-               {% endif %}
                   </tbody>
 
            </table>
@@ -52,6 +50,7 @@
             </div>
           </div>
       </div>
+
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
@@ -174,3 +173,15 @@
 
 
  </script>
+<script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+               {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-danger-600">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No Groups to matching results
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}

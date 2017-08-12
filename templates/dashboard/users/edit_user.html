@@ -97,7 +97,7 @@
                    </div>
                    <div class="form-group">
                     <label>Click to Select Groups</label>
-                    <select multiple="" class="select-border-color border-warning select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+                    <select multiple="" id="multiple"class="select-border-color border-warning select2-hidden-accessible" tabindex="-1" aria-hidden="true">
                         {% if groups %}
                           {% for group in groups %}
                               {% if group in user_groups %}
@@ -824,13 +824,11 @@ $(document).ready(function(){
         }
     });
     $('#submit').click(function(){
-        var raw_groups = $(".select-border-color :selected").map(function(){
+        var raw_groups = $("#multiple :selected").map(function(){
                return $(this).val();
             }).get();
         var user_name, user_email, user_password, user_nid, user_mobile;
-
         var name= $('#name').attr('placeholder'), email= $('#email').attr('placeholder'), nid= $('#nid').attr('placeholder'), mobile= $('#mobile').attr('placeholder'), password = $('#password').attr('pas');
-
         var name_v = $('#name').val(), email_v = $('#email').val(), password_v = $('#password').val(), nid_v = $('#nid').val(), mobile_v = $('#mobile').val();
 
         user_name = !name_v ? name : name_v;
@@ -838,7 +836,6 @@ $(document).ready(function(){
         user_password = !password_v ? password : password_v;
         user_nid = !nid_v ? nid : nid_v;
         user_mobile = !mobile_v ? mobile : mobile_v;
-        console.log(user_name);
 
         var file = $('#image')[0].files[0];
         var f = document.getElementById('update-details');
@@ -850,6 +847,10 @@ $(document).ready(function(){
         formData.append("user_mobile", user_mobile);
         for (var i = 0; i < raw_groups.length; i++) {
               formData.append('groups[]', raw_groups[i]);
+          }
+
+          for (var pair of formData.entries()) {
+              console.log(pair[0]+ ', ' + pair[1]);
           }
 
         if (formData) {
@@ -864,10 +865,11 @@ $(document).ready(function(){
 
                      $.jGrowl('Updated successfully', {
                         header: 'Well done!',
-                        theme: 'bg-success'
-                     });
-                     window.location.reload()
-                     //window.location = "{% url 'dashboard:users' %}";
+                        theme: 'bg-success',
+                        beforeClose: function(){
+                           // window.location = "{% url 'dashboard:users' %}";
+                        }
+                     }, 500);
                   },
                   error:function(error){
                     console.log(error);
