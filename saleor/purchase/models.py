@@ -136,4 +136,7 @@ class PurchaseItems(models.Model):
 		return self.purchase_order
 
 	def __unicode__(self):
-return '%s: %s' % (self.sku,self.product_name)
+		return '%s: %s' % (self.sku,self.product_name)
+
+
+
