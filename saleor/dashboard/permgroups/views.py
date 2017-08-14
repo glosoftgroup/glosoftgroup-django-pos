@@ -32,7 +32,7 @@ error_logger = logging.getLogger('error_logger')
 def groups(request):
 	users = User.objects.all().order_by('id')
 	permissions = Permission.objects.all()
-	groups = Group.objects.all()
+	groups = Group.objects.all().order_by('-id')
 	page = request.GET.get('page', 1)
 	paginator = Paginator(groups, 5)
 	try:
@@ -100,7 +100,7 @@ def group_search( request ):
 
 		if q is not None:            
 			groups = Group.objects.filter( 
-				Q( name__icontains = q ) ).order_by( 'id' )
+				Q( name__icontains = q ) ).order_by( '-id' )
 		   	paginator = Paginator(groups, 5)
 			try:
 				groups = paginator.page(page)
@@ -120,7 +120,7 @@ def group_search( request ):
 def perms(request):
 	users = User.objects.all().order_by('-id')
 	permissions = Permission.objects.all()
-	groups = Group.objects.all()
+	groups = Group.objects.all().order_by('-id')
 	try:
 		first_group = Group.objects.filter()[:1].get()
 		users_in_group = User.objects.filter(groups__id=first_group.id)
@@ -155,7 +155,6 @@ def create_group(request):
 
 @staff_member_required
 @permission_decorator('group.add_group')
-@csrf_exempt
 def group_assign_permission(request):
 	if request.method == 'POST':
 		group_id = request.POST.get('group_id')
@@ -287,23 +286,26 @@ def group_manage(request):
 def get_group_users(request):
 	group_id = request.POST.get('id')
 	group = Group.objects.get(id=group_id)
-	users = User.objects.filter(groups__name=group.name)
+	try:
+		users = User.objects.filter(groups__name=group.name)
 
-	to_json = []
-	for user in users:
-		user_dict = {}
-		user_dict['id'] = user.id
-		if user.name:
-			user_dict['name'] = user.name
-		else:
-			user_dict['name'] = user.email
-		if user.image:
-			user_dict['image'] = str(user.image)
-		else:
-			user_dict['image'] = "/static/images/user.png"
-		to_json.append(user_dict)
-	response_data = simplejson.dumps(to_json)
-	return HttpResponse(response_data, content_type='application/json')
+		to_json = []
+		for user in users:
+			user_dict = {}
+			user_dict['id'] = user.id
+			if user.name:
+				user_dict['name'] = user.name
+			else:
+				user_dict['name'] = user.email
+			if user.image:
+				user_dict['image'] = str(user.image.url)
+			else:
+				user_dict['image'] = "/static/images/user.png"
+			to_json.append(user_dict)
+		response_data = simplejson.dumps(to_json)
+		return HttpResponse(response_data, content_type='application/json')
+	except Exception, e:
+		return HttpResponse('none')
 
 @staff_member_required
 @permission_decorator('group.change_group')
@@ -362,15 +364,25 @@ def group_update(request):
 #** filter and save users in order
 def user_manage(users, group_has_users, group):
 	if group_has_users in users:
-		print ('group has users')
 		not_in_group_users = list(set(users) - set(group_has_users))
 		group.user_set.add(*not_in_group_users)
 		group.save()
 
 	else:
-		print ('no users in groups')
 		not_in_group_users = list(set(users) - set(group_has_users))
 		group.user_set.remove(*group_has_users)
 		group.user_set.add(*not_in_group_users)
 		group.save()
 
+def group_update_users(request):
+	if request.method == 'POST':
+		group_id = request.POST.get('id')
+		group_name = request.POST.get('group_name')
+		group = Group.objects.get(id=group_id)
+		users = request.POST.getlist('users[]')
+		group_has_users = User.objects.filter(groups__name=group.name)
+		try:
+			user_manage(users, group_has_users, group)
+			return HttpResponse('Update wass successful')
+		except Exception, e:
+			return HttpResponse(e)

@@ -1,34 +1,69 @@
   {% load staticfiles %}
-  {% if groups %}
-    {% for group in groups %}
+  {% for group in groups %}
     <tr class='clickable-row' id="{{group.id }}">
-      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}">#{{ forloop.counter }}</td>
+      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{ forloop.counter }}.</td>
        <!-- group name -->
-      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}">{{group.name}}</td>
+      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{group.name}}</td>
       <!-- actions -->
+      {% if perms.auth.change_group or perms.auth.delete_group %}
       <td class="text-center">
-        <ul class="icons-list">
-          <li>
-            <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
-           class="modal_trigger_edit btn btn-default btn-sm edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal" style="font-size: 11px;"></i> edit</a>
-          </li>
-          <li>
-            <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
-           class="modal_trigger_delete btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
-           </a>
-          </li>
-        </ul>
+
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              action <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu edit-dropdown">
+            {% if perms.auth.change_group %}
+              <li>
+                <a data-ta="#modal_users" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
+               data-token='{{ csrf_token }}' class="modal_trigger_user edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> MANAGE USERS</a>
+              </li>
+           {% endif %}
+           {% if perms.auth.change_group %}
+              <li>
+                <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
+               class="modal_trigger_edit edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> EDIT</a>
+              </li>
+           {% endif %}
+            {% if perms.auth.delete_group %}
+              <li>
+                <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
+               class="modal_trigger_delete del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+               </a>
+              </li>
+           {% endif %}
+            </ul>
+          </div>
+
       </td>
+      {% endif %}
     </tr>
     {% endfor %}
-  {% else %}
-     <tr><td colspan="6"><h2 class="text-center">no groups available</h2></td></tr>
- {% endif %}
 
+<!--<script type="text/javascript" src="{% static 'backend/js/groups/groups.js' %}"></script>-->
 <script type="text/javascript">
   //**@ global users array
-    var names = [];
  $(document).ready(function(){
+
+ $(".clickable-row .td").click(function(){
+      var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         var token = '{{ csrf_token }}';
+
+          //*@ get group permissions
+          $.post(url,{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"}, function(data){
+            $('.detail-body').html(data);
+            $(modal).modal();
+          });
+
+});
+
 
      //**@ edit modal
     $('.modal_trigger_edit').on('click', function (e) {
@@ -46,7 +81,7 @@
          $(modal).modal();
          $('.delete_form').attr('action',url);
          var token = '{{ csrf_token }}';
-         
+
           //*@ get group permissions
           $.post(url,{id:id, csrfmiddlewaretoken:"{{ csrf_token }}"}, function(data){
             $('.permissions_display').html(data);
@@ -61,22 +96,27 @@
             success:function(data){
               names = data;
               console.log(names);
+              if(typeof data !== 'undefined' && data.length >0){
+                  names = data;
+                   //*@ populate table
+                    var table_body = $('#group_user_table tbody');
+                    var parent = table_body.parent();
+                    table_body.detach().empty().each(function(i, val){
+                        for (var x = 0; x < remove_duplicates(names).length; x++){
+                            $(this).append('<tr id="guser-'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeGroupUser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> delete</a></td></tr');
+                            if (x == remove_duplicates(names).length - 1){
+                                $(this).appendTo(parent);
+                            }
+                        }
+                    });
+               }else{
+                    $('#group_user_table tbody').empty().append('<tr><td colspan="3"><div class="alert bg-danger col-md-12"><h5 class="text-center" style="text-transform:uppercase">No users available</h5></td></tr></div>')
+               }
+
             },error:function(error){
               console.log(error);
             }
           });
-        //*@ populate table
-        var table_body = $('#group_user_table tbody');
-        var parent = table_body.parent();
-        
-        table_body.detach().empty().each(function(i, val){
-            for (var x = 0; x < remove_duplicates(names).length; x++){
-                $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
-                if (x == remove_duplicates(names).length - 1){
-                    $(this).appendTo(parent);
-                }
-            }
-        });
 
     });
 
@@ -105,9 +145,9 @@ $('.del').on('click', function (e) {
         data: formData,
         processData: false,
         contentType: false,
-        success:function(data){        
+        success:function(data){
           $('#modal_instance').modal('hide');
-          $('#tb #'+id).remove();            
+          $('#tb #'+id).remove();
           $.jGrowl('Group deleted successfully', {
             header: 'Well done!',
             theme: 'bg-success'
