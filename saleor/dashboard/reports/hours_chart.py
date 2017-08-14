@@ -23,7 +23,6 @@ from django.utils.dateformat import DateFormat
 import logging
 
 from ...core.utils import get_paginator_items
-from ..views import staff_member_required
 from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem
 from ...product.models import Product, ProductVariant

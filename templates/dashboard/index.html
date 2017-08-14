@@ -9,7 +9,9 @@
 {% block breadcrumbs %}
     <li class="active"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
 {% endblock %}
-
+<style>
+  table tr .ctd{padding: 8px 10px !important;}
+</style>
 {% block content %}
           <!-- Quick stats boxes -->
           <div class="row animated fadeIn">
@@ -92,29 +94,141 @@
           </div>
           <!-- /quick stats boxes -->
 
-  <div class="row">
-   <div class="col-md-12">
-       <div class="panel panel-flat">
+<div class="row">
+
+  {% if sales_by_item %}
+    <div class="col-md-6">
+    <div class="panel panel-flat" id="itemdiv">
       <div class="panel-heading">
-        <h6 class="panel-title">Chart summaries</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-
+          <h6 class="panel-title" style="text-align:center;">Top 5 Items in last sales</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+      </div>
       <div class="panel-body">
+        <div class="col-md-5">
+           <canvas id="itemChart" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-12">
+                     <div class="data-table-container">
+                        <table class="table bordered highlight responsive data-table">
+                          <tbody>
+                          {% if sales_by_item %}
+                           {% for sales in sales_by_item %}
+                              <tr data-action-go="">
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_name}}">
+                                  <div class="sqaure" style="width: 10px;height: 10px;border-radius: 50%;background-color: {{sales.color}};">
+                                  </div>
+                                </td>
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                    {{forloop.counter }}. {{sales.product_name}}
+                                </td>
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            {% endif %}
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+            </div>
 
-        <div class="col-md-6 col-md-offset-3">
-         <canvas id="myChart" width="400" height="400"></canvas>
         </div>
       </div>
-    </div>    
-   </div>
+    </div>
   </div>
+  {% else %}
+
+     <div class="col-md-6">
+      <div class="panel bg-info">
+        <div class="panel-heading">
+            <h6 class="panel-title" style="text-align:center;">No Items Sold Yet</h6>
+            <div class="heading-elements">
+              <ul class="icons-list">
+                <li><a data-action="close"></a></li>
+              </ul>
+            </div>
+        </div>
+     </div>
+     </div>
+ {% endif %}
+{% if sales_by_category %}
+    <div class="col-md-6">
+    <div class="panel panel-flat" id="catdiv">
+      <div class="panel-heading">
+          <h6 class="panel-title" style="text-align:center;">Top 5 Categories in last sales</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-5">
+           <canvas id="catChart" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-12">
+                     <div class="data-table-containers">
+                        <table class="table bordered highlight responsive data-table">
+                          <tbody>
+                          {% if sales_by_category %}
+                           {% for sales in sales_by_category %}
+                              <tr data-action-go="">
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                  <div class="sqaure" style="width: 10px;height: 10px;border-radius: 50%;background-color: {{sales.color}};">
+                                  </div>
+                                </td>
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                    {{forloop.counter }}.  {{sales.product_category}}
+                                </td>
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}} ({{ sales.percentage }}%)</div>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            {% endif %}
+
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+
+     <div class="col-md-6">
+      <div class="panel bg-info">
+        <div class="panel-heading">
+            <h6 class="panel-title" style="text-align:center;">No Categories Sold Yet</h6>
+            <div class="heading-elements">
+              <ul class="icons-list">
+                <li><a data-action="close"></a></li>
+              </ul>
+            </div>
+        </div>
+     </div>
+     </div>
+ {% endif %}
+ </div>
+
   <div class="row">
     <div class="col-md-12">
       <div class="panel panel-flat">
@@ -179,6 +293,7 @@
   </div>
 {% endblock %}
 {% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
   var endpoint = "{% url 'dashboard:chart' %}";
@@ -232,6 +347,56 @@ $(document).ready(function(){
           }
       });
   }
+
+  //**@ category chart
+  //-----chart**/
+//**@ doughnut chart
+    var defaultData2 = [{% for d in sales_by_category %} {{ d.total_cost__sum }}, {% endfor %}];
+    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}", {% endfor %}];
+    var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
+    // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
+      var ctx = document.getElementById("catChart").getContext('2d');
+      var catChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: labels2,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData2,
+                  backgroundColor:backColor,
+                  borderWidth: 1
+              }]
+          },
+          options:{
+             legend:{
+             display:false}
+          }
+      });
+//--------- /doghnut chart
+
+//-----item chart**/
+    var defaultData3 = [{% for d in sales_by_item %} {{ d.total_cost__sum }}, {% endfor %}];
+    var labels3 = [{% for d in sales_by_item %} "{{ d.product_name }}", {% endfor %}];
+    var backColor = [{% for d in sales_by_item %} "{{ d.color }}", {% endfor %}];
+    // console.log({% for d in sales_by_item %} "{{ d.color }}", {% endfor %});
+      var ctx = document.getElementById("itemChart").getContext('2d');
+      var itemChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: labels3,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData3,
+                  backgroundColor:backColor,
+                  borderWidth: 1
+              }]
+          },
+          options:{
+             legend:{
+             display:false}
+          }
+      });
+//------- /item doghnut chart
 
 });
 </script>

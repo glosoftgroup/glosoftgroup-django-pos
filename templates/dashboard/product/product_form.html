@@ -261,13 +261,13 @@
                 <label>Product Sub-Category:<i class='text-danger'> *</i> </label>
                 <div class="input-group sub-refresh">
                     {{ product_form.product_class}}
-            
+
                  <div class="input-group-btn">
                     <button type="button"  id="add-new-type" data-modal="#modal_type" href="#modal_types" class="btn bg-primary btn-icon "
                             data-title="Add New Sub-Category" data-href='{% url "dashboard:product-class-add-new" 12 %}'
                             data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip"
                             data-original-title="Add New Sub-Category">
-                   <i class="icon-plus-circle2"></i>                   
+                   <i class="icon-plus-circle2"></i>
                     </button>
                   </div>
               </div>
@@ -301,9 +301,7 @@
       <!-- product attribute -->
       <div class="col-md-12" style="margin-bottom:20px;">
         <!-- product attributes -->
-        <div class="form-group" id='div_attributes'>          
-          
-                
+        <div class="form-group" id='div_attributes'>
            {% for attribute_field in product_form.iter_attribute_fields %}
           <div class="col-md-4">
            <label>{{ attribute_field.label }}</label>

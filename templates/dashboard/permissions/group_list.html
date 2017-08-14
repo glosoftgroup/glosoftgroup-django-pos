@@ -96,6 +96,12 @@
                           <ul class="dropdown-menu edit-dropdown">
                           {% if perms.auth.change_group %}
                             <li>
+                              <a data-ta="#modal_users" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
+                             data-token='{{ csrf_token }}' class="modal_trigger_user edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> MANAGE USERS</a>
+                            </li>
+                         {% endif %}
+                         {% if perms.auth.change_group %}
+                            <li>
                               <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
                              class="modal_trigger_edit edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> EDIT</a>
                             </li>
@@ -142,6 +148,88 @@
 {% endif %}
 
 </div>
+
+
+<!-- manage users -->
+ <div id="modal_users" class="modal fade">
+   <div class="modal-dialog modal-md">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+       <div class="row">
+         <div class="col-md-12">
+           <div class="row">
+            <div class="col-md-12">
+             <div class="form-group">
+              <label>Group Name:</label>
+              <input type="text" name="group_name" class="form-control" id="group_name" disabled>
+             </div>
+            </div>
+           </div>
+           <div class="row">
+            <div class="col-md-9">
+              <div class="form-group">
+               <label>Add Users:</label>
+                <div class="multi-select-full">
+                  <select class="multiselect-full-featured" multiple="multiple" style="display: nones;" name="user_select" id="edit_users_multiple" placeholder="select a user...">
+                  {% for usr in users %}
+                    {% if usr.is_active == True and usr.is_superuser == False %}
+                       <option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}
+                       {% else %}{{usr.email}}{% endif %}" data-image="{% if usr.image %}{{usr.image.url}}
+                       {% else %}/static/images/user.png{% endif %}">
+                         {% if usr.name %}
+                            {{usr.name}}
+                         {% else %}
+                            {{usr.email}}
+                         {% endif %}
+                       </option>
+                    {% endif %}
+                  {% endfor %}
+                  </select>
+                </div>
+               </div><!-- end of formgroup-->
+            </div>
+            <div class="col-md-3">
+             <div class="form-group">
+               <label><span style="visibility: hidden;">X</span></label>
+               <button class="btn btn-primary form-control" id="add_user">Add User</button>
+            </div>
+            </div>
+           </div>
+           <div class="row">
+            <div class="col-md-12">
+             <div class="table-responsive pre-scrollable group-users">
+             <table class="table table-framed" id="user_table">
+                <thead>
+                  <tr>
+                    <th>image</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users_table_body">
+
+                </tbody>
+              </table>
+              </div>
+            </div>
+           </div>
+         </div>
+
+        </div>
+       </div>
+       <div class="modal-footer">
+         <button type="submit" id='modal_update_users' class="btn pull-right bg-danger update" data-id=""
+                 data-url="{% url 'dashboard:group_update_users' %}" data-href="" data-token="{{ csrf_token }}">Update</button>
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /manage users -->
 
 
 <!-- edit modal -->
@@ -296,6 +384,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/groups/groups.js' %}"></script>
 <script type="text/javascript">
 function remove_duplicates(objectsArray) {
     var usedObjects = {};
@@ -304,7 +393,7 @@ function remove_duplicates(objectsArray) {
         if (usedObjects[so]) {
             objectsArray.splice(i, 1);
         } else {
-            usedObjects[so] = true;          
+            usedObjects[so] = true;
         }
     }
     return objectsArray;
@@ -319,6 +408,7 @@ function remove_duplicate_name(list) {
 }
 //**@ global users array
  var names = [];
+
 //**@ group users on load
 $('document').ready(function () {
 
@@ -363,21 +453,38 @@ $('document').ready(function () {
             success:function(data){
               names = data;
               console.log(names);
+              if(typeof data !== 'undefined' && data.length >0){
+                  names = data;
+                   //*@ populate table
+                    var table_body = $('#group_user_table tbody');
+                    var parent = table_body.parent();
+                    table_body.detach().empty().each(function(i, val){
+                        for (var x = 0; x < remove_duplicates(names).length; x++){
+                            $(this).append('<tr id="guser-'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeGroupUser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> delete</a></td></tr');
+                            if (x == remove_duplicates(names).length - 1){
+                                $(this).appendTo(parent);
+                            }
+                        }
+                    });
+               }else{
+                    $('#group_user_table tbody').empty().append('<tr><td colspan="3"><div class="alert bg-danger col-md-12"><h5 class="text-center" style="text-transform:uppercase">No users available</h5></td></tr></div>')
+               }
+
             },error:function(error){
               console.log(error);
             }
           });
-        //*@ populate table
-        var table_body = $('#group_user_table tbody');
-        var parent = table_body.parent();
-        table_body.detach().empty().each(function(i, val){
-            for (var x = 0; x < remove_duplicates(names).length; x++){
-                $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> delete</a></td></tr');
-                if (x == remove_duplicates(names).length - 1){
-                    $(this).appendTo(parent);
-                }
-            }
-        });
+        <!--//*@ populate table-->
+        <!--var table_body = $('#group_user_table tbody');-->
+        <!--var parent = table_body.parent();-->
+        <!--table_body.detach().empty().each(function(i, val){-->
+            <!--for (var x = 0; x < remove_duplicates(names).length; x++){-->
+                <!--$(this).append('<tr id="guser-'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeGroupUser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> delete</a></td></tr');-->
+                <!--if (x == remove_duplicates(names).length - 1){-->
+                    <!--$(this).appendTo(parent);-->
+                <!--}-->
+            <!--}-->
+        <!--});-->
 
     });
    // $('.bootstrap-select').selectpicker();
@@ -447,7 +554,7 @@ $('#add_user_btn').on('click', function(e){
 
     table_body.detach().empty().each(function(i, val){
         for (var x = 0; x < remove_duplicates(names).length; x++){
-            $(this).append('<tr id="'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeuser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
+            $(this).append('<tr id="guser-'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeGroupUser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> remove</a></td></tr');
             if (x == remove_duplicates(names).length - 1){
                 $(this).appendTo(parent);
             }
@@ -456,13 +563,23 @@ $('#add_user_btn').on('click', function(e){
 
 });
 //**@ remove user from array
-function removeuser(user){
+function removeGroupUser(user){
    users = remove_duplicates(names);
    var index = names.indexOf(user);
-    $('#'+user).remove();
+    $('#guser-'+user).remove();
     names.splice(index,1);
     console.log(names);
 }
+
+//**@ remove user from array
+function removeuser(user){
+   users = remove_duplicates(names);
+   var index = names.indexOf(user);
+    $('#user-'+user).remove();
+    names.splice(index,1);
+    console.log(names);
+}
+
 //**@ submit group details
 function submitGroupDetails(){
    var user_ids = [];
