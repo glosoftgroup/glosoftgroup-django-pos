@@ -134,6 +134,7 @@ urlpatterns = [
         (views.view_attr), name='product-attributes'),
     url(r'attributes/paginate/$', permission_required('product.view_productattribute', login_url='not_found')
         (views.paginate_attr), name='attr_paginate'),
+    url(r'new-attribute/$',views.new_attribute,name='new-attribute'),
     url(r'attributes/search$',
         views.search_attribute, name='search-attribute'),
     
@@ -145,6 +146,7 @@ urlpatterns = [
     (views.attribute_add_modal), name='product-attribute-add-modal'),
     url(r'attributes/(?P<pk>[0-9]+)/delete/$', permission_required('product.delete_productattribute', login_url='not_found')
         (views.attribute_delete), name='product-attribute-delete'),
+    url(r'attr_list/$',views.attr_list,name="attr_list"),
 
     url(r'attributes/ajax_add/$',
         views.attribute_add, name='product-attr-add'),

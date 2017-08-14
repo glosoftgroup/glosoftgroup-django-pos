@@ -13,7 +13,7 @@
 
 {% block breadcrumbs %}
     <li>
-    	<a href="{% url 'dashboard:notification_list' %}">Messages</a>
+    	<a href="{% url 'dashboard:message_list' %}">Messages</a>
     </li>
     <li class="active">
       {{notification.verb}}
@@ -137,7 +137,7 @@
            <form action="{% url 'dashboard:delete-notification' notification.id %}">
            {% csrf_token %}
 			<div class="modal-body">
-				<h6 class="text-semibold">Notification Title</h6>
+				<h6 class="text-semibold">Message Title</h6>
 				<p>Are you sure you want to 
 				{% if notification.deleted %}
 				Delete permanently
@@ -173,9 +173,9 @@
     var dynamicData = {'csrfmiddlewaretoken':csrf_token};
 
     {% if notification.deleted %}
-	var url = "{% url 'dashboard:delete-permanently' notification.id %}";
+	var url = "{% url 'dashboard:delete-sms-permanently' notification.id %}";
 	{% else %}
-	var url = "{% url 'dashboard:delete-notification' notification.pk %}";
+	var url = "{% url 'dashboard:delete-message' notification.pk %}";
 	{% endif %}
         
     return $.ajax({
@@ -197,7 +197,7 @@
                           header: 'Well done!',
                           theme: 'bg-success'
             });
-	     window.location.href = "{% url 'dashboard:notification_list' %}";
+	     window.location.href = "{% url 'dashboard:message_list' %}";
 	   
         // ./notify
         });

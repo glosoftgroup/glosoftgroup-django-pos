@@ -19,6 +19,8 @@ from ...supplier.models import Supplier
 from ...customer.models import Customer
 from ...smessages.signals import sms as notify
 from ...smessages.models import SMessage as Notification, SmsTemplate
+from ...product.models import Product
+
 
 @staff_member_required
 def get_template(request,pk=None):
@@ -54,11 +56,11 @@ def list_messages(request,status=None):
     delete_permanently = False
     if status == 'trash':
         delete_permanently = True
-        messages = request.user.notifications.deleted()
+        messages = Notification.objects.deleted()
     elif status == 'unread':
-        messages = request.user.notifications.unread()
+        messages = Notification.objects.unread()
     elif status == 'read':
-        messages = request.user.notifications.read()
+        messages = Notification.objects.read()
     elif status == 'emailed':
         mark_read = False
         messages = Notification.objects.filter(actor_object_id=request.user.id,emailed=True)
@@ -66,12 +68,12 @@ def list_messages(request,status=None):
         mark_read = False
         messages = Notification.objects.filter(actor_object_id=request.user.id)
     else:
-        messages = request.user.notifications.active()
+        messages = Notification.objects.active()
     ctx = {
         'delete_permanently': delete_permanently,
         'mark_read': mark_read,
         'status': status,
-        'deleted': len(request.user.notifications.deleted()),
+        'deleted': len(Notification.objects.deleted()),
         'notifications': messages,
         'total_notifications': len(messages),
         'users': User.objects.all()}
@@ -82,7 +84,7 @@ def list_messages(request,status=None):
 
 @staff_member_required
 def unread_count(request):
-    messages = request.user.notifications.unread()
+    messages = Notification.objects.unread()
     return HttpResponse(len(messages))
 
 
@@ -126,7 +128,7 @@ def read(request, pk=None):
               'notification':message,
               'actor':message.actor.email[0]}
         return TemplateResponse(request,
-                            'dashboard/notification/read.html',
+                            'dashboard/messages/read.html',
                             ctx)
     else:
         messages = request.user.notifications.unread()
@@ -136,7 +138,7 @@ def read(request, pk=None):
         'total_notifications': len(messages),
         'users':User.objects.all()}
     return TemplateResponse(request,
-                            'dashboard/notification/list.html',
+                            'dashboard/messages/list.html',
                             ctx)
 
 
@@ -144,14 +146,22 @@ def read(request, pk=None):
 def write(request):
     if request.method == 'POST':
         # get form data
+        single = request.POST.get('single');
         subject = request.POST.get('subject')
         to_customers = request.POST.get('toCustomers',0)
         to_suppliers = request.POST.get('toSuppliers',0)
         user_contacts = json.loads(request.POST.get('userContacts'))
         body = request.POST.get('body')
-        print user_contacts
-        print type(to_customers)
-        print to_suppliers
+
+        if single:
+            user = Supplier.objects(mobile=single)
+            if user:
+                notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
+                notif.save()
+            else:
+                notif = Notification(to='anonymous', actor=request.user, recipient=request.user, sent_to=single, verb=subject, description=body)
+                notif.save()
+        
         if user_contacts and user_contacts is not 'null':
             for mobile in user_contacts:
                 user = User.objects.get(mobile=mobile)
@@ -164,9 +174,54 @@ def write(request):
                 #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
                 notif = Notification(to='customer', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
                 notif.save()
-
+        if not to_customers:
+            for mobile in to_suppliers:
+                user = Supplier.objects.get(mobile=mobile)
+                #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
+                notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
+                notif.save()
     ctx = {'users':User.objects.all().order_by('-id'),
            'templates':SmsTemplate.objects.all().order_by('-id')}
+    
+    if request.GET.get('pk'):
+            product = get_object_or_404(Product, pk=int(request.GET.get('pk')))
+            ctx = {'product':product, 'users':User.objects.all().order_by('-id'),
+           'templates':SmsTemplate.objects.all().order_by('-id')}
+            return TemplateResponse(request,
+                            'dashboard/messages/write_single.html',
+                            ctx)
+    return TemplateResponse(request,
+                            'dashboard/messages/write.html',
+                            ctx)
+
+@staff_member_required
+def write_single(request):
+    if request.method == 'POST':
+        # get form data
+        single = request.POST.get('single');
+        subject = request.POST.get('subject')
+        body = request.POST.get('body')
+
+        if single:
+            try:
+                user = Supplier.objects.get(mobile=single)
+                if user:
+                    notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
+                    notif.save()
+            except:            
+                notif = Notification(to='anonymous', actor=request.user, recipient=request.user, sent_to=single, verb=subject, description=body)
+                notif.save()        
+        
+    ctx = {'users':User.objects.all().order_by('-id'),
+           'templates':SmsTemplate.objects.all().order_by('-id')}
+    
+    if request.GET.get('pk'):
+            product = get_object_or_404(Product, pk=int(request.GET.get('pk')))
+            ctx = {'product':product, 'users':User.objects.all().order_by('-id'),
+           'templates':SmsTemplate.objects.all().order_by('-id')}
+            return TemplateResponse(request,
+                            'dashboard/messages/write_single.html',
+                            ctx)
     return TemplateResponse(request,
                             'dashboard/messages/write.html',
                             ctx)

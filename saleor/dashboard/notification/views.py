@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from ...userprofile.models import User
 from ...supplier.models import Supplier
 from ...customer.models import Customer
+from ...product.models import Product
 from notifications.signals import notify
 from notifications.models import Notification
 
@@ -107,12 +108,23 @@ def write(request):
     if request.method == 'POST':
         # get form data
         subject = request.POST.get('subject')
+        single = request.POST.get('single');
         to_customers = request.POST.get('toCustomer',0)
         to_suppliers = request.POST.get('toSupplier',0)
         email_list = json.loads(request.POST.get('emailList'))
         body = request.POST.get('body')
 
         # send notification/emails
+        if single:
+            user = Supplier.objects.get(email=single)
+            context = {'user': user.name, 'body': body, 'subject': subject}
+            emailit.api.send_mail(user.email,
+                                      context,
+                                      'notification/emails/notification_email',
+                                      from_email=request.user.email)
+            notif = Notification(actor=request.user, recipient=request.user, verb=subject, description=body, emailed=True)
+            notif.save()
+            
         for email in email_list:
             user = User.objects.get(email=email['email'])
             if user.send_mail:
@@ -149,9 +161,12 @@ def write(request):
                 notif.save()
 
         HttpResponse(email_list)
-
-
     ctx = {'users':User.objects.all().order_by('-id')}
+    if request.method == 'GET':
+        if request.GET.get('pk'):
+            product = get_object_or_404(Product, pk=int(request.GET.get('pk')))
+            ctx = {'product':product,'users':User.objects.all().order_by('-id')}
+    
     return TemplateResponse(request,
                             'dashboard/notification/write.html',
                             ctx)

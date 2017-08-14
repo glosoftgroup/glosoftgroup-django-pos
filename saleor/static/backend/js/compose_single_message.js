@@ -7,7 +7,7 @@
  */
 $(function() {
     var pageUrls   = $('.pageUrls');
-	var url        = pageUrls.data('contacts');
+	var url = pageUrls.data('contacts');
 	var composeUrl = pageUrls.data('compose');
     var redirectUrl = pageUrls.data('redirecturl');
 	var sendSms = $('#sendSms');
@@ -55,23 +55,11 @@ getSupplier.tokenize2({
 });
 
 // user contacts
-userContacts.tokenize2({
-    placeholder: 'Select user(s)',
-    sortable: true,
-    dataSource: function(search, object){
-        $.ajax(url, {
-            data: { search: search, start: 1, group:'users' },
-            dataType: 'json',
-            success: function(data){
-                var $items = [];
-                $.each(data, function(k, v){
-                    $items.push(v);
-                });
-                object.trigger('tokenize:dropdown:fill', [$items]);
-            }
-        });
-    }
-});
+// userContacts.tokenize2({
+//     placeholder: 'Select user(s)',
+//     sortable: true,
+//     dataSource: 'select'
+// });
 
 // tokenize events
 $('#customerModal').on('hidden.bs.modal', function () {
@@ -89,8 +77,9 @@ function alertUser(msg,status,header='Well done!')
 }
 
 // ajax
-function sendNotification(userContacts,subject,body,toCustomers,toSuppliers) {
-    var dynamicData = {};    
+function sendNotification(userContacts,subject,body,toCustomers,toSuppliers,single) {
+    var dynamicData = {}; 
+    dynamicData["single"]  = single;
     dynamicData["userContacts"] = JSON.stringify(userContacts);
     dynamicData["subject"] = subject;
     dynamicData["body"] = body;
@@ -108,7 +97,8 @@ function sendNotification(userContacts,subject,body,toCustomers,toSuppliers) {
 sendSms.on('click',function(){   
     var ucontacts = userContacts.val();
     var scontacts = getSupplier.val();
-    var ccontacts = getCustomer.val();    
+    var ccontacts = getCustomer.val(); 
+    var single = $('#single').val();
     var what = body.val();
     var verb = subject.val();
     if(!verb)
@@ -120,16 +110,16 @@ sendSms.on('click',function(){
     if(!what){ alertUser('Message Body required','bg-danger','Empty Body!'); return false;}
     if(!ccontacts){ ccontacts = false; }
     if(!scontacts){ scontacts = false; } 
-    if(!scontacts && !ccontacts && !ucontacts)
+    if(!scontacts && !ccontacts && !ucontacts && !single)
     {
         alertUser('Enter at least one contacts!','bg-danger','Error!');
         return false;
     }
-    sendNotification(ucontacts,verb,what,ccontacts,scontacts).done(function(data) {
+    sendNotification(ucontacts,verb,what,ccontacts,scontacts,single).done(function(data) {
         $.jGrowl('Notification sent successfully', 
         {header: 'Well done!',theme: 'bg-success'});
+        window.location.href = redirectUrl;
     });
-    window.location.href = redirectUrl;
 });
 // ./ event click send button
 });
