@@ -81,23 +81,13 @@
                 <td style="width: 50px"><label>To:</label></td>
                 <td style="width: 100%" class="text-left">
                 <div class="col-md-6">
-                    <select name='contacts' multiple="multiple" id="contacts" class="contacts"></select>
+                {% if product.product_supplier.mobile %}
+                   <input type="text" class="form-control" value="{{ product.product_supplier.mobile}}" name="single" id="single">
+                {% else %}
+                <input type="text" class="form-control" value="" name="single" id="single">
+                {% endif %}
                 </div>
-                <div class="col-md-6">
-                    <div class="formgroup">
-                        <div class="col-sm-4 text-semibold">Select Group
-                        </div>
-                        <div class="col-sm-4">
-                            <button id="supplier" data-toggle="modal" data-target="#supplierModal" class="btn btn-xs hvr-bob btn-primary">
-                            <span class="badge badge-success" id="supplierCount"></span>&nbsp; Supplier</button>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <button id="customer" data-toggle="modal" data-target="#customerModal" class="btn btn-xs btn-primary hvr-bob"><span class="badge badge-success" id="customerCount"></span>
-                            Customers</button>
-                        </div>
-                    </div>
-                </div>
+                
                
                     <ul class="list-inline list-inline-separate no-margin">
 
@@ -108,7 +98,12 @@
             <tr>
                 <td><label>Subject:</label></td>
                 <td class="no-padding">
-                <input class="form-control" placeholder="Add subject" name="subject" value="" id='subject' type="text"></td>
+                {% if product %}
+                <input class="form-control" placeholder="Add subject" name="subject" value="Stock Order for: {{product}}" id='subject' type="text">
+`				{% else %}
+				<input class="form-control" placeholder="Add subject" name="subject" value="" id='subject' type="text">
+				{% endif %}
+                </td>
                 <td>&nbsp;</td>
             </tr>
 
@@ -214,12 +209,12 @@
 {% include "dashboard/messages/modals/contacts.html" %}
 
 <!-- page urls -->
-<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:message-contacts' %}" data-aurl="{% url 'dashboard:get-sms-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
+<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:message-contacts' %}" data-aurl="{% url 'dashboard:get-sms-template' %}" data-redirecturl="{% url 'dashboard:message_list_slug' 'sent' %}" data-compose="{% url 'dashboard:compose_single_message' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
 {% endblock %}
 {% block custom_js %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/compose_message.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/compose_single_message.js' %}"></script>
 
 
 

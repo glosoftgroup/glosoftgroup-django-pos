@@ -36,7 +36,7 @@
 
 <!-- Mail toolbar -->
 <div class="panel-toolbar panel-toolbar-inbox">
-    <div class="navbar navbar-default">
+    <div class="navbar navbar-default" style="z-index: 8;">
         <ul class="nav navbar-nav visible-xs-block no-border">
             <li>
                 <a class="text-center collapsed" data-toggle="collapse" data-target="#inbox-toolbar-toggle-single">
@@ -76,7 +76,14 @@
                 <td style="width: 50px">To:</td>
                 <td style="width: 100%" class="text-left">
                 <div class="col-md-6">
-                    <input type="text" value="" data-role="tagsinput" placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                {% if product.product_supplier %}
+
+                <input type="text" value="{{product.product_supplier.email}}" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                {% else %}
+                <input type="text" value="" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                {% endif %}
+                    
+               
                 </div>
                 <div class="col-md-6">
                     <div class="formgroup">
@@ -102,7 +109,12 @@
             <tr>
                 <td>Subject:</td>
                 <td class="no-padding">
-                <input class="form-control" placeholder="Add subject" name="subject" value="" id='subject' type="text"></td>
+                {% if product %}
+                <input class="form-control" placeholder="Add subject" name="subject" value="Re-order: {{product}}" id='subject' type="text">
+                {% else %}
+                <input class="form-control" placeholder="Add subject" name="subject" value="" id='subject' type="text">
+                {% endif %}
+                </td>
                 <td>&nbsp;</td>
             </tr>
 
@@ -115,7 +127,17 @@
 <!-- Mail container -->
 <div class="mail-container-write">
     <div >
-        <textarea cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ..."></textarea>
+        <textarea cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ...">
+        {% if product %}
+       
+        
+             <h5 align="left" class="text-uppercase text-semibold">
+                 Invoice#
+             </h5>
+             <h5><b>Date:</b> {% now "SHORT_DATETIME_FORMAT" %}</h5>
+         
+             {% endif %}
+        </textarea>
     </div>
 
 
@@ -215,6 +237,9 @@ selector1.on('change',function(){
 // ajax
 function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
     var dynamicData = {};
+    {% if product.product_supplier.email %}
+          dynamicData['single']  = "{{product.product_supplier.email}}";
+    {% endif %}
     console.log('sending data.....');
     dynamicData["emailList"] = JSON.stringify(emailList);
     dynamicData["subject"] = subject;
@@ -259,7 +284,7 @@ sendnot.on('click',function(){
     var to = selector1.val();
     var toSplit = to.split(",");
 
-
+     
     // validate
     if(!to){
         if(1==parseInt(toSuppliers))
@@ -273,8 +298,13 @@ sendnot.on('click',function(){
           //return true;  
         }
         else{
+          
+          {% if product.product_supplier %}
+           toSplit = '{{product.product_supplier.email}}'
+          {% else %}
           alert('Enter atleast one email!');
           return false;  
+          {% endif %}
         } 
         
     }else{
@@ -283,7 +313,8 @@ sendnot.on('click',function(){
             if( emails.indexOf(toSplit[i]) > -1 ) {
                 console.log("success");
                 json.push({"email":toSplit[i]});
-            }
+                
+            }            
        
         }
     }

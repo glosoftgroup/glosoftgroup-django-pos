@@ -60,7 +60,7 @@
  <div class="">
    <div class="panel panel-flat">
     <div class="panel-heading">
-      <h5 class="panel-title">Product Attribute</h5>
+      <h5 class="panel-title">Product Class</h5>
       <div class="heading-elements">
         <ul class="icons-list">
           <li><a data-action="collapse"></a></li>
@@ -92,7 +92,7 @@
             </div>
             </div>
             <div class="form-group text-center">
-             <button id="add-new-attribute" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add" %}'
+             <button id="new-attribute" onclick="return false;" class="btn btn-flat text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add" %}'
               href="#modal_attribute">
              <i class="icon-file-plus"></i>
              Add Attributes
@@ -154,7 +154,9 @@
     </div>
   </div>
    {% include "dashboard/includes/_modal.html"  %}
-   {% include "dashboard/includes/_modal_attribute.html"  %}
+   
+
+   {% include "dashboard/product/attributes/modal/new_attribute.html"  %}
 {% endblock %}
 {% block custom_js %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
@@ -171,13 +173,54 @@
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
     });
+    
+// ajax
+function sendGetForm(myUrl) 
+{
+   var dynamicData = {};
+   return $.ajax({
+      url: myUrl,
+      type: "get",
+      data: dynamicData
+    });
+}
+
+function sendGetAttr(myUrl) 
+{
+   var dynamicData = {};
+   return $.ajax({
+      url: myUrl,
+      type: "get",
+      data: dynamicData
+    });
+}
+    
+var newAttrBtn = $('#new-attribute');
+var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+var resultsDiv = $(".results" );
+var url = "{% url 'dashboard:new-attribute' %}";
+
+newAttrBtn.on('click',function(){   
+  var title_text = $(this).data('title');
+  $('.modal-title').html(title_text);
+  var modal = $(this).attr('href');
+  $(modal).modal();
+  sendGetForm(url).done(function(data){
+    $(".results" ).empty().append( data );
+
+  });
+});
+
+$('#modal_attribute').on('hidden.bs.modal', function () {
+    var attrUrl = "{% url 'dashboard:attr_list' %}"
+    sendGetAttr(attrUrl).done(function(data){
+    $("#id_product_attributes").multiselect('dataprovider', data);
+    $('#id_variant_attributes').multiselect('dataprovider',data);
+    $("#id_product_attributes").multiselect('refresh');
+    });
+});
   function refresh(){
-    window.location.reload();
-    // var url = "{% url 'dashboard:product-class-add' %}";
-    // var posting = $.get( url, {});
-    // posting.done(function(data) {
-    //   $('#refresh-content').empty().append( data );
-    // });
+    //window.location.reload();    
   }
   $('#refresh_content').on('click', function(){
     refresh();

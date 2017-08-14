@@ -193,10 +193,19 @@
         deleteNot(csrf_token).done(function(data) 
         {    
         // notify
+        {% if notification.deleted %}
+        $.jGrowl('Notification deleted permanently', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+            });
+        {% else %}
         $.jGrowl('Notification moved to trash', {
                           header: 'Well done!',
                           theme: 'bg-success'
             });
+
+        {% endif %}
+
 	     window.location.href = "{% url 'dashboard:notification_list' %}";
 	   
         // ./notify

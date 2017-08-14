@@ -75,14 +75,15 @@
               </button>
               <ul class="dropdown-menu edit-dropdown">
                 <li>
-                    <a href="javascript:;">
+                    <a href="javascript:;" data-href="{% url 'dashboard:compose_message' %}"
+                    data-ppk="{{product.pk}}" class="sendSms">
                         <i class="icon-comments" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Edit me">
                         </i> Sms
                     </a>
                 </li>
                 <li>
-                    <a href="javascript:;" data-title='Remove {{ product.name }}' data-href="{% url 'dashboard:product-delete' pk=product.pk %}"
-                class="modal-trigger-ajax">
+                    <a href="javascript:;" data-href="{% url 'dashboard:write' %}"
+                class="modal-trigger-ajax sendMail" data-ppk="{{product.pk}}" >
                         <i class="icon-mail5 position-left" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Delete me">
                         </i> Email
                     </a>
@@ -111,4 +112,21 @@
 </div>
 
 <!-- /search field -->
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript">
+  var sendSms = $('.sendSms');
+  var sendMail = $('.sendMail');
+  
+  sendMail.on('click',function(){
+    var productPk= $(this).data('ppk');
+    var mailUrl  = $(this).data('href');
+    window.location.href = mailUrl+'?pk='+productPk;   
+  });
+  sendSms.on('click',function(){
+    var productPk= $(this).data('ppk');
+    var smsUrl  = $(this).data('href');
+    window.location.href = smsUrl+'?pk='+productPk;   
+  });
+</script>
 {% endblock %}
