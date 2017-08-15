@@ -61,9 +61,14 @@ def view(request):
 	except Exception, e:
 		return HttpResponse(e)
 
+@staff_member_required
 def add(request):
 	amount = request.POST.get('amount')
-	petty_cash = get_object_or_404(PettyCash, pk=1)
+	try:
+		petty_cash = get_object_or_404(PettyCash, pk=1)
+	except:
+		petty_cash = PettyCash(amount=0)
+		petty_cash.save()
 	petty_cash_amount = petty_cash.amount
 	try:
 		petty_cash_amount += Decimal(amount)

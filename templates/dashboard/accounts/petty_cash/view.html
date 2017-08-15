@@ -96,10 +96,10 @@ $(document).ready(function(){
           var f = document.getElementById('petty_cash');
           var formData = new FormData(f);
           $.ajax({
-          url: "{% url 'accounts:petty_cash_add' %}",
-          type: "POST",
-          data: formData,
-          processData: false,
+              url: "{% url 'accounts:petty_cash_add' %}",
+              type: "POST",
+              data: formData,
+              processData: false,
               contentType: false,
               success:function(data){
                 $('.amount').val('');
