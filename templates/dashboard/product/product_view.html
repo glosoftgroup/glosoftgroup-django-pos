@@ -104,7 +104,7 @@
 </div>
 
 <div class="modal-footer">
-	<button type="button" class="btn btn-default btn-block btn-lg" data-dismiss="modal">Close</button>
+	<button data-href="{% url 'dashboard:product-update' pk=product.pk %}" class="btn btn-default btn-block btn-lg edit-b">EDIT</button>
 </div>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>
 <script type="text/javascript">
@@ -113,4 +113,8 @@
         autoWidth: false
     });
     $('.id_product_tax').attr("class", 'form-control');
+    $('.edit-b').on('click', function(){
+      url = $(this).data('href');
+      window.location = url;
+    })
 </script>
