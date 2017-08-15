@@ -1,0 +1,93 @@
+<!-- supplier modal -->
+<div class="modal fade" id="daddProductClass" >
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h6 class="modal-titl">Add Attributes</h6>
+                </div>
+                <div class="modal-body">
+                 <div class="form-group hidden">
+                  <label class="text-purple-800">Product Sub-category Name</label>
+                  <input type="text" class="form-control" placeholder="Sub-category Name" name="newClassNameD" id="newClassNameD">
+                 </div>
+                 <div class="form-group">
+                    <label class="text-purple-800">Attribute that does not affect the price</label>
+                    <select class="getAttributesD" multiple>                        
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="text-purple-800">Attribute that affect the price</label>
+                    <select class="getAttributesTwoD" multiple>                        
+                    </select>
+                   </div>                  
+                </div>
+<div class="panel-group content-group-lg mb-15" id="accordion1">
+  <div class="panel panel-white">
+    <div class="panel-heading">
+      <h6 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion1" href="#accordion-group1">
+        <i class="icon-touch"></i>Add attributes</a>
+      </h6>
+      <div class="heading-elements">
+                <ul class="icons-list">
+                  <li id="add-template">
+                  <a data-toggle="collapse" data-parent="#accordion1" href="#accordion-group1" >
+                  <i class="icon-plus3"></i></a>
+                  </li>
+                    
+                </ul>
+            </div>
+    </div>
+    <div id="accordion-group1" class="panel-collapse collapse">
+
+       
+      <div class="panel-body">
+        <div class="modalbody">
+<div class="">
+  <div class="form-group">
+     <div class="col-md-4">
+      <label class="text-bold">Attribute Name:</label>
+      <div class="input-group">   
+     <input type="text" id="attribute_name32D" class="form-control" placeholder="Attribute Name" name="attribute_nameD">
+     <span class="input-group-btn">
+      <button class="btn bg-primary btn-xs" type="button" id='attr-nameD'>Add</button>
+    </span> 
+    </div>
+     </div>
+     <!-- lsdjf -->
+     <div class="col-md-6">
+     <div class="">    
+    <div class="form-group hidden" id='value-inputD'>
+        <label class="text-bold">Value</label>
+        <div class="input-group">   
+       <input type="text" placeholder="Attribute value e.g Sony for Brand Attribute" id='value32D' class="form-control" name="valueD">
+       <span class="input-group-btn">
+        <button class="btn btn-xs btn-primary hidden" id="newvalueD">Add Value</button>
+      </span> 
+      </div>      
+    </div>    
+  </div>
+     </div>
+     <!-- lsajd -->
+     <div class="col-md-2">
+     <div id='add_value32D'></div>
+     </div>  
+
+  </div><br/>
+  
+</div>
+</div>
+
+      </div>
+    </div>
+  </div>
+                <div class="modal-footer p-15">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="addClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Sub-Category</button>
+                    
+                </div>
+            </div>
+        </div>
+</div>
+</div>

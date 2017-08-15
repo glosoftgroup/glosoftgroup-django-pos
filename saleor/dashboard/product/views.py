@@ -278,7 +278,8 @@ def product_class_create(request,new_window=None):
     if form.is_valid():
         try:
             product_class = form.save()
-            return HttpResponse('success')
+            return redirect('dashboard:product-class-list')
+
         except Exception, e:
             return HttpResponse(e)
         msg = pgettext_lazy(
@@ -1441,4 +1442,57 @@ def attr_list(request):
         contact={'label':attribute.name,'value': attribute.id}
         l.append(contact)
     return HttpResponse(json.dumps(l), content_type='application/json')
-    
+
+@staff_member_required
+def attr_list_f32b(request):
+    search = request.GET.get('search')    
+    attributes = ProductAttribute.objects.all().filter(name__icontains=str(search))
+    l = []
+    for attribute in attributes:
+        # {"text": "Afghanistan", "value": "AF"},
+        contact={'text':attribute.name,'value': attribute.id}
+        l.append(contact)
+    return HttpResponse(json.dumps(l), content_type='application/json')
+     
+@staff_member_required
+def product_class_form32b(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        attributes = json.loads(request.POST.get('attributes'))
+        variants = json.loads(request.POST.get('variants'))
+        print name
+        if name:
+             product_class = ProductClass(name=name)
+             product_class.save()
+             if attributes:
+                for attribute in attributes:
+                    product_class.product_attributes.add(attribute)
+             if variants:
+                for variant in variants:
+                    product_class.variant_attributes.add(variant)
+             #l = []
+             contact={'text':product_class.name,'value': product_class.id}
+             #l.append(contact)
+             return HttpResponse(json.dumps(contact), content_type='application/json')
+        return HttpResponse('Error')
+
+@staff_member_required
+def attr_list_f32d(request):
+    if request.method == 'POST':
+        pk = request.POST.get('name')
+        attributes = json.loads(request.POST.get('attributes'))
+        variants = json.loads(request.POST.get('variants'))
+        print pk
+        if pk:
+             product_class = get_object_or_404(ProductClass,pk=int(pk))
+             if attributes:
+                for attribute in attributes:
+                    product_class.product_attributes.add(attribute)
+             if variants:
+                for variant in variants:
+                    product_class.variant_attributes.add(variant)
+             #l = []
+             contact={'text':product_class.name,'value': product_class.id}
+             #l.append(contact)
+             return HttpResponse(json.dumps(contact), content_type='application/json')
+        return HttpResponse('Error')
