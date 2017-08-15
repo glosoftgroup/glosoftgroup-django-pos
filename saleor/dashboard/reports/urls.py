@@ -17,6 +17,9 @@ urlpatterns = [
 			(views.sales_list), name='sales_list'),
 		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
 			(views.sales_detail), name='sale-detail'),
+		url(r'^reports/sales/list/pdf/$', views.sales_list_pdf, name='reports_sales_list_pdf'),
+    	url(r'^reports/sales/list/export_csv/$', views.sales_list_export_csv, name='reports_sales_list_export_csv'),
+
 		url(r'^product/$',  permission_required('reports.view_products_reports', login_url='not_found')
 			(views.product_reports), name='products_reports'),
 		url( r'^product/search/$', views.products_search, name = 'products_search' ),
@@ -25,11 +28,17 @@ urlpatterns = [
 			(views.product_reorder), name='products_reorder'),
 		url( r'^prs/$', views.products_reorder_search, name = 'products_reorder_search' ),
 		url( r'^prp/$', views.products_reorder_paginate, name = 'products_reorder_paginate' ),
+		url(r'^reports/products/pdf/$', views.products_pdf, name='reports_products_pdf'),
+    	url(r'^reports/products/export_csv/$', views.products_export_csv, name='reports_products_export_csv'),
 
 		url(r'^purchases/$',  permission_required('reports.view_purchase_reports', login_url='not_found')
 			(purchase.purchase_reports), name='purchases_reports'),
 		url(r'^purchases/paginate$',  purchase.purchase_paginate, name='purchase_paginate'),
 		url(r'^purchases/search$',  purchase.purchase_search, name='purchase_search'),
+		url(r'^reports/purchases/pdf/$', purchase.purchase_pdf, name='reports_purchase_pdf'),
+    	url(r'^reports/purchases/export_csv/$', purchase.purchase_export_csv, name='reports_purchases_export_csv'),
+
+
 		url(r'^balancesheet_reports/$', permission_required('reports.view_balancesheet', login_url='not_found')
 			(views.balancesheet_reports), name='balancesheet_reports'),
 		url(r'^chart/$', views.get_dashboard_data, name='chart'), 

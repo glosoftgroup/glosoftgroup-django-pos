@@ -22,6 +22,9 @@ urlpatterns = [
     (views.product_create), name='product-add'),
     url(r'^fetch_variants/$', permission_required('product.view_product', login_url='not_found')
         (views.fetch_variants), name='fetch-variants'),
+    url(r'^products_pdf/$', products.products_pdf, name='products_pdf'),
+    url(r'^products_export_csv/$', products.products_export_csv, name='products_export_csv'),
+
     # tax routes
     url(r'^tax/$', permission_required('product.view_producttax', login_url='not_found')
         (views.tax_list), name='tax-list'),

@@ -81,15 +81,15 @@
                 <thead>
                   <tr class="bg-primary">
                      <th>#</th>
-                      <th>Name</th>
-                      <th>Product Values</th>
+                      <th>Sub Category Name</th>
+                      <th>Product Attributes</th>
                       <th class="text-center">Options</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
                 {% for pk, name, has_variants, product_attributes, variant_attributes in classes %}
                     <tr>
-                      <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">#{{ forloop.counter }}</td>
+                      <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">{{ forloop.counter }}</td>
                       <!-- name -->
                       <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">{{ name }}</td>
                       <!-- product attributes -->

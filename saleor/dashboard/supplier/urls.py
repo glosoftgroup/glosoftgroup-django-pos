@@ -8,6 +8,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
         url(r'^$', views.users, name='supplier'),
+        url(r'^sp/pdf/$', views.supplier_pdf, name='supplier_pdf'),
+        url(r'^sp/export_csv/$', views.supplier_export_csv, name='supplier_export_csv'),
         # url(r'^$', permission_required('userprofile.view_user', login_url='account_login')
         #     (views.users), name='users'),
         url(r'^supplier/paginate/', views.user_paginate, name='supplier_paginate'),

@@ -30,6 +30,12 @@ from ...purchase.models import PurchaseProduct
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
 
+from ...decorators import permission_decorator, user_trail
+from ...utils import render_to_pdf
+import csv
+import random
+from django.utils.encoding import smart_str
+
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
@@ -38,7 +44,7 @@ error_logger = logging.getLogger('error_logger')
 @permission_decorator('reports.view_purchase_reports')
 def purchase_reports(request):
 	try:
-		queryset_list = PurchaseProduct.objects.all().order_by('id')
+		queryset_list = PurchaseProduct.objects.all().order_by('-id')
 		page = request.GET.get('page', 1)
 		paginator = Paginator(queryset_list, 10)
 		try:
@@ -195,3 +201,40 @@ def purchase_search(request):
 			}
 			return TemplateResponse(request, 'dashboard/reports/purchase/search.html',data)
 
+@staff_member_required
+def purchase_pdf(request):
+	purchases = PurchaseProduct.objects.all().order_by('id')
+	data = {
+		'today': date.today(),
+		"purchases": purchases,
+		'puller': request.user
+	}
+	pdf = render_to_pdf('dashboard/reports/purchase/pdf/pdf.html', data)
+	return HttpResponse(pdf, content_type='application/pdf')
+
+@staff_member_required
+def purchase_export_csv(request):
+    pdfname = 'products'+str(random.random())
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+    qs = PurchaseProduct.objects.all().order_by('id')
+    writer = csv.writer(response, csv.excel)
+    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+    writer.writerow([
+        smart_str(u"Transaction Date"),
+        smart_str(u"Supplier Name"),
+        smart_str(u"Item Name"),
+        smart_str(u"Unit Cost"),
+		smart_str(u"Quantity (unit)"),
+		smart_str(u"Total Purchase"),
+    ])
+    for obj in qs:
+        writer.writerow([
+            smart_str(obj.created),
+            smart_str(obj.supplier),
+            smart_str(obj.stock.variant.display_product()),
+			smart_str(obj.stock.variant.get_price_per_item().gross),
+            smart_str(obj.quantity),
+			smart_str(obj.get_total_cost()),
+        ])
+    return response

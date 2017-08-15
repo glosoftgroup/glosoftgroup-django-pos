@@ -63,40 +63,50 @@ def staff_member_required(f):
 
 @staff_member_required
 def index(request):
-    orders_to_ship = Order.objects.filter(status=OrderStatus.FULLY_PAID)
-    orders_to_ship = (orders_to_ship
-                      .select_related('user')
-                      .prefetch_related('groups', 'groups__items', 'payments'))
-    payments = Payment.objects.filter(
-        status=PaymentStatus.PREAUTH).order_by('-created')
-    payments = payments.select_related('order', 'order__user')
-    #top categories
-    cat = top_categories()
-    items = top_items()
-    # low stock
-    low_stock = get_low_stock_products()
+    try:
+        orders_to_ship = Order.objects.filter(status=OrderStatus.FULLY_PAID)
+        orders_to_ship = (orders_to_ship
+                          .select_related('user')
+                          .prefetch_related('groups', 'groups__items', 'payments'))
+        payments = Payment.objects.filter(
+            status=PaymentStatus.PREAUTH).order_by('-created')
+        payments = payments.select_related('order', 'order__user')
+        #top categories
+        cat = top_categories()
+        items = top_items()
+        # low stock
+        low_stock = get_low_stock_products()
 
-    ctx = {'preauthorized_payments': payments,
-           'orders_to_ship': orders_to_ship,
-           'low_stock': low_stock,
-           #top_cat
-           "sales_by_category": cat['sales_by_category'],
-           "categs": cat['categs'],
-           "avg": cat['avg'],
-           "labels": cat['labels'],
-           "default": cat['default'],
-           "hcateg": cat['hcateg'],
-           "date_total_sales": cat['date_total_sales'],
+        ctx = {'preauthorized_payments': payments,
+               'orders_to_ship': orders_to_ship,
+               'low_stock': low_stock,
+               #top_cat
+               "sales_by_category": cat['sales_by_category'],
+               "categs": cat['categs'],
+               "avg": cat['avg'],
+               "labels": cat['labels'],
+               "default": cat['default'],
+               "hcateg": cat['hcateg'],
+               "date_total_sales": cat['date_total_sales'],
+               "no_of_customers": cat['no_of_customers'],
 
-           #items
-           "sales_by_item": items['sales_by_item'],
-           "items": items['items'],
-           "items_avg": items['items_avg'],
-           "items_labels": items['items_labels'],
-           "items_default": items['items_default'],
-           "items_hcateg": items['items_hcateg'],
-           }
-    return TemplateResponse(request, 'dashboard/index.html', ctx)
+               #items
+               "sales_by_item": items['sales_by_item'],
+               "items": items['items'],
+               "items_avg": items['items_avg'],
+               "items_labels": items['items_labels'],
+               "items_default": items['items_default'],
+               "items_hcateg": items['items_hcateg'],
+               "highest_item": items['highest_item'],
+               "lowest_item": items['lowest_item'],
+               }
+        return TemplateResponse(request, 'dashboard/index.html', ctx)
+    except ObjectDoesNotExist as e:
+        return TemplateResponse(request, 'dashboard/index.html', {"e":e, "date":date})
+    except IndexError as e:
+        return TemplateResponse(request, 'dashboard/index.html', {"e":e, "date":date})
+    except KeyError as e:
+        return TemplateResponse(request, 'dashboard/index.html', {"e":e, "date":date})
 
 def top_categories():
     today = datetime.datetime.now()
@@ -122,6 +132,7 @@ def top_categories():
                 for s in range(0, sales_by_category.count(), 1):
                     sales['count'] = s
                 new_sales.append(sales)
+                # new_sales.append(sales_by_category.setdefault(sales, {'data':'None'}))
             categs = Category.objects.all()
             this_year = today.year
             avg_m = Sales.objects.filter(created__year=this_year).annotate(c=Count('total_net'))
@@ -140,6 +151,7 @@ def top_categories():
             date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))[
                 'total_net__sum']
 
+            no_of_customers = Sales.objects.filter(created__contains=date).count()
 
             data = {
                 "sales_by_category": new_sales,
@@ -148,7 +160,8 @@ def top_categories():
                 "labels": labels,
                 "default": default,
                 "hcateg": highest_category_sales,
-                "date_total_sales": date_total_sales
+                "date_total_sales": date_total_sales,
+                "no_of_customers":no_of_customers,
             }
             return data
         except Exception,e:
@@ -167,6 +180,10 @@ def top_items():
         try:
             sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
                 c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
+            highest_item = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
+                c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:1]
+            lowest_item = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
+                c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).order_by('total_cost__sum')[:1]
             sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
             new_sales = []
             for sales in sales_by_category:
@@ -199,7 +216,9 @@ def top_items():
                 "items_avg": avg_m,
                 "items_labels": labels,
                 "items_default": default,
-                "items_hcateg": highest_category_sales
+                "items_hcateg": highest_category_sales,
+                "highest_item":highest_item,
+                "lowest_item":lowest_item,
             }
             return data
         except IndexError as e:
