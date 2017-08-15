@@ -20,6 +20,7 @@
 {% block menu_products_class %}active{% endblock %}
 
 {% block custom_css %}
+<link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
     <style>
     /* The first modal translateZ value*/
     .container {
@@ -263,7 +264,7 @@
                     {{ product_form.product_class}}
 
                  <div class="input-group-btn">
-                    <button type="button"  id="add-new-type" data-modal="#modal_type" href="#modal_types" class="btn bg-primary btn-icon "
+                    <button type="button"  id="add-new-class" data-modal="#addProductClass" href="#addProductClass" class="btn bg-primary btn-icon "
                             data-title="Add New Sub-Category" data-href='{% url "dashboard:product-class-add-new" 12 %}'
                             data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip"
                             data-original-title="Add New Sub-Category">
@@ -282,13 +283,13 @@
        <!-- Product attributes -->
         <div class="col-md-12">
           
-         <div class="form-group">
-          <label>Product Attributes</label>
+         <div class="form-group">         
+          <label> Product Attributes</label>
           <button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product Type" data-trigger="hover" data-content="– it’s a characteristic of a product, shared with all product variants. Example: Manufacturer - all flour variants(1kg,2kg) are published by same company"> <i class="icon-info22 position-right"></i></button>
-          <span>
+           <span>
             <a href="">
               <input type="hidden" value='{% url "dashboard:product-attr-add-value" 1 %}' id="link-pk" name="link-pk">
-              <button id="add-new-attribute" onclick="return false;" class="btn bg-primary btn-icon  text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
+              <button id="add-new-classd" onclick="return false;" class="btn bg-primary btn-icon  text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
                       href="#modal_attribute"  data-popup="tooltip" 
             data-original-title="Add attributes" data-title="Add attributes">
 
@@ -861,11 +862,15 @@
             </div>
           </div>                
 </div>
+<input type="hidden" class="pageUrls" data-attributes="{% url 'dashboard:attr_list_f32b' %}" data-addattrurl="{% url 'dashboard:product-attr-add' %}" data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}" data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
+ {% include "dashboard/includes/_modal_classesd.html"  %}
  {% include "dashboard/includes/_modal_attribute_choice.html"  %}
  {% include "dashboard/includes/_modal_type.html"  %}
+ {% include "dashboard/includes/_modal_classes.html"  %}
+ 
 {% endblock %}
 
  {% block custom_js %}
@@ -1424,6 +1429,9 @@ $('#form-product').validate({
 </script>
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
 
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/form34b.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/form34D.js' %}"></script>
 {% if product.pk %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/media/fancybox.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/gallery.js' %}"></script>

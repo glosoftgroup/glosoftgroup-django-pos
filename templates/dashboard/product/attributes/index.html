@@ -5,7 +5,7 @@
 	    <label class="text-bold">Attribute Name:</label>
 	   </div>
 	   <div class="col-md-6">
-		<input type="text" id="attribute_name" class="form-control" name="attribute_name">
+		<input type="text" id="attribute_name32b" class="form-control" name="attribute_name">
 	   </div>
 	   <div class="col-md-2">
 	    <button class="btn btn-primary btn-xs" id='attr-name'>Add</button>
@@ -16,7 +16,7 @@
 	   <div id='add_value'></div>
 		<div class="form-group hidden" id='value-input'>
 		  	<label class="text-bold">Value</label>
-			<input type="text" id='value' class="form-control" name="value">
+			<input type="text" id='value32b' class="form-control" name="value">
 		 	<span class="help-block">Attribute value e.g Sony for Brand Attribute
 		 	</span>
 		</div>
@@ -66,7 +66,7 @@
 	}
 
   newValueBtn.on('click',function(){
-    var value = $('#value').val();
+    var value = $('#value32b').val();
     //alert(Aurl);
     if(!value){ 
 	  	alertUser('Attribute Value required!','bg-danger','Error');
@@ -75,12 +75,12 @@
      addNValue(Aurl,value).done(function(data){
 	     alertUser('Attribute added successful');
 	     $('#add_value').empty().html(data);
-	     $('#value').val('');
+	     $('#value32b').val('');
 	  });
   });
 
   attrNameBtn.on('click',function(){  
-    var atname = $('#attribute_name').val();
+    var atname = $('#attribute_name32b').val();
     if(!atname){ 
 	  	alertUser('Attribute Name required!','bg-danger','Error');
 	  	return false;
@@ -88,7 +88,7 @@
     addAttribute(Aurl,atname).done(function(data){
 	   alertUser('Attribute added successful');
 	   Aurl = "{% url 'dashboard:product-attr-add' %}"+data+'/';
-	   $('#attribute_name').attr('disabled','disabled');
+	   $('#attribute_name32b').attr('disabled','disabled');
 	   attrNameBtn.remove();
 	   $('#value-input').removeClass('hidden');
 	   $('#newvalue').removeClass('hidden');	   

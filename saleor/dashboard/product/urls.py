@@ -78,6 +78,8 @@ urlpatterns = [
     
     url(r'^classes/add/new_window/(\d+)/$', permission_required('product.add_productclass', login_url='not_found')
         (views.product_class_create), name='product-class-add-new'),
+    url(r'^classes/add/form32b/$', permission_required('product.add_productclass', login_url='not_found')
+        (views.product_class_form32b), name='product-class-form32b'),
     
     url(r'^classes/(?P<pk>[0-9]+)/update/$', permission_required('product.change_productclass', login_url='not_found')
         (views.product_class_edit), name='product-class-update'),
@@ -150,6 +152,8 @@ urlpatterns = [
     url(r'attributes/(?P<pk>[0-9]+)/delete/$', permission_required('product.delete_productattribute', login_url='not_found')
         (views.attribute_delete), name='product-attribute-delete'),
     url(r'attr_list/$',views.attr_list,name="attr_list"),
+    url(r'attr_list/form32b/$',views.attr_list_f32b,name="attr_list_f32b"),
+    url(r'attr_list/form32d/$',views.attr_list_f32d,name="attr_list_f32d"),
 
     url(r'attributes/ajax_add/$',
         views.attribute_add, name='product-attr-add'),
