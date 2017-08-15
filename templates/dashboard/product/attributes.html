@@ -1,12 +1,13 @@
 {% load static %}
 
-	
+  {% if product_form.iter_attribute_fields %}
 	{% for attribute_field in product_form.iter_attribute_fields %}
 	<div class="col-md-4">
 	<label>{{ attribute_field.label }}</label>
 	{{ attribute_field }}
 	</div>
 	{% endfor %}
+  {% endif %}
 
 <script type="text/javascript">
  $('.select').select2({

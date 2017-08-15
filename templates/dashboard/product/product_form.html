@@ -1131,13 +1131,13 @@
    {% url "dashboard:fetch-variants" as url %} 
    var url = "{{ url }}";
    var class_pk = getProductClass();
-   content_loader('#div_attributes');   
+   //content_loader('#div_attributes');   
    var posting = $.post( url, {class_pk:class_pk} );
      // Put the results in a div
    posting.done(function( data ) {    
     $( "#div_attributes" ).empty().append( data ); 
-    var block = $('#div_attributes').parent();   
-      $(block).unblock(); 
+    //var block = $('#div_attributes').parent();   
+      //$(block).unblock(); 
   });
 
   }
