@@ -621,11 +621,29 @@ $( ".check" ).on( "click", function(){
   if(checked){
     $(this).prop("checked", true);
     $(this).parent().parent().parent().siblings('span').show();
-    $(this).parent().parent().parent().siblings('span').text('(granted)');      
+    $(this).parent().parent().parent().siblings('span').text('(granted)');
   }else{
-    $(this).prop("checked", false);
-    $(this).parent('span').removeClass('checked');
-    $(this).parent().parent().parent().siblings('span').hide();
+
+   if($('#checkAll').is(':checked')){
+           $('#checkAll').prop("checked", false);
+           $('#checkAll').parent('span').removeClass('checked');
+           $('#checkAll').parent().parent().parent().siblings('span').hide();
+
+          $('.check:not(this)').each(function(){
+              $(this).prop("checked", false);
+              $(this).parent().parent().parent().siblings('span').hide();
+              $(this).parent().removeClass('checked');
+          });
+
+           $(this).prop("checked", true);
+    $(this).parent().parent().parent().siblings('span').show();
+    $(this).parent().parent().parent().siblings('span').text('(granted)');
+    }else{
+         $(this).prop("checked", false);
+         $(this).parent('span').removeClass('checked');
+         $(this).parent().parent().parent().siblings('span').hide();
+
+    }
   }
 } );
 

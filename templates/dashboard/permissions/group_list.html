@@ -760,7 +760,7 @@ $( ".check" ).on( "click", function(){
   if(checked){
     $(this).prop("checked", true);
     $(this).parent().parent().parent().siblings('span').show();
-    $(this).parent().parent().parent().siblings('span').text('(granted)');      
+    $(this).parent().parent().parent().siblings('span').text('(granted)');
   }else{
     $(this).prop("checked", false);
     $(this).parent('span').removeClass('checked');
