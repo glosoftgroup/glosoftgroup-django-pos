@@ -175,7 +175,7 @@ class ProductForm(forms.ModelForm):
             'Product form placeholder', 'Give your awesome product a name')
         field = self.fields['categories']        
         field.widget.attrs['data-placeholder'] = pgettext_lazy(
-            'Product form placeholder', 'Select Category')
+            'Product form placeholder', 'Select')
         field.widget.attrs['class'] = 'form-control multiselect'
         field.widget.attrs['multiple'] = 'multiple'         
 

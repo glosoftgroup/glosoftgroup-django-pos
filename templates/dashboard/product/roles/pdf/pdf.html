@@ -1,0 +1,110 @@
+{% load staticfiles %}
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+ <html>
+    <link href='https://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
+     <head>
+         <title>Products Report</title>
+         <style type="text/css">
+             body {
+                   font-family: 'Nunito', sans-serif;
+                   color: #384047;
+             }
+             .header {
+                 font-size: 15px;
+                 font-weight: 100;
+                 text-align: center;
+                 color: #007cae;
+             }
+             .title {
+                 font-size: 16px;
+                 font-weight: 100;
+                /* text-align: right;*/
+                padding: 10px 20px 0px 20px;
+             }
+             .title span {
+                 color: #007cae;
+             }
+             .detailss {
+                 padding: 10px 20px 0px 20px;
+                 text-align: left !important;
+                 /*margin-left: 40%;*/
+             }
+             .hrItem {
+                 border: none;
+                 height: 1px;
+                 /* Set the hr color */
+                 color: #333; /* old IE */
+                 background-color: #fff; /* Modern Browsers */
+             }
+             .img-circle{
+              border-radius: 50%;
+             }
+             table {
+              max-width: 960px;
+              margin: 10px auto;
+            }
+            th {
+                  font-weight: 400;
+                  background: #1779c6;
+                  color: #FFF;
+                }
+             .td{text-align: center;}
+             tr{padding:5px;}
+            .foot{padding-top:30px;}
+            .foot p{ color: #007cae;font-size: 12px;}
+         </style>
+     </head>
+     <body>
+         <div class='wrapper'>
+             <div class='header'>
+                 <p class='title'>Products List Report <br>
+                   <span style="font-size: 0.8em;">{{today | date:'d-m-Y'}}</span>
+                 </p>
+             </div>
+         <div>
+         <div class='details'>
+            <table class="table  table-hover datatable-header-footer" style="border:0.5px solid #ddd;">
+                <thead>
+                  <tr class="bg-primary">
+                     <th>Id</th>
+                      <th>Product Name</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Current Stock</th>
+                  </tr>
+                </thead>
+                <tbody id="tb">
+               {% for product in product_results %}
+                    <tr data-title=" {{ product.name }} " class="clickable-row">
+                      <td  class=" td modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.id }}</td>
+                       <!-- product name -->
+                      <td  class=" td modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.name }}</td>
+                      <!-- product category -->
+                      <td  class=" td modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+                        {% with product.get_first_category as category %}
+                        {% if category %}
+                        {{ category }}
+                        {% endif %}
+                        {% endwith %}
+                      </td>
+                      <!-- price -->
+                      <td  class=" td modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> {% gross product.price html=True %}</td>
+                      <!-- variants -->
+                      <td  class=" td modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+
+                      {{ product.get_variants_count }}
+
+                      </td>
+                    </tr>
+                      {% endfor %}
+                  </tbody>
+           </table>
+         </div>
+         <div class="foot">
+             <p style="text-align: center;">Report Pulled by: {% if puller.email %}{{ puller.email }} {% else %} {{ puller.name }}{% endif %}</p>
+         </div>
+     </body>
+ </html>
