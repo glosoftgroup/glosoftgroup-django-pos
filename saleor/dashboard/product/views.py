@@ -355,7 +355,13 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 def fetch_variants(request):
     if request.method == 'POST':
         if request.is_ajax():
-            class_pk = request.POST.get("class_pk", "--")   
+            class_pk = request.POST.get("class_pk", "--")
+            try:
+              pk = int(class_pk)
+            except:
+                ctx = {}
+                return TemplateResponse(
+                request, 'dashboard/product/attributes.html', ctx)
             product_class = get_object_or_404(ProductClass, pk=class_pk)
             create_variant = not product_class.has_variants
             product = Product()

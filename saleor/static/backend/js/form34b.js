@@ -57,6 +57,7 @@ $(function() {
   		addItem(parseInt(data['value']),data['text']);
   		$('#newClassName').val('');
   		$('#addProductClass').modal('hide');
+      refreshAttributes();
   	});
 
 
