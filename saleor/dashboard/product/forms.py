@@ -272,7 +272,8 @@ class VariantAttributeForm(forms.ModelForm):
                 field = forms.CharField(**field_defaults)
             self.fields[attr.get_formfield_name()] = field
         for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['class'] = 'form-control bootstrap-select'
+            # field.widget.attrs['data-pk'] = field.pk
 
     def save(self, commit=True):
         attributes = {}

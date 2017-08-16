@@ -1,0 +1,26 @@
+{% load i18n %}
+{% load materializecss %}
+{% if attribute_form.fields %}
+{% load static %}
+  {% for attribute_field in attribute_form %}
+    <div class="row checkHover">     
+      <div class="col-md-10">
+      {{ attribute_field|materializecss }}
+      </div>
+      <div class="col-md-2 mt-15  ">
+        <label>&nbsp;</label>
+        <i class="text-danger icon-trash iconx hidden"></i>
+     </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>
+    {% trans "This product has no attributes." context "Variant form text" %}
+  </p>
+{% endif %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+	$(".styled, .multiselect-container input").uniform({ radioClass: 'choice' });
+    // Basic select
+    $('.bootstrap-select').selectpicker();
+</script>

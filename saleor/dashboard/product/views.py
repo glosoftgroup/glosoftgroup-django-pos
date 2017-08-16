@@ -380,6 +380,46 @@ def fetch_variants(request):
             return TemplateResponse(
         request, 'dashboard/product/attributes.html', ctx)
 
+@csrf_exempt
+def fetch_variants32(request):
+    variant_pk=None
+    class_pk = request.POST.get("class_pk", "--")
+    product_pk = request.POST.get("product_pk", "--")
+    product = get_object_or_404(Product.objects.all(),
+                                pk=product_pk)
+    form_initial = {}
+    if variant_pk:
+        variant = get_object_or_404(product.variants.all(),
+                                    pk=variant_pk)
+    else:
+        variant = ProductVariant(product=product)
+    form = forms.ProductVariantForm(request.POST or None, instance=variant,
+                                    initial=form_initial)
+    attribute_form = forms.VariantAttributeForm(request.POST or None,
+                                                instance=variant)
+    if all([form.is_valid(), attribute_form.is_valid()]):
+        form.save()
+        attribute_form.save()
+        if variant_pk:
+            msg = pgettext_lazy(
+                'Dashboard message',
+                'Updated variant %s') % variant.name
+        else:
+            msg = pgettext_lazy(
+                'Dashboard message',
+                'Added variant %s') % variant.name
+        messages.success(request, msg)
+        success_url = request.POST['success_url']
+        if is_safe_url(success_url, request.get_host()):
+            return redirect(success_url)
+    errors = attribute_form.errors
+    form_errors = form.errors
+    ctx = {'attribute_form': attribute_form, 'form': form, 'product': product,
+           'variant': variant,'errors':errors,'form_errors':form_errors}
+    return TemplateResponse(
+        request, 'dashboard/product/variants.html', ctx)
+
+
 @staff_member_required
 @permission_decorator('product.add_product')
 def product_create(request):

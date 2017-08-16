@@ -7,6 +7,8 @@ $(function() {
   var url      = pageUrls.data('attributes');
   var addClassUrl = pageUrls.data('addclassurlb');
   var addAttrUrl = pageUrls.data('addattrurl');
+  var addAnotherAttr = $('#add-another-attr');
+  var valueBox = $('#add_value32D');
   // select selectors
   var getAttributesD = $('.getAttributesD');
   var getAttributesTwoD = $('.getAttributesTwoD');
@@ -60,7 +62,9 @@ $(function() {
   		alertUser('Sub category name required!');  		
   		refreshAttributes();
       $('#daddProductClass').modal('hide');
-  	});
+  	}).fail(function(){
+      alertUser('Variant already added. Please add a unique variant name','bg-danger','Error!');
+    });
 
 
 
@@ -160,7 +164,9 @@ $(function() {
 	     alertUser('Attribute added successful');
 	     $('#add_value32D').empty().html(data);
 	     $('#value32D').val('');
-	  });
+	  }).fail(function(){
+      alertUser('Value already added. Please enter a unique name','bg-danger','Error!');
+    });
   });
 
   attrNameBtnD.on('click',function(){  
@@ -173,12 +179,26 @@ $(function() {
 	   alertUser('Attribute added successful');
 	   Aurl = addAttrUrl+data+'/';
 	   $('#attribute_name32D').attr('disabled','disabled');
-	   attrNameBtnD.remove();
+	   attrNameBtnD.addClass('hidden');
 	   $('#value-inputD').removeClass('hidden');
-	   $('#newvalueD').removeClass('hidden');	   
-	});
+	   $('#newvalueD').removeClass('hidden');	
+     addAnotherAttr.removeClass('hidden');
+	}).fail(function(){
+      alertUser('Attribute name already added. Please add a unique name','bg-danger','Error!');
+    });
 });
+
+  addAnotherAttr.on('click',function(){
+     $('#attribute_name32D').removeAttr('disabled');
+     attrNameBtnD.removeClass('hidden');
+     $('#value-inputD').addClass('hidden');
+     $('#newvalueD').addClass('hidden'); 
+     addAnotherAttr.addClass('hidden');
+     valueBox.html('');
+     Aurl = addAttrUrl;
+  });
   // ./add attributes
+
 
 
 });
