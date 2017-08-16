@@ -7,6 +7,8 @@ $(function() {
   var url      = pageUrls.data('attributes');
   var addClassUrl = pageUrls.data('addclassurlb');
   var addAttrUrl = pageUrls.data('addattrurl');
+  var addAnotherAttr = $('#add-another-attr');
+  var valueBox = $('#add_value32D');
   // select selectors
   var getAttributesD = $('.getAttributesD');
   var getAttributesTwoD = $('.getAttributesTwoD');
@@ -173,12 +175,24 @@ $(function() {
 	   alertUser('Attribute added successful');
 	   Aurl = addAttrUrl+data+'/';
 	   $('#attribute_name32D').attr('disabled','disabled');
-	   attrNameBtnD.remove();
+	   attrNameBtnD.addClass('hidden');
 	   $('#value-inputD').removeClass('hidden');
-	   $('#newvalueD').removeClass('hidden');	   
+	   $('#newvalueD').removeClass('hidden');	
+     addAnotherAttr.removeClass('hidden');
 	});
 });
+
+  addAnotherAttr.on('click',function(){
+     $('#attribute_name32D').removeAttr('disabled');
+     attrNameBtnD.removeClass('hidden');
+     $('#value-inputD').addClass('hidden');
+     $('#newvalueD').addClass('hidden'); 
+     addAnotherAttr.addClass('hidden');
+     valueBox.html('');
+     Aurl = addAttrUrl;
+  });
   // ./add attributes
+
 
 
 });
