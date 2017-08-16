@@ -14,12 +14,19 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Count, Min, Sum, Avg, F, Q
 from django.core import serializers
-from django.template.defaultfilters import date
+# from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 import datetime
 from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
+
+from ...decorators import permission_decorator, user_trail
+from ...utils import render_to_pdf
+import csv
+import random
+from django.utils.encoding import smart_str
+from datetime import date
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -309,6 +316,7 @@ def product_reports(request):
 		error_logger.error(e)
 		return HttpResponse('error accessing products reports')
 
+
 @staff_member_required
 def products_paginate(request):
 	page = int(request.GET.get('page'))
@@ -420,6 +428,122 @@ def products_reorder_search(request):
 				return TemplateResponse(request,'dashboard/reports/products/reorder_paginate.html',{'items':items})
 
 			return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
+
+
+@staff_member_required
+def sales_list_pdf(request):
+	try:
+		last_sale = Sales.objects.latest('id')
+		last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
+	except:
+		last_date_of_sales = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	all_sales = Sales.objects.filter(created__contains=last_date_of_sales)
+	total_sales_amount = all_sales.aggregate(Sum('total_net'))
+	total_tax_amount = all_sales.aggregate(Sum('total_tax'))
+	total_sales = []
+	for sale in all_sales:
+		quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+		setattr(sale, 'quantity', quantity['c'])
+		total_sales.append(sale)
+
+	data = {
+		'today': date.today(),
+		'sales': total_sales,
+		'puller': request.user
+	}
+	pdf = render_to_pdf('dashboard/reports/sales/pdf/pdf.html', data)
+	return HttpResponse(pdf, content_type='application/pdf')
+
+@staff_member_required
+def sales_list_export_csv(request):
+	pdfname = 'sales'+str(random.random())
+	response = HttpResponse(content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+
+	try:
+		last_sale = Sales.objects.latest('id')
+		last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
+	except:
+		last_date_of_sales = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	all_sales = Sales.objects.filter(created__contains=last_date_of_sales)
+	total_sales_amount = all_sales.aggregate(Sum('total_net'))
+	total_tax_amount = all_sales.aggregate(Sum('total_tax'))
+	total_sales = []
+	for sale in all_sales:
+		quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+		if not sale['customer']:
+			sale['customer'] = 'Customer'
+		setattr(sale, 'quantity', quantity['c'])
+		total_sales.append(sale)
+
+	qs = total_sales
+	writer = csv.writer(response, csv.excel)
+	response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+	writer.writerow([
+		smart_str(u"Transaction Date"),
+		smart_str(u"Receipt No"),
+		smart_str(u"Client Name"),
+		smart_str(u"Cashier"),
+		smart_str(u"Terminal"),
+		smart_str(u"Quantity"),
+		smart_str(u"Total Sales"),
+	])
+	for obj in qs:
+		writer.writerow([
+			smart_str(obj.created),
+			smart_str(obj.invoice_number),
+			smart_str(obj.customer),
+			smart_str(obj.user.name),
+			smart_str(obj.terminal),
+			smart_str(obj.quantity),
+			smart_str(obj.total_net),
+		])
+	return response
+
+
+@staff_member_required
+def products_pdf(request):
+	items = ProductVariant.objects.all().order_by('-id')
+	data = {
+		'today': date.today(),
+		'items': items,
+		'puller': request.user
+	}
+	pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
+	return HttpResponse(pdf, content_type='application/pdf')
+
+@staff_member_required
+def products_export_csv(request):
+    pdfname = 'products'+str(random.random())
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+    qs = ProductVariant.objects.all().order_by('-id')
+    writer = csv.writer(response, csv.excel)
+    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+    writer.writerow([
+        smart_str(u"sku"),
+        smart_str(u"Product Name"),
+        smart_str(u"Category"),
+        smart_str(u"Sub-Category"),
+		smart_str(u"Reorder-level"),
+		smart_str(u"Current Quantity"),
+		smart_str(u"Unit Cost"),
+		smart_str(u"Total Cost"),
+    ])
+    for obj in qs:
+        writer.writerow([
+            smart_str(obj.sku),
+            smart_str(obj.display_product()),
+            smart_str(obj.product.get_first_category()),
+			smart_str(obj.product.product_class.name),
+            smart_str(obj.product.low_stock_threshold),
+			smart_str(obj.get_stock_quantity()),
+			smart_str(obj.get_price_per_item().gross),
+			smart_str(obj.get_total_price_cost()),
+        ])
+    return response
 
 @staff_member_required
 @permission_decorator('reports.view_balancesheet')

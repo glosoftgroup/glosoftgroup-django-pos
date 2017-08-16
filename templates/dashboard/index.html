@@ -9,112 +9,229 @@
 {% block breadcrumbs %}
     <li class="active"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
 {% endblock %}
-
+<style>
+  table tr .ctd{padding: 8px 10px !important;}
+</style>
 {% block content %}
           <!-- Quick stats boxes -->
           <div class="row animated fadeIn">
-            <div class="col-lg-4">
-
-              <!-- Members online -->
+            <div class="col-lg-3">
               <div class="panel bg-indigo-300">
                 <div class="panel-body">
-                  <div class="heading-elements">
-                    <span class="heading-text badge bg-indigo-800">+53,6%</span>
-                  </div>
+                    <div class="col-md-6">
+                        <div class="icon-object border-white-400 text-white-400"><i class="icon-reading"></i></div>
+                    </div>
+                    <div class="col-md-6" style="vertical-align:middle;">
+                        <h2 class="no-margin">{% if no_of_customers %} {{no_of_customers}} {% else %} 0 {% endif %}</h2>
+                        <h6>Customers Visited</h6>
+                    </div>
 
-                  <h3 class="no-margin">3,450</h3>
-                  Customers Today
-                </div>
-
-                <div class="container-fluid">
-                  <div id="members-online"></div>
                 </div>
               </div>
-              <!-- /members online -->
+           </div>
 
-            </div>
-
-            <div class="col-lg-4">
-
-              <!-- Current server load -->
-              <div class="panel bg-pink-400">
+            <div class="col-lg-3">
+             <div class="panel bg-pink-400">
                 <div class="panel-body">
-                  <div class="heading-elements">
-                    <ul class="icons-list">
-                    <li><a data-action="reload"></a></li>
-                      <li class="dropdown">
-                        <a href="boxed_mini.html#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog3"></i> <span class="caret"></span></a>
-                        <ul class="dropdown-menu dropdown-menu-right">
-                          <li><a href="javascript:;"><i class="icon-sync"></i> Today</a></li>
-                          <li><a href="javascript:;"><i class="icon-list-unordered"></i> Week</a></li>
-                          <li><a href="javascript:;"><i class="icon-pie5"></i> Month</a></li>
-                          <li><a href="javascript:;"><i class="icon-cross3"></i> Clear list</a></li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </div>
+                    <div class="col-md-6">
+                        <div class="icon-object border-white-400 text-white-400"><i class="icon-coins"></i></div>
+                    </div>
 
-                  <h3 class="no-margin">KShs. 23202</h3>
-                  Total Sales
+                    <div class="col-md-6" style="vertical-align:middle;">
+                        <h4 class="no-margin">KShs.
+                              {% if date_total_sales %}
+                                {{date_total_sales}}
+                              {% else %}
+                                0.00
+                              {% endif %}
+                          </h4>
+                        <h6>Total Sales</h6>
+                    </div>
                 </div>
-
                 <div id="server-load"></div>
               </div>
-              <!-- /current server load -->
-
             </div>
 
-            <div class="col-lg-4">
-
-              <!-- Today's revenue -->
+            <div class="col-lg-3">
               <div class="panel bg-slate">
                 <div class="panel-body">
-                  <div class="heading-elements">
-                    <ul class="icons-list">
-                              <li><a data-action="reload"></a></li>
-                            </ul>
-                          </div>
-                  <div class="col-sm-6">
-                    <h5 class="no-margin">KShs. 2300</h5>
-                    Highest <span>(rice)</span>
-                  </div>
-                  <div class="col-sm-6">
-                    <h5 class="no-margin">KShs. 200</h5>
-                    Lowest <span>(sugar)</span>
-                  </div>
+                    <div class="col-md-12" style="vertical-align:middle;">
+                      <div class="col-md-12">
+                          {% if highest_item %}
+                            {% for h in highest_item %}
+                                <h5 class="no-margin">KShs. {{h.total_cost__sum}}</h5>
+                          Highest Product Sold <br/>
+                                  <span>{{h.product_name}}
+                            {% endfor %}
+                          {% else %}
+                               <h5 class="no-margin">Highest Product Sold</h5>
+                                KShs. 0.00
+                          {% endif %}
+                          </span>
+                      </div>
+                    </div>
                 </div>
-
-                <div id="today-revenue"></div>
-              </div>
-              <!-- /today's revenue -->
-
             </div>
           </div>
+          <div class="col-lg-3">
+              <div class="panel bg-slate">
+                <div class="panel-body">
+                    <div class="col-md-12" style="vertical-align:middle;">
+                      <div class="col-md-12">
+                          {% if lowest_item %}
+                            {% for h in lowest_item %}
+                                <h5 class="no-margin">KShs. {{h.total_cost__sum}}</h5>
+                          Lowest Product Sold <br/>
+                                  <span>{{h.product_name}}
+                            {% endfor %}
+                          {% else %}
+                                <h5 class="no-margin">Lowest Product Sold</h5>
+                                KShs. 0.00
+                          {% endif %}
+                          </span>
+                      </div>
+                    </div>
+                </div>
+             </div>
+          </div>
           <!-- /quick stats boxes -->
+      </div>
+<div class="row">
 
-  <div class="row">
-   <div class="col-md-12">
-       <div class="panel panel-flat">
+  {% if sales_by_item %}
+    <div class="col-md-6">
+    <div class="panel panel-flat" id="itemdiv">
       <div class="panel-heading">
-        <h6 class="panel-title">Chart summaries</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-
+          <h6 class="panel-title" style="text-align:center;">Top 5 Items in last sales</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+      </div>
       <div class="panel-body">
+        <div class="col-md-5">
+           <canvas id="itemChart" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-12">
+                     <div class="data-table-container">
+                        <table class="table bordered highlight responsive data-table">
+                          <tbody>
+                          {% if sales_by_item %}
+                           {% for sales in sales_by_item %}
+                              <tr data-action-go="">
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_name}}">
+                                  <div class="sqaure" style="width: 10px;height: 10px;border-radius: 50%;background-color: {{sales.color}};">
+                                  </div>
+                                </td>
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                    {{forloop.counter }}. {{sales.product_name}}
+                                </td>
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            {% endif %}
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+            </div>
 
-        <div class="col-md-6 col-md-offset-3">
-         <canvas id="myChart" width="400" height="400"></canvas>
         </div>
       </div>
-    </div>    
-   </div>
+    </div>
   </div>
+  {% else %}
+
+     <div class="col-md-6">
+      <div class="panel bg-info">
+        <div class="panel-heading">
+            <h4 class="panel-title" style="text-align:center;">No Items Sold Yet</h4>
+            <div class="heading-elements">
+              <ul class="icons-list">
+                <li><a data-action="close"></a></li>
+              </ul>
+            </div>
+        </div>
+     </div>
+     </div>
+ {% endif %}
+{% if sales_by_category %}
+    <div class="col-md-6">
+    <div class="panel panel-flat" id="catdiv">
+      <div class="panel-heading">
+          <h6 class="panel-title" style="text-align:center;">Top 5 Categories in last sales</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-5">
+           <canvas id="catChart" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-12">
+                     <div class="data-table-containers">
+                        <table class="table bordered highlight responsive data-table">
+                          <tbody>
+                          {% if sales_by_category %}
+                           {% for sales in sales_by_category %}
+                              <tr data-action-go="">
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                  <div class="sqaure" style="width: 10px;height: 10px;border-radius: 50%;background-color: {{sales.color}};">
+                                  </div>
+                                </td>
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                    {{forloop.counter }}.  {{sales.product_category}}
+                                </td>
+                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}} ({{ sales.percentage }}%)</div>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            {% endif %}
+
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+
+     <div class="col-md-6">
+      <div class="panel bg-info">
+        <div class="panel-heading">
+            <h4 class="panel-title" style="text-align:center;">No Categories Sold Yet</h4>
+            <div class="heading-elements">
+              <ul class="icons-list">
+                <li><a data-action="close"></a></li>
+              </ul>
+            </div>
+        </div>
+     </div>
+     </div>
+ {% endif %}
+ </div>
+
+{% if low_stock %}
   <div class="row">
     <div class="col-md-12">
       <div class="panel panel-flat">
@@ -177,8 +294,25 @@
 
     </div>
   </div>
+{% else %}
+<div class="row">
+     <div class="col-md-12">
+      <div class="panel bg-info">
+        <div class="panel-heading">
+            <h4 class="panel-title" style="text-align:center;">No products are low in stock</h4>
+            <div class="heading-elements">
+              <ul class="icons-list">
+                <li><a data-action="close"></a></li>
+              </ul>
+            </div>
+        </div>
+     </div>
+     </div>
+</div>
+{% endif %}
 {% endblock %}
 {% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
   var endpoint = "{% url 'dashboard:chart' %}";
@@ -232,6 +366,56 @@ $(document).ready(function(){
           }
       });
   }
+
+  //**@ category chart
+  //-----chart**/
+//**@ doughnut chart
+    var defaultData2 = [{% for d in sales_by_category %} {{ d.total_cost__sum }}, {% endfor %}];
+    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}", {% endfor %}];
+    var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
+    // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
+      var ctx = document.getElementById("catChart").getContext('2d');
+      var catChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: labels2,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData2,
+                  backgroundColor:backColor,
+                  borderWidth: 1
+              }]
+          },
+          options:{
+             legend:{
+             display:false}
+          }
+      });
+//--------- /doghnut chart
+
+//-----item chart**/
+    var defaultData3 = [{% for d in sales_by_item %} {{ d.total_cost__sum }}, {% endfor %}];
+    var labels3 = [{% for d in sales_by_item %} "{{ d.product_name }}", {% endfor %}];
+    var backColor = [{% for d in sales_by_item %} "{{ d.color }}", {% endfor %}];
+    // console.log({% for d in sales_by_item %} "{{ d.color }}", {% endfor %});
+      var ctx = document.getElementById("itemChart").getContext('2d');
+      var itemChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: labels3,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData3,
+                  backgroundColor:backColor,
+                  borderWidth: 1
+              }]
+          },
+          options:{
+             legend:{
+             display:false}
+          }
+      });
+//------- /item doghnut chart
 
 });
 </script>

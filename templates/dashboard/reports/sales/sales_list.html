@@ -252,9 +252,21 @@ $(document).ready(function(){
           tickIcon: 'fa-dot-circle-o',
           pdfIcon:'fa-file-pdf-o',
           excelIcon:'fa-file-excel-o'
-    }).on('change',function(){
-           //var svalue = $(this).val();
+    }).on('change', function(){
+
+        var ts = $(this).val();
+        if(ts == 'pdf'){
+          var url = "{% url 'dashboard:reports_sales_list_pdf' %}";
+          window.open(url, '_blank');
+
+        }else if(ts=='excel'){
+          window.location="{% url 'dashboard:reports_sales_list_export_csv' %}";
+
+        }else{
+          $(this).val('')
+        }
     });
+
     $('.ck').click(function(){
       var name = $('.setName').val();
       var vl = $('.setValue').val();

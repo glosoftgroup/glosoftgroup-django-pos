@@ -154,7 +154,7 @@ class ProductForm(forms.ModelForm):
         field = self.fields['is_featured'] 
         field.widget.attrs['class'] = 'styled' 
 
-        field = self.fields['product_class'] 
+        field = self.fields['product_class']
         field.widget.attrs['class'] = 'form-control bootstrap-select input-group-btn'
         field.widget.attrs['data-live-search'] = 'true'
         field.widget.attrs['data-width'] = '100%'
@@ -175,7 +175,7 @@ class ProductForm(forms.ModelForm):
             'Product form placeholder', 'Give your awesome product a name')
         field = self.fields['categories']        
         field.widget.attrs['data-placeholder'] = pgettext_lazy(
-            'Product form placeholder', 'Search')
+            'Product form placeholder', 'Select')
         field.widget.attrs['class'] = 'form-control multiselect'
         field.widget.attrs['multiple'] = 'multiple'         
 
@@ -192,7 +192,7 @@ class ProductForm(forms.ModelForm):
             field_defaults = {               
                 'label': attribute.name,
                 'required': False,
-                'initial': self.instance.get_attribute(attribute.pk)}
+                'initial': self.instance.get_attribute(attribute.pk),}
             if attribute.has_values():
                 field = CachingModelChoiceField(
                     queryset=attribute.values.all(), **field_defaults)

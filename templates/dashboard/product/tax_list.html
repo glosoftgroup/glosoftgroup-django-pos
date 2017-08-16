@@ -2,12 +2,22 @@
 {% block title %}
  Taxes- {{ block.super }}
 {% endblock %}
+
+ {% block custom_css %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+     tr.nb td{border:0px;}
+     .nb{border:0px;}
+     .table{border:1px solid #ccc}
+   </style>
+ {% endblock %}
+
 {% block breadcrumbs %}
- 
     <li class="active">
       Taxes
     </li>
-
 {% endblock %}
 {% block header_extra %}
 <li style='padding: 9px;'>
@@ -18,61 +28,82 @@
 {% endblock %}
 {% block menu_tax_list %}active{% endblock %}
 {% block content %}
-  
+
+  <div class="row">
+      <div class="col-md-12" style="margin-top:50px;">
+            <div class="row">
+                <div class="col-md-12" style="margin-bottom:10px;">
+                <a class="btn btn-primary" href="{% url 'dashboard:tax-add' %}"><i class="icon-plus2"></i>
+                     Create New tax
+                  </a>
+                </div>
+            </div>
+        </div>
+      {% if tax %}
       <!-- Header and footer fixed -->
-      <div class="panel panel-flat">
-      {% if tax %}	     
-	   <div class="table-responsive">
-        <table class="table  datatable-header-footer">
-                <thead>
-                  <tr class="bg-primary">
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Tax %</th>
-                   
-                    <th>Label</th>                    
-                    <th class="text-center">Actions</th>
-                  </tr>
-                </thead>
-                
-                <tbody>
-                  {% for tx in tax %}
-                  <tr>
-                    <td>#{{ tx.id }}</td>
-                    <!-- image -->
-                   
-                     <!-- Tax name -->
-                    <td>{{ tx.tax_name }}</td>
-                    <!-- tax -->
-                    <td>{{ tx.tax}}</td>
-                   
-                    <!-- label -->
-                    <td>{{ tx.tax_label }}</td>
-                    <!-- actions -->
-                    <td class="text-center">
-                      <ul class="icons-list">
-                        <li><a href="{% url 'dashboard:tax-update' pk=tx.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom"></i></a></li>
-                        <li>
-                  <a href="#modal_instance" data-title="Delete {{ tx.name }} Tax, with {{ tx.tax }}%" data-warning="" data-href="{% url 'dashboard:tax-delete' pk=tx.pk %}"
-                          class="modal-trigger"><i class="icon-trash position-left" data-popup="tooltip"></i> 
-                           
-                          </a>  
-                        </li>
-                       
-                      </ul>
-                    </td>
-                  </tr>
-                    {% endfor %}
-                  </tbody>
-           </table>
-           </div>
-	     
-	  {% else %}
-	  <div class="alert-warning" style="padding: 12px">You do not have tax.  <a class="" href="{% url 'dashboard:tax-add' %}"><i class="icon-plus"></i>
-	 Create New tax
-	</a></div>
-	  {% endif %}
+<div class="col-md-12">
+  <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+           <div class="table-responsives">
+            <table class="table  datatable-header-footer">
+                    <thead>
+                      <tr class="bg-primary">
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Tax %</th>
+
+                        <th>Label</th>
+                        <th class="text-center">Actions</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {% for tx in tax %}
+                      <tr>
+                        <td>#{{ tx.id }}</td>
+                         <!-- Tax name -->
+                        <td>{{ tx.tax_name }}</td>
+                        <!-- tax -->
+                        <td>{{ tx.tax}}</td>
+                        <!-- label -->
+                        <td>{{ tx.tax_label }}</td>
+                        <!-- actions -->
+                        <td class="text-center">
+                          <ul class="icons-list">
+                            <li><a href="{% url 'dashboard:tax-update' pk=tx.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom"></i></a></li>
+                            <li>
+                      <a href="#modal_instance" data-title="Delete {{ tx.name }} Tax, with {{ tx.tax }}%" data-warning="" data-href="{% url 'dashboard:tax-delete' pk=tx.pk %}"
+                              class="modal-trigger"><i class="icon-trash position-left" data-popup="tooltip"></i>
+
+                              </a>
+                            </li>
+
+                          </ul>
+                        </td>
+                      </tr>
+                        {% endfor %}
+                      </tbody>
+               </table>
+               </div>
+          </div>
+        </div>
       </div>
+  </div>
+</div>
+	  {% else %}
+          <div class="col-md-12 animated fadeIn ">
+           <div class="panel bg-danger-600">
+             <div class="panel-body">
+               <div style="text-align: center;font-size:16px;">
+                  No Set Tax Available.
+               </div>
+              </div>
+            </div>
+          </div>
+      {% endif %}
+  </div>
       {% include "dashboard/includes/_modal.html"  %}
      {% endblock %} 
 {% load static %}
