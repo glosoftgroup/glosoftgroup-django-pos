@@ -62,7 +62,9 @@ $(function() {
   		alertUser('Sub category name required!');  		
   		refreshAttributes();
       $('#daddProductClass').modal('hide');
-  	});
+  	}).fail(function(){
+      alertUser('Variant already added. Please add a unique variant name','bg-danger','Error!');
+    });
 
 
 
@@ -162,7 +164,9 @@ $(function() {
 	     alertUser('Attribute added successful');
 	     $('#add_value32D').empty().html(data);
 	     $('#value32D').val('');
-	  });
+	  }).fail(function(){
+      alertUser('Value already added. Please enter a unique name','bg-danger','Error!');
+    });
   });
 
   attrNameBtnD.on('click',function(){  
@@ -179,7 +183,9 @@ $(function() {
 	   $('#value-inputD').removeClass('hidden');
 	   $('#newvalueD').removeClass('hidden');	
      addAnotherAttr.removeClass('hidden');
-	});
+	}).fail(function(){
+      alertUser('Attribute name already added. Please add a unique name','bg-danger','Error!');
+    });
 });
 
   addAnotherAttr.on('click',function(){

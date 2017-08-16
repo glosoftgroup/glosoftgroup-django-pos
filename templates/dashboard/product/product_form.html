@@ -155,17 +155,7 @@
 <div class="row">
     <div class="col-md-12">
             <div class="panel panel-flat">
-              <div class="panel-heading">
-                <h6 class="panel-title">Product Details</h6>                
-                <div class="heading-elements">
-                  <ul class="icons-list">
-                            <li><a data-action="collapse"></a></li>
-                            <li><a data-action="reload"></a></li>
-                            <li><a data-action="close"></a></li>
-                          </ul>
-                        </div>
-              </div>
-
+              
               <div class="panel-body">
                 <div class="tabbable ">
                     {% if product.pk %}
@@ -292,7 +282,6 @@
               <button id="add-new-classd" onclick="return false;" class="btn bg-primary btn-icon  text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
                       href="#modal_attribute"  data-popup="tooltip" 
             data-original-title="Add attributes" data-title="Add attributes">
-
             <i class="icon-plus-circle2"></i>
             </button>
             </a>
