@@ -383,13 +383,20 @@ def fetch_variants(request):
 @staff_member_required
 @permission_decorator('product.add_product')
 def product_create(request):
-    product_classes = ProductClass.objects.order_by('pk')
+    product_classes = ProductClass.objects.all().order_by('pk')
     form_classes = forms.ProductClassSelectorForm(
         request.POST or None, product_classes=product_classes)
     if form_classes.is_valid():
         class_pk=form_classes.cleaned_data['product_cls']
     else:
-        class_pk= 1
+        # check if classes are set else set a default
+        if product_classes.exists():
+            class_pk= 1
+        else:
+            product_class = ProductClass(name='None')
+            product_class.save()
+            class_pk = product_class.pk
+           
     product_class = get_object_or_404(ProductClass, pk=class_pk)
     create_variant = not product_class.has_variants
     product = Product()
