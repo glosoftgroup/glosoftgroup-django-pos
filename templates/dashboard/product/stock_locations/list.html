@@ -29,6 +29,11 @@
 
 {% block content %}
   <div class="row">
+  <div class="p-5">
+   <a class="btn btn-primary" href="{% url 'dashboard:product-stock-location-add' %}" title="{% trans "Add stock location" context "Stock location list add button text" %}">
+      <i class="icon-plus22"></i>Add stock
+    </a>
+  </div>
     <div class='table-responsive'>
   <table class="table table-striped table-hover fixed_headers">
     <thead>

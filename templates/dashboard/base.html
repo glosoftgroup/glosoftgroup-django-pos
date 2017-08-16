@@ -243,11 +243,11 @@
                       {% endif %}
                       {#{% if perms.product.view_stocklocation %}#}
                     <!-- stock location -->
-                    <!--<li class="{% block menu_location_class %}{% endblock %}">-->
-                    <!--<a href="{% url 'dashboard:product-stock-location-list' %}"><i class="icon-location4"></i>-->
-                       {#{% trans "Stock locations" context "Dashboard stock locations list" %}#}
-                    <!--</a>-->
-                    <!--</li>-->
+                    <li class="{% block menu_location_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:product-stock-location-list' %}"><i class="icon-location4"></i>
+                       {% trans "Stock locations" context "Dashboard stock locations list" %}
+                    </a>
+                    </li>
                     <!-- stock reorder -->
                       {#{% endif %}#}
                        {% if perms.product.view_stocklocation %}
