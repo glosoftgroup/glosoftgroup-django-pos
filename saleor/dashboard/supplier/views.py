@@ -22,7 +22,12 @@ from ...customer.models import Customer
 from ...supplier.models import Supplier, AddressBook
 
 from ...decorators import permission_decorator, user_trail
+from ...utils import render_to_pdf
+import csv
+import random
+from django.utils.encoding import smart_str
 import logging
+from datetime import date
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -371,6 +376,40 @@ def user_trails(request):
 	info_logger.info('User: '+str(request.user.name)+' accessed the user trail page')
 	return TemplateResponse(request, 'dashboard/users/trail.html', {'users':users})
 
+
+@staff_member_required
+def supplier_pdf(request):
+	users = Supplier.objects.all().order_by('-id')
+	data = {
+        'today': date.today(),
+        'users': users,
+        'puller': request.user
+        }
+	pdf = render_to_pdf('dashboard/supplier/pagination/pdf/pdf.html', data)
+	return HttpResponse(pdf, content_type='application/pdf')
+
+@staff_member_required
+def supplier_export_csv(request):
+    pdfname = 'supplier'+str(random.random())
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+    qs = Supplier.objects.all().order_by('-id')
+    writer = csv.writer(response, csv.excel)
+    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+    writer.writerow([
+        smart_str(u"ID"),
+        smart_str(u"Name"),
+        smart_str(u"Email"),
+        smart_str(u"Phone No"),
+    ])
+    for obj in qs:
+        writer.writerow([
+            smart_str(obj.pk),
+            smart_str(obj.name),
+            smart_str(obj.email),
+            smart_str(obj.mobile),
+        ])
+    return response
 
 
 

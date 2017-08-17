@@ -29,7 +29,12 @@ from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ...decorators import permission_decorator, user_trail
+from ...utils import render_to_pdf
+import csv
+import random
+from django.utils.encoding import smart_str
 import logging
+from datetime import date
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -182,3 +187,40 @@ def search(request):
 
 			return TemplateResponse(request, 'dashboard/product/roles/search.html',
 									{'product_results':product_results, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+@staff_member_required
+
+def products_pdf(request):
+	product_results = Product.objects.all()
+	data = {
+		'today': date.today(),
+		'product_results': product_results,
+		'puller': request.user
+	}
+	pdf = render_to_pdf('dashboard/product/roles/pdf/pdf.html', data)
+	return HttpResponse(pdf, content_type='application/pdf')
+
+@staff_member_required
+def products_export_csv(request):
+    pdfname = 'products'+str(random.random())
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+    qs = Product.objects.all()
+    writer = csv.writer(response, csv.excel)
+    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+    writer.writerow([
+        smart_str(u"ID"),
+        smart_str(u"Product Name"),
+        smart_str(u"Category"),
+        smart_str(u"Price"),
+		smart_str(u"Current Stock"),
+    ])
+    for obj in qs:
+        writer.writerow([
+            smart_str(obj.pk),
+            smart_str(obj.name),
+            smart_str(obj.get_first_category()),
+			smart_str(obj.price.gross),
+            smart_str(obj.get_variants_count()),
+        ])
+    return response

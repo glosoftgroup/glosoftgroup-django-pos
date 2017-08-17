@@ -389,7 +389,7 @@
                         </li>
                    {% endif %}
                    {% if perms.reports.view_balancesheet %}
-                        <li class="{% block menu_balancesheet_report_class %}{% endblock %}">
+                        <li class="{% block menu_balancesheet_report_class %}{% endblock %}" style="display:none;">
                              <a href="{% url 'dashboard:balancesheet_reports' %}"><i class='icon-book'></i>Balance Sheet</a>
                         </li>
                     {% endif %}

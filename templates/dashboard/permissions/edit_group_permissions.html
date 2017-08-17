@@ -782,18 +782,38 @@ $("#edit-checkAll").on("click",function (event) {
 });
 
 /*--- status on each check ---*/
-$( ".check" ).on( "click", function(event){
-	var checked = $(this).is(':checked');
-	if(checked){
-		$(this).prop("checked", true);
+$( ".check" ).on( "click", function(){
+  var checked = $(this).is(':checked');
+  if(checked){
+       $(this).prop("checked", true);
 		$(this).parent('span').addClass('checked');
 		$(this).parent().parent().parent().siblings('span').show();
-		$(this).parent().parent().parent().siblings('span').text('(granted)');      
-	}else{
-		$(this).prop("checked", false);
+		$(this).parent().parent().parent().siblings('span').text('(granted)');
+  }else{
+
+   if($('#edit-checkAll').is(':checked')){
+           $('#edit-checkAll').prop("checked", false);
+           $('#edit-checkAll').parent('span').removeClass('checked');
+           $('#edit-checkAll').parent().parent().parent().siblings('span').hide();
+
+          $('.check:not(this)').each(function(){
+              $(this).prop("checked", false);
+              $(this).parent().parent().parent().siblings('span').hide();
+              $(this).parent().removeClass('checked');
+          });
+
+          $(this).prop("checked", true);
+		  $(this).parent('span').addClass('checked');
+		  $(this).parent().parent().parent().siblings('span').show();
+		  $(this).parent().parent().parent().siblings('span').text('(granted)');
+    }else{
+         $(this).prop("checked", false);
 		$(this).parent('span').removeClass('checked');
 		$(this).parent().parent().parent().siblings('span').hide();
-	}
+
+    }
+  }
 } );
+
 
 	</script>

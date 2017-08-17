@@ -18,6 +18,7 @@
     label.error{
       color: #FF5722;
     }
+    .table{border:1px solid #ccc}
   </style>
  {% endblock %}
 
@@ -204,8 +205,19 @@ $(document).ready(function(){
           tickIcon: 'fa-dot-circle-o',
           pdfIcon:'fa-file-pdf-o',
           excelIcon:'fa-file-excel-o'
-    }).on('change',function(){
-           //var svalue = $(this).val();
+    }).on('change', function(){
+
+        var ts = $(this).val();
+        if(ts == 'pdf'){
+          var url = "{% url 'dashboard:reports_purchase_pdf' %}";
+          window.open(url, '_blank');
+
+        }else if(ts=='excel'){
+          window.location="{% url 'dashboard:reports_purchases_export_csv' %}";
+
+        }else{
+          $(this).val('')
+        }
     });
 
     //**@ display size select

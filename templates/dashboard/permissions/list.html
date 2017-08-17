@@ -52,7 +52,7 @@
                   <div class="row">
                     <div class="col-md-12">
                       <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                           <div class="form-group">
                             <label for="name">Group Name</label>
                             <input type="text" class="form-control" name="group_name" id="group_name" placeholder="Name">
@@ -79,61 +79,12 @@
                            <div class="form-group">
                              <div class="row">
                                 <div class="col-md-12">
-                                 <div class="pull-left" style="margin-top:40px;">
-                                  <a href="{% url 'dashboard:users' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
-                                  <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create Group <i class="icon-arrow-right14 position-right"></i></button>
+                                 <div style="margin-top:40px;">
+                                  <a href="{% url 'dashboard:users' %}" class="pull-left btn btn-default waves-effect waves-light">Cancel</a>
+                                  <button class="btn btn-primary waves-effect waves-light pull-right" id="submit" type="submit">Create Group <i class="icon-arrow-right14 position-right"></i></button>
                                  </div>
                                 </div>
                               </div>
-                           </div>
-                        </div>
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label>select a group to view users in that group</label>
-                            <select data-placeholder="Select a Group..." class="select  select2-hidden-accessible group_select_users" tabindex="-1" aria-hidden="true">
-                              {% for group in groups %}
-                                <option value="{{group.id}}">{{group.name}}</option>
-                              {% endfor %}
-                            </select>
-                          </div>
-                           <div class="form-group">
-                            <label for="confirm_password">Users List</label>
-                            <div class="table-responsive pre-scrollable group-users" style="max-height: 290px;">
-                            
-                              <table class="table table-hover fixed_header">
-                                <thead>
-                                  <tr class="bg-primary">
-                                    <th>#</th>
-                                    <th>Name</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                  <div class="loader" style="margin: 20px 0px 0px 200px;display: none;">
-                                    <img src="{% static 'images/ripple-loader.svg' %}">
-                                  </div>
-                                </tr>
-                                  {% if users_in_group %}
-                                    {% for user in users_in_group %}
-                                      <tr class="animated fadeIn">
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>
-                                        {% if user.name %}
-                                        {{ user.name}}
-                                        {% else %}
-                                        {{ user.email }}
-                                        {% endif %}
-                                        </td>
-                                      </tr>
-                                    {% endfor %}
-                                    {% else %}
-                                    <tr class="animated fadeIn">
-                                       <td>No users in this group</td>
-                                    </tr>
-                                  {% endif %}
-                                </tbody>
-                              </table>
-                            </div>
                            </div>
                         </div>
                       </div>
@@ -144,27 +95,13 @@
                 </form>
             </div>
             <div class="tab-pane animated fadeIn" id="permissions">
-              <div class="row">                
-                  <div class="col-md-6 col-md-offset-3">
-                    <p class="content-group">Define group permissions by ticking on particular access options. 
-                   <input class="group_id" type="hidden" name="group_id" value=""></p>
-                    <div class="form-group">
-                      <label>select a group to view permissions in that group</label>
-                      <select data-placeholder="Select a Group..." class="select  select2-hidden-accessible group_select_permissions" tabindex="-1" aria-hidden="true">
-                            {% for group in groups %}
-                              <option value="{{group.id}}">{{group.name}}</option>
-                            {% endfor %}
-                          </select>
-                    </div>
-                    <span class="current_group animated shake" style="color: red;font-size:20px;"></span>
-                  </div>
-                </div>
           <div class="content_display">
             <div class="row">    
               <div class="col-md-12">
                    <div class="col-md-3">
                     <div class="form-group">
                       <label class="display-block text-semibold">System Permission Default</label>
+                        <input type="hidden" class="hidden_group_id" name="hidden_group_id">
                       <div class="checkbox">
                             <label>
                               <input class="styled checks" id="can-login" type="checkbox"" value="active">
@@ -684,11 +621,29 @@ $( ".check" ).on( "click", function(){
   if(checked){
     $(this).prop("checked", true);
     $(this).parent().parent().parent().siblings('span').show();
-    $(this).parent().parent().parent().siblings('span').text('(granted)');      
+    $(this).parent().parent().parent().siblings('span').text('(granted)');
   }else{
-    $(this).prop("checked", false);
-    $(this).parent('span').removeClass('checked');
-    $(this).parent().parent().parent().siblings('span').hide();
+
+   if($('#checkAll').is(':checked')){
+           $('#checkAll').prop("checked", false);
+           $('#checkAll').parent('span').removeClass('checked');
+           $('#checkAll').parent().parent().parent().siblings('span').hide();
+
+          $('.check:not(this)').each(function(){
+              $(this).prop("checked", false);
+              $(this).parent().parent().parent().siblings('span').hide();
+              $(this).parent().removeClass('checked');
+          });
+
+           $(this).prop("checked", true);
+    $(this).parent().parent().parent().siblings('span').show();
+    $(this).parent().parent().parent().siblings('span').text('(granted)');
+    }else{
+         $(this).prop("checked", false);
+         $(this).parent('span').removeClass('checked');
+         $(this).parent().parent().parent().siblings('span').hide();
+
+    }
   }
 } );
 
@@ -738,9 +693,7 @@ $( ".check" ).on( "click", function(){
                       });
                       //**@ inactive profile active permissions
                       next_tab('profile', 'permissions');
-                      $('.current_group').text('First choose permissions for '+ group_name);
-                      localStorage.setItem('group_id', data.id);
-                      localStorage.setItem('group_name', data.name);
+                      $('.hidden_group_id').val(data.id);
                       console.log('group name is :'+data.name + ' and id is '+ data.id)
                    }        
 
@@ -756,13 +709,8 @@ $( ".check" ).on( "click", function(){
     }
   });
 
-/*--- create group ---*/
-//**@ check group id in storage 
-if(localStorage.getItem("group_id")){
-  $('.current_group').text('First choose permissions for '+ localStorage.getItem("group_name"));
-}else{
-  $('.current_group').text('');
-}
+/*--- /create group ---*/
+
 /*-------  permission button --------*/
 $("#permission-btn").click(function(event){
     event.preventDefault();
@@ -781,7 +729,8 @@ $("#permission-btn").click(function(event){
     //**@ span val
     var set_current_group_text = $('.current_group').text('');
     //**@ set group_id
-     var g_id =   localStorage.getItem("group_id") ? localStorage.getItem('group_id') : $('.group_select_permissions').val();
+     //var g_id =   localStorage.getItem("group_id") ? localStorage.getItem('group_id') : $('.group_select_permissions').val();
+     var g_id =   $('.hidden_group_id').val();
     //**@ call
     $.ajax({
       url: "{% url 'dashboard:group_assign_permission' %}",
@@ -807,8 +756,6 @@ $("#permission-btn").click(function(event){
          }
 
          window.location = "{% url 'dashboard:perms' %}";
-         localStorage.removeItem('group_id');
-         localStorage.removeItem('group_name');
       }
       ,error:function(){
         $.jGrowl('something went wrong', {
@@ -839,7 +786,8 @@ $("#save-group-btn").click(function(event){
     //**@ span val
     var set_current_group_text = $('.current_group').text('');
     //**@ set group_id
-     var g_id =   localStorage.getItem("group_id") ? localStorage.getItem('group_id') : $('.group_select_permissions').val();
+     //var g_id =   localStorage.getItem("group_id") ? localStorage.getItem('group_id') : $('.group_select_permissions').val();
+     var g_id =   $('.hidden_group_id').val();
     //**@ call
     $.ajax({
       url: "{% url 'dashboard:group_assign_permission' %}",
@@ -863,8 +811,6 @@ $("#save-group-btn").click(function(event){
                   theme: 'bg-success'
               });
          }
-         localStorage.removeItem('group_id');
-         localStorage.removeItem('group_name');
          window.location = "{% url 'dashboard:groups' %}";
 
       }
