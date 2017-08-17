@@ -531,9 +531,9 @@
                         {{ attribute.name|capfirst }}
                       </th>
                     {% endfor %}
-                    <th class="wide">
-                      {% trans "Variant name" context "Product variant table header" %}
-                    </th>
+                   <!--  <th class="wide">
+                      Variant name
+                    </th> -->
                     
                     <th class="right-align">
                       Retail Price
@@ -559,9 +559,7 @@
                           {{ attr_display }}
                         </td>
                       {% endfor %}
-                      <td>
-                        {{ variant.name }}
-                      </td>
+                     
                       <!-- retail price -->
                       <td class="right-align">
                 {% gross variant.get_price_per_item html=True %}
@@ -1131,6 +1129,7 @@
   var checkSkuUrl = "{% url 'dashboard:have-variants' %}";
   var hasVariantDiv = $('#hasVariantDiv');
   var skuInput = $('#id_variant-sku');
+  skuInput.attr('placeholder','Enter Stock keeping unit');
   var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
 
   function checkHasVaraints(class_pk){
