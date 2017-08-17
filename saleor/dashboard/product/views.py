@@ -435,8 +435,7 @@ def product_create(request):
         else:
             product_class = ProductClass(name='None')
             product_class.save()
-            class_pk = product_class.pk
-           
+            class_pk = product_class.pk           
     product_class = get_object_or_404(ProductClass, pk=class_pk)
     create_variant = not product_class.has_variants
     product = Product()
