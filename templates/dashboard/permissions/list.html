@@ -628,16 +628,11 @@ $( ".check" ).on( "click", function(){
            $('#checkAll').prop("checked", false);
            $('#checkAll').parent('span').removeClass('checked');
            $('#checkAll').parent().parent().parent().siblings('span').hide();
+           <!--$('#checkAll').child('span').css('border-color','red !important');-->
 
-          $('.check:not(this)').each(function(){
-              $(this).prop("checked", false);
-              $(this).parent().parent().parent().siblings('span').hide();
-              $(this).parent().removeClass('checked');
-          });
-
-           $(this).prop("checked", true);
-    $(this).parent().parent().parent().siblings('span').show();
-    $(this).parent().parent().parent().siblings('span').text('(granted)');
+           $(this).prop("checked", false);
+           $(this).parent('span').removeClass('checked');
+           $(this).parent().parent().parent().siblings('span').hide();
     }else{
          $(this).prop("checked", false);
          $(this).parent('span').removeClass('checked');

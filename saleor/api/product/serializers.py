@@ -75,6 +75,8 @@ class SalesSerializer(serializers.ModelSerializer):
 				 'amount_paid',
 				 'solditems',
 				 'customer',
+				  'mobile',
+				  'customer_name',
 				)
 
 	def validate_terminal(self,value):
@@ -85,7 +87,7 @@ class SalesSerializer(serializers.ModelSerializer):
 		for term in terminals:
 			self.l.append(term.pk)
 		if not self.terminal_id in self.l:		
-			raise ValidationError('Terminal specified does not extist')
+			raise ValidationError('Terminal specified does not exist')
 		return value	
 
 	def create(self,validated_data):
@@ -94,24 +96,50 @@ class SalesSerializer(serializers.ModelSerializer):
 		terminal = Terminal.objects.get(pk=self.terminal_id)	
 		terminal.amount += Decimal(total_net)		
 		terminal.save()		
-		# calculate loyalty_points
-		customer = validated_data.get('customer')		
+
+		try:
+			if validated_data.get('customer'):
+				customer = Customer.objects.get(name=validated_data.get('customer'))
+			else:
+				customer = Customer.objects.get(name=validated_data.get('customer_name'))
+		except:
+			name = validated_data.get('customer_name')
+			if validated_data.get('mobile'):
+				mobile = validated_data.get('mobile')
+				customer = Customer.objects.create(name=name, mobile=mobile)
+			else:
+				customer = Customer.objects.create(name=name)
+
 		invoice_number = validated_data.get('invoice_number')
+		# calculate loyalty_points
 		if customer:
 			total_net = validated_data.get('total_net')
 			points_eq = SiteSettings.objects.get(pk=1)		
 			points_eq = points_eq.loyalty_point_equiv #settings.LOYALTY_POINT_EQUIVALENCE
-			loyalty_points = total_net/points_eq			
+			if points_eq == 0:
+				loyalty_points = 0
+			else:
+				loyalty_points = total_net/points_eq
 			customer.loyalty_points += loyalty_points
 			customer.save()
-		# get sold products	
-		solditems_data = validated_data.pop('solditems')		
-		sales = Sales.objects.create(**validated_data)		
+		# get sold products
+		solditems_data = validated_data.pop('solditems')
+		# sales = Sales.objects.create(**validated_data)
+		sales = Sales.objects.create(user=validated_data.get('user'),
+									 invoice_number=validated_data.get('invoice_number'),
+									 total_net=validated_data.get('total_net'),
+									 sub_total=validated_data.get('sub_total'),
+									 balance=validated_data.get('balance'),
+									 terminal=validated_data.get('terminal'),
+									 amount_paid=validated_data.get('amount_paid'),
+									 customer=customer,
+									 mobile=validated_data.get('mobile'),
+									 customer_name=validated_data.get('customer_name'))
 		for solditem_data in solditems_data:
 			SoldItem.objects.create(sales=sales,**solditem_data)
 			stock = Stock.objects.get(variant__sku=solditem_data['sku'])
 			if stock:
-				Stock.objects.allocate_stock(stock, solditem_data['quantity'])        			
+				Stock.objects.allocate_stock(stock, solditem_data['quantity'])
 		return sales
 		
 

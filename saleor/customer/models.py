@@ -107,7 +107,7 @@ class CustomerManager(BaseUserManager):
     
 
 class Customer(models.Model):
-    email = models.EmailField(pgettext_lazy('Customer field', 'email'), unique=True)
+    email = models.EmailField(pgettext_lazy('Customer field', 'email'), unique=True, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     addresses = models.ManyToManyField(
         AddressBook, blank=True,
@@ -132,12 +132,12 @@ class Customer(models.Model):
         on_delete=models.SET_NULL,
         verbose_name=pgettext_lazy('Customer field', 'default billing address'))
 
-    USERNAME_FIELD = 'email'
+    # USERNAME_FIELD = 'email'
 
     objects = CustomerManager()
 
-    search_fields = [
-        index.SearchField('email')]
+    # search_fields = [
+    #     index.SearchField('email')]
 
     class Meta:
         verbose_name = pgettext_lazy('Customer model', 'customer')

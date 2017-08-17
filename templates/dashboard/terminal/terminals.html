@@ -14,6 +14,7 @@
      .clickable-row td.td{
       cursor: pointer;
      }
+     .table{border:1px solid #ccc}
    </style>
  {% endblock %}
 {% block header_extra %}
@@ -68,17 +69,8 @@
     
       <!-- Header and footer fixed -->
       <div class="panel panel-flat">
-        <div class="panel-heading">        
-       
-          <div class="heading-elements">
-            <ul class="icons-list">              
-              <li><a data-action="collapse"></a></li>       
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        </div>
+          <div class="panel-body">
         <div class="table-responsive">
-         
 
           <table class="table table-striped table-hover fixed_headers">
            
@@ -160,6 +152,7 @@
            </table>
 
         </div>
+      </div>
       </div>
  
   </div>
