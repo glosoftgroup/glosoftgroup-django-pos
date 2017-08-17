@@ -31,7 +31,7 @@ from .utils import get_attributes_display_map
 @python_2_unicode_compatible
 class Category(MPTTModel):
     name = models.CharField(
-        pgettext_lazy('Category field', 'name'), max_length=128)
+        pgettext_lazy('Category field', 'name'), max_length=128,unique=True)
     slug = models.SlugField(
         pgettext_lazy('Category field', 'slug'), max_length=50)
     description = models.TextField(
@@ -75,7 +75,7 @@ class Category(MPTTModel):
 @python_2_unicode_compatible
 class ProductClass(models.Model):
     name = models.CharField(
-        pgettext_lazy('Product class field', 'name'), max_length=128)
+        pgettext_lazy('Product class field', 'name'), max_length=128, unique=True)
     has_variants = models.BooleanField(
         pgettext_lazy('Product class field', 'has variants'), default=True)
     product_attributes = models.ManyToManyField(
@@ -482,7 +482,7 @@ class ProductAttribute(models.Model):
         max_length=50, unique=True)
     name = models.CharField(
         pgettext_lazy('Product attribute field', 'display name'),
-        max_length=100)
+        max_length=100,unique=True)
 
     class Meta:
         ordering = ('slug', )

@@ -92,6 +92,7 @@ urlpatterns = [
 
     url(r'^(?P<product_pk>[0-9]+)/variants/(?P<variant_pk>[0-9]+)/$', permission_required('product.change_productvariants', login_url='not_found')
         (views.variant_edit), name='variant-update'),
+    url(r'^have-variants/$',views.have_variants, name='have-variants'),
     url(r'^(?P<product_pk>[0-9]+)/variants/add/$', permission_required('product.add_productvariants', login_url='not_found')
         (views.variant_edit), name='variant-add'),
     url(r'^(?P<product_pk>[0-9]+)/variants/(?P<variant_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariants', login_url='not_found')

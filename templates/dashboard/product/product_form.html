@@ -151,6 +151,7 @@
 
 
 {% block content %}
+
 <div id='results'></div>
 <div class="row">
     <div class="col-md-12">
@@ -240,7 +241,7 @@
                   <div class="input-group-btn">
                      <button type="button" class="btn bg-primary btn-icon legitRipple edit_modal-trigger" data-popup="tooltip"
                     data-original-title="Add New category"
-                    href="#modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                    href="#modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add32" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
                        <i class="icon-plus-circle2"></i>
                      </button>
                    </div>
@@ -309,14 +310,7 @@
         <div class="col-md-12">
           <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Stock Reorder Limit</h5>
         </div>
-      <!-- stock reorder limit -->
-      <div class="col-md-3">
-        {% if not product.product_class.has_variants %}
-        <div class="row">   
-         {{ variant_form.sku|materializecss }}
-       </div>
-       {% endif %}
-      </div>
+      <!-- stock reorder limit -->      
       <div class="col-md-3">
         <div class="form-group">
             <label>Reorder Stock Threshold:</label>
@@ -325,7 +319,7 @@
       </div>
       <!-- ./stock reorder limit -->
       <!-- supplier -->
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group" id="div_supplier">
           <label>Supplier:</label>
            <div class="input-group supplier-refresh">
@@ -342,6 +336,13 @@
           </div>
       </div>
       <!-- ./supplier -->     
+      <div class="col-md-3" id="hasVariantDiv">
+        {% if not product.product_class.has_variants %}
+        <div class="row">   
+         {{ variant_form.sku|materializecss }}
+       </div>
+       {% endif %}
+      </div>
      </div>
 
      <!-- Product Pricing Details -->
@@ -429,11 +430,7 @@
       </div>
         </div>
      </div>
-     {% if not product.product_class.has_variants %}
-                  <div class="row">
-                   <!-- variant_form.sku|materializecss }} -->
-                  </div>
-                {% endif %}
+     
 
     </div>
     <!-- ./body --> 
@@ -1131,7 +1128,31 @@
   // end content blocker
 
   // refreshAttributes func
-  var checkSkuUrl = "{% url "dashboard:fetch-variants" %}";
+  var checkSkuUrl = "{% url 'dashboard:have-variants' %}";
+  var hasVariantDiv = $('#hasVariantDiv');
+  var skuInput = $('#id_variant-sku');
+  var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+
+  function checkHasVaraints(class_pk){
+    var postingx = $.post(checkSkuUrl, 
+                         {class_pk:class_pk,
+                          csrfmiddlewaretoken:csrf_token} ); 
+    postingx.done(function( data ) {    
+    if(parseInt(data['has_variants']) == 1){
+     console.log('has variants');
+     hasVariantDiv.addClass('hidden');
+     skuInput.removeAttr('required');
+     skuInput.removeAttr('aria-required');
+     skuInput.removeClass('validate');
+    }else{
+      console.log(data['has_variants']);
+      hasVariantDiv.removeClass('hidden');
+      skuInput.attr('required','required');
+      skuInput.addClass('validate');
+      skuInput.val('dummy');
+    }
+   });
+  }
   function refreshAttributes() {  
    {% url "dashboard:fetch-variants" as url %} 
    var url = "{{ url }}";
@@ -1139,7 +1160,7 @@
    var posting = $.post( url, {class_pk:class_pk} ); 
    posting.done(function( data ) {    
     $( "#div_attributes" ).empty().append( data ); 
-     
+    checkHasVaraints(class_pk);
    });
 
    // check if class has variants
@@ -1176,9 +1197,11 @@
        {% url "dashboard:fetch-variants" as url %}
        var url = "{{ url }}";
        var class_pk = $( this ).val();
-       var posting = $.post( url, {class_pk:class_pk} );
+       var posting = $.post( url,
+                           {class_pk:class_pk} );
          // Put the results in a div
        posting.done(function( data ) {
+        checkHasVaraints(class_pk);
         $( "#div_attributes" ).empty().append( data );
        });
 

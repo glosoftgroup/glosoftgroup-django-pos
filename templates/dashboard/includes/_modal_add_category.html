@@ -1,6 +1,6 @@
 <!-- Blue modal -->
   <div id="modal_add_category" class="modal fade">
-    <div class="modal-dialog ">
+    <div class="modal-dialog modal-xs">
       <div class="modal-content">
         <div class="modal-header bg-blue">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -15,17 +15,25 @@
            <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=images">
            {% endif %}
            
-          <div class="" id="add_category_form">
-           
+          <div class="" id="addcategory_form">        
            </div>
-            
+            <div class="form-group">
+              <label>Category Name:<i class="text-danger">*</i></label>
+              <input type="text" placeholder="Enter name (e.g Grocery)" class="form-control" name="categoryName" id="categoryName">
+            </div>
+            <div class="form-group">
+              <label>Description:(optional)</label>
+              <textarea class="form-control" name="categoryDescription" id="categoryDescription" placeholder="Enter description here....."></textarea>
+            </div>
+            <input type="hidden" value="{% url 'dashboard:category-add32' %}" id="newcaturl" data-newcaturl="{% url 'dashboard:category-add32' %}" hidden="" name="">
+
           </div>
         </div>
         
         <div class="modal-footer">
-          <div class="col-md-6 col-md-offset-3">
+          <div class="col-md-12">
             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-            <button onclick="return false" id="modal_add_category_btn" class="btn  bg-primary pull-right">
+            <button onclick="return false" id="modal_add_category_btn32" class="btn  bg-primary pull-right">
               Create
             </button>
           </div>

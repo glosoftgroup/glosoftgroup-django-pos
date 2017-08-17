@@ -140,7 +140,7 @@ def re_order_form(request, pk):
 @staff_member_required
 def class_list_view(request):
     try:
-        queryset_list = ProductClass.objects.all().exclude(name='None',has_variants=False).prefetch_related(
+        queryset_list = ProductClass.objects.all().exclude(name='None').prefetch_related(
             'product_attributes', 'variant_attributes').order_by('-id')
 
         page = request.GET.get('page', 1)
@@ -428,12 +428,22 @@ def product_create(request):
         request.POST or None, product_classes=product_classes)
     if form_classes.is_valid():
         class_pk=form_classes.cleaned_data['product_cls']
+        print class_pk
     else:
         # check if classes are set else set a default
         if product_classes.exists():
-            class_pk= product_classes.first().pk
+            try:
+                if request.POST.get('product_class'):
+                    class_pk=int(request.POST.get('product_class'))
+                else:
+                    anonymous_class = ProductClass.objects.get(name='None')
+                    class_pk = anonymous_class.pk
+            except:
+                anonymous_class = ProductClass(name='None',has_variants=False)
+                anonymous_class.save()
+                class_pk = anonymous_class.pk           
         else:
-            product_class = ProductClass(name='None')
+            product_class = ProductClass(name='None',has_variants=False)
             product_class.save()
             class_pk = product_class.pk           
     product_class = get_object_or_404(ProductClass, pk=class_pk)
@@ -1551,3 +1561,18 @@ def attr_list_f32d(request):
              #l.append(contact)
              return HttpResponse(json.dumps(contact), content_type='application/json')
         return HttpResponse('Error')
+
+@staff_member_required
+def have_variants(request):
+    if request.method == 'POST':
+        class_pk = request.POST.get('class_pk')
+        try:
+            class_pk = int(class_pk)
+            has_variants = ProductClass.objects.get(pk=class_pk)
+            if has_variants.has_variants:
+                data = {'has_variants':1}
+            else:
+                data = {'has_variants':0}
+            return HttpResponse(json.dumps(data),content_type='application/json')
+        except:
+            HttpResponse('Invalid class ID')
