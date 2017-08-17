@@ -11,7 +11,15 @@
 {% block body_class %}body-sales{% endblock %}
 
 {% block menu_sales_class %}active{% endblock %}
-
+ {% block custom_css %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+     .table{border:1px solid #ccc}
+     .disc-label{border-radius:50px 50px; padding:4px 10px;vertical-align:middle;}
+   </style>
+ {% endblock %}
 {% block breadcrumbs %} 
     <li class="visible-s">{% trans "Discounts" context "Dashboard sales (discounts) list." %}
     </li>
@@ -21,78 +29,174 @@
 {% block menu_discounts_class %} active{% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class='panelbody'>
-    <div class="" style="padding: 8px;">
-      <a href="{% url 'dashboard:sale-add' %}" class="btn btn-primary hvr-glow btn-raised legitRipple"  title="{% trans "Add sale" context "Sale (discount) list add button text" %}">
-      <i class="icon-plus3 position-left"></i>
-        {% trans "Add" context "Dashboard add action" %}
-      </a>
+ <div class="row">
+
+   <div class="col-md-12">
+      <div class="panel panel-flat">
+
+        <div class="panel-body search-panel">
+            <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.discount.add_voucher %}
+                    <a href="{% url 'dashboard:sale-add' %}" class="btn btn-primary hvr-glow btn-raised legitRipple"  title="{% trans "Add sale" context "Sale (discount) list add button text" %}">
+                      <i class="icon-plus2 position-left"></i>
+                      {% trans "Add" context "Dashboard add action" %}
+                    </a>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+             <label>Search Reward</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search Reward" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                  <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+
+        </div>
+      </div>
+   </div>
+
+    <div class="col-md-12">
+      <div id="pagination-div">
+        <div class="panel panel-flat">
+          <div class='panel-body'>
+          <div class="table-responsives">
+            <table class="table responsive data-table">
+              <thead>
+                <tr class="bg-primary">
+                  <th>
+                    {% trans "Name" context "Sale (discount) table header" %}
+                  </th>
+                  <th>
+                    {% trans "Discount" context "Sale (discount) table header" %}
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if sales %}
+                  {% for sale in sales %}
+                    <tr class="clickable-row" data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+                      <td class='td'  data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+                        {{ sale }}
+                      </td>
+                      <td class='td' data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+                        {{ sale.value }}{{ sale.get_type_display }}
+                      </td>
+                      <!-- actions -->
+                      <td >
+                      <span  class="label label-primary disc-label">
+                      <a href="{% url 'dashboard:discount-detail' pk=sale.pk %}" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
+                      Detail
+                      </a>
+                      </span>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                <tr>
+                  <td>
+                    <span>
+                      {% trans "No Discount available" context "Empty sales table message" %}
+                    </span>
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+          <div class="my-paginate">
+            <div class="text-center bootpag-callback" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav">Page 1 of {{pn}} </div>
+            </div>
+            <input type="hidden" id="page_size" val="">
+          </div>
+
+        </div>
+      </div>
     </div>
-    <div class="table-responsive">
-      <table class="table responsive data-table">
-        <thead>
-          <tr class="bg-primary">
-            <th>
-              {% trans "Name" context "Sale (discount) table header" %}
-            </th>
-            <th>
-              {% trans "Discount" context "Sale (discount) table header" %}
-            </th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% if sales %}
-            {% for sale in sales %}
-              <tr class="clickable-row" data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
-                <td class='td'  data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
-                  {{ sale }}
-                </td>
-                <td class='td' data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
-                  {{ sale.value }}{{ sale.get_type_display }}
-                </td>
-                <!-- actions -->
-                <td >
-                <span  class="label label-primary">
-                <a href="{% url 'dashboard:discount-detail' pk=sale.pk %}" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
-                Detail
-                </a>
-                </span>
-                </td>
-              </tr>
-            {% endfor %}
-          {% else %}
-          <tr>
-            <td>
-              <span>
-                {% trans "No Discount found" context "Empty sales table message" %}
-              </span>
-            </td>
-          </tr>
-          {% endif %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  </div>
+ </div>
   {% include "dashboard/includes/_pagination.html" %}
   {% include "dashboard/includes/_modal_template.html"  %}
 {% endblock %}
 
 {% block custom_js %}
-<style type="text/css">
-  .clickable-row { cursor: pointer; }
-</style>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-      // $(".clickable-row").click(function() {
-      //      window.location = $(this).data("href");
-      //  });
       $(".td").click(function() {
             window.location = $(this).data("href");
         });
+
+        //**@ display size select
+        $('.list-sz').selectpicker().on('change', function(){
+            var ts = $(this).val();
+            $.ajax({ url: "{% url 'dashboard:discount_pagination' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+            }});
+        });
+
+        $('.bootpag-callback').bootpag({
+            total: parseInt({{pn}}),
+            maxVisible: 4,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+
+            }).on("page", function(event, num){
+                $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+                $.get("{% url 'dashboard:discount_pagination' %}",{page:num},function(data){
+                   $('#tb').html(data);
+                });
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+
+      $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        delay(function(){
+           var url = "{% url 'dashboard:discount_search' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                  $('#pagination-div').html(data);
+           }});
+        }, 500 );
+
+      });
+
  });
 </script>
 {% endblock %}

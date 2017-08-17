@@ -103,7 +103,7 @@
                          {% if perms.auth.change_group %}
                             <li>
                               <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
-                             class="modal_trigger_edit edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> EDIT</a>
+                             class="modal_trigger_edit edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> EDIT PERMISSIONS</a>
                             </li>
                          {% endif %}
                           {% if perms.auth.delete_group %}
@@ -255,57 +255,57 @@
              </div>
             </div>
            </div>
-           <div class="row">
-            <div class="col-md-9">
-              <div class="form-group">
-               <label>Add Users:</label>
-                <div class="multi-select-full">
-                  <select class="multiselect-full-featured" multiple="multiple" style="display: nones;" name="user_select" id="edit_multiple" placeholder="select a user...">
-                  {% for usr in users %}
-                    {% if usr.is_active == True and usr.is_superuser == False %}
-                       <option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}
-                       {% else %}{{usr.email}}{% endif %}" data-image="{% if usr.image %}{{usr.image.url}}
-                       {% else %}/static/images/user.png{% endif %}">
-                         {% if usr.name %}
-                            {{usr.name}}
-                         {% else %}
-                            {{usr.email}}
-                         {% endif %}
-                       </option>
-                    {% endif %}
-                  {% endfor %}
-                  </select>
-                </div>
-               </div><!-- end of formgroup-->
-            </div>
-            <div class="col-md-3">
-             <div class="form-group">
-               <label><span style="visibility: hidden;">X</span></label>
-               <button class="btn btn-primary form-control" id="add_user_btn">Add User</button>
-            </div>
-            </div>
-           </div>
-           <div class="row">
-            <div class="col-md-12">
-             <div class="table-responsive pre-scrollable group-users">
-             <table class="table table-framed" id="group_user_table">
-                <thead>
-                  <tr>
-                    <th>image</th>
-                    <th>Name</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="table_body">
+           <!--<div class="row">-->
+            <!--<div class="col-md-9">-->
+              <!--<div class="form-group">-->
+               <!--<label>Add Users:</label>-->
+                <!--<div class="multi-select-full">-->
+                  <!--<select class="multiselect-full-featured" multiple="multiple" style="display: nones;" name="user_select" id="edit_multiple" placeholder="select a user...">-->
+                  <!--{% for usr in users %}-->
+                    <!--{% if usr.is_active == True and usr.is_superuser == False %}-->
+                       <!--<option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}-->
+                       <!--{% else %}{{usr.email}}{% endif %}" data-image="{% if usr.image %}{{usr.image.url}}-->
+                       <!--{% else %}/static/images/user.png{% endif %}">-->
+                         <!--{% if usr.name %}-->
+                            <!--{{usr.name}}-->
+                         <!--{% else %}-->
+                            <!--{{usr.email}}-->
+                         <!--{% endif %}-->
+                       <!--</option>-->
+                    <!--{% endif %}-->
+                  <!--{% endfor %}-->
+                  <!--</select>-->
+                <!--</div>-->
+               <!--</div>&lt;!&ndash; end of formgroup&ndash;&gt;-->
+            <!--</div>-->
+            <!--<div class="col-md-3">-->
+             <!--<div class="form-group">-->
+               <!--<label><span style="visibility: hidden;">X</span></label>-->
+               <!--<button class="btn btn-primary form-control" id="add_user_btn">Add User</button>-->
+            <!--</div>-->
+            <!--</div>-->
+           <!--</div>-->
+           <!--<div class="row">-->
+            <!--<div class="col-md-12">-->
+             <!--<div class="table-responsive pre-scrollable group-users">-->
+             <!--<table class="table table-framed" id="group_user_table">-->
+                <!--<thead>-->
+                  <!--<tr>-->
+                    <!--<th>image</th>-->
+                    <!--<th>Name</th>-->
+                    <!--<th>Actions</th>-->
+                  <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody class="table_body">-->
 
-                </tbody>
-              </table>
-              </div>
-            </div>
-           </div>
+                <!--</tbody>-->
+              <!--</table>-->
+              <!--</div>-->
+            <!--</div>-->
+           <!--</div>-->
          </div>
 
-         <div class="col-md-6">
+         <div class="col-md-12">
            <div class="row">
               <div class="col-md-12">
                <h5>Permissions</h5>
@@ -594,12 +594,14 @@ function submitGroupDetails(){
     }).get();
    var checkBoxesStringNumber = checkBoxesStringArray.map(Number);
    console.log(checkBoxesStringNumber);
-       //**@ check login status
+
+    //**@ check login status
     if($("#edit-can-login").is(':checked')){
       $("#edit-can-login").val('active')
     }else{
       $("#edit-can-login").val('inactive');
     }
+
     //**@ check login val
     var can_login_value = $("#edit-can-login").val();
     //**@ id
@@ -669,7 +671,7 @@ $('.del').on('click', function (e) {
             header: 'Well done!',
             theme: 'bg-success'
           });
-          // window.location.reload();
+          window.location.reload();
         },
         error:function(error){
           console.log(error);

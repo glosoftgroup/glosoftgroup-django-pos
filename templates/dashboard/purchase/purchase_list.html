@@ -21,6 +21,7 @@
      .clickable-row td.td{
       cursor: pointer;
      }
+         .table{border:1px solid #ccc}
    </style>
  {% endblock %}
 
@@ -96,7 +97,7 @@
                 <thead>
                   <tr class="bg-primary">        
                     <th>Product Name/sku</th>            
-                    <th>Retail price</th>               
+                    <th>Retail price (KShs)</th>
                     <th>Current Quantity</th>
                     <th>stock in</th>
                     <th>Tax %</th>         
@@ -109,16 +110,17 @@
                         <!-- product name/sku -->
                       <td>
                         <div class="media-left">
-                          <div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibold"> {{ variant.display_product }} </a></div>
+                          <div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibolds"> {{ variant.display_product }} </a></div>
                           <div class="text-muted text-size-small">  {{ variant.sku }} </div>
                         </div>
                       </td>
 
                       <!-- Retail price -->
                       <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
-                      <h6 class="text-semibold">
+                      <h6 class="text-semibolds text-centers">
                       {% if variant.get_price_per_item %}
-                       {% gross variant.get_price_per_item html=True %}
+                       {#{% gross variant.get_price_per_item html=True %}#}
+                          {{variant.get_price_per_item.gross}}
                       {% endif %}
                       </h6>
                       </td>
@@ -200,7 +202,7 @@
   
   {% endfor %}
                 {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">no stock available</h2></td></tr>
+                   <tr><td colspan="6"><h2 class="text-center">No Stock available</h2></td></tr>
                {% endif %}
                   </tbody>
            </table>
@@ -227,9 +229,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
-<script type="text/javascript"> 
 
-</script>
 <script type="text/javascript">
   $(document).ready(function() {
 

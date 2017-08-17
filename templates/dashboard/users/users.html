@@ -65,6 +65,7 @@
               <label>Select group name</label>
               <div class="form-group">
                   <select class="bootstrap-select group-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
+                      <option value="all">Select All</option>
                   {% if groups %}
                   {% for group in groups %}
                        <option value="{{group.id}}">
@@ -303,9 +304,16 @@
           tickIcon: 'fa-dot-circle-o'
     }).on('change', function(){
        var group_id = $(this).val();
-        $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
+       if(group_id == 'all'){
+           $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+          }});
+       }else{
+            $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
              $('#pagination-div').html(data);
-        });
+           });
+       }
+
     });
 
       $(".td").click(function(){

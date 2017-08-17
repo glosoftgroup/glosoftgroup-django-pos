@@ -14,6 +14,7 @@
      .clickable-row td.td{
       cursor: pointer;
      }
+         .table{border:1px solid #ccc}
    </style>
  {% endblock %}
 {% block header_extra %}
@@ -34,7 +35,7 @@
             <div class="col-md-2">
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
-                {% if perms.userprofile.add_user %}
+                {% if perms.userprofile.add_customer %}
                     <a href="{% url 'dashboard:customer-add' %}" class="btn btn-primary  hvr-glow btn-raised legitRipple ">
                     <i class="icon-plus3 position-left"></i>Add Customer</a>
                 {% endif %}
@@ -43,7 +44,7 @@
             <div class="col-md-6">
              <label>Search Customer</label>
               <div class="form-group form-group-material has-feedback">
-                <input class="form-control search_sku" placeholder="Search customer" type="text">
+                <input class="form-control search_user" placeholder="Search customer" type="text">
                 <div class="form-control-feedback">
                   <i class="icon-search4 text-size-base"></i>
                 </div>
@@ -52,12 +53,18 @@
             <div class="col-md-2">
               <label>display list size</label>
               <div class="form-group">
-                 <select class="select list-sz list-size" data-width="100%" tabindex="-98">
-                    <option value="5" selected="selected">5</option>                   
+                 <!--<select class="select list-sz" data-width="100%" tabindex="-98">-->
+                    <!--<option value="5" selected="selected">5</option>                   -->
+                    <!--<option value="10">10</option>-->
+                    <!--<option value="20">20</option>-->
+                    <!--<option value="50">50</option>-->
+                    <!--<option value="100">100</option>-->
+                  <!--</select>-->
+                  <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
                   </select>
               </div>
             </div>
@@ -66,8 +73,9 @@
       </div>
    </div>
 
- {% if users %}
+
   <div class="col-md-12">
+      <div id="pagination-div">
       <!-- Header and footer fixed -->
       <div class="panel panel-flat">
           <div class="panel-body">
@@ -78,6 +86,7 @@
                         <th>Id</th>
                         <th>Image</th>
                         <th>Name</th>
+                        <th>Phone no.</th>
                         <th>Email</th>
                         <th>Sales</th>
                         <th>Loyalty Points</th>
@@ -88,9 +97,10 @@
                     </thead>
 
                     <tbody id="tb">
+                     {% if users %}
                       {% for user in users%}
                       <tr class='clickable-row' id="{{user.pk }}">
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{ forloop.counter }}</td>
                         <!-- image -->
                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
                        {% if user.image %}
@@ -98,9 +108,9 @@
                        {% else %}
                           <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
                        {% endif %}
-                         <!-- product name -->
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.name}}</td>
-                        <!-- product category -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.mobile}}</td>
+
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.email}}
                         </td>
                         <td>{{ user.get_sales }}</td>
@@ -110,41 +120,47 @@
                         </td>
                         <!-- actions -->
                         <td class="text-center">
-                          <ul class="icons-list">
-                           {% if perms.userprofile.change_user %}
-                            <li><a href="{% url 'dashboard:customer-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a></li>
-                            {% endif %}
-                             {% if perms.userprofile.delete_user %}
-                            <li>
-                              <a data-ta="#modal_instance" data-title="Delete Customer {{ user.name }} ?" data-href="{% url 'dashboard:customer-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
-                             class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
-                             </a>
-                            </li>
-                            {% endif %}
-                          </ul>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                action <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu edit-dropdown">
+                             {% if perms.userprofile.change_customer %}
+                                  <li><a href="{% url 'dashboard:customer-edit' pk=user.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                             {% endif %}
+                             {% if perms.userprofile.delete_customer %}
+                                  <li>
+                                  <a data-ta="#modal_instance" data-title="Delete Customer {{ user.name }} ?" data-href="{% url 'dashboard:customer-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                                 class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                                 </a>
+                                </li>
+                             {% endif %}
+                              </ul>
+                        </div>
+
                         </td>
                       </tr>
                       {% endfor %}
+                     {% else %}
+                      <tr><td colspan="8"><h2 class="text-center">No Customers available</h2></td></tr>
+                     {% endif %}
                       </tbody>
 
                </table>
 
             </div>
           </div>
+          <div class="my-paginate">
+            <div class="text-center bootpag-callback" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav">Page 1 of {{pn}} </div>
+            </div>
+            <input type="hidden" id="page_size" val="">
+          </div>
       </div>
- 
   </div>
-      {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No  Customers available
-       </div>
-      </div>
-    </div>
   </div>
-{% endif %}
+
 </div>
 
 <!-- Blue modal -->
@@ -180,21 +196,63 @@
  <!-- /blue modal -->
 {% endblock%}
 {% block custom_js %}
-<script type="text/javascript">
-// $(".toggle").click(function () {
-//     if($(this).hasClass("inactive")){
-//         $(this).html('deactivate');
-//         $(this).removeClass('inactive');
-//         $(this).addClass('activate');
-//     }
-//     else {
-//         $(this).html('activate');
-//         $(this).removeClass('activate');
-//         $(this).addClass('inactive');
-//     }
-// });
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 
+<script type="text/javascript">
   $(document).ready(function() {
+
+        //**@ display size select
+        $('.list-sz').selectpicker().on('change', function(){
+            var ts = $(this).val();
+            $.ajax({ url: "{% url 'dashboard:customer-paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+            }});
+        });
+
+        $('.bootpag-callback').bootpag({
+            total: parseInt({{pn}}),
+            maxVisible: 4,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+
+            }).on("page", function(event, num){
+                $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+                $.get("{% url 'dashboard:customer-paginate' %}",{page:num},function(data){
+                   $('#tb').html(data);
+                });
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+
+      $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        delay(function(){
+           var url = "{% url 'dashboard:customer-search' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                  $('#pagination-div').html(data);
+           }});
+        }, 500 );
+
+      });
+
+
         $(".td").click(function() {
             window.location = $(this).data("href");
         });
@@ -244,6 +302,8 @@
                     }
                 });
             });
+
+
 
   });
 

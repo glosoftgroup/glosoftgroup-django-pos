@@ -212,11 +212,6 @@ def refine_users_permissions(users_in_group, permission_list):
 			user.user_permissions.add(*not_in_user_permissions)
 			user.save()
 
-def users_loop(status, users):
-	for user in users:
-		user.is_staff = status
-		user.is_active = status
-		user.save()
 
 @staff_member_required
 def get_search_users(request):
@@ -317,8 +312,10 @@ def group_update(request):
 		group_has_permissions = group.permissions.all()
 		login_status = request.POST.get('check_login')
 		permission_list = request.POST.getlist('checklist[]')
-		users = request.POST.getlist('users[]')
+		# users = request.POST.getlist('users[]')
+		# users = User.objects.filter(groups__name=group.name)
 		group_has_users = User.objects.filter(groups__name=group.name)
+
 		group.name = group_name
 		if login_status == 'inactive':   
 			users_loop(False, group_has_users)
@@ -330,7 +327,7 @@ def group_update(request):
 					not_in_group_permissions = list(set(permission_list) - set(group_has_permissions))
 					group.permissions.add(*not_in_group_permissions)
 					group.save()
-					user_manage(users, group_has_users, group)
+					# user_manage(users, group_has_users, group)
 					#** refine update users permissions
 					refine_users_permissions(group_users_set_2, permission_list)
 					user_trail(request.user.name, 'added permissions to group: '+ group.name, 'add')
@@ -347,7 +344,7 @@ def group_update(request):
 					group.permissions.remove(*group_has_permissions)
 					group.permissions.add(*not_in_group_permissions)
 					group.save()
-					user_manage(users, group_has_users, group)
+					# user_manage(users, group_has_users, group)
 					users2 = User.objects.filter(groups__name=group.name)
 					for user in users2:
 						user.user_permissions.remove(*group_has_permissions)
@@ -360,6 +357,12 @@ def group_update(request):
 					debug_logger.debug(e)
 					error_logger.error(e)
 					return HttpResponse(str(e)+"That group already exists")
+
+def users_loop(status, users):
+	for user in users:
+		user.is_staff = status
+		user.is_active = status
+		user.save()
 
 #** filter and save users in order
 def user_manage(users, group_has_users, group):

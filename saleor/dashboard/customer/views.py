@@ -11,6 +11,8 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
+from django.db.models import Q
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -28,12 +30,25 @@ error_logger = logging.getLogger('error_logger')
 def users(request):
 	try:
 		users = Customer.objects.all().order_by('-id')
+		page = request.GET.get('page', 1)
+		paginator = Paginator(users, 10)
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except InvalidPage:
+			users = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
 		user_trail(request.user.name, 'accessed customers page', 'view')
 		info_logger.info('User: ' + str(request.user.name) + 'view customers')
-		return TemplateResponse(request, 'dashboard/customer/users.html', {'users':users})
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			return TemplateResponse(request, 'dashboard/customer/users.html',{'users': users, 'pn': paginator.num_pages})
 	except TypeError as e:
 		error_logger.error(e)
-		return HttpResponse('error accessing users')
+		return TemplateResponse(request, 'dashboard/customer/users.html', {'users': users, 'pn': paginator.num_pages})
 
 @staff_member_required
 @permission_decorator('userprofile.add_user')
@@ -129,7 +144,70 @@ def user_update(request, pk):
 			return HttpResponse("success without image")
 
 
+def customer_pagination(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
 
+	users = Customer.objects.all().order_by('-id')
+	if list_sz:
+		paginator = Paginator(users, int(list_sz))
+		users = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/customer/pagination/p2.html',
+								{'users':users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+	else:
+		paginator = Paginator(users, 10)
+	if p2_sz:
+		paginator = Paginator(users, int(p2_sz))
+		users = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/customer/pagination/paginate.html', {"users":users})
+
+	try:
+		users = paginator.page(page)
+	except PageNotAnInteger:
+		users = paginator.page(1)
+	except InvalidPage:
+		users = paginator.page(1)
+	except EmptyPage:
+		users = paginator.page(paginator.num_pages)
+	return TemplateResponse(request, 'dashboard/customer/pagination/paginate.html', {"users":users})
+
+@staff_member_required
+def customer_search(request):
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size', 10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get('q')
+		if list_sz is None:
+			sz = 10
+		else:
+			sz = list_sz
+
+		if q is not None:
+			queryset_list = Customer.objects.filter(
+				Q(name__icontains=q)|
+				Q(email__icontains=q) |
+				Q(mobile__icontains=q)
+			).order_by('-id')
+			paginator = Paginator(queryset_list, 10)
+
+			try:
+				queryset_list = paginator.page(page)
+			except PageNotAnInteger:
+				queryset_list = paginator.page(1)
+			except InvalidPage:
+				queryset_list = paginator.page(1)
+			except EmptyPage:
+				queryset_list = paginator.page(paginator.num_pages)
+			users = queryset_list
+			if p2_sz:
+				users = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/customer/pagination/paginate.html', {"users":users})
+
+			return TemplateResponse(request, 'dashboard/customer/pagination/search.html',
+			{"users":users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 
 		

@@ -11,6 +11,7 @@
 {% endblock %}
 <style>
   table tr .ctd{padding: 8px 10px !important;}
+  .table{border:1px solid #ccc}
 </style>
 {% block content %}
           <!-- Quick stats boxes -->
@@ -252,9 +253,9 @@
 
               {% if low_stock %}
                 <div class="data-table-container">
-                  <table class="table bordered highlight responsive data-table">
+                  <table class="table bordered highlight responsive data-tables" style="border:1px solid #ccc">
                     <thead>
-                      <tr>
+                      <tr class="bg-primary">
                         <th>
                           {% trans "Product name" context "Low stock product list" %}
                         </th>

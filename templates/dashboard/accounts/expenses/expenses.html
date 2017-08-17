@@ -336,7 +336,7 @@ $(document).ready(function(){
                           header: 'Well done!',
                           theme: 'bg-success'
                        });
-                       window.location.reload(true);
+                       window.location = "{% url 'accounts:expenses' %}";
                     },
                     error:function(error){
                       console.log(error);

@@ -105,7 +105,10 @@ class Sales(models.Model):
 	customer = models.ForeignKey(
 		Customer, blank=True, null=True, related_name='customers',
 		verbose_name=pgettext_lazy('Sales field', 'customer'))
-	
+
+	mobile = models.CharField(max_length=20, blank=True)
+	customer_name = models.CharField(max_length=100, null=True, blank=True)
+
 	user = models.ForeignKey(
 		settings.AUTH_USER_MODEL, blank=True, null=True, related_name='users',
 		verbose_name=pgettext_lazy('Sales field', 'user'))

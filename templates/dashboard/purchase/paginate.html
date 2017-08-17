@@ -13,16 +13,17 @@
     <!-- product name/sku -->    
   <td>
     <div class="media-left">
-      <div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibold"> {{ variant.display_product }} </a></div>
+      <div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibolds"> {{ variant.display_product }} </a></div>
       <div class="text-muted text-size-small">  {{ variant.sku }} </div>
     </div>
   </td>
   
   <!-- Retail price -->
   <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
-  <h6 class="text-semibold">
+  <h6 class="text-semibolds">
   {% if variant.get_price_per_item %}
-   {% gross variant.get_price_per_item html=True %}
+   {#{% gross variant.get_price_per_item html=True %}#}
+      {{variant.get_price_per_item.gross}}
   {% endif %}
   </h6>
   </td>

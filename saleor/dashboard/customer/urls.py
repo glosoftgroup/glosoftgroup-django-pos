@@ -15,6 +15,8 @@ urlpatterns = [
         url(r'^delete/(?P<pk>[0-9]+)/$', views.user_delete, name='customer-delete'),
         url(r'^edit/(?P<pk>[0-9]+)/$', views.user_edit, name='customer-edit'),
         url(r'^user_update(?P<pk>[0-9]+)/$', views.user_update, name='customer-update'),
+        url(r'^customer/paginate/$', views.customer_pagination, name='customer-paginate'),
+        url(r'^customer/search/$', views.customer_search, name='customer-search'),
         # url(r'^add/', permission_required('userprofile.add_user', login_url='account_login')(views.user_add)),
         
 ]

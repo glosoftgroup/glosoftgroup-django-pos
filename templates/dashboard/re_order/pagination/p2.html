@@ -1,0 +1,116 @@
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-body">
+        <div class="table-responsive">
+         
+
+          <table class="table  table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
+                <thead>
+                 <tr class="bg-primary">
+                        <th>
+                          {% trans "Product name" context "Low stock product list" %}
+                        </th>
+                        <th class="right-align">
+                          {% trans "Stock left" context "Low stock product list" %}
+                        </th>
+                        <th> Low stock Threshold</th>
+                        <th>Actions</th>
+                      </tr>
+                </thead>
+                <tbody id="p-tb">           
+                {% if low_stock %}
+                      {% for product in low_stock %}
+                        <tr data-action-go="{% url 'dashboard:product-update' pk=product.pk %}#stock">
+                          <td>
+                            {{ product }}
+                          </td>
+                          <td class="right-align">
+                            {{ product.total_stock }}
+                          </td>
+                          <td class="right-align">
+                            {{ product.low_stock_threshold }}
+                          </td>
+                          <td class="action-data">
+                              <!-- Single button -->
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Action <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu edit-dropdown">
+                                <li>
+                                    <a href="javascript:;" data-href="{% url 'dashboard:compose_message' %}"
+                                    data-ppk="{{product.pk}}" class="sendSms">
+                                        <i class="icon-comments" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Edit me">
+                                        </i> Sms
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" data-href="{% url 'dashboard:write' %}"
+                                class="modal-trigger-ajax sendMail" data-ppk="{{product.pk}}" >
+                                        <i class="icon-mail5 position-left" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Delete me">
+                                        </i> Email
+                                    </a>
+                                </li>
+                              </ul>
+                            </div>
+
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    {% else %}
+                       <tr><td colspan="4"><h2 class="text-center">{% trans "No products are low in stock." context "Empty low stock table message" %}</h2></td></tr>
+                   {% endif %}
+                  </tbody>
+           </table>
+
+        </div>
+        </div>
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+      </div>
+
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:reorder_pagination' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                    });
+                }else{
+                    $.get("{% url 'dashboard:reorder_pagination' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
+                   $('#p-tb').html(data);
+                });
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+   });
+ </script>
+<script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

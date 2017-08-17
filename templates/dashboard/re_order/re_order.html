@@ -31,81 +31,128 @@
  {% endblock %}
 {% block menu_reorder_class %}active{% endblock %}
 {% block content %}
-<!-- Search field -->
-<div class="panel panel-default">
-{% if low_stock %}
-<div class="data-table-container">
-  <table class="table bordered highlight responsive data-table">
-    <thead>
-      <tr class="bg-primary">
-        <th>
-          {% trans "Product name" context "Low stock product list" %}
-        </th>
-        <th class="right-align">
-          {% trans "Stock left" context "Low stock product list" %}
-        </th>
-        <th> Low stock Threshold</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for product in low_stock %}
-        <tr data-action-go="{% url "dashboard:product-update" pk=product.pk %}#stock">
-          <td>
-            {{ product }}
-          </td>
-          <td class="right-align">
-            {{ product.total_stock }}
-          </td>
-          <td class="right-align">
-            {{ product.low_stock_threshold }}
-          </td>
-          <!--<td>-->
-              <!--<a href="{#{% url 'dashboard:re_order_form' pk=product.pk %}#}">-->
-              <!--<span class="label label-success">-->
-                  <!--Order-->
-              <!--</span>-->
-              <!--</a>-->
-          <!--</td>-->
-          <td class="action-data">
-              <!-- Single button -->
-            <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Action <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu edit-dropdown">
-                <li>
-                    <a href="javascript:;" data-href="{% url 'dashboard:compose_message' %}"
-                    data-ppk="{{product.pk}}" class="sendSms">
-                        <i class="icon-comments" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Edit me">
-                        </i> Sms
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:;" data-href="{% url 'dashboard:write' %}"
-                class="modal-trigger-ajax sendMail" data-ppk="{{product.pk}}" >
-                        <i class="icon-mail5 position-left" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Delete me">
-                        </i> Email
-                    </a>
-                </li>
-              </ul>
+<div class="row animated fadeIn">
+
+    <div class="col-md-12">
+      <div class="panel panel-flat">
+
+        <div class="panel-body search-panel">
+            <div class="col-md-4">
+             <label>Search Stock</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search Stock" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2 hidden">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+
+            </div>
+        </div>
+      </div>
+   </div>
+
+    <div class="col-md-12">
+     <div id="pagination-div">
+        <div class="panel panel-flat">
+            <div class="panel-body">
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead>
+                      <tr class="bg-primary">
+                        <th>
+                          {% trans "Product name" context "Low stock product list" %}
+                        </th>
+                        <th class="right-align">
+                          {% trans "Stock left" context "Low stock product list" %}
+                        </th>
+                        <th> Low stock Threshold</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% if low_stock %}
+                      {% for product in low_stock %}
+                        <tr data-action-go="{% url 'dashboard:product-update' pk=product.pk %}#stock">
+                          <td>
+                            {{ product }}
+                          </td>
+                          <td class="right-align">
+                            {{ product.total_stock }}
+                          </td>
+                          <td class="right-align">
+                            {{ product.low_stock_threshold }}
+                          </td>
+                          <td class="action-data">
+                              <!-- Single button -->
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Action <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu edit-dropdown">
+                                <li>
+                                    <a href="javascript:;" data-href="{% url 'dashboard:compose_message' %}"
+                                    data-ppk="{{product.pk}}" class="sendSms">
+                                        <i class="icon-comments" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Edit me">
+                                        </i> Sms
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" data-href="{% url 'dashboard:write' %}"
+                                class="modal-trigger-ajax sendMail" data-ppk="{{product.pk}}" >
+                                        <i class="icon-mail5 position-left" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Delete me">
+                                        </i> Email
+                                    </a>
+                                </li>
+                              </ul>
+                            </div>
+
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    {% else %}
+                       <tr><td colspan="4"><h2 class="text-center">{% trans "No products are low in stock." context "Empty low stock table message" %}</h2></td></tr>
+                   {% endif %}
+                    </tbody>
+                  </table>
+                </div>
             </div>
 
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+            <div class="my-paginate">
+            <div class="text-center bootpag-callback" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav">Page 1 of {{totalp}}</div>
+            </div>
+            <input type="hidden" id="page_size" val="">
+          </div>
+
+        </div>
+    </div>
+   </div>
 </div>
-{% else %}
-<div class="card-content card-content--no-data not-found">
-  <p class="grey-text">
-    {% trans "No products are low in stock." context "Empty low stock table message" %}
-  </p>
-</div>
-{% endif %}
-    
-</div>
+
 <div id="stock_content"></div>
 <div class="text-center">
 		
@@ -114,19 +161,76 @@
 <!-- /search field -->
 {% endblock %}
 {% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
-  var sendSms = $('.sendSms');
-  var sendMail = $('.sendMail');
-  
-  sendMail.on('click',function(){
+$(document).ready(function(){
+    //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:reorder_pagination' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+    });
+
+    var sendSms = $('.sendSms');
+    var sendMail = $('.sendMail');
+
+    sendMail.on('click',function(){
     var productPk= $(this).data('ppk');
     var mailUrl  = $(this).data('href');
-    window.location.href = mailUrl+'?pk='+productPk;   
-  });
-  sendSms.on('click',function(){
+    window.location.href = mailUrl+'?pk='+productPk;
+    });
+    sendSms.on('click',function(){
     var productPk= $(this).data('ppk');
     var smsUrl  = $(this).data('href');
-    window.location.href = smsUrl+'?pk='+productPk;   
-  });
+    window.location.href = smsUrl+'?pk='+productPk;
+    });
+
+    $('.bootpag-callback').bootpag({
+            total: parseInt({{totalp}}),
+            maxVisible: 4,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+
+            }).on("page", function(event, num){
+                $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+                $.get("{% url 'dashboard:reorder_pagination' %}",{page:num},function(data){
+                   $('#tb').html(data);
+                });
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+
+      $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        delay(function(){
+           var url = "{% url 'dashboard:reorder_search' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                  $('#pagination-div').html(data);
+           }});
+        }, 500 );
+
+      });
+
+
+});
+
 </script>
 {% endblock %}

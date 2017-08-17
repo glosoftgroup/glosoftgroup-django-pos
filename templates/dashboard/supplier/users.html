@@ -14,6 +14,7 @@
      .clickable-row td.td{
       cursor: pointer;
      }
+     .table{border:1px solid #ccc}
    </style>
  {% endblock %}
 {% block header_extra %}
@@ -97,7 +98,7 @@
                {% if users %}
                   {% for user in users%}
                   <tr class='clickable-row' id="{{user.pk }}">
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{ forloop.counter }}</td>
                     <!-- image -->
                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">
                    {% if user.image %}

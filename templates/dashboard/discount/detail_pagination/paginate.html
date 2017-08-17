@@ -1,0 +1,37 @@
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load static %}
+{% load product_first_image from product_images %}
+
+{% if product_results %}
+                       {% for product in product_results %}
+                        <tr data-title=" {{ product.name }} ">
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">#{{ product.id }}</td>
+                          <!-- image -->
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}"
+                           srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"
+                           alt="" class="circle teal"></td>
+                           <!-- product name -->
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.name }}</td>
+                          <!-- product category -->
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+                            {% with product.get_first_category as category %}
+                            {% if category %}
+                            {{ category }}
+                            {% endif %}
+                            {% endwith %}
+                          </td>
+                          <!-- price -->
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> {% gross product.price html=True %}</td>
+                          <!-- variants -->
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+                          {{ product.get_variants_count }}
+                          </td>
+                        </tr>
+                          {% endfor %}
+                      {% else %}
+                      <tr>
+                     <td colspan="6"><h2 class="text-center">No Products available <i class="icon-heart-broken2"></i></h2></td>
+                      </tr>
+                    {% endif %}
