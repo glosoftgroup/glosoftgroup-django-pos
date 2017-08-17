@@ -18,6 +18,8 @@ urlpatterns = [
 
     url(r'^add/$',
         views.category_create, name='category-add'),
+    url(r'^add/cat32/$',
+        views.category_create32, name='category-add32'),
     url(r'^(?P<root_pk>[0-9]+)/add/$',
         views.category_create, name='category-add'),
     url(r'^(?P<root_pk>[0-9]+)/edit/$',

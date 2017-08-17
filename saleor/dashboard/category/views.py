@@ -3,6 +3,8 @@ from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
+from django.http import HttpResponse
+import json
 from django.utils.translation import pgettext_lazy
 
 from ...product.models import ( Category, 
@@ -145,6 +147,23 @@ def category_search(request, root_pk=None):
             return TemplateResponse(request, 'dashboard/category/pagination/search.html',
                                     {'categories':categories, 'pn': paginator.num_pages, 'sz': sz, 'q': q,'root': root})
 
+
+@staff_member_required
+def category_create32(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        category = Category()        
+        description = request.POST.get('description')
+        new_category = Category.objects.create(name=name,description=description)
+        product = Product()
+        class_pk = ProductClass.objects.all().first().pk
+        product_class = get_object_or_404(ProductClass, pk=class_pk)
+        product.product_class = product_class
+        product_form = ProductForm(request.POST or None, instance=product)
+        ctx = {'category': category, 'product_form': product_form}
+        return TemplateResponse(request, 'dashboard/category/_category_add_success.html', ctx)
+    else:
+        return HttpResponse('Unexpected get method')
 @staff_member_required
 def category_create(request, root_pk=None):
     category = Category()
@@ -157,7 +176,7 @@ def category_create(request, root_pk=None):
                 'Dashboard message', 'Added category %s') % category)
         if request.is_ajax():
             product = Product()
-            class_pk = 1
+            class_pk = ProductClass.objects.all().first().pk
             product_class = get_object_or_404(ProductClass, pk=class_pk)
             product.product_class = product_class
             product_form = ProductForm(request.POST or None, instance=product)

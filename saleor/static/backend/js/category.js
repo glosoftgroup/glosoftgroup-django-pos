@@ -8,16 +8,7 @@ $(function() {
   	var modal = $(this).attr('href');
   	$(modal).modal();
   	//get form
-  	var posting = $.post( url, 
-  		{csrfmiddlewaretoken:csrf_token } 
-  		);
-      // Put the results in a div
-      posting.done(function( data ) {    
-        $("#add_category_form" ).empty().append( data );
-        $('#modal_add_tax').modal('hide'); 
-        //$('#modal_add_category').modal(); 
-      });
-      // end post
+  	
   });
 
 
@@ -28,17 +19,19 @@ $(function() {
           });
       }
    
-  $('#modal_add_category_btn').on('click',function(){
-        var cat_description = $('#cat_description').val();
-        var cat_name = $('#cat_name').val();
+  $('#modal_add_category_btn32').on('click',function(){
+        var cat_description = $('#categoryDescription').val();
+        var cat_name = $('#categoryName').val();
         var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+        
+        var url = $("#newcaturl").val();        
         if(!cat_name){
-          notify('add a valid category');
+          notify('Add a valid category');
           return false;
         }
+        console.log(cat_name);
 
-        // after validating category cat_name
-        var url = $("#add-new-category").data('href');
+        // after validating category cat_name        
         var modal = $("#add-new-category").attr('href');
         var posting = $.post( url, {
                               name:cat_name,
@@ -49,7 +42,12 @@ $(function() {
 //          $( "#category_field" ).empty().append( data );
           $( "#category_field" ).replaceWith( data );
           $(modal).modal('hide');
+          $('#categoryName').val('');
+          $('#categoryDescription').val('');
           notify('New category added successfully','bg-success');
+        });
+        posting.fail(function() {          
+          notify('Category Exists!. Choose a unique name','bg-danger');
         });
   });
   
