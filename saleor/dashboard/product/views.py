@@ -431,7 +431,7 @@ def product_create(request):
     else:
         # check if classes are set else set a default
         if product_classes.exists():
-            class_pk= 1
+            class_pk= product_classes.first().pk
         else:
             product_class = ProductClass(name='None')
             product_class.save()
