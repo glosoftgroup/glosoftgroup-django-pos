@@ -4,6 +4,7 @@ $(function() {
   var modalBtn = $('#add-new-class');
   var addClassBtn = $('#addClassBtn');
   var modalId  = $('#addProductClass');
+  var withVariants = $('#withVariants');
   var url      = pageUrls.data('attributes');
   var addClassUrl = pageUrls.data('addclassurl');
   var addAttrUrl = pageUrls.data('addattrurl');
@@ -24,10 +25,11 @@ $(function() {
 
   // add New Class
   // ajax
-  function addNewClass(name,attributes,variants) {
+  function addNewClass(name,attributes,variants,has_variants=1) {
     var dynamicData = {};    
     dynamicData["attributes"] = JSON.stringify(attributes);
     dynamicData["name"] = name;
+    dynamicData['has_variants'] = has_variants;
     dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
     dynamicData['variants']= JSON.stringify(variants);
     return $.ajax({
@@ -48,11 +50,15 @@ $(function() {
   	var cname = $('#newClassName').val();
   	var attributes = getAttributes.val();
   	var variants = getAttributesTwo.val();
+    var has_variants = 1;
+    if(withVariants.is(":checked"))
+    { has_variants = 1; }else{ has_variants = 0;}
+    //console.log(has_variants);
   	if(!cname){
   		alertUser('Sub category name required!','bg-danger','Error!');
   		return false;
   	}
-  	addNewClass(cname,attributes,variants).done(function(data){
+  	addNewClass(cname,attributes,variants,has_variants).done(function(data){
   		alertUser('Sub category name required!');  		
   		addItem(parseInt(data['value']),data['text']);
   		$('#newClassName').val('');

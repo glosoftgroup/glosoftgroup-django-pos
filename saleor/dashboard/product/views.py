@@ -140,7 +140,7 @@ def re_order_form(request, pk):
 @staff_member_required
 def class_list_view(request):
     try:
-        queryset_list = ProductClass.objects.all().prefetch_related(
+        queryset_list = ProductClass.objects.all().exclude(name='None',has_variants=False).prefetch_related(
             'product_attributes', 'variant_attributes').order_by('-id')
 
         page = request.GET.get('page', 1)
@@ -1510,11 +1510,15 @@ def attr_list_f32b(request):
 def product_class_form32b(request):
     if request.method == 'POST':
         name = request.POST.get('name')
+        has_variants = int(request.POST.get('has_variants'))
         attributes = json.loads(request.POST.get('attributes'))
         variants = json.loads(request.POST.get('variants'))
-        print name
+        if has_variants == 1:
+            has_variants_value = True
+        else:
+            has_variants_value = False
         if name:
-             product_class = ProductClass(name=name)
+             product_class = ProductClass(name=name,has_variants=has_variants_value)
              product_class.save()
              if attributes:
                 for attribute in attributes:
@@ -1522,9 +1526,8 @@ def product_class_form32b(request):
              if variants:
                 for variant in variants:
                     product_class.variant_attributes.add(variant)
-             #l = []
-             contact={'text':product_class.name,'value': product_class.id}
-             #l.append(contact)
+             
+             contact={'text':product_class.name,'value': product_class.id}             
              return HttpResponse(json.dumps(contact), content_type='application/json')
         return HttpResponse('Error')
 

@@ -310,7 +310,14 @@
           <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Stock Reorder Limit</h5>
         </div>
       <!-- stock reorder limit -->
-      <div class="col-md-6">
+      <div class="col-md-3">
+        {% if not product.product_class.has_variants %}
+        <div class="row">   
+         {{ variant_form.sku|materializecss }}
+       </div>
+       {% endif %}
+      </div>
+      <div class="col-md-3">
         <div class="form-group">
             <label>Reorder Stock Threshold:</label>
            {{ product_form.low_stock_threshold }}
@@ -1124,18 +1131,21 @@
   // end content blocker
 
   // refreshAttributes func
+  var checkSkuUrl = "{% url "dashboard:fetch-variants" %}";
   function refreshAttributes() {  
    {% url "dashboard:fetch-variants" as url %} 
    var url = "{{ url }}";
-   var class_pk = getProductClass();
-   //content_loader('#div_attributes');   
-   var posting = $.post( url, {class_pk:class_pk} );
-     // Put the results in a div
+   var class_pk = getProductClass();     
+   var posting = $.post( url, {class_pk:class_pk} ); 
    posting.done(function( data ) {    
     $( "#div_attributes" ).empty().append( data ); 
-    //var block = $('#div_attributes').parent();   
-      //$(block).unblock(); 
-  });
+     
+   });
+
+   // check if class has variants
+   //var posting = $.get( url, {class_pk:class_pk} ); 
+
+
 
   }
   

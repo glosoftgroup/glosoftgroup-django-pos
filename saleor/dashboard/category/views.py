@@ -157,7 +157,7 @@ def category_create(request, root_pk=None):
                 'Dashboard message', 'Added category %s') % category)
         if request.is_ajax():
             product = Product()
-            class_pk = 1
+            class_pk = ProductClass.objects.all().first().pk
             product_class = get_object_or_404(ProductClass, pk=class_pk)
             product.product_class = product_class
             product_form = ProductForm(request.POST or None, instance=product)
