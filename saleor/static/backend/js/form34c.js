@@ -75,7 +75,7 @@ $(function() {
    });
   // get getAttributes
   getAttributesD.tokenize2({
-    placeholder: 'Select Attributes(s) (eg. Brand)',
+    placeholder: 'Select variant(s) (eg. Weight)',
     displayNoResultsMessage:true,
     //searchMinLength:3,
     sortable: true,

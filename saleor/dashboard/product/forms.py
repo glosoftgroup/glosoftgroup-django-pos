@@ -79,10 +79,10 @@ class ProductClassForm(forms.ModelForm):
         labels = {
             'variant_attributes': pgettext_lazy(
                 'Product class form label',
-                'Attributes specific to each variant'),
+                'Variants'),
             'product_attributes': pgettext_lazy(
                 'Product class form label',
-                'Attributes common to all variants')}
+                'Attributes')}
     def __init__(self, *args, **kwargs):       
         super(ProductClassForm, self).__init__(*args, **kwargs)
         field = self.fields['product_attributes'] 

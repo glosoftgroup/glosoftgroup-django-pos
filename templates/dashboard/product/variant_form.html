@@ -96,9 +96,9 @@
           <fieldset>
             <legend class="text-semibold"></legend>
 
-            <div class="form-group">             
-              {{ form.name|materializecss }}
-            </div>
+                       
+            <!-- form.name|materializecss }} -->
+         
 
             <div class="form-group">
               <label>Product Variants:
@@ -126,7 +126,7 @@
                   {% endfor %}
                 {% else %}
                   <p>
-                    {% trans "This product has no attributes." context "Variant form text" %}
+                    {% trans "This product has no variants." context "Variant form text" %}
                   </p>
                 {% endif %}
               </div>
