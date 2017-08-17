@@ -1,0 +1,47 @@
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load static %}
+
+{% if low_stock %}
+  {% for product in low_stock %}
+    <tr data-action-go="{% url 'dashboard:product-update' pk=product.pk %}#stock">
+      <td>
+        {{ product }}
+      </td>
+      <td class="right-align">
+        {{ product.total_stock }}
+      </td>
+      <td class="right-align">
+        {{ product.low_stock_threshold }}
+      </td>
+      <td class="action-data">
+          <!-- Single button -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Action <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu edit-dropdown">
+            <li>
+                <a href="javascript:;" data-href="{% url 'dashboard:compose_message' %}"
+                data-ppk="{{product.pk}}" class="sendSms">
+                    <i class="icon-comments" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Edit me">
+                    </i> Sms
+                </a>
+            </li>
+            <li>
+                <a href="javascript:;" data-href="{% url 'dashboard:write' %}"
+            class="modal-trigger-ajax sendMail" data-ppk="{{product.pk}}" >
+                    <i class="icon-mail5 position-left" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Delete me">
+                    </i> Email
+                </a>
+            </li>
+          </ul>
+        </div>
+
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+   <tr><td colspan="4"><h2 class="text-center">{% trans "No products are low in stock." context "Empty low stock table message" %}</h2></td></tr>
+{% endif %}

@@ -1,0 +1,33 @@
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load static %}
+
+{% if sales %}
+  {% for sale in sales %}
+    <tr class="clickable-row" data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+      <td class='td'  data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+        {{ sale }}
+      </td>
+      <td class='td' data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+        {{ sale.value }}{{ sale.get_type_display }}
+      </td>
+      <!-- actions -->
+      <td >
+      <span  class="label label-primary disc-label">
+      <a href="{% url 'dashboard:discount-detail' pk=sale.pk %}" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
+      Detail
+      </a>
+      </span>
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+<tr>
+  <td>
+    <span>
+      {% trans "No Discount available" context "Empty sales table message" %}
+    </span>
+  </td>
+</tr>
+{% endif %}

@@ -37,11 +37,100 @@ error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 def re_order(request):
+    try:
+        queryset_list = get_low_stock_products()
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(queryset_list, 10)
+        try:
+            queryset_list = paginator.page(page)
+        except PageNotAnInteger:
+            queryset_list = paginator.page(1)
+        except InvalidPage:
+            queryset_list = paginator.page(1)
+        except EmptyPage:
+            queryset_list = paginator.page(paginator.num_pages)
+        low_stock = queryset_list
+        user_trail(request.user.name, 'accessed reorder page', 'view')
+        info_logger.info('User: ' + str(request.user.name) + ' accessed reorder page')
+
+        data ={
+            "low_stock":low_stock,
+            "totalp":paginator.num_pages
+               }
+        if request.GET.get('initial'):
+            return HttpResponse(paginator.num_pages)
+        else:
+            return TemplateResponse(request, 'dashboard/re_order/re_order.html', data)
+    except TypeError as e:
+        error_logger.error(e)
+        return TemplateResponse(request, 'dashboard/re_order/re_order.html', data)
+
+def reorder_pagination(request):
+    page = int(request.GET.get('page', 1))
+    list_sz = request.GET.get('size')
+    p2_sz = request.GET.get('psize')
+    select_sz = request.GET.get('select_size')
+
     low_stock = get_low_stock_products()
-    ctx = {"low_stock":low_stock}
-    user_trail(request.user.name, 'accessed reorder page', 'view')
-    info_logger.info('User: '+str(request.user.name)+' accessed reorder page')
-    return TemplateResponse(request, 'dashboard/re_order/re_order.html', ctx)    
+    if list_sz:
+        paginator = Paginator(low_stock, int(list_sz))
+        low_stock = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/re_order/pagination/p2.html',
+                                {'low_stock':low_stock, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+    else:
+        paginator = Paginator(low_stock, 10)
+    if p2_sz:
+        paginator = Paginator(low_stock, int(p2_sz))
+        low_stock = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/re_order/pagination/paginate.html', {"low_stock":low_stock})
+
+    try:
+        low_stock = paginator.page(page)
+    except PageNotAnInteger:
+        low_stock = paginator.page(1)
+    except InvalidPage:
+        low_stock = paginator.page(1)
+    except EmptyPage:
+        low_stock = paginator.page(paginator.num_pages)
+    return TemplateResponse(request, 'dashboard/re_order/pagination/paginate.html', {"low_stock":low_stock})
+
+@staff_member_required
+def reorder_search(request):
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
+            stock = get_low_stock_products()
+            queryset_list = stock.filter(
+                Q(name__icontains=q)|
+                Q(total_stock__icontains=q)
+            ).order_by('-id')
+            paginator = Paginator(queryset_list, 10)
+
+            try:
+                queryset_list = paginator.page(page)
+            except PageNotAnInteger:
+                queryset_list = paginator.page(1)
+            except InvalidPage:
+                queryset_list = paginator.page(1)
+            except EmptyPage:
+                queryset_list = paginator.page(paginator.num_pages)
+            low_stock = queryset_list
+            if p2_sz:
+                low_stock = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/re_order/pagination/paginate.html', {"low_stock":low_stock})
+
+            return TemplateResponse(request, 'dashboard/re_order/pagination/search.html',
+                                    {"low_stock":low_stock, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 import json
 @staff_member_required

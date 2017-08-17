@@ -1,0 +1,103 @@
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-body">
+        <div class="table-responsives">
+
+          <table class="table  table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
+                <thead>
+                  <tr class="bg-primary">
+                  <th>
+                    {% trans "Name" context "Sale (discount) table header" %}
+                  </th>
+                  <th>
+                    {% trans "Discount" context "Sale (discount) table header" %}
+                  </th>
+                  <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="p-tb">           
+                    {% if sales %}
+                      {% for sale in sales %}
+                        <tr class="clickable-row" data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+                          <td class='td'  data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+                            {{ sale }}
+                          </td>
+                          <td class='td' data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
+                            {{ sale.value }}{{ sale.get_type_display }}
+                          </td>
+                          <!-- actions -->
+                          <td >
+                          <span  class="label label-primary disc-label">
+                          <a href="{% url 'dashboard:discount-detail' pk=sale.pk %}" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
+                          Detail
+                          </a>
+                          </span>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    {% else %}
+                    <tr>
+                      <td>
+                        <span>
+                          {% trans "No Discount available" context "Empty sales table message" %}
+                        </span>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+           </table>
+
+        </div>
+        </div>
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+      </div>
+
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:discount_pagination' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                    });
+                }else{
+                    $.get("{% url 'dashboard:discount_pagination' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
+                   $('#p-tb').html(data);
+                });
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+        $(".td").click(function() {
+             window.location = $(this).data("href");
+        });
+   });
+ </script>
+<script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

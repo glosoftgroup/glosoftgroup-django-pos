@@ -4,6 +4,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.utils.translation import pgettext_lazy
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
+from django.db.models import Q
 
 from ...discount.models import Sale, Voucher
 from ...decorators import permission_decorator, user_trail
@@ -16,22 +18,189 @@ error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 def sale_list(request):
+    try:
+        sales = Sale.objects.prefetch_related('products')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(sales, 10)
+        try:
+            sales = paginator.page(page)
+        except PageNotAnInteger:
+            sales = paginator.page(1)
+        except InvalidPage:
+            sales = paginator.page(1)
+        except EmptyPage:
+            sales = paginator.page(paginator.num_pages)
+        user_trail(request.user.name, 'accessed discount page', 'view')
+        info_logger.info('User: ' + str(request.user.name) + 'accessed discount page')
+
+        return TemplateResponse(request, 'dashboard/discount/sale_list.html',
+                                    {'sales': sales, 'pn': paginator.num_pages})
+    except TypeError as e:
+        error_logger.error(e)
+        return TemplateResponse(request, 'dashboard/customer/users.html', {})
+
+def disc_paginate(request):
+    page = int(request.GET.get('page', 1))
+    list_sz = request.GET.get('size')
+    p2_sz = request.GET.get('psize')
+    select_sz = request.GET.get('select_size')
+
     sales = Sale.objects.prefetch_related('products')
-    ctx = {'sales': sales}
-    user_trail(request.user.name, 'accessed discount page', 'view')
-    info_logger.info('User: ' + str(request.user.name) + 'accessed discount page')
-    return TemplateResponse(request, 'dashboard/discount/sale_list.html', ctx)
+    if list_sz:
+        paginator = Paginator(sales, int(list_sz))
+        sales = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/discount/pagination/p2.html',
+                            {'sales':sales, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+    else:
+        paginator = Paginator(sales, 10)
+    if p2_sz:
+        paginator = Paginator(sales, int(p2_sz))
+        sales = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/discount/pagination/paginate.html', {"sales":sales})
+
+    try:
+        sales = paginator.page(page)
+    except PageNotAnInteger:
+        sales = paginator.page(1)
+    except InvalidPage:
+        sales = paginator.page(1)
+    except EmptyPage:
+        sales = paginator.page(paginator.num_pages)
+    return TemplateResponse(request, 'dashboard/discount/pagination/paginate.html', {"sales":sales})
+
+@staff_member_required
+def disc_search(request):
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
+            discounts = Sale.objects.prefetch_related('products')
+            queryset_list = discounts.filter(
+                Q(name__icontains=q) |
+                Q(value__icontains=q)
+            ).order_by('-id')
+            paginator = Paginator(queryset_list, 10)
+
+            try:
+                queryset_list = paginator.page(page)
+            except PageNotAnInteger:
+                queryset_list = paginator.page(1)
+            except InvalidPage:
+                queryset_list = paginator.page(1)
+            except EmptyPage:
+                queryset_list = paginator.page(paginator.num_pages)
+            sales = queryset_list
+            if p2_sz:
+                users = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/discount/pagination/paginate.html', {"sales":sales})
+
+            return TemplateResponse(request, 'dashboard/discount/pagination/search.html',
+            {"sales":sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 @staff_member_required
 def discount_detail(request,pk=None):
     if request.method == 'GET':
         if pk:
+            try:
+                instance = get_object_or_404(Sale, pk=pk)
+                products = instance.products.all()
+
+                page = request.GET.get('page', 1)
+                paginator = Paginator(products, 10)
+                try:
+                    products = paginator.page(page)
+                except PageNotAnInteger:
+                    products = paginator.page(1)
+                except InvalidPage:
+                    products = paginator.page(1)
+                except EmptyPage:
+                    products = paginator.page(paginator.num_pages)
+                user_trail(request.user.name, 'accessed discount detail page for ' + str(instance.name), 'view')
+                info_logger.info(
+                    'User: ' + str(request.user.name) + 'accessed discount detail page for ' + str(instance.name))
+
+                return TemplateResponse(request, 'dashboard/discount/discount_detail.html',
+                                        {'product_results':products,'discount':instance, 'pn': paginator.num_pages, 'pk':pk})
+            except TypeError as e:
+                error_logger.error(e)
+                return TemplateResponse(request, 'dashboard/customer/discount_detail.html', {})
+
+def disc_products_paginate(request):
+    page = int(request.GET.get('page', 1))
+    list_sz = request.GET.get('size')
+    p2_sz = request.GET.get('psize')
+    select_sz = request.GET.get('select_size')
+    pk = request.GET.get('pk')
+
+    instance = get_object_or_404(Sale, pk=pk)
+    products = instance.products.all()
+    if list_sz:
+        paginator = Paginator(products, int(list_sz))
+        products = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/discount/detail_pagination/p2.html',
+                            {'product_results':products, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0, 'pk':pk})
+    else:
+        paginator = Paginator(products, 10)
+    if p2_sz:
+        paginator = Paginator(products, int(p2_sz))
+        products = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/discount/detail_pagination/paginate.html', {"product_results":products, 'pk':pk})
+
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except InvalidPage:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+    return TemplateResponse(request, 'dashboard/discount/detail_pagination/paginate.html', {"product_results":products, 'pk':pk})
+
+@staff_member_required
+def disc_products_search(request):
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        pk = request.GET.get('pk')
+
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
             instance = get_object_or_404(Sale, pk=pk)
             products = instance.products.all()
-            ctx = {'product_results':products,'discount':instance}
-            user_trail(request.user.name, 'accessed discount detail page for '+str(instance.name), 'view')
-            info_logger.info('User: ' + str(request.user.name) + 'accessed discount detail page for '+str(instance.name))
-            return TemplateResponse(request, 'dashboard/discount/discount_detail.html', ctx)
+
+            queryset_list = products.filter(
+                Q(name__icontains=q)
+            ).order_by('-id')
+            paginator = Paginator(queryset_list, 10)
+
+            try:
+                queryset_list = paginator.page(page)
+            except PageNotAnInteger:
+                queryset_list = paginator.page(1)
+            except InvalidPage:
+                queryset_list = paginator.page(1)
+            except EmptyPage:
+                queryset_list = paginator.page(paginator.num_pages)
+            sales = queryset_list
+            if p2_sz:
+                users = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/discount/detail_pagination/paginate.html', {"product_results":products, 'pk':pk})
+
+            return TemplateResponse(request, 'dashboard/discount/detail_pagination/search.html',
+            {"product_results":products, 'pn': paginator.num_pages, 'sz': sz, 'q': q, 'pk':pk})
 
 @staff_member_required
 def sale_edit(request, pk=None):
