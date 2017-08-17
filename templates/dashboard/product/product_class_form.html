@@ -27,7 +27,7 @@
  
     <li>
       <a href="{% url "dashboard:product-class-list" %}" >
-        {% trans "Product types" context "Dashboard product types list" %}
+        Product sub-category
       </a>
     </li>
     
@@ -36,7 +36,7 @@
         {% if product_class.pk %}
           {{ product_class }}
         {% else %}
-          {% trans 'Add new product type' context "Product class breadcrumbs" %}
+          {% trans 'Add new product sub-category' context "Product sub breadcrumbs" %}
         {% endif %}
      
     </li>
