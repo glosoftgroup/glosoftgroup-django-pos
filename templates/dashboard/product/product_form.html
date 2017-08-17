@@ -422,6 +422,11 @@
       </div>
         </div>
      </div>
+     {% if not product.product_class.has_variants %}
+                  <div class="row">
+                    {{ variant_form.sku|materializecss }}
+                  </div>
+                {% endif %}
 
     </div>
     <!-- ./body --> 
@@ -892,7 +897,10 @@
 
  <script type="text/javascript">
   $( document ).ready(function() {
-
+     // Default initialization
+    $(".styledxx, .multiselect-container input").uniform({
+        radioClass: 'choice'
+    });
     $( "h5" ).addClass( "text-bold" );
 
     $('.btn[data-toggle=modal]').on('click', function(){

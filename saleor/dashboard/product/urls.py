@@ -98,7 +98,8 @@ urlpatterns = [
         (views.variant_delete), name='variant-delete'),
     url(r'^(?P<product_pk>[0-9]+)/variants/bulk_delete/', permission_required('product.delete_productvariants', login_url='not_found')
         (views.variants_bulk_delete), name='variant-bulk-delete'),
-
+    url(r'^products_pdf/$', products.products_pdf, name='products_pdf'),
+url(r'^products_export_csv/$', products.products_export_csv, name='products_export_csv'),
     url(r'^(?P<product_pk>[0-9]+)/stock/(?P<stock_pk>[0-9]+)/$', permission_required('product.change_stock', login_url='not_found')
         (views.stock_edit), name='product-stock-update'),
     url(r'^stock/(?P<stock_pk>[0-9]+)/history$', permission_required('product.view_stock', login_url='not_found')

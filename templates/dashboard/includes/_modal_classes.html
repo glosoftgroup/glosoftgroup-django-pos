@@ -1,15 +1,19 @@
 <!-- supplier modal -->
 <div class="modal fade" id="addProductClass" >
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-xs" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-titl">Add Sub-category</h4>
+                    <h5 class="modal-title">Add Sub-category</h5>
                 </div>
                 <div class="modal-body">
                  <div class="form-group">
                  	<label class="text-purple-800">Product Sub-category Name</label>
                  	<input type="text" class="form-control" placeholder="Sub-category Name" name="newClassName" id="newClassName">
+                 </div>
+                 <div class="form-group">		
+					<input checked="checked" type="checkbox">
+					Has Variants                	
                  </div>
                  <div class="form-group hidden">
                     <label class="text-purple-800">Attribute that does not affect the price</label>
