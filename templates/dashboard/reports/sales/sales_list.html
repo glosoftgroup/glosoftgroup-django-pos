@@ -84,7 +84,7 @@
       </div>
    </div>
    </div>
-{% if sales %}
+
 <div class="col-md-12">
    <div id="pagination-div">
     <div class="panel panel-flat">
@@ -119,13 +119,14 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
                           </tr>
                         {% endfor %}
-                        {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                         {% else %}
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Summary Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
                  </table>
               </div>
+              {% if sales %}
               <div class="my-paginate">
                 <div class="text-center bootpag-callback" style="padding:20px;">
                   <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -133,8 +134,10 @@
                 </div>
                 <input type="hidden" id="page_size" val="">
               </div>
+              {% endif %}
              </div>
             </div>
+          {% if sales %}
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
@@ -155,6 +158,7 @@
 
               </div>
              </div>
+          {% endif %}
             </div>
 <!--       <div class="panel-footer">
       <button class="btn btn-primary disabled">checki this</button>
@@ -163,17 +167,6 @@
    </div><!--pagination div-->
   </div>
 
-     {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-       No sales summary available for {{date}}
-       </div>
-      </div>
-    </div>
-  </div>
- {% endif %}
 
 </div>
 
