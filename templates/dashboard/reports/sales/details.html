@@ -68,8 +68,8 @@
                             <td>{{item.total_cost}}</td>
                           </tr>
                         {% endfor %}
-                        {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                         {% else %}
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
@@ -77,6 +77,7 @@
               </div>
              </div>
             </div>
+          {% if items %}
             <div class="row">
               <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
                   <span>
@@ -90,6 +91,7 @@
 
               </div>
              </div>
+          {% endif %}
             </div>
     </div>
    </div><!--pagination div-->
