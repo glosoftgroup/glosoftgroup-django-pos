@@ -168,6 +168,8 @@ url(r'^products_export_csv/$', products.products_export_csv, name='products_expo
 
     url(r'stocklocations/$', permission_required('product.view_stocklocation', login_url='not_found')
         (views.stock_location_list), name='product-stock-location-list'),
+    url(r'stocklocations/pagiante/$', views.stock_location_pagination, name='product-stock-location-paginate'),
+    url(r'stocklocations/search/$', views.stock_location_search, name='product-stock-location-search'),
     url(r'stocklocations/add/$', permission_required('product.add_stocklocation', login_url='not_found')
         (views.stock_location_edit), name='product-stock-location-add'),
     url(r'stocklocations/(?P<location_pk>[0-9]+)/$', permission_required('product.change_stocklocation', login_url='not_found')

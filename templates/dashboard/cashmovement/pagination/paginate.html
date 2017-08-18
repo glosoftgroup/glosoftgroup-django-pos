@@ -1,0 +1,25 @@
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load static %}
+
+{% if transactions %}
+  {% for transaction in transactions %}
+  <tr class='clickable-row' id="{{user.pk }}">
+    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{ forloop.counter }}</td>
+
+    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">
+    {{transaction.terminal}}
+    </td>
+    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{transaction.user}}
+    </td>
+    <td>{{transaction.manager}} </td>
+    <td>{{transaction.trans_type}}</td>
+     <td>{{transaction.amount}}</td>
+     <td>{{ transaction.created}}</td>
+
+  </tr>
+  {% endfor %}
+{% else %}
+   <tr><td colspan="7"><h2 class="text-center">No Cash Movement Available</h2></td></tr>
+{% endif %}

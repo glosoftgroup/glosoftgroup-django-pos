@@ -8,8 +8,7 @@
   Purchases Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li><a href="{% url 'dashboard:sales_reports' %}">Reports</a></li>
-     <li class="active"><a href="{% url 'dashboard:purchases_reports' %}">Purchases</a></li>
+     <li class="active"><a href="{% url 'dashboard:purchases_reports' %}">Purchases Reports</a></li>
  {% endblock %}
 
 {% block menu_purchase_report_class %}active{% endblock %}
@@ -24,6 +23,7 @@
 
 {% block content %}
 <div class="row animated fadeIn">
+    <div class="col-md-12">
     <div class="panel panel-flat">
 
         <div class="panel-body search-panel">
@@ -69,7 +69,7 @@
             </div>
       </div>
    </div>
-
+</div>
 <div class="col-md-12">
   <div id="pagination-div">
     <div class="panel panel-flat">

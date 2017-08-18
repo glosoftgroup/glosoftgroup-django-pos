@@ -37,19 +37,14 @@
  
     <li>
       <a href="{% url 'dashboard:sale-list' %}">
-        {% trans "Sales" context "Dashboard sales (discounts) list." %}
-      </a>
-    </li>
-    <li class="back-mobile">
-      <a href="{% url 'dashboard:sale-list' %}">
-        <i class="icon-arrow-left8"></i>
+        {% trans "Discount" context "Dashboard sales (discounts) list." %}
       </a>
     </li>
     <li class="active">      
         {% if sale.pk %}
           {{ sale }}
         {% else %}
-          {% trans "Add new sale" context "Sale (discount) breadcrumbs" %}
+          {% trans "Add New Discount" context "Sale (discount) breadcrumbs" %}
         {% endif %}      
     </li>
  

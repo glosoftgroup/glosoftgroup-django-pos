@@ -15,9 +15,7 @@
  {% endblock %}
 
 {% block breadcrumbs %}
-    <li class="active">
-      Taxes
-    </li>
+  <li class="active"><a href="{% url 'dashboard:tax-list' %}">Taxes</a></li>
 {% endblock %}
 {% block header_extra %}
 <li style='padding: 9px;'>
@@ -39,7 +37,6 @@
                 </div>
             </div>
         </div>
-      {% if tax %}
       <!-- Header and footer fixed -->
 <div class="col-md-12">
   <div class="panel panel-flat">
@@ -53,37 +50,44 @@
                         <th>Id</th>
                         <th>Name</th>
                         <th>Tax %</th>
-
-                        <th>Label</th>
                         <th class="text-center">Actions</th>
                       </tr>
                     </thead>
 
                     <tbody>
-                      {% for tx in tax %}
+                     {% if tax %}
+                       {% for tx in tax %}
                       <tr>
                         <td>#{{ tx.id }}</td>
                          <!-- Tax name -->
                         <td>{{ tx.tax_name }}</td>
                         <!-- tax -->
                         <td>{{ tx.tax}}</td>
-                        <!-- label -->
-                        <td>{{ tx.tax_label }}</td>
                         <!-- actions -->
                         <td class="text-center">
-                          <ul class="icons-list">
-                            <li><a href="{% url 'dashboard:tax-update' pk=tx.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom"></i></a></li>
-                            <li>
-                      <a href="#modal_instance" data-title="Delete {{ tx.name }} Tax, with {{ tx.tax }}%" data-warning="" data-href="{% url 'dashboard:tax-delete' pk=tx.pk %}"
-                              class="modal-trigger"><i class="icon-trash position-left" data-popup="tooltip"></i>
-
-                              </a>
-                            </li>
-
-                          </ul>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                action <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu edit-dropdown">
+                             {% if perms.product.change_producttax %}
+                                  <li><a href="{% url 'dashboard:tax-update' pk=tx.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom"></i>EDIT</a></li>
+                             {% endif %}
+                             {% if perms.product.delete_producttax %}
+                                  <li>
+                                  <a href="#modal_instance" data-title="Delete {{ tx.tax_name }} Tax, with {{ tx.tax }}%" data-warning="" data-href="{% url 'dashboard:tax-delete' pk=tx.pk %}"
+                                  class="modal-trigger"><i class="icon-trash position-left" data-popup="tooltip"></i>
+                                  DELETE</a>
+                                </li>
+                             {% endif %}
+                              </ul>
+                            </div>
                         </td>
                       </tr>
                         {% endfor %}
+                    {% else %}
+                     <tr><td colspan="4"><h2 class="text-center">No Set Tax Available</h2></td></tr>
+                    {% endif %}
                       </tbody>
                </table>
                </div>
@@ -92,17 +96,7 @@
       </div>
   </div>
 </div>
-	  {% else %}
-          <div class="col-md-12 animated fadeIn ">
-           <div class="panel bg-danger-600">
-             <div class="panel-body">
-               <div style="text-align: center;font-size:16px;">
-                  No Set Tax Available.
-               </div>
-              </div>
-            </div>
-          </div>
-      {% endif %}
+
   </div>
       {% include "dashboard/includes/_modal.html"  %}
      {% endblock %} 

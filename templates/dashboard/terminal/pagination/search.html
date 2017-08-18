@@ -1,0 +1,132 @@
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-body">
+        <div class="table-responsives">
+         
+
+          <table class="table  table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
+                <thead>
+                  <tr class="bg-primary">
+                    <th>#ID</th>
+                    <th>Till Id</th>
+                    <th>Till Name</th>
+                    <th>Cash movements</th>
+                    <th>Sales</th>
+                    <th>Amount</th>
+                    <th>History</th>
+                    {% if perms.sale.change_terminal or perms.sale.delete_terminal %}
+                    <th class="text-center">Actions</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody id="p-tb">           
+                    {% if users %}
+                  {% for user in users %}
+                  <tr class='clickable-row' id="{{user.pk }}">
+                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">
+                    {{user.terminal_number}}
+                    </td>
+                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{user.terminal_name}}
+                    </td>
+                    <td>
+                     <span class="text-bold label bg-indigo-800">
+                      {{ user.get_transations}}
+                     </span>
+                    </td>
+                    <td>
+                    <span class="text-bold label bg-indigo-800">
+                      {{ user.get_sales }}
+                      </span>
+                    </td>
+                    <td>
+                      {{ user.amount}}
+                    </td>
+                    <td>
+                      <span class="label label-success">
+                       <a href="#modal_instance2" class="text-white modal-trigger-ajax" data-title="{{ user }} History" data-href="{% url 'dashboard:terminal-history' pk=user.pk %}">
+                      History
+                      </a>
+                      </span>
+                    </td>
+                    <!-- actions -->
+                    <td class="text-center">
+
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            action <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu edit-dropdown">
+                         {% if perms.sale.change_terminal %}
+                             <li><a href="{% url 'dashboard:terminal-edit' pk=user.pk %}" class=""><i class="icon-pencil7"></i> EDIT</a></li>
+                         {% endif %}
+                         {% if perms.sale.delete_terminal %}
+                            <li>
+                          <a data-ta="#modal_instance" data-title="Delete Terminal  {{ user.terminal_name }} ?" data-href="{% url 'dashboard:terminal-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                         class="modal-trigger del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                         </a>
+                        </li>
+                         {% endif %}
+                          </ul>
+                        </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                   <tr><td colspan="8"><h2 class="text-center">No Terminals Available</h2></td></tr>
+               {% endif %}
+                </tbody>
+           </table>
+
+        </div>
+        </div>
+          {% if users %}
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+          {% endif %}
+      </div>
+
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+
+                $.get("{% url 'dashboard:terminal-search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                   $('#p-tb').html(data);
+                });
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+      $(".td").click(function() {
+         window.location = $(this).data("href");
+      });
+
+   });
+ </script>

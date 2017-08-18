@@ -12,10 +12,8 @@
 {% block menu_customers_class %}active{% endblock %}
 
 {% block breadcrumbs %}
-  
-    <li class="active">
-      {% trans "Customers" context "Dashboard customers list" %}
-    </li>
+
+<li class="active"><a href="{% url 'dashboard:customers' %}">Customer</a></li>
   
 {% endblock %}
 
