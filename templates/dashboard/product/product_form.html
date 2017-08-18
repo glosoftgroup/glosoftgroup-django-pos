@@ -371,6 +371,7 @@
 
         </div>
       <!-- Retail price inclusive tax -->
+      <div id="pricingDiv">
       <div class="row" style="margin-bottom:20px;">
       <div class="col-md-4">
         <div class="form-group">
@@ -388,7 +389,6 @@
            </span>                  
         </div>
       </div>
-
       <!-- (Before Tax) -->
       <div class="col-md-4">
          <div class="form-group">
@@ -407,8 +407,7 @@
           <label class="col-md-12">wholesale Price:<span class="text-muted text-small">(Inclusive Tax)</span></label>
           {{ product_form.wholesale_price }}                     
         </div>
-      </div> 
- 
+      </div>  
       <!-- Wholesale Tax: -->
       <div class="col-md-4">
         <div class="form-group">
@@ -418,7 +417,6 @@
            </span>                  
           </div>
       </div>
-
       <!-- wholesale price before tax  -->
       <div class="col-md-4">
         <div class="form-group">
@@ -429,6 +427,7 @@
         </div> 
       </div>
         </div>
+     </div>
      </div>
      
 
@@ -1103,6 +1102,7 @@
     return parseInt(pclass);
   }
   getProductClass();
+  
   // content locader
   // content wait loader
    function content_loader(val) {   
@@ -1128,30 +1128,44 @@
   // refreshAttributes func
   var checkSkuUrl = "{% url 'dashboard:have-variants' %}";
   var hasVariantDiv = $('#hasVariantDiv');
-  var skuInput = $('#id_variant-sku');
+  var skuInput      = $('#id_variant-sku');
+  var priceInput    = $('#id_price');
+  var pricingDiv    = $('#pricingDiv');
   skuInput.attr('placeholder','Enter Stock keeping unit');
   var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
 
   function checkHasVaraints(class_pk){
     var postingx = $.post(checkSkuUrl, 
                          {class_pk:class_pk,
-                          csrfmiddlewaretoken:csrf_token} ); 
+                          csrfmiddlewaretoken:csrf_token,
+                          track:'checkHasVaraints'} ); 
     postingx.done(function( data ) {    
     if(parseInt(data['has_variants']) == 1){
      console.log('has variants');
      hasVariantDiv.addClass('hidden');
+     pricingDiv.addClass('hidden');
      skuInput.removeAttr('required');
      skuInput.removeAttr('aria-required');
      skuInput.removeClass('validate');
+
+     // price requiered so check if its empty/else add 0
+     if(!priceInput.val()){ priceInput.val(0);}
     }else{
       console.log(data['has_variants']);
       hasVariantDiv.removeClass('hidden');
+      pricingDiv.removeClass('hidden');
       skuInput.attr('required','required');
       skuInput.addClass('validate');
       skuInput.val('dummy');
+
     }
    });
+    postingx.fail(function(){
+      notify('Error refreshing sku division!','bg-danger');
+    });
   }
+  checkHasVaraints(getProductClass());
+  
   function refreshAttributes() {  
    {% url "dashboard:fetch-variants" as url %} 
    var url = "{{ url }}";
