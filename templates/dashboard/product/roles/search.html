@@ -10,7 +10,7 @@
      .nb{border:0px;}
      .table{border:1px solid #ccc}
    </style>
-{% if product_results %}
+
       <div class="panel panel-flat">
         <div class="table-responsives">
          
@@ -28,6 +28,7 @@
                       </tr>
                     </thead>
                     <tbody id="p-tb">
+                    {% if product_results %}
                     {% for product in product_results %}
                     <tr data-title=" {{ product.name }} " class="clickable-row">
                       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.id }}</td>
@@ -80,28 +81,23 @@
                       </td>
                     </tr>
                       {% endfor %}
+                     {% else %}
+                      <tr><td colspan="7"><h5 class="text-center">No Products Available</h5></td></tr>
+                    {% endif %}
                     </tbody>
                </table>
             </div>
         </div>
+          {% if product_results %}
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
+          {% endif %}
       </div>
-     {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No Products available
-       </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
+
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>

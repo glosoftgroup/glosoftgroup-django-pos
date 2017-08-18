@@ -92,7 +92,8 @@
         </div>
       </div>
    </div>
-  {% if users %}
+
+
   <div class="col-md-12">
    <div id="pagination-div">
       <!-- Header and footer fixed -->
@@ -115,6 +116,7 @@
                   </tr>
                 </thead>
                 <tbody id="tb">
+                {% if users %}
                   {% for user in users %}
                   <tr class='clickable-row' id="{{user.pk }}">
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{ forloop.counter }}</td>
@@ -174,6 +176,9 @@
 
                   </tr>
                   {% endfor %}
+                {% else %}
+                  <tr><td colspan="6"><h5 class="text-center">No Users Availbale</h5></td></tr>
+                {% endif %}
                   </tbody>
            </table>
 
@@ -189,17 +194,6 @@
       </div>
     </div><!-- pagination -->
   </div>
-     {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No users to display
-       </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
 </div>
 
 <!-- Blue modal -->

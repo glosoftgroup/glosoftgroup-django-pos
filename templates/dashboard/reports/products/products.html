@@ -107,12 +107,13 @@
                           </tr>
                         {% endfor %}
                         {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no products available</h2></td></tr>
+                         <tr><td colspan="6"><h2 class="text-center">No Products Reports available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
                  </table>
               </div>
+              {% if items %}
               <div class="my-paginate">
                 <div class="text-center bootpag-callback" style="padding:20px;">
                   <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -120,8 +121,10 @@
                 </div>
                 <input type="hidden" id="page_size" val="">
               </div>
+              {% endif %}
              </div>
             </div>
+          {% if items %}
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
@@ -132,6 +135,7 @@
                   
               </div>
              </div>
+          {% endif %}
             </div>
 <!--       <div class="panel-footer">
       <button class="btn btn-primary disabled">checki this</button>

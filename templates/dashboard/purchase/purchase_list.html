@@ -108,9 +108,9 @@
                   {% for variant in product_results %}
                     <tr>
                         <!-- product name/sku -->
-                      <td>
+                      <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
                         <div class="media-left">
-                          <div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibolds"> {{ variant.display_product }} </a></div>
+                          <div class=""><a href="javascript:;" class="text-default text-semibolds"> {{ variant.display_product }} </a></div>
                           <div class="text-muted text-size-small">  {{ variant.sku }} </div>
                         </div>
                       </td>
@@ -198,17 +198,16 @@
                       {% endif %}
                       </span></td>
                    </tr>
-  
-  
-  {% endfor %}
+              {% endfor %}
                 {% else %}
-                   <tr><td colspan="6"><h2 class="text-center">No Stock available</h2></td></tr>
+                   <tr><td colspan="6"><h2 class="text-center">No Stock Available</h2></td></tr>
                {% endif %}
                   </tbody>
            </table>
 
         </div>
         </div>
+          {% if product_results %}
          <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -216,6 +215,7 @@
             </div>
             <input type="hidden" id="page_size" val="">
           </div>
+          {% endif %}
       </div>
     </div><!-- pagination -->
   </div>

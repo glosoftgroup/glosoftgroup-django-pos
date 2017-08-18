@@ -60,7 +60,9 @@
                       <div class="col-md-12">
                           {% if highest_item %}
                             {% for h in highest_item %}
-                                <h5 class="no-margin">KShs. {{h.total_cost__sum}}</h5>
+                                <h5 class="no-margin">Highest Product Sold</h5>
+                          <h6 class="no-margin">KShs. {{h.total_cost__sum}} - ({{h.quantity__sum}}
+                                    {% if h.quantity__sum is 1 %} item {% else %} items {% endif %})</h6>
                           Highest Product Sold <br/>
                                   <span>{{h.product_name}}
                             {% endfor %}
@@ -81,7 +83,9 @@
                       <div class="col-md-12">
                           {% if lowest_item %}
                             {% for h in lowest_item %}
-                                <h5 class="no-margin">KShs. {{h.total_cost__sum}}</h5>
+                                <h5 class="no-margin">Lowest Product Sold</h5>
+                                <h6 class="no-margin">KShs. {{h.total_cost__sum}} - ({{h.quantity__sum}}
+                                    {% if h.quantity__sum is 1%} item {% else %} items {% endif %})</h6>
                           Lowest Product Sold <br/>
                                   <span>{{h.product_name}}
                             {% endfor %}
@@ -134,6 +138,7 @@
                                     {{forloop.counter }}. {{sales.product_name}}
                                 </td>
                                 <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                    ({{sales.quantity__sum}} {% if h.quantity__sum is 1%} item {% else %} items {% endif %} )
                                      <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
                                 </td>
                               </tr>

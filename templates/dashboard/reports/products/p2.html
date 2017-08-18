@@ -35,18 +35,20 @@
                           </tr>
                         {% endfor %}
                         {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no products available</h2></td></tr>
+                         <tr><td colspan="6"><h2 class="text-center">No Products Reports available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
                  </table>
         </div>
-         <div class="my-paginate">
-            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
-              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
-            </div>
-          </div>
+              {% if items %}
+             <div class="my-paginate">
+                <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+                </div>
+              </div>
+              {% endif %}
           </div>
         </div>
       </div>

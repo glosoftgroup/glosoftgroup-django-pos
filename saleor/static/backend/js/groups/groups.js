@@ -1,7 +1,11 @@
+$('#modal_detail').on('hidden.bs.modal', function () {
+    var id = $('.cgroup_id').val();
+    $( "#"+id+" td ul .modal_trigger_user" ).trigger( "click" );
+});
+
 $('#modal_users').on('hidden.bs.modal', function () {
     names = [];
-    console.log(names)
-})
+});
 //**@ users modal
     $('body').on('click', '.modal_trigger_user',function (e) {
          var url = $(this).data('href')
@@ -28,7 +32,6 @@ $('#modal_users').on('hidden.bs.modal', function () {
             success:function(data){
              if(typeof data !== 'undefined' && data.length >0){
                   names = data;
-                  console.log(names);
                    //*@ populate table
                     var table_body = $('#user_table tbody');
                     var parent = table_body.parent();
@@ -66,8 +69,6 @@ $('#add_user').on('click', function(e){
       names.indexOf(val) === -1 ? names.push(val) : console.log('already exists');
     });
 
-console.log(names);
-console.log(remove_duplicates(names));
     var table_body = $('#users_table_body');
     var parent = table_body.parent();
 
@@ -93,7 +94,6 @@ $('body').on('click', '#modal_update_users',function(){
     //**@ id
     var g_id = $('#group-id').val();
     var g_name = $('#group_name').val();
-    console.log('id: '+g_id);
 
     //**@ post
     $.ajax({
@@ -107,7 +107,6 @@ $('body').on('click', '#modal_update_users',function(){
       },
       async:false,
       success: function(data){
-      console.log(data);
               $.jGrowl('group updated successfully', {
                   header: 'Well done!',
                   theme: 'bg-success'

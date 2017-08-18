@@ -79,7 +79,7 @@
         </div>
       </div>
    </div>
-  {% if product_results %}
+
   <div class="col-md-12">
    <div id="pagination-div">
       <!-- Header and footer fixed -->
@@ -99,6 +99,7 @@
                   </tr>
                 </thead>
                 <tbody id="tb">
+                {% if product_results %}
                 {% for product in product_results %}
                     <tr data-title=" {{ product.name }} " class="clickable-row">
                       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.id }}</td>
@@ -151,11 +152,15 @@
                       </td>
                     </tr>
                       {% endfor %}
+                {% else %}
+                  <tr><td colspan="7"><h5 class="text-center">No Products Available</h5></td></tr>
+                {% endif %}
                 </tbody>
            </table>
 
         </div>
         </div>
+          {% if product_results %}
          <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -163,20 +168,11 @@
             </div>
             <input type="hidden" id="page_size" val="">
           </div>
+          {% endif %}
       </div>
     </div><!-- pagination -->
   </div>
-     {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No Products available
-       </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
+
 </div>
 
 {% include "dashboard/includes/_modal_template.html"  %}
