@@ -10,50 +10,52 @@
           <table class="table  table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
                 <thead>
                   <tr class="bg-primary">
-                  <th>
-                    {% trans "Name" context "Sale (discount) table header" %}
-                  </th>
-                  <th>
-                    {% trans "Discount" context "Sale (discount) table header" %}
-                  </th>
-                  <th>Actions</th>
-                </tr>
+                    <th>#</th>
+                    <th>Location Name</th>
+                    {% if perms.product.change_stocklocation or perms.product.delete_stocklocation %}
+                    <th class="text-center">Actions</th>
+                    {% endif %}
+                  </tr>
                 </thead>
                 <tbody id="p-tb">           
-                    {% if sales %}
-                      {% for sale in sales %}
-                        <tr class="clickable-row" data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
-                          <td class='td'  data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
-                            {{ sale }}
-                          </td>
-                          <td class='td' data-href="{% url 'dashboard:sale-update' pk=sale.pk %}">
-                            {{ sale.value }}{{ sale.get_type_display }}
-                          </td>
-                          <!-- actions -->
-                          <td >
-                          <span  class="label label-primary disc-label">
-                          <a href="{% url 'dashboard:discount-detail' pk=sale.pk %}" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
-                          Detail
-                          </a>
-                          </span>
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    {% else %}
-                    <tr>
-                      <td colspan="3">
-                        <h2 class="text-center">
-                          {% trans "No Discount available" context "Empty sales table message" %}
-                        </h2>
+                {% if locations %}
+                  {% for location in locations %}
+                    <tr class="td" data-href="{% url 'dashboard:product-stock-location-edit' location.pk %}">
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ location }}</td>
+                      {% if perms.product.change_stocklocation or perms.product.delete_stocklocation %}
+                     <td class="text-center">
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            action <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu edit-dropdown">
+                         {% if perms.product.change_stocklocation %}
+                            <li><a href="{% url 'dashboard:product-stock-location-edit' location.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                         {% endif %}
+                         {% if perms.product.delete_stocklocation %}
+                            <li>
+                                <a data-ta="#modal_instance" data-title="Delete Location {{ location.name }} ?" data-href="{% url 'dashboard:product-stock-location-delete' location.pk %}" data-name="{{ location.name }}" data-id="{{ location.pk }}"
+                         class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                         </a>
+                            </li>
+                         {% endif %}
+                          </ul>
+                        </div>
+
                       </td>
-                    </tr>
                     {% endif %}
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                <tr><td colspan="2"><h2 class="text-center">No Locations Available</h2></td></tr>
+                {% endif %}
                   </tbody>
            </table>
 
         </div>
         </div>
-          {% if sales %}
+          {% if locations %}
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -87,19 +89,17 @@
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
                 var gid = '{{gid}}';
                 if(gid == 0){
-                    $.get("{% url 'dashboard:discount_pagination' %}",{page:num, psize:'{{sz}}'},function(data){
+                    $.get("{% url 'dashboard:product-stock-location-paginate' %}",{page:num, psize:'{{sz}}'},function(data){
                       $('#p-tb').html(data);
                     });
                 }else{
-                    $.get("{% url 'dashboard:discount_pagination' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
+                    $.get("{% url 'dashboard:product-stock-location-paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
                    $('#p-tb').html(data);
                 });
                 }
 
         }).children('.pagination').addClass('pagination-flat pagination-sm')
-        $(".td").click(function() {
-             window.location = $(this).data("href");
-        });
+
    });
  </script>
 <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

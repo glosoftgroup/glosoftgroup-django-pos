@@ -1,0 +1,100 @@
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-body">
+        <div class="table-responsives">
+         
+
+          <table class="table  table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
+                <thead>
+                  <tr class="bg-primary">
+                    <th>#</th>
+                    <th>Location Name</th>
+                   {% if perms.product.change_stocklocation or perms.product.delete_stocklocation %}
+                    <th class="text-center">Actions</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody id="p-tb">           
+                    {% if locations %}
+                  {% for location in locations %}
+                    <tr class="td" data-href="{% url 'dashboard:product-stock-location-edit' location.pk %}">
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ location }}</td>
+                      {% if perms.product.change_stocklocation or perms.product.delete_stocklocation %}
+                     <td class="text-center">
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            action <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu edit-dropdown">
+                         {% if perms.product.change_stocklocation %}
+                            <li><a href="{% url 'dashboard:product-stock-location-edit' location.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                         {% endif %}
+                         {% if perms.product.delete_stocklocation %}
+                            <li>
+                                <a data-ta="#modal_instance" data-title="Delete Location {{ location.name }} ?" data-href="{% url 'dashboard:product-stock-location-delete' location.pk %}" data-name="{{ location.name }}" data-id="{{ location.pk }}"
+                         class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                         </a>
+                            </li>
+                         {% endif %}
+                          </ul>
+                        </div>
+
+                      </td>
+                    {% endif %}
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                <tr><td colspan="2"><h2 class="text-center">No Locations Available</h2></td></tr>
+                {% endif %}
+                </tbody>
+           </table>
+
+        </div>
+        </div>
+          {% if locations %}
+         <div class="my-paginate">
+            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+            </div>
+          </div>
+          {% endif %}
+      </div>
+
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+
+                $.get("{% url 'dashboard:product-stock-location-search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                   $('#p-tb').html(data);
+                });
+        }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+   });
+ </script>

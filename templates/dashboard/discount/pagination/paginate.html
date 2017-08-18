@@ -23,11 +23,11 @@
     </tr>
   {% endfor %}
 {% else %}
-<tr>
-  <td>
-    <span>
-      {% trans "No Discount available" context "Empty sales table message" %}
-    </span>
-  </td>
-</tr>
-{% endif %}
+  <tr>
+    <td>
+      <h2 class="text-center">
+        {% trans "No Discount available" context "Empty sales table message" %}
+      </h2>
+    </td>
+  </tr>
+  {% endif %}

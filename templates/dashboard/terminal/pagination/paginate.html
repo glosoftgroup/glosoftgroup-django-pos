@@ -1,0 +1,60 @@
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load static %}
+
+{% if users %}
+      {% for user in users %}
+      <tr class='clickable-row' id="{{user.pk }}">
+        <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+        <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">
+        {{user.terminal_number}}
+        </td>
+        <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{user.terminal_name}}
+        </td>
+        <td>
+         <span class="text-bold label bg-indigo-800">
+          {{ user.get_transations}}
+         </span>
+        </td>
+        <td>
+        <span class="text-bold label bg-indigo-800">
+          {{ user.get_sales }}
+          </span>
+        </td>
+        <td>
+          {{ user.amount}}
+        </td>
+        <td>
+          <span class="label label-success">
+           <a href="#modal_instance2" class="text-white modal-trigger-ajax" data-title="{{ user }} History" data-href="{% url 'dashboard:terminal-history' pk=user.pk %}">
+          History
+          </a>
+          </span>
+        </td>
+        <!-- actions -->
+        <td class="text-center">
+
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                action <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu edit-dropdown">
+             {% if perms.sale.change_terminal %}
+                 <li><a href="{% url 'dashboard:terminal-edit' pk=user.pk %}" class=""><i class="icon-pencil7"></i> EDIT</a></li>
+             {% endif %}
+             {% if perms.sale.delete_terminal %}
+                <li>
+              <a data-ta="#modal_instance" data-title="Delete Terminal  {{ user.terminal_name }} ?" data-href="{% url 'dashboard:terminal-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+             class="modal-trigger del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+             </a>
+            </li>
+             {% endif %}
+              </ul>
+            </div>
+        </td>
+      </tr>
+      {% endfor %}
+    {% else %}
+       <tr><td colspan="8"><h2 class="text-center">No Terminals Available</h2></td></tr>
+   {% endif %}

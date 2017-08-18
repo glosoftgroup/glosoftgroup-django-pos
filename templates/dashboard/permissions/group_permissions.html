@@ -145,7 +145,7 @@
         </div>
         <div class="col-md-3">
           <div class="form-group">
-            <label class="display-block text-semibold">Product Class(type)</label>
+            <label class="display-block text-semibold">Product Sub-Category)</label>
             {% for permission in permissions%}
              {% if permission.content_type.model ==  'productclass' %}
                                     {% if permission in group_permissions %}                          
@@ -156,7 +156,15 @@
                             <input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
                           </span>
                           </div>
-                          {{permission.name}}
+                          {% if permission.name == 'Can add product class' %}
+                                        Can add Sub Category
+                                      {% elif permission.name == 'Can change product class' %}
+                                      Can add Sub Category
+                                      {% elif permission.name == 'Can delete product class' %}
+                                      Can add Sub Category
+                                      {% elif permission.name == 'Can view product class' %}
+                                      Can add Sub Category
+                                      {% endif %}
                         </label>
                         <span id="granted" class="granted text-success">(granted)</span>
                       </div>
@@ -169,7 +177,15 @@
                         value="{{permission.id}}">
                         </span>
                       </div>
-                         {{permission.name}}
+                         {% if permission.name == 'Can add product class' %}
+                                        Can add Sub Category
+                                      {% elif permission.name == 'Can change product class' %}
+                                      Can add Sub Category
+                                      {% elif permission.name == 'Can delete product class' %}
+                                      Can add Sub Category
+                                      {% elif permission.name == 'Can view product class' %}
+                                      Can add Sub Category
+                                      {% endif %}
                      </label>
                      <span id="granted" class="granted text-success"></span>
                      </div>
