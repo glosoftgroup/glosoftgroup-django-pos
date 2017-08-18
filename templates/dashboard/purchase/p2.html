@@ -125,12 +125,14 @@
 
         </div>
         </div>
+          {% if product_results %}
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
+          {% endif %}
       </div>
 
     <!-- Core Scripts - Include with every page -->

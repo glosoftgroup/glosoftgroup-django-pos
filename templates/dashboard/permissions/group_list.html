@@ -61,7 +61,7 @@
         </div>
       </div>
    </div>
-     {% if groups %}
+
   <div class="col-md-12">
     <div id="pagination-div">
       <div class="panel panel-flat">
@@ -80,6 +80,7 @@
                 </thead>
  
                 <tbody id="tb">
+                {% if groups %}
                   {% for group in groups %}
                   <tr class='clickable-row' id="{{group.id }}">
                     <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{ forloop.counter }}.</td>
@@ -120,6 +121,9 @@
                     {% endif %}
                   </tr>
                   {% endfor %}
+                {% else %}
+                  <tr><td colspan="3"><h5 class="text-center">No Groups Availbale</h5></td></tr>
+                {% endif %}
                   </tbody>
 
            </table>
@@ -134,18 +138,6 @@
       </div>
       </div><!-- pagination-div-->
   </div>
-
-          {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No Groups to Display
-       </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
 
 </div>
 
@@ -245,7 +237,6 @@
          <div class="col-md-6">
            <div class="row">
            <div class="col-md-12">
-             <h5>Group & Users</h5>
              <input type="hidden" name="group-id" id="group-id">
            </div>
             <div class="col-md-12">
@@ -255,54 +246,6 @@
              </div>
             </div>
            </div>
-           <!--<div class="row">-->
-            <!--<div class="col-md-9">-->
-              <!--<div class="form-group">-->
-               <!--<label>Add Users:</label>-->
-                <!--<div class="multi-select-full">-->
-                  <!--<select class="multiselect-full-featured" multiple="multiple" style="display: nones;" name="user_select" id="edit_multiple" placeholder="select a user...">-->
-                  <!--{% for usr in users %}-->
-                    <!--{% if usr.is_active == True and usr.is_superuser == False %}-->
-                       <!--<option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}-->
-                       <!--{% else %}{{usr.email}}{% endif %}" data-image="{% if usr.image %}{{usr.image.url}}-->
-                       <!--{% else %}/static/images/user.png{% endif %}">-->
-                         <!--{% if usr.name %}-->
-                            <!--{{usr.name}}-->
-                         <!--{% else %}-->
-                            <!--{{usr.email}}-->
-                         <!--{% endif %}-->
-                       <!--</option>-->
-                    <!--{% endif %}-->
-                  <!--{% endfor %}-->
-                  <!--</select>-->
-                <!--</div>-->
-               <!--</div>&lt;!&ndash; end of formgroup&ndash;&gt;-->
-            <!--</div>-->
-            <!--<div class="col-md-3">-->
-             <!--<div class="form-group">-->
-               <!--<label><span style="visibility: hidden;">X</span></label>-->
-               <!--<button class="btn btn-primary form-control" id="add_user_btn">Add User</button>-->
-            <!--</div>-->
-            <!--</div>-->
-           <!--</div>-->
-           <!--<div class="row">-->
-            <!--<div class="col-md-12">-->
-             <!--<div class="table-responsive pre-scrollable group-users">-->
-             <!--<table class="table table-framed" id="group_user_table">-->
-                <!--<thead>-->
-                  <!--<tr>-->
-                    <!--<th>image</th>-->
-                    <!--<th>Name</th>-->
-                    <!--<th>Actions</th>-->
-                  <!--</tr>-->
-                <!--</thead>-->
-                <!--<tbody class="table_body">-->
-
-                <!--</tbody>-->
-              <!--</table>-->
-              <!--</div>-->
-            <!--</div>-->
-           <!--</div>-->
          </div>
 
          <div class="col-md-12">
@@ -370,9 +313,9 @@
        <div class="modal-body detail-body">
 
        </div>
-
+        <input type="hidden" class="cgroup_id">
        <div class="modal-footer">
-         <button type="button" class="btn btn-default btn-block" data-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-default btn-block" data-dismiss="modal">ADD USER</button>
        </div>
      </div>
    </div>
@@ -779,6 +722,7 @@ $(".clickable-row .td").click(function(){
          $('.del').attr('data-id', id);
          $('.del').attr('data-href', url);
          $('.modal-title').html(prompt_text);
+         $('.cgroup_id').val(id);
          var token = '{{ csrf_token }}';
 
           //*@ get group permissions

@@ -1,5 +1,4 @@
 {% load staticfiles %}
-{% if groups %}
       <div class="panel panel-flat">
         <div class="panel-body">
         <div class="table-responsives">
@@ -17,46 +16,50 @@
                 </thead>
  
                 <tbody id="p-tb">
+                {% if groups %}
                   {% for group in groups %}
-    <tr class='clickable-row' id="{{group.id }}">
-      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{ forloop.counter }}.</td>
-       <!-- group name -->
-      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{group.name}}</td>
-      <!-- actions -->
-      {% if perms.auth.change_group or perms.auth.delete_group %}
-      <td class="text-center">
+                    <tr class='clickable-row' id="{{group.id }}">
+                      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{ forloop.counter }}.</td>
+                       <!-- group name -->
+                      <td class="td" data-href="{% url 'dashboard:group-detail' pk=group.pk %}" data-ta="#modal_detail" data-title="{{ group.name|title }} List" data-name="{{ group.name }}" data-id="{{ group.pk }}">{{group.name}}</td>
+                      <!-- actions -->
+                      {% if perms.auth.change_group or perms.auth.delete_group %}
+                      <td class="text-center">
 
-          <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              action <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu edit-dropdown">
-            {% if perms.auth.change_group %}
-              <li>
-                <a data-ta="#modal_users" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
-               data-token='{{ csrf_token }}' class="modal_trigger_user edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> MANAGE USERS</a>
-              </li>
-           {% endif %}
-           {% if perms.auth.change_group %}
-              <li>
-                <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
-               class="modal_trigger_edit edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> EDIT</a>
-              </li>
-           {% endif %}
-            {% if perms.auth.delete_group %}
-              <li>
-                <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
-               class="modal_trigger_delete del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
-               </a>
-              </li>
-           {% endif %}
-            </ul>
-          </div>
+                          <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              action <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu edit-dropdown">
+                            {% if perms.auth.change_group %}
+                              <li>
+                                <a data-ta="#modal_users" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
+                               data-token='{{ csrf_token }}' class="modal_trigger_user edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> MANAGE USERS</a>
+                              </li>
+                           {% endif %}
+                           {% if perms.auth.change_group %}
+                              <li>
+                                <a data-ta="#modal_edit" data-title="Update group {{ group.name }}" data-href="{% url 'dashboard:group_manage' %}" data-name="{{ group.name }}" data-id="{{ group.pk }}" data-users="{% url 'dashboard:get_group_users' %}"
+                               class="modal_trigger_edit edit-btn"><i class="icon-pencil7" href="#modal_edit" data-toggle="modal"></i> EDIT</a>
+                              </li>
+                           {% endif %}
+                            {% if perms.auth.delete_group %}
+                              <li>
+                                <a data-ta="#modal_instance" data-title="Delete group {{ group.name }} ?" data-href="{% url 'dashboard:group-delete' pk=group.id %}" data-name="{{ group.name }}" data-id="{{ group.pk }}"
+                               class="modal_trigger_delete del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                               </a>
+                              </li>
+                           {% endif %}
+                            </ul>
+                          </div>
 
-      </td>
-      {% endif %}
-    </tr>
-    {% endfor %}
+                      </td>
+                      {% endif %}
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                      <tr><td colspan="3"><h5 class="text-center">No Groups Availbale</h5></td></tr>
+                    {% endif %}
                   </tbody>
 
            </table>
@@ -215,14 +218,3 @@
 
  </script>
 <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
-               {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No Groups to matching results
-       </div>
-      </div>
-    </div>
-  </div>
-{% endif %}

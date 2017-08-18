@@ -139,14 +139,15 @@
                   </table>
                 </div>
             </div>
-
+            {% if low_stock %}
             <div class="my-paginate">
-            <div class="text-center bootpag-callback" style="padding:20px;">
-              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav">Page 1 of {{totalp}}</div>
+                <div class="text-center bootpag-callback" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav">Page 1 of {{totalp}}</div>
+                </div>
+                <input type="hidden" id="page_size" val="">
             </div>
-            <input type="hidden" id="page_size" val="">
-          </div>
+            {% endif %}
 
         </div>
     </div>

@@ -70,7 +70,7 @@
         </div>
       </div>
    </div>
-  {% if classes %}
+
   <div class="col-md-12">
    <div id="pagination-div">
       <!-- Header and footer fixed -->
@@ -87,6 +87,7 @@
                   </tr>
                 </thead>
                 <tbody id="tb">
+                {% if classes %}
                 {% for pk, name, has_variants, product_attributes, variant_attributes in classes %}
                     <tr>
                       <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">{{ forloop.counter }}</td>
@@ -122,11 +123,15 @@
                           </td>
                     </tr>
                     {% endfor %}
+                {% else %}
+                  <tr><td colspan="4"><h5 class="text-center">No Sub Categories Available</h5></td></tr>
+                {% endif %}
                 </tbody>
            </table>
 
         </div>
         </div>
+          {% if classes %}
          <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -134,20 +139,11 @@
             </div>
             <input type="hidden" id="page_size" val="">
           </div>
+          {% endif %}
       </div>
     </div><!-- pagination -->
   </div>
-     {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No Sub Categories available
-       </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
+
 </div>
 
 {% include "dashboard/includes/_modal.html"  %}
