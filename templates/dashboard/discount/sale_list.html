@@ -111,9 +111,9 @@
                 {% else %}
                 <tr>
                   <td>
-                    <span>
+                    <h2 class="text-center">
                       {% trans "No Discount available" context "Empty sales table message" %}
-                    </span>
+                    </h2>
                   </td>
                 </tr>
                 {% endif %}
@@ -121,6 +121,7 @@
             </table>
           </div>
         </div>
+            {% if sales %}
           <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -128,6 +129,7 @@
             </div>
             <input type="hidden" id="page_size" val="">
           </div>
+            {% endif %}
 
         </div>
       </div>

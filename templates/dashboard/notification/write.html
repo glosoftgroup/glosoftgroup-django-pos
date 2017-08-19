@@ -77,10 +77,9 @@
                 <td style="width: 100%" class="text-left">
                 <div class="col-md-6">
                 {% if product.product_supplier %}
-
-                <input type="text" value="{{product.product_supplier.email}}" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                    <input type="text" value="{{product.product_supplier.email}}" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead">
                 {% else %}
-                <input type="text" value="" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                    <input type="text" value="" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead">
                 {% endif %}
                     
                
@@ -129,13 +128,10 @@
     <div >
         <textarea cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ...">
         {% if product %}
-       
-        
              <h5 align="left" class="text-uppercase text-semibold">
                  Invoice#
              </h5>
              <h5><b>Date:</b> {% now "SHORT_DATETIME_FORMAT" %}</h5>
-         
              {% endif %}
         </textarea>
     </div>

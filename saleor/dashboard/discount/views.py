@@ -37,7 +37,7 @@ def sale_list(request):
                                     {'sales': sales, 'pn': paginator.num_pages})
     except TypeError as e:
         error_logger.error(e)
-        return TemplateResponse(request, 'dashboard/customer/users.html', {})
+        return TemplateResponse(request, 'dashboard/discount/sale_list.html', {})
 
 def disc_paginate(request):
     page = int(request.GET.get('page', 1))

@@ -8,10 +8,8 @@
  Purchase- {{ block.super }}
 {% endblock %}
 {% block breadcrumbs %}
- 
-    <li class="active">
-      Purchase
-    </li>
+
+<li class="active"><a href="{% url 'dashboard:purchase-list' %}">Purchase</a></li>
 
 {% endblock %}
 {% block menu_purchase_list %}active{% endblock %}

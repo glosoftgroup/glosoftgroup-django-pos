@@ -1,12 +1,13 @@
 {% load staticfiles %}
       <div class="panel panel-flat">
+          <div class="panel-body">
         <div class="table-responsive">
          
                 <table class="table  datatable-header-footer table-hover">
                   <caption style="margin-bottom: 10px;">
                    </caption> 
                       <thead style="border-top:1px solid #ddd;">
-                        <tr>
+                        <tr class="bg-primary">
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
                           <th>Client Name</th>
@@ -29,20 +30,23 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
                           </tr>
                         {% endfor %}
-                        {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                         {% else %}
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Reports Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
                  </table>
 
         </div>
+      </div>
+          {% if sales %}
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
+          {% endif %}
       </div>
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>

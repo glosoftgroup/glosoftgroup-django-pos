@@ -1,5 +1,5 @@
 {% load staticfiles %}
-{% if sales %}
+
       <div class="panel panel-flat">
       <div class="panel-body">
         <div class="row">
@@ -9,7 +9,7 @@
                   <caption style="margin-bottom: 10px;">
                    </caption> 
                       <thead style="border-top:1px solid #ddd;">
-                        <tr>
+                        <tr class="bg-primary">
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
                           <th>Client Name</th>
@@ -32,21 +32,24 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
                           </tr>
                         {% endfor %}
-                        {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                         {% else %}
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Reports Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
                  </table>
         </div>
-         <div class="my-paginate">
-            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
-              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
-            </div>
-          </div>
+          {% if sales %}
+             <div class="my-paginate">
+                <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+                </div>
+              </div>
+          {% endif %}
           </div>
         </div>
+          {% if sales %}
          <div class="row">
             <div class="col-md-10 col-md-offset-1">
                <p class="text-center" style="margin: 20px 0px;">
@@ -71,6 +74,7 @@
                 <span>Report pullled by User</span></p>
             </div>
           </div>
+          {% endif %}
       </div>
     </div>
     <!-- Core Scripts - Include with every page -->
@@ -171,14 +175,3 @@
 
    });
  </script>
-{% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-       No sales summary available for {{date}}
-       </div>
-      </div>
-    </div>
-  </div>
- {% endif %}

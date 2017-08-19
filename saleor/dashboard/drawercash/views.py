@@ -11,6 +11,8 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
+from django.db.models import Q
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
@@ -26,24 +28,178 @@ error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
 def transactions(request):
+	try:
+		transactions = DrawerCash.objects.all().order_by('-id')
+		page = request.GET.get('page', 1)
+		paginator = Paginator(transactions, 10)
+		try:
+			transactions = paginator.page(page)
+		except PageNotAnInteger:
+			transactions = paginator.page(1)
+		except InvalidPage:
+			transactions = paginator.page(1)
+		except EmptyPage:
+			transactions = paginator.page(paginator.num_pages)
+		user_trail(request.user.name, 'accessed transaction', 'view')
+		info_logger.info('User: ' + str(request.user.name) + 'accessed transaction:')
+		return TemplateResponse(request, 'dashboard/cashmovement/transactions.html',{'transactions':transactions, 'pn': paginator.num_pages})
+	except TypeError as e:
+		error_logger.error(e)
+		return TemplateResponse(request, 'dashboard/cashmovement/transactions.html', {'transactions':transactions, 'pn': paginator.num_pages})
+
+def transaction_pagination(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+
 	transactions = DrawerCash.objects.all().order_by('-id')
-	user_trail(request.user.name, 'accessed transaction', 'view')
-	info_logger.info('User: ' + str(request.user.name) + 'accessed transaction:')
-	return TemplateResponse(request, 
-							'dashboard/cashmovement/transactions.html', 
-							{'transactions':transactions})
+	if list_sz:
+		paginator = Paginator(transactions, int(list_sz))
+		transactions = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/cashmovement/pagination/p2.html',
+								{'transactions':transactions, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+	else:
+		paginator = Paginator(transactions, 10)
+	if p2_sz:
+		paginator = Paginator(transactions, int(p2_sz))
+		transactions = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/cashmovement/pagination/paginate.html', {"transactions":transactions})
+	try:
+		transactions = paginator.page(page)
+	except PageNotAnInteger:
+		transactions = paginator.page(1)
+	except InvalidPage:
+		transactions = paginator.page(1)
+	except EmptyPage:
+		transactions = paginator.page(paginator.num_pages)
+	return TemplateResponse(request, 'dashboard/cashmovement/pagination/paginate.html', {"transactions":transactions})
+
+@staff_member_required
+def transaction_search(request):
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size', 10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get('q')
+		if list_sz is None:
+			sz = 10
+		else:
+			sz = list_sz
+
+		if q is not None:
+			queryset_list = DrawerCash.objects.filter(
+				Q(user__name__icontains=q) |
+				Q(user__email__icontains=q) |
+				Q(terminal__terminal_name__icontains=q) |
+				Q(trans_type__icontains=q) |
+				Q(manager__name__icontains=q) |
+				Q(manager__email__icontains=q)
+			).order_by('-id')
+			paginator = Paginator(queryset_list, 10)
+
+			try:
+				queryset_list = paginator.page(page)
+			except PageNotAnInteger:
+				queryset_list = paginator.page(1)
+			except InvalidPage:
+				queryset_list = paginator.page(1)
+			except EmptyPage:
+				queryset_list = paginator.page(paginator.num_pages)
+			transactions = queryset_list
+			if p2_sz:
+				transactions = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/cashmovement/pagination/paginate.html', {"transactions":transactions})
+
+			return TemplateResponse(request, 'dashboard/cashmovement/pagination/search.html',
+			{"transactions":transactions, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 @staff_member_required
 # @permission_decorator('userprofile.view_user')
 def terminals(request):
 	try:
 		users = Terminal.objects.all().order_by('-id')
+		page = request.GET.get('page', 1)
+		paginator = Paginator(users, 10)
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except InvalidPage:
+			users = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
 		user_trail(request.user.name, 'accessed Terminals', 'view')
 		info_logger.info('User: ' + str(request.user.name) + ' accessed terminals')
-		return TemplateResponse(request, 'dashboard/terminal/terminals.html', {'users':users})
+		return TemplateResponse(request, 'dashboard/terminal/terminals.html',{'users': users, 'pn': paginator.num_pages})
 	except TypeError as e:
 		error_logger.error(e)
-		return HttpResponse('error accessing users')
+		return TemplateResponse(request, 'dashboard/terminal/terminals.html', {'users': users, 'pn': paginator.num_pages})
+
+def terminal_pagination(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+
+	users = Terminal.objects.all().order_by('-id')
+	if list_sz:
+		paginator = Paginator(users, int(list_sz))
+		users = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/terminal/pagination/p2.html',
+								{'users':users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+	else:
+		paginator = Paginator(users, 10)
+	if p2_sz:
+		paginator = Paginator(users, int(p2_sz))
+		users = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/terminal/pagination/paginate.html', {"users":users})
+
+	try:
+		users = paginator.page(page)
+	except PageNotAnInteger:
+		users = paginator.page(1)
+	except InvalidPage:
+		users = paginator.page(1)
+	except EmptyPage:
+		users = paginator.page(paginator.num_pages)
+	return TemplateResponse(request, 'dashboard/terminal/pagination/paginate.html', {"users":users})
+
+@staff_member_required
+def terminal_search(request):
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size', 10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get('q')
+		if list_sz is None:
+			sz = 10
+		else:
+			sz = list_sz
+
+		if q is not None:
+			queryset_list = Terminal.objects.filter(
+				Q(terminal_name__icontains=q)|
+				Q(terminal_number__icontains=q)
+			).order_by('-id')
+			paginator = Paginator(queryset_list, 10)
+
+			try:
+				queryset_list = paginator.page(page)
+			except PageNotAnInteger:
+				queryset_list = paginator.page(1)
+			except InvalidPage:
+				queryset_list = paginator.page(1)
+			except EmptyPage:
+				queryset_list = paginator.page(paginator.num_pages)
+			users = queryset_list
+			if p2_sz:
+				users = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/terminal/pagination/paginate.html', {"users":users})
+
+			return TemplateResponse(request, 'dashboard/terminal/pagination/search.html',
+			{"users":users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
 @permission_decorator('userprofile.add_terminal')

@@ -1,0 +1,37 @@
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load static %}
+
+{% if locations %}
+  {% for location in locations %}
+    <tr class="td" data-href="{% url 'dashboard:product-stock-location-edit' location.pk %}">
+      <td>{{ forloop.counter }}</td>
+      <td>{{ location }}</td>
+      {% if perms.product.change_stocklocation or perms.product.delete_stocklocation %}
+     <td class="text-center">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            action <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu edit-dropdown">
+         {% if perms.product.change_stocklocation %}
+            <li><a href="{% url 'dashboard:product-stock-location-edit' location.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+         {% endif %}
+         {% if perms.product.delete_stocklocation %}
+            <li>
+                <a data-ta="#modal_instance" data-title="Delete Location {{ location.name }} ?" data-href="{% url 'dashboard:product-stock-location-delete' location.pk %}" data-name="{{ location.name }}" data-id="{{ location.pk }}"
+         class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+         </a>
+            </li>
+         {% endif %}
+          </ul>
+        </div>
+
+      </td>
+    {% endif %}
+    </tr>
+  {% endfor %}
+{% else %}
+<tr><td colspan="2"><h2 class="text-center">No Locations Available</h2></td></tr>
+{% endif %}

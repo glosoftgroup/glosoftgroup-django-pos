@@ -81,7 +81,7 @@
         </div>
       </div>
    </div>
-  {% if expenses %}
+
   <div class="col-md-12">
    <div id="pagination-div">
       <!-- Header and footer fixed -->
@@ -104,6 +104,7 @@
                   </tr>
                 </thead>
                 <tbody id="tb">
+                {% if expenses %}
                   {% for expense in expenses %}
                   <tr class='clickable-row' id="{{user.pk }}">
                     <td>{{ expense.expense_date }}</td>
@@ -129,32 +130,33 @@
                     {% endif %}
                   </tr>
                   {% endfor %}
+                {% else %}
+                    <tr>
+                      <td colspan="6">
+                        <h2 class="text-center">
+                          No Expenses Available
+                        </h2>
+                      </td>
+                    </tr>
+                {% endif %}
                   </tbody>
            </table>
 
         </div>
         </div>
-         <div class="my-paginate">
-            <div class="text-center bootpag-callback" style="padding:20px;">
-              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav">Page 1</div>
-            </div>
-            <input type="hidden" id="page_size" val="">
-          </div>
+          {% if expenses %}
+             <div class="my-paginate">
+                <div class="text-center bootpag-callback" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav">Page 1</div>
+                </div>
+                <input type="hidden" id="page_size" val="">
+              </div>
+          {% endif %}
       </div>
     </div><!-- pagination -->
   </div>
-     {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No Employees to display
-       </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
+
 </div>
 
 <!-- Blue modal -->

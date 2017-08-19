@@ -16,8 +16,12 @@ urlpatterns = [
         url(r'^terminal_update(?P<pk>[0-9]+)/$', views.terminal_update, name='terminal-update'),
         url(r'^detail/(?P<pk>[0-9]+)/$', views.terminal_detail, name='terminal-detail'),
         url(r'^delete/(?P<pk>[0-9]+)/$', views.terminal_delete, name='terminal-delete'),
+        url(r'^terminal/paginate/$', views.terminal_pagination, name='terminal-paginate'),
+        url(r'^terminal/search/$', views.terminal_search, name='terminal-search'),
         # cashmovement urls
         url(r'^transations/$', views.transactions, name='transactions'),
+        url(r'^transaction/paginate/$', views.transaction_pagination, name='transaction-paginate'),
+        url(r'^transaction/search/$', views.transaction_search, name='transaction-search'),
         ]
 
 if settings.DEBUG:

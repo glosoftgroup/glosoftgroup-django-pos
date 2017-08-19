@@ -1,5 +1,5 @@
 {% load staticfiles %}
-{% if purchases %}
+
       <div class="panel panel-flat">
       <div class="panel-body">
         <div class="row">
@@ -18,6 +18,7 @@
                         </tr>
                       </thead>
                       <tbody id="p-tb">
+                      {% if purchases %}
                       {% for purchase in purchases %}
                       <tr>
                           <td> {{purchase.created}}</td>
@@ -29,18 +30,24 @@
                           <td>{{purchase.get_total_cost}}</td>
                       </tr>
                       {% endfor %}
+                      {% else %}
+                         <tr><td colspan="6"><h2 class="text-center">No Purchase Reports Available</h2></td></tr>
+                        {% endif %}
                       </tbody>
 
                  </table>
         </div>
-         <div class="my-paginate">
-            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
-              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
-            </div>
-          </div>
+          {% if purchases %}
+             <div class="my-paginate">
+                <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+                </div>
+              </div>
+          {% endif %}
           </div>
         </div>
+          {% if purchases %}
          <div class="row">
              <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
@@ -57,6 +64,7 @@
 
               </div>
           </div>
+          {% endif %}
       </div>
     </div>
     <!-- Core Scripts - Include with every page -->
@@ -112,14 +120,3 @@
 
    });
  </script>
-{% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-       No purchases reports available {% if date %} for {{date}} {% endif %}
-       </div>
-      </div>
-    </div>
-  </div>
- {% endif %}

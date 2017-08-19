@@ -8,10 +8,8 @@
  Re-order - {{ block.super }}
 {% endblock %}
 {% block breadcrumbs %}
- 
-    <li class="active">
-      Re-order Products
-    </li>
+
+<li class="active"><a href="{% url 'dashboard:re_order' %}">Re-order Products</a></li>
 
 {% endblock %}
  {% block custom_css %}

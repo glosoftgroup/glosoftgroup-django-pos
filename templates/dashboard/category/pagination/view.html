@@ -69,7 +69,7 @@
         </div>
       </div>
    </div>
-  {% if categories %}
+
   <div class="col-md-12">
    <div id="pagination-div">
       <!-- Header and footer fixed -->
@@ -87,6 +87,7 @@
                   </tr>
                 </thead>
                 <tbody id="tb">
+                {% if categories %}
                 {% for node in categories %}
                    <tr>
                    <!-- ## -->
@@ -134,11 +135,21 @@
                       </td>
                    </tr>
                 {% endfor %}
+                {% else %}
+                <tr>
+                  <td colspan="5">
+                    <h2 class="text-center">
+                      No Categories Available
+                    </h2>
+                  </td>
+                </tr>
+                {% endif %}
                 </tbody>
            </table>
 
         </div>
         </div>
+          {% if categories %}
          <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -146,20 +157,11 @@
             </div>
             <input type="hidden" id="page_size" val="">
           </div>
+          {% endif %}
       </div>
     </div><!-- pagination -->
   </div>
-     {% else %}
-  <div class="col-md-12 animated fadeIn ">
-   <div class="panel bg-danger-600">
-     <div class="panel-body">
-       <div style="text-align: center;font-size:16px;">
-        No categories available
-       </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
+
 </div>
 
 {% include "dashboard/includes/_modal_template.html"  %}

@@ -1137,11 +1137,87 @@ def attribute_delete(request, pk):
 @staff_member_required
 @permission_decorator('product.view_stocklocation')
 def stock_location_list(request):
-    stock_locations = StockLocation.objects.all()
-    ctx = {'locations': stock_locations}
-    return TemplateResponse(
-        request, 'dashboard/product/stock_locations/list.html', ctx)
+    try:
+        stock_locations = StockLocation.objects.all().order_by('-id')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(stock_locations, 10)
+        try:
+            stock_locations = paginator.page(page)
+        except PageNotAnInteger:
+            stock_locations = paginator.page(1)
+        except InvalidPage:
+            stock_locations = paginator.page(1)
+        except EmptyPage:
+            stock_locations = paginator.page(paginator.num_pages)
+        user_trail(request.user.name, 'accessed stock_locations', 'view')
+        info_logger.info('User: ' + str(request.user.name) + 'accessed transaction:')
+        return TemplateResponse(request, 'dashboard/product/stock_locations/list.html',
+                                {'locations': stock_locations, 'pn': paginator.num_pages})
+    except TypeError as e:
+        error_logger.error(e)
+        return TemplateResponse(request, 'dashboard/product/stock_locations/list.html', {})
 
+def stock_location_pagination(request):
+    page = int(request.GET.get('page', 1))
+    list_sz = request.GET.get('size')
+    p2_sz = request.GET.get('psize')
+    select_sz = request.GET.get('select_size')
+
+
+    stock_locations = StockLocation.objects.all().order_by('-id')
+    if list_sz:
+        paginator = Paginator(stock_locations, int(list_sz))
+        stock_locations = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/product/stock_locations/pagination/p2.html',
+                                {'locations': stock_locations, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+    else:
+        paginator = Paginator(stock_locations, 10)
+	if p2_sz:
+		paginator = Paginator(stock_locations, int(p2_sz))
+		stock_locations = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/product/stock_locations/pagination/paginate.html', {'locations': stock_locations})
+	try:
+		stock_locations = paginator.page(page)
+	except PageNotAnInteger:
+		stock_locations = paginator.page(1)
+	except InvalidPage:
+		stock_locations = paginator.page(1)
+	except EmptyPage:
+		stock_locations = paginator.page(paginator.num_pages)
+	return TemplateResponse(request, 'dashboard/product/stock_locations/pagination/paginate.html', {'locations': stock_locations})
+
+@staff_member_required
+def stock_location_search(request):
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size', 10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get('q')
+		if list_sz is None:
+			sz = 10
+		else:
+			sz = list_sz
+
+        if q is not None:
+            queryset_list = StockLocation.objects.filter(
+                Q(name__icontains=q)).order_by('-id')
+            paginator = Paginator(queryset_list, 10)
+
+            try:
+                queryset_list = paginator.page(page)
+            except PageNotAnInteger:
+                queryset_list = paginator.page(1)
+            except InvalidPage:
+                queryset_list = paginator.page(1)
+            except EmptyPage:
+                queryset_list = paginator.page(paginator.num_pages)
+            stock_locations = queryset_list
+            if p2_sz:
+                stock_locations = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/product/stock_locations/pagination/paginate.html', {'locations': stock_locations})
+
+            return TemplateResponse(request, 'dashboard/product/stock_locations/pagination/search.html',
+                                    {'locations': stock_locations, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 @staff_member_required
 @permission_decorator('product.change_stocklocation')
