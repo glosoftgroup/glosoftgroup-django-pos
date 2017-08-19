@@ -1,0 +1,43 @@
+{% load materializecss %}
+<!-- stock reorder limit -->
+     <div class="col-md-12">       
+        <div class="col-md-12">
+          <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Stock Reorder Limit</h5>
+        </div>
+      <!-- stock reorder limit -->      
+      <div class="col-md-3">
+        <div class="form-group">
+            <label>Reorder Stock Threshold:</label>
+           {{ product_form.low_stock_threshold }}
+        </div>
+      </div>
+      <!-- ./stock reorder limit -->
+      <!-- supplier -->
+      <div class="col-md-3">
+        <div class="form-group" id="div_supplier">
+          <label>Supplier:</label>
+           <div class="input-group supplier-refresh">
+             {{ product_form.product_supplier }}
+             <span class="input-group-btn">
+             <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-primary "
+                data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
+                href="#modal_attribute"  data-popup="tooltip"
+                data-original-title="Add New Supplier" data-title="Add New Supplier">
+              <i class=" icon-plus-circle2"></i>   
+             </a>
+            </span>
+           </div>
+          </div>
+      </div>
+      <!-- ./supplier -->     
+      <div class="col-md-3" id="hasVariantDiv">
+        {% if not product.product_class.has_variants %}
+        <div class="row disablesku">   
+         {{ variant_form.sku|materializecss }}
+       </div>
+       {% endif %}
+      </div>
+      <div class="col-md-3">
+       <button class="btn btn-primary mt-20" id="updatestock" data-productpk="{{product.pk}}" data-stockurl="{% url 'dashboard:product-data' %}">Create</button>
+      </div>
+     </div>

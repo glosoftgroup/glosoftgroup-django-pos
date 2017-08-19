@@ -511,6 +511,45 @@ def fetch_variants32(request):
 
 @staff_member_required
 @permission_decorator('product.add_product')
+def product_data(request):
+    if request.method == 'POST':
+        pk = request.POST.get('pk')
+        # try:
+        product = Product.objects.get(pk=pk)
+        if request.POST.get('tax'):
+            try:
+                tax = ProductTax.objects.get(pk=int(request.POST.get('tax')))
+                product.product_tax = tax
+            except:
+                print('Error getting tax')
+        if request.POST.get('supplier'):
+            try:
+                supplier = Supplier.objects.get(pk=int(request.POST.get('supplier')))
+                product.product_supplier = supplier
+            except:
+                print('Error add supplier')
+        if request.POST.get('sku'):
+            #try:
+            variant = ProductVariant.objects.get(product=product)
+            variant.name = request.POST.get('sku')
+            variant.save();
+            print variant
+            #except:
+            #   print('Error adding sku')
+        if request.POST.get('wholesale_price'):
+            product.wholesale_price = request.POST.get('wholesale_price')
+        if request.POST.get('price'):
+            product.price = request.POST.get('price')
+        if request.POST.get('threshold'):
+            product.low_stock_threshold = int(request.POST.get('threshold'))
+        product.save()
+        return HttpResponse({'message':str(product)+' Added'})
+        #except:
+        #return HttpResponse('Invalid product id')
+    return HttpResponse('Invalid Method!')
+
+@staff_member_required
+@permission_decorator('product.add_product')
 def product_create(request):
     product_classes = ProductClass.objects.all().order_by('pk')
     form_classes = forms.ProductClassSelectorForm(
@@ -1661,7 +1700,7 @@ def have_variants(request):
             if has_variants.has_variants:
                 data = {'has_variants':1}
             else:
-                data = {'has_variants':0}
+                data = {'has_variants':0,'name':has_variants.name}
             return HttpResponse(json.dumps(data),content_type='application/json')
         except:
             HttpResponse('Invalid class ID')

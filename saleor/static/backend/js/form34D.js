@@ -7,15 +7,38 @@ $(function() {
   var url      = pageUrls.data('attributes');
   var addClassUrl = pageUrls.data('addclassurlb');
   var addAttrUrl = pageUrls.data('addattrurl');
+  var getDetailUrl = pageUrls.data('variantdetail');
   var addAnotherAttr = $('#add-another-attr');
   var valueBox = $('#add_value32D');
   // select selectors
   var getAttributesD = $('.getAttributesD');
   var getAttributesTwoD = $('.getAttributesTwoD');
+  
+  // get product class getDetailUrl
+  function getDetail(class_pk,getDetailUrl)
+  {
+    var dynamicData = {};
+    dynamicData["name"] = name;
+    dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+    dynamicData['class_pk'] = class_pk;
+    return $.ajax({
+      url: getDetailUrl,
+      type: "post",
+      data: dynamicData
+    });
+  }
+  // ./ porduct class detail
 
   // open modal
   modalBtnD.on('click',function(){
-  	$('#daddProductClass').modal();
+    getDetail(getProductClass(),getDetailUrl).done(function(data){
+      if(data['name'] == 'None' ){
+        alertUser('Change Sub category and try again!','bg-danger','You cannot add attributes!');
+      }else{
+        $('#daddProductClass').modal();
+      }
+    });
+  	
   });
   // alertUser
   function alertUser(msg,status='bg-success',header='Well done!')

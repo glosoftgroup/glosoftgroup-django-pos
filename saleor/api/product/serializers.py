@@ -75,8 +75,8 @@ class SalesSerializer(serializers.ModelSerializer):
 				 'amount_paid',
 				 'solditems',
 				 'customer',
-				  'mobile',
-				  'customer_name',
+				 'mobile',
+				 'customer_name',
 				)
 
 	def validate_terminal(self,value):

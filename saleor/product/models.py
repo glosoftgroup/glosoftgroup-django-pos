@@ -135,7 +135,7 @@ class Product(models.Model, ItemRange, index.Indexed):
         ProductTax, related_name='producttax',blank=True, null=True,
         verbose_name=pgettext_lazy('Product field', 'product class'))
     name = models.CharField(
-        pgettext_lazy('Product field', 'name'), max_length=128)
+        pgettext_lazy('Product field', 'name'),unique=True, max_length=128)
     description = models.TextField(
         verbose_name=pgettext_lazy('Product field', 'description'), blank=True, null=True)
     categories = models.ManyToManyField(
@@ -162,7 +162,7 @@ class Product(models.Model, ItemRange, index.Indexed):
         pgettext_lazy('Product field', 'is featured'), default=False)
     low_stock_threshold = models.IntegerField(
         pgettext_lazy('Product field', 'low stock threshold'),
-        validators=[MinValueValidator(0)], default=Decimal(10))
+        validators=[MinValueValidator(0)], null=True,blank=True, default=Decimal(10))
     
 
     objects = ProductManager()

@@ -159,7 +159,7 @@
               
               <div class="panel-body">
                 <div class="tabbable ">
-                    {% if product.pk %}
+                   
                   <ul class="nav nav-tabs nav-tabs-highlight">
                   <!-- general settings tab -->
                    {% if request.GET.tab %}                   
@@ -169,33 +169,42 @@
                     {% endif %}
                         <a href="#bordered-tab1" data-toggle="tab">General Details</a>
                       </li>
-                    {% if product.pk %}
+                     <!-- if product.pk %} -->
+                     <!-- pricing tab -->
+                     <!-- variant tab -->
+                    {% if request.GET.tab == 'pricing'  %}                   
+                     <li class="active">
+                    {% else %}
+                      <li>             
+                    {% endif %}
+                    <a href="#bordered-tax" class="tabProductAdded" data-toggle="tab">Product Pricing/Tax</a></li>
                     <!-- variant tab -->
                     {% if request.GET.tab == 'variants'  %}                   
                      <li class="active">
                     {% else %}
                       <li>             
                     {% endif %}
-                    <a href="#bordered-tab2" data-toggle="tab">Product Variant</a></li>
+                    <a href="#bordered-tab2" class="tabProductAdded" data-toggle="tab">Product Variant</a></li>
                     <!-- stock tab -->
                    {% if request.GET.tab == 'stock'  %}                   
                      <li class="active">
                     {% else %}
                       <li>             
                     {% endif %}
-                    <a href="#stock-tab" data-toggle="tab">Stock</a></li>
+                    <a href="#stock-tab" class="tabProductAdded" data-toggle="tab">Stock</a></li>
                     <!-- images tab -->
                     {% if request.GET.tab == 'images'  %}                   
                      <li class="active">
                     {% else %}
-                      <li>             
+                      <li >             
                     {% endif %}
                     
-                    <a href="#images-tab" data-toggle="tab">Images</a></li>
-                    {% endif %}
+                    <a href="#images-tab" class="tabProductAdded" data-toggle="tab">Images</a>
+                    </li>
+                     <!-- endif %} -->
                     
                   </ul>
-                    {% endif %}
+                    
                   <div class="tab-content">
                   {% if request.GET.tab %}                   
                      <div class="tab-pane has-padding" id="bordered-tab1">            
@@ -302,134 +311,25 @@
         </div>
       </div>
       <!-- ./product attribute -->
-     
-     </div>
-
-     <!-- stock reorder limit -->
-     <div class="col-md-12">       
-        <div class="col-md-12">
-          <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Stock Reorder Limit</h5>
-        </div>
-      <!-- stock reorder limit -->      
-      <div class="col-md-3">
-        <div class="form-group">
-            <label>Reorder Stock Threshold:</label>
-           {{ product_form.low_stock_threshold }}
-        </div>
-      </div>
-      <!-- ./stock reorder limit -->
-      <!-- supplier -->
-      <div class="col-md-4">
-        <div class="form-group" id="div_supplier">
-          <label>Supplier:</label>
-           <div class="input-group supplier-refresh">
-             {{ product_form.product_supplier }}
-             <span class="input-group-btn">
-             <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-primary "
-                data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
-                href="#modal_attribute"  data-popup="tooltip"
-                data-original-title="Add New Supplier" data-title="Add New Supplier">
-              <i class=" icon-plus-circle2"></i>   
-             </a>
-            </span>
-           </div>
-          </div>
-      </div>
-      <!-- ./supplier -->     
-      <div class="col-md-3" id="hasVariantDiv">
-        {% if not product.product_class.has_variants %}
+  <div class="hidden"> 
+   {% if product.pk %}
+   {{ product_form.price }}
+    {% if not product.product_class.has_variants %}
         <div class="row">   
          {{ variant_form.sku|materializecss }}
        </div>
        {% endif %}
-      </div>
-     </div>
+   {% else %}
+    <div class="col-md-9">
+    <input class="form-control" id="id_price" name="price" value="0" required="" type="number">
+    <input class="form-control validate" id="id_variant-sku" maxlength="32" name="variant-sku" value="EN000-1" required="required" type="text">
+    </div>  
+    {% endif %}    
+    
+  </div>
 
-     <!-- Product Pricing Details -->
-     <div class="col-md-12">       
-        <div class="col-md-12">
-          <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Product Pricing Details</h5>
-        </div>
-        <div class="col-md-12">
-          <div class="row">
-            <div class="col-md-4">
-              <div class="form-group" id='tax_field'>
-                <label>Tax: % </label>
-                <div class="input-group tax-refresh">
-                {{ product_form.product_tax }}
-                  <div class="input-group-btn">
-                      <a id="add-new-tax" onclick="return false;" class="btn btn-icon bg-primary "
-                        href="#modal_attributes"  data-title="Add New Tax">
-                      <i class=" icon-plus-circle2"></i>
-                     </a>
-                  </div>
-                 </div>
-              </div>
-            </div>
-          </div>
-          
 
-        </div>
-      <!-- Retail price inclusive tax -->
-      <div id="pricingDiv">
-      <div class="row" style="margin-bottom:20px;">
-      <div class="col-md-4">
-        <div class="form-group">
-            <label class="col-md-12">Retail Price:<i class='text-danger'>*</i><span class="text-muted text-small">(Inclusive Tax)</span></label>
-            {{ product_form.price }}                
-        </div>
-      </div>
-      <!-- -->
-      <!-- Retail Tax -->
-      <div class="col-md-4">
-        <div class="form-group">
-          <label class="col-md-12 text-muted">Retail Tax:</label>
-            <span class="col-md-12">
-           <input type="disabled" name="retail_tax" id="retail_tax" class="form-control" value="" disabled="">
-           </span>                  
-        </div>
-      </div>
-      <!-- (Before Tax) -->
-      <div class="col-md-4">
-         <div class="form-group">
-          <label class="col-md-12 text-muted">Retail Price:<span class="text-muted text-small">(Before Tax)</span></label>
-          <span class="col-md-12">
-           <input type="disabled" name="retail_plus_tax" id="retail_plus_tax" class="form-control" value="" disabled="">
-          </span>                  
-        </div>
-      </div> 
-      <!--  -->
-      </div>
-     <div class="row" style="margin-bottom:20px;">
-      <!-- wholesale Price: -->
-      <div class="col-md-4">
-        <div class="form-group">
-          <label class="col-md-12">wholesale Price:<span class="text-muted text-small">(Inclusive Tax)</span></label>
-          {{ product_form.wholesale_price }}                     
-        </div>
-      </div>  
-      <!-- Wholesale Tax: -->
-      <div class="col-md-4">
-        <div class="form-group">
-            <label class="col-md-12 text-muted">Wholesale Tax:</label>
-            <span class="col-md-12">
-           <input type="disabled" name="wholesale_tax" id="wholesale_tax" class="form-control" value="" disabled="">
-           </span>                  
-          </div>
-      </div>
-      <!-- wholesale price before tax  -->
-      <div class="col-md-4">
-        <div class="form-group">
-          <label class="col-md-12 text-muted">wholesale Price:(Before Tax)</label>
-          <span class="col-md-12">
-            <input type="disabled" name="wholesale_plus_tax" id="wholesale_plus_tax" class="form-control" value="" disabled="">
-         </span>                  
-        </div> 
-      </div>
-        </div>
-     </div>
-     </div>
-     
+     </div>    
 
     </div>
     <!-- ./body --> 
@@ -460,6 +360,9 @@
           </form>
           <!-- /2 columns form -->
                     </div>
+  <!-- panel product pricing -->
+{% include "dashboard/product/partials/pricing.html" with product=product %}
+  <!-- ./end produc pricing -->
                     <!-- panel product variant -->
                     {% if request.GET.tab == 'variants'  %}                   
                      <div class="tab-pane has-padding active" id="bordered-tab2">
@@ -469,7 +372,9 @@
                     
                     {% if product.pk %}
                       {% if product.product_class.has_variants %}
-      <div id="variants" class="">
+      <!-- CODE V -->
+      <div id="variants" class="">      
+
         <form method="post" action="{% url 'dashboard:variant-bulk-delete' product_pk=product.pk %}" novalidate>
           {% csrf_token %}
           <div class="data-table-header-action" style="padding:8px;">
@@ -610,6 +515,10 @@
                     {% endif %}
                     
                      {% if product.pk %}
+                  <!-- CODE S -->
+      <!-- STOCK DETAILS -->
+      {% include "dashboard/product/partials/stock_details.html" with product=product %}
+
                       <div id="stock" class="card">
       <form method="post" action="{% url 'dashboard:stock-bulk-delete' product_pk=product.pk %}" novalidate>
         {% csrf_token %}
@@ -856,8 +765,9 @@
               </div>
             </div>
           </div>                
+
 </div>
-<input type="hidden" class="pageUrls" data-attributes="{% url 'dashboard:attr_list_f32b' %}" data-addattrurl="{% url 'dashboard:product-attr-add' %}" data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}" data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
+<input type="hidden" class="pageUrls" data-attributes="{% url 'dashboard:attr_list_f32b' %}" data-variantdetail="{% url 'dashboard:have-variants' %}" data-addattrurl="{% url 'dashboard:product-attr-add' %}" data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}" data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
@@ -869,6 +779,11 @@
 {% endblock %}
 
  {% block custom_js %}
+
+ {% if not product.pk %}
+ <script type="text/javascript" src="{% static 'backend/js/tabs_toggle.js' %}"></script>
+ {% endif %}
+<script type="text/javascript" src="{% static 'backend/js/addProduct.js' %}"></script>
 
  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
 

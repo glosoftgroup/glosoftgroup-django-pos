@@ -84,8 +84,16 @@ class SalesCreateAPIView(generics.CreateAPIView):
 
 
 class SalesListAPIView(generics.ListAPIView):
-    queryset = Sales.objects.all()
+    #queryset = Sales.objects.all()
     serializer_class = SalesSerializer
+    def get_queryset(self, *args, **kwargs):        
+        queryset_list = Sales.objects.all()
+        query = self.request.GET.get('q')
+        if query:
+            queryset_list = queryset_list.filter(
+                Q(invoice_number__icontains=query)               
+                ).distinct()
+        return queryset_list
 
 
 class ProductListAPIView(generics.ListAPIView):
