@@ -22,7 +22,8 @@ from .serializers import (
     CustomerListSerializer,
     ProductStockListSerializer,
     ProductListSerializer,
-    SalesSerializer,  
+    SalesSerializer, 
+    SalesListSerializer, 
      )
 from rest_framework import generics
 
@@ -85,7 +86,7 @@ class SalesCreateAPIView(generics.CreateAPIView):
 
 class SalesListAPIView(generics.ListAPIView):
     #queryset = Sales.objects.all()
-    serializer_class = SalesSerializer
+    serializer_class = SalesListSerializer
     def get_queryset(self, *args, **kwargs):        
         queryset_list = Sales.objects.all()
         query = self.request.GET.get('q')

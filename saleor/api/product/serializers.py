@@ -59,6 +59,32 @@ class TrackSerializer(serializers.ModelSerializer):
 				 )
 
 
+class SalesListSerializer(serializers.ModelSerializer):
+	url = HyperlinkedIdentityField(view_name='product-api:sales-details')
+	solditems = TrackSerializer(many=True)
+	cashier = SerializerMethodField()
+	class Meta:
+		model = Sales
+		fields = ('id',
+				 'user',
+				 'invoice_number',
+				 'total_net',
+				 'sub_total',                 
+				 'url',
+				 'balance',
+				 'terminal',
+				 'amount_paid',
+				 'solditems',
+				 'customer',
+				 'mobile',
+				 'customer_name',
+				 'cashier',
+				)
+	def get_cashier(self,obj):
+		name = User.objects.get(pk=obj.user.id)
+		return name.name
+
+
 class SalesSerializer(serializers.ModelSerializer):
 	url = HyperlinkedIdentityField(view_name='product-api:sales-details')
 	solditems = TrackSerializer(many=True)
