@@ -118,7 +118,14 @@
                         {% endwith %}
                       </td>
                       <!-- price -->
-                      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> {{product.price.gross}}</td>
+                      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+                      {% if not product.product_class.has_variants %}
+                       {{product.price.gross}}
+                      {% else %}
+                      --
+                      {% endif %}
+                       </td>
+                      
                       <!-- variants -->
                       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
 

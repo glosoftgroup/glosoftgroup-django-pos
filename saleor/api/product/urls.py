@@ -11,6 +11,7 @@ from .views import (
     SalesCreateAPIView,
     SalesDetailAPIView,
     SalesDeleteAPIView,
+    SalesUpdateAPIView,
     )
 
 
@@ -23,6 +24,7 @@ urlpatterns = [
     url(r'^customer/list/$', CustomerListAPIView.as_view(), name='customer-list'),
     url(r'^customer-details/(?P<pk>[0-9]+)/$', CustomerDetailAPIView.as_view(), name='costomer-detail'),
     url(r'^list-orders/$', SalesListAPIView.as_view(), name='list-orders'),
+    url(r'^sale-edit/(?P<pk>[0-9]+)/$', SalesUpdateAPIView.as_view(), name='update-view'),
     url(r'^create-order/$', SalesCreateAPIView.as_view(), name='create-order'),
     url(r'^sales-details/(?P<pk>[0-9]+)/$', SalesDetailAPIView.as_view(), name='sales-details'),
     url(r'^sales-delete/(?P<pk>[0-9]+)/$', SalesDeleteAPIView.as_view(), name='sales-delete'),

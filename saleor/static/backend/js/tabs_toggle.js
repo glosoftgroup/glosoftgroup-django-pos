@@ -22,7 +22,7 @@ $(function() {
  	var dt = new Date();
     var time = dt.getHours() + "-" + dt.getMinutes() + "-" + dt.getSeconds();
     var nSku = id_name.val()+time+'x';
- 	$('#id_variant-sku').val(nSku);
+ 	$('#idvariant-sku').val(nSku);
  });
  //***********
 });

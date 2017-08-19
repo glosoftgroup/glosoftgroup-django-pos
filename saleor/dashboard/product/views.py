@@ -644,7 +644,7 @@ def product_edit(request, pk):
     form = forms.ProductForm(request.POST or None, instance=product)
     variants_delete_form = forms.VariantBulkDeleteForm()
     stock_delete_form = forms.StockBulkDeleteForm()
-
+    pc = ProductClass.objects.filter(pk=product.product_class.pk).get().variant_attributes.all()
     if edit_variant:
         variant = variants.first()
         variant_form = forms.ProductVariantForm(
@@ -660,7 +660,7 @@ def product_edit(request, pk):
             'Dashboard message', 'Updated product %s') % product
         messages.success(request, msg)
         return redirect('dashboard:product-update', pk=product.pk)
-    ctx = {'attributes': attributes, 'images': images, 'product_form': form,
+    ctx = {'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
            'product': product, 'stock_delete_form': stock_delete_form,
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
