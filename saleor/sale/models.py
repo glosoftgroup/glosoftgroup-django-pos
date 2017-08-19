@@ -153,6 +153,8 @@ class Sales(models.Model):
 		
 	def __str__(self):
 		return self.invoice_number
+	def __unicode__(self):
+   		return unicode(self.invoice_number)
 								
 class SoldItem(models.Model):
 	sales = models.ForeignKey(Sales,related_name='solditems',on_delete=models.CASCADE)
@@ -177,6 +179,9 @@ class SoldItem(models.Model):
 		ordering = ['order']
 	def __unicode__(self):
 		return '%d: %s' % (self.order,self.product_name)
+
+	def __str__(self):
+		return self.product_name
 
 class DrawerCash(models.Model):
 	trans_type = models.CharField(

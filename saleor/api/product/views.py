@@ -23,7 +23,8 @@ from .serializers import (
     ProductStockListSerializer,
     ProductListSerializer,
     SalesSerializer, 
-    SalesListSerializer, 
+    SalesListSerializer,
+    SalesUpdateSerializer, 
      )
 from rest_framework import generics
 
@@ -82,6 +83,10 @@ class SalesCreateAPIView(generics.CreateAPIView):
                                            amount=serializer.data['total_net'],
                                            trans_type='sale')
         
+
+class SalesUpdateAPIView(generics.RetrieveUpdateAPIView):    
+    queryset = Sales.objects.all()
+    serializer_class = SalesUpdateSerializer
 
 
 class SalesListAPIView(generics.ListAPIView):

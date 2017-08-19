@@ -1,0 +1,80 @@
+<div class="data-table-container">
+            <table class="table  datatable-header-footer">
+              {% if variants %}
+                <thead>
+               
+                  <tr class="bg-primary">
+                    <th class="bulk-checkbox">
+                      <input type="checkbox" id="select-all-variants" class="filled-in select-all switch-actions">
+                      <label for="select-all-variants"></label>
+                    </th>
+                    <th>
+                      {% trans "SKU" context "Product variant table header" %}
+                    </th>
+                    {% for attribute in attributes %}
+                      <th>
+                        {{ attribute.name|capfirst }}
+                      </th>
+                    {% endfor %}                  
+                    
+                    <th class="right-align">
+                      Retail Price
+                    </th>
+                    <th class="right-align">
+                      Wholesale Price
+                    </th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for variant in variants %}
+                    <tr data-action-go="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}" title="{% trans "Edit variant" context "Product variant table link title" %}">
+                      <td class="bulk-checkbox ignore-link">
+                        <input id="id_variants_{{ variant.id }}" name="items" type="checkbox" value="{{ variant.id }}" class="filled-in switch-actions">
+                        <label for="id_variants_{{ variant.id }}"></label>
+                      </td>
+                      <td>
+                        {{ variant.sku }}
+                      </td>
+                      {% for attr_display in variant|attributes_values_with_empty:attributes %}
+                        <td>
+                          {{ attr_display }}
+                        </td>
+                      {% endfor %}
+                     
+                      <!-- retail price -->
+                      <td class="right-align">
+                {% gross variant.get_price_per_item html=True %}
+                      </td>
+                      <!-- wholesale price -->
+                      <td class="right-align">
+                      {% if variant.get_wholesale_price_per_item %}
+                {% gross variant.get_wholesale_price_per_item html=True %}
+                     {% endif %}
+                      </td>
+                      <!-- actions -->
+                    <td class="text-center">
+                      <ul class="icons-list">
+                        <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me"></i></a></li>
+                        <li>
+                   
+                        </li>
+                       
+                      </ul>
+                    </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              {% else %}
+                  <tbody>
+                    <tr>
+                      <td>
+                        <span>
+                          {% trans "There are no variants for this product" context "Empty product variant table message" %}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+              {% endif %}
+            </table>
+          </div>

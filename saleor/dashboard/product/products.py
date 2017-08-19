@@ -44,7 +44,7 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def view(request):
 	try:
-		queryset_list = Product.objects.all()
+		queryset_list = Product.objects.all().order_by('-id')
 		page = request.GET.get('page', 1)
 		paginator = Paginator(queryset_list, 10)
 		try:
@@ -86,7 +86,7 @@ def paginate(request):
 	select_sz = request.GET.get('select_size')
 
 	try:
-		queryset_list = Product.objects.all()
+		queryset_list = Product.objects.all().order_by('-id')
 		if list_sz:
 			paginator = Paginator(queryset_list, int(list_sz))
 			queryset_list = paginator.page(page)
@@ -125,7 +125,7 @@ def paginate(request):
 
 @staff_member_required
 def product_filter(request):
-	queryset_list = Product.objects.all()
+	queryset_list = Product.objects.all().order_by('-id')
 	#paginator = Paginator(queryset_list, 10)
 	page = request.GET.get('page',1)
 	size = request.GET.get('size',10)
