@@ -381,14 +381,14 @@
         <form method="post" action="{% url 'dashboard:variant-bulk-delete' product_pk=product.pk %}" novalidate>
           {% csrf_token %}
           <div class="data-table-header-action" style="padding:8px;">
-          <div class='col-md-12'>
+
+          <!-- code add/edit -->
             <a href="{% url 'dashboard:variant-add' product_pk=product.pk %}" class="btn-data-table btn-show-when-unchecked btn btn-primary">
               {% trans "Add" context "Dashboard add action" %}
             </a>
             <a href="#modal-product-variant-delete" class="modal-trigger btn-data-table btn-show-when-checked btn btn-danger" style="display:none" hidden>
               {% trans "Delete" context "Dashboard delete action" %}
             </a>
-          </div>
 
             <div class="modal fade" id="modal-product-variant-delete">
             <div class="modal-dialog">
