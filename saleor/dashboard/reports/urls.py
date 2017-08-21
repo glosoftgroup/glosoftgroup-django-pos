@@ -43,7 +43,7 @@ urlpatterns = [
 			(views.balancesheet_reports), name='balancesheet_reports'),
 		url(r'^chart/$', views.get_dashboard_data, name='chart'), 
 		url( r'^sales_search/$', views.sales_search, name = 'sales_search' ),
-		url( r'^sales_paginate/$', views.sales_paginate, name = 'sales_paginate' ),
+		url( r'^sales_paginate/$', views.sales_paginate, name = 'sales_paginate'),
 		url(r'^cpdf/(?P<image>.+)/$', pdfs.chart_pdf, name='chart_pdf'),
 		url(r'^csv/(?P<image>.+)/$', pdfs.sales_export_csv, name='chart_csv'),
 

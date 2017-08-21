@@ -104,7 +104,12 @@
                            </div>
                         </div>
                       </div>            
-                     
+                     <div class="row">
+                          <div class="col-md-12">
+                            <label for="mobile">Description</label>
+                              <textarea class="form-control" id="description" name="description" placeholder="Example: They Supply Unga every week"></textarea>
+                       </div>
+                     </div>
                     </div>
                   </div>
                   <div class="row">
@@ -167,13 +172,16 @@ function disable_profile_tab(){
           digits: true,          
         },
         mobile:{
-          required:true,
-          digits: true,
-          minlength: 6
+            required:true,
+            digits: true,
+            minlength: 6
+        },
+        description:{
+            required:true
         },
       website:{
-          required:false,          
-          minlength: 5
+            required:false,
+            minlength: 5
         }
 
     },
@@ -185,6 +193,9 @@ function disable_profile_tab(){
       password:{
         required: "please provide a password",
         minlength: "password must be atleast 6 characters long"
+      },
+      description:{
+        required:"Please enter the description to describe the supplier"
       },
       confirm_password:{
         required: "please provide a password",
@@ -227,7 +238,8 @@ function disable_profile_tab(){
                        $("#website").val('');
                        $("#street2").val('');
                        $("#street1").val('');
-                       $("#city").val('');           
+                       $("#city").val('');
+                       $("#description").val('');
 
                        $.jGrowl('Supplier added successfully, now add permissioins', {
                           header: 'Well done!',

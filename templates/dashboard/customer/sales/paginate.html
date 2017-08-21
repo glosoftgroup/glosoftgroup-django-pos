@@ -1,0 +1,24 @@
+{% load staticfiles %}
+ {% if sales %}
+    {% for sale in sales %}
+      <tr class='clickable-row' id="{{sale.pk }}">
+        <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+        <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.invoice_number }}</td>
+          <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+        <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+        <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.terminal}}</td>
+        <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.quantity}}</td>
+        <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.total_net}}</td>
+      </tr>
+        <script type="text/javascript">
+        $(document).ready(function(){
+
+            $(".td").click(function(){
+                  window.location = $(this).data("href");
+              });
+        });
+        </script>
+    {% endfor %}
+    {% else %}
+     <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+    {% endif %}

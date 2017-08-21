@@ -5,7 +5,7 @@
 {% load prices_i18n %}
 
 {% block title %}
-  {% trans "Terminals" context "Dashboard terminal list" %} - {{ block.super }}
+  Tills
 {% endblock %}
 
 {% block menu_terminal_class %}active{% endblock %}
@@ -20,7 +20,7 @@
 {% block header_extra %}
 {% endblock %}
 {% block breadcrumbs %}
-<li class="active"><a href="{% url 'dashboard:terminals' %}">Terminals</a></li>
+<li class="active"><a href="{% url 'dashboard:terminals' %}">Tills</a></li>
 {% endblock %}
 {% block content %}
  <div class="row">
@@ -33,14 +33,14 @@
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
                 {% if perms.sale.add_terminal %}
-                    <a href="{% url 'dashboard:terminal-add' %}" class="btn btn-primary hvr-glow btn-raised legitRipple waves-effect waves-light"><i class="icon-plus2 position-left"></i>Add Terminal</a>
+                    <a href="{% url 'dashboard:terminal-add' %}" class="btn btn-primary hvr-glow btn-raised legitRipple waves-effect waves-light"><i class="icon-plus2 position-left"></i>Add Till</a>
                 {% endif %}
               </div>
             </div>
             <div class="col-md-6">
-             <label>Search Terminal</label>
+             <label>Search Till</label>
               <div class="form-group form-group-material has-feedback">
-                <input class="form-control search_terminal" placeholder="Search terminal" type="text">
+                <input class="form-control search_terminal" placeholder="Search Till" type="text">
                 <div class="form-control-feedback">
                   <i class="icon-search4 text-size-base"></i>
                 </div>
@@ -129,7 +129,7 @@
                          {% endif %}
                          {% if perms.sale.delete_terminal %}
                             <li>
-                          <a data-ta="#modal_instance" data-title="Delete Terminal  {{ user.terminal_name }} ?" data-href="{% url 'dashboard:terminal-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                          <a data-ta="#modal_instance" data-title="Delete Till  {{ user.terminal_name }} ?" data-href="{% url 'dashboard:terminal-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
                          class="modal-trigger del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
                          </a>
                         </li>
@@ -140,7 +140,7 @@
                   </tr>
                   {% endfor %}
                 {% else %}
-                   <tr><td colspan="8"><h2 class="text-center">No Terminals Available</h2></td></tr>
+                   <tr><td colspan="8"><h2 class="text-center">No Tills Available</h2></td></tr>
                {% endif %}
                   </tbody>
 
@@ -175,7 +175,7 @@
          {% csrf_token %}
          <div class="">
            <h5 class="text-center">
-             Confirm Terminal delete!
+             Confirm Till delete!
            </h5>
            <input type="hidden" class="item-id" />
            </div>

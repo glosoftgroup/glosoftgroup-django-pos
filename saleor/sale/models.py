@@ -106,7 +106,7 @@ class Sales(models.Model):
 		Customer, blank=True, null=True, related_name='customers',
 		verbose_name=pgettext_lazy('Sales field', 'customer'))
 
-	mobile = models.CharField(max_length=20, blank=True)
+	mobile = models.CharField(max_length=20, blank=True, null=True)
 	customer_name = models.CharField(max_length=100, null=True, blank=True)
 
 	user = models.ForeignKey(
@@ -200,6 +200,7 @@ class DrawerCash(models.Model):
 	created = models.DateTimeField(
 		pgettext_lazy('DrawerCash field', 'created'),
 		default=now, editable=False)
+	note = models.CharField(max_length=1000, null=True, blank=True)
 
 	class Meta:		
 		verbose_name = pgettext_lazy('DrawerCash model', 'DrawerCash')

@@ -10,8 +10,6 @@
  <TD>{{ address.email }}</TD>
  <!-- pphone -->
  <td>{{ address.phone }}</td>
- <!-- Name -->
- <td>{{ address }}</td>
  <!-- adddress -->
  <td>
    <span>
@@ -20,8 +18,8 @@
    </span>
  </td>
  <td>
-   <a href="#modal_instance" data-title="Delete  Category" class="modal-trigger-ajax" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:contact-delete' pk=address.pk %}"
-><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>Remove category
+   <a href="#modal_instance" data-title="Delete  Category" class="btn btn-default modal-trigger-ajax" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:contact-delete' pk=address.pk %}"
+><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i> Remove
 </a>
  </td>
  <script type="text/javascript">
