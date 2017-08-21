@@ -8,7 +8,7 @@
   Add Expense
 {% endblock %}
  {% block breadcrumbs %}
-     <li><a href="{% url 'accounts:expenses' %}">Expenses</a></li>
+     <li><a href="{% url 'accounts:personal_expenses' %}">Personal Expenses</a></li>
      <li class="active"><a href="{% url 'accounts:add_expense' %}">Add Expense</a></li>
  {% endblock %}
 {% block menu_expenses_class %}active{% endblock %}
@@ -277,13 +277,10 @@ $(document).ready(function(){
               $('#pagination-div').html(data);
         }});*/
     });
-    var petty_cash_balance;
-    $.ajax({ url: "{% url 'accounts:petty_cash_balance' %}",type: 'GET', async:false,success: function(data){
-              petty_cash_balance = data;
-        }});
+    var minimum_amount = 1;
     jQuery.validator.addMethod("greaterThanZero", function(value, element) {
-        return this.optional(element) || (parseFloat(value) <= petty_cash_balance);
-    }, "* more than petty cash amount (KShs."+ petty_cash_balance +" )");
+        return this.optional(element) || (parseFloat(value) >= minimum_amount);
+    }, "* should be more than (KShs."+ minimum_amount +" )");
 
       //** validate form & submit
       $('#expenses').validate({
@@ -324,7 +321,7 @@ $(document).ready(function(){
           var formData = new FormData(f);
           if (formData) {
                 $.ajax({
-                    url: "{% url 'accounts:add_expense_process' %}",
+                    url: "{% url 'accounts:add_personal_expense_process' %}",
                     type: "POST",
                     data: formData,
                     processData: false,
@@ -335,7 +332,7 @@ $(document).ready(function(){
                           header: 'Well done!',
                           theme: 'bg-success'
                        });
-                       window.location = "{% url 'accounts:expenses' %}";
+                       window.location = "{% url 'accounts:personal_expenses' %}";
                     },
                     error:function(error){
                       console.log(error);

@@ -51,6 +51,7 @@ error_logger = logging.getLogger('error_logger')
 def expenses(request):
     try:
         expenses = Expenses.objects.all().order_by('-id')
+        expense_types = ExpenseType.objects.all()
         page = request.GET.get('page', 1)
         paginator = Paginator(expenses, 10)
         try:
@@ -62,7 +63,8 @@ def expenses(request):
         except EmptyPage:
             expenses = paginator.page(paginator.num_pages)
         data = {
-            "expenses": expenses
+            "expenses": expenses,
+            "expense_types":expense_types
         }
         user_trail(request.user.name, 'accessed expenses', 'views')
         info_logger.info('User: ' + str(request.user.name) + 'accessed expenses page')
@@ -80,40 +82,51 @@ def expenses_paginate(request):
     list_sz = request.GET.get('size')
     p2_sz = request.GET.get('psize')
     select_sz = request.GET.get('select_size')
-
-    try:
-        expenses = Expenses.objects.all().order_by('-id')
-        if list_sz:
-            paginator = Paginator(expenses, int(list_sz))
-            expenses = paginator.page(page)
-            data = {
-                'expenses': expenses,
-                'pn': paginator.num_pages,
-                'sz': list_sz,
-                'gid': 0
-            }
-            return TemplateResponse(request, 'dashboard/accounts/expenses/p2.html', data)
-        else:
-            paginator = Paginator(expenses, 10)
+    if request.GET.get('gid'):
+        type = ExpenseType.objects.get(pk=request.GET.get('gid'))
+        expenses = Expenses.objects.filter(expense_type=type.name)
         if p2_sz:
             paginator = Paginator(expenses, int(p2_sz))
             expenses = paginator.page(page)
-            data = {
-                "expenses": expenses
-            }
-            return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', data)
+            return TemplateResponse(request,'dashboard/accounts/expenses/paginate.html',{'expenses':expenses})
 
+        paginator = Paginator(expenses, 10)
+        expenses = paginator.page(page)
+        return TemplateResponse(request,'dashboard/accounts/expenses/p2.html',{'expenses':expenses, 'pn':paginator.num_pages,'sz':10,'gid':request.GET.get('gid')})
+    else:
         try:
-            expenses = paginator.page(page)
-        except PageNotAnInteger:
-            expenses = paginator.page(1)
-        except InvalidPage:
-            expenses = paginator.page(1)
-        except EmptyPage:
-            expenses = paginator.page(paginator.num_pages)
-        return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', {"expenses": expenses})
-    except Exception, e:
-        return  HttpResponse()
+            expenses = Expenses.objects.all().order_by('-id')
+            if list_sz:
+                paginator = Paginator(expenses, int(list_sz))
+                expenses = paginator.page(page)
+                data = {
+                    'expenses': expenses,
+                    'pn': paginator.num_pages,
+                    'sz': list_sz,
+                    'gid': 0
+                }
+                return TemplateResponse(request, 'dashboard/accounts/expenses/p2.html', data)
+            else:
+                paginator = Paginator(expenses, 10)
+            if p2_sz:
+                paginator = Paginator(expenses, int(p2_sz))
+                expenses = paginator.page(page)
+                data = {
+                    "expenses": expenses
+                }
+                return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', data)
+
+            try:
+                expenses = paginator.page(page)
+            except PageNotAnInteger:
+                expenses = paginator.page(1)
+            except InvalidPage:
+                expenses = paginator.page(1)
+            except EmptyPage:
+                expenses = paginator.page(paginator.num_pages)
+            return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', {"expenses": expenses})
+        except Exception, e:
+            return  HttpResponse()
 
 def detail(request):
     status = 'read'

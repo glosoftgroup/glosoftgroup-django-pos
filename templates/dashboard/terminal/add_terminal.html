@@ -5,18 +5,18 @@
 {% load prices_i18n %}
 
 {% block title %}
-  {% trans "Terminal" context "Dashboard terminal list" %} - {{ block.super }}
+  Till
 {% endblock %}
 {% block header_extra %}
 {% endblock %}
 {% block breadcrumbs %} 
    <li>
       <a href="{% url 'dashboard:terminals' %}">
-      Terminal
+      Till
       </a>
     </li>
     <li class="active">
-      Add terminal
+      Add Till
     </li>
 {% endblock %}
 
@@ -34,7 +34,7 @@
 <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
-        <h6 class="panel-title">Create terminal Details</h6>
+        <h6 class="panel-title">Create Till Details</h6>
         <div class="heading-elements">
           <ul class="icons-list">
             <li><a data-action="collapse"></a></li>
@@ -47,7 +47,7 @@
       <div class="panel-body">
         <div class="tabbable">
           <ul class="nav nav-tabs nav-tabs-highlight">
-            <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">add terminal </a></li>
+            <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">add till </a></li>
           </ul>
 
           <div class="tab-content">
@@ -62,12 +62,12 @@
                         <div class="col-md-6">
                           <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" class="form-control" name="name" id="name" placeholder="Terminal Name">
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Till Name">
                           </div>
                         
                            <div class="form-group">
                             <label for="exampleInputPassword1">Termnial No:</label>
-                            <input type="text" class="form-control" name="nid" id="nid" placeholder="Termnial Number">
+                            <input type="text" class="form-control" name="nid" id="nid" placeholder="Till Number">
                            </div>
                            
                         </div>
@@ -83,7 +83,7 @@
                     <div class="col-md-12">
                      <div class="pull-right" style="margin-top:40px;">
                       <a href="{% url 'dashboard:terminals' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
-                      <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create Terminal <i class="icon-arrow-right14 position-right"></i></button>
+                      <button class="btn btn-primary waves-effect waves-light" id="submit" type="submit">Create Till <i class="icon-arrow-right14 position-right"></i></button>
                      </div>
                     </div>
                   </div>

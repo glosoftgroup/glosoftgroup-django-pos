@@ -812,6 +812,10 @@ $( ".check" ).on( "click", function(){
 		$(this).parent('span').addClass('checked');
 		$(this).parent().parent().parent().siblings('span').show();
 		$(this).parent().parent().parent().siblings('span').text('(granted)');
+		    if($('.check:checked').length == $('.check').length){
+				$('#edit-checkAll').prop("checked", true);
+				$('#edit-checkAll').parent('span').addClass('checked');
+			}
   }else{
 
    if($('#edit-checkAll').is(':checked')){

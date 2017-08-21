@@ -25,6 +25,7 @@ from .search.urls import urlpatterns as search_urls
 from .userprofile.urls import urlpatterns as userprofile_urls
 import notifications.urls
 from .api.product import views as api_views
+from .api.login import ObtainJSONWebToken
 from . import decorators
 
 
@@ -52,8 +53,8 @@ urlpatterns = [
     url(r'', include('payments.urls')),
     url('', include('social_django.urls', namespace='social')),
     #jwt post token code url
-    url(r'^api/auth/token/', obtain_jwt_token),
-
+    # url(r'^api/auth/token/', obtain_jwt_token),
+    url(r'^api/auth/token/', ObtainJSONWebToken.as_view()),
 ]
 
 if settings.DEBUG:

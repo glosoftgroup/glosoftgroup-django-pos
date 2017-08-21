@@ -98,8 +98,8 @@ class SalesSerializer(serializers.ModelSerializer):
 		terminal.save()		
 
 		try:
-			if validated_data.get('customer'):
-				customer = Customer.objects.get(name=validated_data.get('customer'))
+			if validated_data.get('mobile'):
+				customer = Customer.objects.get(mobile=validated_data.get('mobile'))
 			else:
 				customer = Customer.objects.get(name=validated_data.get('customer_name'))
 		except:
