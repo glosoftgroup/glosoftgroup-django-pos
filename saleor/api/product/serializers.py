@@ -129,7 +129,7 @@ class SalesSerializer(serializers.ModelSerializer):
                  'customer',
                  'mobile',
                  'customer_name',
-
+                 'status',
                 )
 
     def validate_terminal(self,value):

@@ -190,8 +190,8 @@ $(function() {
   var addClassUrl = pageUrls.data('addclassurlb');
   var addAttrUrl = pageUrls.data('addattrurl');
   var getDetailUrl = pageUrls.data('variantdetail');
-  var addAnotherAttr = $('#add-another-attr');
-  var valueBox = $('#add_value32D');
+  var addAnotherAttr = $('#add-another-attrx');
+  var valueBox = $('#add_value32Dx');
   // select selectors
   var getAttributesD = $('.xgetAttributesD');
   //var getAttributesTwoD = $('.xgetAttributesTwoD');
@@ -305,8 +305,8 @@ $(function() {
   // sdfj
 
   // add attributes
-  var attrNameBtnD = $('#attr-nameD');
-  var newValueBtnD = $('#newvalueD');
+  var attrNameBtnD = $('#attr-nameDx');
+  var newValueBtnD = $('#newvalueDx');
   var Aurl = addAttrUrl;
   function alertUser(msg,status='bg-success',header='Well done!')
   {
@@ -340,7 +340,7 @@ $(function() {
   }
 
   newValueBtnD.on('click',function(){
-    var value = $('#value32D').val();
+    var value = $('#value32Dx').val();
     //alert(Aurl);
     if(!value){ 
       alertUser('Attribute Value required!','bg-danger','Error');
@@ -348,15 +348,15 @@ $(function() {
      }
      addNValueD(Aurl,value).done(function(data){
        alertUser('Attribute added successful');
-       $('#add_value32D').empty().html(data);
-       $('#value32D').val('');
+       $('#add_value32Dx').empty().html(data);
+       $('#value32Dx').val('');
     }).fail(function(){
       alertUser('Value already added. Please enter a unique name','bg-danger','Error!');
     });
   });
 
   attrNameBtnD.on('click',function(){  
-    var atname = $('#attribute_name32D').val();
+    var atname = $('#attribute_name32Dx').val();
     if(!atname){ 
       alertUser('Attribute Name required!','bg-danger','Error');
       return false;
@@ -364,10 +364,10 @@ $(function() {
     addAttributeD(Aurl,atname).done(function(data){
      alertUser('Attribute added successful');
      Aurl = addAttrUrl+data+'/';
-     $('#attribute_name32D').attr('disabled','disabled');
+     $('#attribute_name32Dx').attr('disabled','disabled');
      attrNameBtnD.addClass('hidden');
-     $('#value-inputD').removeClass('hidden');
-     $('#newvalueD').removeClass('hidden'); 
+     $('#value-inputDx').removeClass('hidden');
+     $('#newvalueDx').removeClass('hidden'); 
      addAnotherAttr.removeClass('hidden');
   }).fail(function(){
       alertUser('Attribute name already added. Please add a unique name','bg-danger','Error!');
@@ -375,10 +375,10 @@ $(function() {
 });
 
   addAnotherAttr.on('click',function(){
-     $('#attribute_name32D').removeAttr('disabled');
+     $('#attribute_name32Dx').removeAttr('disabled');
      attrNameBtnD.removeClass('hidden');
-     $('#value-inputD').addClass('hidden');
-     $('#newvalueD').addClass('hidden'); 
+     $('#value-inputDx').addClass('hidden');
+     $('#newvalueDx').addClass('hidden'); 
      addAnotherAttr.addClass('hidden');
      valueBox.html('');
      Aurl = addAttrUrl;
