@@ -662,7 +662,7 @@
                     {{ item.location }}
                   </td>
                   <td class="right-align">
-                    {{ item.quantity }}
+                    {{ item.variant.get_stock_quantity }}
                   </td>
                   <td class="right-align">
                     {{ item.quantity_allocated }}
