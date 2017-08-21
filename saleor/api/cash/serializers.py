@@ -46,7 +46,8 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 				  'terminal',
 				  'User',
 				  'manager',
-				  'trans_type')
+				  'trans_type',
+				  'note')
 
 	def validate_terminal(self,value):
 		data = self.get_initial()
@@ -154,4 +155,4 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 										   amount=amount,
 										   trans_type=trans_type)
 		print drawer		
-		return validated_data
+return validated_data
