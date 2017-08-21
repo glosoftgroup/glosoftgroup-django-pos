@@ -8,6 +8,19 @@
 *  Latest update: Aug 19, 2017
 *
 * ---------------------------------------------------------------------------- */
+// alertUser
+function alertUser(msg,status='bg-success',header='Well done!')
+{ $.jGrowl(msg,{header: header,theme: status}); }
+//add productDetails
+function addProductDetails(dynamicData,url,method){
+  dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+  return $.ajax({
+      url: url,
+      type: method,
+      data: dynamicData
+    });
+
+}
 
 $(function() {  
  
@@ -104,15 +117,75 @@ $(function() {
 });
 /* ------------------------------------------------------------------------------
 *
-*  # adding varaings
+*  # adding varaints
 **
 * ---------------------------------------------------------------------------- */
+$(function() {
+  var addvariantBtn = $('#addvariantBtn');
+  var retailPriceId = $('#rprice');
+  var wholePriceId  = $('#wprice');
+  var dynamicVariants = $('.dynamicvxx');
+  var newSkuId = $('#new-sku-td');
+  var refreshVaraintsContent = $('#refreshvaraintscontent');
+  var json = [];
+  addvariantBtn.on('click',function(){    
+    // map each varaint
+    dynamicVariants.map(function() { 
+      //console.log($(this).data('pk'));
+      var id = $(this).data('pk');      
+      var value = $(this).val(); 
+      if(id && value){
+        json.push({'id':id,'value':value});
+      }
+      return $(this).data('pk');
+    }).get();  
+    // ./mapping    
+    
+    wholePrice  = wholePriceId.val();
+    retailPrice = retailPriceId.val();
+    newSku      = newSkuId.val();
+    if(!retailPrice || !newSku){
+      alertUser('Retail Price & SKU required','bg-danger','Fill required fields!');
+      return false;
+    }
+    dynamicData = {};
+    if(wholePrice){
+      dynamicData['wholesale'] = wholePrice;
+    }
+    if ( json.length < 1) {
+      //alertUser(json.length);
+      alertUser('Please Select variants','bg-danger','Varaints Required!');
+      return false;
+    }  
+    
+    dynamicData['price'] = retailPrice;
+    dynamicData['sku'] = newSku;
+    dynamicData['attributes'] = JSON.stringify(json);
+    dynamicData['track'] = 'adding variants';
+    dynamicData['pk'] = $(this).data('productpk');
+    var method = 'post';
+    var url = $(this).data('attrurl');
+    addProductDetails(dynamicData,url,method)
+    .done(function(data){
+      alertUser('data sent successfully');
+      json = [];
+      refreshVaraintsContent.html(data);
+    })
+    .fail(function(){
+      alertUser('Error adding attributes','bg-danger','Error!');
+      json = [];
+    });
+  });
+
+
+});
+
 $(function() {
   
   var pageUrls = $('.pageUrls');
   var modalBtnD = $('#addNewvaraints');
-  var addClassBtnD = $('#addClassBtnD');
-  var modalIdD  = $('#daddProductClass');
+  var addClassBtnD = $('#xaddClassBtnD');
+  var modalIdD  = $('#xProductClass');
   var url      = pageUrls.data('attributes');
   var addClassUrl = pageUrls.data('addclassurlb');
   var addAttrUrl = pageUrls.data('addattrurl');
@@ -120,8 +193,8 @@ $(function() {
   var addAnotherAttr = $('#add-another-attr');
   var valueBox = $('#add_value32D');
   // select selectors
-  var getAttributesD = $('.getAttributesD');
-  var getAttributesTwoD = $('.getAttributesTwoD');
+  var getAttributesD = $('.xgetAttributesD');
+  //var getAttributesTwoD = $('.xgetAttributesTwoD');
   
   // get product class getDetailUrl
   function getDetail(class_pk,getDetailUrl)
@@ -144,7 +217,7 @@ $(function() {
       if(data['name'] == 'None' ){
         alertUser('Change Sub category and try again!','bg-danger','You cannot add attributes!');
       }else{
-        $('#daddProductClass').modal();
+        modalIdD.modal();
       }
     });
     
@@ -160,7 +233,7 @@ $(function() {
   // ajax
   function addNewClassD(name,attributes,variants) {
     var dynamicData = {};    
-    dynamicData["attributes"] = JSON.stringify(attributes);
+    //dynamicData["attributes"] = JSON.stringify(attributes);
     dynamicData["name"] = name;
     dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
     dynamicData['variants']= JSON.stringify(variants);
@@ -181,7 +254,7 @@ $(function() {
   addClassBtnD.on('click',function(){
     var cname = $('#id_product_class').val();
     var attributes = getAttributesD.val();
-    var variants = getAttributesTwoD.val();
+    //var variants = getAttributesTwoD.val();
     if(!attributes && !variants){
       alertUser('Add attributes or variants!','bg-danger','Error!');
       return false;
@@ -190,9 +263,10 @@ $(function() {
       alertUser('Sub category name required!','bg-danger','Error!');
       return false;
     }
-    addNewClassD(cname,attributes,variants).done(function(data){
+    addNewClassD(cname,variants,attributes).done(function(data){
       alertUser('Sub category name required!');     
-      refreshAttributes();
+      //refreshAttributes();
+      window.location.href = $('#xaddClassBtnD').data('refreshme');
       $('#daddProductClass').modal('hide');
     }).fail(function(){
       alertUser('Variant already added. Please add a unique variant name','bg-danger','Error!');
@@ -226,28 +300,8 @@ $(function() {
     }
 });
 
-  getAttributesTwoD.on('tokenize:select', function(container){
-  $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
-   });
-  getAttributesTwoD.tokenize2({
-    placeholder: 'Select Attributes(s) (eg. Box Size, Bottle size, Book cover, weight)',
-    displayNoResultsMessage:true,
-    //searchMinLength:3,
-    sortable: true,
-    dataSource: function(search, object){
-        $.ajax(url, {
-            data: { search: search, start: 1, group:'users' },
-            dataType: 'json',
-            success: function(data){
-                var $items = [];
-                $.each(data, function(k, v){
-                    $items.push(v);
-                });
-                object.trigger('tokenize:dropdown:fill', [$items]);
-            }
-        });
-    }
-});
+  
+  
   // sdfj
 
   // add attributes
