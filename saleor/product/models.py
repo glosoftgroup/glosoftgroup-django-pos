@@ -498,6 +498,28 @@ class ProductAttribute(models.Model):
     def has_values(self):
         return self.values.exists()
 
+@python_2_unicode_compatible
+class VariantAttribute(models.Model):
+    slug = models.SlugField(
+        pgettext_lazy('Variant attribute field', 'internal name'),
+        max_length=50, unique=True)
+    name = models.CharField(
+        pgettext_lazy('Variant attribute field', 'display name'),
+        max_length=100,unique=True)
+
+    class Meta:
+        ordering = ('slug', )
+        verbose_name = pgettext_lazy('Variant attribute model', 'variant attribute')
+        verbose_name_plural = pgettext_lazy('Variant attribute model', 'variant attributes')
+
+    def __str__(self):
+        return self.name
+
+    def get_formfield_name(self):
+        return slugify('variant-attribute-%s' % self.slug)    
+    def has_values(self):
+        return self.values.exists()
+
 
 @python_2_unicode_compatible
 class AttributeChoiceValue(models.Model):

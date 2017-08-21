@@ -374,16 +374,55 @@
                       {% if product.product_class.has_variants %}
       <!-- CODE V -->
       <div id="variants" class="">
-      {% for v in pc %}      
-      <!-- v}} -->
-      {% endfor %}
+      <button data-attributes="{% url 'dashboard:attr_list_f32b' %}" class="btn btn-primary mb-5" id="addNewvaraints">New variant</button>
+      <table class="table table-hover">
+        <thead>
+        <tr class="bg-primary">  
+        <th>SKU</th>    
+        {% for v in pc %} 
+         <th>{{v}}</th>       
+        {% endfor %}
+        <th>Retail Price</th>
+        <th>Wholesale Price</th>
+        <th></th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+          <td>
+            <input type="text" id="new-sku-td" placeholder="Enter SKU" class="form-control" name='new-sku-td'>
+          </td>
+          {% for v in pc%}
+          <td>
+           <select placeholder="{{v}}" data-pk={{v.pk}} name="{{v}}" class="bootstrap-select form-control dynamicvxx">
+            <option></option>         
+            
+              {% for value in v.values.all %} 
+                <option value="{{value.pk}}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </td>
+            
+          {% endfor %}
+          <td>
+            <input type="text" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
+            </td>
+            <td>
+              <input type="text" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
+            </td>     
+            <td>
+              <button class="btn btn-xs btn-primary" id="addvariantBtn" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <!-- <button class="btn btn-primary" id="addNewvaraints">New variant</button> -->
         <form method="post" action="{% url 'dashboard:variant-bulk-delete' product_pk=product.pk %}" novalidate>
           {% csrf_token %}
           <div class="data-table-header-action" style="padding:8px;">
 
           <!-- code add/edit -->
-            <a href="{% url 'dashboard:variant-add' product_pk=product.pk %}" class="btn-data-table btn-show-when-unchecked btn btn-primary">
+            <a href="{% url 'dashboard:variant-add' product_pk=product.pk %}" class="btn-data-table btn-show-when-unchecked btn btn-primary hidden">
               {% trans "Add" context "Dashboard add action" %}
             </a>
             <a href="#modal-product-variant-delete" class="modal-trigger btn-data-table btn-show-when-checked btn btn-danger" style="display:none" hidden>
@@ -422,7 +461,7 @@
               
             </div>
           </div>
-          <div class="data-table-container">
+          <div class="data-table-container" id="refreshvaraintscontent">
 
             <table class="table  datatable-header-footer">
               {% if variants %}
@@ -782,7 +821,7 @@
  {% include "dashboard/includes/_modal_attribute_choice.html"  %}
  {% include "dashboard/includes/_modal_type.html"  %}
  {% include "dashboard/includes/_modal_classes.html"  %}
- {% include "dashboard/includes/_modal_classesc.html"  %}
+ {% include "dashboard/includes/_modal_classesx.html"  %}
 {% endblock %}
 
  {% block custom_js %}
@@ -956,18 +995,7 @@
               addclass: 'bg-danger'
           });
       }
-  /*function refreshProductType()
-  {
-    notify('I will refresh product type page ');
-    $('#productType').html('refresh me..!');
-    var url= "{% url 'dashboard:refresh_producttype' %}";
-    var posting = $.get(url,{});
-    posting.done(function(data){
-      $( "#productType" ).empty().append( data );
-      notify('New product type added successfully','bg-success');
-    });
-  }*/
-
+  
   $('#modal_add_tax_btn').on('click',function(){
        refresh_tax();
         var tax = $('#id_tax').val();
@@ -1097,32 +1125,10 @@
     $( "#div_attributes" ).empty().append( data ); 
     checkHasVaraints(class_pk);
    });
-
-   // check if class has variants
-   //var posting = $.get( url, {class_pk:class_pk} ); 
-
-
-
-  }
-  
+  }  
   // end refreshAttributes
 
-  // refreshsupplier func
-  /*function refreshSupplier() {
-   {% url "dashboard:fetch_suppliers" as url %} 
-   var url = "{{ url }}";
-   var class_pk = getProductClass();
-   content_loader('#div_supplier');   
-   var posting = $.get( url, {} );
-     // Put the results in a div
-   posting.done(function( data ) {    
-    $( "#div_supplier" ).empty().append( data );
-    $('#modal_attribute').modal('hide'); 
-    var block = $('#div_supplier').parent().parent().parent().parent().parent();   
-      $(block).unblock(); 
-  });
-
-  }*/
+  
   // end refreshsupplier
   $('body').on('change', "select[name*='product_class']", function(){
        var link = '{% url "dashboard:product-attr-add" %}';
@@ -1142,20 +1148,7 @@
 
     });
 
-  /*$( "select[name*='product_class']").change(function refreshAttributes() {
-   var link = '{% url "dashboard:product-attr-add" %}';
-   var link = link+getProductClass()+'/';
-   $('#add-new-attribute').attr('data-href',link);
-   $('#link-pk').val(link);
-   {% url "dashboard:fetch-variants" as url %} 
-   var url = "{{ url }}";
-   var class_pk = $( this ).val();
-   var posting = $.post( url, {class_pk:class_pk} );
-     // Put the results in a div
-  posting.done(function( data ) {    
-    $( "#div_attributes" ).empty().append( data );  });
-
-  });*/
+  
 
   $('.switch-actions').on('change', function() {
   let $btnChecked = $(this).parents('form').find('.btn-show-when-checked');

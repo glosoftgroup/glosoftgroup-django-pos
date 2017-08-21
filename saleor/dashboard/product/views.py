@@ -874,6 +874,40 @@ def product_image_delete(request, product_pk, img_pk):
 
 @staff_member_required
 @permission_decorator('product.change_productvariants')
+def add_attributes(request):
+    if request.method == 'POST':
+        product_variant = ProductVariant()        
+        if request.POST.get('sku'):
+            product_variant.sku = request.POST.get('sku')
+        if request.POST.get('price'):
+            product_variant.price_override = request.POST.get('price')
+        if request.POST.get('wholesale'):
+            product_variant.wholesale_override = request.POST.get('wholesale')
+        if request.POST.get('attributes'):
+            attr_list = json.loads(request.POST.get('attributes'))
+            attrs = {}
+            for att in attr_list:
+                attrs[att['id']] =att['value']
+            print attrs
+            product_variant.attributes = attrs
+        if request.POST.get('pk'):            
+            product = Product.objects.get(pk=int(request.POST.get('pk')))
+            product_variant.product = product
+            attributes = product.product_class.variant_attributes.prefetch_related('values')    
+            variants = product.variants.all()
+            product_variant.save()
+            ctx = {'product':product,
+                   'attributes':attributes,
+                   'variants':variants}
+            return TemplateResponse(request,
+                'dashboard/product/partials/variant_table.html', ctx)
+
+
+
+
+    return HttpResponse('Error!');
+@staff_member_required
+@permission_decorator('product.change_productvariants')
 def variant_edit(request, product_pk, variant_pk=None):
     product = get_object_or_404(Product.objects.all(),
                                 pk=product_pk)
@@ -1749,7 +1783,9 @@ def product_class_form32b(request):
 def attr_list_f32d(request):
     if request.method == 'POST':
         pk = request.POST.get('name')
-        attributes = json.loads(request.POST.get('attributes'))
+        attributes = []
+        if request.POST.get('attributes'):
+            attributes = json.loads(request.POST.get('attributes'))
         variants = json.loads(request.POST.get('variants'))
         print pk
         if pk:
