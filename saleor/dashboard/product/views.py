@@ -747,6 +747,15 @@ def add_stock_ajax(request):
         info_logger.error(message)
         return HttpResponse(message)
 
+@staff_member_required
+@permission_decorator('product.change_stock')
+def stock_form(request,product_pk):
+    stock = Stock()
+    product = Product.objects.get(pk=product_pk)
+    form = forms.StockForm(request.POST or None, instance=stock,
+                           product=product)
+    ctx = {'form': form, 'product': product, 'stock': stock}
+    return TemplateResponse(request, 'dashboard/product/partials/add_stock_form.html', ctx)
 
 @staff_member_required
 @permission_decorator('product.change_stock')
@@ -783,7 +792,11 @@ def stock_edit(request, product_pk, stock_pk=None):
     errors = form.errors
     ctx = {'form': form, 'product': product, 'stock': stock, 'errors':errors}
     if request.is_ajax():
-        return TemplateResponse(request, 'dashboard/purchase/includes/add_stock_form.html', ctx)
+        if not stock:
+            return HttpResponse(json.dumps({'message':0},content_type='application/json'))
+        else:
+            return HttpResponse(json.dumps({'message':1},content_type='application/json'))
+        #return TemplateResponse(request, 'dashboard/purchase/includes/add_stock_form.html', ctx)
     return TemplateResponse(request, 'dashboard/product/stock_form.html', ctx)
 
 
