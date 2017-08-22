@@ -680,7 +680,7 @@
                   <td colspan="8">
                     <span class="text-center alert alert-warning">
                       {% trans "There is no stock for this product." context "Empty stock table message" %}
-                      <button class="btn btn-primary btn-xs" data-contenturl="{% url 'dashboard:product-stock-add' pk=product.pk %}" onclick="return false" id="addNewStockBtn">Add stock</button>
+                      <button class="btn btn-primary btn-xs" data-contenturl="{% url 'dashboard:product-stock-add' product_pk=product.pk %}" onclick="return false" id="addNewStockBtn">Add stock</button>
                     </span>
                   </td>
                 </tr>
