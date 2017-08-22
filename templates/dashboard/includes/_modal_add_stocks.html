@@ -1,0 +1,29 @@
+{% load i18n %}
+{% load mptt_tags %}
+{% load materializecss %}
+{% load staticfiles %}
+
+
+  <div id="modal_stocks" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">      
+        <div class="modal-header bg-blue">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h6 class="modal-title text-white text-center">Add stock</h6>
+        </div>
+         <div class="results">
+           <div class="modal-body">
+            <!-- content form  -->      
+               <div class="col-md-3 text-center col-offset-4">        
+               <span class="text-center" style="height: 100px;width: auto;">
+               Loading...
+               </span>
+               </div>
+               
+          </div>
+        </div>        
+        
+      </div>
+    </div>
+  </div>
+  <!-- /blue modal

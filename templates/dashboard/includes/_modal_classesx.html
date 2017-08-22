@@ -19,11 +19,11 @@
                     </select>
                    </div>                  
                 </div>
-<div class="panel-group content-group-lg mb-15" id="accordion1">
+<div class="panel-group content-group-lg mb-15" id="accordionx">
   <div class="panel panel-white">
     <div class="panel-heading">
       <h6 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion1" href="#accordion-group1">
+        <a data-toggle="collapse" data-parent="#accordionx" href="#accordion-groupx">
         <i class="icon-touch"></i>Add variants</a>
       </h6>
       <div class="heading-elements">
@@ -36,34 +36,34 @@
                 </ul>
             </div>
     </div>
-    <div id="accordion-group1" class="panel-collapse collapse">
+    <div id="accordion-groupx" class="panel-collapse collapse">
 
        
       <div class="panel-body">
         <div class="modalbody">
 <div class="">
   <div class="form-group">
-     <div id="add-another-attr" class="col-md-12 hidden">
+     <div id="add-another-attrx" class="col-md-12 hidden">
         <button class="btn btn-xs btn-primary">Add another variant</button>
       </div>
      <div class="col-md-4">      
       <label class="text-bold">Variant Name:</label>
       <div class="input-group">   
-     <input type="text" id="attribute_name32D" class="form-control" placeholder="Variant Name" name="attribute_nameD">
+     <input type="text" id="attribute_name32Dx" class="form-control" placeholder="Variant Name" name="attribute_nameDx">
      <span class="input-group-btn">
-      <button class="btn bg-primary btn-xs" type="button" id='attr-nameD'>Add</button>
+      <button class="btn bg-primary btn-xs" type="button" id='attr-nameDx'>Add</button>
     </span> 
     </div>
      </div>
      <!-- lsdjf -->
      <div class="col-md-6">
      <div class="">    
-    <div class="form-group hidden" id='value-inputD'>
+    <div class="form-group hidden" id='value-inputDx'>
         <label class="text-bold">Value</label>
         <div class="input-group">   
-       <input type="text" placeholder="e.g 1kg for weight variant" id='value32D' class="form-control" name="valueD">
+       <input type="text" placeholder="e.g 1kg for weight variant" id='value32Dx' class="form-control" name="valueDx">
        <span class="input-group-btn">
-        <button class="btn btn-xs btn-primary hidden" id="newvalueD">Add Value</button>
+        <button class="btn btn-xs btn-primary hidden" id="newvalueDx">Add Value</button>
       </span> 
       </div>      
     </div>    
@@ -71,7 +71,7 @@
      </div>
      <!-- lsajd -->
      <div class="col-md-2">
-     <div id='add_value32D'></div>
+     <div id='add_value32Dx'></div>
      </div>  
 
   </div><br/>
@@ -84,7 +84,11 @@
   </div>
                 <div class="modal-footer p-15">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button data-refreshme="{{request.get_full_path|urlencode}}?tab=variants" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Variants</button>
+                    {% if product.pk %}
+                    <button data-refreshme="{% url 'dashboard:product-update' pk=product.pk %}?tab=variants" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Variants</button>
+                    {% else %}
+                    <button data-refreshme="" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Variants</button>
+                    {% endif %}
                     
                 </div>
             </div>

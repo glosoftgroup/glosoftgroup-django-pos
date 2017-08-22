@@ -610,7 +610,7 @@
         </div>
         <div class="data-table-container">
           <table class="table  datatable-header-footer responsive data-table">
-            {% if stock_items %}
+            
             <thead>
               <tr class='bg-primary'>
                 <th class="bulk-checkbox">
@@ -637,6 +637,7 @@
                 <th>Actions</th>
               </tr>
             </thead>
+            {% if stock_items %}
             <tbody>
               {% for item in stock_items %}
                 <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
@@ -662,7 +663,7 @@
                     {{ item.location }}
                   </td>
                   <td class="right-align">
-                    {{ item.quantity }}
+                    {{ item.variant.get_stock_quantity }}
                   </td>
                   <td class="right-align">
                     {{ item.quantity_allocated }}
@@ -676,9 +677,10 @@
             {% else %}
               <tbody>
                 <tr>
-                  <td>
-                    <span>
+                  <td colspan="8">
+                    <span class="text-center alert alert-warning">
                       {% trans "There is no stock for this product." context "Empty stock table message" %}
+                      <button class="btn btn-primary btn-xs" data-contenturl="{% url 'dashboard:product-stock-add' pk=product.pk %}" onclick="return false" id="addNewStockBtn">Add stock</button>
                     </span>
                   </td>
                 </tr>
@@ -822,6 +824,7 @@
  {% include "dashboard/includes/_modal_type.html"  %}
  {% include "dashboard/includes/_modal_classes.html"  %}
  {% include "dashboard/includes/_modal_classesx.html"  %}
+ {% include "dashboard/includes/_modal_add_stocks.html"  %}
 {% endblock %}
 
  {% block custom_js %}
