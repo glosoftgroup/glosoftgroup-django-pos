@@ -36,6 +36,7 @@
       <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
 
       <div class="panel-body">
+          <div class="col-md-8">
           <form class="form" enctype="multipart/form-data" id="petty_cash" name="petty_cash">
              {% csrf_token %}
               <div class="row">
@@ -46,7 +47,7 @@
                               <div class="col-md-6 col-md-offset-3">
                                   <div class="form-group">
                                        <label for="amount">Current Balance</label>
-                                      <div class="alert bg-info div-amount"><span style="font-size:1.1em;">KShs. {{ amount|intcomma }}</span></div>
+                                      <div class="alert bg-primary div-amount"><span style="font-size:1.1em;">KShs. {{ amount|intcomma }}</span></div>
                                    </div>
                                    <div class="form-group">
                                       <label for="amount">Amount</label>
@@ -65,8 +66,74 @@
                     </div>
                   </div>
                 </div>
-              </div>
           </form>
+          </div>
+          <div class="col-md-4">
+              <!--<div class="col-md-12">-->
+              <label>pick a date to see petty cash expenditure</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control daterange-single" type="text">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            <!--</div>-->
+              <div id="expenditureDetails">
+                {% if pettyCash %}
+                    <div class="panel border-left-lg border-left-warning invoice-grid timeline-content">
+                      <div class="panel-body">
+                        <div class="row">
+                          <div class="col-sm-12">
+                              <div class="row">
+                                  <div class="col-md-12">
+                                      <p class="text-semibold text-center">
+                                          {% if balance %}
+                                            {% for p in balance %} {{p.created|date:'jS F Y'}} {% endfor %}
+                                          {% else %}
+                                          0.00
+                                          {% endif %}
+                                      </p>
+                                      <p class="text-semibold no-margin-top">Opening Cash: KShs. {{opening_amount.opening_amount__sum}}</p>
+                                      <p class="text-semibold no-margin-top">Amount Spent: KShs.
+                                          {% if expense_amount %}
+                                            {{expense_amount}}
+                                          {% else %}
+                                            0.00
+                                          {% endif %}
+                                      </p>
+                                      <p class="text-semibold no-margin-top">Expenses: (
+                                          {% if types %}
+                                             {% for e in types %}
+                                                {% if forloop.last %}
+                                                    {{e.expense_type}}
+                                                {% else %}
+                                                    {{e.expense_type}},
+                                                {% endif %}
+                                              {% endfor %}
+                                          {% else %}
+                                            No Expense Types
+                                          {% endif %}
+                                          )</p>
+                                      <p class="text-semibold no-margin-top">Balance:
+                                          {% if balance %}
+                                            {% for i in balance %} {{i.balance}} {% endfor %}
+                                          {% else %}
+                                            0.00
+                                          {% endif %}
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="alert bg-grey div-amount">
+                        <span style="font-size:1.1em;">No Petty Cash Details</span>
+                    </div>
+                    {% endif %}
+              </div>
+          </div>
       </div>
 
     </div>
@@ -104,7 +171,7 @@ $(document).ready(function(){
               contentType: false,
               success:function(data){
                 $('.amount').val('');
-                $('.div-amount').html(data);
+                $('.div-amount span').text('KShs. '+data);
                 $.jGrowl('Amount Updated successfully', {
                   header: 'Well done!',
                   theme: 'bg-success'
@@ -120,7 +187,16 @@ $(document).ready(function(){
               }
           });
     }
-  });
+  });$('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+        $.ajax({ url: "{% url 'accounts:pettycash_expenditure' %}",type: 'GET',data: {date:date}, async:false,success: function(data){
+              $('#expenditureDetails').html(data);
+        }});
+    });
 
 
   });

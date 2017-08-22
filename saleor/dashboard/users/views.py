@@ -50,12 +50,8 @@ def user_trails(request):
             users = paginator.page(1)
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
-        user_trail(request.user.name, 'accessed users list page', 'view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
-        if request.GET.get('initial'):
-            return HttpResponse(paginator.num_pages)
-        else:
-            return TemplateResponse(request, 'dashboard/users/trail.html', {'users':users, 'pn':paginator.num_pages})
+
+        return TemplateResponse(request, 'dashboard/users/trail.html', {'users':users, 'pn':paginator.num_pages})
     except TypeError as e:
         error_logger.error(e)
         return HttpResponse('error accessing users')
@@ -78,10 +74,7 @@ def users(request):
             users = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed users list page','view')
         info_logger.info('User: '+str(request.user.name)+' accessed the view users page')
-        if request.GET.get('initial'):
-            return HttpResponse(paginator.num_pages)
-        else:
-            return TemplateResponse(request, 'dashboard/users/users.html', {'groups':groups,'users':users, 'pn': paginator.num_pages})
+        return TemplateResponse(request, 'dashboard/users/users.html', {'groups':groups,'users':users, 'pn': paginator.num_pages})
     except TypeError as e:
         error_logger.error(e)
         return HttpResponse('error accessing users')

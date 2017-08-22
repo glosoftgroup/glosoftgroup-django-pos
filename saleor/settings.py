@@ -205,7 +205,8 @@ INSTALLED_APPS = [
     'social_django',
     'django_countries',
     'rest_framework.authtoken',
-    'notifications'
+    'notifications',
+    'chartjs',
 ]
 
 LOGGING = {

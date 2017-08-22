@@ -159,14 +159,15 @@ def add_process(request):
                         received_by=received_by, phone=phone, payment_mode=payment_mode,
                         description=description)
 
-    petty_cash = get_object_or_404(PettyCash, pk=1)
-    petty_cash_amount = petty_cash.amount
+
+    petty_cash = PettyCash.objects.latest('id')
+    petty_cash_amount = petty_cash.balance
     try:
-        petty_cash_amount -= int(amount)
-        petty_cash.amount = petty_cash_amount
+        petty_cash_amount -= Decimal(amount)
+        petty_cash.balance = petty_cash_amount
         petty_cash.save()
-        user_trail(request.user.name,'petty cash balance: ' + str(petty_cash.amount)
-                   + ' removed from expense ' + str(amount) + ' balance ' + str(petty_cash_amount) + ', total',
+        user_trail(request.user.name,'petty cash balance: ' + str(petty_cash.balance)
+                   + ' removed from expenses of ' + str(amount) + ', current balance is ' + str(petty_cash_amount) + ', total',
                    'update')
     except Exception, e:
         error_logger.error(e)
@@ -196,6 +197,17 @@ def delete(request, pk=None):
             error_logger.error(e)
             return HttpResponse(e)
 
+def detail(request, pk=None):
+
+    if request.method == 'GET':
+        try:
+            expense = get_object_or_404(Expenses, pk=pk)
+            user_trail(request.user.name, 'access expense details of: '+ str(expense.expense_type)+' on '+str(expense.expense_date),'view')
+            info_logger.info('access expense details of: '+ str(expense.expense_type)+' on '+str(expense.expense_date))
+            return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense':expense})
+        except Exception, e:
+            error_logger.error(e)
+            return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense': expense})
 
 def expenses_search(request):
     if request.is_ajax():

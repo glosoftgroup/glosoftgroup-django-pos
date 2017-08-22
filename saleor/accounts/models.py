@@ -28,7 +28,7 @@ class Expenses(models.Model):
 	account = models.CharField(max_length=100, null=True, blank=True)
 	description = models.TextField(max_length=100, null=True, blank=True)
 	phone = models.CharField(max_length=100, null=True, blank=True)
-	amount = models.CharField(max_length=100, null=True, blank=True)
+	amount = models.DecimalField(max_digits=100, decimal_places=2, null=True, blank=True)
 
 class PersonalExpenses(models.Model):
 	added_on = models.DateTimeField(default=now, editable=False)
@@ -42,10 +42,12 @@ class PersonalExpenses(models.Model):
 	account = models.CharField(max_length=100, null=True, blank=True)
 	description = models.TextField(max_length=100, null=True, blank=True)
 	phone = models.CharField(max_length=100, null=True, blank=True)
-	amount = models.CharField(max_length=100, null=True, blank=True)
+	amount = models.DecimalField(max_digits=100, decimal_places=2, null=True, blank=True)
 
 class ExpenseType(models.Model):
 	name = models.CharField(max_length=100, null=True, blank=True)
 
 class PettyCash(models.Model):
-	amount = models.DecimalField(max_digits=100, decimal_places=2, null=True)
+	created = models.DateTimeField(default=now, editable=False)
+	opening_amount = models.DecimalField(max_digits=100, decimal_places=2, null=True)
+	balance = models.DecimalField(max_digits=100, decimal_places=2, null=True)
