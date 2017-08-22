@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.db.models import Q
+from django.db import IntegrityError
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext, Context
@@ -258,8 +259,12 @@ def user_process(request):
         )
         try:
             new_user.save()
-        except:
+        except IntegrityError:
             error_logger.info('Error when saving ')
+            return HttpResponse('user exists with those details')
+        except Exception, e:
+            error_logger.error(e)
+            
         last_id = User.objects.latest('id')
         if groups:
             permissions = Permission.objects.filter(group__name__in=groups)

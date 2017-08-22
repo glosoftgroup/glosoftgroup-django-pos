@@ -12,12 +12,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
-from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, Min, Sum, Avg, F, Q
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...customer.models import Customer
+from ...sale.models import Sales, SoldItem, DrawerCash
 from ...decorators import permission_decorator, user_trail
 import logging
 
@@ -102,6 +104,52 @@ def user_detail(request, pk):
 	info_logger.info('User: ' + str(request.user.name) + ' accessed detail page to view customer:' + str(user.name))
 	return TemplateResponse(request, 'dashboard/customer/detail.html', {'user':user})
 
+def sales_detail(request, pk):
+	customer = get_object_or_404(Customer, pk=pk)
+	try:
+		all_sales = Sales.objects.filter(customer=customer)
+		total_sales_amount = all_sales.aggregate(Sum('total_net'))
+		total_tax_amount = all_sales.aggregate(Sum('total_tax'))
+		total_sales = []
+		for sale in all_sales:
+			quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+			setattr(sale, 'quantity', quantity['c'])
+			total_sales.append(sale)
+
+		page = request.GET.get('page', 1)
+		paginator = Paginator(total_sales, 10)
+		try:
+			total_sales = paginator.page(page)
+		except PageNotAnInteger:
+			total_sales = paginator.page(1)
+		except InvalidPage:
+			total_sales = paginator.page(1)
+		except EmptyPage:
+			total_sales = paginator.page(paginator.num_pages)
+		user_trail(request.user.name, 'accessed sales details for customer'+str(customer.name), 'view')
+		info_logger.info('User: ' + str(request.user.name) + 'accessed sales details for customer'+str(customer.name))
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			data = {
+				'sales': total_sales,
+				"total_sales_amount":total_sales_amount,
+				"total_tax_amount":total_tax_amount,
+				"customer":customer,
+			}
+			return TemplateResponse(request, 'dashboard/customer/sales/sales_list.html',data)
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
+
+def sales_items_detail(request, pk=None, ck=None):
+	try:
+		customer = get_object_or_404(Customer, pk=ck)
+		sale = Sales.objects.get(pk=pk)
+		items = SoldItem.objects.filter(sales=sale)
+		return TemplateResponse(request, 'dashboard/customer/sales/details.html',{'items': items, "sale":sale, "customer":customer})
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
+
 def user_delete(request, pk):
 	user = get_object_or_404(Customer, pk=pk)
 	if request.method == 'POST':
@@ -180,7 +228,7 @@ def customer_search(request):
 		list_sz = request.GET.get('size', 10)
 		p2_sz = request.GET.get('psize')
 		q = request.GET.get('q')
-		if list_sz is None:
+		if list_sz == 0:
 			sz = 10
 		else:
 			sz = list_sz

@@ -9,11 +9,16 @@
 {% endblock %}
 
 {% block menu_supplier_class %}active{% endblock %}
+ {% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:supplier' %}">Supplier</a></li>
+    <li><a href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{user.name|title}}</a></li>
+ {% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
       color: #FF5722;
     }
+    .table{border:1px solid #ccc}
   </style>
  {% endblock %}
 
@@ -43,21 +48,24 @@
           <div class="tab-content">
             <!-- contacts -->
              <div class="tab-pane animated fadeIn" id="contacts">
-
-               <a href="#modal_instance2" class="btn btn-primary text-white modal-trigger-ajax" data-title="Add Contact" data-href="{% url 'dashboard:address-add' pk=user.pk %}">
-                      Create Contact
-                  </a>             
+                <div class="row">
+                    <div class="col-md-12">
+                       <a href="#modal_instance2" class="btn btn-primary text-white modal-trigger-ajax" data-title="Add Contact" data-href="{% url 'dashboard:address-add' pk=user.pk %}">
+                           <i class="icon-plus2"></i>   Create Contact
+                          </a>
+                    </div>
+                 </div>
                <div class="row">
-               <table class="table table-striped table-hover fixed_headers">
+                   <div class="col-md-12">
+               <table class="table table-striped table-hover fixed_headers"style="margin-top:20px;">
                      <thead>
-                       <tr>
+                       <tr class="bg-primary">
                          <th>Contact Name</th>
                          <th>Job Position</th>
                          <th>Email</th>
                          <th>Phone</th>
-                         <th>Name</th>
                          <th>Address</th>
-                         
+                         <th>Actions</th>
                        </tr>
                      </thead>
                      <tbody id="contact-list">
@@ -72,8 +80,6 @@
                          <TD>{{ address.email }}</TD>
                          <!-- pphone -->
                          <td>{{ address.phone }}</td>
-                         <!-- Name -->
-                         <td>{{ address }}</td>
                          <!-- adddress -->
                          <td>
                            <span>
@@ -83,8 +89,8 @@
                          </td>
                          <td>
                            <a href="#modal_instance" data-title="Delete contact" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:contact-delete' pk=address.pk %}"
-    class="btn btn-default modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>Remove
-    </a>
+                            class="btn btn-default modal-trigger-ajax"><i class="icon-trash position-left" data-popup="tooltip"  data-placement="bottom"  data-original-title="Delete me"></i>Remove
+                            </a>
                          </td>
                          
                        </tr>
@@ -98,12 +104,10 @@
                           </td>
                         </tr>
                          {% endif %}
-                       
-
                      </tbody>
                    </table>
                  </div>              
-              
+               </div>
              
              </div>
              <div id="dresults"></div>
@@ -159,7 +163,12 @@
                            </div>
                         </div>
                       </div>            
-                     
+                     <div class="row">
+                          <div class="col-md-12">
+                            <label for="mobile">Description</label>
+                              <textarea class="form-control" name="description" id="description" placeholder="Example: They Supply Unga every week"> {% if user.description %} {{user.description}} {% endif %}</textarea>
+                       </div>
+                     </div>
                     </div>
           </div>
           <div class="row">
@@ -283,6 +292,9 @@ $( ".check" ).on( "click", function(){
           digits: true,
           minlength: 6
         },
+        description:{
+            required:true
+        },
         mobile:{
           required:true,
           digits: true,
@@ -298,6 +310,9 @@ $( ".check" ).on( "click", function(){
       password:{
         required: "please provide a password",
         minlength: "password must be atleast 6 characters long"
+      },
+      description:{
+        required:"Please enter the description to describe the supplier"
       },
       confirm_password:{
         required: "please provide a password",
@@ -321,16 +336,18 @@ $( ".check" ).on( "click", function(){
                   processData: false,
                   contentType: false,
                   success:function(data){
-                     console.log(data);             
 
                      $.jGrowl('Updated successfully', {
                         header: 'Well done!',
-                        theme: 'bg-success'
-                     });
-                     // window.location = "{% url 'dashboard:users' %}";
+                        theme: 'bg-success',
+                        beforeClose: function(){
+                            window.location = "{% url 'dashboard:supplier' %}";
+                        }
+                     }, 100);
+                     //});
+                     //window.location = "{% url 'dashboard:supplier' %}";
                   },
                   error:function(error){
-                    console.log(error);
                     $.jGrowl('Change a few things up and try submitting again', {
                         header: 'Oh snap!',
                         theme: 'bg-danger'

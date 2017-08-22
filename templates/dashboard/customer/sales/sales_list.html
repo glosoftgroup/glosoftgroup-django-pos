@@ -8,10 +8,11 @@
   Sales List Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:sales_list' %}">Sales Reports</a></li>
+<li class="active"><a href="{% url 'dashboard:customers' %}">Customer</a></li>
+<li class="active"><a href="{% url 'dashboard:customer-sales-detail' pk=customer.pk %}">{{customer.name|title}}</a></li>
  {% endblock %}
 
-{% block menu_report_class %}active{% endblock %}
+{% block menu_addCustomer_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -35,19 +36,6 @@
                 <div class="form-control-feedback">
                   <i class="icon-search4 text-size-base"></i>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-2">
-                <label>categories</label>
-              <div class="form-group">
-                 <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="list">sales list</option>
-                     <option value="summary">sales summary</option>
-                    <option value="category">by category</option>
-                    <option value="items">by items</option>
-                    <option value="user">by user</option>
-                     <option value="terminal">by terminal</option>
-                  </select>
               </div>
             </div>
             <div class="col-md-2">
@@ -87,6 +75,9 @@
 <div class="col-md-12">
    <div id="pagination-div">
     <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h5 class="panel-title text-center">{{customer.name|title}} Sales Details</h5>
+        </div>
       <div class="panel-body">
         <div class="row">
           <div class="col-md-12">
@@ -109,17 +100,17 @@
                         {% if sales %}
                         {% for sale in sales %}
                           <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.terminal}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.invoice_number }}</td>
+                              <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.terminal}}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.quantity}}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.total_net}}</td>
                           </tr>
                         {% endfor %}
                          {% else %}
-                         <tr><td colspan="7"><h2 class="text-center">No Sales Summary Available</h2></td></tr>
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Summary Available for {{customer.name}}</h2></td></tr>
                         {% endif %}
                         </tbody>
 
@@ -208,7 +199,7 @@ $(document).ready(function(){
         firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){
+            $.get("{% url 'dashboard:customer_sales_paginate' %}",{page:parseInt(num), cpk:'{{customer.pk}}'},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm');
@@ -219,7 +210,7 @@ $(document).ready(function(){
         showDropdowns:true
     }).on('change',function(){
       var date = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+        $.ajax({ url: "{% url 'dashboard:customer_sales_paginate' %}",type: 'GET',data: {page:1, date:date, cpk:'{{customer.pk}}' }, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
     });
@@ -272,7 +263,7 @@ $(document).ready(function(){
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+        $.ajax({ url: "{% url 'dashboard:customer_sales_paginate' %}",type: 'GET',data: {page:1, size:ts, cpk:'{{customer.pk}}'}, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
      });
@@ -290,8 +281,8 @@ $(document).ready(function(){
     $('.search_user').keyup(function() {
       var search_text = $(this).val();
       delay(function(){
-         var url = "{% url 'dashboard:sales_search' %}";
-         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+         var url = "{% url 'dashboard:customer_sales_search' %}";
+         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, cpk:'{{customer.pk}}'},success: function(data){
                 $('#pagination-div').html(data);
          }});
       }, 500 );

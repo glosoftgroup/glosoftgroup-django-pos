@@ -42,7 +42,6 @@ DATABASES = {
         default='postgres://saleor:saleor@localhost:5432/saleor',
         conn_max_age=600)}
 
-
 TIME_ZONE = 'Africa/Nairobi'
 LANGUAGE_CODE = 'en-us'
 LOCALE_PATHS = [os.path.join(PROJECT_ROOT, 'locale')]
@@ -50,6 +49,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+USE_THOUSAND_SEPARATOR = True
 
 EMAIL_URL = os.environ.get('EMAIL_URL')
 SENDGRID_USERNAME = os.environ.get('SENDGRID_USERNAME')

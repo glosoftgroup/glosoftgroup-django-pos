@@ -878,18 +878,16 @@ $(document).ready(function(){
                   processData: false,
                   contentType: false,
                   success:function(data){
-                     console.log(data);             
 
                      $.jGrowl('Updated successfully', {
                         header: 'Well done!',
                         theme: 'bg-success',
                         beforeClose: function(){
-                           // window.location = "{% url 'dashboard:users' %}";
+                            window.location = "{% url 'dashboard:users' %}";
                         }
-                     }, 500);
+                     }, 100);
                   },
                   error:function(error){
-                    console.log(error);
                     $.jGrowl('Change a few things up and try submitting again', {
                         header: 'Oh snap!',
                         theme: 'bg-danger'
@@ -964,6 +962,10 @@ $( ".check" ).on( "click", function(){
     $(this).prop("checked", true);
     $(this).parent().parent().parent().siblings('span').show();
     $(this).parent().parent().parent().siblings('span').text('(granted)');
+        if($('.check:checked').length == $('.check').length){
+            $('#checkAll').prop("checked", true);
+            $('#checkAll').parent('span').addClass('checked');
+        }
   }else{
 
    if($('#checkAll').is(':checked')){

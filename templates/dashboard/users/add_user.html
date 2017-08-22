@@ -137,7 +137,7 @@
                   <label class="display-block text-semibold">System Permission Default</label>
                   <div class="checkbox">
                     <label>
-                      <input class="styled checks" id="can-login" type="checkbox"" value="active">
+                      <input class="styled checks" id="can-login" type="checkbox" value="active">
                       can login
                     </label>
                     <span id="granted" class="granted text-success"></span>
@@ -154,7 +154,7 @@
                 <div class="row">
                   <div class="col-md-12">
                     <div class="form-group">
-                    {% for permission in permissions%}
+                    {% for permission in permissions %}
                        {% if permission.content_type.model ==  'unused' %}
                           <div class="checkbox">
                             <label>
@@ -601,6 +601,10 @@ $( ".check" ).on( "click", function(){
     $(this).prop("checked", true);
     $(this).parent().parent().parent().siblings('span').show();
     $(this).parent().parent().parent().siblings('span').text('(granted)');
+    if($('.check:checked').length == $('.check').length){
+        $('#checkAll').prop("checked", true);
+        $('#checkAll').parent('span').addClass('checked');
+    }
   }else{
 
    if($('#checkAll').is(':checked')){

@@ -55,7 +55,7 @@ class AddressBook(models.Model):
         max_length=128, blank=True)
     postal_code = models.CharField(
         pgettext_lazy('AddressBook field', 'postal code'),
-        max_length=20, blank=True)
+        max_length=200, blank=True)
     country = CountryField(
         pgettext_lazy('AddressBook field', 'country'))
     country_area = models.CharField(
@@ -63,12 +63,6 @@ class AddressBook(models.Model):
         max_length=128, blank=True)
     phone = models.CharField(
         pgettext_lazy('AddressBook field', 'phone number'),
-        max_length=30, blank=True)
-    first_name = models.CharField(
-        pgettext_lazy('AddressBook field', 'first name'),
-        max_length=30, blank=True)
-    last_name = models.CharField(
-        pgettext_lazy('AddressBook field', 'last name'),
         max_length=30, blank=True)
     email = models.CharField(
         pgettext_lazy('AddressBook field', 'email'),
@@ -80,7 +74,7 @@ class AddressBook(models.Model):
 
     @property
     def full_name(self):
-        return '%s %s' % (self.first_name, self.last_name)
+        return '%s' % (self.contact_name)
 
     class Meta:
         verbose_name = pgettext_lazy('AddressBook model', 'address book')
@@ -93,12 +87,11 @@ class AddressBook(models.Model):
 
     def __repr__(self):
         return (
-            'AddressBook(first_name=%r, last_name=%r, company_name=%r, '
+            'AddressBook(contact_name=%r, company_name=%r, '
             'street_address_1=%r, street_address_2=%r, city=%r, '
             'postal_code=%r, country=%r, country_area=%r, phone=%r)' % (
-                self.first_name, self.last_name, self.company_name,
-                self.street_address_1, self.street_address_2, self.city,
-                self.postal_code, self.country, self.country_area,
+                self.contact_name, self.company_name, self.street_address_1, self.street_address_2,
+                self.city, self.postal_code, self.country, self.country_area,
                 self.phone))
     
 
@@ -139,7 +132,8 @@ class Supplier(models.Model):
     county = models.CharField(max_length=128, null=True, blank=True)    
     website = models.CharField(max_length=128, null=True, blank=True)    
     url = models.CharField(max_length=128, null=True, blank=True)    
-    fax = models.CharField(max_length=128, null=True, blank=True)    
+    fax = models.CharField(max_length=128, null=True, blank=True)
+    description = models.CharField(max_length=500, null=True, blank=True)
     addresses = models.ManyToManyField(
         AddressBook, blank=True,
         verbose_name=pgettext_lazy('Supplier field', 'addresses'))   

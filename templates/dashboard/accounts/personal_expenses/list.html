@@ -9,11 +9,11 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'accounts:expenses' %}">Expenses</a></li>
+     <li class="active"><a href="{% url 'accounts:personal_expenses' %}">Personal Expenses</a></li>
  {% endblock %}
 
 
-{% block menu_expenses_class %}active{% endblock %}
+{% block menu_personal_expenses_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
      .clickable-row td.td{
@@ -34,7 +34,7 @@
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
                 {% if perms.userprofile.add_user %}
-                   <a href="{% url 'accounts:add_expense' %}" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>
+                   <a href="{% url 'accounts:add_personal_expense' %}" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>
                 {% endif %}
               </div>
             </div>
@@ -128,7 +128,7 @@
                       <ul class="icons-list">
                          {% if perms.accounts.delete_expense %}
                         <li>
-                          <a data-ta="#modal_instance" data-title="Delete Expense {{ expense.expense_type }} ?" data-href="{% url 'accounts:expense-delete' pk=expense.pk %}" data-name="{{ expense.expense_type}}" data-id="{{ expense.pk }}"
+                          <a data-ta="#modal_instance" data-title="Delete Expense {{ expense.expense_type }} ?" data-href="{% url 'accounts:personal-expense-delete' pk=expense.pk %}" data-name="{{ expense.expense_type}}" data-id="{{ expense.pk }}"
                          class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
                          </a>
                         </li>
@@ -229,14 +229,14 @@
     var pagination_totalsize;
     var status;
     //**@ get
-    $.ajax({ url: "{% url 'accounts:expenses' %}",type: 'GET',data: {initial:'initial'},
+    $.ajax({ url: "{% url 'accounts:personal_expenses' %}",type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
          pagination_totalsize = data;
     }});
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
-        $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+        $.ajax({ url: "{% url 'accounts:personal_expenses_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
      });
@@ -247,7 +247,7 @@
         leaps: false
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
-            $.get("{% url 'accounts:expenses_paginate' %}",{page:num},function(data){
+            $.get("{% url 'accounts:personal_expenses_paginate' %}",{page:num},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm')
@@ -259,17 +259,16 @@
     }).on('change', function(){
        var group_id = $(this).val();
        if(group_id == 'all'){
-           $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+           $.ajax({ url: "{% url 'accounts:personal_expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
               $('#pagination-div').html(data);
           }});
        }else{
-            $.get("{% url 'accounts:expenses_paginate' %}",{page:1,gid:group_id},function(data){
+            $.get("{% url 'accounts:personal_expenses_paginate' %}",{page:1,gid:group_id},function(data){
              $('#pagination-div').html(data);
            });
        }
 
     });
-
 
       $(".td").click(function(){
           window.location = $(this).data("href");
@@ -334,7 +333,7 @@
       $('.search_user').keyup(function() {
         var search_text = $(this).val();
         delay(function(){
-           var url = "{% url 'accounts:expenses_search' %}";
+           var url = "{% url 'accounts:personal_expenses_search' %}";
            $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
                   $('#pagination-div').html(data);
            }});

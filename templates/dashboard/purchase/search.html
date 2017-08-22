@@ -23,9 +23,9 @@
                   {% for variant in product_results %}
     <tr>
     <!-- product name/sku -->    
-  <td>
+ <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
     <div class="media-left">
-      <div class=""><a href="{% url 'dashboard:product-update' pk=variant.product.pk %}" class="text-default text-semibolds"> {{ variant.display_product }} </a></div>
+      <div class=""><a href="javascript:;" class="text-default text-semibolds"> {{ variant.display_product }} </a></div>
       <div class="text-muted text-size-small">  {{ variant.sku }} </div>
     </div>
   </td>

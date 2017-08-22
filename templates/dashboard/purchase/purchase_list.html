@@ -5,11 +5,11 @@
 {% load staticfiles %}
 {% load product_first_image from product_images %}
 {% block title %}
- Purchase- {{ block.super }}
+Add Stock- {{ block.super }}
 {% endblock %}
 {% block breadcrumbs %}
 
-<li class="active"><a href="{% url 'dashboard:purchase-list' %}">Purchase</a></li>
+<li class="active"><a href="{% url 'dashboard:purchase-list' %}">Add Stock</a></li>
 
 {% endblock %}
 {% block menu_purchase_list %}active{% endblock %}
