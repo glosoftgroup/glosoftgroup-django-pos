@@ -132,6 +132,14 @@ class SalesSerializer(serializers.ModelSerializer):
                  'status',
                 )
 
+    def validate_total_net(self,value):
+        data = self.get_initial()        
+        try:
+            self.total_net = Decimal(data.get('total_net'))
+        except:
+            raise ValidationError('Total Net should be a decimal/integer')
+        return value
+        
     def validate_terminal(self,value):
         data = self.get_initial()
         self.terminal_id = int(data.get('terminal'))

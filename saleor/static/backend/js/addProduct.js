@@ -388,3 +388,19 @@ $(function() {
 
 
 });
+
+/* ------------------------------------------------------------------------------
+*
+*  # adding stock
+**
+* ---------------------------------------------------------------------------- */
+
+$(function(){
+  var addNewStockBtn = $('#addNewStockBtn');
+  var modalIds = $('#modal_stocks');
+  var getStockformUrl = $(this).data('contenturl');
+
+  addNewStockBtn.on('click',function(){
+    modalIds.modal();
+  });
+});

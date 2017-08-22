@@ -84,7 +84,11 @@
   </div>
                 <div class="modal-footer p-15">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    {% if product.pk %}
                     <button data-refreshme="{% url 'dashboard:product-update' pk=product.pk %}?tab=variants" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Variants</button>
+                    {% else %}
+                    <button data-refreshme="" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Variants</button>
+                    {% endif %}
                     
                 </div>
             </div>
