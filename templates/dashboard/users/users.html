@@ -255,13 +255,8 @@
           $(this).val('')
         }
     });
-    var pagination_totalsize;
+
     var status;
-    //**@ get
-    $.ajax({ url: "{% url 'dashboard:users' %}",type: 'GET',data: {initial:'initial'},
-        async:false,success: function(data){
-         pagination_totalsize = data;
-    }});
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
@@ -271,7 +266,7 @@
      });
 
     $('.bootpag-callback').bootpag({
-        total: parseInt(pagination_totalsize),
+        total: parseInt({{pn}}),
         maxVisible: 5,
         leaps: true,
         firstLastUse: true,
@@ -286,7 +281,7 @@
         firstClass: 'first',
         leaps: false
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+            $(".pages-nav").html("Page " + num +" of "+{{pn}}); // or some ajax content loading...
             $.get("{% url 'dashboard:user_paginate' %}",{page:num},function(data){
                $('#tb').html(data);
             });

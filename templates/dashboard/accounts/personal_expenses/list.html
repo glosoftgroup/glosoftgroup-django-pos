@@ -9,7 +9,7 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'accounts:personal_expenses' %}">Personal Expenses</a></li>
+     <li class="active"><a href="{% url 'accounts:personal_expenses' %}">Business Expenses</a></li>
  {% endblock %}
 
 
@@ -115,12 +115,12 @@
                 {% if expenses %}
                   {% for expense in expenses %}
                   <tr class='clickable-row' id="{{user.pk }}">
-                    <td>{{ expense.expense_date }}</td>
-                    <td>{{expense.expense_type}}</td>
-                    <td>{{expense.paid_to}}</td>
-                    <td>{{expense.payment_mode}}
+                    <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{ expense.expense_date }}</td>
+                    <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{expense.expense_type}}</td>
+                    <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{expense.paid_to}}</td>
+                    <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{expense.payment_mode}}
                     </td>
-                    <td>
+                    <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">
                     {{ expense.amount }}</td>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <!-- actions -->
@@ -199,6 +199,26 @@
  </div>
  <div class="info"></div>
  <!-- /blue modal -->
+
+<!-- expense detail modal -->
+ <div id="pdetail" class="modal fade">
+   <div class="modal-dialog modal-md">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center">Expense Details</h6>
+       </div>
+       <div class="modal-body">
+
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default btn-block" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /expense detail modal-->
+
 {% endblock%}
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
@@ -271,7 +291,22 @@
     });
 
       $(".td").click(function(){
-          window.location = $(this).data("href");
+          <!--window.location = $(this).data("href");-->
+          var url = $(this).data('href');
+          var modal = $(this).data('m');
+
+          $.ajax({
+              url: url,
+              type: "GET",
+              data: {csrfmiddlewaretoken:'{{csrf_token}}'},
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $(modal+' .modal-body').html(data);
+                $(modal).modal();
+              },
+              error:function(error){}
+          });
       });
 
       $('.modal-trigger').on('click', function (e) {
