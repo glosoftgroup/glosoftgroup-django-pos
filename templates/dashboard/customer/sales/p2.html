@@ -1,0 +1,180 @@
+{% load staticfiles %}
+
+      <div class="panel panel-flat">
+          <div class="panel-heading">
+            <h5 class="panel-title text-center">{{customer.name|title}} Sales Details</h5>
+        </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table  datatable-header-footer table-hover">
+                  <caption style="margin-bottom: 10px;">
+                   </caption> 
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr class="bg-primary">
+                          <th>Transaction Date</th>
+                          <th>Receipt No</th>
+                          <th>Client Name</th>
+                          <th>Cashier</th>
+                          <th>Terminal</th>
+                          <th>Quantity</th>
+                          <th>Total Sales</th>
+                        </tr>
+                      </thead>
+                      <tbody id="p-tb">
+                        {% if sales %}
+                        {% for sale in sales %}
+                          <tr class='clickable-row' id="{{sale.pk }}">
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.invoice_number }}</td>
+                              <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.terminal}}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.quantity}}</td>
+                            <td class="td" data-href="{% url 'dashboard:customer-sales-items-detail' pk=sale.pk ck=customer.pk %}">{{sale.total_net}}</td>
+                          </tr>
+                        {% endfor %}
+                         {% else %}
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Reports Available</h2></td></tr>
+                        {% endif %}
+                        </tbody>
+
+                 </table>
+        </div>
+          {% if sales %}
+             <div class="my-paginate">
+                <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+                </div>
+              </div>
+          {% endif %}
+          </div>
+        </div>
+          {% if sales %}
+         <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+               <p class="text-center" style="margin: 20px 0px;">
+                 {% if date != today %}
+                   Sales of {{date}} : Kshs 
+                   {% if not that_date_sum.total_net__sum %}
+                      0.00 <br />
+                   {% else %}
+                      {{that_date_sum.total_net__sum}}<br />
+                   {% endif %}
+                 {% endif %}
+                 Todays Sales: Kshs 
+                 {% if tsum.total_net__sum %}
+                      {{tsum.total_net__sum}} 
+                 {% else %}
+                      0.00<br />
+                 {% endif %}<br />
+                 Total Sales: Kshs {{total_sales.total_net__sum}}<br />
+                 Total Tax: Kshs {{ total_tax.total_tax__sum}}
+               </p>
+                <p class="text-center"> Thank you for partnering with us.<br />
+                <span>Report pullled by User</span></p>
+            </div>
+          </div>
+          {% endif %}
+      </div>
+    </div>
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+
+       $(".td").click(function(){
+          window.location = $(this).data("href");
+      });
+
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            leaps: true,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:customer_sales_paginate' %}",{page:num, psize:'{{sz}}', cpk:'{{customer.pk}}'},function(data){
+                      $('#p-tb').html(data);
+                      console.log('without gid '+data);
+                    });
+                }else{
+                    if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
+                        $.get("{% url 'dashboard:customer_sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth', cpk:'{{customer.pk}}'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('action is '+'{{gid}}');
+                    }else{
+                        $.get("{% url 'dashboard:customer_sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth', cpk:'{{customer.pk}}'},function(data){
+                           $('#p-tb').html(data);
+                        });
+                        console.log('date is'+gid);
+                    }
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+        /* clicked the submit button */
+        $('.del').on('click', function (e) {
+                var f = document.getElementById('delform');
+                var formData = new FormData(f);
+                var id = $(this).data('id');
+                var url = $(this).data('href');
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){        
+                      $('#modal_instance').modal('hide');
+                      $('#tb #'+id).remove();            
+                      $.jGrowl('User deleted successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                      });
+                      window.location.reload();
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Error deleting Staff', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            });
+
+   });
+ </script>

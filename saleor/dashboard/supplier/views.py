@@ -114,7 +114,9 @@ def user_search(request):
 		if q is not None:
 			users = Supplier.objects.filter(
 				Q(name__icontains=q) |
-				Q(email__icontains=q) | Q(mobile__icontains=q)).order_by('id')
+				Q(email__icontains=q) |
+				Q(mobile__icontains=q) |
+				Q(description__icontains=q) ).order_by('id')
 			paginator = Paginator(users, 10)
 			try:
 				users = paginator.page(page)
@@ -178,6 +180,7 @@ def user_process(request):
 		street1 = request.POST.get('street1')
 		street2 = request.POST.get('street2')
 		mobile = request.POST.get('mobile')
+		description = request.POST.get('description')
 		image= request.FILES.get('image')
 		groups = request.POST.getlist('groups[]')
 		new_user = Supplier.objects.create(
@@ -190,7 +193,8 @@ def user_process(request):
 			street1 = street1,
 			street2 = street2,
 			mobile = mobile,
-			image = image
+			image = image,
+			description = description
 		)
 		try:
 			new_user.save()
@@ -238,6 +242,7 @@ def user_update(request, pk):
 		street1 = request.POST.get('street1')
 		street2 = request.POST.get('street2')
 		mobile = request.POST.get('mobile')
+		description = request.POST.get('description')
 		image= request.FILES.get('image')		
 		if image :
 			user.name = name
@@ -250,6 +255,7 @@ def user_update(request, pk):
 			user.street1 = street1
 			user.mobile = mobile
 			user.image = image
+			user.description = description
 			user.save()
 			user_trail(request.user.name, 'updated supplier: '+ str(user.name))
 			info_logger.info('User: '+str(request.user.name)+' updated supplier: '+str(user.name))
@@ -264,6 +270,7 @@ def user_update(request, pk):
 			user.street2 = street2
 			user.street1 = street1
 			user.mobile = mobile
+			user.description = description
 			user.save()
 			user_trail(request.user.name, 'updated supplier: '+ str(user.name))
 			info_logger.info('User: '+str(request.user.name)+' updated supplier: '+str(user.name))
@@ -319,8 +326,6 @@ def address_add(request,pk):
 			email = request.POST.get('email')
 			postal_code = request.POST.get('postal_code')
 			phone = request.POST.get('phone')
-			first_name = request.POST.get('first_name')
-			last_name = request.POST.get('last_name')
 			contact_name = request.POST.get('contact_name')
 			job_position = request.POST.get('job_position')
 			supplier = get_object_or_404(Supplier, pk=pk)
@@ -329,8 +334,6 @@ def address_add(request,pk):
 								email=email,
 								postal_code =postal_code,
 								phone = phone,
-								first_name=first_name,
-								last_name=last_name,
 								contact_name=contact_name,
 								job_position=job_position
 								)

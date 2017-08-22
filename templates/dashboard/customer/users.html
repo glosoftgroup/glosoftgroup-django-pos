@@ -19,8 +19,7 @@
  {% endblock %}
 {% block header_extra %}
 {% endblock %}
-{% block breadcrumbs %} 
-    
+{% block breadcrumbs %}
 <li class="active"><a href="{% url 'dashboard:customers' %}">Customer</a></li>
 {% endblock %}
 {% block content %}
@@ -51,13 +50,6 @@
             <div class="col-md-2">
               <label>display list size</label>
               <div class="form-group">
-                 <!--<select class="select list-sz" data-width="100%" tabindex="-98">-->
-                    <!--<option value="5" selected="selected">5</option>                   -->
-                    <!--<option value="10">10</option>-->
-                    <!--<option value="20">20</option>-->
-                    <!--<option value="50">50</option>-->
-                    <!--<option value="100">100</option>-->
-                  <!--</select>-->
                   <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="0" selected>No:</option>
                     <option value="5">5</option>
@@ -123,16 +115,19 @@
                                 action <span class="caret"></span>
                               </button>
                               <ul class="dropdown-menu edit-dropdown">
-                             {% if perms.userprofile.change_customer %}
-                                  <li><a href="{% url 'dashboard:customer-edit' pk=user.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
-                             {% endif %}
-                             {% if perms.userprofile.delete_customer %}
-                                  <li>
-                                  <a data-ta="#modal_instance" data-title="Delete Customer {{ user.name }} ?" data-href="{% url 'dashboard:customer-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
-                                 class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
-                                 </a>
-                                </li>
-                             {% endif %}
+                                  {% if perms.userprofile.view_customer %}
+                                  <li><a href="{% url 'dashboard:customer-sales-detail' pk=user.pk %}"><i class="icon-cash2"></i> SALES DETAILS</a></li>
+                                {% endif %}
+                                 {% if perms.userprofile.change_customer %}
+                                      <li><a href="{% url 'dashboard:customer-edit' pk=user.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                                 {% endif %}
+                                 {% if perms.userprofile.delete_customer %}
+                                      <li>
+                                      <a data-ta="#modal_instance" data-title="Delete Customer {{ user.name }} ?" data-href="{% url 'dashboard:customer-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
+                                     class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                                     </a>
+                                    </li>
+                                 {% endif %}
                               </ul>
                         </div>
 
@@ -148,13 +143,15 @@
 
             </div>
           </div>
+          {% if users %}
           <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav">Page 1 of {{pn}} </div>
             </div>
-            <input type="hidden" id="page_size" val="">
+            <input type="hidden" id="page_size">
           </div>
+          {% endif %}
       </div>
   </div>
   </div>
@@ -201,14 +198,6 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
-        //**@ display size select
-        $('.list-sz').selectpicker().on('change', function(){
-            var ts = $(this).val();
-            $.ajax({ url: "{% url 'dashboard:customer-paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
-                  $('#pagination-div').html(data);
-            }});
-        });
-
         $('.bootpag-callback').bootpag({
             total: parseInt({{pn}}),
             maxVisible: 4,
@@ -224,12 +213,20 @@
             firstClass: 'first',
 
             }).on("page", function(event, num){
-                $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+                $('#page_size').val(num);
+                $(".pages-nav").html("Page " + num +" of "+{{pn}}); // or some ajax content loading...
                 $.get("{% url 'dashboard:customer-paginate' %}",{page:num},function(data){
                    $('#tb').html(data);
                 });
         }).children('.pagination').addClass('pagination-flat pagination-sm')
 
+        //**@ display size select
+        $('.list-sz').selectpicker().on('change', function(){
+            var ts = $(this).val();
+            $.ajax({ url: "{% url 'dashboard:customer-paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+            }});
+        });
 
       var delay = (function(){
         var timer = 0;
@@ -241,9 +238,11 @@
 
       $('.search_user').keyup(function() {
         var search_text = $(this).val();
+        var size = $('.list-sz').val();
+        var page =  $('#page_size').val();
         delay(function(){
            var url = "{% url 'dashboard:customer-search' %}";
-           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+           $.ajax({ url:url, type: 'GET',data: {page:page, q:search_text, size:size},success: function(data){
                   $('#pagination-div').html(data);
            }});
         }, 500 );

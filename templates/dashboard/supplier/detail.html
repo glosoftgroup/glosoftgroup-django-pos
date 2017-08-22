@@ -8,6 +8,10 @@
 {% endblock %}
 
 {% block menu_supplier_class %}active{% endblock %}
+ {% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:supplier' %}">Supplier</a></li>
+    <li><a href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{user.name|title}}</a></li>
+ {% endblock %}
 {% block custom_css %}
 <style type="text/css">
 
@@ -26,28 +30,86 @@
           </div>
         </div>
         <div class="panel-body">
-        <div class="col-md-6 col-xs-12 left text-center">
-          <div class="left">
-              {% if user.image %}
-          <img src=" {{user.image.url}}" alt="Texto Alternativo" class="img-circle img-thumbnail" style="width: 200px;height: 200px;" />
-             {% else %}
-                <img src="{% static 'images/user.png' %}" alt="" class="img-circle img-thumbnail" style="width: 100px;height: 100px;" />
+
+            <div class="col-md-6 col-xs-12 left text-center">
+          <div class="col-md-12">
+                      {% if user.image %}
+              <img src=" {{user.image.url}}" alt="Texto Alternativo" class="img-circle img-thumbnail" style="width: 200px;height: 200px;" />
+           {% else %}
+              <img src="{% static 'images/user.png' %}" alt="" class="img-circle img-thumbnail" style="width: 200px;height: 200px;" />
+            {% endif %}
+
+                    <div class="caption text-center">
+                    <h3 class="text-semibold no-margin">
+                      {{user.name }}
+                    </h3>
+
+          </div>
+
+          </div>
+
+          <table class="table datatable-header-footer">
+             <thead><tr><td colspan="2"><h5>Details</h5></td></tr></thead>
+            <tbody>
+              <tr><td>Email:</td><td> {{user.email }}</td></tr>
+              <tr><td>Mobile No:</td><td> {{user.mobile }}</td></tr>
+              <tr><td>Address:</td><td> {{user.street1 }}</td></tr>
+              <tr><td>Website:</td><td> {{user.website }}</td></tr>
+              <tr><td>Description:</td><td> {{user.description }} </td></tr>
+            </tbody>
+
+          </table>
+         <a href="{% url 'dashboard:supplier-edit' pk=user.pk %}" class="btn-block btn-info btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>
+  		     </div>
+
+            <div class="col-md-6 col0xs-12" style="padding-left: 60px;">
+                <div class="col-md-12">
+                    <h4>Contacts</h4>
+                </div>
+                {% if  user.get_addresses %}
+                     {% for address in user.get_addresses %}
+              <div class="col-md-12">
+                <div class="panel border-left-lg border-left-warning invoice-grid timeline-content">
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-sm-12">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <p class="text-semibold no-margin-top">Name: {{address.contact_name}}</p>
+                                  <p class="text-semibold no-margin-top">Email: {{address.email}}</p>
+                              </div>
+                              <div class="col-md-6">
+                                  <p class="text-semibold no-margin-top">Job Position: {{ address.job_position }}</p>
+                                  <p class="text-semibold no-margin-top">Mobile: {{ address.phone }}</p>
+                              </div>
+                              <div class="col-md-12">
+                                  <span class="text-semibold no-margin-top">Address: {{ address.city}}&nbsp;
+                             {{ address.postal_code }} </span>
+                              </div>
+                          </div>
+
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                {% endfor %}
+            {% else %}
+            <div class="col-md-12">
+                <div class="panel border-left-lg border-left-warning invoice-grid timeline-content">
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <h6 class="text-center"> No Contacts Available</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
              {% endif %}
-             <h1>{{user.name }}</h1>
-            
-           <div class="right">
-            <p> Email: {{user.email }}</p>            
-            <p> Mobile No: {{user.mobile }}</p>  
            </div>
-         </div> 
-         <div class="col-md-6 col0xs-12">
-          
-         <h2> Edit Supplier 
-            <a href="{% url 'dashboard:supplier-edit' pk=user.pk %}" class="btn btn-default btn-sm"><i class="icon-pencil7" style="font-size: 11px;"></i> edit</a>
-         </h2>
-         
-         </div> 
-   </div>
+
   </div>   
   </div>
 </div>

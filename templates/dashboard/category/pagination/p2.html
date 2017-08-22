@@ -56,9 +56,9 @@
                                     Action <span class="caret"></span>
                                   </button>
                                   <ul class="dropdown-menu edit-dropdown">
-                                    <li><a href="{% url 'dashboard:category-list' root_pk=node.pk %}" data-csrf_token='{{ csrf_token }}'>
-                                        <i class="icon-eye position-left"></i>DETAILS
-                                    </a></li>
+                                    <!--<li><a href="{% url 'dashboard:category-list' root_pk=node.pk %}" data-csrf_token='{{ csrf_token }}'>-->
+                                        <!--<i class="icon-eye position-left"></i>DETAILS-->
+                                    <!--</a></li>-->
                                  {% if perms.product.change_category %}
                                     <li><a href="#modal_instance" data-title="Edit {{ node.name }} Category" data-warning="" data-csrf_token='{{ csrf_token }}' data-href="{% url 'dashboard:category-edit' root_pk=node.pk %}"
                                     class="modal-trigger-ajax"><i class="icon-pencil7 position-left" data-popup="tooltip" tite='Edit product' data-placement="bottom"  data-original-title="Edit me"></i>EDIT

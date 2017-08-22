@@ -4,9 +4,12 @@
 {% load prices_i18n %}
 
 {% block title %}
-  users
+  Customer
 {% endblock %}
-
+{% block breadcrumbs %}
+<li class="active"><a href="{% url 'dashboard:customers' %}">Customer</a></li>
+<li class="active"><a href="javascript:;">Detail</a></li>
+{% endblock %}
 {% block menu_addCustomer_class %}active{% endblock %}
 {% block custom_css %}
 <style type="text/css">
