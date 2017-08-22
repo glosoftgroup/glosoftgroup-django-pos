@@ -27,6 +27,9 @@ $(function() {
  // pricing variables
  var tax_id = $('#id_product_tax');
  var updatePricing = $('#updatePricing');
+ $('#xsxs').on('click',function(){
+  console.log('clicked');
+ });
  var newPrice = $('#tabprice');
  var wholesaleId = $('#id_wholesale_price');
  var tax = 0;
@@ -41,21 +44,7 @@ $(function() {
  $('.disablesku').find('input[name=variant-sku]')
  .removeAttr('required').attr('disabled','disabled');
 
- // alertUser
-  function alertUser(msg,status='bg-success',header='Well done!')
-  { $.jGrowl(msg,{header: header,theme: status}); }
-
-
- //add productDetails
- function addProductDetails(dynamicData,url,method){
- 	dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
- 	return $.ajax({
-      url: url,
-      type: method,
-      data: dynamicData
-    });
-
- }
+ 
 
  updateStockBtn.on('click', function(){ 	
  	var sku = skuId.val();
@@ -88,7 +77,7 @@ $(function() {
     });
 
  });
- updatePricing.on('click',function(){
+ updatePricing.on('click',function(){    
     tax = tax_id.val();
     price = newPrice.val();
     wholesalePrice = wholesaleId.val();
@@ -397,10 +386,19 @@ $(function() {
 
 $(function(){
   var addNewStockBtn = $('#addNewStockBtn');
-  var modalIds = $('#modal_stocks');
-  var getStockformUrl = $(this).data('contenturl');
+  var modalIds = $('#modal_stocks');  
+  var addStockForm = $('.addstockresults');
 
   addNewStockBtn.on('click',function(){
+    dynamicData = {};
+    var getStockformUrl = $(this).data('contenturl');
+    method = 'get';
+    addProductDetails(dynamicData,getStockformUrl,method)
+    .done(function(data){
+      //alertUser(data);
+      addStockForm.html(data);
+
+    });
     modalIds.modal();
   });
 });
