@@ -9,6 +9,7 @@ from graphene_django.views import GraphQLView
 
 from .accounts.urls import urlpatterns as accounts_urls
 from .api.cash.urls import urlpatterns as api_cash_urls
+from .api.invoice.urls import urlpatterns as api_invoice_urls
 from .api.payment.urls import urlpatterns as api_payment_urls
 from .api.product.urls import urlpatterns as api_urls
 from .cart.urls import urlpatterns as cart_urls
@@ -34,6 +35,7 @@ urlpatterns = [
     url(r'^account/', include(registration_urls)),
     url(r'^accounts/', include(accounts_urls, namespace='accounts')),
     url(r'^api/cash/', include(api_cash_urls, namespace='cash-api')),
+    url(r'^api/invoice/', include(api_invoice_urls, namespace='invoice-api')),
     url(r'^api/products/', include(api_urls, namespace='product-api')),
     url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),
     url(r'^cart/', include(cart_urls, namespace='cart')),
