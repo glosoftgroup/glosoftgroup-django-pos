@@ -42,16 +42,23 @@
              table {
               max-width: 960px;
               margin: 10px auto;
+
+            }
+            tr{
+                border-bottom:0.5px solid #ddd;
+                border-right:0.5px solid #ddd;
+                border-left:0.5px solid #ddd;
             }
             th {
                   font-weight: 400;
-                  background: #1779c6;
+                  background:#2196F3;
                   color: #FFF;
                 }
              .td{text-align: center;}
              tr{padding:5px;}
-            .foot{padding-top:30px;}
-            .foot p{ color: #007cae;font-size: 12px;}
+            <!--.foot{padding-top:30px;}-->
+            <!--.foot p{ color: #007cae;font-size: 12px;}-->
+
          </style>
      </head>
      <body>
@@ -63,7 +70,7 @@
              </div>
          <div>
          <div class='details'>
-            <table class="table  table-hover datatable-header-footer" style="border:0.5px solid #ddd;"> 
+            <table repeat="1" class="table  table-hover datatable-header-footer" style="">
                 <thead>
                   <tr>
                     <th>Id</th>
@@ -93,8 +100,9 @@
                   </tbody>
            </table>
          </div>
-         <div class="foot">
+         <div class="foot" id="footerContent">
              <p style="text-align: center;">Report Pulled by: {% if puller.email %}{{ puller.email }} {% else %} {{ puller.name }}{% endif %}</p>
+             <p style="text-align:center">Page <pdf:pagenumber> of <pdf:pagecount> </p>
          </div>
      </body>
  </html>
