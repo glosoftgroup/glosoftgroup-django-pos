@@ -16,12 +16,13 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 import os
+import base64
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf
+from ...utils import render_to_pdf, image64
 import csv
 import random
 from django.utils.encoding import smart_str
@@ -427,6 +428,7 @@ def user_assign_permission(request):
                 user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name),'add')
                 info_logger.info('User: '+str(request.user.name)+' assigned permissions for user: '+str(user.name))
                 return HttpResponse('permissions updated')
+
 @staff_member_required
 def user_search( request ):
 
@@ -526,11 +528,15 @@ def usertrail_search( request ):
 
 @staff_member_required
 def users_pdf(request):
+    name = request.GET.get('name')
     users = User.objects.all()
+    img = image64()
     data = {
         'today': date.today(),
         'users': users,
-        'puller': request.user
+        'puller': request.user,
+        'name':name,
+        'image':img,
         }
     pdf = render_to_pdf('dashboard/users/pdf/users.html', data)
     return HttpResponse(pdf, content_type='application/pdf')
