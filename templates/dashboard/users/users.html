@@ -184,6 +184,7 @@
 
         </div>
         </div>
+          {% if users %}
          <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -191,6 +192,7 @@
             </div>
             <input type="hidden" id="page_size" val="">
           </div>
+          {% endif %}
       </div>
     </div><!-- pagination -->
   </div>
@@ -236,6 +238,7 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
+
     $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
@@ -245,8 +248,30 @@
 
         var ts = $(this).val();
         if(ts == 'pdf'){
-          var url = "{% url 'dashboard:users_pdf' %}";
-          window.open(url, '_blank');
+            var searchData = $('.search_user').val();
+            var listSizeVal = $('.list-sz').find(":selected").val();
+            var groupSizeVal = $('.group-sz').find(":selected").val();
+            var url = "{% url 'dashboard:users_pdf' %}";
+
+            if (searchData && (groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')) ){
+                $.get(url, {q:searchData, gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if ((groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none'))){
+                $.get(url, {gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (searchData){
+                $.get(url, {q:searchData}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else{
+                $.get(url, function(data){
+                          window.open("data:application/pdf," + escape(data));
+               });
+            }
+          <!--var url = "{% url 'dashboard:users_pdf' %}";-->
+          <!--window.open(url, '_blank');-->
 
         }else if(ts=='excel'){
           window.location="{% url 'dashboard:users_export_csv' %}";
@@ -475,7 +500,6 @@
        }
 
     });
-
 
   });
 
