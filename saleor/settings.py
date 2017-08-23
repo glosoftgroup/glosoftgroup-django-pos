@@ -206,7 +206,7 @@ INSTALLED_APPS = [
     'django_countries',
     'rest_framework.authtoken',
     'notifications',
-    'chartjs',
+    # 'chartjs',
 ]
 
 LOGGING = {

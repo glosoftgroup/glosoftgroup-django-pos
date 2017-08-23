@@ -180,12 +180,18 @@ def user_paginate(request):
     list_sz = request.GET.get('size')
     p2_sz = request.GET.get('psize')
     select_sz = request.GET.get('select_size')
+
     if request.GET.get('gid'):
         users = User.objects.filter(groups__id=request.GET.get('gid'))
         if p2_sz:
             paginator = Paginator(users, int(p2_sz))
             users = paginator.page(page)
             return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
+
+        if list_sz:
+            paginator = Paginator(users, int(list_sz))
+            users = paginator.page(page)
+            return TemplateResponse(request,'dashboard/users/p2.html',{'users':users, 'pn':paginator.num_pages,'sz':list_sz, 'gid':request.GET.get('gid')})
 
         paginator = Paginator(users, 10)
         users = paginator.page(page)
@@ -348,6 +354,11 @@ def user_update(request, pk):
                     user.groups.add(*th_groups2)
                     user.user_permissions.remove(*permissions_in_user_groups)
                     user.user_permissions.add(*group_permissions)
+            else:
+                '''remove all groups'''
+                if user_groups:
+                    user.groups.remove(*user_groups)
+                    return HttpResponse("groups removed")
             return HttpResponse("success with image")
         else:
             user.name = name
@@ -369,6 +380,11 @@ def user_update(request, pk):
                     user.groups.add(*th_groups2)
                     user.user_permissions.remove(*permissions_in_user_groups)
                     user.user_permissions.add(*group_permissions)
+            else:
+                '''remove all groups'''
+                if user_groups:
+                    user.groups.remove(*user_groups)
+                    return HttpResponse("groups removed")
             return HttpResponse("success without image")
 
 
@@ -416,32 +432,65 @@ def user_search( request ):
 
     if request.is_ajax():
         page = request.GET.get('page', 1)
-        list_sz = request.GET.get('size',10)
+        list_sz = request.GET.get('size')
         p2_sz = request.GET.get('psize')
         q = request.GET.get( 'q' )
-        if list_sz is None:
+        if list_sz == 0 or list_sz is None:
             sz = 10
         else:
             sz = list_sz
 
+
         if q is not None:
             users = User.objects.filter(
                 Q( name__icontains = q ) |
-                Q( email__icontains = q ) | Q( mobile__icontains = q ) ).order_by( 'id' )
-            paginator = Paginator(users, 10)
-            try:
-                users = paginator.page(page)
-            except PageNotAnInteger:
-                users = paginator.page(1)
-            except InvalidPage:
-                users = paginator.page(1)
-            except EmptyPage:
-                users = paginator.page(paginator.num_pages)
-            if p2_sz:
-                users = paginator.page(page)
-                return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
+                Q( email__icontains = q ) | Q( mobile__icontains = q ) ).order_by('-id' )
 
-            return TemplateResponse(request, 'dashboard/users/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
+            if request.GET.get('gid'):
+                users = users.filter(groups__id=request.GET.get('gid'))
+                if p2_sz:
+                    paginator = Paginator(users, int(p2_sz))
+                    users = paginator.page(page)
+                    return TemplateResponse(request, 'dashboard/users/paginate.html', {'users': users})
+
+                if list_sz:
+                    paginator = Paginator(users, int(list_sz))
+                    users = paginator.page(page)
+                    return TemplateResponse(request, 'dashboard/users/search.html',
+                                            {'users': users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid':request.GET.get('gid'),'q':q})
+
+                paginator = Paginator(users, 10)
+                users = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/users/search.html',
+                                        {'users': users, 'pn': paginator.num_pages, 'sz': sz,
+                                         'gid': request.GET.get('gid')})
+
+            else:
+                if list_sz:
+                    paginator = Paginator(users, int(list_sz))
+                    users = paginator.page(page)
+                    return TemplateResponse(request, 'dashboard/users/search.html',
+                                            {'users': users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,'q':q})
+
+                if p2_sz:
+                    paginator = Paginator(users, int(p2_sz))
+                    users = paginator.page(page)
+                    return TemplateResponse(request, 'dashboard/users/paginate.html', {'users': users})
+
+                paginator = Paginator(users, 10)
+                try:
+                    users = paginator.page(page)
+                except PageNotAnInteger:
+                    users = paginator.page(1)
+                except InvalidPage:
+                    users = paginator.page(1)
+                except EmptyPage:
+                    users = paginator.page(paginator.num_pages)
+                # if p2_sz:
+                #     users = paginator.page(page)
+                #     return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
+
+                return TemplateResponse(request, 'dashboard/users/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 @staff_member_required
 def usertrail_search( request ):

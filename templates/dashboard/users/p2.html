@@ -98,8 +98,8 @@
                     });
                 }else{
                     $.get("{% url 'dashboard:user_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
-                   $('#p-tb').html(data);
-                });
+                       $('#p-tb').html(data);
+                    });
                 }
 
         }).children('.pagination').addClass('pagination-flat pagination-sm')
