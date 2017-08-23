@@ -401,10 +401,6 @@ class StockManager(models.Manager):
         stock.quantity = F('quantity') - quantity
         stock.quantity_allocated = F('quantity_allocated') - quantity
         stock.save(update_fields=['quantity', 'quantity_allocated'])
-    def decrease_quantity(self, stock, quantity):
-        stock.quantity = F('quantity') - quantity        
-        stock.save(update_fields=['quantity'])
-
 
 
 
@@ -611,5 +607,4 @@ class VariantImage(models.Model):
         verbose_name = pgettext_lazy(
             'Variant image model', 'variant image')
         verbose_name_plural = pgettext_lazy(
-            'Variant image model', 'variant images')
-
+'Variant image model', 'variant images')

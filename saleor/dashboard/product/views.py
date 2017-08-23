@@ -633,6 +633,10 @@ def product_edit(request, pk):
     product = get_object_or_404(
         Product.objects.prefetch_related(
             'images', 'variants'), pk=pk)
+    product = Product.objects.get(pk=product.pk)
+    stock = Stock()
+    stock_form = forms.StockForm(request.POST or None, instance=stock,
+                           product=product)
     edit_variant = not product.product_class.has_variants
     attributes = product.product_class.variant_attributes.prefetch_related(
         'values')
@@ -660,7 +664,7 @@ def product_edit(request, pk):
             'Dashboard message', 'Updated product %s') % product
         messages.success(request, msg)
         return redirect('dashboard:product-update', pk=product.pk)
-    ctx = {'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
+    ctx = {'stock_form':stock_form,'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
            'product': product, 'stock_delete_form': stock_delete_form,
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,

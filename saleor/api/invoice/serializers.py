@@ -64,8 +64,11 @@ class ItemsSerializer(serializers.ModelSerializer):
     def get_item_pk(self,obj):
         return obj.pk
     def get_available_stock(self,obj):
-        stock = ProductVariant.objects.get(sku=obj.sku)
-        return stock.get_stock_quantity()
+        try:
+            stock = ProductVariant.objects.get(sku=obj.sku)
+            return stock.get_stock_quantity()
+        except:
+            return 0
 
 class InvoiceListSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
