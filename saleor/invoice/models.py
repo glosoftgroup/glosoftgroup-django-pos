@@ -60,7 +60,7 @@ class Invoice(models.Model):
 		Terminal, related_name='terminal_invoice',blank=True, default='',
 		verbose_name=pgettext_lazy('Invoice field', 'order'))
 	invoice_number = models.CharField(
-		pgettext_lazy('Invoice field', 'invoice_number'), null=True, max_length=36,)
+		pgettext_lazy('Invoice field', 'invoice_number'), unique=True, null=True, max_length=36,)
 	
 	total_net = models.DecimalField(
 		pgettext_lazy('Invoice field', 'total net'), default=Decimal(0), max_digits=100, decimal_places=2)

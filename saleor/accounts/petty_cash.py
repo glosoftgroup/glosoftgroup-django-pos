@@ -51,37 +51,47 @@ error_logger = logging.getLogger('error_logger')
 def view(request):
 	try:
 		try:
-			petty_cash = PettyCash.objects.latest('id')
-			amount = petty_cash.balance
+			lastEntry = PettyCash.objects.latest('id')
+			date = lastEntry.created
+			amount = lastEntry.closing
+			opening = lastEntry.opening
+			added = lastEntry.added
+			closing = lastEntry.closing
 		except:
+			date = datetime.date.today()
 			amount = 0
-
-		date = DateFormat(datetime.datetime.today()).format('Y-m-d')
-
-		try:
-			pettyCash = PettyCash.objects.filter(created__icontains=date)
-			opening_amount = pettyCash.aggregate(Sum('opening_amount'))
-			p = pettyCash.order_by('-id')[:1]
-			balance = [i for i in p]
-			expenses = Expenses.objects.filter(added_on__icontains=date)
-			types = expenses.values('expense_type').annotate(Count('expense_type'))
-			expense_amount = expenses.aggregate(Sum('amount'))['amount__sum']
-		except:
-			expenses = 0
-			types = 0
-			pettyCash = None
-			opening_amount = 0
-			expense_amount = 0
-			balance = 0
-
+			opening = 0
+			added = 0
+			closing = 0
+		# try:
+		# 	petty_cash = PettyCash.objects.latest('id')
+		# 	amount = petty_cash.balance
+		# except:
+		# 	amount = 0
+		#
+		# date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+		#
+		# try:
+		# 	pettyCash = PettyCash.objects.filter(created__icontains=date)
+		# 	opening_amount = pettyCash.aggregate(Sum('opening_amount'))
+		# 	p = pettyCash.order_by('-id')[:1]
+		# 	balance = [i for i in p]
+		# 	expenses = Expenses.objects.filter(added_on__icontains=date)
+		# 	types = expenses.values('expense_type').annotate(Count('expense_type'))
+		# 	expense_amount = expenses.aggregate(Sum('amount'))['amount__sum']
+		# except:
+		# 	expenses = 0
+		# 	types = 0
+		# 	pettyCash = None
+		# 	opening_amount = 0
+		# 	expense_amount = 0
+		# 	balance = 0
+		#
 		data = {
-			'expenses': expenses,
-			'types': types,
-			'pettyCash': pettyCash,
-			'opening_amount': opening_amount,
-			'expense_amount': expense_amount,
-			'balance': balance,
-
+			'pdate':date,
+			'opening_amount': opening,
+			'added_amount': added,
+			'closing_amount': closing,
 			'amount': amount
 		}
 
@@ -91,32 +101,37 @@ def view(request):
 
 @staff_member_required
 def add(request):
-	amount = request.POST.get('amount')
-	try:
-		petty_cash = PettyCash.objects.latest('id')
-		total = petty_cash.balance + Decimal(amount)
-		print (petty_cash.balance)
-		print (total)
-		new_petty_cash = PettyCash(opening_amount=total, balance=total)
-		previousBalance = petty_cash.balance
-	except Exception, e:
-		new_petty_cash = PettyCash(opening_amount=amount, balance=amount)
-		previousBalance = 0
-		print (e)
+	amount = Decimal(request.POST.get('amount'))
 
 	try:
-		new_petty_cash.save()
-		user_trail(request.user.name, 'petty cash balance: '+ str(previousBalance)+', added '+ str(amount)+' current balance is '+ str(new_petty_cash.balance)+', total', 'update')
-		info_logger.info('User: ' + str(request.user.name) + 'petty cash balance: '+ str(previousBalance)+', added '+ str(amount)+' current balance is '+ str(new_petty_cash.balance)+', total', 'update')
-		return HttpResponse(new_petty_cash.balance)
+		lastEntry = PettyCash.objects.latest('id')
+		pd = DateFormat(lastEntry.created).format('Y-m-d')
+		td = DateFormat(datetime.datetime.today()).format('Y-m-d')
+		if td == pd:
+			lastEntry.added = lastEntry.added + amount
+			lastEntry.closing = lastEntry.closing + amount
+			lastEntry.save()
+			balance = lastEntry.closing
+		else:
+			new_opening = lastEntry.closing
+			new_balance = lastEntry.closing + amount
+			new_petty_cash = PettyCash(opening=new_opening, added=amount, closing=new_balance)
+			new_petty_cash.save()
+			balance = new_petty_cash.closing
+		user_trail(request.user.name, 'added KShs. '+ str(amount)+' to petty cash balance of KShs. '+
+				   str(lastEntry.closing)+' current balance is KShs. '+str(lastEntry.closing + amount), 'update')
+		info_logger.info(
+			'User: ' + str(request.user.name) + 'added '+ str(amount)+' to petty cash balance of KShs. '+
+			str(lastEntry.closing)+' current balance is '+str(lastEntry.closing + amount), 'update')
+		return HttpResponse(balance)
 	except Exception, e:
 		print (e)
-		return HttpResponse(e)
+		HttpResponse(e)
 
 def balance(request):
 	try:
-		current_amount = PettyCash.objects.latest('id')
-		amount = current_amount.balance
+		lastEntryId = PettyCash.objects.latest('id')
+		amount = lastEntryId.closing
 		return HttpResponse(amount)
 	except Exception, e:
 		amount = 0
@@ -125,22 +140,34 @@ def balance(request):
 def expenditure(request):
 	date = request.GET.get('date')
 	try:
-		pettyCash = PettyCash.objects.filter(created__icontains=date)
-		opening_amount = pettyCash.aggregate(Sum('opening_amount'))
-		p = pettyCash.order_by('-id')[:1]
-		balance = [i for i in p]
-		expenses = Expenses.objects.filter(added_on__icontains=date)
-		types = expenses.values('expense_type').annotate(Count('expense_type'))
-		amount = expenses.aggregate(Sum('amount'))['amount__sum']
+		if date:
+			date = date
+		else:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
+		pettyCash = PettyCash.objects.filter(created__icontains=date)
+		lastEntry = pettyCash.latest('id')
+
+		pd = DateFormat(lastEntry.created).format('Y-m-d')
+		td = DateFormat(datetime.datetime.today()).format('Y-m-d')
+		if td == pd:
+			dateToday = 1
+		else:
+			dateToday = 0
+
+		date = lastEntry.created
+		amount = lastEntry.closing
+		opening = lastEntry.opening
+		added = lastEntry.added
+		closing = lastEntry.closing
 		data = {
-			'expenses':expenses,
-			'types':types,
-			'pettyCash':pettyCash,
-			'opening_amount':opening_amount,
-			'expense_amount':amount,
-			'balance':balance
+			'pdate': date,
+			'opening_amount': opening,
+			'added_amount': added,
+			'closing_amount': closing,
+			'amount': amount,
+			'dateToday':dateToday
 		}
 		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html', data)
 	except Exception, e:
-		return HttpResponse(e)
+		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html',{})

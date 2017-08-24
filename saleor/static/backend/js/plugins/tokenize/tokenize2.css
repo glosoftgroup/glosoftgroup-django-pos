@@ -35,7 +35,7 @@
 .tokenize > .tokens-container > .token,
 .tokenize > .tokens-container > .placeholder,
 .tokenize > .tokens-container > .token-search {
-    border: 1px solid #cdd5e3;
+    border: 1px solid #0d3377;
     display: inline-block;
     margin: 5px 5px 0 0;
     position: relative;

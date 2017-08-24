@@ -145,10 +145,6 @@ class CreateInvoiceSerializer(serializers.ModelSerializer):
            total_net = Decimal(validated_data.get('total_net'))
         except:
            total_net = Decimal(0)
-        terminal = Terminal.objects.get(pk=self.terminal_id)    
-        terminal.amount += Decimal(total_net)       
-        terminal.save() 
-
         try:
             if validated_data.get('customer'):
                 customer = Customer.objects.get(name=validated_data.get('customer'))

@@ -152,11 +152,10 @@ def add_process(request):
     paid_to  = request.POST.get('paid_to')
     received_by = request.POST.get('received_by')
     phone = request.POST.get('phone')
-    payment_mode = request.POST.get('payment_mode')
     description = request.POST.get('description')
     new_expense = PersonalExpenses(voucher=voucher, expense_type=expense_type, expense_date=expense_date,
                         amount=amount, authorized_by=authorized_by, paid_to=paid_to,
-                        received_by=received_by, phone=phone, payment_mode=payment_mode,
+                        received_by=received_by, phone=phone,
                         description=description)
 
     try:
@@ -199,8 +198,8 @@ def expenses_search(request):
         if q is not None:
             expenses = PersonalExpenses.objects.filter(
                 Q(expense_type__icontains=q) |
-                Q(paid_to__icontains=q) | Q(received_by__icontains=q) |
-                Q(payment_mode__icontains=q) | Q(phone__icontains=q)).order_by('id')
+                Q(paid_to__icontains=q) | Q(received_by__icontains=q)|
+                Q(phone__icontains=q)).order_by('id')
             paginator = Paginator(expenses, 10)
             try:
                 expenses = paginator.page(page)
