@@ -109,6 +109,15 @@ $(function() {
 *  # adding varaints
 **
 * ---------------------------------------------------------------------------- */
+
+function refreshStockVar(dynamicData={},url){    
+    return $.ajax({
+      url: url,
+      type: 'get',
+      data: dynamicData
+    });
+}
+
 $(function() {
   var addvariantBtn = $('#addvariantBtn');
   var retailPriceId = $('#rprice');
@@ -116,6 +125,7 @@ $(function() {
   var dynamicVariants = $('.dynamicvxx');
   var newSkuId = $('#new-sku-td');
   var refreshVaraintsContent = $('#refreshvaraintscontent');
+  var refreshStockVariants = $('#refreshStockVariants');
   var json = [];
   addvariantBtn.on('click',function(){    
     // map each varaint
@@ -154,11 +164,19 @@ $(function() {
     dynamicData['pk'] = $(this).data('productpk');
     var method = 'post';
     var url = $(this).data('attrurl');
+    var refreshvurl = $(this).data('refreshvurl');
     addProductDetails(dynamicData,url,method)
     .done(function(data){
       alertUser('data sent successfully');
       json = [];
       refreshVaraintsContent.html(data);
+      var dynamic = {}
+      dynamic['template'] = 'select_variant';
+      dynamic['get'] = 'variants';      
+      refreshStockVar(dynamic,refreshvurl)
+      .done(function(data){
+        refreshStockVariants.html(data);
+      });
     })
     .fail(function(){
       alertUser('Error adding attributes','bg-danger','Error!');
@@ -377,11 +395,81 @@ $(function() {
 
 
 });
+/* ------------------------------------------------------------------------------
+*
+*  # adding form stock
+**
+* ---------------------------------------------------------------------------- */
+function refreshStockDiv(url){
+    dynamicData = {};
+    return $.ajax({
+      url: url,
+      type: 'get',
+      data: dynamicData
+    });
+   }
+$(function(){
+   var stockVariantId  = $('#id_variant');
+   var costPriceId     = $('#stockcostprice');
+   var stockInvoiceId  = $('#stockInvoiceNumber');
+   var stockLocationId = $('#id_location');
+   var stockQuantityId = $('#stock_quantity');
+   var addnewStockBtn  = $('#addnewStockBtn');
+   // success
+   var refreshDiv = $('#refreshStockitems');   
+   addnewStockBtn.on('click',function(){
+    var variant = stockVariantId.val();
+    var cost_price = costPriceId.val();
+    var location = stockLocationId.val();
+    var quantity = stockQuantityId.val();
+    var invoice_number  = stockInvoiceId.val();
+    var addStockUrl = $(this).data('contenturl');
+    var refreshStockUrl = $(this).data('refreshstockurl');
+    // validation
+    if(!variant){
+      alertUser('Please select a variant','bg-danger','Field Required!');
+      return false;
+    }
+    if(!cost_price){
+      alertUser('Enter cost price','bg-danger','Field Required!');
+      return false;
+    }
+    if(!quantity){
+      alertUser('Stock Quantity required','bg-danger','Field Required!');
+      return false;
+    }
+    if(!invoice_number){
+      alertUser('Invoice number required','bg-danger','Field Required!');
+      return false;
+    }
+    
+    // ./validation
+    dynamicData = {};
+    dynamicData['variant'] = variant;
+    dynamicData['quantity'] = quantity;
+    dynamicData['cost_price'] = cost_price;
+    dynamicData['location'] = location;
+    dynamicData['invoice_number'] = invoice_number;
+    dynamicData['track'] = 'adding stock details';
+
+    addProductDetails(dynamicData,addStockUrl,'post')
+    .done(function(data){
+      alertUser('Stock information sent successfully');
+      refreshStockDiv(refreshStockUrl)
+      .done(function(data){
+        refreshDiv.html(data);
+      });
+    })
+    .fail(function(){
+      alertUser('Stock already exist','bg-danger','Error!');
+    });
+   });
+});
 
 /* ------------------------------------------------------------------------------
 *
-*  # adding stock
-**
+*  # adding modal stock
+*
 * ---------------------------------------------------------------------------- */
 
 $(function(){

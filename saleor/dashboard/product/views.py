@@ -763,6 +763,26 @@ def stock_form(request,product_pk):
 
 @staff_member_required
 @permission_decorator('product.change_stock')
+def stock_fresh(request, product_pk):
+    product = Product.objects.get(pk=product_pk)
+    if request.GET.get('get'):
+        if request.GET.get('get') == 'variants':
+            template = request.GET.get('template')
+            stock = Stock()
+            form = forms.StockForm(request.POST or None, instance=stock,
+                           product=product)
+            ctx = {'product':product,'stock_form':form}
+            return TemplateResponse(request, 'dashboard/product/partials/'+template+'.html', ctx)
+    variants = product.variants.all()
+    stock_items = Stock.objects.filter(
+        variant__in=variants).select_related('variant', 'location')
+    ctx = {'product':product,'stock_items':stock_items}
+    return TemplateResponse(request, 'dashboard/product/partials/stock_refresh.html', ctx)
+
+
+
+@staff_member_required
+@permission_decorator('product.change_stock')
 def stock_edit(request, product_pk, stock_pk=None):
     product = get_object_or_404(Product, pk=product_pk)
     if stock_pk:
