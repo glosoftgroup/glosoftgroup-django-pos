@@ -1,0 +1,73 @@
+{% if stock_form %}
+ {{ stock_form.variant }}
+
+ <script type="text/javascript">
+  // Basic select
+  $('.select').selectpicker();
+  function refreshStockDiv(url){
+    dynamicData = {};
+    return $.ajax({
+      url: url,
+      type: 'get',
+      data: dynamicData
+    });
+   }
+$(function(){
+   var stockVariantId  = $('#id_variant');
+   var costPriceId     = $('#stockcostprice');
+   var stockInvoiceId  = $('#stockInvoiceNumber');
+   var stockLocationId = $('#id_location');
+   var stockQuantityId = $('#stock_quantity');
+   var addnewStockBtn  = $('#addnewStockBtn');
+   // success
+   var refreshDiv = $('#refreshStockitems');   
+   addnewStockBtn.on('click',function(){
+    var variant = stockVariantId.val();
+    var cost_price = costPriceId.val();
+    var location = stockLocationId.val();
+    var quantity = stockQuantityId.val();
+    var invoice_number  = stockInvoiceId.val();
+    var addStockUrl = $(this).data('contenturl');
+    var refreshStockUrl = $(this).data('refreshstockurl');
+    // validation
+    if(!variant){
+      alertUser('Please select a variant','bg-danger','Field Required!');
+      return false;
+    }
+    if(!cost_price){
+      alertUser('Enter cost price','bg-danger','Field Required!');
+      return false;
+    }
+    if(!quantity){
+      alertUser('Stock Quantity required','bg-danger','Field Required!');
+      return false;
+    }
+    if(!invoice_number){
+      alertUser('Invoice number required','bg-danger','Field Required!');
+      return false;
+    }
+    
+    // ./validation
+    dynamicData = {};
+    dynamicData['variant'] = variant;
+    dynamicData['quantity'] = quantity;
+    dynamicData['cost_price'] = cost_price;
+    dynamicData['location'] = location;
+    dynamicData['invoice_number'] = invoice_number;
+    dynamicData['track'] = 'adding stock details';
+
+    addProductDetails(dynamicData,addStockUrl,'post')
+    .done(function(data){
+      alertUser('Stock information sent successfully');
+      refreshStockDiv(refreshStockUrl)
+      .done(function(data){
+        refreshDiv.html(data);
+      });
+    })
+    .fail(function(){
+      alertUser('Stock already exist','bg-danger','Error!');
+    });
+   });
+});
+ </script>
+{% endif %}
