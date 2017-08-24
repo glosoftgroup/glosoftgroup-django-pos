@@ -1853,3 +1853,17 @@ def have_variants(request):
             return HttpResponse(json.dumps(data),content_type='application/json')
         except:
             HttpResponse('Invalid class ID')
+
+@staff_member_required
+def add_new_attribute(request):
+    if request.method == 'POST':
+        if request.POST.get('name'):
+            slug = request.POST.get('name').replace(' ','_')
+            attribute = ProductAttribute.objects.create(name=request.POST.get('name'),slug=slug)
+        if request.POST.get('attributes'):
+            choices = json.loads(request.POST.get('attributes'))
+            for choice in choices:
+                slug = choice.replace(' ','_')
+                AttributeChoiceValue.objects.create(attribute=attribute,slug=slug,name=choice);        
+        return HttpResponse(attribute)
+    
