@@ -116,7 +116,7 @@
                       localStorage.setItem('user_id', data);
                       $('.user_id').val(localStorage.getItem("user_id"));
                       {% if product.pk %}
-                      window.location = "{% url 'dashboard:product-update' pk=product.pk %}?tab=stock";      
+                      //window.location = "{% url 'dashboard:product-update' pk=product.pk %}?tab=stock";      
                       {% endif %}
                     },
                     error:function(error){

@@ -401,13 +401,13 @@
             
           {% endfor %}
           <td>
-            <input type="text" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
+            <input type="number" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
             </td>
             <td>
-              <input type="text" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
+              <input type="number" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
             </td>     
             <td>
-              <button class="btn btn-xs btn-primary" id="addvariantBtn" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
+              <button class="btn btn-xs btn-primary" id="addvariantBtn" data-refreshvurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
             </td>
           </tr>
         </tbody>
@@ -561,12 +561,12 @@
                   <!-- CODE S -->
       <!-- STOCK DETAILS -->
       {% include "dashboard/product/partials/stock_details.html" with product=product %}
-
+      {% include 'dashboard/product/partials/stock_table_form.html' with product=product %}
                       <div id="stock" class="card">
       <form method="post" action="{% url 'dashboard:stock-bulk-delete' product_pk=product.pk %}" novalidate>
         {% csrf_token %}
         <div class="data-table-header-action" style="padding: 8px;">
-          <a href="#" data-contenturl="{% url 'dashboard:product-stock-add-form' product_pk=product.pk %}" onclick="return false" id="addNewStockBtn" class="btn-data-table btn-show-when-unchecked btn btn-primary">
+          <a href="#" data-contenturl="{% url 'dashboard:product-stock-add-form' product_pk=product.pk %}" onclick="return false" id="addNewStockBtn" class="btn-data-table btn-show-when-unchecked hidden btn btn-primary">
             {% trans "Add" context "Product form stock tab table action" %}
           </a>
           <a href="#modal-product-stock-delete" class=" btn-data-table btn-show-when-checked btn btn-danger" data-toggle="modal"  data-target="#modal-product-stock-delete"  style="display:none" hidden>
@@ -594,7 +594,7 @@
                 <button type="submit" class="modal-action btn btn-danger">
                   {% trans "Delete" context "Dashboard delete action" %}
                 </button>
-                <a href="#!" class="modal-action modal-close  btn btn-link ">
+                <a href="#!" data-dismiss="modal" class="modal-action modal-close  btn btn-link ">
                   {% trans "Cancel" context "Dashboard cancel action" %}
                 </a>
               </div>
@@ -605,6 +605,7 @@
           </div>
           <!-- end modal -->
         </div>
+      
         <div class="data-table-container">
           <table class="table  datatable-header-footer responsive data-table">
             
@@ -634,8 +635,9 @@
                 <th>Actions</th>
               </tr>
             </thead>
+             <tbody id="refreshStockitems">
             {% if stock_items %}
-            <tbody>
+           
               {% for item in stock_items %}
                 <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
                   <td class="bulk-checkbox ignore-link">
@@ -669,10 +671,8 @@
                     <a href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me">Edit</i></a>
                   </td>
                 </tr>
-              {% endfor %}
-            </tbody>
-            {% else %}
-              <tbody>
+              {% endfor %}           
+            {% else %}             
                 <tr>
                   <td colspan="8">
                     <span class="text-center alert alert-warning">
@@ -1145,6 +1145,7 @@
   
 
   $('.switch-actions').on('change', function() {
+    console.log('u clicked a check box');
   let $btnChecked = $(this).parents('form').find('.btn-show-when-checked');
   let $btnUnchecked = $(this).parents('form').find('.btn-show-when-unchecked');
   if ($(this).parents('form').find('.switch-actions:checked').length) {
