@@ -79,7 +79,7 @@
               </div>
             <!--</div>-->
               <div id="expenditureDetails">
-                {% if pettyCash %}
+                {% if amount != 0 %}
                     <div class="panel border-left-lg border-left-warning invoice-grid timeline-content">
                       <div class="panel-body">
                         <div class="row">
@@ -87,40 +87,12 @@
                               <div class="row">
                                   <div class="col-md-12">
                                       <p class="text-semibold text-center">
-                                          {% if balance %}
-                                            {% for p in balance %} {{p.created|date:'jS F Y'}} {% endfor %}
-                                          {% else %}
-                                          0.00
-                                          {% endif %}
+                                          {{pdate|date:'jS F Y'}}
                                       </p>
-                                      <p class="text-semibold no-margin-top">Opening Cash: KShs. {{opening_amount.opening_amount__sum}}</p>
-                                      <p class="text-semibold no-margin-top">Amount Spent: KShs.
-                                          {% if expense_amount %}
-                                            {{expense_amount}}
-                                          {% else %}
-                                            0.00
-                                          {% endif %}
-                                      </p>
-                                      <p class="text-semibold no-margin-top">Expenses: (
-                                          {% if types %}
-                                             {% for e in types %}
-                                                {% if forloop.last %}
-                                                    {{e.expense_type}}
-                                                {% else %}
-                                                    {{e.expense_type}},
-                                                {% endif %}
-                                              {% endfor %}
-                                          {% else %}
-                                            No Expense Types
-                                          {% endif %}
-                                          )</p>
-                                      <p class="text-semibold no-margin-top">Balance:
-                                          {% if balance %}
-                                            {% for i in balance %} {{i.balance}} {% endfor %}
-                                          {% else %}
-                                            0.00
-                                          {% endif %}
-                                      </p>
+                                      <p class="text-semibold no-margin-top">Opening Cash: KShs. {{opening_amount}}</p>
+                                      <p class="text-semibold no-margin-top">Cash Added: KShs. {{added_amount}} </p>
+
+                                      <p class="text-semibold no-margin-top">Current Balance: {{closing_amount}}</p>
                                   </div>
                               </div>
                           </div>
@@ -172,6 +144,10 @@ $(document).ready(function(){
               success:function(data){
                 $('.amount').val('');
                 $('.div-amount span').text('KShs. '+data);
+
+                $.get("{% url 'accounts:pettycash_expenditure' %}", function(data){
+                          $('#expenditureDetails').html(data);
+                });
                 $.jGrowl('Amount Updated successfully', {
                   header: 'Well done!',
                   theme: 'bg-success'

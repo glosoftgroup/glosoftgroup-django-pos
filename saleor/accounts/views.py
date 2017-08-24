@@ -152,23 +152,20 @@ def add_process(request):
     paid_to  = request.POST.get('paid_to')
     received_by = request.POST.get('received_by')
     phone = request.POST.get('phone')
-    payment_mode = request.POST.get('payment_mode')
     description = request.POST.get('description')
     new_expense = Expenses(voucher=voucher, expense_type=expense_type, expense_date=expense_date,
                         amount=amount, authorized_by=authorized_by, paid_to=paid_to,
-                        received_by=received_by, phone=phone, payment_mode=payment_mode,
+                        received_by=received_by, phone=phone,
                         description=description)
 
 
     petty_cash = PettyCash.objects.latest('id')
-    petty_cash_amount = petty_cash.balance
+    petty_cash_amount = petty_cash.closing
     try:
         petty_cash_amount -= Decimal(amount)
-        petty_cash.balance = petty_cash_amount
+        petty_cash.closing = petty_cash_amount
         petty_cash.save()
-        user_trail(request.user.name,'petty cash balance: ' + str(petty_cash.balance)
-                   + ' removed from expenses of ' + str(amount) + ', current balance is ' + str(petty_cash_amount) + ', total',
-                   'update')
+        user_trail(request.user.name,'spent KShs. '+ str(amount) +'on '+ str(expense_type) +' from petty cash, balance is: ' + str(petty_cash.closing))
     except Exception, e:
         error_logger.error(e)
 
@@ -224,7 +221,7 @@ def expenses_search(request):
             expenses = Expenses.objects.filter(
                 Q(expense_type__icontains=q) |
                 Q(paid_to__icontains=q) | Q(received_by__icontains=q) |
-                Q(payment_mode__icontains=q) | Q(phone__icontains=q)).order_by('id')
+                Q(phone__icontains=q)).order_by('id')
             paginator = Paginator(expenses, 10)
             try:
                 expenses = paginator.page(page)

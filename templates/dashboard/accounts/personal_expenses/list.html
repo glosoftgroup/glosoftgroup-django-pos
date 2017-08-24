@@ -104,7 +104,6 @@
                     <th>Exp. Date</th>
                     <th>Expense</th>
                     <th>Paid To</th>
-                    <th>Payment Mode</th>
                     <th>Amount</th>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <th class="text-center">Actions</th>
@@ -118,8 +117,6 @@
                     <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{ expense.expense_date }}</td>
                     <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{expense.expense_type}}</td>
                     <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{expense.paid_to}}</td>
-                    <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{expense.payment_mode}}
-                    </td>
                     <td class="td" data-href="{% url 'accounts:bexpense-detail' pk=expense.pk %}" data-m="#pdetail">
                     {{ expense.amount }}</td>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
