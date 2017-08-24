@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 
-from . import views
+from . import views, users_pdf
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -11,7 +11,7 @@ urlpatterns = [
                 (views.users), name='users'),
         url(r'^add/$', permission_required('userprofile.add_user', login_url='not_found')
                 (views.user_add), name='user-add'),
-        url(r'^users_pdf/$', views.users_pdf, name='users_pdf'),
+        # url(r'^users_pdf/$', views.users_pdf, name='users_pdf'),
         url(r'^users_export_csv/$', views.users_export_csv, name='users_export_csv'),
         url(r'^user_process/$',  permission_required('userprofile.add_user')
         (views.user_process), name='user_process'),
@@ -29,6 +29,7 @@ urlpatterns = [
         url(r'^user_assign_permission/$', views.user_assign_permission, name='user_assign_permission'),
         url(r'^user_paginate/', views.user_paginate, name='user_paginate'),
         url( r'^users_search/$', views.user_search, name = 'user_search' ),
+        url( r'^test/pdf/$', users_pdf.pdf, name ='users_pdf'),
         
 ]
 

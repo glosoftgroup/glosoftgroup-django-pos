@@ -1,22 +1,7 @@
 {% load materializecss %}
-{% load prices_i18n %}
-
-{% if request.GET.tab == 'pricing'  %}                   
-<div class="tab-pane has-padding active" id="bordered-tax">
-{% else %}
-  <div class="tab-pane has-padding" id="bordered-tax">            
-{% endif %}
-
-{% if product.pk %}
- 
-  
-  <!-- price area -->
-      <div class="col-md-12">
-        <!-- Product Pricing Details -->
-     <div class="col-md-12">       
-        <div class="col-md-12">
-          <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;">Product Pricing/Tax</h5>
-        </div>
+{% load prices_i18n %}  
+  <!-- price area -->  
+        <!-- Product Pricing Details -->      
         <div class="col-md-12">
           <div class="row">
             <div class="col-md-4">
@@ -38,71 +23,51 @@
         </div>
       {% if not product.product_class.has_variants %}
       <!-- Retail price inclusive tax -->
+
 <div id="pricingDiv">
-      <div class="row" style="margin-bottom:20px;">
-      <div class="col-md-4">
-        <div class="form-group">
-            <label class="col-md-12">Retail Price:<i class='text-danger'>*</i><span class="text-muted text-small">(Inclusive Tax)</span></label>
-            <input type="number" class="form-control" value="{{ product.price.gross }}" id="tabprice" name="tabprice">               
-        </div>
+
+<table class="table table-hover">
+  <thead>
+   <tr class="bg-primary">
+    <th>&nbsp;</th>
+    <th>Retail Price</th>
+    <th>Wholesale Price</th>
+    <th>&nbsp;</th>
+   </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td>
+      <div class="col-md-9">
+       <input type="number" placeholder="Retail Price" class="form-control" value="{{ product.price.gross }}" id="tabprice" name="tabprice"> 
       </div>
-      <!-- -->
-      <!-- Retail Tax -->
-      <div class="col-md-4">
-        <div class="form-group">
-          <label class="col-md-12 text-muted">Retail Tax:</label>
-            <span class="col-md-12">
-           <input type="disabled" name="retail_tax" id="retail_tax" class="form-control" value="" disabled="">
-           </span>                  
-        </div>
+      <div class="col-md-3">
+       <span>KES</span>
       </div>
-      <!-- (Before Tax) -->
-      <div class="col-md-4">
-         <div class="form-group">
-          <label class="col-md-12 text-muted">Retail Price:<span class="text-muted text-small">(Before Tax)</span></label>
-          <span class="col-md-12">
-           <input type="disabled" name="retail_plus_tax" id="retail_plus_tax" class="form-control" value="" disabled="">
-          </span>                  
-        </div>
-      </div> 
-      <!--  -->
-      </div>
-     <div class="row" style="margin-bottom:20px;">
-      <!-- wholesale Price: -->
-      <div class="col-md-4">
-        <div class="form-group">
-          <label class="col-md-12">wholesale Price:<span class="text-muted text-small">(Inclusive Tax)</span></label>
-          {{ product_form.wholesale_price }}                     
-        </div>
-      </div>  
-      <!-- Wholesale Tax: -->
-      <div class="col-md-4">
-        <div class="form-group">
-            <label class="col-md-12 text-muted">Wholesale Tax:</label>
-            <span class="col-md-12">
-           <input type="disabled" name="wholesale_tax" id="wholesale_tax" class="form-control" value="" disabled="">
-           </span>                  
-          </div>
-      </div>
-      <!-- wholesale price before tax  -->
-      <div class="col-md-4">
-        <div class="form-group">
-          <label class="col-md-12 text-muted">wholesale Price:(Before Tax)</label>
-          <span class="col-md-12">
-            <input type="disabled" name="wholesale_plus_tax" id="wholesale_plus_tax" class="form-control" value="" disabled="">
-         </span>                  
-        </div> 
-      </div>
-        </div>
-     </div>
-     {% endif %}
-     </div>
-      </div>
-      <!-- ./price area -->
-     <div class="col-md-6 col-md-offset-3 text-center p-10" style="margin-top:20px;">
-     <button class="btn btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing" onclick="return false;">Update</button>
-     	
-     </div>
+      </td>
+      <td>
+         {{ product_form.wholesale_price }}
+      </td>
+      <td>
+        <span>
+         <a  class="btn hvr-glow btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing">Save</a>
+       </span>
+      </td>
+    </tr>
+   
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3" class="text-center">
+       
+      </td>
+    </tr>
+  </tfoot>
+</table>
   
-{% endif %}
+    
 </div>
+     {% endif %}
+         
+  

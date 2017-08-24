@@ -66,18 +66,20 @@
                   </tr>
                   {% endfor %}
                 {% else %}
-                  <tr><td colspan="6"><h5 class="text-center">No Users Availbale</h5></td></tr>
+                  <tr><td colspan="6"><h5 class="text-center">No Users Available</h5></td></tr>
                 {% endif %}
                   </tbody>
            </table>
         </div>
         </div>
+          {% if users %}
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
             </div>
           </div>
+          {% endif %}
       </div>
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
@@ -98,8 +100,8 @@
                     });
                 }else{
                     $.get("{% url 'dashboard:user_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
-                   $('#p-tb').html(data);
-                });
+                       $('#p-tb').html(data);
+                    });
                 }
 
         }).children('.pagination').addClass('pagination-flat pagination-sm')

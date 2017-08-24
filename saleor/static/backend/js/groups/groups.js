@@ -1,8 +1,8 @@
-$('#modal_detail').on('hidden.bs.modal', function () {
+$('#modal_detail .addUserBtn').on('click', function(){
+    $('#modal_detail').modal('hide');
     var id = $('.cgroup_id').val();
     $( "#"+id+" td ul .modal_trigger_user" ).trigger( "click" );
 });
-
 $('#modal_users').on('hidden.bs.modal', function () {
     names = [];
 });

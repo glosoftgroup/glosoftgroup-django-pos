@@ -58,10 +58,27 @@ class TrackSerializer(serializers.ModelSerializer):
                 'product_category'
                  )
 
+class ItemsSerializer(serializers.ModelSerializer):
+    available_stock = SerializerMethodField()
+    class Meta:
+        model = SoldItem
+        fields = (
+                'order',
+                'sku',
+                'quantity',
+                'unit_cost',
+                'total_cost',
+                'product_name',
+                'product_category',
+                'available_stock'
+                 )
+    def get_available_stock(self,obj):
+        stock = ProductVariant.objects.get(sku=obj.sku)
+        return stock.get_stock_quantity()
 
 class SalesListSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
-    solditems = TrackSerializer(many=True)
+    solditems = ItemsSerializer(many=True)
     cashier = SerializerMethodField()
     class Meta:
         model = Sales
@@ -87,7 +104,7 @@ class SalesListSerializer(serializers.ModelSerializer):
 
 
 class SalesUpdateSerializer(serializers.ModelSerializer):    
-    #solditems = TrackSerializer(many=True)    
+    #solditems = ItemsSerializer(required=False,many=True)    
     class Meta:
         model = Sales
         fields = ('id',                 
@@ -98,8 +115,9 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
                  'terminal',
                  'amount_paid',                 
                  'mobile',
-                 'customer_name',                 
-                )       
+                 'customer_name',
+                 #'solditems',
+                 )       
     
 
     def update(self, instance, validated_data):        
@@ -108,6 +126,8 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
         instance.mobile = validated_data.get('mobile', instance.mobile)
         instance.customer_name = validated_data.get('customer_name', instance.customer_name)
         instance.save()
+        #solditems_data = validated_data.pop('solditems')
+        #print solditems_data
         return instance
 
 
@@ -153,10 +173,13 @@ class SalesSerializer(serializers.ModelSerializer):
 
     def create(self,validated_data):
         # add sold amount to drawer 
-        total_net = Decimal(validated_data.get('total_net'))
+        try:
+           total_net = Decimal(validated_data.get('total_net'))
+        except:
+           total_net = Decimal(0)
         terminal = Terminal.objects.get(pk=self.terminal_id)    
         terminal.amount += Decimal(total_net)       
-        terminal.save()     
+        terminal.save() 
 
         try:
             if validated_data.get('customer'):
@@ -183,7 +206,7 @@ class SalesSerializer(serializers.ModelSerializer):
                 loyalty_points = total_net/points_eq
             customer.loyalty_points += loyalty_points
             customer.save()
-        # get sold products
+        # get sold products        
         solditems_data = validated_data.pop('solditems')
         # sales = Sales.objects.create(**validated_data)
         sales = Sales.objects.create(user=validated_data.get('user'),
@@ -199,8 +222,9 @@ class SalesSerializer(serializers.ModelSerializer):
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
             stock = Stock.objects.get(variant__sku=solditem_data['sku'])
-            if stock:
-                Stock.objects.allocate_stock(stock, solditem_data['quantity'])
+            if stock:                
+                Stock.objects.decrease_quantity(stock,solditem_data['quantity'])                
+                
         return sales
         
 

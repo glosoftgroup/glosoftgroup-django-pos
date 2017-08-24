@@ -172,12 +172,7 @@
                      <!-- if product.pk %} -->
                      <!-- pricing tab -->
                      <!-- variant tab -->
-                    {% if request.GET.tab == 'pricing'  %}                   
-                     <li class="active">
-                    {% else %}
-                      <li>             
-                    {% endif %}
-                    <a href="#bordered-tax" class="tabProductAdded" data-toggle="tab">Product Pricing/Tax</a></li>
+                    
                     <!-- variant tab -->
                     {% if request.GET.tab == 'variants'  %}                   
                      <li class="active">
@@ -361,7 +356,7 @@
           <!-- /2 columns form -->
                     </div>
   <!-- panel product pricing -->
-{% include "dashboard/product/partials/pricing.html" with product=product %}
+
   <!-- ./end produc pricing -->
                     <!-- panel product variant -->
                     {% if request.GET.tab == 'variants'  %}                   
@@ -369,8 +364,9 @@
                     {% else %}
                       <div class="tab-pane has-padding" id="bordered-tab2">            
                     {% endif %}
-                    
+                    {% include "dashboard/product/partials/pricing.html" with product=product %}
                     {% if product.pk %}
+
                       {% if product.product_class.has_variants %}
       <!-- CODE V -->
       <div id="variants" class="">
@@ -405,13 +401,13 @@
             
           {% endfor %}
           <td>
-            <input type="text" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
+            <input type="number" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
             </td>
             <td>
-              <input type="text" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
+              <input type="number" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
             </td>     
             <td>
-              <button class="btn btn-xs btn-primary" id="addvariantBtn" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
+              <button class="btn btn-xs btn-primary" id="addvariantBtn" data-refreshvurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
             </td>
           </tr>
         </tbody>
@@ -551,6 +547,7 @@
      </div>
     {% endif %}
     {% endif %}
+     
                     </div>
                     <!-- end product variant -->
                     <!-- product stock -->
@@ -564,12 +561,12 @@
                   <!-- CODE S -->
       <!-- STOCK DETAILS -->
       {% include "dashboard/product/partials/stock_details.html" with product=product %}
-
+      {% include 'dashboard/product/partials/stock_table_form.html' with product=product %}
                       <div id="stock" class="card">
       <form method="post" action="{% url 'dashboard:stock-bulk-delete' product_pk=product.pk %}" novalidate>
         {% csrf_token %}
         <div class="data-table-header-action" style="padding: 8px;">
-          <a href="{% url 'dashboard:product-stock-add' product_pk=product.pk %}" class="btn-data-table btn-show-when-unchecked btn btn-primary">
+          <a href="#" data-contenturl="{% url 'dashboard:product-stock-add-form' product_pk=product.pk %}" onclick="return false" id="addNewStockBtn" class="btn-data-table btn-show-when-unchecked hidden btn btn-primary">
             {% trans "Add" context "Product form stock tab table action" %}
           </a>
           <a href="#modal-product-stock-delete" class=" btn-data-table btn-show-when-checked btn btn-danger" data-toggle="modal"  data-target="#modal-product-stock-delete"  style="display:none" hidden>
@@ -597,7 +594,7 @@
                 <button type="submit" class="modal-action btn btn-danger">
                   {% trans "Delete" context "Dashboard delete action" %}
                 </button>
-                <a href="#!" class="modal-action modal-close  btn btn-link ">
+                <a href="#!" data-dismiss="modal" class="modal-action modal-close  btn btn-link ">
                   {% trans "Cancel" context "Dashboard cancel action" %}
                 </a>
               </div>
@@ -608,6 +605,7 @@
           </div>
           <!-- end modal -->
         </div>
+      
         <div class="data-table-container">
           <table class="table  datatable-header-footer responsive data-table">
             
@@ -637,8 +635,9 @@
                 <th>Actions</th>
               </tr>
             </thead>
+             <tbody id="refreshStockitems">
             {% if stock_items %}
-            <tbody>
+           
               {% for item in stock_items %}
                 <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
                   <td class="bulk-checkbox ignore-link">
@@ -663,7 +662,7 @@
                     {{ item.location }}
                   </td>
                   <td class="right-align">
-                    {{ item.variant.get_stock_quantity }}
+                    {{ item.quantity }}
                   </td>
                   <td class="right-align">
                     {{ item.quantity_allocated }}
@@ -672,15 +671,13 @@
                     <a href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me">Edit</i></a>
                   </td>
                 </tr>
-              {% endfor %}
-            </tbody>
-            {% else %}
-              <tbody>
+              {% endfor %}           
+            {% else %}             
                 <tr>
                   <td colspan="8">
                     <span class="text-center alert alert-warning">
                       {% trans "There is no stock for this product." context "Empty stock table message" %}
-                      <button class="btn btn-primary btn-xs" data-contenturl="{% url 'dashboard:product-stock-add' product_pk=product.pk %}" onclick="return false" id="addNewStockBtn">Add stock</button>
+                      
                     </span>
                   </td>
                 </tr>
@@ -837,26 +834,20 @@
  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
 
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switch.min.js' %}"></script>
-
-
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/ui/moment/moment.min.js' %}"></script>
  
  
-  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+ 
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/core/libraries/jquery_ui/core.min.js' %}"></script>
-
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switchery.min.js' %}"></script>
 <!-- additional js -->
 <script type="text/javascript" src="{% static 'backend/js/category.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/productclass.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
+
 <script type="text/javascript" src="{% static 'backend/js/productattribute.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
 
@@ -934,7 +925,7 @@
   // fetch tax from the server
   var tax = localStorage.getItem("tax")
   // calculate retail tax exclusive tax
-  var retail = $('#id_price').val();
+  var retail = $('#tabprice').val();
   var retail_plus_tax = (parseInt(retail)*100)/(parseInt(tax)+100);
   retail_plus_tax=roundOff(retail_plus_tax);
 
@@ -953,7 +944,7 @@
    var wtx = parseInt(wholesale)-parseInt(wholesale_plus_tax);
    $('#wholesale_tax').attr('value',wtx);
   }
-  $("#id_price").on("change keyup paste keydown", function(event) {
+  $("#tabprice").on("change keyup paste keydown", function(event) {
       pricing();
   });
   $("body").on("change onbur keyup keydown", "#id_product_tax", function(event) {
@@ -1154,6 +1145,7 @@
   
 
   $('.switch-actions').on('change', function() {
+    console.log('u clicked a check box');
   let $btnChecked = $(this).parents('form').find('.btn-show-when-checked');
   let $btnUnchecked = $(this).parents('form').find('.btn-show-when-unchecked');
   if ($(this).parents('form').find('.switch-actions:checked').length) {

@@ -188,6 +188,7 @@ INSTALLED_APPS = [
     'saleor.payment',
     'saleor.purchase',
     'saleor.smessages',
+    'saleor.invoice',
 
     # External apps
     'versatileimagefield',
@@ -205,7 +206,8 @@ INSTALLED_APPS = [
     'social_django',
     'django_countries',
     'rest_framework.authtoken',
-    'notifications'
+    'notifications',
+    # 'chartjs',
 ]
 
 LOGGING = {

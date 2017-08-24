@@ -216,3 +216,17 @@ def expenses_search(request):
 
             return TemplateResponse(request, 'dashboard/accounts/personal_expenses/search.html',
                                     {'expenses': expenses, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+def detail(request, pk=None):
+
+    if request.method == 'GET':
+        try:
+            expense = get_object_or_404(PersonalExpenses, pk=pk)
+            user_trail(request.user.name, 'access expense details of: ' + str(expense.expense_type) + ' on ' + str(
+                expense.expense_date), 'view')
+            info_logger.info(
+                'access expense details of: ' + str(expense.expense_type) + ' on ' + str(expense.expense_date))
+            return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense': expense})
+        except Exception, e:
+            error_logger.error(e)
+            return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense': expense})

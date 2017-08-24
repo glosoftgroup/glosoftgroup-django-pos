@@ -65,16 +65,16 @@
               <label>Select group name</label>
               <div class="form-group">
                   <select class="bootstrap-select group-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
-                      <option value="all">Select All</option>
-                  {% if groups %}
-                  {% for group in groups %}
-                       <option value="{{group.id}}">
-                            {{group.name}}
-                       </option>
-                  {% endfor %}
-                  {% else %}
-                   <option value="none" data-icon="fa-dot-circle-o">No groups</option>
-                  {% endif %}
+                      <option value="all" selected>Select All</option>
+                      {% if groups %}
+                          {% for group in groups %}
+                               <option value="{{group.id}}">
+                                    {{group.name}}
+                               </option>
+                          {% endfor %}
+                      {% else %}
+                       <option value="none" data-icon="fa-dot-circle-o">No groups</option>
+                      {% endif %}
                   </select>
               </div>
             </div>
@@ -184,6 +184,7 @@
 
         </div>
         </div>
+          {% if users %}
          <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -191,6 +192,7 @@
             </div>
             <input type="hidden" id="page_size" val="">
           </div>
+          {% endif %}
       </div>
     </div><!-- pagination -->
   </div>
@@ -236,6 +238,7 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
+
     $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
@@ -245,8 +248,30 @@
 
         var ts = $(this).val();
         if(ts == 'pdf'){
-          var url = "{% url 'dashboard:users_pdf' %}";
-          window.open(url, '_blank');
+            var searchData = $('.search_user').val();
+            var listSizeVal = $('.list-sz').find(":selected").val();
+            var groupSizeVal = $('.group-sz').find(":selected").val();
+            var url = "{% url 'dashboard:users_pdf' %}";
+
+            if (searchData && (groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')) ){
+                $.get(url, {q:searchData, gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if ((groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none'))){
+                $.get(url, {gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (searchData){
+                $.get(url, {q:searchData}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else{
+                $.get(url, function(data){
+                          window.open("data:application/pdf," + escape(data));
+               });
+            }
+          <!--var url = "{% url 'dashboard:users_pdf' %}";-->
+          <!--window.open(url, '_blank');-->
 
         }else if(ts=='excel'){
           window.location="{% url 'dashboard:users_export_csv' %}";
@@ -255,23 +280,9 @@
           $(this).val('')
         }
     });
-    var pagination_totalsize;
-    var status;
-    //**@ get
-    $.ajax({ url: "{% url 'dashboard:users' %}",type: 'GET',data: {initial:'initial'},
-        async:false,success: function(data){
-         pagination_totalsize = data;
-    }});
-    //**@ display size select
-    $('.list-sz').selectpicker().on('change', function(){
-        var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
-     });
 
     $('.bootpag-callback').bootpag({
-        total: parseInt(pagination_totalsize),
+        total: parseInt({{pn}}),
         maxVisible: 5,
         leaps: true,
         firstLastUse: true,
@@ -286,29 +297,12 @@
         firstClass: 'first',
         leaps: false
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+            $(".pages-nav").html("Page " + num +" of "+{{pn}}); // or some ajax content loading...
             $.get("{% url 'dashboard:user_paginate' %}",{page:num},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm')
 
-    //**@ group name select
-    $('.group-sz').selectpicker({
-          iconBase: 'fa',
-          tickIcon: 'fa-dot-circle-o'
-    }).on('change', function(){
-       var group_id = $(this).val();
-       if(group_id == 'all'){
-           $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-          }});
-       }else{
-            $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
-             $('#pagination-div').html(data);
-           });
-       }
-
-    });
 
       $(".td").click(function(){
           window.location = $(this).data("href");
@@ -372,16 +366,140 @@
 
       $('.search_user').keyup(function() {
         var search_text = $(this).val();
-        delay(function(){ 
-           var url = "{% url 'dashboard:user_search' %}";
-           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
-                  $('#pagination-div').html(data);
-           }});
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var groupSizeVal = $('.group-sz').find(":selected").val();
+        var url = "{% url 'dashboard:user_search' %}";
+
+        delay(function(){
+            if((listSizeVal && listSizeVal != '0') && groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(listSizeVal && listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }
         }, 500 );
 
       });
 
 
+    //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var groupSizeVal = $('.group-sz').find(":selected").val();
+        var url = "{% url 'dashboard:user_search' %}";
+
+        if(searchData && groupSizeVal && groupSizeVal != 'all' && groupSizeVal !='none'){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+       }else if(searchData){
+           if(listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+
+       }else if(groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+           if(listSizeVal != '0'){
+                $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:groupSizeVal, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }else{
+                $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:groupSizeVal, size:10},function(data){
+                 $('#pagination-div').html(data);
+               });
+
+           }
+       }else{
+           if(listSizeVal != '0'){
+               $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+           }
+       }
+
+     });
+
+     //**@ group name select
+    $('.group-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o'
+    }).on('change', function(){
+
+       var group_id = $(this).val();
+       var searchData = $('.search_user').val();
+       var listSizeVal = $('.list-sz').find(":selected").val();
+       var url = "{% url 'dashboard:user_search' %}";
+
+       if(searchData && listSizeVal && listSizeVal != '0'){
+            if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:group_id},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(searchData){
+            if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:group_id},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(listSizeVal && listSizeVal != '0'){
+           if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }else{
+           if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url: "{% url 'dashboard:user_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get("{% url 'dashboard:user_paginate' %}",{page:1,gid:group_id},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }
+
+    });
 
   });
 

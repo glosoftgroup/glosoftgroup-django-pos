@@ -32,7 +32,8 @@
   <link href="{% static 'backend/css/hover-min.css' %}" rel="stylesheet" type="text/css">
    <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
   <!--image preview -->
-  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">  
+  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css"> 
+  <script type="text/javascript" src="{% static 'backend/js/jquery-1.11.3.min.js' %}"></script> 
   <!-- /global stylesheets -->
   <style type="text/css">
     .search-panel{padding: 6px;}
@@ -342,12 +343,12 @@
                   <ul>
                     <li class="{% block menu_personal_expenses_class %}{% endblock %}">
                         <a href="{% url 'accounts:personal_expenses' %}">
-                        <i class="icon-align-center-vertical"></i>Personal Expenses
+                        <i class="icon-align-center-vertical"></i>Business Expenses
                         </a>
                     </li>
                       <li class="{% block menu_expenses_class %}{% endblock %}">
                         <a href="{% url 'accounts:expenses' %}">
-                        <i class="icon-price-tags"></i>Business Expenses
+                        <i class="icon-price-tags"></i>Petty Cash Expenses
                         </a>
                     </li>
                       <li class="{% block menu_petty_cash_class %}{% endblock %}">
@@ -471,7 +472,7 @@
     <div id="base-modal" class="modal"></div>
     <div id="base-modal-fixed" class="modal modal-fixed-footer"></div>
     <!-- Core JS files -->
-  <script type="text/javascript" src="{% static 'backend/js/jquery-1.11.3.min.js' %}"></script>
+  
   <script type="text/javascript" src="{% static 'backend/js/core/libraries/bootstrap.min.js' %}"></script>
   <!-- /core JS files -->
    <script src="{% static 'backend/js/plugins/ui/jquery-validation/jquery.validate.js' %} "></script>

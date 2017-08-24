@@ -121,19 +121,21 @@
                   </tr>
                   {% endfor %}
                 {% else %}
-                  <tr><td colspan="3"><h5 class="text-center">No Groups Availbale</h5></td></tr>
+                  <tr><td colspan="3"><h2 class="text-center">No Groups Available</h2></td></tr>
                 {% endif %}
                   </tbody>
 
            </table>
          </div>
         </div>
+          {% if groups %}
         <div class="my-paginate">
             <div class="text-center bootpag-callback" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
               <div class="pull-right pages-nav">Page 1</div>
             </div>
           </div>
+          {% endif %}
       </div>
       </div><!-- pagination-div-->
   </div>
@@ -309,12 +311,12 @@
          <button type="button" class="close" data-dismiss="modal">&times;</button>
          <h6 class="modal-title text-white text-center"></h6>
        </div>
-       <div class="modal-body detail-body">
+       <div class="modal-body detail-body" style="max-height:300px;overflow-y:scroll;">
 
        </div>
         <input type="hidden" class="cgroup_id">
        <div class="modal-footer">
-         <button type="button" class="btn btn-default btn-block" data-dismiss="modal">ADD USER</button>
+         <button type="button" class="btn btn-default btn-block addUserBtn" data-dismiss="modals">ADD USER</button>
        </div>
      </div>
    </div>
