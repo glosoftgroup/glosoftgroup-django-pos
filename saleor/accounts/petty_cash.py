@@ -82,8 +82,7 @@ def add(request):
 
 	try:
 		try:
-			# lastEntry = PettyCash.objects.latest('id')
-			lastEntry = PettyCash.objects.get(pk=100)
+			lastEntry = PettyCash.objects.latest('id')
 			pd = DateFormat(lastEntry.created).format('Y-m-d')
 			td = DateFormat(datetime.datetime.today()).format('Y-m-d')
 			if td == pd:
