@@ -123,6 +123,7 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 		manager = self.manager	
 		terminal = validated_data['terminal']
 		user = validated_data['User']
+		note = validated_data['note']
 
 		self.terminal = Terminal.objects.get(pk=self.terminal_id)	
 		trail = str(manager)+' '+trans_type+' '+str(amount)+\
@@ -153,6 +154,7 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 										   user = User.objects.get(pk=int(user)),
 										   terminal=terminal,
 										   amount=amount,
-										   trans_type=trans_type)
+										   trans_type=trans_type,
+										   note=note)
 		print drawer		
 		return validated_data

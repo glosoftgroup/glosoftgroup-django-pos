@@ -13,6 +13,7 @@ $(function() {
   // select selectors
   var getAttributesD = $('.getAttributesD');
   var getAttributesTwoD = $('.getAttributesTwoD');
+  var getAttributesChoice = $('.selectAttributesChoice');
   
   // get product class getDetailUrl
   function getDetail(class_pk,getDetailUrl)
@@ -117,6 +118,8 @@ $(function() {
     }
 });
 
+  
+
   getAttributesTwoD.on('tokenize:select', function(container){
 	$(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
    });
@@ -150,6 +153,9 @@ $(function() {
 	    $.jGrowl(msg, 
 	    {header: header,theme: status});
   }	
+
+  
+
     // ajax
 	function addAttributeD(myUrl,attName) 
 	{
