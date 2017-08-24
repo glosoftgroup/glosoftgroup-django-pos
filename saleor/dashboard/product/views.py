@@ -633,6 +633,10 @@ def product_edit(request, pk):
     product = get_object_or_404(
         Product.objects.prefetch_related(
             'images', 'variants'), pk=pk)
+    product = Product.objects.get(pk=product.pk)
+    stock = Stock()
+    stock_form = forms.StockForm(request.POST or None, instance=stock,
+                           product=product)
     edit_variant = not product.product_class.has_variants
     attributes = product.product_class.variant_attributes.prefetch_related(
         'values')
@@ -660,7 +664,7 @@ def product_edit(request, pk):
             'Dashboard message', 'Updated product %s') % product
         messages.success(request, msg)
         return redirect('dashboard:product-update', pk=product.pk)
-    ctx = {'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
+    ctx = {'stock_form':stock_form,'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
            'product': product, 'stock_delete_form': stock_delete_form,
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
@@ -756,6 +760,26 @@ def stock_form(request,product_pk):
                            product=product)
     ctx = {'form': form, 'product': product, 'stock': stock}
     return TemplateResponse(request, 'dashboard/product/partials/add_stock_form.html', ctx)
+
+@staff_member_required
+@permission_decorator('product.change_stock')
+def stock_fresh(request, product_pk):
+    product = Product.objects.get(pk=product_pk)
+    if request.GET.get('get'):
+        if request.GET.get('get') == 'variants':
+            template = request.GET.get('template')
+            stock = Stock()
+            form = forms.StockForm(request.POST or None, instance=stock,
+                           product=product)
+            ctx = {'product':product,'stock_form':form}
+            return TemplateResponse(request, 'dashboard/product/partials/'+template+'.html', ctx)
+    variants = product.variants.all()
+    stock_items = Stock.objects.filter(
+        variant__in=variants).select_related('variant', 'location')
+    ctx = {'product':product,'stock_items':stock_items}
+    return TemplateResponse(request, 'dashboard/product/partials/stock_refresh.html', ctx)
+
+
 
 @staff_member_required
 @permission_decorator('product.change_stock')

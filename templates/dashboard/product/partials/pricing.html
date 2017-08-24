@@ -1,15 +1,7 @@
 {% load materializecss %}
-{% load prices_i18n %}
-
-
-
-
-  
-  <!-- price area -->
-  
-        <!-- Product Pricing Details -->
-       
-       
+{% load prices_i18n %}  
+  <!-- price area -->  
+        <!-- Product Pricing Details -->      
         <div class="col-md-12">
           <div class="row">
             <div class="col-md-4">
@@ -37,13 +29,15 @@
 <table class="table table-hover">
   <thead>
    <tr class="bg-primary">
-    <th>Price after tax</th>
-    <th>Tax (KES)</th>
-    <th>Price before tax</th>
+    <th>&nbsp;</th>
+    <th>Retail Price</th>
+    <th>Wholesale Price</th>
+    <th>&nbsp;</th>
    </tr>
   </thead>
   <tbody>
     <tr>
+      <td></td>
       <td>
       <div class="col-md-9">
        <input type="number" placeholder="Retail Price" class="form-control" value="{{ product.price.gross }}" id="tabprice" name="tabprice"> 
@@ -53,23 +47,15 @@
       </div>
       </td>
       <td>
-         <input type="disabled" placeholder="Tax" name="retail_tax" id="retail_tax" class="form-control" value="" disabled="">
+         {{ product_form.wholesale_price }}
       </td>
       <td>
-         <input type="disabled" placeholder="Before Tax" name="retail_plus_tax" id="retail_plus_tax" class="form-control" value="" disabled="">
+        <span>
+         <a  class="btn hvr-glow btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing">Save</a>
+       </span>
       </td>
     </tr>
-    <tr>
-      <td>
-        {{ product_form.wholesale_price }}
-      </td>
-      <td>
-         <input type="disabled" name="wholesale_tax" id="wholesale_tax" class="form-control" value="" disabled="">
-      </td>
-      <td>
-        <input type="disabled" name="wholesale_plus_tax" id="wholesale_plus_tax" class="form-control" value="" disabled="">
-      </td>
-    </tr>
+   
   </tbody>
   <tfoot>
     <tr>
@@ -79,14 +65,9 @@
     </tr>
   </tfoot>
 </table>
-<div class="mb-15">
-  <span>
-        <a style="width: 100%" class="btn hvr-glow btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing">Save</a>
-       </span>
-</div>
-     
+  
     
-     </div>
+</div>
      {% endif %}
          
   

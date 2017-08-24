@@ -222,14 +222,8 @@ class SalesSerializer(serializers.ModelSerializer):
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
             stock = Stock.objects.get(variant__sku=solditem_data['sku'])
-            if stock:
-                if validated_data.get('status') == 'new':
-                    print 'new'
-                    Stock.objects.allocate_stock(stock, solditem_data['quantity'])
-                if validated_data.get('status') == 'fully-paid':
-                    Stock.objects.decrease_stock(stock, solditem_data['quantity'])
-                    #Stock.objects.deallocate_stock(stock,solditem_data['quantity'])
-                    print 'fully-paid'
+            if stock:                
+                Stock.objects.decrease_quantity(stock,solditem_data['quantity'])                
                 
         return sales
         

@@ -1,0 +1,56 @@
+
+{% if stock_items %}
+{% load i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+{% load prices_i18n %}
+{% load attributes %}
+{% for item in stock_items %}
+<tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
+  <td class="bulk-checkbox ignore-link">
+    <input name="items" type="checkbox" id="{{ item.id }}" class="filled-in switch-actions switch-stock" value="{{ item.id }}">
+    <label for="{{ item.id }}"></label>
+  </td>
+  <td>
+    {{ item.variant.sku }}                    
+  </td>
+  <!-- cost price -->
+  <td>
+    {% if item.cost_price %}
+     {% gross item.cost_price %}
+    {% endif %}   
+  </td>
+  <!-- sales price -->
+  <td> 
+  {% gross item.variant.get_price_per_item html=True %}
+  </td>
+  
+  <td>
+    {{ item.location }}
+  </td>
+  <td class="right-align">
+    {{ item.quantity }}
+  </td>
+  <td class="right-align">
+    {{ item.quantity_allocated }}
+  </td>
+  <td>
+    <a href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me">Edit</i></a>
+  </td>
+</tr>
+{% endfor %}
+<script type="text/javascript">
+	$('.switch-actions').on('change', function() {
+    console.log('u clicked a check box');
+  let $btnChecked = $(this).parents('form').find('.btn-show-when-checked');
+  let $btnUnchecked = $(this).parents('form').find('.btn-show-when-unchecked');
+  if ($(this).parents('form').find('.switch-actions:checked').length) {
+    $btnChecked.show();
+    $btnUnchecked.hide();
+  } else {
+    $btnUnchecked.show();
+    $btnChecked.hide();
+  }
+});
+</script>
+{% endif %}

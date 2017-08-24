@@ -607,5 +607,4 @@ class VariantImage(models.Model):
         verbose_name = pgettext_lazy(
             'Variant image model', 'variant image')
         verbose_name_plural = pgettext_lazy(
-            'Variant image model', 'variant images')
-
+'Variant image model', 'variant images')
