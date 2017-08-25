@@ -6,5 +6,6 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.index, name='payment')
+    url(r'^$', views.index, name='payment'),
+    url(r'^payments/$',views.payments_list, name='list-payments')
 ]

@@ -1,0 +1,20 @@
+{% if expense %}
+    <div class="col-md-12 detail-column">
+        <div class="col-md-6">
+            <p><span style="font-weight:500">Expense Type:</span> {{expense.expense_type}}</p>
+            <p><span style="font-weight:500">Amount:</span> KShs. {{expense.amount}}</p>
+        </div>
+        <div class="col-md-6">
+            <p><span style="font-weight:500">Authorized By:</span> {{expense.authorized_by}}</p>
+            <p><span style="font-weight:500">Paid To:</span> {{expense.paid_to}}</p>
+        </div>
+        <div class="col-md-12">
+            <label style="font-weight:500">Description</label>
+            <p>{{expense.description}}</p>
+        </div>
+    </div>
+{% else %}
+<div class="alert bg-info col-md-12">
+    <h4 class="text-center">No details for this expense</h4>
+</div>
+{% endif %}
