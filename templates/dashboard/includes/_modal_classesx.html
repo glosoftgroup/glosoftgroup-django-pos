@@ -29,52 +29,37 @@
       <div class="heading-elements">
                 <ul class="icons-list">
                   <li id="add-template">
-                  <a data-toggle="collapse" data-parent="#accordion1" href="#accordion-group1" >
+                  <a data-toggle="collapse" data-parent="#accordionx" href="#accordion-groupx" >
                   <i class="icon-plus3"></i></a>
                   </li>
                     
                 </ul>
             </div>
     </div>
-    <div id="accordion-groupx" class="panel-collapse collapse">
+   <div id="accordion-groupx" style="background-color: #FEFCFC;" class="panel-collapse collapse">
 
        
       <div class="panel-body">
         <div class="modalbody">
 <div class="">
+<!-- new fields -->
+<div class="col-md-3">
   <div class="form-group">
-     <div id="add-another-attrx" class="col-md-12 hidden">
-        <button class="btn btn-xs btn-primary">Add another variant</button>
-      </div>
-     <div class="col-md-4">      
-      <label class="text-bold">Variant Name:</label>
-      <div class="input-group">   
-     <input type="text" id="attribute_name32Dx" class="form-control" placeholder="Variant Name" name="attribute_nameDx">
-     <span class="input-group-btn">
-      <button class="btn bg-primary btn-xs" type="button" id='attr-nameDx'>Add</button>
-    </span> 
-    </div>
-     </div>
-     <!-- lsdjf -->
-     <div class="col-md-6">
-     <div class="">    
-    <div class="form-group hidden" id='value-inputDx'>
-        <label class="text-bold">Value</label>
-        <div class="input-group">   
-       <input type="text" placeholder="e.g 1kg for weight variant" id='value32Dx' class="form-control" name="valueDx">
-       <span class="input-group-btn">
-        <button class="btn btn-xs btn-primary hidden" id="newvalueDx">Add Value</button>
-      </span> 
-      </div>      
-    </div>    
+    <label>Variant Name</label>
+    <input type="text" placeholder="Variant Name" id="newvName" class="form-control" name="newvName">
   </div>
-     </div>
-     <!-- lsajd -->
-     <div class="col-md-2">
-     <div id='add_value32Dx'></div>
-     </div>  
-
-  </div><br/>
+</div>
+<div class="col-md-7">
+  <div class="form-group">
+    <label>Variant choice</label>
+    <select class="selectVariantChoice" multiple></select>
+  </div>
+</div>
+<div class="col-md-2 text-right" style="margin-top: 20px;">
+  <button class="btn btn-primary btn-xs" id="addVariantChBtn">Add</button>
+</div>
+<!-- ./new fields -->
+  <br/>
   
 </div>
 </div>

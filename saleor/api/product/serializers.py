@@ -150,6 +150,7 @@ class SalesSerializer(serializers.ModelSerializer):
                  'mobile',
                  'customer_name',
                  'status',
+                 'payment_options',
                 )
 
     def validate_total_net(self,value):
@@ -223,7 +224,7 @@ class SalesSerializer(serializers.ModelSerializer):
             SoldItem.objects.create(sales=sales,**solditem_data)
             stock = Stock.objects.get(variant__sku=solditem_data['sku'])
             if stock:                
-                Stock.objects.decrease_quantity(stock,solditem_data['quantity'])                
+                Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
                 
         return sales
         

@@ -22,62 +22,47 @@
                     </select>
                    </div>                  
                 </div>
-<div class="panel-group content-group-lg mb-15" id="accordion1">
+<div class="panel-group content-group-lg mb-15" id="accordion1attribute">
   <div class="panel panel-white">
     <div class="panel-heading">
       <h6 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion1" href="#accordion-group1">
+        <a data-toggle="collapse" data-parent="#accordion1attribute" href="#accordion-group1attribute">
         <i class="icon-touch"></i>Add attributes</a>
       </h6>
       <div class="heading-elements">
                 <ul class="icons-list">
                   <li id="add-template">
-                  <a data-toggle="collapse" data-parent="#accordion1" href="#accordion-group1" >
+                  <a data-toggle="collapse" data-parent="#accordion1attribute" href="#accordion-group1attribute" >
                   <i class="icon-plus3"></i></a>
                   </li>
                     
                 </ul>
             </div>
     </div>
-    <div id="accordion-group1" class="panel-collapse collapse">
+    <div id="accordion-group1attribute" style="background-color: #FEFCFC;" class="panel-collapse collapse">
 
        
       <div class="panel-body">
         <div class="modalbody">
 <div class="">
+<!-- new fields -->
+<div class="col-md-3">
   <div class="form-group">
-     <div id="add-another-attr" class="col-md-12 hidden">
-        <button class="btn btn-xs btn-primary">Add another attribute</button>
-      </div>
-     <div class="col-md-4">      
-      <label class="text-bold">Attribute Name:</label>
-      <div class="input-group">   
-     <input type="text" id="attribute_name32D" class="form-control" placeholder="Attribute Name" name="attribute_nameD">
-     <span class="input-group-btn">
-      <button class="btn bg-primary btn-xs" type="button" id='attr-nameD'>Add</button>
-    </span> 
-    </div>
-     </div>
-     <!-- lsdjf -->
-     <div class="col-md-6">
-     <div class="">    
-    <div class="form-group hidden" id='value-inputD'>
-        <label class="text-bold">Value</label>
-        <div class="input-group">   
-       <input type="text" placeholder="Attribute value e.g Sony for Brand Attribute" id='value32D' class="form-control" name="valueD">
-       <span class="input-group-btn">
-        <button class="btn btn-xs btn-primary hidden" id="newvalueD">Add Value</button>
-      </span> 
-      </div>      
-    </div>    
+    <label>Attribute Name</label>
+    <input type="text" placeholder="Attribute Name" id="newattrName" class="form-control" name="newattrName">
   </div>
-     </div>
-     <!-- lsajd -->
-     <div class="col-md-2">
-     <div id='add_value32D'></div>
-     </div>  
-
-  </div><br/>
+</div>
+<div class="col-md-7">
+  <div class="form-group">
+    <label>Attribute choice</label>
+    <select class="selectAttributesChoice" multiple></select>
+  </div>
+</div>
+<div class="col-md-2 text-right" style="margin-top: 20px;">
+  <button class="btn btn-primary btn-xs" id="addAttributeChBtn">Add</button>
+</div>
+<!-- ./new fields -->
+  <br/>
   
 </div>
 </div>
