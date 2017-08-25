@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . import views, expense_type, petty_cash, personal_expenses
+from . import views, expense_type, petty_cash, personal_expenses, expenses_pdf
 
 
 urlpatterns = [
@@ -19,6 +19,7 @@ urlpatterns = [
 	url(r'^p/expenses/paginate/', personal_expenses.expenses_paginate, name='personal_expenses_paginate'),
 	url( r'^pexpenses/search/$', personal_expenses.expenses_search, name = 'personal_expenses_search' ),
 	url(r'^detail/b/(?P<pk>[0-9]+)/$', personal_expenses.detail, name='bexpense-detail'),
+	url( r'^expenses/pdf/$', expenses_pdf.pdf, name ='expenses_pdf'),
 
 	url(r'^add/expense/type/$', expense_type.add, name='add_expense_type'),
 	url(r'^pty/cash/$', petty_cash.view, name='petty_cash'),

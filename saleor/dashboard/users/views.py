@@ -488,10 +488,6 @@ def user_search( request ):
                     users = paginator.page(1)
                 except EmptyPage:
                     users = paginator.page(paginator.num_pages)
-                # if p2_sz:
-                #     users = paginator.page(page)
-                #     return TemplateResponse(request,'dashboard/users/paginate.html',{'users':users})
-
                 return TemplateResponse(request, 'dashboard/users/search.html', {'users':users, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 @staff_member_required

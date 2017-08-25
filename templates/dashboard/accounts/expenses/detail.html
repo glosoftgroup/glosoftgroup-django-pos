@@ -1,26 +1,18 @@
 {% if expense %}
-<!--<div class="row animated fadeIn">-->
-    <div class="col-md-12">
+    <div class="col-md-12 detail-column">
         <div class="col-md-6">
-            <!--<div class="col-md-12">-->
-            <p><span style="font-weight:500">Voucher No:</span> {{expense.voucher}}</p>
             <p><span style="font-weight:500">Expense Type:</span> {{expense.expense_type}}</p>
-            <p><span style="font-weight:500">Expense Date:</span> {{expense.expense_date}}</p>
             <p><span style="font-weight:500">Amount:</span> KShs. {{expense.amount}}</p>
-            <!--</div>-->
         </div>
         <div class="col-md-6">
             <p><span style="font-weight:500">Authorized By:</span> {{expense.authorized_by}}</p>
             <p><span style="font-weight:500">Paid To:</span> {{expense.paid_to}}</p>
-            <p><span style="font-weight:500">Received By:</span> {{expense.received_by}}</p>
-            <p><span style="font-weight:500">Mobile No:</span> {{expense.phone}}</p>
         </div>
         <div class="col-md-12">
             <label style="font-weight:500">Description</label>
             <p>{{expense.description}}</p>
         </div>
     </div>
-<!--</div>-->
 {% else %}
 <div class="alert bg-info col-md-12">
     <h4 class="text-center">No details for this expense</h4>

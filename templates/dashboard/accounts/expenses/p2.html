@@ -18,7 +18,6 @@
                         <th>Exp. Date</th>
                         <th>Expense</th>
                         <th>Paid To</th>
-                        <th>Payment Mode</th>
                         <th>Amount</th>
                         {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                         <th class="text-center">Actions</th>
@@ -29,12 +28,10 @@
                     {% if expenses %}
                         {% for expense in expenses %}
                           <tr class='clickable-row' id="{{user.pk }}">
-                            <td>{{ expense.expense_date }}</td>
-                            <td>{{expense.expense_type}}</td>
-                            <td>{{expense.paid_to}}</td>
-                            <td>{{expense.payment_mode}}
-                            </td>
-                            <td>
+                            <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{ expense.added_on|date:'d-m-Y'}}</td>
+                            <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.expense_type}}</td>
+                            <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.paid_to}}</td>
+                            <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">
                             {{ expense.amount }}</td>
                             {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                             <!-- actions -->
@@ -43,7 +40,7 @@
                                  {% if perms.accounts.delete_expense %}
                                 <li>
                                   <a data-ta="#modal_instance" data-title="Delete Expense {{ expense.expense_type }} ?" data-href="{% url 'accounts:expense-delete' pk=expense.pk %}" data-name="{{ expense.expense_type}}" data-id="{{ expense.pk }}"
-                                 class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                                 class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
                                  </a>
                                 </li>
                                 {% endif %}
@@ -102,7 +99,6 @@
 
 
       $('.modal-trigger').on('click', function (e) {
-
          var url = $(this).data('href')
          var prompt_text = $(this).data('title');
          var username = $(this).data('name');

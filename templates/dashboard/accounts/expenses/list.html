@@ -22,6 +22,9 @@
      tr.nb td{border:0px;}
      .nb{border:0px;}
      .table{border:1px solid #ccc}
+     #addExpenseTable{display:none;}
+     .detail-column p{font-size:14px;}
+     #expenses label.error{color:#ff7043}
    </style>
  {% endblock %}
 
@@ -34,7 +37,8 @@
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
                 {% if perms.userprofile.add_user %}
-                   <a href="{% url 'accounts:add_expense' %}" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>
+                   <!--<a href="{% url 'accounts:add_expense' %}" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>-->
+                  <a href="javascript:;" id="addExpenseBtn" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>
                 {% endif %}
               </div>
             </div>
@@ -85,10 +89,59 @@
                   </select>
               </div>
             </div>
+    <div class="col-md-12" id="addExpenseTable">
+        <form class="form" enctype="multipart/form-data" id="expenses" name="expenses">
+            {% csrf_token %}
+     <table class="table table-hover">
+        <thead>
+            <tr class="bg-primary">
+            <th>Expense Type</th>
+            <th>Amount</th>
+            <th>Paid To</th>
+            <th>Description</th>
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>
+          <td>
+            <div class="input-group">
+                <div class="btn-group bootstrap-select input-group-btn" id="expense_types" style="width: 100%;">
+                    <select class="bootstrap-select sel required expense_type" id="expense_type" name="expense_type" data-width="100%" tabindex="-98" style="display: none;">
+                        <option value="">Choose...</option>
+                          {% if expense_types %}
+                            {% for type in expense_types %}
+                              <option value="{{type.name}}">{{type.name}}</option>
+                            {% endfor %}
+                          {% else %}
+                            <option value="none">No Expense Types</option>
+                          {% endif %}
+                          <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Expense Type" data-select="#expense_types"
+                            data-href="{% url 'accounts:add_expense_type' %}" data-cat="expense_type" data-label="Expense Type:"> add new expense type</option>
+                    </select>
+                </div>
+            </div>
+          </td>
 
+          <td>
+            <input placeholder="amount" class="form-control" id="amount" name="amount" type="number" min="1">
+            </td>
+            <td>
+              <input placeholder="paid to" class="form-control" id="paidTo" name="paid_to" type="text">
+            </td>
+              <td>
+              <input placeholder="description" class="form-control" id="description" name="description" type="text">
+            </td>
+            <td>
+              <button class="btn btn-xs btn-primary legitRipple" id="submitExpenseBtn" data-token="{% csrf_token %}" data-url="{% url 'accounts:add_expense_process' %}" type="submit">Submit <i class="icon-arrow-right14 position-right"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table> </form></div>
         </div>
       </div>
    </div>
+
 
   <div class="col-md-12">
    <div id="pagination-div">
@@ -114,10 +167,10 @@
                 {% if expenses %}
                   {% for expense in expenses %}
                   <tr class='clickable-row' id="{{expense.pk }}">
-                    <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{ expense.expense_date }}</td>
-                    <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{expense.expense_type}}</td>
-                    <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-m="#pdetail">{{expense.paid_to}}</td>
-                    <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-m="#pdetail">
+                    <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{ expense.added_on|date:'d-m-Y'}}</td>
+                    <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.expense_type}}</td>
+                    <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.paid_to}}</td>
+                    <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">
                     {{ expense.amount }}</td>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <!-- actions -->
@@ -126,7 +179,7 @@
                          {% if perms.accounts.delete_expense %}
                         <li>
                           <a data-ta="#modal_instance" data-title="Delete Expense {{ expense.expense_type }} ?" data-href="{% url 'accounts:expense-delete' pk=expense.pk %}" data-name="{{ expense.expense_type}}" data-id="{{ expense.pk }}"
-                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
                          </a>
                         </li>
                         {% endif %}
@@ -153,7 +206,7 @@
              <div class="my-paginate">
                 <div class="text-center bootpag-callback" style="padding:20px;">
                   <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav">Page 1</div>
+                  <div class="pull-right pages-nav">Page 1 of {{pn}}</div>
                 </div>
                 <input type="hidden" id="page_size" val="">
               </div>
@@ -198,7 +251,7 @@
  <!-- /blue modal -->
 <!-- expense detail modal -->
  <div id="pdetail" class="modal fade">
-   <div class="modal-dialog modal-md">
+   <div class="modal-dialog modal-sm">
      <div class="modal-content">
        <div class="modal-header bg-blue">
          <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -214,6 +267,40 @@
    </div>
  </div>
  <!-- /expense detail modal-->
+<!-- edit modal -->
+ <div id="edit_modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <form action="" class="edit_form" method="post" id="editform" novalidate>
+           <div class="modal-body">
+            {% csrf_token %}
+                 <div class="form-group">
+                     <label class="cat_label"> </label>
+                     <input class="form-control edit_class" name=""/>
+                 </div>
+                  <input type="hidden" class="eitem-url"/>
+                  <input type="hidden" class="eitem-select"/>
+                 <input type="hidden" name="option" value="option"/>
+
+           </div>
+           <div class="modal-footer">
+               <button class="btn btn-primary waves-effect waves-light pull-right data_update"
+                       id='modal_edit' type="submit">
+                   Create
+                   <i class="icon-arrow-right14 position-right"></i>
+               </button>
+
+             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+           </div>
+       </form>
+     </div>
+   </div>
+ </div>
+ <!-- /edit modal -->
 {% endblock%}
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
@@ -222,7 +309,106 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
-    $('.export-sz').selectpicker({
+    $('#addExpenseBtn').on('click', function(){
+        $('#addExpenseTable').slideToggle();
+    });
+    $('.expense_type').selectpicker({
+        iconBase: 'fa',
+        addIcon:'fa-plus-circle'
+    });
+    $('.input-group').on('change', '.sel', function(){
+       var v = $(this).val();
+
+       if(v == 'add'){
+             var selected = $(this).find('option:selected');
+
+             var url = selected.data('href')
+             var prompt_text = selected.data('title');
+             var modal = selected.data('ta');
+             var select = selected.data('select');
+             var cat = selected.data('cat');
+             var label = selected.data('label');
+             $('.cat_label').html(label);
+             $('.eitem-url').val(url);
+             $('.eitem-select').val(select);
+             $('.modal-title').html(prompt_text);
+             $('.edit_class').attr('name', cat)
+             $(modal).modal();
+             $('.delete_form').attr('action',url);
+
+             var form = $("#editform"), validator = form.validate();
+             validator.resetForm();
+             form.find(".error").removeClass("error");
+
+             $("#editform input[name='" + cat + "']").rules("add", {required:true});
+       }
+    });
+    <!--$('#submitExpenseBtn').on('click', function(){-->
+       <!--var token = $(this).data('token');-->
+       <!--var url = $(this).data('url');-->
+       <!--var expense_type = $('#expense_type').val();-->
+       <!--var amount = $('#amount').val();-->
+       <!--var paidTo = $('#paidTo').val();-->
+       <!--var description = $('#description').val();-->
+       <!--data = {csrfmiddlewaretoken: '{{ csrf_token }}',amount:amount, expense_type:expense_type,-->
+        <!--paid_to:paidTo, description:description};-->
+
+       <!--$.ajax({ url: url,type: 'POST',data: data, async:false,success: function(data){-->
+          <!--$('#addExpenseTable').slideUp();-->
+          <!--$.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){-->
+              <!--$('#pagination-div').html(data);-->
+            <!--}});-->
+       <!--}});-->
+    <!--});-->
+    $('#editform').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+           category: {
+              required:true
+            }
+        },
+        messages:{
+          category:{
+            required: "please fill in the required field"
+          }
+        },
+        submitHandler: function() {
+              var name = $('.edit_class').data('name');
+              var inputValue = $('.edit_class').val();
+              var f = document.getElementById('editform');
+              var formData = new FormData(f);
+              //formData.append(name, inputValue);
+              var url = $('.eitem-url').val();
+              var selectClass = $('.eitem-select').val();
+              $.ajax({
+                  url: url,
+                  type: "POST",
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success:function(data){
+                    $('#edit_modal_instance').modal('hide');
+                    $('.edit_class').val('');
+                    var replaceDiv = $('.eitem-select').val()
+                    $(replaceDiv).replaceWith(data);
+                    $.jGrowl('Created successfully', {
+                      header: 'Well done!',
+                      theme: 'bg-success'
+                    });
+                    //window.location.reload();
+                  },
+                  error:function(error){
+                    console.log(error);
+                    $.jGrowl('Error Updating', {
+                        header: 'Oh snap!',
+                        theme: 'bg-danger'
+                    });
+                  }
+              });
+        }
+      });
+
+        $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
           pdfIcon:'fa-file-pdf-o',
@@ -231,8 +417,28 @@
 
         var ts = $(this).val();
         if(ts == 'pdf'){
-          var url = "{% url 'dashboard:users_pdf' %}";
-          window.open(url, '_blank');
+            var searchData = $('.search_user').val();
+            var listSizeVal = $('.list-sz').find(":selected").val();
+            var groupSizeVal = $('.group-sz').find(":selected").val();
+            var url = "{% url 'accounts:expenses_pdf' %}";
+
+            if (searchData && (groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')) ){
+                $.get(url, {q:searchData, gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if ((groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none'))){
+                $.get(url, {gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (searchData){
+                $.get(url, {q:searchData}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else{
+                $.get(url, function(data){
+                          window.open("data:application/pdf," + escape(data));
+               });
+            }
 
         }else if(ts=='excel'){
           window.location="{% url 'dashboard:users_export_csv' %}";
@@ -241,23 +447,9 @@
           $(this).val('')
         }
     });
-    var pagination_totalsize;
-    var status;
-    //**@ get
-    $.ajax({ url: "{% url 'accounts:expenses' %}",type: 'GET',data: {initial:'initial'},
-        async:false,success: function(data){
-         pagination_totalsize = data;
-    }});
-    //**@ display size select
-    $('.list-sz').selectpicker().on('change', function(){
-        var ts = $(this).val();
-        $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
-     });
 
     $('.bootpag-callback').bootpag({
-        total: parseInt(pagination_totalsize),
+        total: parseInt({{pn}}),
         maxVisible: 3,
         leaps: false
         }).on("page", function(event, num){
@@ -267,29 +459,31 @@
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm')
 
-     //**@ group name select
-    $('.group-sz').selectpicker({
-          iconBase: 'fa',
-          tickIcon: 'fa-dot-circle-o'
-    }).on('change', function(){
-       var group_id = $(this).val();
-       if(group_id == 'all'){
-           $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-          }});
-       }else{
-            $.get("{% url 'accounts:expenses_paginate' %}",{page:1,gid:group_id},function(data){
-             $('#pagination-div').html(data);
-           });
-       }
+     <!--//**@ group name select-->
+    <!--$('.group-sz').selectpicker({-->
+          <!--iconBase: 'fa',-->
+          <!--tickIcon: 'fa-dot-circle-o'-->
+    <!--}).on('change', function(){-->
+       <!--var group_id = $(this).val();-->
+       <!--if(group_id == 'all'){-->
+           <!--$.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){-->
+              <!--$('#pagination-div').html(data);-->
+          <!--}});-->
+       <!--}else{-->
+            <!--$.get("{% url 'accounts:expenses_paginate' %}",{page:1,gid:group_id},function(data){-->
+             <!--$('#pagination-div').html(data);-->
+           <!--});-->
+       <!--}-->
 
-    });
+    <!--});-->
 
 
-      $(".td").click(function(){
+      $('body').on('click', '.td', function(){
           <!--window.location = $(this).data("href");-->
           var url = $(this).data('href');
           var modal = $(this).data('m');
+          var modalTitle = $(this).data('mtitle');
+           $(modal+' .modal-title').html(modalTitle);
 
           $.ajax({
               url: url,
@@ -361,13 +555,220 @@
         };
       })();
 
-      $('.search_user').keyup(function() {
-        var search_text = $(this).val();
-        delay(function(){
-           var url = "{% url 'accounts:expenses_search' %}";
-           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+      <!--$('.search_user').keyup(function() {-->
+        <!--var search_text = $(this).val();-->
+        <!--delay(function(){-->
+           <!--var url = "{% url 'accounts:expenses_search' %}";-->
+           <!--$.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){-->
+                  <!--$('#pagination-div').html(data);-->
+           <!--}});-->
+        <!--}, 500 );-->
+
+      <!--});-->
+
+    var petty_cash_balance;
+    $.ajax({ url: "{% url 'accounts:petty_cash_balance' %}",type: 'GET', async:false,success: function(data){
+              petty_cash_balance = data;
+     }});
+
+    jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+        return this.optional(element) || (parseFloat(value) <= petty_cash_balance);
+    }, "* more than petty cash amount (KShs."+ petty_cash_balance +" )");
+
+      //** validate form & submit
+      $('#expenses').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+            amount: { required:true, digits:true, greaterThanZero : true },
+            paid_to:{required:true},
+            description:{required:true}
+        },
+        messages:{
+          amount:{
+            required: "please provide the amount"
+          },
+          paid_to:{
+            required: "please provide the name"
+          },
+          description:{
+            required: "please provide a description"
+          },
+        },
+        submitHandler: function() {
+          var f = document.getElementById('expenses');
+          var formData = new FormData(f);
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'accounts:add_expense_process' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                         $('#expenses')[0].reset();
+                         $('#addExpenseTable').slideUp();
+                         $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                            $('#pagination-div').html(data);
+                         }});
+                         $.jGrowl('message sent successfully', {
+                            header: 'Well done!',
+                            theme: 'bg-success'
+                         });
+
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try sending again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            }
+        }
+      });
+
+    <!--//**@ display size select-->
+    <!--$('.list-sz').selectpicker().on('change', function(){-->
+        <!--var ts = $(this).val();-->
+        <!--$.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){-->
+              <!--$('#pagination-div').html(data);-->
+        <!--}});-->
+     <!--});-->
+
+
+     //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var groupSizeVal = $('.group-sz').find(":selected").val();
+        var url = "{% url 'accounts:expenses_search' %}";
+
+        if(searchData && groupSizeVal && groupSizeVal != 'all' && groupSizeVal !='none'){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+       }else if(searchData){
+           if(listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+
+       }else if(groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+           if(listSizeVal != '0'){
+                $.get("{% url 'accounts:expenses_paginate' %}",{page:1,gid:groupSizeVal, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }else{
+                $.get("{% url 'accounts:expenses_paginate' %}",{page:1,gid:groupSizeVal, size:10},function(data){
+                 $('#pagination-div').html(data);
+               });
+
+           }
+       }else{
+           if(listSizeVal != '0'){
+               $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                   $('#pagination-div').html(data);
-           }});
+              }});
+           }else{
+                $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+           }
+       }
+
+     });
+
+     //**@ group name select
+    $('.group-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o'
+    }).on('change', function(){
+
+       var group_id = $(this).val();
+       var searchData = $('.search_user').val();
+       var listSizeVal = $('.list-sz').find(":selected").val();
+       var url = "{% url 'accounts:expenses_search' %}";
+
+       if(searchData && listSizeVal && listSizeVal != '0'){
+            if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:group_id},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(searchData){
+            if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:group_id},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(listSizeVal && listSizeVal != '0'){
+           if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get("{% url 'accounts:expenses_paginate' %}",{page:1,gid:group_id, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }else{
+           if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get("{% url 'accounts:expenses_paginate' %}",{page:1,gid:group_id},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }
+
+    });
+
+    $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var groupSizeVal = $('.group-sz').find(":selected").val();
+        var url = "{% url 'accounts:expenses_search' %}";
+
+        delay(function(){
+            if((listSizeVal && listSizeVal != '0') && groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(listSizeVal && listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }
         }, 500 );
 
       });
