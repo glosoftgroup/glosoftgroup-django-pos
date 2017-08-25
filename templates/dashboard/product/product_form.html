@@ -26,84 +26,7 @@
     .container {
       margin: 5em auto;
     }
-    .modal.in {
-      -webkit-perspective: 2000px;
-      -moz-perspective: 2000px;
-      -ms-perspective: 2000px;
-      -o-perspective: 2000px;
-      perspective: 2000px;
-    }
-    .modal.in .modal-dialog.aside {
-      -webkit-transform: -340px;
-      -moz-transform: -340px;
-      -ms-transform: -340px;
-      -o-transform: -340px;
-      transform: -340px;
-      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
-      -ms-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
-      -o-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
-      transform: scale(0.8) rotateY(45deg) translateZ(-340px);
-      -webkit-transform-style: preserve-3d;
-      -ms-transform-style: preserve-3d;
-      -o-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-    }
-    .modal.in .modal-dialog.aside.aside-1 {
-      -webkit-transform: calc(-300px);
-      -moz-transform: calc(-300px);
-      -ms-transform: calc(-300px);
-      -o-transform: calc(-300px);
-      transform: calc(-300px);
-      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
-      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
-      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
-      transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
-    }
-    .modal.in .modal-dialog.aside.aside-2 {
-      -webkit-transform: calc(-260px);
-      -moz-transform: calc(-260px);
-      -ms-transform: calc(-260px);
-      -o-transform: calc(-260px);
-      transform: calc(-260px);
-      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
-      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
-      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
-      transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
-    }
-    .modal.in .modal-dialog.aside.aside-3 {
-      -webkit-transform: calc(-220px);
-      -moz-transform: calc(-220px);
-      -ms-transform: calc(-220px);
-      -o-transform: calc(-220px);
-      transform: calc(-220px);
-      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
-      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
-      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
-      transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
-    }
-    .modal.in .modal-dialog.aside.aside-4 {
-      -webkit-transform: calc(-180px);
-      -moz-transform: calc(-180px);
-      -ms-transform: calc(-180px);
-      -o-transform: calc(-180px);
-      transform: calc(-180px);
-      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
-      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
-      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
-      transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
-    }
-    .modal.in .modal-dialog.aside.aside-5 {
-      -webkit-transform: calc(-140px);
-      -moz-transform: calc(-140px);
-      -ms-transform: calc(-140px);
-      -o-transform: calc(-140px);
-      transform: calc(-140px);
-      -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
-      -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
-      -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
-      transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
-    }
-
+    
     </style>
 {% endblock %}
 {% block header_menu %}
@@ -157,7 +80,7 @@
     <div class="col-md-12">
             <div class="panel panel-flat">
               
-              <div class="panel-body">
+              <div class="panel-body animated fadeIn">
                 <div class="tabbable ">
                    
                   <ul class="nav nav-tabs nav-tabs-highlight">
@@ -421,7 +344,7 @@
             <a href="{% url 'dashboard:variant-add' product_pk=product.pk %}" class="btn-data-table btn-show-when-unchecked btn btn-primary hidden">
               {% trans "Add" context "Dashboard add action" %}
             </a>
-            <a href="#modal-product-variant-delete" class="modal-trigger btn-data-table btn-show-when-checked btn btn-danger" style="display:none" hidden>
+            <a href="#modal-product-variant-delete" class=" btn-data-table btn-show-when-checked btn btn-danger" id="modal-product-variant-delete-btn" style="display:none" hidden>
               {% trans "Delete" context "Dashboard delete action" %}
             </a>
 
@@ -464,10 +387,7 @@
                 <thead>
                
                   <tr class="bg-primary">
-                    <th class="bulk-checkbox">
-                      <input type="checkbox" id="select-all-variants" class="filled-in select-all switch-actions">
-                      <label for="select-all-variants"></label>
-                    </th>
+                    
                     <th>
                       {% trans "SKU" context "Product variant table header" %}
                     </th>
@@ -483,16 +403,13 @@
                     <th class="right-align">
                       Wholesale Price
                     </th>
-                    <th class="text-center">Actions</th>
+                    <th class="text-center">Options</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for variant in variants %}
-                    <tr data-action-go="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}" title="{% trans "Edit variant" context "Product variant table link title" %}">
-                      <td class="bulk-checkbox ignore-link">
-                        <input id="id_variants_{{ variant.id }}" name="items" type="checkbox" value="{{ variant.id }}" class="filled-in switch-actions">
-                        <label for="id_variants_{{ variant.id }}"></label>
-                      </td>
+                    <tr id="variant-row{{variant.pk}}" data-action-go="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}" title="{% trans "Edit variant" context "Product variant table link title" %}">
+                      
                       <td>
                         {{ variant.sku }}
                       </td>
@@ -514,13 +431,23 @@
                       </td>
                       <!-- actions -->
                     <td class="text-center">
-                      <ul class="icons-list">
-                        <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me"></i></a></li>
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu edit-dropdown">   
+                        <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                       
                         <li>
-                   
+                          <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" 
+                         data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ variant.name }}" data-id="{{ variant.pk }}"
+                       class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
+                       </a>
                         </li>
                        
-                      </ul>
+                        </ul>
+                    </div>
+                      
                     </td>
                     </tr>
                   {% endfor %}
@@ -815,13 +742,15 @@
 <input type="hidden" class="pageUrls" data-attributes="{% url 'dashboard:attr_list_f32b' %}" data-variantdetail="{% url 'dashboard:have-variants' %}" data-addattrurl="{% url 'dashboard:product-attr-add' %}" data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}" data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
- {% include "dashboard/includes/_modal_add_tax.html"  %}
+ {% include "dashboard/includes/_modal_add_tax.html"  %} 
  {% include "dashboard/includes/_modal_classesd.html"  %}
  {% include "dashboard/includes/_modal_attribute_choice.html"  %}
  {% include "dashboard/includes/_modal_type.html"  %}
  {% include "dashboard/includes/_modal_classes.html"  %}
  {% include "dashboard/includes/_modal_classesx.html"  %}
  {% include "dashboard/includes/_modal_add_stocks.html"  %}
+ {% include "dashboard/includes/_modal_subcategory.html"  %}
+ {% include "dashboard/includes/_modal_delete_instance.html"  %}
 {% endblock %}
 
  {% block custom_js %}
@@ -831,13 +760,8 @@
  {% endif %}
 <script type="text/javascript" src="{% static 'backend/js/addProduct.js' %}"></script>
 
- <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
-
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switch.min.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/moment/moment.min.js' %}"></script>
- 
- 
- 
+   
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
@@ -850,9 +774,95 @@
 
 <script type="text/javascript" src="{% static 'backend/js/productattribute.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
-
+<script type="text/javascript" src="{% static 'backend/js/deleteModal.js' %}"></script>
  <script type="text/javascript">
   $( document ).ready(function() {
+    $('.selectAttributesChoice').tokenize2({
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
+    tokensAllowCustom:true,      
+    });
+    $('.selectVariantChoice').tokenize2({
+    placeholder: 'Add variant choice(s) (eg. 1kg, 2kg)',
+    tokensAllowCustom:true,      
+    });
+    function addAttributePlusChoice(dynamicData,myUrl) 
+    {     
+       return $.ajax({
+          url: myUrl,
+          type: "post",
+          data: dynamicData
+        });
+    }
+    
+    var getAttributesChoice = $('.selectAttributesChoice');
+    var getVariantChoice = $('.selectVariantChoice');
+    var addAttributeChBtn = $('#addAttributeChBtn');
+    var addVariantChBtn = $('#addVariantChBtn');
+
+    addVariantChBtn.on('click',function(){
+      var newattrName = $('#newvName').val();
+      var choices = getVariantChoice.val();
+      if(!newattrName)
+      {
+        alertUser('Variant name required','bg-danger','Variant name required');
+        return false;
+      }
+      if(!choices)
+      {
+        alertUser('Variant name required','bg-danger','Variant name required');
+        return false;
+      }
+      var dynamicData = {};
+      var myUrl = "{% url 'dashboard:add-new-attribute' %}";
+      dynamicData["attributes"] = JSON.stringify(choices);
+      dynamicData["name"] = newattrName;
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      dynamicData['track'] = 'Add attribute plus choice';
+      addAttributePlusChoice(dynamicData,myUrl)
+      .done(function(data){
+        alertUser('Success');
+        getAttributesChoice.val('');
+         
+         getVariantChoice.parents('div').find('li.token').remove();
+        $('#newvName').val('');
+      })
+      .fail(function(){
+        alertUser('Variant already exist','bg-danger','Add unique variant name');
+      });
+    });
+
+    addAttributeChBtn.on('click',function(){
+      var newattrName = $('#newattrName').val();
+      var choices = getAttributesChoice.val();
+      if(!newattrName)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      if(!choices)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      var dynamicData = {};
+      var myUrl = "{% url 'dashboard:add-new-attribute' %}";
+      dynamicData["attributes"] = JSON.stringify(choices);
+      dynamicData["name"] = newattrName;
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      dynamicData['track'] = 'Add attribute plus choice';
+      addAttributePlusChoice(dynamicData,myUrl)
+      .done(function(data){
+        alertUser('Success');
+        getAttributesChoice.val('');
+         
+         $(".selectAttributesChoice").parents('div').find('li.token').remove();
+        $('#newattrName').val('');
+      })
+      .fail(function(){
+        alertUser('Attribute already exist','bg-danger','Add unique attribute name');
+      });
+    });
+
      // Default initialization
     $(".styledxx, .multiselect-container input").uniform({
         radioClass: 'choice'
@@ -1383,8 +1393,8 @@ $('#form-product').validate({
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
 
 <script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/form34b.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/form34D.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/addSubCategoryModal.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/addAttributesModal.js' %}"></script>
 {% if product.pk %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/media/fancybox.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/gallery.js' %}"></script>

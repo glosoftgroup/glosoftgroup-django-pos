@@ -1,0 +1,33 @@
+<!-- Blue modal -->
+ <div id="modal_delete_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+         <div class="">
+         <form action="" class="delete_form" method="post" id="delform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm delete!
+           </h5>
+           <input type="hidden" class="item-id" />
+           <input type="hidden" value="" id="success_url" name="success_url">
+           </div>
+           
+         </div>
+       </div>
+       
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger delete-this" onclick="return false" data-id="" data-href="">Delete</button>
+         </form>          
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
+       </div>
+     </div>
+   </div>
+ </div>
+ <div class="info"></div>
+ <!-- /blue modal -->

@@ -99,6 +99,9 @@ urlpatterns = [
         (views.variant_edit), name='variant-add'),
     url(r'^(?P<product_pk>[0-9]+)/variants/(?P<variant_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariants', login_url='not_found')
         (views.variant_delete), name='variant-delete'),
+    url(r'^(?P<product_pk>[0-9]+)/single/variants/(?P<variant_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariants', login_url='not_found')
+        (views.single_variant_delete), name='single-variant-delete'),
+    
     url(r'^(?P<product_pk>[0-9]+)/variants/bulk_delete/', permission_required('product.delete_productvariants', login_url='not_found')
         (views.variants_bulk_delete), name='variant-bulk-delete'),
     url(r'^products_pdf/$', products.products_pdf, name='products_pdf'),

@@ -1866,4 +1866,16 @@ def add_new_attribute(request):
                 slug = choice.replace(' ','_')
                 AttributeChoiceValue.objects.create(attribute=attribute,slug=slug,name=choice);        
         return HttpResponse(attribute)
+
+@permission_decorator('product.delete_productvariants')
+@staff_member_required
+def single_variant_delete(request,product_pk,variant_pk):
+    product = get_object_or_404(Product, pk=product_pk)
+    variant = get_object_or_404(product.variants, pk=variant_pk)
+    if request.method == 'POST':
+        variant.delete()
+        
+        return HttpResponse('deleted successfully')
+    return HttpResponse('invalid method')
     
+    pass

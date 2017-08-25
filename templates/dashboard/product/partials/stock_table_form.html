@@ -15,6 +15,7 @@
       </tr>
     </thead>
     <tbody>
+     <tr>
     	<td width="15%">
     		<input type="text" placeholder="Invoice Number" class="form-control" id="stockInvoiceNumber" name="stockInvoiceNumber">
     	</td>
@@ -35,6 +36,7 @@
     	<td>
     		<button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-add' product_pk=product.pk %}" id='addnewStockBtn' class="btn btn-xs btn-primary">Add</button>
     	</td>
+      </tr>
     </tbody>
    </table>
   

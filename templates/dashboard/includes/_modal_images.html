@@ -1,4 +1,4 @@
-<!-- Blue modal -->
+<!-- images modal -->
   <div id="modal_instance" class="modal fade">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -6,10 +6,10 @@
           <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h6 class="modal-title text-white"></h6>
         </div>
-
+        <form action="" class="delete_form" method="post" novalidate>
         <div class="modal-body">
           <div class="">
-          <form action="" class="delete_form" method="post" novalidate>
+         
           {% csrf_token %}
           {% if product.pk %}
            <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=images">
@@ -26,15 +26,11 @@
         <div class="modal-footer">
           <button type="submit" id='modal_delete' class="btn  bg-danger">
             <i class='text-white'>Delete</i>
-          </button> 
-          </form>
-
-          
-          <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
-
-          
+          </button>           
+          <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>          
         </div>
+     </form>
       </div>
     </div>
   </div>
-  <!-- /blue modal -->
+  <!-- /images modal -->
