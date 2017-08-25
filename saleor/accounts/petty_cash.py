@@ -52,11 +52,27 @@ def view(request):
 	try:
 		try:
 			lastEntry = PettyCash.objects.latest('id')
-			date = lastEntry.created
-			amount = lastEntry.closing
-			opening = lastEntry.opening
-			added = lastEntry.added
-			closing = lastEntry.closing
+			pd = DateFormat(lastEntry.created).format('Y-m-d')
+			td = DateFormat(datetime.datetime.today()).format('Y-m-d')
+			if td == pd:
+				date = lastEntry.created
+				amount = lastEntry.closing
+				opening = lastEntry.opening
+				added = lastEntry.added
+				closing = lastEntry.closing
+			else:
+				new_opening = lastEntry.closing
+				new_balance = lastEntry.closing
+				added = 0
+				new_petty_cash = PettyCash(opening=new_opening, added=added, closing=new_balance)
+				new_petty_cash.save()
+
+				date = new_petty_cash.created
+				amount = new_petty_cash.closing
+				opening = new_petty_cash.opening
+				closing = new_petty_cash.closing
+				added = new_petty_cash.added
+
 		except:
 			date = datetime.date.today()
 			amount = 0

@@ -64,7 +64,8 @@ def expenses(request):
             expenses = paginator.page(paginator.num_pages)
         data = {
             "expenses": expenses,
-            "expense_types":expense_types
+            "expense_types":expense_types,
+            "pn": paginator.num_pages
         }
         user_trail(request.user.name, 'accessed expenses', 'views')
         info_logger.info('User: ' + str(request.user.name) + 'accessed expenses page')
@@ -74,7 +75,7 @@ def expenses(request):
             return TemplateResponse(request, 'dashboard/accounts/expenses/list.html', data)
     except TypeError as e:
         error_logger.error(e)
-        return HttpResponse('error accessing users')
+        return HttpResponse('error accessing expenses')
 
 @staff_member_required
 def expenses_paginate(request):
@@ -89,6 +90,11 @@ def expenses_paginate(request):
             paginator = Paginator(expenses, int(p2_sz))
             expenses = paginator.page(page)
             return TemplateResponse(request,'dashboard/accounts/expenses/paginate.html',{'expenses':expenses})
+
+        if list_sz:
+            paginator = Paginator(expenses, int(list_sz))
+            expenses = paginator.page(page)
+            return TemplateResponse(request,'dashboard/accounts/expenses/p2.html',{'expenses':expenses, 'pn':paginator.num_pages,'sz':list_sz, 'gid':request.GET.get('gid')})
 
         paginator = Paginator(expenses, 10)
         expenses = paginator.page(page)
@@ -144,19 +150,28 @@ def add(request):
     return TemplateResponse(request, 'dashboard/accounts/expenses/expenses.html', data)
 
 def add_process(request):
-    voucher = request.POST.get('voucher')
+    # voucher = request.POST.get('voucher')
     expense_type = request.POST.get('expense_type')
-    expense_date = request.POST.get('expense_date')
+    # expense_date = request.POST.get('expense_date')
+    expense_date = DateFormat(datetime.datetime.today()).format('Y-m-d')
     amount = request.POST.get('amount')
-    authorized_by = request.POST.get('authorized_by')
+    # authorized_by = request.POST.get('authorized_by')
+    if request.user.name:
+        authorized_by = request.user.name
+    else:
+        authorized_by = request.user.email
+
     paid_to  = request.POST.get('paid_to')
-    received_by = request.POST.get('received_by')
-    phone = request.POST.get('phone')
+    # received_by = request.POST.get('received_by')
+    # phone = request.POST.get('phone')
     description = request.POST.get('description')
-    new_expense = Expenses(voucher=voucher, expense_type=expense_type, expense_date=expense_date,
-                        amount=amount, authorized_by=authorized_by, paid_to=paid_to,
-                        received_by=received_by, phone=phone,
-                        description=description)
+    # new_expense = Expenses(voucher=voucher, expense_type=expense_type, expense_date=expense_date,
+    #                     amount=amount, authorized_by=authorized_by, paid_to=paid_to,
+    #                     received_by=received_by, phone=phone,
+    #                     description=description)
+    new_expense = Expenses(expense_type=expense_type, expense_date=expense_date,
+                           amount=amount, authorized_by=authorized_by, paid_to=paid_to,
+                           description=description)
 
 
     petty_cash = PettyCash.objects.latest('id')
@@ -206,7 +221,7 @@ def detail(request, pk=None):
             error_logger.error(e)
             return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense': expense})
 
-def expenses_search(request):
+def expenses_searchs(request):
     if request.is_ajax():
         page = request.GET.get('page', 1)
         list_sz = request.GET.get('size', 10)
@@ -237,3 +252,66 @@ def expenses_search(request):
 
             return TemplateResponse(request, 'dashboard/accounts/expenses/search.html',
 {'expenses': expenses, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+@staff_member_required
+def expenses_search( request ):
+
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size')
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get( 'q' )
+        if list_sz == 0 or list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+
+        if q is not None:
+            expenses = Expenses.objects.filter(
+                Q(expense_type__icontains=q) |
+                Q(paid_to__icontains=q) | Q(authorized_by__icontains=q)).order_by('id')
+
+            if request.GET.get('gid'):
+                type = ExpenseType.objects.get(pk=request.GET.get('gid'))
+                expenses = expenses.filter(expense_type=type.name)
+                if p2_sz:
+                    paginator = Paginator(expenses, int(p2_sz))
+                    expenses = paginator.page(page)
+                    return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html',
+                                            {'expenses': expenses})
+
+                if list_sz:
+                    paginator = Paginator(expenses, int(list_sz))
+                    expenses = paginator.page(page)
+                    return TemplateResponse(request, 'dashboard/accounts/expenses/search.html',
+                                            {'expenses': expenses, 'pn': paginator.num_pages, 'sz': list_sz, 'gid':request.GET.get('gid'),'q':q})
+
+                paginator = Paginator(expenses, 10)
+                expenses = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/accounts/expenses/search.html',
+                                        {'expenses': expenses, 'pn': paginator.num_pages, 'sz': sz,
+                                         'gid': request.GET.get('gid')})
+
+            else:
+                if list_sz:
+                    paginator = Paginator(expenses, int(list_sz))
+                    expenses = paginator.page(page)
+                    return TemplateResponse(request, 'dashboard/accounts/expenses/search.html',
+                                            {'expenses': expenses, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,'q':q})
+
+                if p2_sz:
+                    paginator = Paginator(expenses, int(p2_sz))
+                    expenses = paginator.page(page)
+                    return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', {'expenses': expenses})
+
+                paginator = Paginator(expenses, 10)
+                try:
+                    expenses = paginator.page(page)
+                except PageNotAnInteger:
+                    expenses = paginator.page(1)
+                except InvalidPage:
+                    expenses = paginator.page(1)
+                except EmptyPage:
+                    expenses = paginator.page(paginator.num_pages)
+                return TemplateResponse(request, 'dashboard/accounts/expenses/search.html', {'expenses':expenses, 'pn':paginator.num_pages,'sz':sz,'q':q})
