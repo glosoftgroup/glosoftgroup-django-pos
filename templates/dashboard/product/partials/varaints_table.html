@@ -54,13 +54,23 @@
                       </td>
                       <!-- actions -->
                     <td class="text-center">
-                      <ul class="icons-list">
-                        <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me"></i></a></li>
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu edit-dropdown">   
+                        <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                       
                         <li>
-                   
+                          <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" 
+                         data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ variant.name }}" data-id="{{ variant.pk }}"
+                       class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
+                       </a>
                         </li>
                        
-                      </ul>
+                        </ul>
+                    </div>
+                      
                     </td>
                     </tr>
                   {% endfor %}
@@ -78,3 +88,4 @@
               {% endif %}
             </table>
           </div>
+<script type="text/javascript" src="{% static 'backend/js/deleteModal.js' %}"></script>

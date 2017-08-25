@@ -4,7 +4,7 @@
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h6 class="modal-title">Add Variants</h6>
+                    <h6 class="modal-title">Add Attributes</h6>
                 </div>
                 <div class="modal-body">
                  <div class="form-group hidden">
@@ -12,72 +12,57 @@
                   <input type="text" class="form-control" placeholder="Sub-category Name" name="newClassNameD" id="newClassNameD">
                  </div>
                  <div class="form-group">
-                    <label class="text-purple-800">Product Variant(s)</label>
+                    <label class="text-purple-800">Attribute that does not affect the price</label>
                     <select class="getAttributesD" multiple>                        
                     </select>
                   </div>
                   <div class="form-group hidden">
-                    <label class="text-purple-800">Variants </label>
+                    <label class="text-purple-800">Attribute that affect the price</label>
                     <select class="getAttributesTwoD" multiple>                        
                     </select>
                    </div>                  
                 </div>
-<div class="panel-group content-group-lg mb-15" id="accordion1">
+<div class="panel-group content-group-lg mb-15" id="accordion1attribute">
   <div class="panel panel-white">
     <div class="panel-heading">
       <h6 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion1" href="#accordion-group1">
-        <i class="icon-touch"></i>Add variants</a>
+        <a data-toggle="collapse" data-parent="#accordion1attribute" href="#accordion-group1attribute">
+        <i class="icon-touch"></i>Add attributes</a>
       </h6>
       <div class="heading-elements">
                 <ul class="icons-list">
                   <li id="add-template">
-                  <a data-toggle="collapse" data-parent="#accordion1" href="#accordion-group1" >
+                  <a data-toggle="collapse" data-parent="#accordion1attribute" href="#accordion-group1attribute" >
                   <i class="icon-plus3"></i></a>
                   </li>
                     
                 </ul>
             </div>
     </div>
-    <div id="accordion-group1" class="panel-collapse collapse">
+    <div id="accordion-group1attribute" style="background-color: #FEFCFC;" class="panel-collapse collapse">
 
        
       <div class="panel-body">
         <div class="modalbody">
 <div class="">
+<!-- new fields -->
+<div class="col-md-3">
   <div class="form-group">
-     <div id="add-another-attr" class="col-md-12 hidden">
-        <button class="btn btn-xs btn-primary">Add another variant</button>
-      </div>
-     <div class="col-md-4">      
-      <label class="text-bold">Variant Name:</label>
-      <div class="input-group">   
-     <input type="text" id="attribute_name32D" class="form-control" placeholder="Variant Name" name="attribute_nameD">
-     <span class="input-group-btn">
-      <button class="btn bg-primary btn-xs" type="button" id='attr-nameD'>Add</button>
-    </span> 
-    </div>
-     </div>
-     <!-- lsdjf -->
-     <div class="col-md-6">
-     <div class="">    
-    <div class="form-group hidden" id='value-inputD'>
-        <label class="text-bold">Value</label>
-        <div class="input-group">   
-       <input type="text" placeholder="e.g 1kg for weight variant" id='value32D' class="form-control" name="valueD">
-       <span class="input-group-btn">
-        <button class="btn btn-xs btn-primary hidden" id="newvalueD">Add Value</button>
-      </span> 
-      </div>      
-    </div>    
+    <label>Attribute Name</label>
+    <input type="text" placeholder="Attribute Name" id="newattrName" class="form-control" name="newattrName">
   </div>
-     </div>
-     <!-- lsajd -->
-     <div class="col-md-2">
-     <div id='add_value32D'></div>
-     </div>  
-
-  </div><br/>
+</div>
+<div class="col-md-7">
+  <div class="form-group">
+    <label>Attribute choice</label>
+    <select class="selectAttributesChoice" multiple></select>
+  </div>
+</div>
+<div class="col-md-2 text-right" style="margin-top: 20px;">
+  <button class="btn btn-primary btn-xs" id="addAttributeChBtn">Add</button>
+</div>
+<!-- ./new fields -->
+  <br/>
   
 </div>
 </div>
@@ -87,7 +72,7 @@
   </div>
                 <div class="modal-footer p-15">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button  type="button" id="addClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Variants</button>
+                    <button type="button" id="addClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Attributes</button>
                     
                 </div>
             </div>

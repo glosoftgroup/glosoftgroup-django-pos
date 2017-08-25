@@ -7,11 +7,8 @@
     {% if variants %}
       <thead>
      
-        <tr class="bg-primary">
-          <th class="bulk-checkbox">
-            <input type="checkbox" id="select-all-variants" class="filled-in select-all switch-actions">
-            <label for="select-all-variants"></label>
-          </th>
+        <tr id="variant-row{{variant.pk}}" class="bg-primary">
+          
           <th>
             {% trans "SKU" context "Product variant table header" %}
           </th>
@@ -33,10 +30,7 @@
       <tbody>
         {% for variant in variants %}
           <tr data-action-go="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}" title="{% trans "Edit variant" context "Product variant table link title" %}">
-            <td class="bulk-checkbox ignore-link">
-              <input id="id_variants_{{ variant.id }}" name="items" type="checkbox" value="{{ variant.id }}" class="filled-in switch-actions">
-              <label for="id_variants_{{ variant.id }}"></label>
-            </td>
+            
             <td>
               {{ variant.sku }}
             </td>
@@ -56,16 +50,26 @@
       {% gross variant.get_wholesale_price_per_item html=True %}
            {% endif %}
             </td>
-            <!-- actions -->
-          <td class="text-center">
-            <ul class="icons-list">
-              <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me"></i></a></li>
-              <li>
-         
-              </li>
-             
-            </ul>
-          </td>
+             <!-- actions -->
+                    <td class="text-center">
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu edit-dropdown">   
+                        <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                       
+                        <li>
+                          <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" 
+                         data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ variant.name }}" data-id="{{ variant.pk }}"
+                       class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
+                       </a>
+                        </li>
+                       
+                        </ul>
+                    </div>
+                      
+                    </td>
           </tr>
         {% endfor %}
       </tbody>
@@ -81,23 +85,5 @@
         </tbody>
     {% endif %}
   </table>
-<script type="text/javascript">
-$('.switch-actions').on('change', function() {
-  let $btnChecked = $(this).parents('form').find('.btn-show-when-checked');
-  let $btnUnchecked = $(this).parents('form').find('.btn-show-when-unchecked');
-  if ($(this).parents('form').find('.switch-actions:checked').length) {
-    $btnChecked.show();
-    $btnUnchecked.hide();
-  } else {
-    $btnUnchecked.show();
-    $btnChecked.hide();
-  }
-});
-    $('#select-all-variants').click(function () {    
-    $(':checkbox.switch-actions').prop('checked', this.checked);    
-     });
-    $('#select-all-stock').click(function () {    
-    $(':checkbox.switch-stock').prop('checked', this.checked);
 
-  });
-</script>
+<script type="text/javascript" src="{% static 'backend/js/deleteModal.js' %}"></script>

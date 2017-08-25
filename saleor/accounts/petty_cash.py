@@ -52,41 +52,34 @@ def view(request):
 	try:
 		try:
 			lastEntry = PettyCash.objects.latest('id')
-			date = lastEntry.created
-			amount = lastEntry.closing
-			opening = lastEntry.opening
-			added = lastEntry.added
-			closing = lastEntry.closing
+			pd = DateFormat(lastEntry.created).format('Y-m-d')
+			td = DateFormat(datetime.datetime.today()).format('Y-m-d')
+			if td == pd:
+				date = lastEntry.created
+				amount = lastEntry.closing
+				opening = lastEntry.opening
+				added = lastEntry.added
+				closing = lastEntry.closing
+			else:
+				new_opening = lastEntry.closing
+				new_balance = lastEntry.closing
+				added = 0
+				new_petty_cash = PettyCash(opening=new_opening, added=added, closing=new_balance)
+				new_petty_cash.save()
+
+				date = new_petty_cash.created
+				amount = new_petty_cash.closing
+				opening = new_petty_cash.opening
+				closing = new_petty_cash.closing
+				added = new_petty_cash.added
+
 		except:
 			date = datetime.date.today()
 			amount = 0
 			opening = 0
 			added = 0
 			closing = 0
-		# try:
-		# 	petty_cash = PettyCash.objects.latest('id')
-		# 	amount = petty_cash.balance
-		# except:
-		# 	amount = 0
-		#
-		# date = DateFormat(datetime.datetime.today()).format('Y-m-d')
-		#
-		# try:
-		# 	pettyCash = PettyCash.objects.filter(created__icontains=date)
-		# 	opening_amount = pettyCash.aggregate(Sum('opening_amount'))
-		# 	p = pettyCash.order_by('-id')[:1]
-		# 	balance = [i for i in p]
-		# 	expenses = Expenses.objects.filter(added_on__icontains=date)
-		# 	types = expenses.values('expense_type').annotate(Count('expense_type'))
-		# 	expense_amount = expenses.aggregate(Sum('amount'))['amount__sum']
-		# except:
-		# 	expenses = 0
-		# 	types = 0
-		# 	pettyCash = None
-		# 	opening_amount = 0
-		# 	expense_amount = 0
-		# 	balance = 0
-		#
+
 		data = {
 			'pdate':date,
 			'opening_amount': opening,
@@ -104,28 +97,39 @@ def add(request):
 	amount = Decimal(request.POST.get('amount'))
 
 	try:
-		lastEntry = PettyCash.objects.latest('id')
-		pd = DateFormat(lastEntry.created).format('Y-m-d')
-		td = DateFormat(datetime.datetime.today()).format('Y-m-d')
-		if td == pd:
-			lastEntry.added = lastEntry.added + amount
-			lastEntry.closing = lastEntry.closing + amount
-			lastEntry.save()
-			balance = lastEntry.closing
-		else:
-			new_opening = lastEntry.closing
-			new_balance = lastEntry.closing + amount
-			new_petty_cash = PettyCash(opening=new_opening, added=amount, closing=new_balance)
+		try:
+			lastEntry = PettyCash.objects.latest('id')
+			pd = DateFormat(lastEntry.created).format('Y-m-d')
+			td = DateFormat(datetime.datetime.today()).format('Y-m-d')
+			if td == pd:
+				lastEntry.added = lastEntry.added + amount
+				lastEntry.closing = lastEntry.closing + amount
+				lastEntry.save()
+				balance = lastEntry.closing
+			else:
+				new_opening = lastEntry.closing
+				new_balance = lastEntry.closing + amount
+				new_petty_cash = PettyCash(opening=new_opening, added=amount, closing=new_balance)
+				new_petty_cash.save()
+				balance = new_petty_cash.closing
+			user_trail(request.user.name, 'added KShs. '+ str(amount)+' to petty cash balance of KShs. '+
+					   str(lastEntry.closing)+' current balance is KShs. '+str(lastEntry.closing + amount), 'update')
+			info_logger.info(
+				'User: ' + str(request.user.name) + 'added KShs. '+ str(amount)+' to petty cash balance of KShs. '+
+				str(lastEntry.closing)+' current balance is '+str(lastEntry.closing + amount), 'update')
+			return HttpResponse(balance)
+		except:
+			new_petty_cash = PettyCash(opening=amount, added=amount, closing=amount)
 			new_petty_cash.save()
 			balance = new_petty_cash.closing
-		user_trail(request.user.name, 'added KShs. '+ str(amount)+' to petty cash balance of KShs. '+
-				   str(lastEntry.closing)+' current balance is KShs. '+str(lastEntry.closing + amount), 'update')
-		info_logger.info(
-			'User: ' + str(request.user.name) + 'added '+ str(amount)+' to petty cash balance of KShs. '+
-			str(lastEntry.closing)+' current balance is '+str(lastEntry.closing + amount), 'update')
-		return HttpResponse(balance)
+			user_trail(request.user.name, 'added KShs. ' + str(amount) + ' to petty cash, current balance is KShs. ' + str(balance), 'update')
+
+			info_logger.info(
+				'User: ' + str(request.user.name) + 'added KShs. ' + str(amount) + ' to petty cash, current balance is ' + str(balance), 'update')
+			return HttpResponse(balance)
+
 	except Exception, e:
-		print (e)
+		error_logger.error(e)
 		HttpResponse(e)
 
 def balance(request):
