@@ -335,6 +335,12 @@
                     Cash movement
                     </a>
                     </li>
+                     <li class="{% block menu_paymentoptions_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:payments-list' %}">
+                    <i class="icon-cash4"></i>
+                    Payment Options
+                    </a>
+                    </li>
                   </ul>
                 </li>
                   {% endif %}

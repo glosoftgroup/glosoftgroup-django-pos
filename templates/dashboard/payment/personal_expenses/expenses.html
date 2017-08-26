@@ -1,0 +1,415 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Add Expense
+{% endblock %}
+ {% block breadcrumbs %}
+     <li><a href="{% url 'accounts:personal_expenses' %}">Business Expenses</a></li>
+     <li class="active"><a href="{% url 'accounts:add_expense' %}">Add Expense</a></li>
+ {% endblock %}
+{% block menu_expenses_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Add Expense</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+      <div class="panel-body">
+          <form class="form" enctype="multipart/form-data" id="expenses" name="expenses">
+             {% csrf_token %}
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <div class="row">
+                              <div class="col-md-4">
+                                   <div class="form-group">
+                                      <label for="voucher">Voucher No</label>
+                                       <input class="form-control" name="voucher" placeholder="Enter: voucher no"/>
+                                   </div>
+                              </div>
+
+                              <div class="col-md-4">
+                                  <div class="form-group">
+                                            <label>Expense Type</label>
+                                            <div class="input-group">
+                                                <div class="btn-group bootstrap-select input-group-btn" id="expense_types" style="width: 100%;">
+                                                    <select class="bootstrap-select sel required expense_type" id="roleSelect" name="expense_type" data-width="100%" tabindex="-98" style="display: none;">
+                                                        <option value="">Choose...</option>
+                                                          {% if expense_types %}
+                                                            {% for type in expense_types %}
+                                                              <option value="{{type.name}}">{{type.name}}</option>
+                                                            {% endfor %}
+                                                          {% else %}
+                                                            <option value="none">No Expense Types</option>
+                                                          {% endif %}
+                                                          <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Expense Type" data-select="#expense_types"
+                                                            data-href="{% url 'accounts:add_expense_type' %}" data-cat="expense_type" data-label="Expense Type:"> add new expense type</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="input-group-btn">
+                                                    <button type="button" class="btn bg-indigo btn-icon legitRipple edit_modal-trigger edit-btn"
+                                                            data-popup="tooltip" data-original-title="Add New Expense Type" data-placement="top"
+                                                            data-ta="#edit_modal_instance" data-title="Add New Expense Type" data-select="#expense_types"
+                                                            data-href="{% url 'accounts:add_expense_type' %}" data-cat="expense_type" data-label="Expense Type:">
+                                                        <i class="icon-plus-circle2"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                              </div>
+
+                              <div class="col-md-4">
+                                   <div class="form-group">
+                                      <label for="dob">Expense Date</label>
+                                       <div class="input-group">
+                                          <input class="form-control daterange-single dob" type="text" name="expense_date" placeholder="Enter: yyy-mm-dd">
+                                          <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                                       </div>
+                                   </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <div class="row">
+                              <div class="col-md-4">
+                                   <div class="form-group">
+                                      <label for="amount">Amount</label>
+                                       <input class="form-control" type="text" name="amount" placeholder="Enter: amount"/>
+                                   </div>
+                              </div>
+                              <div class="col-md-4">
+                                  <div class="form-group">
+                                    <label for="gender">Authorized By</label>
+                                    <select class="bootstrap-select gender" name="authorized_by" data-width="100%" tabindex="-98" style="display: none;">
+                                        {% for user in staff %}
+                                        <option value="{{user.name}}">{% if user.name %}
+                                            {{ user.name }}
+                                        {% else %}
+                                        {{ user.email }}
+                                        {% endif %}</option>
+                                        {% endfor %}
+                                    </select>
+                                  </div>
+                              </div>
+
+                              <div class="col-md-4">
+                                   <div class="form-group">
+                                      <label for="email">Paid To</label>
+                                       <input class="form-control" type="text" name="paid_to" placeholder="Enter: recipient"/>
+                                   </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <div class="row">
+                            <div class="col-md-4">
+                                   <div class="form-group">
+                                      <label for="email">Received By</label>
+                                       <input class="form-control" type="text" name="received_by" placeholder="Enter: recipient"/>
+                                   </div>
+                              </div>
+
+                              <div class="col-md-4">
+                                   <div class="form-group">
+                                      <label for="phone">Mobile Number</label>
+                                       <input class="form-control" type="text" name="phone" placeholder="Enter: mobile no"/>
+                                   </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-12">
+                      <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" name="description"></textarea>
+                        </div>
+                  </div>
+                    <div class="col-md-12">
+                         <div class="text-center" style="margin-top:40px;">
+                          <a href="{% url 'accounts:expenses' %}" class="btn btn-default waves-effect waves-light">Cancel</a>
+                          <button class="btn btn-primary waves-effect waves-light" id="supplier-submit" type="submit">Create Expense<i class="icon-arrow-right14 position-right"></i></button>
+                         </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- edit modal -->
+ <div id="edit_modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <form action="" class="edit_form" method="post" id="editform" novalidate>
+           <div class="modal-body">
+            {% csrf_token %}
+                 <div class="form-group">
+                     <label class="cat_label"> </label>
+                     <input class="form-control edit_class" name=""/>
+                 </div>
+                  <input type="hidden" class="eitem-url"/>
+                  <input type="hidden" class="eitem-select"/>
+                 <input type="hidden" name="option" value="option"/>
+
+           </div>
+           <div class="modal-footer">
+               <button class="btn btn-primary waves-effect waves-light pull-right data_update"
+                       id='modal_edit' type="submit">
+                   Create
+                   <i class="icon-arrow-right14 position-right"></i>
+               </button>
+
+             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+           </div>
+       </form>
+     </div>
+   </div>
+ </div>
+ <!-- /edit modal -->
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    //** general select
+    $('.bootstrap-select').selectpicker({
+        iconBase: 'fa',
+        addIcon:'fa-plus-circle'
+    });
+
+    //** role change
+    //**$('.input-group').on('change', '#roleSelect', function(){
+
+    $('.input-group').on('change', '.sel', function(){
+       var v = $(this).val();
+
+       if(v == 'add'){
+             var selected = $(this).find('option:selected');
+
+             var url = selected.data('href')
+             var prompt_text = selected.data('title');
+             var modal = selected.data('ta');
+             var select = selected.data('select');
+             var cat = selected.data('cat');
+             var label = selected.data('label');
+             $('.cat_label').html(label);
+             $('.eitem-url').val(url);
+             $('.eitem-select').val(select);
+             $('.modal-title').html(prompt_text);
+             $('.edit_class').attr('name', cat)
+             $(modal).modal();
+             $('.delete_form').attr('action',url);
+
+             var form = $("#editform"), validator = form.validate();
+             validator.resetForm();
+             form.find(".error").removeClass("error");
+
+             $("#editform input[name='" + cat + "']").rules("add", {required:true});
+
+       }
+
+    });
+    //** general datepicker
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    });
+    //** dob
+    $('.dob').on('change',function(){
+        var date = $(this).val();
+        /*$.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});*/
+    });
+
+    //** doj
+    $('.doj').on('change',function(){
+      var date = $(this).val();
+        /*$.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});*/
+    });
+    var minimum_amount = 1;
+    jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+        return this.optional(element) || (parseFloat(value) >= minimum_amount);
+    }, "* should be more than (KShs."+ minimum_amount +" )");
+
+      //** validate form & submit
+      $('#expenses').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+            voucher: { required:true },
+            amount: { required:true, digits:true, greaterThanZero : true },
+            paid_to:{required:true},
+            received_by:{required:true},
+            description:{required:true},
+            phone:{ required:true, digits: true, minlength: 6},
+            role: {  required: true}
+        },
+        messages:{
+          voucher:{
+            required: "please provide a voucher number"
+          },
+          amount:{
+            required: "please provide the amount"
+          },
+          paid_to:{
+            required: "please provide the name of the recipient"
+          },
+          received_by:{
+            required: "please provide the name of the recipient"
+          },
+          description:{
+            required: "please provide a description"
+          },
+          phone:{
+            required: "please provide the phone number",
+            digits:"please input digits only",
+            minlength: "name must be atleast 6 characters long"
+          }
+        },
+        submitHandler: function() {
+          var f = document.getElementById('expenses');
+          var formData = new FormData(f);
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'accounts:add_personal_expense_process' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       $('#expenses')[0].reset();
+                       $.jGrowl('message sent successfully', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+                       window.location = "{% url 'accounts:personal_expenses' %}";
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try sending again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            }
+        }
+      });
+
+  //** modal functionality
+  //** modal edit
+  $('.edit_modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var modal = $(this).data('ta');
+         var select = $(this).data('select');
+
+         var cat = $(this).data('cat');
+         var label = $(this).data('label');
+         $('.cat_label').html(label);
+
+         $('.eitem-url').val(url);
+         $('.eitem-select').val(select);
+         $('.modal-title').html(prompt_text);
+         $('.edit_class').attr('name', cat)
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+
+         var form = $("#editform"), validator = form.validate();
+         validator.resetForm();
+         form.find(".error").removeClass("error");
+         $("#editform input[name='" + cat + "']").rules("add", {required:true});
+      });
+  $('#editform').validate({
+    onkeyup: function(element) {$(element).valid()},
+    rules:{
+       category: {
+          required:true
+        }
+    },
+    messages:{
+      category:{
+        required: "please fill in the required field"
+      }
+    },
+    submitHandler: function() {
+          var name = $('.edit_class').data('name');
+          var inputValue = $('.edit_class').val();
+          var f = document.getElementById('editform');
+          var formData = new FormData(f);
+          //formData.append(name, inputValue);
+          var url = $('.eitem-url').val();
+          var selectClass = $('.eitem-select').val();
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $('#edit_modal_instance').modal('hide');
+                $('.edit_class').val('');
+                var replaceDiv = $('.eitem-select').val()
+                $(replaceDiv).replaceWith(data);
+                $.jGrowl('Created successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                //window.location.reload();
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error Updating', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });
+    }
+  });
+
+
+  });
+</script>
+{% endblock %}

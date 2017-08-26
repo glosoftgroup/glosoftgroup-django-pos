@@ -1873,9 +1873,16 @@ def single_variant_delete(request,product_pk,variant_pk):
     product = get_object_or_404(Product, pk=product_pk)
     variant = get_object_or_404(product.variants, pk=variant_pk)
     if request.method == 'POST':
-        variant.delete()
-        
+        variant.delete()        
         return HttpResponse('deleted successfully')
     return HttpResponse('invalid method')
     
-    pass
+    
+@permission_decorator('product.delete_productvariants')
+@staff_member_required
+def single_stock_delete(request,product_pk,stock_pk):
+    stock = Stock.objects.get(pk=stock_pk)
+    if request.method == 'POST':
+        stock.delete()        
+        return HttpResponse('deleted successfully')
+    return HttpResponse('invalid method')

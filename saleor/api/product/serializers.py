@@ -14,7 +14,8 @@ from ...discount.models import get_product_discounts
 from ...sale.models import (
             Sales, 
             SoldItem,
-            Terminal)
+            Terminal,
+            PaymentOption)
 from ...site.models import SiteSettings
 from ...product.models import (
             Product,
@@ -96,6 +97,7 @@ class SalesListSerializer(serializers.ModelSerializer):
                  'mobile',
                  'customer_name',
                  'cashier',
+                 'payment_options'
                 )
 
     def get_cashier(self,obj):
@@ -209,7 +211,7 @@ class SalesSerializer(serializers.ModelSerializer):
             customer.save()
         # get sold products        
         solditems_data = validated_data.pop('solditems')
-        # sales = Sales.objects.create(**validated_data)
+        payment_options_data = validated_data.pop('payment_options')
         sales = Sales.objects.create(user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),
                                      total_net=validated_data.get('total_net'),
@@ -220,11 +222,17 @@ class SalesSerializer(serializers.ModelSerializer):
                                      customer=customer,
                                      mobile=validated_data.get('mobile'),
                                      customer_name=validated_data.get('customer_name'))
+        for payment_option_data in payment_options_data:
+            print payment_option_data
+            sales.payment_options.add(payment_option_data)
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
-            stock = Stock.objects.get(variant__sku=solditem_data['sku'])
-            if stock:                
-                Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
+            try:
+                stock = Stock.objects.get(variant__sku=solditem_data['sku'])
+                if stock:                
+                    Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
+            except:
+                print 'Stock not found!'
                 
         return sales
         
