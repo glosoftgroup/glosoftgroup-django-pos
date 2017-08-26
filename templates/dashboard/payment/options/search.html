@@ -15,31 +15,29 @@
               <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                      <thead>
                       <tr class="bg-primary">
-                        <th>Exp. Date</th>
-                        <th>Expense</th>
-                        <th>Paid To</th>
-                        <th>Amount</th>
+                        
+                        <th>Name</th>
+                        <th>Description</th>
                         {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
-                        <th class="text-center">Actions</th>
+                        <th class="text-center">Options</th>
                         {% endif %}
                       </tr>
                     </thead>
                     <tbody id="p-tb">
-                    {% if expenses %}
-                        {% for expense in expenses %}
+                    {% if options %}
+                        {% for option in options %}
                           <tr class='clickable-row' id="{{user.pk }}">
-                            <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{ expense.added_on|date:'d-m-Y'}}</td>
-                            <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.expense_type}}</td>
-                            <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.paid_to}}</td>
-                            <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">
-                            {{ expense.amount }}</td>
+                            <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{ option.name }}</td>
+                            
+                            <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">
+                            {{ option.description }}</td>
                             {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                             <!-- actions -->
                             <td class="text-center">
                               <ul class="icons-list">
-                                 {% if perms.accounts.delete_expense %}
+                                 {% if perms.accounts.delete_option %}
                                 <li>
-                                  <a data-ta="#modal_instance" data-title="Delete Expense {{ expense.expense_type }} ?" data-href="{% url 'accounts:expense-delete' pk=expense.pk %}" data-name="{{ expense.expense_type}}" data-id="{{ expense.pk }}"
+                                  <a data-ta="#modal_instance" data-title="Delete option {{ option.name }} ?" data-href="{% url 'dashboard:option-delete' pk=option.pk %}" data-name="{{ option.option_type}}" data-id="{{ option.pk }}"
                                  class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
                                  </a>
                                 </li>
@@ -53,7 +51,7 @@
                         <tr>
                           <td colspan="6">
                             <h2 class="text-center">
-                              No Expenses Available
+                              No options Available
                             </h2>
                           </td>
                         </tr>
@@ -62,7 +60,7 @@
                </table>
             </div>
         </div>
-          {% if expenses %}
+          {% if options %}
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -87,11 +85,11 @@
 
                 var gid = '{{gid}}';
                 if(gid == 0){
-                    $.get("{% url 'accounts:expenses_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                    $.get("{% url 'dashboard:payment-option-search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
                       $('#p-tb').html(data);
                     });
                 }else{
-                    $.get("{% url 'accounts:expenses_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}', gid:'{{gid}}'},function(data){
+                    $.get("{% url 'dashboard:payment-option-search' %}",{page:num, psize:'{{sz}}', q:'{{q}}', gid:'{{gid}}'},function(data){
                        $('#p-tb').html(data);
                     });
                 }
