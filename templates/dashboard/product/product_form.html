@@ -294,6 +294,15 @@
       <!-- CODE V -->
       <div id="variants" class="">
       <button data-attributes="{% url 'dashboard:attr_list_f32b' %}" class="btn btn-primary mb-5" id="addNewvaraints">New variant</button>
+      <div class="mt-15">
+        <button class="btn btn-primary" id="btntogglev">
+          Add variant
+        </button>
+      </div>
+      <style type="text/css">
+        #toggleVariant{display:none;}
+      </style>
+      <div id="toggleVariant">
       <table class="table table-hover">
         <thead>
         <tr class="bg-primary">  
@@ -335,6 +344,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
       <!-- <button class="btn btn-primary" id="addNewvaraints">New variant</button> -->
         <form method="post" action="{% url 'dashboard:variant-bulk-delete' product_pk=product.pk %}" novalidate>
           {% csrf_token %}
@@ -918,6 +928,11 @@
    });
  {% endif %}
 
+
+  $('#btntogglev').on('click',function(){
+    $('#toggleVariant').slideToggle();
+  });
+    
 
  function roundOff(val){
   return Math.round(val * 100) / 100;

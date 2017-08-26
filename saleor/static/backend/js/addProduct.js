@@ -168,6 +168,7 @@ $(function() {
     addProductDetails(dynamicData,url,method)
     .done(function(data){
       alertUser('data sent successfully');
+      $('#toggleVariant').slideUp();
       json = [];
       refreshVaraintsContent.html(data);
       var dynamic = {}
