@@ -6,7 +6,8 @@ $('.modal-trigger-delete').on('click', function (e) {
          //var username = $(this).data('name');
          var modal = $(this).data('ta');
          var id = $(this).data('id');
-         succes_url = $(this).data('successurl')+'?tab=variants';
+         var tabname = $(this).data('tabname');
+         succes_url = $(this).data('successurl')+tabname;
 
          $('#success_url').attr('value',success_url);
          $('.delete-this').attr('data-id', id);
