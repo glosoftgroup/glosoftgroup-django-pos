@@ -17,7 +17,10 @@ urlpatterns = [
 			(views.sales_list), name='sales_list'),
 		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
 			(views.sales_detail), name='sale-detail'),
-		url(r'^reports/sales/list/pdf/$', views.sales_list_pdf, name='reports_sales_list_pdf'),
+		url(r'^reports/sales/list/pdf/$', pdfs.sales_list_pdf, name='reports_sales_list_pdf'),
+		url(r'^reports/category/pdf/$', pdfs.sales_category, name='reports_sales_category_pdf'),
+		url(r'^pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+			(pdfs.sales_detail), name='pdf-sale-detail'),
     	url(r'^reports/sales/list/export_csv/$', views.sales_list_export_csv, name='reports_sales_list_export_csv'),
 
 		url(r'^product/$',  permission_required('reports.view_products_reports', login_url='not_found')

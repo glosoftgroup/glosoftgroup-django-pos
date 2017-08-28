@@ -1,67 +1,45 @@
 {% load staticfiles %}
-{% load product_first_image from product_images %}
-{% load i18n %}
-{% load prices_i18n %}
  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
  <html>
-    <link href='https://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
      <head>
-         <title>Sales Report</title>
+         <title>Sales Items IReport</title>
          <style type="text/css">
-             body {
-                   font-family: 'Nunito', sans-serif;
-                   color: #384047;
-             }
-             .header {
-                 font-size: 15px;
-                 font-weight: 100;
-                 text-align: center;
-                 color: #007cae;
-             }
-             .title {
-                 font-size: 16px;
-                 font-weight: 100;
-                /* text-align: right;*/
-                padding: 10px 20px 0px 20px;
-             }
-             .title span {
-                 color: #007cae;
-             }
-             .detailss {
-                 padding: 10px 20px 0px 20px;
-                 text-align: left !important;
-                 /*margin-left: 40%;*/
-             }
-             .hrItem {
-                 border: none;
-                 height: 1px;
-                 /* Set the hr color */
-                 color: #333; /* old IE */
-                 background-color: #fff; /* Modern Browsers */
-             }
-             .img-circle{
-              border-radius: 50%;
-             }
-             table {
-              max-width: 960px;
-              margin: 10px auto;
+             body {sans-serif; color: #384047;}
+             .header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}
+             .title {font-size: 16px;font-weight: 100;}
+             .header p{color:#384047;}
+
+             .img-circle{border-radius: 50%;}
+             table {ax-width: 960px; margin: 10px auto;}
+            tr{border-bottom:0.5px solid #ddd;border-right:0.5px solid #ddd;
+                border-left:0.5px solid #ddd;
             }
+            td{border:none;}
             th {
-                  font-weight: 400;
-                  background: #1779c6;
+                  font-weight: bold;
+                  background:#2196F3;
                   color: #FFF;
+                  border:none;
+                  font-size:11px;
+                  vertical-align:middle;
                 }
-             .td{text-align: center;}
+             .td{text-align: center;font-size:11px;}
              tr{padding:5px;}
-            .foot{padding-top:30px;}
-            .foot p{ color: #007cae;font-size: 12px;}
+             .img{width:50px;height:50px;}
          </style>
      </head>
      <body>
          <div class='wrapper'>
              <div class='header'>
-                 <p class='title'>Sales List Report <br>
-                   <span style="font-size: 0.8em;">{{today | date:'d-m-Y'}}</span>
+                 <p style="margin-bottom:0px;"><img class="img" src="{{image}}" alt="Red dot" /></p>
+                 <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;"> SALES ITEMS REPORT
+                     <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
+                        INVOICE: {{sale.invoice_number}}
+                 </p>
+                 <p style="margin-bottom:0px;margin-top:2px;font-size:10px;">
+                        CASHIER: {{sale.user.name | upper}}
+                 </p>
+                   <p style="margin-top:2px;font-size:11px;">{{today | date:'jS F Y'}}</p>
                  </p>
              </div>
          <div>
@@ -70,35 +48,39 @@
                 <thead>
                   <tr class="bg-primary">
                        <th>Transaction Date</th>
-                          <th>Receipt No</th>
-                          <th>Client Name</th>
-                          <th>Cashier</th>
-                          <th>Terminal</th>
+                          <th>Item Name</th>
+                          <th>Unit Cost</th>
                           <th>Quantity</th>
                           <th>Total Sales</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
-                    {% if sales %}
-                        {% for sale in sales %}
-                          <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.terminal}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
+                    {% if items %}
+                        {% for item in items %}
+                          <tr>
+                            <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
+                            <td>{{item.product_name}}</td>
+                            <td>{{item.unit_cost}}</td>
+                            <td>{{item.quantity}}</td>
+                            <td>{{item.total_cost}}</td>
                           </tr>
                         {% endfor %}
-                        {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">no sales available</h2></td></tr>
+                         {% else %}
+                         <tr><td colspan="5"><h2 class="text-center">No Items Available</h2></td></tr>
                         {% endif %}
                   </tbody>
            </table>
          </div>
-         <div class="foot">
-             <p style="text-align: center;">Report Pulled by: {% if puller.email %}{{ puller.email }} {% else %} {{ puller.name }}{% endif %}</p>
+         <div class="foot" id="footerContent">
+                 <p style="text-align: center;font-size:11px;">Report Pulled by:
+                     <span style="font-weight:bold">
+                         {% if puller.name %}
+                            {{ puller.name | upper }}
+                         {% else %}
+                            {{ puller.email | upper }}
+                         {% endif %}
+                     </span></p>
+
          </div>
      </body>
  </html>

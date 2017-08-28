@@ -38,7 +38,7 @@ from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, Terminal
 from ...product.models import Product, ProductVariant, Category
 from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf
+from ...utils import render_to_pdf, convert_html_to_pdf, image64
 
 from .hours_chart import get_item_results, get_terminal_results, get_user_results, get_hours_results, get_hours_results_range, get_date_results_range, get_date_results, get_category_results
 
@@ -92,3 +92,99 @@ def sales_export_csv(request, image):
 			smart_str(fh),
 		])
 	return response
+
+@staff_member_required
+def sales_list_pdf( request ):
+
+	if request.is_ajax():
+		q = request.GET.get( 'q' )
+		gid = request.GET.get('gid')
+
+		if gid:
+			gid = gid
+		else:
+			gid = None
+
+		sales = []
+		if q is not None:
+			all_sales = Sales.objects.filter(
+				Q(invoice_number__icontains=q) |
+				Q(terminal__terminal_name__icontains=q) |
+				Q(created__icontains=q) |
+				Q(customer__name__icontains=q) | Q(customer__mobile__icontains=q) |
+				Q(solditems__product_name__icontains=q) |
+				Q(user__email__icontains=q) |
+				Q(user__name__icontains=q)).order_by('id')
+
+			if gid:
+				csales = all_sales.filter(created__icontains=request.GET.get('gid'))
+				for sale in csales:
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					setattr(sale, 'quantity', quantity['c'])
+					sales.append(sale)
+
+		elif gid:
+			csales = Sales.objects.filter(created__icontains=request.GET.get('gid'))
+			for sale in csales:
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				setattr(sale, 'quantity', quantity['c'])
+				sales.append(sale)
+		else:
+			csales = Sales.objects.all()
+			for sale in csales:
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				setattr(sale, 'quantity', quantity['c'])
+				sales.append(sale)
+
+		img = image64()
+		data = {
+			'today': date.today(),
+			'sales': sales,
+			'puller': request.user,
+			'image': img,
+			'gid':gid
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/pdf/saleslist_pdf.html', data)
+		return HttpResponse(pdf, content_type='application/pdf')
+
+@staff_member_required
+@permission_decorator('reports.view_sales_reports')
+def sales_detail(request, pk=None):
+	try:
+		sale = Sales.objects.get(pk=pk)
+		items = SoldItem.objects.filter(sales=sale)
+		img = image64()
+		data = {
+			'today': date.today(),
+			'items': items,
+			'sale': sale,
+			'puller': request.user,
+			'image': img
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/pdf/pdf.html',data)
+		return HttpResponse(pdf, content_type='application/pdf')
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
+
+@staff_member_required
+@permission_decorator('reports.view_sales_reports')
+def sales_category(request):
+	try:
+		image = request.GET.get('image')
+		sales_date = request.GET.get('date')
+		if not sales_date:
+			sales_date = None
+
+		img = image64()
+		data = {
+			'today': date.today(),
+			'puller': request.user,
+			'image': img,
+			'category':image,
+			'sales_date':sales_date
+		}
+		print (sales_date)
+		pdf = render_to_pdf('dashboard/reports/sales/pdf/category.html',data)
+		return HttpResponse(pdf, content_type='application/pdf')
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
