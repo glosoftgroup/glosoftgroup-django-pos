@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block custom_css %}
-<link href="{% static 'backend/js/plugins/fastselect/fastselect.min.css' %}" rel="stylesheet" type="text/css">
+<!-- <link href="{% static 'backend/js/plugins/fastselect/fastselect.min.css' %}" rel="stylesheet" type="text/css"> -->
 {% endblock %}
 {% block content %}
 <div id="write-message"></div>
@@ -124,9 +124,9 @@
 
 
 <!-- Mail container -->
-<div class="mail-container-write">
+<div class="mail-container-write" style="z-index: -12345;">
     <div >
-        <textarea cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ...">
+        <textarea style="z-index: -12345;" cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ...">
         {% if product %}
              <h5 align="left" class="text-uppercase text-semibold">
                  Invoice#
@@ -168,32 +168,24 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/prism.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
 
-
+<style type="text/css">
+    .typeahead { z-index: 100000; }
+</style>
 <script>
 var emails = [
     {% for user in users %}
     '{{user.email}}',
     {% endfor %}
     ];
-$(document).ready(function(){
-     // Data
-     
-
-    //
-    // Typeahead implementation
-    //
-
+$(document).ready(function(){     
     // Matcher
     var substringMatcher = function(strs) {
         return function findMatches(q, cb) {
             var matches, substringRegex;
-
             // an array that will be populated with substring matches
             matches = [];
-
             // regex used to determine if a string contains the substring `q`
             substrRegex = new RegExp(q, 'i');
-
             // iterate through the pool of strings and for any string that
             // contains the substring `q`, add it to the `matches` array
             $.each(strs, function(i, str) {
@@ -212,7 +204,7 @@ $(document).ready(function(){
         {
             hint: true,
             highlight: true,
-            minLength: 1
+            minLength: 1,
         },
         {
             name: 'emails',

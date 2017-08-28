@@ -214,7 +214,7 @@
 {% include "dashboard/messages/modals/contacts.html" %}
 
 <!-- page urls -->
-<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:message-contacts' %}" data-aurl="{% url 'dashboard:get-sms-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
+<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:message-contacts' %}" data-aurl="{% url 'dashboard:get-sms-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-redirecturl="{% url 'dashboard:message_list_slug' status='sent' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
 {% endblock %}
 {% block custom_js %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
