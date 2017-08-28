@@ -270,8 +270,6 @@
                           window.open("data:application/pdf," + escape(data));
                });
             }
-          <!--var url = "{% url 'dashboard:users_pdf' %}";-->
-          <!--window.open(url, '_blank');-->
 
         }else if(ts=='excel'){
           window.location="{% url 'dashboard:users_export_csv' %}";

@@ -49,32 +49,6 @@
           {% endif %}
           </div>
         </div>
-          {% if sales %}
-         <div class="row">
-            <div class="col-md-10 col-md-offset-1">
-               <p class="text-center" style="margin: 20px 0px;">
-                 {% if date != today %}
-                   Sales of {{date}} : Kshs 
-                   {% if not that_date_sum.total_net__sum %}
-                      0.00 <br />
-                   {% else %}
-                      {{that_date_sum.total_net__sum}}<br />
-                   {% endif %}
-                 {% endif %}
-                 Todays Sales: Kshs 
-                 {% if tsum.total_net__sum %}
-                      {{tsum.total_net__sum}} 
-                 {% else %}
-                      0.00<br />
-                 {% endif %}<br />
-                 Total Sales: Kshs {{total_sales.total_net__sum}}<br />
-                 Total Tax: Kshs {{ total_tax.total_tax__sum}}
-               </p>
-                <p class="text-center"> Thank you for partnering with us.<br />
-                <span>Report pullled by User</span></p>
-            </div>
-          </div>
-          {% endif %}
       </div>
     </div>
     <!-- Core Scripts - Include with every page -->
@@ -112,17 +86,9 @@
                       console.log('without gid '+data);
                     });
                 }else{
-                    if(gid == 'view' || gid == 'add' || gid == 'update' || gid == 'delete'){
-                        $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', action:gid, sth:'sth'},function(data){
-                           $('#p-tb').html(data);
-                        });
-                        console.log('action is '+'{{gid}}');
-                    }else{
-                        $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}', date:gid, sth:'sth'},function(data){
-                           $('#p-tb').html(data);
-                        });
-                        console.log('date is'+gid);
-                    }
+                    $.get("{% url 'dashboard:sales_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
+                       $('#p-tb').html(data);
+                    });
                 }
 
         }).children('.pagination').addClass('pagination-flat pagination-sm')
