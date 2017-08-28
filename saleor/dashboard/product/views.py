@@ -697,9 +697,12 @@ def product_delete(request, pk):
 def stock_history(request,stock_pk=None):
     if request.method == 'GET':
         if stock_pk:
-            instance = get_object_or_404(Stock, pk=stock_pk)
-            stock_history = StockHistoryEntry.objects.filter(stock=instance).order_by('-id')
-            ctx = {'stock_history':stock_history}
+            try:
+                instance = get_object_or_404(Stock, pk=stock_pk)
+                stock_history = StockHistoryEntry.objects.filter(stock=instance).order_by('-id')
+                ctx = {'stock_history':stock_history}
+            except:
+                ctx = {}
             return TemplateResponse(request, 'dashboard/includes/_stock_history.html', ctx)
             #return HttpResponse(len(stock_history))
 

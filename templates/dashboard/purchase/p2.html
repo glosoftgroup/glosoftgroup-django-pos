@@ -23,7 +23,7 @@
                   {% for variant in product_results %}
     <tr>
     <!-- product name/sku -->    
-  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
+  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.get_stock_pk %}">
     <div class="media-left">
       <div class=""><a href="javascript:;" class="text-default text-semibolds"> {{ variant.display_product }} </a></div>
       <div class="text-muted text-size-small">  {{ variant.sku }} </div>
@@ -31,7 +31,7 @@
   </td>
   
   <!-- Retail price -->
-  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
+  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.get_stock_pk %}">
   <h6 class="text-semibolds">
       {% if variant.get_price_per_item %}
        {#{% gross variant.get_price_per_item html=True %}#}
@@ -41,7 +41,7 @@
   </td>
   
   <!--current stock quantity -->
-  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
+  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.get_stock_pk %}">
     <span class="old_value{{ variant.get_stock_pk }}" data-quantity="{{ variant.get_stock_quantity }}"
     data-href="{% url 'dashboard:add_stock_ajax' %}">
     {{ variant.get_stock_quantity }}  
@@ -105,7 +105,7 @@
   {% endif %}   
   </td>
   <!-- product tax -->
-  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.pk %}">
+  <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.get_stock_pk %}">
   <span class="text-warning">
   {% if variant.product.get_product_tax %}
   {{ variant.product.get_product_tax }}

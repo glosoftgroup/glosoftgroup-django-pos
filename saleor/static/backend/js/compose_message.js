@@ -129,7 +129,7 @@ sendSms.on('click',function(){
         $.jGrowl('Notification sent successfully', 
         {header: 'Well done!',theme: 'bg-success'});
     });
-    window.location.href = redirectUrl;
+    //window.location.href = redirectUrl;
 });
 // ./ event click send button
 });

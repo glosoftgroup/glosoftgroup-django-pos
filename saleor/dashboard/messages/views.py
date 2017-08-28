@@ -145,15 +145,16 @@ def read(request, pk=None):
 @staff_member_required
 def write(request):
     if request.method == 'POST':
-        # get form data
-        single = request.POST.get('single');
+        # get form data        
         subject = request.POST.get('subject')
         to_customers = request.POST.get('toCustomers',0)
         to_suppliers = request.POST.get('toSuppliers',0)
         user_contacts = json.loads(request.POST.get('userContacts'))
         body = request.POST.get('body')
 
-        if single:
+        if request.POST.get('single'):
+            single = request.POST.get('single')
+            print('to single')
             user = Supplier.objects(mobile=single)
             if user:
                 notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
@@ -163,19 +164,22 @@ def write(request):
                 notif.save()
         
         if user_contacts and user_contacts is not 'null':
+            print('to users')
             for mobile in user_contacts:
                 user = User.objects.get(mobile=mobile)
                 #notify.send(request.user, sent_to=user, verb=subject, description=body)
                 notif = Notification(to='user', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
                 notif.save()
-        if not to_customers:
+        if  request.POST.get('toCustomers'):
+            print('to customers')
             for mobile in to_customers:
                 user = Customer.objects.get(mobile=mobile)
                 #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
                 notif = Notification(to='customer', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
                 notif.save()
-        if not to_customers:
-            for mobile in to_suppliers:
+        if request.POST.get('toSuppliers'):
+            print('to suppliers')
+            for mobile in to_suppliers:                
                 user = Supplier.objects.get(mobile=mobile)
                 #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
                 notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)

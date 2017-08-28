@@ -1,8 +1,15 @@
 {% load materializecss %}
 {% load prices_i18n %}
 {% load static %}
-
-
+<div class="mt-15">
+    <button class="btn btn-primary" id="btntoggles">
+      Add Stock
+    </button>
+</div>
+ <style type="text/css">
+        #toggleStock{display:none;}
+</style>
+<div id="toggleStock">
 <table class="table  datatable-header-footer responsive data-table">            
     <thead>
       <tr class='bg-primary'>        
@@ -40,3 +47,4 @@
     </tbody>
    </table>
   
+</div>

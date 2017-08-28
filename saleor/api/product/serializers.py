@@ -27,6 +27,11 @@ from ...customer.models import Customer
 
 
 User = get_user_model()
+from ...decorators import user_trail
+import logging
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 
 class CreateStockSerializer(ModelSerializer):
@@ -331,6 +336,19 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     # used during jwt authentication
+    groups = SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id','email','name']
+        fields = ['id','email','name','groups']
+    def get_groups(self,obj):
+        info_logger.info('User: '+str(self.obj.name)+' '+str(self.obj.email)+' logged in via api')
+        user_trail(obj.name, 'logged in via api','view')
+        
+        groups = []
+        if obj.groups.filter(name='cashier').exists():
+            groups.append('cashier')            
+        if obj.groups.filter(name='sales').exists():
+            groups.append('sales')            
+        if obj.groups.filter(name='supervisor').exists():            
+            groups.append('supervisor')
+        return groups

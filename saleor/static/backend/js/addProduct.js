@@ -456,6 +456,8 @@ $(function(){
     addProductDetails(dynamicData,addStockUrl,'post')
     .done(function(data){
       alertUser('Stock information sent successfully');
+      /* toggle form */
+      $('#toggleStock').slideUp();
       refreshStockDiv(refreshStockUrl)
       .done(function(data){
         refreshDiv.html(data);
@@ -480,13 +482,10 @@ $(function(){
 
   addNewStockBtn.on('click',function(){
     dynamicData = {};
-    var getStockformUrl = $(this).data('contenturl');
-    method = 'get';
-    addProductDetails(dynamicData,getStockformUrl,method)
-    .done(function(data){
-      //alertUser(data);
+    var getStockformUrl = $(this).data('contenturl');    
+    addProductDetails(dynamicData,getStockformUrl,'get')
+    .done(function(data){     
       addStockForm.html(data);
-
     });
     modalIds.modal();
   });

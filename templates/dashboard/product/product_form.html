@@ -932,6 +932,9 @@
   $('#btntogglev').on('click',function(){
     $('#toggleVariant').slideToggle();
   });
+  $('#btntoggles').on('click',function(){
+    $('#toggleStock').slideToggle();
+  });
     
 
  function roundOff(val){
@@ -964,8 +967,7 @@
   var retail_plus_tax = (parseInt(retail)*100)/(parseInt(tax)+100);
   retail_plus_tax=roundOff(retail_plus_tax);
 
-  $('#retail_plus_tax').attr('value',retail_plus_tax);
-  //alert(retail_plus_tax);
+  $('#retail_plus_tax').attr('value',retail_plus_tax);  
   var tx = parseInt(retail)-parseInt(retail_plus_tax);
 
   $('#retail_tax').attr('value',tx);
@@ -1029,11 +1031,11 @@
        refresh_tax();
         var tax = $('#id_tax').val();
         var tax_name = $('#id_tax_name').val();
-
+        
         if(!$.isNumeric(tax)){
           notify('Enter a valid tax');
           return false;
-        }
+        }     
 
         //** post form data using jquery
         var url = "{% url "dashboard:tax-add-ajax" %}";
@@ -1047,6 +1049,7 @@
             }
             else
             {
+                $('#tax-form-error').removeClass('hidden');
                 notify('Error Adding Tax');
             }
 
@@ -1374,8 +1377,7 @@ $('#form-product').validate({
     });
   }
 
-  function refresh_tax(){
-  alert('taxt');
+  function refresh_tax(){  
     var url = "{% url 'dashboard:product-add' %}";
     var posting = $.get( url, {'ajax_subcategory':'ajax_subcategory', 'tax':'tax'});
     posting.done(function(data) {
