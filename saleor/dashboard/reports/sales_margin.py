@@ -30,3 +30,4 @@ from ...decorators import permission_decorator, user_trail
 
 @staff_member_required
 def sales_margin(request):
+	return HttpResponse('on')
