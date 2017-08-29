@@ -24,35 +24,25 @@
 {% endblock %}
 
 {% block content %}
- <div class="panel panel-flat">
-  <div class="panel-heading">
-      <h5 class="panel-title">Site Settings</h5>
-      <div class="heading-elements">
-        <ul class="icons-list">
-          <li><a data-action="collapse"></a></li>
-          <li><a data-action="reload"></a></li>
-          <li><a data-action="close"></a></li>
-        </ul>
-      </div>
-    </div>
+ <div class="panel panel-flat">  
     <div class="panel-body">
                   <div class="tabbable">
-                    <ul class="nav nav-tabs nav-tabs-highlight">
+                    <ul class="nav nav-tabs nav-tabs-highlight"  style="margin-bottom:0px;">
                       <li class="active"><a href="#basic" data-toggle="tab">Basic Settings</a></li>
-                     <!--  <li><a href="#products" data-toggle="tab" disabled>Products</a></li>
-                      <li><a href="#sales" data-toggle="tab">Sales</a></li> -->                    
+                      <li><a href="#sms" data-toggle="tab" disabled>Communications</a></li>
+                     <!--  <li><a href="#sales" data-toggle="tab">Sales</a></li>  -->                   
                     </ul>
 
-                    <div class="tab-content">
+                    <div class="tab-content" style="margin-bottom:0px;">
                       <div class="tab-pane fade in active" id="basic">
                        <!--  basic settings -->
                         {% include "dashboard/sites/_basic_config.html" with form=form %}
                         <!-- ./end bsettings -->
                       </div>
 
-                      <div class="tab-pane fade" id="products">
+                      <div class="tab-pane fade" id="sms">
                        <!--  products -->
-                       {% include "dashboard/sites/_product_config.html" %}
+                       {% include "dashboard/sites/_sms_config.html" with form=form %}
                         <!-- ./products -->
                       </div>
 
@@ -66,7 +56,8 @@
     
     <div class="col m12 l3 help-box"></div>
   </div>
-
+<!-- page usrls -->
+<input type="hidden" class="pageUrls" data-updateurl="{% url 'dashboard:update-settings' site_id=1 %}" name="">
 {% endblock %}
 
 {% block custom_js %}
@@ -78,4 +69,5 @@ $( document ).ready(function() {
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/anytime.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/picker_date.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/site-settings.js' %}"></script>
 {% endblock %}

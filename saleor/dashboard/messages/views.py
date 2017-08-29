@@ -1,4 +1,7 @@
 import emailit.api
+from africastalking.AfricasTalkingGateway import (
+        AfricasTalkingGateway, 
+        AfricasTalkingGatewayException)
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
@@ -68,7 +71,7 @@ def list_messages(request,status=None):
         mark_read = False
         messages = Notification.objects.filter(actor_object_id=request.user.id)
     else:
-        messages = Notification.objects.active()
+        messages = Notification.objects.filter(to='user',sent_to=request.user.id)
     ctx = {
         'delete_permanently': delete_permanently,
         'mark_read': mark_read,
@@ -147,9 +150,13 @@ def write(request):
     if request.method == 'POST':
         # get form data        
         subject = request.POST.get('subject')
-        to_customers = request.POST.get('toCustomers',0)
-        to_suppliers = request.POST.get('toSuppliers',0)
+        to_customers = json.loads(request.POST.get('toCustomers'))
+        to_suppliers = json.loads(request.POST.get('toSuppliers'))
         user_contacts = json.loads(request.POST.get('userContacts'))
+        if not request.POST.get('toSuppliers'):
+            to_suppliers = False
+        if not request.POST.get('toCustomers'):
+            to_customers = False
         body = request.POST.get('body')
 
         if request.POST.get('single'):
@@ -166,19 +173,24 @@ def write(request):
         if user_contacts and user_contacts is not 'null':
             print('to users')
             for mobile in user_contacts:
+                check = sendSms(str(mobile),body)                
                 user = User.objects.get(mobile=mobile)
                 #notify.send(request.user, sent_to=user, verb=subject, description=body)
                 notif = Notification(to='user', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
                 notif.save()
-        if  request.POST.get('toCustomers'):
+        
+        if  to_customers:
             print('to customers')
+            print to_customers            
             for mobile in to_customers:
+                print mobile
                 user = Customer.objects.get(mobile=mobile)
                 #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
                 notif = Notification(to='customer', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
                 notif.save()
-        if request.POST.get('toSuppliers'):
+        if to_suppliers:
             print('to suppliers')
+            print request.POST.get('toSuppliers')
             for mobile in to_suppliers:                
                 user = Supplier.objects.get(mobile=mobile)
                 #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
@@ -230,7 +242,7 @@ def write_single(request):
                             'dashboard/messages/write.html',
                             ctx)
 
-
+@staff_member_required
 def contacts(request):
     search = request.GET.get('search')
     group = request.GET.get('group')
@@ -262,3 +274,24 @@ def contacts(request):
         contact={'text':user.name,'value': user.mobile}
         l.append(contact)
     return HttpResponse(json.dumps(l), content_type='application/json')
+
+def sendSms(to,message):
+    # Specify your login credentials
+    username = "MyAfricasTalkingUsername"
+    apikey   = "MyAfricasTalkingAPIKey"
+    gateway = AfricasTalkingGateway(username, apikey)
+    try:
+        # Thats it, hit send and we'll take care of the rest.
+        
+        results = gateway.sendMessage(to, message)
+        
+        for recipient in results:
+            # status is either "Success" or "error message"
+            print 'number=%s;status=%s;messageId=%s;cost=%s' % (recipient['number'],
+                                                                recipient['status'],
+                                                                recipient['messageId'],
+                                                                recipient['cost'])
+            return True
+    except AfricasTalkingGatewayException, e:
+        print 'Encountered an error while sending: %s' % str(e)
+        return False

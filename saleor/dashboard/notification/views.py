@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from ..views import staff_member_required
+from django.db.models import Q
 from ...decorators import permission_decorator, user_trail
 import logging
 import json
@@ -112,7 +113,7 @@ def write(request):
         to_customers = request.POST.get('toCustomer',0)
         to_suppliers = request.POST.get('toSupplier',0)
         email_list = json.loads(request.POST.get('emailList'))
-        body = request.POST.get('body')
+        body = request.POST.get('body')       
 
         # send notification/emails
         if single:
@@ -126,7 +127,7 @@ def write(request):
             notif.save()
             
         for email in email_list:
-            user = User.objects.get(email=email['email'])
+            user = User.objects.get(email=email)
             if user.send_mail:
                 context = {'user': user.name, 'body': body, 'subject': subject}
                 emailit.api.send_mail(user.email,
@@ -170,3 +171,34 @@ def write(request):
     return TemplateResponse(request,
                             'dashboard/notification/write.html',
                             ctx)
+def emails(request):
+    search = request.GET.get('search')
+    group = request.GET.get('group')
+    if 'users' == str(group):
+        users = User.objects.all().filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+        ).exclude(email=None)
+    elif 'suppliers' == str(group):
+        users = Supplier.objects.all().filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+        ).exclude(email=None)
+    elif 'customers' == str(group):
+        users = Customer.objects.all().filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+        ).exclude(email=None)
+    else:
+        users = User.objects.all().filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+        ).exclude(email=None)
+
+    contact = {}
+    l = []
+    for user in users:
+        # {"text": "Afghanistan", "value": "AF"},
+        contact={'text':user.email,'value': user.email}
+        l.append(contact)
+    return HttpResponse(json.dumps(l), content_type='application/json')

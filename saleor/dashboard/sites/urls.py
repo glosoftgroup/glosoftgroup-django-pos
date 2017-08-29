@@ -35,4 +35,6 @@ urlpatterns = [
     url(r'^brdelete/(?P<pk>[0-9]+)/$', branch.branch_delete, name='branch-delete'),
     url(r'^branch/paginate/$', branch.branch_paginate, name='branch_paginate'),
     url( r'^branch/search/$', branch.search, name = 'branch_search' ),
+
+    url( r'^update/settings/(?P<site_id>[0-9]+)$', views.update_settings, name = 'update-settings' ),
 ]
