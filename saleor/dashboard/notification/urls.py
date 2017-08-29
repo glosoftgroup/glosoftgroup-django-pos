@@ -12,6 +12,7 @@ urlpatterns = [
      url(r'^write/$', views.write, name='write'),
      url(r'^unread/count/$', views.unread_count, name='unread_count'),
      url(r'^read/notification/(?P<pk>[0-9]+)$', views.read, name='read-notification'),
+     url(r'^emails/ajax/$', views.emails, name='notification-emails'),
      url(r'^delete/notification/(?P<pk>[0-9]+)$', views.delete, name='delete-notification'),
      url(r'^delete/permanently/(?P<pk>[0-9]+)$', views.delete_permanently, name='delete-permanently'),
 ]

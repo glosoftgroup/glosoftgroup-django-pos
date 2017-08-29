@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
+from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 
 from .forms import AuthorizationKeyFormSet, SiteSettingForm
@@ -27,4 +28,17 @@ def update(request, site_id=None):
         return redirect('dashboard:site-update', site_id=site.id)
     ctx = {'site': site, 'form': form}
     return TemplateResponse(request, 'dashboard/sites/detail.html', ctx)
+
+def update_settings(request,site_id=None):
+    if request.method == 'POST':
+        site = get_object_or_404(SiteSettings, pk=site_id)
+        if request.POST.get('sms_username'):
+            site.sms_gateway_username = request.POST.get('sms_username')
+            print site.sms_gateway_username
+        if request.POST.get('sms_api_key'):
+            site.sms_gateway_apikey = request.POST.get('sms_api_key')
+            print site.sms_gateway_apikey
+        site.save()
+        return HttpResponse('success')
+    return HttpResponse('Invalid method')
 
