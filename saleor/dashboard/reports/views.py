@@ -213,7 +213,7 @@ def sales_search(request):
 				Q(customer__name__icontains=q) | Q(customer__mobile__icontains=q) |
 				Q(solditems__product_name__icontains=q) |
 				Q(user__email__icontains=q) |
-				Q(user__name__icontains=q)).order_by( 'id' )
+				Q(user__name__icontains=q)).order_by( 'id' ).distinct()
 			sales = []
 
 			if request.GET.get('gid'):
