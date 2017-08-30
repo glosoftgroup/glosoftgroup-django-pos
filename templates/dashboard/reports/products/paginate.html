@@ -1,15 +1,17 @@
-                      {% if items %}
+{% load prices_i18n %}
+{% load humanize %}
+{% if items %}
                         {% for item in items %}
                           <tr>
-                            <td>{{item.sku}}</td>
-                            <td>{{item.display_product}}</td>
-                            <td>{{item.product.get_first_category}}</td>
-                            <td>{{item.product.product_class.name}}</td>
-                            <td>{{item.product.low_stock_threshold}}</td>
+                            <td class="text-center">{{item.sku}}</td>
+                            <td class="text-center">{{item.display_product}}</td>
+                            <td class="text-center">{{item.product.get_first_category}}</td>
+                            <td class="text-center">{{item.product.product_class.name}}</td>
+                            <td class="text-center">{{item.product.low_stock_threshold}}</td>
                             
-                            <td>{{item.get_stock_quantity}}</td>
-                             <td>{{item.get_price_per_item.gross}}</td>
-                            <td>{{item.get_total_price_cost}}</td>
+                            <td class="text-center">{{item.get_stock_quantity}}</td>
+                              <td><span class="pull-right"> {{item.get_price_per_item.gross|intcomma}}</span></td>
+                              <td><span class="pull-right">{{item.get_total_price_cost|intcomma}}</span></td>
                           </tr>
                         {% endfor %}
                         {% else %}

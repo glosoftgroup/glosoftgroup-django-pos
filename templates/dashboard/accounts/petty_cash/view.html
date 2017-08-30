@@ -89,10 +89,10 @@
                                       <p class="text-semibold text-center">
                                           {{pdate|date:'jS F Y'}}
                                       </p>
-                                      <p class="text-semibold no-margin-top">Opening Cash: KShs. {{opening_amount}}</p>
-                                      <p class="text-semibold no-margin-top">Cash Added: KShs. {{added_amount}} </p>
+                                      <p class="text-semibold no-margin-top">Opening Cash: KShs. {{opening_amount|intcomma }}</p>
+                                      <p class="text-semibold no-margin-top">Cash Added: KShs. {{added_amount|intcomma }} </p>
 
-                                      <p class="text-semibold no-margin-top">Current Balance: {{closing_amount}}</p>
+                                      <p class="text-semibold no-margin-top">Current Balance: {{closing_amount|intcomma }}</p>
                                   </div>
                               </div>
                           </div>

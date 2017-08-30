@@ -616,11 +616,48 @@
 			 </div>
 		<div class="col-md-12">
 		  <div class="row">
-			<div class="col-md-3">
+			<div class="col-md-6">
 				<div class="col-md-12">
 					<h5>Drawer Cash</h5>
 				</div>
-				<div class="col-md-12">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="display-block text-semibold">DrawerCash</label>
+						{% for permission in permissions %}
+						 {% if permission.content_type.model ==  'drawercash' %}
+							{% if permission in group_permissions %}
+											<div class="checkbox">
+												<label>
+												<div class="checker">
+													<span class="checked">
+														<input class="styled check"  checked="checked" type="checkbox" value="{{permission.id}}">
+													</span>
+													</div>
+													{{permission.name}}
+												</label>
+												<span id="granted" class="granted text-success">(granted)</span>
+											</div>
+									{% else %}
+										 <div class="checkbox">
+										 <label>
+										 <div class="checker">
+												<span class="">
+												 <input class="styled check" type="checkbox"
+												value="{{permission.id}}">
+												</span>
+											</div>
+												 {{permission.name}}
+										 </label>
+										 <span id="granted" class="granted text-success"></span>
+										 </div>
+									{% endif %}
+							{% else %}
+							{% endif %}
+							{% endfor %}
+					</div>
+				</div>
+
+				<div class="col-md-6">
 					<div class="form-group">
 						<label class="display-block text-semibold">Terminal</label>
 						{% for permission in permissions %}

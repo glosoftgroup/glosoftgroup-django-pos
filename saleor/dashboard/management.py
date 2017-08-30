@@ -26,7 +26,7 @@ def add_view_permissions(sender, **kwargs):
 			and not Permission.objects.filter(codename='make_invoice'):
 		url_content_type = ContentType.objects.create(app_label='sales', model='unused')
 		Permission.objects.create(name='can make sales', content_type=url_content_type,codename='make_sale')
-		Permission.objects.create(name='can perform invoicing', content_type=url_content_type, codename='make_invoice')
+		Permission.objects.create(name='can generate invoice', content_type=url_content_type, codename='make_invoice')
 
 	if not ContentType.objects.filter(model='reports') \
 			and not Permission.objects.filter(codename='view_sale_reports') \

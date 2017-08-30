@@ -371,7 +371,10 @@ class ProductVariant(models.Model, Item):
     def get_cost_price(self):
         stock = self.select_stockrecord()
         if stock:
-            return stock.cost_price
+            if stock.cost_price:
+                return stock.cost_price
+            else:
+                return 0
 
     def product_category(self):
         category = self.product.categories.first().name
