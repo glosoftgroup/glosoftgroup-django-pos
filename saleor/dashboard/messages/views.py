@@ -1,4 +1,5 @@
 import emailit.api
+from django.conf import settings
 from africastalking.AfricasTalkingGateway import (
         AfricasTalkingGateway, 
         AfricasTalkingGatewayException)
@@ -23,6 +24,7 @@ from ...customer.models import Customer
 from ...smessages.signals import sms as notify
 from ...smessages.models import SMessage as Notification, SmsTemplate
 from ...product.models import Product
+from ...site.models import SiteSettings
 
 
 @staff_member_required
@@ -64,9 +66,9 @@ def list_messages(request,status=None):
         messages = Notification.objects.unread()
     elif status == 'read':
         messages = Notification.objects.read()
-    elif status == 'emailed':
+    elif status == 'sent_to_sms':
         mark_read = False
-        messages = Notification.objects.filter(actor_object_id=request.user.id,emailed=True)
+        messages = Notification.objects.filter(actor_object_id=request.user.id,sent=True)
     elif status == 'sent':
         mark_read = False
         messages = Notification.objects.filter(actor_object_id=request.user.id)
@@ -172,12 +174,37 @@ def write(request):
         
         if user_contacts and user_contacts is not 'null':
             print('to users')
+            to = []
             for mobile in user_contacts:
-                check = sendSms(str(mobile),body)                
-                user = User.objects.get(mobile=mobile)
-                #notify.send(request.user, sent_to=user, verb=subject, description=body)
-                notif = Notification(to='user', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
-                notif.save()
+                to.append(mobile.replace('(','').replace(')','').replace('-',''))
+            to_csv = ",".join(to)
+            #print to_csv
+            sms_response = sendSms(to_csv,body)
+            #sms_response = [{'status': 'Success', 'number': '+254719739180'},]
+            if sms_response:
+                for report in sms_response:                    
+                    mb = report['number'].decode('utf-8')
+                    user = User.objects.get(mobile=report['number'])                    
+                    # status is either "Success" or "error message"
+                    if report['status'] == 'Success':
+                        notif = Notification.objects.create(
+                                to='user', 
+                                actor=request.user, 
+                                recipient=request.user, 
+                                sent_to=user.id,  
+                                verb=subject,
+                                sent=True, 
+                                description=body)
+                        #print 'with status success'      
+                    else:
+                        notif = Notification.objects.create(
+                                            to='user', 
+                                            actor=request.user,
+                                            recipient=request.user,
+                                            sent_to=user.id, 
+                                            verb=subject, 
+                                            description=body)
+                        print 'not sent'
         
         if  to_customers:
             print('to customers')
@@ -277,21 +304,29 @@ def contacts(request):
 
 def sendSms(to,message):
     # Specify your login credentials
-    username = "MyAfricasTalkingUsername"
-    apikey   = "MyAfricasTalkingAPIKey"
-    gateway = AfricasTalkingGateway(username, apikey)
+    site = SiteSettings.objects.get(pk=1)
+    username = site.sms_gateway_username #"MyAfricasTalkingUsername"
+    apikey   = site.sms_gateway_apikey #"MyAfricasTalkingAPIKey"
+    if username == "pkinuthia10@gmail.com":
+        username = 'sandbox'
+    print username
+    print apikey
+    gateway = AfricasTalkingGateway(username, str(apikey), "sandbox")
+    report = []
     try:
-        # Thats it, hit send and we'll take care of the rest.
-        
-        results = gateway.sendMessage(to, message)
-        
+        # Thats it, hit send and we'll take care of the rest.        
+        results = gateway.sendMessage(to, message)        
         for recipient in results:
             # status is either "Success" or "error message"
+            report.append({
+                'number':recipient['number'],
+                'status':recipient['status']
+                })
             print 'number=%s;status=%s;messageId=%s;cost=%s' % (recipient['number'],
                                                                 recipient['status'],
                                                                 recipient['messageId'],
                                                                 recipient['cost'])
-            return True
+            return report
     except AfricasTalkingGatewayException, e:
         print 'Encountered an error while sending: %s' % str(e)
         return False

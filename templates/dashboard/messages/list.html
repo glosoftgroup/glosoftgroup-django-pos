@@ -66,7 +66,7 @@
 								<li class="active"><a href="{% url 'dashboard:message_list' %}"><i class="icon-drawer-in"></i> Inbox <span class="badge badge-success">{{total_notifications}}</span></a></li>
 								
 								<li><a href="{% url 'dashboard:message_list_slug' 'sent' %}"><i class="icon-drawer-out"></i> Sent </a></li>
-								<li><a href="{% url 'dashboard:message_list_slug' 'emailed' %}"><i class="icon-drawer-out"></i> Sent email</a></li>
+								<li><a href="{% url 'dashboard:message_list_slug' 'sent_to_sms' %}"><i class="icon-drawer-out"></i> Sent via sms</a></li>
 								
 								<li class="navigation-divider"></li>
 								<li><a href="{% url 'dashboard:message_list_slug' 'unread' %}"><i class="icon-envelope"></i> Unread <span class="badge badge-success"></span></a></li>

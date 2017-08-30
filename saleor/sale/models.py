@@ -141,7 +141,8 @@ class Sales(models.Model):
     
     total_net = models.DecimalField(
         pgettext_lazy('Sales field', 'total net'), default=Decimal(0), max_digits=100, decimal_places=2)
-    
+    total_tax = models.DecimalField(
+        pgettext_lazy('Sales field', 'total tax'), default=Decimal(0), max_digits=100, decimal_places=2)    
     sub_total = models.DecimalField(
         pgettext_lazy('Sales field', 'sub total'), default=Decimal(0), max_digits=100, decimal_places=2)
     

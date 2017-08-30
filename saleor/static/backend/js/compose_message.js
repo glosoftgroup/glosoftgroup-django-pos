@@ -144,12 +144,13 @@ sendSms.on('click',function(){
     .done(function(data) {
         $.jGrowl('Notification sent successfully', 
         {header: 'Well done!',theme: 'bg-success'});
+        window.location.href = redirectUrl;
     })
     .fail(function(){
     sendspinnerId.addClass('icon-checkmark3');
     sendspinnerId.removeClass('icon-spinner').removeClass('spinner');
     });
-    window.location.href = redirectUrl;
+    
 });
 // ./ event click send button
 });

@@ -158,6 +158,7 @@ class SalesSerializer(serializers.ModelSerializer):
                  'customer_name',
                  'status',
                  'payment_options',
+                 'total_tax'
                 )
 
     def validate_total_net(self,value):
@@ -185,6 +186,10 @@ class SalesSerializer(serializers.ModelSerializer):
            total_net = Decimal(validated_data.get('total_net'))
         except:
            total_net = Decimal(0)
+        try:
+            total_tax = Decimal(validated_data.get('total_tax'))
+        except:
+            total_tax = Decimal(0)
         terminal = Terminal.objects.get(pk=self.terminal_id)    
         terminal.amount += Decimal(total_net)       
         terminal.save() 
@@ -225,6 +230,7 @@ class SalesSerializer(serializers.ModelSerializer):
                                      terminal=validated_data.get('terminal'),
                                      amount_paid=validated_data.get('amount_paid'),
                                      customer=customer,
+                                     total_tax=total_tax,
                                      mobile=validated_data.get('mobile'),
                                      customer_name=validated_data.get('customer_name'))
         for payment_option_data in payment_options_data:
@@ -236,8 +242,11 @@ class SalesSerializer(serializers.ModelSerializer):
                 stock = Stock.objects.get(variant__sku=solditem_data['sku'])
                 if stock:                
                     Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
+                    print stock.quantity
+                else: 
+                    print 'stock not found'
             except:
-                print 'Stock not found!'
+                print 'Error reducing stock!'
                 
         return sales
         
@@ -336,19 +345,28 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     # used during jwt authentication
-    groups = SerializerMethodField()
+    permissions = SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id','email','name','groups']
-    def get_groups(self,obj):
-        info_logger.info('User: '+str(self.obj.name)+' '+str(self.obj.email)+' logged in via api')
+        fields = ['id','email','name','permissions']
+    def get_permissions(self,obj):
+        info_logger.info('User: '+str(obj.name)+' '+str(obj.email)+' logged in via api')
         user_trail(obj.name, 'logged in via api','view')
         
-        groups = []
-        if obj.groups.filter(name='cashier').exists():
-            groups.append('cashier')            
-        if obj.groups.filter(name='sales').exists():
-            groups.append('sales')            
-        if obj.groups.filter(name='supervisor').exists():            
-            groups.append('supervisor')
-        return groups
+        permissions = []
+        if obj.has_perm('sales.make_sale'):
+            permissions.append('make sales') 
+        if obj.has_perm('sales.make_invoice'):
+            permissions.append('make invoice') 
+        if obj.has_perm('sale.change_drawercash'):
+            permissions.append('change drawercash')
+        if obj.has_perm('sale.view_sales'):
+            permissions.append('view sales')
+        if obj.has_perm('sale.add_drawercash'):
+            permissions.append('add drawercash')
+        if obj.has_perm('sale.view_drawercash'):
+            permissions.append('view drawercash')
+        if obj.has_perm('sale.view_productvariant'):
+            permissions.append('view productvariant')
+            
+        return permissions

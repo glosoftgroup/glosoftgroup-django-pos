@@ -63,7 +63,7 @@ class AddressBook(models.Model):
         max_length=128, blank=True)
     phone = models.CharField(
         pgettext_lazy('AddressBook field', 'phone number'),
-        max_length=30, blank=True)
+        max_length=30, unique=True, blank=True)
     email = models.CharField(
         pgettext_lazy('AddressBook field', 'email'),
         max_length=30, blank=True)
