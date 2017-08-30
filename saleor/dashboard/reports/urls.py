@@ -5,6 +5,7 @@ from . import views
 from . import charts
 from . import pdfs
 from . import purchase
+from . import sales_margin
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -70,6 +71,9 @@ urlpatterns = [
 			(charts.sales_terminal_chart), name = 'sales_terminal_chart' ),
 		url( r'^ttd/$', charts.get_terminal_sale_details, name = 'get_terminal_sale_details' ),
 		url( r'^weekfilter/$', charts.get_sales_by_week, name = 'get_sales_by_week' ),
+
+		url( r'^sales/margin/$', sales_margin.sales_margin, name = 'sales_margin' ),
+		url( r'^sales/tax/report/$', sales_margin.sales_tax, name = 'sales_tax' ),
 
 ]
 
