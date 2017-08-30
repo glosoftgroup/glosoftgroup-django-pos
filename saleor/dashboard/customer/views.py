@@ -73,7 +73,7 @@ def user_process(request):
 		# password = request.POST.get('password')
 		# encr_password = make_password(password)
 
-		mobile = request.POST.get('mobile')
+		mobile = request.POST.get('mobile').replace(' ','').replace('(','').replace(')','').replace('-','')
 		image= request.FILES.get('image')
 		groups = request.POST.getlist('groups[]')
 		new_user = Customer.objects.create(
@@ -169,7 +169,7 @@ def user_update(request, pk):
 		name = request.POST.get('name')
 		email = request.POST.get('email')		
 		nid = request.POST.get('nid')
-		mobile = request.POST.get('mobile')
+		mobile = request.POST.get('mobile').replace(' ','').replace('(','').replace(')','').replace('-','')
 		image= request.FILES.get('image')		
 		if image :
 			user.name = name

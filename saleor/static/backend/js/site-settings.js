@@ -1,4 +1,4 @@
-// alertUser
+ // alertUser
 function alertUser(msg,status='bg-success',header='Well done!')
 { $.jGrowl(msg,{header: header,theme: status}); }
 function updateSettings(dynamicData,url,method){

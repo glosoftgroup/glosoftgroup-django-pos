@@ -169,6 +169,7 @@ class SMessage(models.Model):
     public = models.BooleanField(default=True)
     deleted = models.BooleanField(default=False)
     emailed = models.BooleanField(default=False)
+    sent = models.BooleanField(default=False)
 
     data = JSONField(blank=True, null=True)
     objects = SMessagesQuerySet.as_manager()

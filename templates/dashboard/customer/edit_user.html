@@ -88,7 +88,7 @@
                   
                    <div class="form-group">
                     <label for="mobile">Phone</label>
-                    <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile" value="{{ user.mobile}}">
+                    <input type="text" class="form-control" name="mobile" data-mask="(+254)-999-999-999" id="mobile" placeholder="Mobile" value="{{ user.mobile}}">
                    </div>
                 </div>
               </div>
@@ -218,7 +218,7 @@ $( ".check" ).on( "click", function(){
         },
         mobile:{
           required:true,
-          digits: true,
+          //digits: true,
           minlength: 6
         }
 

@@ -65,7 +65,7 @@ class Address(models.Model):
         max_length=128, blank=True)
     phone = models.CharField(
         pgettext_lazy('Address field', 'phone number'),
-        max_length=30, blank=True)
+        max_length=30, unique=True, blank=True)
     objects = AddressManager()
 
     @property
