@@ -1,15 +1,21 @@
 import logging
+import base64
+import json
+from datetime import datetime, timedelta
+import hashlib
 
-from django.conf import settings
 from django.utils.translation import get_language
 from django_countries.fields import Country
 
 from . import analytics
 from ..discount.models import Sale
+from ..site.models import Files
 from .utils import get_client_ip, get_country_by_ip, get_currency_for_country
+from django.conf import settings
+from django.template.response import TemplateResponse
 
 logger = logging.getLogger(__name__)
-
+info_logger = logging.getLogger('info_logger')
 
 class GoogleAnalytics(object):
     def process_request(self, request):
@@ -49,3 +55,61 @@ class CurrencyMiddleware(object):
             request.currency = get_currency_for_country(request.country)
         else:
             request.currency = settings.DEFAULT_CURRENCY
+
+
+class SettingsMiddleware(object):
+
+    def process_request(self, request):
+        # return TemplateResponse(request, 'lockdown/form.html', {'days': 'error'})
+
+        try:
+            ufile = Files.objects.all()[:1][0]
+        except IndexError:
+            return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
+
+        filecontent  = ufile.file
+        filename = ufile.check
+
+        h = hashlib.sha256()
+        h.update(filecontent)
+        hex = h.hexdigest()
+
+        print filename
+        print hex
+
+        if filename != hex:
+            return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
+
+        logger.exception('filecontent'+filecontent)
+
+        if self.is_not_empty(filecontent):
+            jsonvalue = base64.b64decode(filecontent)
+            info_logger.info('jsonvalue: '+ jsonvalue)
+            print jsonvalue
+
+            if self.is_json(jsonvalue):
+                data = json.loads(jsonvalue)
+                version = data["Version"]
+                dateobj = datetime.strptime(version, '%Y-%m-%d')
+                exp = dateobj - datetime.utcnow()
+                info_logger.info('expiry date: ' + str(exp))
+                print exp
+
+                if exp < timedelta(seconds=0):
+                    return TemplateResponse(request, 'lockdown/form.html', {'days': exp})
+                else:
+                    info_logger.info('No issue on expiry date')
+                    return None
+            else:
+                return TemplateResponse(request, 'lockdown/form.html', {'days': 'error'})
+
+
+    def is_json(self, myjson):
+        try:
+            json_object = json.loads(myjson)
+        except ValueError, e:
+            return False
+        return True
+
+    def is_not_empty(self, s):
+        return bool(s and s.strip())

@@ -82,3 +82,9 @@ class UserRole(models.Model):
 
 	def __str__(self):
 		return str(self.name)
+
+class Files(models.Model):
+    file = models.TextField(null=True, blank=True)
+    check = models.CharField(max_length=256, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
