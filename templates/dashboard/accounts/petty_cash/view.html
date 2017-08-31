@@ -166,7 +166,8 @@ $(document).ready(function(){
   });$('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true
+        showDropdowns:true,
+        maxDate: new Date()
     }).on('change',function(){
       var date = $(this).val();
         $.ajax({ url: "{% url 'accounts:pettycash_expenditure' %}",type: 'GET',data: {date:date}, async:false,success: function(data){
