@@ -49,7 +49,7 @@
                       <th>Receipt No</th>
                       <th>Client Name</th>
                       <th>Cashier</th>
-                      <th>Terminal</th>
+                      <th>Payment Mode</th>
                       <th>Quantity</th>
                       <th>Total Sales</th>
                   </tr>
@@ -60,9 +60,9 @@
                   <tr class='clickable-row' id="{{user.pk }}">
                     <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.terminal}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.payment_options.name %}{{sale.payment_options.name}}{% else %} Cash {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
                   </tr>

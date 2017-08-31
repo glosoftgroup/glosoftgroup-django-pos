@@ -60,11 +60,18 @@ def view(request):
 				opening = lastEntry.opening
 				added = lastEntry.added
 				closing = lastEntry.closing
+				expenses = Expenses.objects.filter(added_on__icontains=td).aggregate(Sum('amount'))['amount__sum']
+
+				print expenses
 			else:
 				new_opening = lastEntry.closing
 				new_balance = lastEntry.closing
 				added = 0
 				new_petty_cash = PettyCash(opening=new_opening, added=added, closing=new_balance)
+				try:
+					expenses = Expenses.objects.filter(added_on__icontains=td).aggregate(Sum('amount'))['amount__sum']
+				except:
+					expenses = 0
 				new_petty_cash.save()
 
 				date = new_petty_cash.created
@@ -79,13 +86,15 @@ def view(request):
 			opening = 0
 			added = 0
 			closing = 0
+			expenses = 0
 
 		data = {
 			'pdate':date,
 			'opening_amount': opening,
 			'added_amount': added,
 			'closing_amount': closing,
-			'amount': amount
+			'amount': amount,
+			'expenses':expenses
 		}
 
 		return TemplateResponse(request, 'dashboard/accounts/petty_cash/view.html', data)
@@ -155,9 +164,15 @@ def expenditure(request):
 		pd = DateFormat(lastEntry.created).format('Y-m-d')
 		td = DateFormat(datetime.datetime.today()).format('Y-m-d')
 		if td == pd:
+
 			dateToday = 1
+			expenses = Expenses.objects.filter(added_on__icontains=pd).aggregate(Sum('amount'))['amount__sum']
 		else:
 			dateToday = 0
+			try:
+				expenses = Expenses.objects.filter(added_on__icontains=pd).aggregate(Sum('amount'))['amount__sum']
+			except:
+				expenses = 0
 
 		date = lastEntry.created
 		amount = lastEntry.closing
@@ -170,8 +185,55 @@ def expenditure(request):
 			'added_amount': added,
 			'closing_amount': closing,
 			'amount': amount,
-			'dateToday':dateToday
+			'dateToday':dateToday,
+			'expenses':expenses
 		}
 		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html', data)
 	except Exception, e:
-		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html',{})
+		lastEntry = PettyCash.objects.latest('id')
+		lp2 = datetime.datetime.strptime(DateFormat(lastEntry.created).format('Y-m-d'), '%Y-%m-%d')
+		d = datetime.datetime.strptime(date, '%Y-%m-%d')
+
+		if d > lp2:
+			print ('gre')
+			try:
+				dateToday = 0
+				lp3 = Expenses.objects.latest('id')
+				lpsDate = DateFormat(lp3.added_on).format('Y-m-d')
+				expenses = Expenses.objects.filter(added_on__icontains=lpsDate).aggregate(Sum('amount'))['amount__sum']
+				date = lastEntry.created
+				amount = lastEntry.closing
+				opening = lastEntry.opening
+				added = lastEntry.added
+				closing = lastEntry.closing
+			except:
+				expenses = 0
+				date = 0
+				amount = 0
+				opening = 0
+				added = 0
+				closing = 0
+		else:
+			dateToday = 0
+			try:
+				expenses = Expenses.objects.filter(added_on__icontains=pd).aggregate(Sum('amount'))['amount__sum']
+			except:
+				expenses = 0
+				date = 0
+				amount = 0
+				opening = 0
+				added = 0
+				closing = 0
+
+		da = datetime.datetime.strptime(request.GET.get('date'), '%Y-%m-%d')
+		da2 = DateFormat(da).format('jS F Y')
+		data = {
+			'pdate':da2 ,
+			'opening_amount': opening,
+			'added_amount': added,
+			'closing_amount': closing,
+			'amount': amount,
+			'dateToday': dateToday,
+			'expenses': expenses
+		}
+		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html',data)
