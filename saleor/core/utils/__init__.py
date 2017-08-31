@@ -73,9 +73,6 @@ def get_currency_for_country(country):
         return currencies[0]
     return settings.DEFAULT_CURRENCY
 
-def get_settings_for_lock(locksettings):
-    settings.LOCKDOWN_ENABLED = locksettings
-    return settings.LOCKDOWN_ENABLED
 
 def get_paginator_items(items, paginate_by, page_number):
     if not page_number:
