@@ -60,7 +60,6 @@ class CurrencyMiddleware(object):
 class SettingsMiddleware(object):
 
     def process_request(self, request):
-        # return TemplateResponse(request, 'lockdown/form.html', {'days': 'error'})
 
         try:
             ufile = Files.objects.all()[:1][0]
@@ -80,12 +79,9 @@ class SettingsMiddleware(object):
         if filename != hex:
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
 
-        logger.exception('filecontent'+filecontent)
-
         if self.is_not_empty(filecontent):
             jsonvalue = base64.b64decode(filecontent)
             info_logger.info('jsonvalue: '+ jsonvalue)
-            print jsonvalue
 
             if self.is_json(jsonvalue):
                 data = json.loads(jsonvalue)
@@ -93,7 +89,6 @@ class SettingsMiddleware(object):
                 dateobj = datetime.strptime(version, '%Y-%m-%d')
                 exp = dateobj - datetime.utcnow()
                 info_logger.info('expiry date: ' + str(exp))
-                print exp
 
                 if exp < timedelta(seconds=0):
                     return TemplateResponse(request, 'lockdown/form.html', {'days': exp})
