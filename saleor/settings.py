@@ -134,8 +134,7 @@ TEMPLATES = [{
         'string_if_invalid': '<< MISSING VARIABLE "%s" >>' if DEBUG else ''}}]
 
 # Make this unique, and don't share it with anybody.
-# SECRET_KEY = os.environ.get('SECRET_KEY')
-SECRET_KEY = '*^h0yx9zk2c2h#gbni_*l65dim=9rgruc98#c*c^*bj7v%@47a'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
