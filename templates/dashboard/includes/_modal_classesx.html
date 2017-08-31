@@ -1,20 +1,20 @@
-<!-- supplier modal -->
+<!-- variant modal -->
 <div class="modal fade" id="xProductClass" >
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h6 class="modal-title">Add Variants</h6>
+                    <h6 class="modal-title">Add Attributes</h6>
                 </div>
                 <div class="modal-body">
                  
                  <div class="form-group">
-                    <label class="text-purple-800">Product Variant(s)</label>
+                    <label class="text-purple-800">Product Attributes(s)</label>
                     <select class="xgetAttributesD" multiple>                        
                     </select>
                   </div>
                   <div class="form-group hidden">
-                    <label class="text-purple-800">Variants </label>
+                    <label class="text-purple-800">Attributes </label>
                     <select class="getAttributesTwoD" multiple>                        
                     </select>
                    </div>                  
@@ -24,7 +24,7 @@
     <div class="panel-heading">
       <h6 class="panel-title">
         <a data-toggle="collapse" data-parent="#accordionx" href="#accordion-groupx">
-        <i class="icon-touch"></i>Add variants</a>
+        <i class="icon-touch"></i>Add attributes</a>
       </h6>
       <div class="heading-elements">
                 <ul class="icons-list">
@@ -45,13 +45,13 @@
 <!-- new fields -->
 <div class="col-md-3">
   <div class="form-group">
-    <label>Variant Name</label>
-    <input type="text" placeholder="Variant Name" id="newvName" class="form-control" name="newvName">
+    <label>Attribute Name</label>
+    <input type="text" placeholder="Attribute Name" id="newvName" class="form-control" name="newvName">
   </div>
 </div>
 <div class="col-md-7">
   <div class="form-group">
-    <label>Variant choice</label>
+    <label>Attribute choices</label>
     <select class="selectVariantChoice" multiple></select>
   </div>
 </div>
@@ -70,9 +70,9 @@
                 <div class="modal-footer p-15">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     {% if product.pk %}
-                    <button data-refreshme="{% url 'dashboard:product-update' pk=product.pk %}?tab=variants" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Variants</button>
+                    <button data-refreshme="{% url 'dashboard:product-update' pk=product.pk %}?tab=variants" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add attribute(s)</button>
                     {% else %}
-                    <button data-refreshme="" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add Variants</button>
+                    <button data-refreshme="" type="button" id="xaddClassBtnD" class="btn btn-primary btn-xs" onclick="return false;">Add attribute(s)</button>
                     {% endif %}
                     
                 </div>

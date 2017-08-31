@@ -172,13 +172,11 @@ def write(request):
                 notif = Notification(to='anonymous', actor=request.user, recipient=request.user, sent_to=single, verb=subject, description=body)
                 notif.save()
         
-        if user_contacts and user_contacts is not 'null':
-            print('to users')
+        if user_contacts and user_contacts is not 'null':            
             to = []
             for mobile in user_contacts:
                 to.append(mobile.replace('(','').replace(')','').replace('-',''))
-            to_csv = ",".join(to)
-            #print to_csv
+            to_csv = ",".join(to)            
             sms_response = sendSms(to_csv,body)
             #sms_response = [{'status': 'Success', 'number': '+254719739180'},]
             if sms_response:
@@ -204,11 +202,15 @@ def write(request):
                                             sent_to=user.id, 
                                             verb=subject, 
                                             description=body)
-                        print 'not sent'
+                        print('not sent')
         
         if  to_customers:
             print('to customers')
-            print to_customers            
+            to = []
+            for mobile in to_customers:
+                to.append(mobile.replace('(','').replace(')','').replace('-',''))
+            to_csv = ",".join(to)            
+            sms_response = sendSms(to_csv,body)                        
             for mobile in to_customers:
                 print mobile
                 user = Customer.objects.get(mobile=mobile)
@@ -329,4 +331,4 @@ def sendSms(to,message):
             return report
     except AfricasTalkingGatewayException, e:
         print 'Encountered an error while sending: %s' % str(e)
-        return False
+        return None

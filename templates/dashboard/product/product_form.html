@@ -293,8 +293,8 @@
                       {% if product.product_class.has_variants %}
       <!-- CODE V -->
       <div id="variants" class="">
-      <button data-attributes="{% url 'dashboard:attr_list_f32b' %}" class="btn btn-primary mb-5" id="addNewvaraints">New variant</button>
-      <div class="mt-15">
+      
+      <div class="mb-15">
         <button class="btn btn-primary" id="btntogglev">
           Add variant
         </button>
@@ -802,7 +802,7 @@
     tokensAllowCustom:true,      
     });
     $('.selectVariantChoice').tokenize2({
-    placeholder: 'Add variant choice(s) (eg. 1kg, 2kg)',
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
     tokensAllowCustom:true,      
     });
     function addAttributePlusChoice(dynamicData,myUrl) 
