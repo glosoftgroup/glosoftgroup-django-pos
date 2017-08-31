@@ -5,6 +5,7 @@ from rest_framework.serializers import (
 					IntegerField
 				 )
 from datetime import datetime
+from ...sale.models import PaymentOption
 from ...payment.models import MpesaPayment
 
 class MpesaPaymentUpdateSerializer(serializers.ModelSerializer):
@@ -41,3 +42,11 @@ class MpesaPaymentListSerializer(serializers.ModelSerializer):
 		time = obj.created.strftime("%d/%m/%Y %H:%M:%S %p")
 		return time
 
+class PaymentOptionListSerializer(serializers.ModelSerializer):	
+	class Meta:
+		model = PaymentOption
+		fields = ('id',
+				 'name', 
+				 'description',)
+
+				 

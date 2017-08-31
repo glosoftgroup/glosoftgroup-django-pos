@@ -355,18 +355,7 @@ class UserSerializer(serializers.ModelSerializer):
         
         permissions = []
         if obj.has_perm('sales.make_sale'):
-            permissions.append('make sales') 
+            permissions.append('make_sale') 
         if obj.has_perm('sales.make_invoice'):
-            permissions.append('make invoice') 
-        if obj.has_perm('sale.change_drawercash'):
-            permissions.append('change drawercash')
-        if obj.has_perm('sale.view_sales'):
-            permissions.append('view sales')
-        if obj.has_perm('sale.add_drawercash'):
-            permissions.append('add drawercash')
-        if obj.has_perm('sale.view_drawercash'):
-            permissions.append('view drawercash')
-        if obj.has_perm('sale.view_productvariant'):
-            permissions.append('view productvariant')
-            
+            permissions.append('make_invoice')           
         return permissions

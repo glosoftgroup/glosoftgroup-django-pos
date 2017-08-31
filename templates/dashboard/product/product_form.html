@@ -293,8 +293,8 @@
                       {% if product.product_class.has_variants %}
       <!-- CODE V -->
       <div id="variants" class="">
-      <button data-attributes="{% url 'dashboard:attr_list_f32b' %}" class="btn btn-primary mb-5" id="addNewvaraints">New variant</button>
-      <div class="mt-15">
+      
+      <div class="mb-15">
         <button class="btn btn-primary" id="btntogglev">
           Add variant
         </button>
@@ -548,7 +548,7 @@
             
             <thead>
               <tr class='bg-primary'>
-                
+                <th>Name</th>
                 <th>
                   {% trans "SKU" context "Stock table header" %}
                 </th>
@@ -574,7 +574,7 @@
            
               {% for item in stock_items %}
                 <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
-                  
+                  <td>{{ item.variant.display_product }}</td>
                   <td>
                     {{ item.variant.sku }}                    
                   </td>
@@ -802,7 +802,7 @@
     tokensAllowCustom:true,      
     });
     $('.selectVariantChoice').tokenize2({
-    placeholder: 'Add variant choice(s) (eg. 1kg, 2kg)',
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
     tokensAllowCustom:true,      
     });
     function addAttributePlusChoice(dynamicData,myUrl) 
