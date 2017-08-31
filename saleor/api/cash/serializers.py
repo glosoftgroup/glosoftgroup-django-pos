@@ -27,7 +27,7 @@ class TerminalListSerializer(serializers.ModelSerializer):
 		return obj.get_todaySales()
 		
 class UserAuthorizationSerializer(serializers.Serializer):
-	email = serializers.EmailField()
+	email = serializers.CharField()
 	password = serializers.CharField(max_length=200)
 	user = serializers.CharField(max_length=200)
 	terminal = serializers.CharField(max_length=200)

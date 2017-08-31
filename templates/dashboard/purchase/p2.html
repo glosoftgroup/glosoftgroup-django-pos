@@ -50,8 +50,8 @@
   <!-- stock in  -->
   <td>
   {% if variant.get_stock_pk == 0 %}
-  <a href="{% url 'dashboard:product-stock-add' product_pk=variant.product.pk %}" id="type-number{{ variant.get_stock_pk }}" data-type="number"
-  data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Add stock</a>
+  <a href="{% url 'dashboard:product-update' pk=variant.product.pk %}?tab=stock" id="type-number{{ variant.get_stock_pk }}" data-type="number"
+                      data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Add stock</a>
   {% else %}
   <a href="javascript:;" id="type-number{{ variant.get_stock_pk }}" data-type="number"
   data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Add stock</a>

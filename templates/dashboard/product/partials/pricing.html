@@ -21,6 +21,13 @@
                  </div>
               </div>
             </div>
+             {% if product.product_class.has_variants %}
+            <!-- no variant -->
+            <span >
+             <a style="margin-top: 28px;" class="btn hvr-glow btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing">Save</a>
+            </span>
+            {% endif %}
+            <!-- ./no varaint -->
           </div>     
 
         </div>
