@@ -37,7 +37,7 @@
             <div class="col-md-2">
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
-                {% if perms.userprofile.add_user %}
+                {% if perms.accounts.add_expense %}
                    <!--<a href="{% url 'accounts:add_expense' %}" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>-->
                   <a href="javascript:;" id="addExpenseBtn" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>
                 {% endif %}

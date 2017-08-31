@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load humanize %}
    <style type="text/css">
      .clickable-row td.td{
       cursor: pointer;
@@ -18,7 +19,6 @@
                         <th>Exp. Date</th>
                         <th>Expense</th>
                         <th>Paid To</th>
-                        <th>Payment Mode</th>
                         <th>Amount</th>
                         {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                         <th class="text-center">Actions</th>
@@ -32,10 +32,8 @@
                             <td>{{ expense.expense_date }}</td>
                             <td>{{expense.expense_type}}</td>
                             <td>{{expense.paid_to}}</td>
-                            <td>{{expense.payment_mode}}
-                            </td>
                             <td>
-                            {{ expense.amount }}</td>
+                                <span class="pull-right">{{ expense.amount|intcomma }}</span></td>
                             {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                             <!-- actions -->
                             <td class="text-center">

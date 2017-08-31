@@ -208,9 +208,7 @@ def sales_tax(request):
 				cost = product.get_cost_price().gross
 			except Exception,e:
 				cost = product.get_cost_price()
-				print(cost)
 			except Exception,e:
-				print(cost)
 				cost = 0
 			costPrice.append(cost)
 

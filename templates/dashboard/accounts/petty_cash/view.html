@@ -91,7 +91,7 @@
                                       </p>
                                       <p class="text-semibold no-margin-top">Opening Cash: KShs. {{opening_amount|intcomma }}</p>
                                       <p class="text-semibold no-margin-top">Cash Added: KShs. {{added_amount|intcomma }} </p>
-
+                                      <p class="text-semibold no-margin-top">Expenses Incurred: KShs. {% if expenses %}{{expenses|intcomma }}{% else %} 0.00{% endif %} </p>
                                       <p class="text-semibold no-margin-top">Current Balance: {{closing_amount|intcomma }}</p>
                                   </div>
                               </div>
