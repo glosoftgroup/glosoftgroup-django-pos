@@ -16,7 +16,6 @@ from django.db.models import Count, Min, Sum, Avg, F, Q
 from django.core import serializers
 from ...utils import render_to_pdf, convert_html_to_pdf, image64
 
-# from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 import datetime
 from datetime import date, timedelta
