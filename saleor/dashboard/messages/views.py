@@ -58,27 +58,35 @@ def add_template(request):
 def list_messages(request,status=None):
     # read users messages
     mark_read = True
+    title = 'Inbox'
     delete_permanently = False
     if status == 'trash':
         delete_permanently = True
+        title = 'Trashed'
         messages = Notification.objects.deleted()
     elif status == 'unread':
+        title = 'Unread '
         messages = Notification.objects.unread()
     elif status == 'read':
+        title = 'Read'
         messages = Notification.objects.read()
     elif status == 'sent_to_sms':
+        title = 'Sent'
         mark_read = False
-        messages = Notification.objects.filter(actor_object_id=request.user.id,sent=True)
-    elif status == 'failed':
+        print request.user.mobile
+        messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=True)
+    elif status == 'pending':
+        title = 'Pending'
         mark_read = False
-        messages = Notification.objects.filter(actor_object_id=request.user.id,sent=False)
+        messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=False)
     
     elif status == 'sent':
         mark_read = False
         messages = Notification.objects.filter(actor_object_id=request.user.id)
     else:
-        messages = Notification.objects.filter(to='user',sent_to=request.user.id)
+        messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
     ctx = {
+        'title':title,
         'delete_permanently': delete_permanently,
         'mark_read': mark_read,
         'status': status,
@@ -195,7 +203,7 @@ def write(request):
                 to.append(mobile.replace('(','').replace(')','').replace('-',''))
             to_csv = ",".join(to)                                               
             sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='customer')                    
-            print sms_response            
+            
         if to_suppliers:
             print('to suppliers')
             to = []
@@ -319,26 +327,31 @@ def send_notification(number=None,actor=None,tag='user',body=None,subject=None,s
     if tag == 'user':
         user = User.objects.get(mobile=number.decode('utf-8'))
     if tag == 'customer':
+        print number
         user = Customer.objects.get(mobile=number.decode('utf-8'))
     if tag == 'supplier':
         user = Supplier.objects.get(mobile=number.decode('utf-8'))
     if status == 'Success':
         notif = Notification.objects.create(
-                            to='user', 
+                            to=tag, 
                             actor=actor, 
                             recipient=actor, 
                             sent_to=user.id,  
                             verb=subject,
+                            from_number=actor.mobile,
+                            to_number=user.mobile,
                             sent=True, 
                             description=body,
                             status=status)
         print notif.status                    
     else:
         notif = Notification.objects.create(
-                            to='user', 
+                            to=tag, 
                             actor=actor,
                             recipient=actor,
                             sent_to=user.id, 
+                            from_number=actor.mobile,
+                            to_number=user.mobile,
                             verb=subject, 
                             description=body,
                             status=status)
