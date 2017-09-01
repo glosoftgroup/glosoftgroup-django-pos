@@ -153,6 +153,7 @@ class SMessage(models.Model):
     actor = GenericForeignKey('actor_content_type', 'actor_object_id')
 
     verb = models.CharField(max_length=255)
+    status = models.CharField(max_length=655,default='',blank=True,null=True)
     description = models.TextField(blank=True, null=True)
 
     target_content_type = models.ForeignKey(ContentType, related_name='sms_target', blank=True, null=True)
