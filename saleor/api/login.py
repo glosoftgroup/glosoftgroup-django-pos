@@ -36,22 +36,18 @@ class CustomJWTSerializer(JSONWebTokenSerializer):
 
             user = authenticate(username=us.email, password=attrs.get('password'))
 
-            if user:
-				if not user.has_perm('sales.make_sale'):
-					msg = _('Permission Denied.')
+            if user:				
+				if not user.is_active:
+					msg = _('User account is disabled.')
 					raise serializers.ValidationError(msg)
-				else:
-					if not user.is_active:
-						msg = _('User account is disabled.')
-						raise serializers.ValidationError(msg)
 
-					payload = jwt_payload_handler(user)
+				payload = jwt_payload_handler(user)
 
-					return {
-						'token': jwt_encode_handler(payload),
-						'user': user,
-						'permissions':user.get_all_permissions(),
-					}
+				return {
+					'token': jwt_encode_handler(payload),
+					'user': user,
+					'permissions':user.get_all_permissions(),
+				}
             else:
                 msg = _('Unable to log in with provided credentials.')
                 raise serializers.ValidationError(msg)

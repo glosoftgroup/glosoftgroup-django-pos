@@ -28,7 +28,10 @@
 {% endblock %}
 
 {% block custom_css %}
-
+<link rel="stylesheet" type="text/css" href="{% static 'backend/js/plugins/protip/css/protip.css' %}">
+<style type="text/css">
+	.protip{z-index: 0;}
+</style>
 {% endblock %}
 {% block content %}
 <!-- Secondary sidebar -->
@@ -137,13 +140,15 @@
 
 	<div class="table-responsive">
 		<table class="table table-inbox">
-			<tbody data-link="row" class="rowlink">
+			<tbody data-link="row" class="rowlink protip-target">
 			{% for notification in  notifications %}
-				<tr class="unread">
+				<tr class="unread protip"
+				data-pt-title="You must be at least 18!"
+				>
 					
 					<td class="table-inbox-star rowlink-skip">
 					{% if mark_read %}
-					<a href="{% url 'dashboard:read-message' notification.id%}">
+					<a href="{% url 'dashboard:read-message' notification.id %}">
 					{% else %}
 					<a href='#'>
 					{% endif %}
@@ -195,11 +200,13 @@
 
  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switch.min.js' %}"></script>
  <script type="text/javascript" src="{% static 'backend/js/pages/mail_list.js' %}"></script>
-
+<script type="text/javascript" src="{% static 'backend/js/plugins/protip/js/protip.min.js' %}"></script>
 
 <script type="text/javascript">
 // IIFE - Immediately Invoked Function Expression
   (function($, window, document) {
+  
+    $.protip();
 
     // The $ is now locally scoped
 
