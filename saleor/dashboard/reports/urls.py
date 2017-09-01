@@ -1,12 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 
-from . import views
-from . import charts
-from . import pdfs
-from . import purchase
-from . import sales_margin
-from . import sales_tax
+from . import views,charts, pdfs,  purchase, sales_margin, sales_tax, sales_margin2
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -20,6 +15,7 @@ urlpatterns = [
 		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
 			(views.sales_detail), name='sale-detail'),
 
+		# Sales Tax
 		url(r'^tx/$', permission_required('reports.view_sales_reports', login_url='not_found')
 			(sales_tax.sales_reports), name='sales_tax_reports'),
 		url(r'^tx/sales/$', permission_required('reports.view_sales_reports', login_url='not_found')
@@ -31,6 +27,24 @@ urlpatterns = [
 		url(r'^tx/pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
 			(sales_tax.pdf_sale_tax_detail), name='pdf-sale-tax-detail'),
 		url(r'^tx/reports/sales/list/pdf/$', sales_tax.sales_list_tax_pdf, name='reports_sales_tax_list_pdf'),
+
+		# Sales Margin
+		url(r'^mrg/$', permission_required('reports.view_sales_reports', login_url='not_found')
+			(sales_margin2.sales_reports), name='sales_margin_list_reports'),
+		url(r'^mrg/sales/$', permission_required('reports.view_sales_reports', login_url='not_found')
+			(sales_margin2.sales_list), name='sales_margin_list'),
+		url(r'^mrg/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+			(sales_margin2.sales_detail), name='sale_margin_detail'),
+		url( r'^mrg/sales_search/$', sales_margin2.sales_search, name = 'sales_margin_search' ),
+		url( r'^mrg/sales_paginate/$', sales_margin2.sales_paginate, name = 'sales_margin_paginate'),
+		url(r'^mrg/pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+			(sales_margin2.pdf_sale_tax_detail), name='pdf-sale-margin-detail'),
+		url(r'^mrg/sales/list/pdf/$', sales_margin2.sales_list_tax_pdf, name='reports_sales_margin_list_pdf'),
+
+		url(r'^mrg/sls/itms/paginate/$', sales_margin2.sales_items_paginate, name='sales_margin_items_paginate'),
+		url(r'^mrg/sls/itms/search/$', sales_margin2.sales_items_search, name='sales_margin_items_search'),
+
+
 
 		url(r'^reports/sales/list/pdf/$', pdfs.sales_list_pdf, name='reports_sales_list_pdf'),
 		url(r'^reports/category/pdf/$', pdfs.sales_category, name='reports_sales_category_pdf'),
