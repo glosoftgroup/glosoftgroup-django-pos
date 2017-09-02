@@ -382,12 +382,12 @@
                       {% endif %}
                       {% if perms.reports.view_sales_reports %}
                         <li class="{% block menu_report_margin_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Margin</a>
+                          <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>
                         </li>
                       {% endif %}
                       {% if perms.reports.view_sales_reports %}
                         <li class="{% block menu_report_margin2_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin2</a>
+                          <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin</a>
                         </li>
                       {% endif %}
                       {#{% if perms.reports.view_sales_reports %}#}

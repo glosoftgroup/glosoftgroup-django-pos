@@ -4,15 +4,14 @@
  {% if items %}
     {% for item in items %}
       <tr>
-        <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
         <td>{{item.product_name}}</td>
-        <td>{{item.unit_cost}}</td>
-        <td>{{item.quantity}}</td>
-        <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
+        <td><span class="pull-right">{{item.unit_cost}}</span></td>
+        <td>{{item.quantity__sum}}</td>
+        <td><span class="pull-right">{{item.total_cost__sum|intcomma}}</span></td>
         <td><span>{{item.unitMargin|intcomma}}</span></td>
           <td><span>{{item.salesMargin|intcomma}}</span></td>
       </tr>
     {% endfor %}
      {% else %}
-     <tr><td colspan="7"><h2 class="text-center">No Items Available</h2></td></tr>
+     <tr><td colspan="6"><h2 class="text-center">No Items Available</h2></td></tr>
 {% endif %}

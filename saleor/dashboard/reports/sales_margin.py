@@ -61,8 +61,15 @@ def sales_margin(request):
 		z = []
 		g, h, i = dateTo.split('-')
 		z.append(g)
-		z.append(h)
-		z.append(str(int(i) + 1))
+		if i == '30':
+			z.append(h)
+			z.append(str(int(i) + 1))
+		elif i =='31':
+			z.append(str(int(h) + 1))
+			z.append('01')
+		else:
+			z.append(h)
+			z.append(str(int(i) + 1))
 		dateTo = '-'.join(z)
 		date2 = dateFrom2 + ' - ' + dateTo2
 	else:
@@ -174,8 +181,15 @@ def sales_tax(request):
 		z = []
 		g, h, i = dateTo.split('-')
 		z.append(g)
-		z.append(h)
-		z.append(str(int(i) + 1))
+		if i == '30':
+			z.append(h)
+			z.append(str(int(i) + 1))
+		elif i =='31':
+			z.append(str(int(h) + 1))
+			z.append('01')
+		else:
+			z.append(h)
+			z.append(str(int(i) + 1))
 		dateTo = '-'.join(z)
 		date2 = dateFrom2 + ' - ' + dateTo2
 	else:
