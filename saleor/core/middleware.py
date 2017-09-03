@@ -73,8 +73,6 @@ class SettingsMiddleware(object):
         h.update(filecontent)
         hex = h.hexdigest()
 
-        print filename
-        print hex
 
         if filename != hex:
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
