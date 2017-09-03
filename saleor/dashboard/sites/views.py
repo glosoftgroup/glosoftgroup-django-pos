@@ -49,7 +49,6 @@ def update_settings(request,site_id=None):
         return HttpResponse('success')
     return HttpResponse('Invalid method')
 
-@csrf_exempt
 def add_sitekeys(request):
     if request.method == 'POST':
         keyfile = request.POST.get('lic_key')
