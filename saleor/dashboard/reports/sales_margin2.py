@@ -71,13 +71,19 @@ def sales_list(request):
 			setattr(sale, 'totalCostPrice', totalCostPrice)
 			try:
 				grossProfit = sale.total_net - totalCostPrice
-				status = 'true'
 				margin = round((grossProfit / sale.total_net) * 100, 2)
 			except:
 				grossProfit = 0
 				margin = 0
 			setattr(sale, 'margin', margin)
 			total_sales.append(sale)
+
+		try:
+			grossProfit = total_sales_amount['total_net__sum'] - totalCostPrice
+			totalMargin = round((grossProfit / total_sales_amount['total_net__sum']) * 100, 2)
+		except:
+			grossProfit = 0
+			totalMargin = 0
 
 		page = request.GET.get('page', 1)
 		paginator = Paginator(total_sales, 10)
@@ -96,11 +102,13 @@ def sales_list(request):
 			'sales': total_sales,
 			"total_sales_amount":total_sales_amount,
 			"total_tax_amount":total_tax_amount,
-			"date":last_date_of_sales
+			"date":last_date_of_sales,
+			"totalMargin":totalMargin
 		}
 		return TemplateResponse(request, 'dashboard/reports/sales_margin2/sales_list.html',data)
-	except ObjectDoesNotExist as e:
+	except Exception as e:
 		error_logger.error(e)
+		print (e)
 
 
 @staff_member_required
@@ -585,100 +593,61 @@ def sales_items_paginate(request):
 	total_sales = Sales.objects.aggregate(Sum('total_net'))
 	total_tax = Sales.objects.aggregate(Sum('total_tax'))
 
-
-	if date:
-		try:
-			all_salesd = Sales.objects.filter(created__icontains=date).order_by('-id')
-			that_date_sum = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))
-			items = SoldItem.objects.filter(sales__created=date)
-			total_items = []
-			for t in items:
-				product = ProductVariant.objects.get(sku=t.sku)
-				try:
-					itemPrice = product.get_cost_price().gross
-				except:
-					itemPrice = product.get_cost_price()
-				unitSalesCost = t.unit_cost
-				totalSalesCost = t.total_cost
-				try:
-					grossProfit = unitSalesCost - itemPrice
-					unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
-					salesGrossProfit = totalSalesCost - (itemPrice * t.quantity)
-					salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
-				except:
-					grossProfit = 0
-					unitMargin = 0
-					salesMargin = 0
-				setattr(t, 'unitMargin', unitMargin)
-				setattr(t, 'salesMargin', salesMargin)
-				total_items.append(t)
-
-			if p2_sz and date:
-				paginator = Paginator(total_items, int(p2_sz))
-				total_items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales_margin2/items/paginate.html',{'items':total_items, 'gid':date})
-
-			paginator = Paginator(sales, 10)
-			total_items = paginator.page(page)
-			return TemplateResponse(request,'dashboard/reports/sales_margin2/items/p2.html',
-				{'items':total_items, 'pn':paginator.num_pages,'sz':10,'gid':date,
-				'total_sales':total_sales,'total_tax':total_tax,'tsum':tsum,
-				'that_date_sum':that_date_sum, 'date':date, 'today':today})
-
-		except ObjectDoesNotExist as e:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/p2.html',{'date': date})
-
-	else:
-		try:
-			last_sale = Sales.objects.latest('id')
-			last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
-			all_sales = Sales.objects.filter(created__contains=last_date_of_sales)
-			total_sales_amount = all_sales.aggregate(Sum('total_net'))
-			items = SoldItem.objects.all()
-			total_items = []
-			for t in items:
-				product = ProductVariant.objects.get(sku=t.sku)
-				try:
-					itemPrice = product.get_cost_price().gross
-				except:
-					itemPrice = product.get_cost_price()
-				unitSalesCost = t.unit_cost
-				totalSalesCost = t.total_cost
-				try:
-					grossProfit = unitSalesCost - itemPrice
-					unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
-					salesGrossProfit = totalSalesCost - (itemPrice * t.quantity)
-					salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
-				except:
-					grossProfit = 0
-					unitMargin = 0
-					salesMargin = 0
-				setattr(t, 'unitMargin', unitMargin)
-				setattr(t, 'salesMargin', salesMargin)
-				total_items.append(t)
-
-			if list_sz:
-				paginator = Paginator(total_items, int(list_sz))
-				total_items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales_margin2/items/p2.html',{'items':total_items, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
-			else:
-				paginator = Paginator(total_items, 10)
-			if p2_sz:
-				paginator = Paginator(total_items, int(p2_sz))
-				total_items = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales_margin2/items/paginate.html',{'items':total_items})
-
+	try:
+		last_sale = Sales.objects.latest('id')
+		last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
+		all_sales = Sales.objects.filter(created__contains=last_date_of_sales)
+		total_sales_amount = all_sales.aggregate(Sum('total_net'))
+		items = SoldItem.objects.values('product_name', 'product_category', 'sku',
+										   'unit_cost') \
+			.annotate(Count('sku')) \
+			.annotate(Sum('total_cost')) \
+			.annotate(Sum('unit_cost')) \
+			.annotate(Sum('quantity')).order_by('product_name')
+		total_items = []
+		for t in items:
+			product = ProductVariant.objects.get(sku=t['sku'])
 			try:
-				total_items = paginator.page(page)
-			except PageNotAnInteger:
-				total_items = paginator.page(1)
-			except InvalidPage:
-				total_items = paginator.page(1)
-			except EmptyPage:
-				total_items = paginator.page(paginator.num_pages)
+				itemPrice = product.get_cost_price().gross
+			except:
+				itemPrice = product.get_cost_price()
+			unitSalesCost = t['unit_cost']
+			totalSalesCost = t['total_cost__sum']
+			try:
+				grossProfit = unitSalesCost - itemPrice
+				unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+				salesGrossProfit = totalSalesCost - (itemPrice * t['quantity__sum'])
+				salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+			except:
+				grossProfit = 0
+				unitMargin = 0
+				salesMargin = 0
+			t['unitMargin'] = unitMargin
+			t['salesMargin'] = salesMargin
+			total_items.append(t)
+
+		if list_sz:
+			paginator = Paginator(total_items, int(list_sz))
+			total_items = paginator.page(page)
+			return TemplateResponse(request,'dashboard/reports/sales_margin2/items/p2.html',{'items':total_items, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
+		else:
+			paginator = Paginator(total_items, 10)
+		if p2_sz:
+			paginator = Paginator(total_items, int(p2_sz))
+			total_items = paginator.page(page)
 			return TemplateResponse(request,'dashboard/reports/sales_margin2/items/paginate.html',{'items':total_items})
-		except ObjectDoesNotExist as e:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/p2.html', {'date': date})
+
+		try:
+			total_items = paginator.page(page)
+		except PageNotAnInteger:
+			total_items = paginator.page(1)
+		except InvalidPage:
+			total_items = paginator.page(1)
+		except EmptyPage:
+			total_items = paginator.page(paginator.num_pages)
+		return TemplateResponse(request,'dashboard/reports/sales_margin2/items/paginate.html',{'items':total_items})
+	except ObjectDoesNotExist as e:
+		return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/p2.html', {'date': date})
 
 @staff_member_required
 def sales_items_search(request):
@@ -693,107 +662,155 @@ def sales_items_search(request):
 			sz = list_sz
 
 		if q is not None:
-			all_sales = Sales.objects.filter(
-				Q(invoice_number__icontains=q) |
-				Q(terminal__terminal_name__icontains=q) |
-				Q(created__icontains=q) |
-				Q(customer__name__icontains=q) | Q(customer__mobile__icontains=q) |
-				Q(solditems__product_name__icontains=q) |
-				Q(user__email__icontains=q) |
-				Q(user__name__icontains=q)).order_by('id').distinct()
+			allItems = SoldItem.objects.values('product_name', 'product_category', 'sku',
+											 'unit_cost')\
+				.annotate(Count('sku'))\
+				.annotate(Sum('total_cost')) \
+				.annotate(Sum('unit_cost'))\
+				.annotate(Sum('quantity')).order_by('product_name')
+			all_items = allItems.filter(
+				Q(sku__icontains=q) |
+				Q(product_name__icontains=q) |
+				Q(product_category__icontains = q))
 
-			if request.GET.get('gid'):
-				items = SoldItem.objects.filter(sales__created__icontains=request.GET.get('gid'))
-				total_items = []
-				for t in items:
-					product = ProductVariant.objects.get(sku=t.sku)
-					try:
-						itemPrice = product.get_cost_price().gross
-					except:
-						itemPrice = product.get_cost_price()
-					unitSalesCost = t.unit_cost
-					totalSalesCost = t.total_cost
-					try:
-						grossProfit = unitSalesCost - itemPrice
-						unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
-						salesGrossProfit = totalSalesCost - (itemPrice * t.quantity)
-						salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
-					except:
-						grossProfit = 0
-						unitMargin = 0
-						salesMargin = 0
-					setattr(t, 'unitMargin', unitMargin)
-					setattr(t, 'salesMargin', salesMargin)
-					total_items.append(t)
-
-				if p2_sz:
-					paginator = Paginator(total_items, int(p2_sz))
-					total_items = paginator.page(page)
-					return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/paginate.html',
-											{'items': total_items})
-
-				if list_sz:
-					paginator = Paginator(total_items, int(list_sz))
-					total_items = paginator.page(page)
-					return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/search.html',
-											{'items': total_items, 'pn': paginator.num_pages, 'sz': list_sz,
-											 'gid': request.GET.get('gid'), 'q': q})
-
-				paginator = Paginator(total_items, 10)
+			items = all_items
+			total_items = []
+			for t in items:
+				product = ProductVariant.objects.get(sku=t['sku'])
+				try:
+					itemPrice = product.get_cost_price().gross
+				except:
+					itemPrice = product.get_cost_price()
+				unitSalesCost = t['unit_cost']
+				totalSalesCost = t['total_cost__sum']
+				try:
+					grossProfit = unitSalesCost - itemPrice
+					unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+					salesGrossProfit = totalSalesCost - (itemPrice * t['quantity__sum'])
+					salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+				except:
+					grossProfit = 0
+					unitMargin = 0
+					salesMargin = 0
+				t['unitMargin'] = unitMargin
+				t['salesMargin'] = salesMargin
+				total_items.append(t)
+			if list_sz:
+				paginator = Paginator(total_items, int(list_sz))
 				total_items = paginator.page(page)
 				return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/search.html',
-										{'items': total_items, 'pn': paginator.num_pages, 'sz': sz,
-										 'gid': request.GET.get('gid')})
+										{'items': total_items, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,
+										 'q': q})
 
-			else:
-				items = SoldItem.objects.all()
-				total_items = []
-				for t in items:
-					product = ProductVariant.objects.get(sku=t.sku)
-					try:
-						itemPrice = product.get_cost_price().gross
-					except:
-						itemPrice = product.get_cost_price()
-					unitSalesCost = t.unit_cost
-					totalSalesCost = t.total_cost
-					try:
-						grossProfit = unitSalesCost - itemPrice
-						unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
-						salesGrossProfit = totalSalesCost - (itemPrice * t.quantity)
-						salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
-					except:
-						grossProfit = 0
-						unitMargin = 0
-						salesMargin = 0
-					setattr(t, 'unitMargin', unitMargin)
-					setattr(t, 'salesMargin', salesMargin)
-					total_items.append(t)
-				if list_sz:
-					paginator = Paginator(total_items, int(list_sz))
-					total_items = paginator.page(page)
-					return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/search.html',
-											{'items': total_items, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,
-											 'q': q})
+			if p2_sz:
+				paginator = Paginator(total_items, int(p2_sz))
+				total_items = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/paginate.html',
+										{'items': total_items})
 
-				if p2_sz:
-					paginator = Paginator(total_items, int(p2_sz))
-					total_items = paginator.page(page)
-					return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/paginate.html',
-											{'items': total_items})
+			paginator = Paginator(total_items, 10)
+			try:
+				total_items = paginator.page(page)
+			except PageNotAnInteger:
+				total_items = paginator.page(1)
+			except InvalidPage:
+				total_items = paginator.page(1)
+			except EmptyPage:
+				total_items = paginator.page(paginator.num_pages)
+			if p2_sz:
+				total_items = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/paginate.html',
+										{'items': total_items})
 
-				paginator = Paginator(total_items, 10)
+			return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/search.html',
+									{'items': total_items, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+@staff_member_required
+def sales_list_margin_items_pdf( request ):
+
+	if request.is_ajax():
+		q = request.GET.get( 'q' )
+		gid = request.GET.get('gid')
+
+		if gid:
+			gid = gid
+		else:
+			gid = None
+
+		sales = []
+		costPrice = []
+		if q is not None:
+			allItems = SoldItem.objects.values('product_name', 'product_category', 'sku',
+											   'unit_cost') \
+				.annotate(Count('sku')) \
+				.annotate(Sum('total_cost')) \
+				.annotate(Sum('unit_cost')) \
+				.annotate(Sum('quantity')).order_by('product_name')
+			all_items = allItems.filter(
+				Q(sku__icontains=q) |
+				Q(product_name__icontains=q) |
+				Q(product_category__icontains=q))
+
+			items = all_items
+			total_items = []
+			for t in items:
+				product = ProductVariant.objects.get(sku=t['sku'])
 				try:
-					total_items = paginator.page(page)
-				except PageNotAnInteger:
-					total_items = paginator.page(1)
-				except InvalidPage:
-					total_items = paginator.page(1)
-				except EmptyPage:
-					total_items = paginator.page(paginator.num_pages)
-				if p2_sz:
-					total_items = paginator.page(page)
-					return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/paginate.html',
-											{'items': total_items})
+					itemPrice = product.get_cost_price().gross
+				except:
+					itemPrice = product.get_cost_price()
+				unitSalesCost = t['unit_cost']
+				totalSalesCost = t['total_cost__sum']
+				try:
+					grossProfit = unitSalesCost - itemPrice
+					unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+					salesGrossProfit = totalSalesCost - (itemPrice * t['quantity__sum'])
+					salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+				except:
+					grossProfit = 0
+					unitMargin = 0
+					salesMargin = 0
+				t['unitMargin'] = unitMargin
+				t['salesMargin'] = salesMargin
+				total_items.append(t)
 
-				return TemplateResponse(request, 'dashboard/reports/sales_margin2/items/search.html',
-										{'items': total_items, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+		else:
+			items = SoldItem.objects.values('product_name', 'product_category', 'sku',
+											   'unit_cost') \
+				.annotate(Count('sku')) \
+				.annotate(Sum('total_cost')) \
+				.annotate(Sum('unit_cost')) \
+				.annotate(Sum('quantity')).order_by('product_name')
+			total_items = []
+			for t in items:
+				product = ProductVariant.objects.get(sku=t['sku'])
+				try:
+					itemPrice = product.get_cost_price().gross
+				except:
+					itemPrice = product.get_cost_price()
+				unitSalesCost = t['unit_cost']
+				totalSalesCost = t['total_cost__sum']
+				try:
+					grossProfit = unitSalesCost - itemPrice
+					unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+					salesGrossProfit = totalSalesCost - (itemPrice * t['quantity__sum'])
+					salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+				except:
+					grossProfit = 0
+					unitMargin = 0
+					salesMargin = 0
+				t['unitMargin'] = unitMargin
+				t['salesMargin'] = salesMargin
+				total_items.append(t)
+
+		img = image64()
+		data = {
+			'today': date.today(),
+			'items': total_items,
+			'puller': request.user,
+			'image': img,
+			'gid':gid
+		}
+		pdf = render_to_pdf('dashboard/reports/sales_margin2/pdf/margin_items.html', data)
+		return HttpResponse(pdf, content_type='application/pdf')

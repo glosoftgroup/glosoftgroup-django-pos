@@ -1044,7 +1044,7 @@ $("#permission-btn").click(function(event){
              'checklist[]': checkBoxesStringArray,
              'user_id': '{{user.id}}',
              'check_login':can_login_value,
-             'csrfmiddlewaretoken':"{% csrf_token %}"
+             'csrfmiddlewaretoken':"{{ csrf_token }}"
       },
       success: function(data){
          $.jGrowl('permissions updated successfully', {

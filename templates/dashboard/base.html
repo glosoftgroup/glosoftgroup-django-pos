@@ -382,12 +382,12 @@
                       {% endif %}
                       {% if perms.reports.view_sales_reports %}
                         <li class="{% block menu_report_margin_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Margin</a>
+                          <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>
                         </li>
                       {% endif %}
                       {% if perms.reports.view_sales_reports %}
                         <li class="{% block menu_report_margin2_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin2</a>
+                          <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin</a>
                         </li>
                       {% endif %}
                       {#{% if perms.reports.view_sales_reports %}#}
@@ -544,6 +544,8 @@
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
    <script type="text/javascript" src="{% static 'backend/js/fixed_breadcrumb.js' %}"></script>
+           <script type="text/javascript" src="{% static 'backend/js/plugins/js-cookie/src/js.cookie.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/test-cookie.js' %}"></script>
   <style type="text/css">
     .toper{top:50px;}
   </style>

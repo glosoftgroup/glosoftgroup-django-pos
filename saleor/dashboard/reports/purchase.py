@@ -181,25 +181,57 @@ def purchase_search(request):
 			for purchase in purchases:
 				all_purchases += purchase.get_total_cost()
 
-			paginator = Paginator(purchases, 10)
-			try:
-				purchases = paginator.page(page)
-			except PageNotAnInteger:
-				purchases = paginator.page(1)
-			except InvalidPage:
-				purchases = paginator.page(1)
-			except EmptyPage:
-				purchases = paginator.page(paginator.num_pages)
-			if p2_sz:
-				purchases = paginator.page(page)
+			if request.GET.get('gid'):
+				purchases = purchases.filter(created__icontains=request.GET.get('gid'))
 
-				return TemplateResponse(request, 'dashboard/reports/purchase/paginate.html', {'purchases': purchases})
-			data = {
-				"purchases": purchases,
-				"all_purchases": all_purchases,
-				"gid": date, 'pn': paginator.num_pages, 'sz': sz, 'q': q,
-			}
-			return TemplateResponse(request, 'dashboard/reports/purchase/search.html',data)
+				if p2_sz:
+					paginator = Paginator(purchases, int(p2_sz))
+					purchases = paginator.page(page)
+					return TemplateResponse(request, 'dashboard/reports/purchase/paginate.html', {'purchases': purchases})
+
+				if list_sz:
+					paginator = Paginator(purchases, int(list_sz))
+					purchases = paginator.page(page)
+					return TemplateResponse(request, 'dashboard/reports/purchase/search.html',
+											{'purchases': purchases, "all_purchases": all_purchases, 'pn': paginator.num_pages, 'sz': list_sz,
+											 'gid': request.GET.get('gid'), 'q': q})
+
+				paginator = Paginator(purchases, 10)
+				purchases = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/reports/purchase/search.html',
+										{'purchases': purchases, "all_purchases": all_purchases, 'pn': paginator.num_pages, 'sz': sz,
+										 'gid': request.GET.get('gid')})
+
+			else:
+
+				if list_sz:
+					paginator = Paginator(purchases, int(list_sz))
+					purchases = paginator.page(page)
+					return TemplateResponse(request, 'dashboard/reports/purchase/search.html',
+											{'purchases': purchases, "all_purchases": all_purchases, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,
+											 'q': q})
+
+				if p2_sz:
+					paginator = Paginator(purchases, int(p2_sz))
+					purchases = paginator.page(page)
+					return TemplateResponse(request, 'dashboard/reports/purchase/paginate.html', {'purchases': purchases})
+
+				paginator = Paginator(purchases, 10)
+				try:
+					purchases = paginator.page(page)
+				except PageNotAnInteger:
+					purchases = paginator.page(1)
+				except InvalidPage:
+					purchases = paginator.page(1)
+				except EmptyPage:
+					purchases = paginator.page(paginator.num_pages)
+				if p2_sz:
+					purchases = paginator.page(page)
+					return TemplateResponse(request, 'dashboard/reports/purchase/paginate.html', {'purchases': purchases})
+
+				return TemplateResponse(request, 'dashboard/reports/purchase/search.html',
+										{'purchases': purchases, "all_purchases": all_purchases, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
 def purchase_pdf(request):

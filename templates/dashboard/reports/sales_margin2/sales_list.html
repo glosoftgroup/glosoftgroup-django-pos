@@ -109,7 +109,7 @@
                           <tr class='clickable-row' id="{{sale.pk }}">
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.totalCostPrice|intcomma }}</span></td>
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
@@ -138,14 +138,8 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Last Sales Sales: Kshs
-                    {% if total_sales_amount.total_net__sum %}
-                       {{total_sales_amount.total_net__sum}}
-                    {% else %}
-                       0.00<br />
-                    {% endif %}<br />
                    Total Sales: Kshs {{total_sales_amount.total_net__sum}}<br />
-                   Total Tax: Kshs {{ total_tax_amount.total_tax__sum}}
+                   Total Margin: {{totalMargin}} %
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
                   <span>Report pullled by User</span></p>
@@ -272,7 +266,7 @@ $(document).ready(function(){
         var listSizeVal = $('.list-sz').find(":selected").val();
         var searchData = $('.search_user').val();
 
-         if(sv == 'list' && date && listSizeVal && searchData){
+         if(sv == 'items' && date && listSizeVal && searchData){
             if(listSizeVal != '0'){
                $.ajax({ url: "{% url 'dashboard:sales_margin_items_search' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
@@ -294,11 +288,11 @@ $(document).ready(function(){
             }
         }else if(sv == 'items' && listSizeVal && date){
             if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_margin_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_margin_items_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url: "{% url 'dashboard:sales_margin_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_margin_items_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }
@@ -307,7 +301,7 @@ $(document).ready(function(){
                   $('#pagination-div').html(data);
             }});
         }else if(sv == 'items' && searchData){
-         $.ajax({ url: "{% url 'dashboard:sales_margin_items_search' %}",type: 'GET',data: {page:1, size:10, gid:date,q:searchData}, async:false,success: function(data){
+         $.ajax({ url: "{% url 'dashboard:sales_margin_items_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
                   $('#pagination-div').html(data);
             }});
         }else if(sv == 'items' && listSizeVal){
@@ -386,16 +380,33 @@ $(document).ready(function(){
             var groupSizeVal = $('.group-sz').find(":selected").val();
             var date = $('.daterange-single').val();
             var url = "{% url 'dashboard:reports_sales_margin_list_pdf' %}";
+            var url2 = "{% url 'dashboard:reports_sales_margin_items_pdf' %}";
             var scategory = $('.sales-category').find(":selected").val();
 
-            if(date && (scategory == 'items')){
-
+            if(searchData && (scategory == 'items')){
+                $.get(url2, {q:searchData}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
             }else if(scategory == 'items'){
-
-            }else if(date && (scategory == 'sales')){
-
+                $.get(url2, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if((scategory == 'sales') && date && searchData){
+                $.get(url, {q:searchData, gid:date}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if((scategory == 'sales') && date){
+                $.get(url, {gid:date}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if((scategory == 'sales') && searchData){
+                $.get(url, {q:searchData}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
             }else if(scategory == 'sales'){
-
+                $.get(url, function(data){
+                          window.open("data:application/pdf," + escape(data));
+               });
             }else if(date && (scategory == 'user')){
                     var node = document.getElementById('pagination-div')
                     domtoimage.toPng(node)
@@ -474,25 +485,33 @@ $(document).ready(function(){
                           $('#pagination-div').html(data);
                 }});
             }
-        }else if(((scategory && scategory != 'items' && scategory != 'none') && (!searchData && !date)) || (scategory && scategory != 'items' && scategory != 'none' && date)){
-           console.log('nothinh')
-        }else if((scategory == 'sales' && date && searchData)){
+        }else if(scategory == 'items'){
             if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_items_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_items_paginate' %}", type: 'GET',data: {page:1, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if((scategory == 'sales' && date && searchData)){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }
         }else if(scategory == 'sales' && searchData){
             if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }
@@ -506,25 +525,23 @@ $(document).ready(function(){
                           $('#pagination-div').html(data);
                 }});
             }
-        }else if(((scategory && scategory != 'sales' && scategory != 'none') && (!searchData && !date)) || (scategory && scategory != 'sales' && scategory != 'none' && date)){
-           console.log('nothinh')
         }else if(searchData && date){
             if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, size:10, q:searchData, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
              }
         }else if(searchData){
             if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, size:listSizeVal, q:searchData},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, size:10, q:searchData},success: function(data){
                           $('#pagination-div').html(data);
                 }});
              }
@@ -580,24 +597,22 @@ $(document).ready(function(){
         var scategory = $('.sales-category').find(":selected").val();
 
         delay(function(){
-            if(scategory == 'list' && (listSizeVal && listSizeVal != '0') && date ){
-                    $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text, gid:date}, async:false,success: function(data){
+            if(scategory == 'items' && (listSizeVal && listSizeVal != '0') && date ){
+                    $.ajax({ url: "{% url 'dashboard:sales_margin_items_search' %}",type: 'GET',data: {page:1, size:listSizeVal, q:search_text, gid:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
-            }else if(scategory == 'list' && (listSizeVal && listSizeVal != '0')){
-                    $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text}, async:false,success: function(data){
+            }else if(scategory == 'items' && (listSizeVal && listSizeVal != '0')){
+                    $.ajax({ url: "{% url 'dashboard:sales_margin_items_search' %}",type: 'GET',data: {page:1, size:listSizeVal, q:search_text}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
-            }else if((scategory == 'list' &&  listSizeVal == '0' && date) || (scategory == 'none' &&  listSizeVal == '0' && date)){
-                    $.ajax({ url: url,type: 'GET',data: {page:1, size:10, q:search_text, gid:date}, async:false,success: function(data){
+            }else if(scategory == 'items' &&  listSizeVal == '0' && date){
+                    $.ajax({ url: "{% url 'dashboard:sales_margin_items_search' %}",type: 'GET',data: {page:1, size:10, q:search_text, gid:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
-            }else if((scategory == 'list' &&  listSizeVal == '0') || (scategory == 'none' &&  listSizeVal == '0')){
-                    $.ajax({ url: url,type: 'GET',data: {page:1, size:10, q:search_text}, async:false,success: function(data){
+            }else if(scategory == 'items' &&  listSizeVal == '0'){
+                    $.ajax({ url: "{% url 'dashboard:sales_margin_items_search' %}",type: 'GET',data: {page:1, size:10, q:search_text}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
-            }else if((scategory != 'none' && scategory != 'list') || (scategory != 'none' && scategory != 'list' && listSizeVal != '0')){
-                console.log('nothing');
             }else if(scategory == 'sales' && (listSizeVal && listSizeVal != '0') && date ){
                     $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text, gid:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
@@ -606,16 +621,14 @@ $(document).ready(function(){
                     $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
-            }else if((scategory == 'sales' &&  listSizeVal == '0' && date) || (scategory == 'none' &&  listSizeVal == '0' && date)){
+            }else if(scategory == 'sales' &&  listSizeVal == '0' && date){
                     $.ajax({ url: url,type: 'GET',data: {page:1, size:10, q:search_text, gid:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
-            }else if((scategory == 'sales' &&  listSizeVal == '0') || (scategory == 'none' &&  listSizeVal == '0')){
+            }else if(scategory == 'sales' &&  listSizeVal == '0'){
                     $.ajax({ url: url,type: 'GET',data: {page:1, size:10, q:search_text}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
-            }else if((scategory != 'none' && scategory != 'sales') || (scategory != 'none' && scategory != 'sales' && listSizeVal != '0')){
-                console.log('nothing');
             }else if(listSizeVal && listSizeVal != '0' && date){
                 $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
@@ -629,7 +642,7 @@ $(document).ready(function(){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10},success: function(data){
                         $('#pagination-div').html(data);
                }});
             }

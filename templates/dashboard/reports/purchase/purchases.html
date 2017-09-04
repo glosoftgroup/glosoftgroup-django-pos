@@ -149,8 +149,8 @@
 
 {% endblock%}
 {% block custom_js %}
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/html2canvas.js' %}"></script>
@@ -192,7 +192,7 @@ $(document).ready(function(){
         showDropdowns:true
     }).on('change',function(){
       var date = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+        $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, date:date}, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
     });
@@ -219,10 +219,46 @@ $(document).ready(function(){
 
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
-        var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
+        var listVal = $(this).val();
+        var searchData = $('.search_purchase').val();
+        var date = $('.daterange-single').val();
+
+        if (searchData && date){
+              if (listVal != '0'){
+                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+        }else if (searchData){
+                if (listVal != '0'){
+                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+        }else if (date){
+               if (listVal != '0'){
+                   $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal, date:date}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:10, date:date}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+        }else{
+                $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+        }
+
      });
 
 
@@ -236,13 +272,38 @@ $(document).ready(function(){
     })();
 
     $('.search_purchase').keyup(function() {
-      var search_text = $(this).val();
-      delay(function(){
-         var url = "{% url 'dashboard:purchase_search' %}";
-         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
-                $('#pagination-div').html(data);
-         }});
-      }, 500 );
+          var search_text = $(this).val();
+          var listSizeVal = $('.list-sz').find(':selected').val();
+          var date = $('.daterange-single').val();
+
+          var url = "{% url 'dashboard:purchase_search' %}";
+          delay(function(){
+              if (date && listSizeVal){
+                 if(listSizeVal != '0'){
+                     $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, gid:date},success: function(data){
+                            $('#pagination-div').html(data);
+                     }});
+                 }else{
+                     $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10, gid:date},success: function(data){
+                            $('#pagination-div').html(data);
+                     }});
+                 }
+              } else if (listSizeVal){
+                        if(listSizeVal != '0'){
+                     $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal},success: function(data){
+                            $('#pagination-div').html(data);
+                     }});
+                 }else{
+                     $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10},success: function(data){
+                            $('#pagination-div').html(data);
+                     }});
+                 }
+              }else{
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                        $('#pagination-div').html(data);
+                 }});
+              }
+          }, 500 );
 
     });
 
