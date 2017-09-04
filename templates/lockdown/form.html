@@ -145,10 +145,11 @@
           },
           submitHandler: function() {
 
-            alert('here..');
-
             var activation_form = document.getElementById('license_activation');
             var formData = new FormData(activation_form);
+
+            alert('submit...');
+            alert(formData.toString());
 
             if (formData) {
                     $.ajax({

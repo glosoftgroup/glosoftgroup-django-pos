@@ -53,6 +53,9 @@ def update_settings(request,site_id=None):
 def add_sitekeys(request):
     if request.method == 'POST':
         keyfile = request.POST.get('lic_key')
+        info_logger.info("***************")
+        info_logger.info(keyfile)
+        info_logger.info("***************")
         check = "sometext"
         new_key = Files.objects.create(
             file=keyfile,
@@ -62,6 +65,9 @@ def add_sitekeys(request):
             new_key.save()
         except DatabaseError, BaseException :
             error_logger.info('Error when saving ')
-        request.POST.get('sms_username')
-        return HttpResponse('success')
-    return HttpResponse('Invalid request')
+
+        if new_key.id:
+            return HttpResponse('success', content_type='application/json')
+        return HttpResponse('Error: Not saved', content_type='application/json')
+
+    return HttpResponse('Invalid request', content_type='application/json')
