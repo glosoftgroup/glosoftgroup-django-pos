@@ -58,23 +58,35 @@ def add_template(request):
 def list_messages(request,status=None):
     # read users messages
     mark_read = True
+    title = 'Inbox'
     delete_permanently = False
     if status == 'trash':
         delete_permanently = True
+        title = 'Trashed'
         messages = Notification.objects.deleted()
     elif status == 'unread':
+        title = 'Unread '
         messages = Notification.objects.unread()
     elif status == 'read':
+        title = 'Read'
         messages = Notification.objects.read()
     elif status == 'sent_to_sms':
+        title = 'Sent'
         mark_read = False
-        messages = Notification.objects.filter(actor_object_id=request.user.id,sent=True)
+        print request.user.mobile
+        messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=True)
+    elif status == 'pending':
+        title = 'Pending'
+        mark_read = False
+        messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=False)
+    
     elif status == 'sent':
         mark_read = False
         messages = Notification.objects.filter(actor_object_id=request.user.id)
     else:
-        messages = Notification.objects.filter(to='user',sent_to=request.user.id)
+        messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
     ctx = {
+        'title':title,
         'delete_permanently': delete_permanently,
         'mark_read': mark_read,
         'status': status,
@@ -152,13 +164,18 @@ def write(request):
     if request.method == 'POST':
         # get form data        
         subject = request.POST.get('subject')
-        to_customers = json.loads(request.POST.get('toCustomers'))
-        to_suppliers = json.loads(request.POST.get('toSuppliers'))
-        user_contacts = json.loads(request.POST.get('userContacts'))
-        if not request.POST.get('toSuppliers'):
-            to_suppliers = False
-        if not request.POST.get('toCustomers'):
-            to_customers = False
+        if request.POST.get('toCustomers'):
+            to_customers = json.loads(request.POST.get('toCustomers'))
+        else:
+            to_customers = None
+        if request.POST.get('toSuppliers'):
+            to_suppliers = json.loads(request.POST.get('toSuppliers'))
+        else:
+            to_suppliers = None
+        if request.POST.get('userContacts'):
+            user_contacts = json.loads(request.POST.get('userContacts'))
+        else:
+            user_contacts = None            
         body = request.POST.get('body')
 
         if request.POST.get('single'):
@@ -176,55 +193,25 @@ def write(request):
             to = []
             for mobile in user_contacts:
                 to.append(mobile.replace('(','').replace(')','').replace('-',''))
-            to_csv = ",".join(to)            
-            sms_response = sendSms(to_csv,body)
-            #sms_response = [{'status': 'Success', 'number': '+254719739180'},]
-            if sms_response:
-                for report in sms_response:                    
-                    mb = report['number'].decode('utf-8')
-                    user = User.objects.get(mobile=report['number'])                    
-                    # status is either "Success" or "error message"
-                    if report['status'] == 'Success':
-                        notif = Notification.objects.create(
-                                to='user', 
-                                actor=request.user, 
-                                recipient=request.user, 
-                                sent_to=user.id,  
-                                verb=subject,
-                                sent=True, 
-                                description=body)
-                        #print 'with status success'      
-                    else:
-                        notif = Notification.objects.create(
-                                            to='user', 
-                                            actor=request.user,
-                                            recipient=request.user,
-                                            sent_to=user.id, 
-                                            verb=subject, 
-                                            description=body)
-                        print('not sent')
-        
+            to_csv = ",".join(to)                                               
+            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='user')                    
+            print sms_response
         if  to_customers:
             print('to customers')
             to = []
             for mobile in to_customers:
                 to.append(mobile.replace('(','').replace(')','').replace('-',''))
-            to_csv = ",".join(to)            
-            sms_response = sendSms(to_csv,body)                        
-            for mobile in to_customers:
-                print mobile
-                user = Customer.objects.get(mobile=mobile)
-                #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
-                notif = Notification(to='customer', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
-                notif.save()
+            to_csv = ",".join(to)                                               
+            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='customer')                    
+            
         if to_suppliers:
             print('to suppliers')
-            print request.POST.get('toSuppliers')
-            for mobile in to_suppliers:                
-                user = Supplier.objects.get(mobile=mobile)
-                #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
-                notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
-                notif.save()
+            to = []
+            for mobile in to_suppliers:
+                to.append(mobile.replace('(','').replace(')','').replace('-',''))
+            to_csv = ",".join(to)                                               
+            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='supplier')                    
+            print sms_response
     ctx = {'users':User.objects.all().order_by('-id'),
            'templates':SmsTemplate.objects.all().order_by('-id')}
     
@@ -304,15 +291,13 @@ def contacts(request):
         l.append(contact)
     return HttpResponse(json.dumps(l), content_type='application/json')
 
-def sendSms(to,message):
+def sendSms(to,message,subject,actor,tag='user'):
     # Specify your login credentials
     site = SiteSettings.objects.get(pk=1)
     username = site.sms_gateway_username #"MyAfricasTalkingUsername"
     apikey   = site.sms_gateway_apikey #"MyAfricasTalkingAPIKey"
     if username == "pkinuthia10@gmail.com":
-        username = 'sandbox'
-    print username
-    print apikey
+        username = 'sandbox'    
     gateway = AfricasTalkingGateway(username, str(apikey), "sandbox")
     report = []
     try:
@@ -328,7 +313,49 @@ def sendSms(to,message):
                                                                 recipient['status'],
                                                                 recipient['messageId'],
                                                                 recipient['cost'])
-            return report
+
+            
+            send_notification(recipient['number'],actor,tag,message,subject,recipient['status'])
     except AfricasTalkingGatewayException, e:
         print 'Encountered an error while sending: %s' % str(e)
         return None
+
+def send_notification(number=None,actor=None,tag='user',body=None,subject=None,status=None):
+    if not number or not actor or not body or not subject:
+        return False
+    user = None
+    if tag == 'user':
+        user = User.objects.get(mobile=number.decode('utf-8'))
+    if tag == 'customer':
+        print number
+        user = Customer.objects.get(mobile=number.decode('utf-8'))
+    if tag == 'supplier':
+        user = Supplier.objects.get(mobile=number.decode('utf-8'))
+    if status == 'Success':
+        notif = Notification.objects.create(
+                            to=tag, 
+                            actor=actor, 
+                            recipient=actor, 
+                            sent_to=user.id,  
+                            verb=subject,
+                            from_number=actor.mobile,
+                            to_number=user.mobile,
+                            sent=True, 
+                            description=body,
+                            status=status)
+        print notif.status                    
+    else:
+        notif = Notification.objects.create(
+                            to=tag, 
+                            actor=actor,
+                            recipient=actor,
+                            sent_to=user.id, 
+                            from_number=actor.mobile,
+                            to_number=user.mobile,
+                            verb=subject, 
+                            description=body,
+                            status=status)
+        print notif.status
+    print 'message saved on db'
+    #print status
+        

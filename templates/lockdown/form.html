@@ -1,10 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>License LocK</title>
-</head>
-<body>
-    <h1>Please contact the administrator the system has been locked!!</h1>
-</body>
-</html>
+{% extends "dashboard/base_nosidebar.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  {% trans "Customers" context "Dashboard customer list" %} - {{ block.super }}
+{% endblock %}
+{% block header_extra %}
+{% endblock %}
+{% block breadcrumbs %}
+   <li>
+      <a href="{% url 'dashboard:Activation' %}">
+      Customers
+      </a>
+    </li>
+    <li class="active">
+      Add customer
+    </li>
+{% endblock %}
+
+{% block menu_addCustomer_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-warning no-border">
+            <span class="text-semibold">Sorry!</span> Systems seems to have locked!! Please
+            <span class="text-semibold">activate</span> the system. Contact systems
+            administrator or glosoftgroup on +254711727778
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">System Locked</h6>
+                    <div class="heading-elements">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse"></a></li>
+                            <li><a data-action="reload"></a></li>
+                            <li><a data-action="close"></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <div class="tabbable">
+                        <ul class="nav nav-tabs nav-tabs-highlight">
+                            <li class="active"><a href="#highlighted-tab2" data-toggle="tab">Activate Online</a></li>
+                            <li><a href="#highlighted-tab3" data-toggle="tab">Add License Key</a></li>
+
+                        </ul>
+
+                        <div class="tab-content">
+
+                            <div class="tab-pane active" id="highlighted-tab2">
+                                <form class="form" method="post" name="online_activation">
+                                {% csrf_token %}
+                                   <div class="col-md-8">
+                                      <div class="row">
+                                        <div class="col-md-6">
+                                          <div class="form-group">
+                                            <label for="name">Customer Code</label>
+                                            <input type="text" class="form-control" name="code" id="code" placeholder="code">
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div class="row">
+                                          <div class="col-md-6">
+                                          <button class="btn btn-primary waves-effect waves-light" id="submit"
+                                                type="submit">Activate
+                                              <i class="icon-arrow-right14 position-right"></i></button>
+                                          </div>
+                                      </div>
+                                   </div>
+                                </form>
+                            </div>
+
+                            <div class="tab-pane" id="highlighted-tab3">
+                                <form class="form" method="post" name="license_activation" id="addlicensekey">
+                                {% csrf_token %}
+                                    <div class="col-md-8">
+                                        <div class="row">
+                                        <div class="col-md-6">
+                                          <div class="form-group">
+                                            <label for="name">License Key</label>
+                                              <textarea name="lic_key" id="lic_key" rows="4"
+                                                        cols="4" class="form-control elastic"
+                                                        placeholder="Paste License Key here....">
+                                              </textarea>
+                                          </div>
+                                        </div>
+                                        </div>
+
+                                        <div class="row">
+                                          <div class="col-md-6">
+                                          <button class="btn btn-primary waves-effect waves-light" id="submit"
+                                                type="submit">Activate
+                                              <i class="icon-arrow-right14 position-right"></i></button>
+                                          </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+      </div>
+</div>
+{% endblock%}
+{% block custom_js %}
+    <script type="text/javascript">
+        $('#addlicensekey').validate({
+          rules:{
+            lic_key: {
+              required:true,
+              minlength:3
+            }
+          },
+          messages:{
+            lic_key:{
+              required: "Please provide the license key",
+              minlength: "name must be atleast 3 characters long"
+            }
+          },
+          submitHandler: function() {
+
+            alert('here..');
+
+            var activation_form = document.getElementById('license_activation');
+            var formData = new FormData(activation_form);
+
+            if (formData) {
+                    $.ajax({
+                        url: "{% url 'dashboard:addsitekeys' %}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success:function(data){
+                           console.log(data);
+                           $("#lic_key").val('');
+
+                           $.jGrowl('License key added', {
+                              header: 'Successful!',
+                              theme: 'bg-success'
+                           });
+                        },
+                        error:function(error){
+                          console.log(error);
+                          $.jGrowl('The License key should not be empty', {
+                              header: 'Error Occurred!',
+                              theme: 'bg-danger'
+                          });
+                        }
+                    });
+                }
+
+          }
+        });
+
+    </script>
+
+{% endblock %}

@@ -239,7 +239,7 @@ def user_add(request):
 def user_process(request):
     user = User.objects.all()
     if request.method == 'POST':
-        name = request.POST.get('name')
+        name = (request.POST.get('name')).lower()
         email = request.POST.get('email')
         password = request.POST.get('password')
         encr_password = make_password(password)
@@ -322,7 +322,7 @@ def user_update(request, pk):
     permissions_in_user_groups = Permission.objects.filter(group__in=[group for group in user_groups])
 
     if request.method == 'POST':
-        name = request.POST.get('user_name')
+        name = (request.POST.get('user_name')).lower()
         email = request.POST.get('user_email')
         password = request.POST.get('user_password')
         nid = request.POST.get('user_nid')
