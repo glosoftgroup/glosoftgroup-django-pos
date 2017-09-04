@@ -101,7 +101,7 @@
                             <td class="text-center">{{item.product.product_class.name}}</td>
                             <td class="text-center">{{item.product.low_stock_threshold}}</td>
                             
-                            <td>{{item.get_stock_quantity}}</td>
+                            <td class="text-center">{{item.get_stock_quantity}}</td>
                               <td><span class="pull-right">{{item.get_price_per_item.gross|intcomma }}</span></td>
                               <td><span class="pull-right">{{item.get_total_price_cost|intcomma }}</span></td>
                           </tr>

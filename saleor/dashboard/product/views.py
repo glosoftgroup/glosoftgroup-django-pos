@@ -438,9 +438,9 @@ def product_list(request):
     user_trail(request.user.name, 'accessed the products page', 'view')
     info_logger.info('User: '+str(request.user.name)+' accessed the products page')
     return TemplateResponse(request, 'dashboard/product/list.html', ctx)
+
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 @staff_member_required
-@csrf_exempt
 def fetch_variants(request):
     if request.method == 'POST':
         if request.is_ajax():
@@ -469,7 +469,7 @@ def fetch_variants(request):
             return TemplateResponse(
         request, 'dashboard/product/attributes.html', ctx)
 
-@csrf_exempt
+@staff_member_required
 def fetch_variants32(request):
     variant_pk=None
     class_pk = request.POST.get("class_pk", "--")
@@ -1354,7 +1354,6 @@ def refresh_producttype(request):
     ctx)
 
 @staff_member_required
-@csrf_exempt
 def tax_add_ajax(request):
     if request.method == 'POST':
         if request.is_ajax():

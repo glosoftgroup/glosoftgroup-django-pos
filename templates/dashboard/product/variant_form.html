@@ -205,8 +205,13 @@
   function refreshAttributes() {  
    {% url "dashboard:fetch-variants32" as url %} 
    var url = "{{ url }}";
-   var class_pk = $('#id_product_class').val();     
-   var posting = $.post( url, {class_pk:class_pk,product_pk:"{{product.pk}}"} );
+   var class_pk = $('#id_product_class').val(); 
+   var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();    
+   var posting = $.post( url, {
+                class_pk:class_pk,
+                csrfmiddlewaretoken:csrf_token,
+                product_pk:"{{product.pk}}"
+              } );
    
    posting.done(function( data ) {    
     $( "#div_attributes" ).empty().append( data );   

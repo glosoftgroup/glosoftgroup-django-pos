@@ -1,0 +1,21 @@
+{% load staticfiles i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% if browser == 'firefox' %}
+     <img src="{% static 'images/instructions/firefox.png' %}" width="100%" height="100%"/>
+{% elif browser == 'chrome' %}
+    <img src="{% static 'images/instructions/chrome.png' %}" width="100%" height="100%"/>
+{% elif browser == 'ie' %}
+    <img src="{% static 'images/instructions/ie.png' %}" width="100%" height="100%"/>
+{% elif browser == 'edge' %}
+    <img src="{% static 'images/instructions/edge.png' %}" width="100%" height="100%"/>
+{% elif browser == 'safari' %}
+    <img src="{% static 'images/instructions/safari.png' %}" width="100%" height="100%"/>
+{% endif %}
+</body>
+</html>
