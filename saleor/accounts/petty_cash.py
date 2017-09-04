@@ -175,7 +175,7 @@ def expenditure(request):
 			except:
 				expenses = 0
 
-		date = lastEntry.created
+		date = DateFormat(datetime.datetime.strptime(date, '%Y-%m-%d')).format('jS F Y')
 		amount = lastEntry.closing
 		opening = lastEntry.opening
 		added = lastEntry.added

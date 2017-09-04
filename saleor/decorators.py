@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseForbidden
 from django.core.exceptions import ObjectDoesNotExist
 from .userprofile.models import UserTrail
 from django.shortcuts import get_object_or_404
@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
+from django.template.response import TemplateResponse
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -57,3 +58,6 @@ class EmailOrUsernameModelBackend(object):
 			return get_user_model().objects.get(pk=username)
 		except get_user_model().DoesNotExist:
 			return None
+
+def friendly_csrf_failure_view(request, reason="SuspiciousOperation", template_name="403_csrf.html"):
+	return HttpResponseForbidden('Not Authorized. Please contact your Administrator.')

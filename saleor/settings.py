@@ -237,10 +237,13 @@ LOGGING = {
         }
     },
     'handlers': {
+        'null': {
+                'class': 'logging.NullHandler',
+        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'django.utils.log.AdminEmailHandler',
         },
         'console': {
             'level': 'DEBUG',
@@ -260,6 +263,12 @@ LOGGING = {
             'filename': 'saleor/logs/error.log',
             'formatter': 'standard'
         },
+        'warning_logfile': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': 'saleor/logs/warning.log',
+            'formatter': 'standard'
+        },
         'info_logfile': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
@@ -268,9 +277,19 @@ LOGGING = {
         },
     },
     'loggers': {
+        'django.security.*': {
+                'handlers': ['error_logfile','null'],
+                'level': 'ERROR',
+                'propagate': True
+        },
+        'django.security.csrf': {
+                'handlers': ['warning_logfile'],
+                'level': 'WARNING',
+                'propagate': True
+        },
         'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
+            'handlers': ['warning_logfile'], #['error_logfile'], #['mail_admins'],
+            # 'level': 'WARNING', #''ERROR',
             'propagate': True
         },
         'saleor': {
@@ -296,7 +315,7 @@ LOGGING = {
     }
 }
 
-
+CSRF_FAILURE_VIEW = 'saleor.decorators.friendly_csrf_failure_view'
 AUTH_USER_MODEL = 'userprofile.User'
 
 LOGIN_URL = '/'
