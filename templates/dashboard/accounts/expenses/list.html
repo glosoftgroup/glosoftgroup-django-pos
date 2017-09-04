@@ -3,6 +3,7 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load prices_i18n %}
+{% load humanize %}
 
 {% block title %}
   Expenses
@@ -36,7 +37,7 @@
             <div class="col-md-2">
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
-                {% if perms.userprofile.add_user %}
+                {% if perms.accounts.add_expense %}
                    <!--<a href="{% url 'accounts:add_expense' %}" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>-->
                   <a href="javascript:;" id="addExpenseBtn" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>
                 {% endif %}
@@ -96,7 +97,7 @@
         <thead>
             <tr class="bg-primary">
             <th>Expense Type</th>
-            <th>Amount</th>
+            <th>Amount (KShs)</th>
             <th>Paid To</th>
             <th>Description</th>
             <th></th>
@@ -157,8 +158,8 @@
                     <th>Exp. Date</th>
                     <th>Expense</th>
                     <th>Paid To</th>
-                    <th>Amount</th>
-                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                    <th>Amount (KShs)</th>
+                    {% if perms.accounts.change_expense or perms.accounts.delete_expense %}
                     <th class="text-center">Actions</th>
                     {% endif %}
                   </tr>
@@ -171,7 +172,7 @@
                     <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.expense_type}}</td>
                     <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.paid_to}}</td>
                     <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">
-                    {{ expense.amount }}</td>
+                        <span class="pull-right"> {{ expense.amount|intcomma }}</span></td>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <!-- actions -->
                     <td class="text-center">

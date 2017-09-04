@@ -1,12 +1,14 @@
 {% load staticfiles %}
+{% load prices_i18n %}
+{% load humanize %}
 {% for purchase in purchases %}
     <tr>
       <td> {{purchase.created}}</td>
       <!--<td>{{purchase.invoice_number}}</td>-->
       <td>{{purchase.supplier}}</td>
       <td>{{purchase.stock.variant.display_product}}</td>
-      <td>{{purchase.stock.variant.get_price_per_item.gross}}</td>
+        <td><span class="pull-right"> {{purchase.stock.variant.get_price_per_item.gross|intcomma}}</span></td>
       <td>{{purchase.quantity}}</td>
-      <td>{{purchase.get_total_cost}}</td>
+        <td><span class="pull-right"> {{purchase.get_total_cost|intcomma}}</span></td>
     </tr>
 {% endfor %}

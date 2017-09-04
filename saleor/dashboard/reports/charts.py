@@ -124,13 +124,17 @@ def sales_category_chart(request, image=None):
 				"avg":avg_m,
 				"labels":labels,
 				"default":default,
-				"hcateg":highest_category_sales
+				"hcateg":highest_category_sales,
+				"sales_date":date
 			}
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', data)
+			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/category.html', data)
 		except ObjectDoesNotExist as e:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e":e, "date":date})
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/category.html', {"e":e, "date":date})
+			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e":e, "date":date})
 		except IndexError as e:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e": e, "date":date})
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/category.html', {"e":e, "date":date})
+			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e": e, "date":date})
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
@@ -541,11 +545,15 @@ def get_sales_by_week(request):
 def sales_user_chart(request):
 	image = request.POST.get('img')
 	today = datetime.datetime.now()
-	try:
-		last_sale = Sales.objects.latest('id')
-		date = DateFormat(last_sale.created).format('Y-m-d')
-	except:
-		date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+	get_date = request.GET.get('date')
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
 	if image:
 		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
@@ -614,13 +622,15 @@ def sales_user_chart(request):
 				"categs": categs,
 				"labels": labels,
 				"default": default,
-				"hcateg": highest_user_sales
+				"hcateg": highest_user_sales,
+				"sales_date":date
 			}
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html', data)
+			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/user.html', data)
 		except ObjectDoesNotExist:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/user.html',{"sales_date":date})
 		except IndexError:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/user.html',{"sales_date":date})
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
@@ -703,11 +713,15 @@ def get_user_sale_details(request):
 def sales_terminal_chart(request):
 	image = request.POST.get('img')
 	today = datetime.datetime.now()
-	try:
-		last_sale = Sales.objects.latest('id')
-		date = DateFormat(last_sale.created).format('Y-m-d')
-	except:
-		date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+	get_date = request.GET.get('date')
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
 	if image:
 		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
@@ -773,13 +787,15 @@ def sales_terminal_chart(request):
 				"categs": categs,
 				"labels": labels,
 				"default": default,
-				"hcateg": highest_user_sales
+				"hcateg": highest_user_sales,
+				"sales_date":date
 			}
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_teller.html', data)
+			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_teller.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/till.html', data)
 		except ObjectDoesNotExist:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_teller.html')
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/till.html',{"sales_date":date})
 		except IndexError:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html')
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/till.html',{"sales_date":date})
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
@@ -934,13 +950,15 @@ def sales_product_chart(request):
 				"avg":avg_m,
 				"labels":labels,
 				"default":default,
-				"hcateg":highest_category_sales
+				"hcateg":highest_category_sales,
+				"sales_date":date
 			}
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html', data)
+			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/items.html', data)
 		except ObjectDoesNotExist as e:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html')
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/items.html',{'sales_date':date})
 		except IndexError as e:
-			return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html')
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/items.html',{'sales_date':date})
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')

@@ -108,7 +108,7 @@
                            </div>
                            <div class="form-group">
                             <label for="mobile">Phone</label>
-                            <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile">
+                            <input type="text" data-mask="(+254)-999-999-999" class="form-control" name="mobile" id="mobile" placeholder="Mobile">
                            </div>
                            <div class="form-group">
                               <label for="email">Job Title</label>
@@ -445,11 +445,28 @@
                   </div>
             </div>
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <div class="col-md-12">
                         <h5>Drawer Cash</h5>
                     </div>
-                    <div class="col-md-12">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                      <label class="display-block text-semibold">DrawerCash</label>
+                      {% for permission in permissions%}
+                       {% if permission.content_type.model ==  'drawercash' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    </div>
+                    <div class="col-md-6">
                       <div class="form-group">
                       <label class="display-block text-semibold">Terminal</label>
                       {% for permission in permissions%}
@@ -537,6 +554,10 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript">
+/* mask phone numbre */
+$('#mobisdle').inputmask({
+  mask: '(254)-000-000-000'
+})
 /* disable th permissions tab code */
 $('#next-tab').click(function(){
   $('#permissions-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
@@ -657,7 +678,7 @@ $( ".check" ).on( "click", function(){
         },
         mobile:{
           required:true,
-          digits: true,
+          //digits: true,
           minlength: 6
         }
 

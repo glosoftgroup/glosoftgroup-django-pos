@@ -77,9 +77,9 @@
                  <p style="text-align: center;font-size:11px;">Report Pulled by:
                      <span style="font-weight:bold">
                          {% if puller.name %}
-                            {{ puller.name }}
+                            {{ puller.name | upper }}
                          {% else %}
-                            {{ puller.email }}
+                            {{ puller.email | upper }}
                          {% endif %}
                      </span></p>
 

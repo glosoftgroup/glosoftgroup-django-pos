@@ -16,6 +16,9 @@ from django.utils.six import text_type
 from .utils import id2slug
 
 # from .signals import sms
+from ..customer.models import Customer
+from ..supplier.models import Supplier
+from ..userprofile.models import User
 
 from model_utils import Choices
 from jsonfield.fields import JSONField
@@ -137,8 +140,7 @@ class SMessagesQuerySet(models.query.QuerySet):
 
 
 
-class SMessage(models.Model):
-   
+class SMessage(models.Model):   
     LEVELS = Choices('success', 'info', 'warning', 'error')
     TO = Choices('supplier', 'customer', 'user', 'anonymous')
     note = models.CharField(max_length=255, blank=True, null=True)
@@ -153,6 +155,11 @@ class SMessage(models.Model):
     actor = GenericForeignKey('actor_content_type', 'actor_object_id')
 
     verb = models.CharField(max_length=255)
+    from_number = models.CharField(max_length=255,default='',blank=True,null=True)
+    to_number = models.CharField(max_length=255,default='',blank=True,null=True)
+    status = models.CharField(max_length=655,default='',blank=True,null=True)
+    external_id = models.CharField(max_length=655,default='',blank=True,null=True)
+    link_id = models.CharField(max_length=655,default='',blank=True,null=True)
     description = models.TextField(blank=True, null=True)
 
     target_content_type = models.ForeignKey(ContentType, related_name='sms_target', blank=True, null=True)
@@ -169,6 +176,7 @@ class SMessage(models.Model):
     public = models.BooleanField(default=True)
     deleted = models.BooleanField(default=False)
     emailed = models.BooleanField(default=False)
+    sent = models.BooleanField(default=False)
 
     data = JSONField(blank=True, null=True)
     objects = SMessagesQuerySet.as_manager()
@@ -217,6 +225,16 @@ class SMessage(models.Model):
         if not self.unread:
             self.unread = True
             self.save()
+    def receipient_details(self):
+        user = None
+        if self.to == 'user':
+            user = User.objects.get(pk=self.sent_to)
+        if self.to == 'customer':
+            user = Customer.objects.get(pk=self.sent_to)
+        if self.to == 'supplier':
+            user = Supplier.objects.get(pk=self.sent_to)
+        return user
+
 
 # 'NOTIFY_USE_JSONFIELD' is for backward compatibility
 # As app name is 'notifications', let's use 'NOTIFICATIONS' consistently from now

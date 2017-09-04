@@ -53,7 +53,7 @@
   </head>
 
   <body class="{% block body_class %}{% endblock %} navbar-top">
- <div class='content-area'>
+ <div class='content-area '>
   <!-- Main navbar -->
   <div class="navbar navbar-inverse navbar-fixed-top bg-primary-600" >
     <div class="navbar-header" style="padding-right: : 30px;">
@@ -99,7 +99,7 @@
           <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 
-          {% if request.user.name %}{{ request.user.name }} {% else %} {{ request.user.email }}{% endif %}<span class="caret"></span></a>
+          {% if request.user.name %}{{ request.user.name|title }} {% else %} {{ request.user.email }}{% endif %}<span class="caret"></span></a>
           <ul class="dropdown-menu">
              <li>
                 <a href="{% url 'dashboard:user-detail' pk=user.id %}">
@@ -335,6 +335,12 @@
                     Cash movement
                     </a>
                     </li>
+                     <li class="{% block menu_paymentoptions_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:payments-list' %}">
+                    <i class="icon-cash4"></i>
+                    Payment Options
+                    </a>
+                    </li>
                   </ul>
                 </li>
                   {% endif %}
@@ -374,6 +380,26 @@
                           <a href="{% url 'dashboard:sales_list' %}"><i class='icon-cash3'></i>Sales</a>
                         </li>
                       {% endif %}
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_margin_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Margin</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_margin2_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin2</a>
+                        </li>
+                      {% endif %}
+                      {#{% if perms.reports.view_sales_reports %}#}
+                        <!--<li class="{% block menu_report_tax_class %}{% endblock %}">-->
+                          <!--<a href="{% url 'dashboard:sales_tax' %}"><i class='icon-cash2'></i>Sales Tax</a>-->
+                        <!--</li>-->
+                      {#{% endif %}#}
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_tax2_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_tax_list' %}"><i class='icon-cash2'></i>Sales Tax</a>
+                        </li>
+                      {% endif %}
                       {% if perms.reports.view_products_reports %}
                         <li class="{% block menu_product_report_class %}{% endblock %}">
                           <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
@@ -387,13 +413,13 @@
 
 
 
-                   {% if perms.product.view_producttax %}
-                        <li class="{% block menu_tax_list %}{% endblock %}">
-                            <a href="{% url 'dashboard:tax-list' %}">
-                            <i class="icon-drawer-out"></i>Tax
-                            </a>
-                        </li>
-                   {% endif %}
+                   {#{% if perms.product.view_producttax %}#}
+                        <!--<li class="{% block menu_tax_list %}{% endblock %}">-->
+                            <!--<a href="{% url 'dashboard:tax-list' %}">-->
+                            <!--<i class="icon-drawer-out"></i>Tax-->
+                            <!--</a>-->
+                        <!--</li>-->
+                   {#{% endif %}#}
                    {% if perms.reports.view_balancesheet %}
                         <li class="{% block menu_balancesheet_report_class %}{% endblock %}" style="display:none;">
                              <a href="{% url 'dashboard:balancesheet_reports' %}"><i class='icon-book'></i>Balance Sheet</a>
@@ -474,7 +500,7 @@
     <div id="base-modal" class="modal"></div>
     <div id="base-modal-fixed" class="modal modal-fixed-footer"></div>
     <!-- Core JS files -->
-  
+
   <script type="text/javascript" src="{% static 'backend/js/core/libraries/bootstrap.min.js' %}"></script>
   <!-- /core JS files -->
    <script src="{% static 'backend/js/plugins/ui/jquery-validation/jquery.validate.js' %} "></script>
@@ -557,7 +583,7 @@
   $(document).ready(function(){
     setInterval(function(){ getNotification().done(function (data) {
        $(".status-mark22").text(data);
-    }) }, 20000);  
+    }) }, 9920000);  
     
   });
 

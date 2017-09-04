@@ -2,6 +2,7 @@
 {% load product_first_image from product_images %}
 {% load i18n %}
 {% load prices_i18n %}
+{% load humanize %}
 {% for product in product_results %}
     <tr data-title=" {{ product.name }} " class="clickable-row">
       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">#{{ product.id }}</td>
@@ -20,7 +21,7 @@
         {% endwith %}
       </td>
       <!-- price -->
-      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> {% gross product.price html=True %}</td>
+        <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> <span class="pull-right">{% gross product.price html=True %}</span></td>
       <!-- variants -->
       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
 

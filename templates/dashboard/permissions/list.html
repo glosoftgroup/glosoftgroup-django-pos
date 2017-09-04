@@ -328,6 +328,7 @@
             <!-- end inventory -->
             <!-- user -->
             <div class="row">
+                <div class="col-md-12">
                  <div class="col-md-12">
                  <h5>User Management</h5>
                  </div>
@@ -399,13 +400,32 @@
                         {% endfor %}
                     </div>
                   </div>
+                </div>
             </div>
             <div class="row">
-              <div class="col-md-3">
+              <div class="col-md-6">
                   <div class="col-md-12">
                       <h5>Drawer Cash</h5>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="display-block text-semibold">DrawerCash</label>
+                      {% for permission in permissions %}
+                       {% if permission.content_type.model ==  'drawercash' %}
+                          <div class="checkbox">
+                            <label>
+                              <input class="styled check" type="checkbox" value="{{permission.id}}">
+                              {{permission.name}}
+                            </label>
+                            <span id="granted" class="granted text-success"></span>
+                          </div>
+                        {% else %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
                     <div class="form-group">
                       <label class="display-block text-semibold">Terminal</label>
                       {% for permission in permissions %}

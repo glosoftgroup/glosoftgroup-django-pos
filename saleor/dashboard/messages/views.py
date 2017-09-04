@@ -1,4 +1,8 @@
 import emailit.api
+from django.conf import settings
+from africastalking.AfricasTalkingGateway import (
+        AfricasTalkingGateway, 
+        AfricasTalkingGatewayException)
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
@@ -20,6 +24,7 @@ from ...customer.models import Customer
 from ...smessages.signals import sms as notify
 from ...smessages.models import SMessage as Notification, SmsTemplate
 from ...product.models import Product
+from ...site.models import SiteSettings
 
 
 @staff_member_required
@@ -53,23 +58,35 @@ def add_template(request):
 def list_messages(request,status=None):
     # read users messages
     mark_read = True
+    title = 'Inbox'
     delete_permanently = False
     if status == 'trash':
         delete_permanently = True
+        title = 'Trashed'
         messages = Notification.objects.deleted()
     elif status == 'unread':
+        title = 'Unread '
         messages = Notification.objects.unread()
     elif status == 'read':
+        title = 'Read'
         messages = Notification.objects.read()
-    elif status == 'emailed':
+    elif status == 'sent_to_sms':
+        title = 'Sent'
         mark_read = False
-        messages = Notification.objects.filter(actor_object_id=request.user.id,emailed=True)
+        print request.user.mobile
+        messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=True)
+    elif status == 'pending':
+        title = 'Pending'
+        mark_read = False
+        messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=False)
+    
     elif status == 'sent':
         mark_read = False
         messages = Notification.objects.filter(actor_object_id=request.user.id)
     else:
-        messages = Notification.objects.active()
+        messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
     ctx = {
+        'title':title,
         'delete_permanently': delete_permanently,
         'mark_read': mark_read,
         'status': status,
@@ -145,15 +162,25 @@ def read(request, pk=None):
 @staff_member_required
 def write(request):
     if request.method == 'POST':
-        # get form data
-        single = request.POST.get('single');
+        # get form data        
         subject = request.POST.get('subject')
-        to_customers = request.POST.get('toCustomers',0)
-        to_suppliers = request.POST.get('toSuppliers',0)
-        user_contacts = json.loads(request.POST.get('userContacts'))
+        if request.POST.get('toCustomers'):
+            to_customers = json.loads(request.POST.get('toCustomers'))
+        else:
+            to_customers = None
+        if request.POST.get('toSuppliers'):
+            to_suppliers = json.loads(request.POST.get('toSuppliers'))
+        else:
+            to_suppliers = None
+        if request.POST.get('userContacts'):
+            user_contacts = json.loads(request.POST.get('userContacts'))
+        else:
+            user_contacts = None            
         body = request.POST.get('body')
 
-        if single:
+        if request.POST.get('single'):
+            single = request.POST.get('single')
+            print('to single')
             user = Supplier.objects(mobile=single)
             if user:
                 notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
@@ -162,24 +189,29 @@ def write(request):
                 notif = Notification(to='anonymous', actor=request.user, recipient=request.user, sent_to=single, verb=subject, description=body)
                 notif.save()
         
-        if user_contacts and user_contacts is not 'null':
+        if user_contacts and user_contacts is not 'null':            
+            to = []
             for mobile in user_contacts:
-                user = User.objects.get(mobile=mobile)
-                #notify.send(request.user, sent_to=user, verb=subject, description=body)
-                notif = Notification(to='user', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
-                notif.save()
-        if not to_customers:
+                to.append(mobile.replace('(','').replace(')','').replace('-',''))
+            to_csv = ",".join(to)                                               
+            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='user')                    
+            print sms_response
+        if  to_customers:
+            print('to customers')
+            to = []
             for mobile in to_customers:
-                user = Customer.objects.get(mobile=mobile)
-                #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
-                notif = Notification(to='customer', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
-                notif.save()
-        if not to_customers:
+                to.append(mobile.replace('(','').replace(')','').replace('-',''))
+            to_csv = ",".join(to)                                               
+            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='customer')                    
+            
+        if to_suppliers:
+            print('to suppliers')
+            to = []
             for mobile in to_suppliers:
-                user = Supplier.objects.get(mobile=mobile)
-                #notify.send(request.user, sent_to=user.id, verb=subject, description=body)
-                notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
-                notif.save()
+                to.append(mobile.replace('(','').replace(')','').replace('-',''))
+            to_csv = ",".join(to)                                               
+            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='supplier')                    
+            print sms_response
     ctx = {'users':User.objects.all().order_by('-id'),
            'templates':SmsTemplate.objects.all().order_by('-id')}
     
@@ -226,7 +258,7 @@ def write_single(request):
                             'dashboard/messages/write.html',
                             ctx)
 
-
+@staff_member_required
 def contacts(request):
     search = request.GET.get('search')
     group = request.GET.get('group')
@@ -258,3 +290,72 @@ def contacts(request):
         contact={'text':user.name,'value': user.mobile}
         l.append(contact)
     return HttpResponse(json.dumps(l), content_type='application/json')
+
+def sendSms(to,message,subject,actor,tag='user'):
+    # Specify your login credentials
+    site = SiteSettings.objects.get(pk=1)
+    username = site.sms_gateway_username #"MyAfricasTalkingUsername"
+    apikey   = site.sms_gateway_apikey #"MyAfricasTalkingAPIKey"
+    if username == "pkinuthia10@gmail.com":
+        username = 'sandbox'    
+    gateway = AfricasTalkingGateway(username, str(apikey), "sandbox")
+    report = []
+    try:
+        # Thats it, hit send and we'll take care of the rest.        
+        results = gateway.sendMessage(to, message)        
+        for recipient in results:
+            # status is either "Success" or "error message"
+            report.append({
+                'number':recipient['number'],
+                'status':recipient['status']
+                })
+            print 'number=%s;status=%s;messageId=%s;cost=%s' % (recipient['number'],
+                                                                recipient['status'],
+                                                                recipient['messageId'],
+                                                                recipient['cost'])
+
+            
+            send_notification(recipient['number'],actor,tag,message,subject,recipient['status'])
+    except AfricasTalkingGatewayException, e:
+        print 'Encountered an error while sending: %s' % str(e)
+        return None
+
+def send_notification(number=None,actor=None,tag='user',body=None,subject=None,status=None):
+    if not number or not actor or not body or not subject:
+        return False
+    user = None
+    if tag == 'user':
+        user = User.objects.get(mobile=number.decode('utf-8'))
+    if tag == 'customer':
+        print number
+        user = Customer.objects.get(mobile=number.decode('utf-8'))
+    if tag == 'supplier':
+        user = Supplier.objects.get(mobile=number.decode('utf-8'))
+    if status == 'Success':
+        notif = Notification.objects.create(
+                            to=tag, 
+                            actor=actor, 
+                            recipient=actor, 
+                            sent_to=user.id,  
+                            verb=subject,
+                            from_number=actor.mobile,
+                            to_number=user.mobile,
+                            sent=True, 
+                            description=body,
+                            status=status)
+        print notif.status                    
+    else:
+        notif = Notification.objects.create(
+                            to=tag, 
+                            actor=actor,
+                            recipient=actor,
+                            sent_to=user.id, 
+                            from_number=actor.mobile,
+                            to_number=user.mobile,
+                            verb=subject, 
+                            description=body,
+                            status=status)
+        print notif.status
+    print 'message saved on db'
+    #print status
+        

@@ -6,9 +6,11 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from ...payment.models import MpesaPayment
+from ...sale.models import PaymentOption
 from .serializers import (
      MpesaPaymentListSerializer,
-     MpesaPaymentUpdateSerializer  
+     MpesaPaymentUpdateSerializer,
+     PaymentOptionListSerializer
      )
 from rest_framework import generics
 
@@ -19,9 +21,6 @@ class MpesaPaymentUpdateAPIView(generics.RetrieveUpdateAPIView):
 class MpesaPaymentDetailAPIView(generics.RetrieveAPIView):
     queryset = MpesaPayment.objects.all()
     serializer_class = MpesaPaymentListSerializer
-
-
-
 
 class MpesaPaymentListAPIView(generics.ListAPIView):       
     pagination_class = PostLimitOffsetPagination
@@ -40,3 +39,8 @@ class MpesaPaymentListAPIView(generics.ListAPIView):
                 Q(status=1)               
                 ).order_by('-id').distinct()
         return queryset_list
+
+
+class PaymentOptionsListAPIView(generics.ListAPIView):
+    serializer_class = PaymentOptionListSerializer
+    queryset = PaymentOption.objects.all()

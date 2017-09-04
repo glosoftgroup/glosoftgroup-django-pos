@@ -7,10 +7,7 @@
 {% load attributes %}
 {% for item in stock_items %}
 <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
-  <td class="bulk-checkbox ignore-link">
-    <input name="items" type="checkbox" id="{{ item.id }}" class="filled-in switch-actions switch-stock" value="{{ item.id }}">
-    <label for="{{ item.id }}"></label>
-  </td>
+  <td>{{ item.variant.display_product }}</td>
   <td>
     {{ item.variant.sku }}                    
   </td>
@@ -35,22 +32,25 @@
     {{ item.quantity_allocated }}
   </td>
   <td>
-    <a href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me">Edit</i></a>
-  </td>
+                  <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu edit-dropdown">   
+                        <li><a href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                       
+                        <li>
+                          <a data-ta="#modal_delete_instance" data-title="Delete {{item.name}}?" data-href="{% url 'dashboard:single-stock-delete' product_pk=product.pk stock_pk=item.pk %}" data-tabname='?tab=stock'
+                         data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ item.name }}" data-id="{{ item.pk }}"
+                       class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
+                       </a>
+                        </li>
+                       
+                        </ul>
+                    </div>
+                    
+                  </td>
 </tr>
 {% endfor %}
-<script type="text/javascript">
-	$('.switch-actions').on('change', function() {
-    console.log('u clicked a check box');
-  let $btnChecked = $(this).parents('form').find('.btn-show-when-checked');
-  let $btnUnchecked = $(this).parents('form').find('.btn-show-when-unchecked');
-  if ($(this).parents('form').find('.switch-actions:checked').length) {
-    $btnChecked.show();
-    $btnUnchecked.hide();
-  } else {
-    $btnUnchecked.show();
-    $btnChecked.hide();
-  }
-});
-</script>
+<script type="text/javascript" src="{% static 'backend/js/deleteModal.js' %}"></script>
 {% endif %}

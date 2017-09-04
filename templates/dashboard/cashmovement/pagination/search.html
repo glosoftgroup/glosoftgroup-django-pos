@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load prices_i18n %}
+{% load humanize %}
 {% load materializecss %}
 {% load staticfiles %}
       <!-- Header and footer fixed -->
@@ -16,7 +17,7 @@
                         <th>Cashier</th>
                         <th>Supervisor</th>
                         <th>Type</th>
-                        <th>Amount</th>
+                        <th>Amount (KShs)</th>
                         <th>Transaction date</th>
                   </tr>
                 </thead>
@@ -33,7 +34,7 @@
                         </td>
                         <td>{{transaction.manager}} </td>
                         <td>{{transaction.trans_type}}</td>
-                         <td>{{transaction.amount}}</td>
+                          <td><span class="pull-right">{{transaction.amount|intcomma}}</span></td>
                          <td>{{ transaction.created}}</td>
 
                       </tr>

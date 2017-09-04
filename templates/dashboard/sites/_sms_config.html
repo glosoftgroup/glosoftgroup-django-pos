@@ -1,0 +1,30 @@
+{% load i18n %}
+<div class="row">
+      <div class="panel-body">
+        <form method="post" id="product-settings" enctype="multipart/form-data" novalidate>
+          <div class="ard-content-form">
+            {% csrf_token %}
+            <div class="col-md-12">
+             <h5 style="border-bottom:1px solid #626862;display:inline-block;margin-bottom:20px;" class="text-bold"> SMS gateway login credentials</h5>        
+            </div>
+             <div class="col-md-4">
+                <div class="form-group">
+                  <label>Username</label>
+                  <input type="text" placeholder="Username" class="form-control" value="{{site.sms_gateway_username}}" id="api_username" name="re_order">
+                </div>                
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>API key</label>
+                  <input type="text" placeholder="API Key" class="form-control" value="{{site.sms_gateway_apikey}}" id="api_key" name="api_key">
+                </div>               
+             </div> 
+             <div class="col-md-2 text-left" style="margin-top: 25px;">            
+              <button  type="submit"  id="sms_api_btn" class="btn  btn-primary waves-effect waves-light" onclick="return false;">
+                Create
+              </button>
+            </div>      
+          </div>          
+        </form>
+      </div>
+    </div>

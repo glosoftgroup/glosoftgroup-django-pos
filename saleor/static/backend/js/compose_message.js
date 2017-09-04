@@ -18,8 +18,13 @@ $(function() {
 	var body = $('#body');
 	var customerCount = $('#customerCount');
 	var supplierCount = $('#supplierCount');
+    var sendspinnerId = $('#sendspinner');
 
 // customer contacts
+getCustomer.on('tokenize:select', function(container){
+  $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
+});
+
 getCustomer.tokenize2({
     placeholder: 'Select customer(s)',
     dataSource: function(search, object){
@@ -37,6 +42,10 @@ getCustomer.tokenize2({
     }
 });
 // supplier contacts
+getSupplier.on('tokenize:select', function(container){
+  $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
+});
+
 getSupplier.tokenize2({
     placeholder: 'Select supplier(s)',
     dataSource: function(search, object){
@@ -55,6 +64,9 @@ getSupplier.tokenize2({
 });
 
 // user contacts
+userContacts.on('tokenize:select', function(container){
+  $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
+});
 userContacts.tokenize2({
     placeholder: 'Select user(s)',
     sortable: true,
@@ -89,14 +101,7 @@ function alertUser(msg,status,header='Well done!')
 }
 
 // ajax
-function sendNotification(userContacts,subject,body,toCustomers,toSuppliers) {
-    var dynamicData = {};    
-    dynamicData["userContacts"] = JSON.stringify(userContacts);
-    dynamicData["subject"] = subject;
-    dynamicData["body"] = body;
-    dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
-    dynamicData['toCustomers']= JSON.stringify(toCustomers);
-    dynamicData['toSuppliers']= JSON.stringify(toSuppliers);
+function sendNotification(dynamicData) {    
     return $.ajax({
       url: composeUrl,
       type: "post",
@@ -111,6 +116,7 @@ sendSms.on('click',function(){
     var ccontacts = getCustomer.val();    
     var what = body.val();
     var verb = subject.val();
+    var dynamicData = {}; 
     if(!verb)
     { 
         alertUser('Message Subject required','bg-danger','Error!');
@@ -118,18 +124,36 @@ sendSms.on('click',function(){
         subject.focus();
     }
     if(!what){ alertUser('Message Body required','bg-danger','Empty Body!'); return false;}
-    if(!ccontacts){ ccontacts = false; }
-    if(!scontacts){ scontacts = false; } 
+    if(ccontacts){ 
+     dynamicData['toCustomers']= JSON.stringify(ccontacts);
+    }
+    if(scontacts){
+     dynamicData['toSuppliers']= JSON.stringify(scontacts);
+    } 
     if(!scontacts && !ccontacts && !ucontacts)
     {
         alertUser('Enter at least one contacts!','bg-danger','Error!');
         return false;
     }
-    sendNotification(ucontacts,verb,what,ccontacts,scontacts).done(function(data) {
+
+    sendspinnerId.removeClass('icon-checkmark3');
+    sendspinnerId.addClass('icon-spinner').addClass('spinner');       
+    dynamicData["userContacts"] = JSON.stringify(ucontacts);
+    dynamicData["subject"] = verb;
+    dynamicData["body"] = what;
+    dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();    
+    
+    sendNotification(dynamicData)
+    .done(function(data) {
         $.jGrowl('Notification sent successfully', 
         {header: 'Well done!',theme: 'bg-success'});
+        window.location.href = redirectUrl;
+    })
+    .fail(function(){
+    sendspinnerId.addClass('icon-checkmark3');
+    sendspinnerId.removeClass('icon-spinner').removeClass('spinner');
     });
-    window.location.href = redirectUrl;
+    
 });
 // ./ event click send button
 });

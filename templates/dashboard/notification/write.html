@@ -25,8 +25,9 @@
 {% endblock %}
 
 {% block custom_css %}
-<link href="{% static 'backend/js/plugins/fastselect/fastselect.min.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
+
 {% block content %}
 <div id="write-message"></div>
 <div class="container-detached">
@@ -47,7 +48,7 @@
 
         <div class="navbar-collapse collapse" id="inbox-toolbar-toggle-single">
             <div class="btn-group navbar-btn">
-                <button type="button" id="sendnot" class="btn bg-blue"><i class="icon-checkmark3 position-left"></i> Send mail</button>
+                <button type="button" id="sendnot" class="btn bg-blue hvr-glow "><i class="icon-checkmark3 position-left" id="sendspinner"></i> Send mail</button>
             </div>
 
             <div class="btn-group navbar-btn">
@@ -79,7 +80,8 @@
                 {% if product.product_supplier %}
                     <input type="text" value="{{product.product_supplier.email}}" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead">
                 {% else %}
-                    <input type="text" value="" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead">
+                    <select name='useremails' multiple="multiple" id="useremails" class="useremails"></select>
+                   <!--  <input type="text" value="" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead"> -->
                 {% endif %}
                     
                
@@ -124,9 +126,9 @@
 
 
 <!-- Mail container -->
-<div class="mail-container-write">
+<div class="mail-container-write" style="z-index: -12345;">
     <div >
-        <textarea cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ...">
+        <textarea style="z-index: -12345;" cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ...">
         {% if product %}
              <h5 align="left" class="text-uppercase text-semibold">
                  Invoice#
@@ -152,7 +154,8 @@
     </div>
 </div>
 
-
+<!-- page urls -->
+<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:notification-emails' %}" data-aurl="{% url 'dashboard:get-sms-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-redirecturl="{% url 'dashboard:message_list_slug' status='sent' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
 
 {% endblock %}
 {% block custom_js %}
@@ -162,73 +165,10 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/parsers.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/locales/bootstrap-wysihtml5.ua-UA.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/editor_wysihtml5.js' %}"></script>
-
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/tags/tagsinput.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/tags/tokenfield.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/prism.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
-
-
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
 <script>
-var emails = [
-    {% for user in users %}
-    '{{user.email}}',
-    {% endfor %}
-    ];
-$(document).ready(function(){
-     // Data
-     
 
-    //
-    // Typeahead implementation
-    //
-
-    // Matcher
-    var substringMatcher = function(strs) {
-        return function findMatches(q, cb) {
-            var matches, substringRegex;
-
-            // an array that will be populated with substring matches
-            matches = [];
-
-            // regex used to determine if a string contains the substring `q`
-            substrRegex = new RegExp(q, 'i');
-
-            // iterate through the pool of strings and for any string that
-            // contains the substring `q`, add it to the `matches` array
-            $.each(strs, function(i, str) {
-                if (substrRegex.test(str)) {
-
-                    // the typeahead jQuery plugin expects suggestions to a
-                    // JavaScript object, refer to typeahead docs for more info
-                    matches.push({ value: str });
-                }
-            });
-            cb(matches);
-        };
-    };
-    // Attach typeahead
-    $('.tagsinput-typeahead').tagsinput('input').typeahead(
-        {
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-            name: 'emails',
-            displayKey: 'value',
-            source: substringMatcher(emails)
-        }
-    ).bind('typeahead:selected', $.proxy(function (obj, datum) {  
-        this.tagsinput('add', datum.value);
-        this.tagsinput('input').typeahead('val', '');
-    }, $('.tagsinput-typeahead')));
-});
-
-var selector1 = $('.tagsinput-typeahead');
-selector1.on('change',function(){
-    console.log(selector1.val());
-});
+   
 
 // ajax
 function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
@@ -253,11 +193,38 @@ function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
 
 var sendnot = $('#sendnot');
 var subject = $('#subject');
-var body = $('#body');
+var body    = $('#body');
 var supplier = $('#supplier');
 var customers = $('#customers');
 var toSuppliers = 0;
 var toCustomers = 0;
+var userEmails = $('#useremails');
+var pageUrls   = $('.pageUrls');
+var url = pageUrls.data('contacts');
+var sendspinnerId = $('#sendspinner');
+// tokenize
+userEmails.on('tokenize:select', function(container){
+  $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
+});
+// user contacts
+userEmails.tokenize2({
+    placeholder: 'Select user(s)',
+    sortable: true,
+    dataSource: function(search, object){
+        $.ajax(url, {
+            data: { search: search, start: 1, group:'users' },
+            dataType: 'json',
+            success: function(data){
+                var $items = [];
+                $.each(data, function(k, v){
+                    $items.push(v);
+                });
+                object.trigger('tokenize:dropdown:fill', [$items]);
+            }
+        });
+    }
+});
+// ./tokenize
 function updateCheckedBoxes()
 {
    if(supplier.is(":checked"))
@@ -271,16 +238,15 @@ function updateCheckedBoxes()
         toCustomers = 1;
     }else{ toCustomers = 0;} 
 }
+
 sendnot.on('click',function(){
     updateCheckedBoxes();
     // return false;
+
     var subjectString = subject.val();
     var bodyText = body.val();
     var json = [];
-    var to = selector1.val();
-    var toSplit = to.split(",");
-
-     
+    var to = userEmails.val();
     // validate
     if(!to){
         if(1==parseInt(toSuppliers))
@@ -293,26 +259,14 @@ sendnot.on('click',function(){
           console.log('customer set');
           //return true;  
         }
-        else{
-          
+        else{          
           {% if product.product_supplier %}
            toSplit = '{{product.product_supplier.email}}'
           {% else %}
           alert('Enter atleast one email!');
           return false;  
           {% endif %}
-        } 
-        
-    }else{
-        for (var i = 0; i < toSplit.length; i++) 
-        {
-            if( emails.indexOf(toSplit[i]) > -1 ) {
-                console.log("success");
-                json.push({"email":toSplit[i]});
-                
-            }            
-       
-        }
+        }         
     }
     if(!subjectString){
         alert('subject required');
@@ -321,14 +275,15 @@ sendnot.on('click',function(){
     if(!bodyText){
         alert('Message body required');
         return false;
-    }
-    
+    } 
     
 
     //console.log(json);
-    // send Notifications
-    sendNotification(json,subjectString,bodyText,toCustomers,toSuppliers).done(function(data) {    
-     $(".tagsinput-typeahead").val('');
+    // send Notifications    
+    sendspinnerId.removeClass('icon-checkmark3');
+    sendspinnerId.addClass('icon-spinner').addClass('spinner');
+    
+    sendNotification(to,subjectString,bodyText,toCustomers,toSuppliers).done(function(data) {     
      body.val('');
      subject.val('');
      $.jGrowl('Notification sent successfully', {
@@ -336,6 +291,11 @@ sendnot.on('click',function(){
                           theme: 'bg-success'
                        });
      window.location.href = "{% url 'dashboard:notification_list_slug' 'sent' %}";
+    }).fail(function(){
+        //icon-spinner  spinner icon-checkmark3
+    sendspinnerId.addClass('icon-checkmark3');
+    sendspinnerId.removeClass('icon-spinner').removeClass('spinner');
+    
     });
     // ./send Notifications
 });

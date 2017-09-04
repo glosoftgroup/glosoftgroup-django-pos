@@ -124,6 +124,8 @@ urlpatterns = [
         (views.stock_bulk_delete), name='stock-bulk-delete'),
     url(r'^add_stock_ajax/$',
         views.add_stock_ajax,name='add_stock_ajax'),
+    url(r'^(?P<product_pk>[0-9]+)/delete/single/stock/(?P<stock_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariants', login_url='not_found')
+        (views.single_stock_delete), name='single-stock-delete'),
     url(r'^re_order/$',
         views.re_order,name='re_order'),
     url(r'^re_order/pagination/$',

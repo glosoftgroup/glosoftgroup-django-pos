@@ -60,11 +60,18 @@ def view(request):
 				opening = lastEntry.opening
 				added = lastEntry.added
 				closing = lastEntry.closing
+				expenses = Expenses.objects.filter(added_on__icontains=td).aggregate(Sum('amount'))['amount__sum']
+
+				print expenses
 			else:
 				new_opening = lastEntry.closing
 				new_balance = lastEntry.closing
 				added = 0
 				new_petty_cash = PettyCash(opening=new_opening, added=added, closing=new_balance)
+				try:
+					expenses = Expenses.objects.filter(added_on__icontains=td).aggregate(Sum('amount'))['amount__sum']
+				except:
+					expenses = 0
 				new_petty_cash.save()
 
 				date = new_petty_cash.created
@@ -79,13 +86,15 @@ def view(request):
 			opening = 0
 			added = 0
 			closing = 0
+			expenses = 0
 
 		data = {
 			'pdate':date,
 			'opening_amount': opening,
 			'added_amount': added,
 			'closing_amount': closing,
-			'amount': amount
+			'amount': amount,
+			'expenses':expenses
 		}
 
 		return TemplateResponse(request, 'dashboard/accounts/petty_cash/view.html', data)
@@ -149,15 +158,22 @@ def expenditure(request):
 		else:
 			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
-		pettyCash = PettyCash.objects.filter(created__icontains=date)
+		# pettyCash = PettyCash.objects.filter(created__icontains=date)
+		pettyCash = dateFactorial(date)
 		lastEntry = pettyCash.latest('id')
 
 		pd = DateFormat(lastEntry.created).format('Y-m-d')
 		td = DateFormat(datetime.datetime.today()).format('Y-m-d')
 		if td == pd:
+
 			dateToday = 1
+			expenses = Expenses.objects.filter(added_on__icontains=pd).aggregate(Sum('amount'))['amount__sum']
 		else:
 			dateToday = 0
+			try:
+				expenses = Expenses.objects.filter(added_on__icontains=pd).aggregate(Sum('amount'))['amount__sum']
+			except:
+				expenses = 0
 
 		date = lastEntry.created
 		amount = lastEntry.closing
@@ -170,8 +186,29 @@ def expenditure(request):
 			'added_amount': added,
 			'closing_amount': closing,
 			'amount': amount,
-			'dateToday':dateToday
+			'dateToday':dateToday,
+			'expenses':expenses
 		}
 		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html', data)
-	except Exception, e:
-		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html',{})
+	except BaseException:
+		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html', {})
+
+
+def dateFactorial(date):
+	date = str(date)
+	enteredDate = DateFormat(datetime.datetime.strptime(date, '%Y-%m-%d')).format('Y-m-d')
+	firstDateEntry = DateFormat(PettyCash.objects.all().first().created).format('Y-m-d')
+	if enteredDate < firstDateEntry:
+		raise BaseException
+	elif enteredDate == firstDateEntry:
+		return PettyCash.objects.filter(created__icontains=firstDateEntry)
+	else:
+		try:
+			query = PettyCash.objects.filter(created__icontains=enteredDate)
+			if query.exists():
+				return query
+			else:
+				raise ObjectDoesNotExist
+		except ObjectDoesNotExist:
+			return dateFactorial(DateFormat(datetime.datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)).format('Y-m-d'))
+

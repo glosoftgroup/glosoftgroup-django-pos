@@ -1,3 +1,4 @@
+{% load humanize %}
 {% if amount %}
 <div class="panel border-left-lg border-left-warning invoice-grid timeline-content">
   <div class="panel-body">
@@ -6,11 +7,12 @@
           <div class="row">
               <div class="col-md-12">
                   <p class="text-semibold text-center">
-                      {{pdate|date:'jS F Y'}}
+                      {#{{pdate|date:'jS F Y'}}#}
+                      {{pdate}}
                   </p>
                   <p class="text-semibold no-margin-top">Opening Cash: KShs. {{opening_amount}}</p>
                   <p class="text-semibold no-margin-top">Cash Added: KShs. {{added_amount}} </p>
-
+                  <p class="text-semibold no-margin-top">Expenses Incurred: KShs. {% if expenses %}{{expenses|intcomma }}{% else %} 0.00{% endif %} </p>
                   <p class="text-semibold no-margin-top">
                       {% if dateToday == 0 %}
                         Closing Balance:

@@ -25,6 +25,12 @@ class SiteSettings(models.Model):
         auto_now=False, null=True, blank=True)
     closing_time = models.TimeField(pgettext_lazy('Site field', 'closing time'),
         auto_now=False, null=True, blank=True)
+    sms_gateway_username = models.CharField(
+        pgettext_lazy('Site field', 'sms gateway username'), max_length=500,
+        blank=True)
+    sms_gateway_apikey = models.CharField(
+        pgettext_lazy('Site field', 'sms gateway api key'), max_length=500,
+        blank=True)
     def __str__(self):
         return self.name
 
@@ -76,3 +82,9 @@ class UserRole(models.Model):
 
 	def __str__(self):
 		return str(self.name)
+
+class Files(models.Model):
+    file = models.TextField(null=True, blank=True)
+    check = models.CharField(max_length=256, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)

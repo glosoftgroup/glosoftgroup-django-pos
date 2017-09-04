@@ -1,0 +1,280 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load humanize %}
+
+{% block title %}
+  Sales Margin Report
+{% endblock %}
+{% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:sales_margin' %}">Sales Margin</a></li>
+ {% endblock %}
+
+{% block menu_report_margin_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+    .b-details{padding:0px 10px;}
+    .blist{
+      list-style: none;
+    }
+    .blist li{font-size: 1.1em;}
+    .hs{border-bottom: 2px solid #ddd;}
+    .total-text{padding-left:50px;}
+    .total-amount{border-top:1px solid #ddd;border-bottom: 1px solid #ddd;}
+    .total-b-texts{}
+    .total-b-amount{border-bottom:2px solid #999;}
+    .totals{margin-top: 10px;}
+    .address-block{font-size: 1.1em}
+    .rangeDates{display:none;}
+  </style>
+ {% endblock %}
+
+{% block content %}
+
+<div class="row animated fadeIn">
+       <div class="col-md-12">
+      <div class="panel panel-flat">
+
+        <div class="panel-body search-panel">
+            <div class="col-md-12">
+            <div class="col-md-4">
+              <label>pick a date</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control daterange-single" type="text" placeholder="yyyy-mm-dd">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+             <label style="visibility:hidden;">Export</label>
+              <button class="btn btn-primary btn-block rangeBtn">DATE RANGE SEARCH</button>
+            </div>
+        </div>
+            <div class="col-md-12 rangeDates">
+                <div class="col-md-3">
+              <label>From</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control dateFrom" type="text" placeholder="From:">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+             <label>To</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control dateTo" type="text" placeholder="To:">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label style="visibility:hidden;">Export</label>
+              <button class="btn btn-primary btn-block btnRangeSearch">SEARCH</button>
+            </div>
+            </div>
+      </div>
+   </div>
+   </div>
+
+
+
+{% if status == 'true' %}
+<div id="pagination-div">
+<div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-body" id="reportBody">
+        <div class="row" style="margin-top:0px; padding-top: 0px;">
+            <div class="col-md-4 col-md-offset-4" style="margin-top:0px; padding-top: 0px;">
+              <img src="{% static 'backend/images/cp-logo2.jpg' %}" class="img-responsive center-block" style="height: 100px;width: auto; ">
+               <p class="text-center address-block">
+                Company Name.<br />
+                P.O Box 23333-00100, Nairobi, Kenya<br />
+                Sales Margin<br/>
+                As at: {{date}}
+               </p>
+            </div>
+        </div>
+            <div class="row">
+             <div class="col-md-10 col-md-offset-1">
+              <div class="col-md-6">
+                 <h3 class="text-centers hs">Gross Margin</h3>
+                 <div class="b-details">
+                   <h5>Margin</h5>
+                   <p>
+                     <ul class="blist">
+                       <li>Total Sales<span class="pull-right"> {{totalSales|intcomma }}</span></li>
+                       <li>Total Costs(purchases) <span class="pull-right"> {{totalCostPrice|intcomma }}</span></li>
+                     </ul>
+                     <p><span class="total-text">Gross Profit</span> <span class="pull-right total-amount">Kshs {{grossProfit}}</span></p>
+                   </p>
+                 </div>
+              </div>
+              <div class="col-md-6">
+                 <h3 class="text-centers hs">Markup</h3>
+                 <div class="b-details">
+                   <h5>Net Profit</h5>
+                   <p>
+                     <ul class="blist">
+                       <li>Total Sales <span class="pull-right"> {{totalSales|intcomma }}</span></li>
+                       <li>Total Costs(Purchases) <span class="pull-right"> {{totalCostPrice|intcomma }}</span></li>
+                     </ul>
+                     <p><span class="total-text">Gross Profit</span> <span class="pull-right total-amount">Kshs {{grossProfit|intcomma }}</span></p>
+                   </p>
+                 </div>
+              </div>
+              <div class="col-md-12 totals">
+                <div class="col-md-6">
+                  <div class="b-details">
+                  <p><span class="total-b-texts">Profit Margin</span> <span class="pull-right total-b-amount">{{margin|intcomma }}%</span></p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="b-details">
+                  <p><span class="total-b-texts">Percentage Markup</span> <span class="total-b-amount pull-right">{{markup|intcomma }}%</span></p>
+                  </div>
+                </div>
+              </div>
+             </div>
+            </div>
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                  <p class="text-center" style="margin: 20px 0px;"> Thank you for partnering with us.<br />
+                  <span>Report Pulled By: {% if puller.name %}
+                        {{ puller.name | upper }}
+                     {% else %}
+                        {{ puller.email | upper }}
+                     {% endif %}</span></p>
+
+              </div>
+             </div>
+            </div>
+
+
+    </div>
+  </div>
+</div>
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-info">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+          No Sales Margin report available momas
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}
+
+</div>
+
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dist/dom-to-image.min.js' %}"></script>
+<script type="text/javascript">
+$('.rangeBtn').on('click', function(){
+  $('.rangeDates').slideToggle();
+})
+    // Show calendars on left
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true,
+        autoUpdateInput:false
+    }, function(chosen_date) {
+        $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
+        var date2 = chosen_date.format('DD-MM-YYYY')
+        var date = $('.daterange-single').val();
+        $.get("{% url 'dashboard:sales_margin' %}",{ajax:'ajax',date:date, date2:date2}, function(data){
+           $('#pagination-div').html(data);
+        });
+    });
+
+    $('.dateFrom').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true,
+        autoUpdateInput:false
+    }, function(chosen_date) {
+        $('.dateFrom').val(chosen_date.format('YYYY-MM-DD'));
+    });
+    $('.dateTo').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true,
+        autoUpdateInput:false
+    }, function(chosen_date) {
+        $('.dateTo').val(chosen_date.format('YYYY-MM-DD'));
+    });
+
+    $('.btnRangeSearch').on('click', function(){
+      var from =  $('.dateFrom').val();
+      var to = $('.dateTo').val();
+
+      if(from == ''){
+            $.jGrowl('please fill in the Start Date', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+      }else if(to == ''){
+          $.jGrowl('please fill in the End Date', {
+                              header: 'Oh snap!',
+                              theme: 'bg-danger'
+                          });
+      }else{
+          $('.rangeDates').slideUp();
+          $('.dateFrom').val('');
+          $('.dateTo').val('');
+          $.get("{% url 'dashboard:sales_margin' %}",{ajax:'ajax',dateFrom:from, dateTo:to}, function(data){
+             $('#pagination-div').html(data);
+          });
+      }
+
+    });
+
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change', function(){
+
+        var ts = $(this).val();
+        var date = $('.daterange-single');
+        if(ts == 'pdf'){
+            var node = document.getElementById('reportBody')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                       $.get("{% url 'dashboard:sales_margin' %}",{pdf:'pdf',image:dataUrl}, function(data){
+                            window.open("data:application/pdf," + escape(data));
+                        });
+                    }).catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+         }
+    });
+</script>
+{% endblock %}

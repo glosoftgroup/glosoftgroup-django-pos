@@ -293,7 +293,16 @@
                       {% if product.product_class.has_variants %}
       <!-- CODE V -->
       <div id="variants" class="">
-      <button data-attributes="{% url 'dashboard:attr_list_f32b' %}" class="btn btn-primary mb-5" id="addNewvaraints">New variant</button>
+      
+      <div class="mb-15">
+        <button class="btn btn-primary" id="btntogglev">
+          Add variant
+        </button>
+      </div>
+      <style type="text/css">
+        #toggleVariant{display:none;}
+      </style>
+      <div id="toggleVariant">
       <table class="table table-hover">
         <thead>
         <tr class="bg-primary">  
@@ -335,6 +344,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
       <!-- <button class="btn btn-primary" id="addNewvaraints">New variant</button> -->
         <form method="post" action="{% url 'dashboard:variant-bulk-delete' product_pk=product.pk %}" novalidate>
           {% csrf_token %}
@@ -439,7 +449,7 @@
                         <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
                        
                         <li>
-                          <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" 
+                          <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" data-tabname='?tab=variants' 
                          data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ variant.name }}" data-id="{{ variant.pk }}"
                        class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
                        </a>
@@ -538,10 +548,7 @@
             
             <thead>
               <tr class='bg-primary'>
-                <th class="bulk-checkbox">
-                  <input type="checkbox" id="select-all-stock" class="filled-in select-all switch-actions">
-                  <label for="select-all-stock"></label>
-                </th>
+                <th>Name</th>
                 <th>
                   {% trans "SKU" context "Stock table header" %}
                 </th>
@@ -559,7 +566,7 @@
                 <th class="right-align">
                   {% trans "Allocated" context "Stock table header" %}
                 </th>
-                <th>Actions</th>
+                <th>Options</th>
               </tr>
             </thead>
              <tbody id="refreshStockitems">
@@ -567,10 +574,7 @@
            
               {% for item in stock_items %}
                 <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
-                  <td class="bulk-checkbox ignore-link">
-                    <input name="items" type="checkbox" id="{{ item.id }}" class="filled-in switch-actions switch-stock" value="{{ item.id }}">
-                    <label for="{{ item.id }}"></label>
-                  </td>
+                  <td>{{ item.variant.display_product }}</td>
                   <td>
                     {{ item.variant.sku }}                    
                   </td>
@@ -595,7 +599,23 @@
                     {{ item.quantity_allocated }}
                   </td>
                   <td>
-                    <a href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"><i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me">Edit</i></a>
+                  <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu edit-dropdown">   
+                        <li><a href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                       
+                        <li>
+                          <a data-ta="#modal_delete_instance" data-title="Delete {{item.variant.sku}}?" data-href="{% url 'dashboard:single-stock-delete' product_pk=product.pk stock_pk=item.pk %}" data-tabname='?tab=stock'
+                         data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ item.variant.sku }}" data-id="{{ item.pk }}"
+                       class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
+                       </a>
+                        </li>
+                       
+                        </ul>
+                    </div>
+                    
                   </td>
                 </tr>
               {% endfor %}           
@@ -782,7 +802,7 @@
     tokensAllowCustom:true,      
     });
     $('.selectVariantChoice').tokenize2({
-    placeholder: 'Add variant choice(s) (eg. 1kg, 2kg)',
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
     tokensAllowCustom:true,      
     });
     function addAttributePlusChoice(dynamicData,myUrl) 
@@ -909,6 +929,14 @@
  {% endif %}
 
 
+  $('#btntogglev').on('click',function(){
+    $('#toggleVariant').slideToggle();
+  });
+  $('#btntoggles').on('click',function(){
+    $('#toggleStock').slideToggle();
+  });
+    
+
  function roundOff(val){
   return Math.round(val * 100) / 100;
  }
@@ -939,8 +967,7 @@
   var retail_plus_tax = (parseInt(retail)*100)/(parseInt(tax)+100);
   retail_plus_tax=roundOff(retail_plus_tax);
 
-  $('#retail_plus_tax').attr('value',retail_plus_tax);
-  //alert(retail_plus_tax);
+  $('#retail_plus_tax').attr('value',retail_plus_tax);  
   var tx = parseInt(retail)-parseInt(retail_plus_tax);
 
   $('#retail_tax').attr('value',tx);
@@ -1004,11 +1031,11 @@
        refresh_tax();
         var tax = $('#id_tax').val();
         var tax_name = $('#id_tax_name').val();
-
+        
         if(!$.isNumeric(tax)){
           notify('Enter a valid tax');
           return false;
-        }
+        }     
 
         //** post form data using jquery
         var url = "{% url "dashboard:tax-add-ajax" %}";
@@ -1022,6 +1049,7 @@
             }
             else
             {
+                $('#tax-form-error').removeClass('hidden');
                 notify('Error Adding Tax');
             }
 
@@ -1349,8 +1377,7 @@ $('#form-product').validate({
     });
   }
 
-  function refresh_tax(){
-  alert('taxt');
+  function refresh_tax(){  
     var url = "{% url 'dashboard:product-add' %}";
     var posting = $.get( url, {'ajax_subcategory':'ajax_subcategory', 'tax':'tax'});
     posting.done(function(data) {

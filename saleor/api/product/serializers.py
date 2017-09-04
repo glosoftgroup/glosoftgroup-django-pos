@@ -14,7 +14,8 @@ from ...discount.models import get_product_discounts
 from ...sale.models import (
             Sales, 
             SoldItem,
-            Terminal)
+            Terminal,
+            PaymentOption)
 from ...site.models import SiteSettings
 from ...product.models import (
             Product,
@@ -26,6 +27,11 @@ from ...customer.models import Customer
 
 
 User = get_user_model()
+from ...decorators import user_trail
+import logging
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 
 class CreateStockSerializer(ModelSerializer):
@@ -96,6 +102,7 @@ class SalesListSerializer(serializers.ModelSerializer):
                  'mobile',
                  'customer_name',
                  'cashier',
+                 'payment_options'
                 )
 
     def get_cashier(self,obj):
@@ -151,6 +158,7 @@ class SalesSerializer(serializers.ModelSerializer):
                  'customer_name',
                  'status',
                  'payment_options',
+                 'total_tax'
                 )
 
     def validate_total_net(self,value):
@@ -178,6 +186,10 @@ class SalesSerializer(serializers.ModelSerializer):
            total_net = Decimal(validated_data.get('total_net'))
         except:
            total_net = Decimal(0)
+        try:
+            total_tax = Decimal(validated_data.get('total_tax'))
+        except:
+            total_tax = Decimal(0)
         terminal = Terminal.objects.get(pk=self.terminal_id)    
         terminal.amount += Decimal(total_net)       
         terminal.save() 
@@ -209,7 +221,7 @@ class SalesSerializer(serializers.ModelSerializer):
             customer.save()
         # get sold products        
         solditems_data = validated_data.pop('solditems')
-        # sales = Sales.objects.create(**validated_data)
+        payment_options_data = validated_data.pop('payment_options')
         sales = Sales.objects.create(user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),
                                      total_net=validated_data.get('total_net'),
@@ -218,13 +230,23 @@ class SalesSerializer(serializers.ModelSerializer):
                                      terminal=validated_data.get('terminal'),
                                      amount_paid=validated_data.get('amount_paid'),
                                      customer=customer,
+                                     total_tax=total_tax,
                                      mobile=validated_data.get('mobile'),
                                      customer_name=validated_data.get('customer_name'))
+        for payment_option_data in payment_options_data:
+            print payment_option_data
+            sales.payment_options.add(payment_option_data)
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
-            stock = Stock.objects.get(variant__sku=solditem_data['sku'])
-            if stock:                
-                Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
+            try:
+                stock = Stock.objects.get(variant__sku=solditem_data['sku'])
+                if stock:                
+                    Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
+                    print stock.quantity
+                else: 
+                    print 'stock not found'
+            except:
+                print 'Error reducing stock!'
                 
         return sales
         
@@ -323,6 +345,17 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     # used during jwt authentication
+    permissions = SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id','email','name']
+        fields = ['id','email','name','permissions']
+    def get_permissions(self,obj):
+        info_logger.info('User: '+str(obj.name)+' '+str(obj.email)+' logged in via api')
+        user_trail(obj.name, 'logged in via api','view')
+        
+        permissions = []
+        if obj.has_perm('sales.make_sale'):
+            permissions.append('make_sale') 
+        if obj.has_perm('sales.make_invoice'):
+            permissions.append('make_invoice')           
+        return permissions

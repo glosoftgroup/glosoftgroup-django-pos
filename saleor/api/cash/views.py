@@ -30,28 +30,30 @@ def login(request):
 	if request.method == 'POST':		
 		if serializer.is_valid():
 			password = serializer.data['password']
-			email = serializer.data['email']
-			terminal = serializer.data['terminal']			
-			l=[]
-			user_qs = get_user_model().objects.all()
-			for user in user_qs:
-				l.append(user.email)
-			if not email in l:		
-				return Response({'Authentication Error!'}, status=status.HTTP_400_BAD_REQUEST)
+			username = serializer.data['email']
+			terminal = serializer.data['terminal']		
+			if '@' in username:
+				kwargs = {'email': username}
 			else:
-				user = get_user_model().objects.get(email=email)
-				if user.check_password(password) and user.has_perm('sales.make_sale'):					 
-					trail = str(user.name)+' '+\
-							str(user.email)+' logged in Termial:'+\
-							str(terminal)+'. Session active '+str(request.user.name)
-					user_trail(user,trail,'view')
+				kwargs = {'name': username}
+			try:
+				user = get_user_model().objects.get(**kwargs)
+				if user.check_password(password) and user.has_perm('sales.add_drawercash') and user.has_perm('sales.change_drawercash'):
+					record_trail(request.user.name,user,terminal)
+					return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 				else:
-					return Response({'Authentication Error!'}, status=status.HTTP_400_BAD_REQUEST)
-			#serializer.save()
-			return Response(serializer.data, status=status.HTTP_201_CREATED)
-		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+					return Response({'Permission Denied!'}, status=status.HTTP_401_UNAUTHORIZED)
+			except:										
+				return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)			
+			
 	elif request.method == 'GET':		
 			return Response(status=status.HTTP_400_BAD_REQUEST)
+
+def record_trail(loggedin,user,terminal):
+	trail = str(user.name)+' '+\
+			str(user.email)+' logged in Termial:'+\
+			str(terminal)+'. Session active '+str(loggedin)
+	user_trail(user,trail,'view')
 
 @api_view(['GET', 'POST'])
 def logout(request):

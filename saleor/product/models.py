@@ -371,7 +371,10 @@ class ProductVariant(models.Model, Item):
     def get_cost_price(self):
         stock = self.select_stockrecord()
         if stock:
-            return stock.cost_price
+            if stock.cost_price:
+                return stock.cost_price
+            else:
+                return 0
 
     def product_category(self):
         category = self.product.categories.first().name
@@ -399,7 +402,7 @@ class StockManager(models.Manager):
 
     def decrease_stock(self, stock, quantity):
         stock.quantity = F('quantity') - quantity
-        stock.quantity_allocated = F('quantity_allocated') - quantity
+        #stock.quantity_allocated = F('quantity_allocated') - quantity
         stock.save(update_fields=['quantity', 'quantity_allocated'])
 
 
