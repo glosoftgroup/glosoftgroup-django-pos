@@ -91,7 +91,7 @@
                             </div>
 
                             <div class="tab-pane" id="highlighted-tab3">
-                                <form class="form" method="post" name="license_activation" id="addlicensekey">
+                                <form class="form" name="license_activation" id="addlicensekey">
                                 {% csrf_token %}
                                     <div class="col-md-8">
                                         <div class="row">
@@ -108,7 +108,7 @@
 
                                         <div class="row">
                                           <div class="col-md-6">
-                                          <button class="btn btn-primary waves-effect waves-light" id="submit"
+                                          <button class="btn btn-primary waves-effect waves-light" id="submitKey"
                                                 type="submit">Activate
                                               <i class="icon-arrow-right14 position-right"></i></button>
                                           </div>
@@ -131,6 +131,7 @@
 {% block custom_js %}
     <script type="text/javascript">
         $('#addlicensekey').validate({
+          onkeyup: function(element) {$(element).valid()},
           rules:{
             lic_key: {
               required:true,
@@ -147,7 +148,7 @@
 
             alert('here..');
 
-            var activation_form = document.getElementById('license_activation');
+            var activation_form = document.getElementById('addlicensekey');
             var formData = new FormData(activation_form);
 
             if (formData) {

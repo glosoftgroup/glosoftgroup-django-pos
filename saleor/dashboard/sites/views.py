@@ -11,6 +11,7 @@ from .forms import AuthorizationKeyFormSet, SiteSettingForm
 from ..views import staff_member_required
 from ...site.models import AuthorizationKey, SiteSettings, Files
 from ...site.utils import get_site_settings_from_request
+from django.views.decorators.csrf import csrf_protect
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -50,17 +51,18 @@ def update_settings(request,site_id=None):
     return HttpResponse('Invalid method')
 
 def add_sitekeys(request):
+    print ('now working')
     if request.method == 'POST':
-        keyfile = request.POST.get('lic_key')
-        check = "sometext"
-        new_key = Files.objects.create(
-            file=keyfile,
-            check=check
-        )
-        try:
-            new_key.save()
-        except DatabaseError, BaseException :
-            error_logger.info('Error when saving ')
-        request.POST.get('sms_username')
+        # keyfile = request.POST.get('lic_key')
+        # check = "sometext"
+        # new_key = Files.objects.create(
+        #     file=keyfile,
+        #     check=check
+        # )
+        # try:
+        #     new_key.save()
+        # except DatabaseError, BaseException :
+        #     error_logger.info('Error when saving ')
+        # request.POST.get('sms_username')
         return HttpResponse('success')
     return HttpResponse('Invalid request')
