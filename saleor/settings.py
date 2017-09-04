@@ -149,6 +149,7 @@ MIDDLEWARE_CLASSES = [
     'saleor.core.middleware.CountryMiddleware',
     'saleor.core.middleware.CurrencyMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    'saleor.core.middleware.SettingsMiddleware',
 ]
 
 INSTALLED_APPS = [

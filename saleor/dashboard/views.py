@@ -34,6 +34,7 @@ from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+# from lockdown.decorators import lockdown
 import datetime
 from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
@@ -56,10 +57,8 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 
-
 def staff_member_required(f):
     return _staff_member_required(f, login_url='home')
-
 
 @staff_member_required
 def index(request):
