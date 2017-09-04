@@ -64,7 +64,6 @@ def user_add(request):
 		return HttpResponse('error accessing add users page')
 
 @staff_member_required
-@csrf_exempt
 def user_process(request):
 	user = User.objects.all()
 	if request.method == 'POST':

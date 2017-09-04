@@ -187,7 +187,7 @@ def option_searchs(request):
                 options = paginator.page(paginator.num_pages)
             if p2_sz:
                 options = paginator.page(page)
-                return TemplateResponse(request, 'dashboard/payment/options/paginate.html', {'options': options})
+                return TemplateResponse(request, 'dashboard/payment/options/paginate.html', {'options': options,'sz':sz})
 
             return TemplateResponse(request, 'dashboard/payment/options/search.html',
 {'options': options, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
