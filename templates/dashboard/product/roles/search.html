@@ -129,5 +129,12 @@
         }).children('.pagination').addClass('pagination-flat pagination-sm')
 
    });
+
+
+    $.when( $.ready ).then(function() {     
+       $('.bootstrap-select').selectpicker();
+       $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
+    });
+    console.log("{{sz}}");
  </script>
  <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

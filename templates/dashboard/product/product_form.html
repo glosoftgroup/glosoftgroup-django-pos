@@ -90,7 +90,7 @@
                     {% else %}
                       <li class="active">
                     {% endif %}
-                        <a href="#bordered-tab1" data-toggle="tab">General Details</a>
+                        <a href="#bordered-tab1" data-toggle="tab">Product Name</a>
                       </li>
                      <!-- if product.pk %} -->
                      <!-- pricing tab -->
@@ -102,7 +102,7 @@
                     {% else %}
                       <li>             
                     {% endif %}
-                    <a href="#bordered-tab2" class="tabProductAdded" data-toggle="tab">Product Variant</a></li>
+                    <a href="#bordered-tab2" class="tabProductAdded" data-toggle="tab">Pricing</a></li>
                     <!-- stock tab -->
                    {% if request.GET.tab == 'stock'  %}                   
                      <li class="active">
@@ -945,7 +945,11 @@
     {% url "dashboard:tax-add-ajax" as url %}
     var url = "{{ url }}";
     var tax_id = $('#id_product_tax').val();
-    var posting = $.post( url, {tax_id:tax_id,} );
+    var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+    var posting = $.post( url, {
+                          tax_id:tax_id,
+                          csrfmiddlewaretoken:csrf_token
+                      } );
     posting.done(function( data ){
       if(data.length > 3)
       {
@@ -1039,7 +1043,12 @@
 
         //** post form data using jquery
         var url = "{% url "dashboard:tax-add-ajax" %}";
-        var posting = $.post( url, {tax:tax,tax_name:tax_name,});
+        var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+        var posting = $.post( url, {
+                  tax:tax,
+                  tax_name:tax_name,
+                  csrfmiddlewaretoken:csrf_token
+                });
         posting.done(function( data ) {
             //if ($('#added').val() == 'added')
             if(data)
@@ -1151,8 +1160,9 @@
   function refreshAttributes() {  
    {% url "dashboard:fetch-variants" as url %} 
    var url = "{{ url }}";
-   var class_pk = getProductClass();     
-   var posting = $.post( url, {class_pk:class_pk} ); 
+   var class_pk = getProductClass();  
+   var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();   
+   var posting = $.post( url, {class_pk:class_pk,csrfmiddlewaretoken:csrf_token} ); 
    posting.done(function( data ) {    
     $( "#div_attributes" ).empty().append( data ); 
     checkHasVaraints(class_pk);
@@ -1170,8 +1180,9 @@
        {% url "dashboard:fetch-variants" as url %}
        var url = "{{ url }}";
        var class_pk = $( this ).val();
+       var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
        var posting = $.post( url,
-                           {class_pk:class_pk} );
+                           {class_pk:class_pk,csrfmiddlewaretoken:csrf_token} );
          // Put the results in a div
        posting.done(function( data ) {
         checkHasVaraints(class_pk);
