@@ -52,7 +52,7 @@ def update_settings(request,site_id=None):
 def add_sitekeys(request):
     if request.method == 'POST':
         keyfile = request.POST.get('lic_key')
-        check = ""
+        check = "sometext"
         new_key = Files.objects.create(
             file=keyfile,
             check=check
