@@ -130,52 +130,52 @@
 {% endblock%}
 {% block custom_js %}
     <script type="text/javascript">
-    $('#user-details').validate({
-      rules:{
-        lic_key: {
-          required:true,
-          minlength:3
-        }
-      },
-      messages:{
-        lic_key:{
-          required: "Please provide the license key",
-          minlength: "name must be atleast 3 characters long"
-        }
-      },
-      submitHandler: function() {
-
-        var activation_form = document.getElementById('license_activation');
-        var formData = new FormData(activation_form);
-
-        if (formData) {
-                $.ajax({
-                    url: "{% url 'dashboard:customer_process' %}",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success:function(data){
-                       console.log(data);
-                       $("#lic_key").val('');
-
-                       $.jGrowl('License key added', {
-                          header: 'Successful!',
-                          theme: 'bg-success'
-                       });
-                    },
-                    error:function(error){
-                      console.log(error);
-                      $.jGrowl('The License key should not be empty', {
-                          header: 'Error Occurred!',
-                          theme: 'bg-danger'
-                      });
-                    }
-                });
+        $('#user-details').validate({
+          rules:{
+            lic_key: {
+              required:true,
+              minlength:3
             }
+          },
+          messages:{
+            lic_key:{
+              required: "Please provide the license key",
+              minlength: "name must be atleast 3 characters long"
+            }
+          },
+          submitHandler: function() {
 
-      }
-    });
+            var activation_form = document.getElementById('license_activation');
+            var formData = new FormData(activation_form);
+
+            if (formData) {
+                    $.ajax({
+                        url: "{% url 'dashboard:addsitekeys' %}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success:function(data){
+                           console.log(data);
+                           $("#lic_key").val('');
+
+                           $.jGrowl('License key added', {
+                              header: 'Successful!',
+                              theme: 'bg-success'
+                           });
+                        },
+                        error:function(error){
+                          console.log(error);
+                          $.jGrowl('The License key should not be empty', {
+                              header: 'Error Occurred!',
+                              theme: 'bg-danger'
+                          });
+                        }
+                    });
+                }
+
+          }
+        });
 
     </script>
 
