@@ -196,25 +196,27 @@
          <button type="button" class="close" data-dismiss="modal">&times;</button>
          <h6 class="modal-title text-white text-center"></h6>
        </div>
-       <div class="modal-body">
-         <div class="">
          <form action="" class="delete_form" method="post" id="delform" novalidate>
-         {% csrf_token %}
-         <div class="">
-           <h5 class="text-center">
-             Confirm Customer delete!
-           </h5>
-           <input type="hidden" class="item-id" />
-           </div>
-           
-         </div>
-       </div>
+             {% csrf_token %}
+               <div class="modal-body">
+                 <div class="">
+
+                     <div class="">
+                       <h5 class="text-center">
+                         Confirm Customer delete!
+                       </h5>
+                       <input type="hidden" class="item-id" />
+                     </div>
+
+                 </div>
+               </div>
        
-       <div class="modal-footer">
-         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" onclick="return false" data-id="" data-href="">Delete</button>
-         </form>          
-         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>          
-       </div>
+               <div class="modal-footer">
+                 <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" onclick="return false" data-id="" data-href="">Delete</button>
+
+                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+               </div>
+         </form>
      </div>
    </div>
  </div>
