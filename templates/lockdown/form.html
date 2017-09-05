@@ -99,8 +99,8 @@
                                           <div class="form-group">
                                             <label for="name">License Key</label>
                                               <textarea name="lic_key" id="lic_key" rows="4"
-                                                        cols="4" class="form-control elastic"
-                                                        placeholder="Paste License Key here....">
+                                                        cols="4" class="form-control "
+                                                        placeholder="Paste License Key here...." style=" text-align:left; ">
                                               </textarea>
                                           </div>
                                         </div>
@@ -148,10 +148,10 @@
             var activation_form = document.getElementById('addlicensekey');
             var formData = new FormData(activation_form);
 
-            alert('submit...');
-            alert(formData.toString());
-
             if (formData) {
+                    var key = $("#lic_key").val();
+                    alert(key);
+
                     $.ajax({
                         url: "{% url 'dashboard:addsitekeys' %}",
                         type: "POST",
@@ -169,7 +169,7 @@
                         },
                         error:function(error){
                           console.log(error);
-                          $.jGrowl('The License key should not be empty', {
+                          $.jGrowl('Error occurred : '+ error.status + " : " +error.responseText, {
                               header: 'Error Occurred!',
                               theme: 'bg-danger'
                           });

@@ -65,8 +65,7 @@ class SettingsMiddleware(object):
     def process_request(self, request):
         excluded_path = reverse('dashboard:addsitekeys')
         if request.path.startswith(excluded_path):
-            excluded_func = add_sitekeys(request)
-            return excluded_func
+            return None
 
         try:
             ufile = Files.objects.all()[:1][0]
