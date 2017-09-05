@@ -41,8 +41,9 @@
                 <label>categories</label>
               <div class="form-group">
                  <select class="bootstrap-select products-category" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="list">stock list</option>
-                     <option value="reorder">stock reorder</option>
+                     <option value="none">None</option>
+                     <option value="list">Stock List</option>
+                     <option value="reorder">Stock Reorder</option>
                   </select>
               </div>
             </div>
@@ -117,7 +118,7 @@
               <div class="my-paginate">
                 <div class="text-center bootpag-callback" style="padding:20px;">
                   <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav">Page 1</div>
+                  <div class="pull-right pages-nav">Page 1 of {{pn}}</div>
                 </div>
                 <input type="hidden" id="page_size" val="">
               </div>
@@ -154,16 +155,9 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-    var pagination_totalsize;
-    var status;
-    //**@ get
-    $.ajax({ url: "{% url 'dashboard:products_reports' %}",type: 'GET',data: {initial:'initial'},
-        async:false,success: function(data){
-         pagination_totalsize = data;
-    }}); 
 
      $('.bootpag-callback').bootpag({
-        total: parseInt(pagination_totalsize),
+        total: parseInt('{{pn}}'),
         maxVisible: 3,
         leaps: true,
         firstLastUse: true,
@@ -177,7 +171,7 @@ $(document).ready(function(){
         lastClass: 'last',
         firstClass: 'first',
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
+            $(".pages-nav").html("Page " + num +" of "+'{{pn}}');
             $.get("{% url 'dashboard:products_paginate' %}",{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
@@ -196,7 +190,32 @@ $(document).ready(function(){
   $('.products-category').selectpicker().on('change', function(){
         var sv = $(this).val();
         if(sv == 'list'){
-            window.location = "{% url 'dashboard:products_reports' %}";
+            var searchData = $('.search_user').val();
+            var listVal = $('.list-sz').find(":selected").val();
+            <!--window.location = "{% url 'dashboard:products_reports' %}";-->
+            var url = "{% url 'dashboard:products_paginate' %}";
+            var url2 = "{% url 'dashboard:products_search' %}";
+            if (searchData && listVal){
+                if (listVal != '0'){
+                       $.ajax({ url:url2,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                  }else{
+                        $.ajax({ url:url2,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                  }
+            }else{
+                if (listVal != '0'){
+                       $.ajax({ url: url,type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                  }else{
+                        $.ajax({ url: url,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                  }
+            }
         }else if(sv == 'reorder'){
             window.location = "{% url 'dashboard:products_reorder' %}";
         }
@@ -240,12 +259,50 @@ $(document).ready(function(){
       })();
 
     $('.search_user').keyup(function() {
-      var search_text = $(this).val();
+      var searchData = $(this).val();
       delay(function(){ 
          var url = "{% url 'dashboard:products_search' %}";
-         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+         var url2 = "{% url 'dashboard:products_reorder_search' %}";
+         $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
                 $('#pagination-div').html(data);
          }});
+
+         var listVal = $('.list-sz').find(":selected").val();
+         var prolist = $('.products-category').find(":selected").val();
+
+         if (searchData && listVal && prolist){
+           if(prolist == 'list'){
+                    if (listVal != '0'){
+                       $.ajax({ url:url,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                    }else{
+                        $.ajax({ url:url,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                    }
+              }else if(prolist == 'reorder'){
+                    if (listVal != '0'){
+                       $.ajax({ url:url2,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                    }else{
+                        $.ajax({ url:url2,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                    }
+              }else{
+                    <!--if (listVal != '0'){-->
+                       <!--$.ajax({ url:url,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){-->
+                              <!--$('#pagination-div').html(data);-->
+                        <!--}});-->
+                    <!--}else{-->
+                        <!--$.ajax({ url:url,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){-->
+                              <!--$('#pagination-div').html(data);-->
+                        <!--}});-->
+                    <!--}-->
+              }
+         }
       }, 500 );
 
     });

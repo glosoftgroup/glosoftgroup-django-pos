@@ -3,16 +3,35 @@ from __future__ import unicode_literals
 import ast
 import os
 import os.path
-
+import datetime
 import dj_database_url
 import dj_email_url
 from django.contrib.messages import constants as messages
 import django_cache_url
+from django.utils.dateformat import DateFormat
 
-directory = "saleor/logs"
-if not os.path.exists(directory):
-    os.makedirs(directory)
+dateToday = datetime.datetime.now()
+thisDate = dateToday.strftime('%d-%m-%Y')
+thisMonth = dateToday.strftime('%b')
+dayName = dateToday.strftime("%a")
 
+thisMonthDirectory = "saleor/logs/"+thisMonth
+thisDateDirectory = "saleor/logs/"+thisMonth+"/"+thisDate+'('+ dayName+')'
+info_path = thisDateDirectory+'/info'
+error_path = thisDateDirectory+'/error'
+debug_path = thisDateDirectory+'/debug'
+warning_path = thisDateDirectory+'/warning'
+
+if not os.path.exists(thisMonthDirectory):
+    os.makedirs(thisMonthDirectory)
+if not os.path.exists(thisDateDirectory):
+    os.makedirs(thisDateDirectory)
+if not os.path.exists(info_path) or not os.path.exists(error_path) \
+        or not os.path.exists(debug_path) or not os.path.exists(warning_path):
+    os.makedirs(info_path)
+    os.makedirs(error_path)
+    os.makedirs(debug_path)
+    os.makedirs(warning_path)
 
 DEBUG = ast.literal_eval(os.environ.get('DEBUG', 'True'))
 
@@ -211,6 +230,8 @@ INSTALLED_APPS = [
     # 'chartjs',
 ]
 
+U_LOGFILE_SIZE = 5 * 1024 * 1024
+U_LOGFILE_COUNT = 10
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -254,26 +275,34 @@ LOGGING = {
         },
         'debug_logfile': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'saleor/logs/debug.log',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename':debug_path+'/debug.log',
+            'maxBytes': U_LOGFILE_SIZE,
+            'backupCount': U_LOGFILE_COUNT,
             'formatter': 'standard'
         },
         'error_logfile': {
             'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': 'saleor/logs/error.log',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename':error_path+'/error.log',
+            'maxBytes': U_LOGFILE_SIZE,
+            'backupCount': U_LOGFILE_COUNT,
             'formatter': 'standard'
         },
         'warning_logfile': {
             'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': 'saleor/logs/warning.log',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename':warning_path+'/warning.log',
+            'maxBytes': U_LOGFILE_SIZE,
+            'backupCount': U_LOGFILE_COUNT,
             'formatter': 'standard'
         },
         'info_logfile': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': 'saleor/logs/info.log',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename':info_path+'/info.log',
+            'maxBytes': U_LOGFILE_SIZE,
+            'backupCount': U_LOGFILE_COUNT,
             'formatter': 'standard'
         },
     },

@@ -189,12 +189,54 @@ $(document).ready(function(){
     $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true
+        showDropdowns:true,
+        autoUpdateInput:false
+    }, function(chosen_date){
+        $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
     }).on('change',function(){
-      var date = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, date:date}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
+        <!--var date = $(this).val();-->
+        <!--alert(date);-->
+        var searchData =  $('.search_purchase').val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        <!--$.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, date:date}, async:false,success: function(data){-->
+              <!--$('#pagination-div').html(data);-->
+        <!--}});-->
+
+
+    });
+        $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true,
+        autoUpdateInput:false
+    }, function(chosen_date) {
+        $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
+        var date = $('.daterange-single').val();
+        var searchData = $('.search_purchase').val();
+        var listVal = $('.list-sz').find(":selected").val();
+        var url = "{% url 'dashboard:purchase_search' %}";
+
+       if (searchData && listVal){
+            if (listVal != '0'){
+                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+        }else{
+            if (listVal != '0'){
+                   $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal, gid:date, date:date}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date, date:date}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+        }
     });
 
    $('.export-sz').selectpicker({
@@ -205,12 +247,47 @@ $(document).ready(function(){
     }).on('change', function(){
 
         var ts = $(this).val();
+        var searchData = $('.search_purchase').val();
+        var date = $('.daterange-single').val();
         if(ts == 'pdf'){
           var url = "{% url 'dashboard:reports_purchase_pdf' %}";
-          window.open(url, '_blank');
+          if(searchData && date){
+              $.get(url, {q:searchData, gid:date}, function(data){
+                   window.open("data:application/pdf," + escape(data));
+              });
+          }else if(searchData){
+              $.get(url, {q:searchData}, function(data){
+                   window.open("data:application/pdf," + escape(data));
+              });
+          }else if(date){
+              $.get(url, {gid:date}, function(data){
+                   window.open("data:application/pdf," + escape(data));
+              });
+          }else{
+              $.get(url, function(data){
+                   window.open("data:application/pdf," + escape(data));
+              });
+          }
 
         }else if(ts=='excel'){
-          window.location="{% url 'dashboard:reports_purchases_export_csv' %}";
+          url="{% url 'dashboard:reports_purchases_export_csv' %}";
+          if(searchData && date){
+              $.get(url, {q:searchData, gid:date}, function(data){
+                   window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false);
+              });
+          }else if(searchData){
+              $.get(url, {q:searchData}, function(data){
+                   window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false);
+              });
+          }else if(date){
+              $.get(url, {gid:date}, function(data){
+                   window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false);
+              });
+          }else{
+              $.get(url, function(data){
+                   window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false);
+              });
+          }
 
         }else{
           $(this).val('')
