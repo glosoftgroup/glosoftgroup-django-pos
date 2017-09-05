@@ -106,6 +106,7 @@ def paginate(request):
 			product_results = queryset_list
 			data = {
 				'product_results': product_results,
+				'sz':p2_sz
 			}
 			return TemplateResponse(request, 'dashboard/product/roles/paginate.html', data)
 
@@ -118,7 +119,7 @@ def paginate(request):
 		except EmptyPage:
 			queryset_list = paginator.page(paginator.num_pages)
 		product_results = queryset_list
-		return TemplateResponse(request, 'dashboard/product/roles/paginate.html', {'product_results': product_results})
+		return TemplateResponse(request, 'dashboard/product/roles/paginate.html', {'product_results': product_results,'sz':p2_sz})
 	except Exception, e:
 		return  HttpResponse()
 

@@ -3,7 +3,7 @@ import base64
 import json
 from datetime import datetime, timedelta
 import hashlib
-
+from ast import literal_eval
 from django.utils.translation import get_language
 from django_countries.fields import Country
 
@@ -13,6 +13,9 @@ from ..site.models import Files
 from .utils import get_client_ip, get_country_by_ip, get_currency_for_country
 from django.conf import settings
 from django.template.response import TemplateResponse
+from django.urls import reverse
+from django.http import QueryDict, HttpResponse
+from saleor.dashboard.sites.views import add_sitekeys
 
 logger = logging.getLogger(__name__)
 info_logger = logging.getLogger('info_logger')
@@ -60,6 +63,10 @@ class CurrencyMiddleware(object):
 class SettingsMiddleware(object):
 
     def process_request(self, request):
+        excluded_path = reverse('dashboard:addsitekeys')
+        if request.path.startswith(excluded_path):
+            excluded_func = add_sitekeys(request)
+            return excluded_func
 
         try:
             ufile = Files.objects.all()[:1][0]
@@ -106,3 +113,5 @@ class SettingsMiddleware(object):
 
     def is_not_empty(self, s):
         return bool(s and s.strip())
+
+
