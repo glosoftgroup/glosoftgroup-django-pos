@@ -51,17 +51,23 @@ def update_settings(request,site_id=None):
         return HttpResponse('success')
     return HttpResponse('Invalid method')
 
+@csrf_exempt
 def add_sitekeys(request):
     if request.method == 'POST':
-        keyfile = request.POST.get('lic_key')
+        keyfile = request.POST.get('lic_key').strip()
         info_logger.info("***************")
         info_logger.info(keyfile)
         info_logger.info("***************")
         check = "sometext"
-        new_key = Files.objects.create(
-            file=keyfile,
-            check=check
-        )
+        if keyfile:
+            new_key = Files.objects.create(
+                file=keyfile,
+                check=check
+            )
+        else:
+            error_logger.info('License Key is empty ')
+            return HttpResponse('Empty Key license')
+
         try:
             new_key.save()
         except DatabaseError, BaseException :
