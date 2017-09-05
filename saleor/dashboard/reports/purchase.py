@@ -235,38 +235,118 @@ def purchase_search(request):
 
 @staff_member_required
 def purchase_pdf(request):
-	purchases = PurchaseProduct.objects.all().order_by('id')
-	data = {
-		'today': date.today(),
-		"purchases": purchases,
-		'puller': request.user
-	}
-	pdf = render_to_pdf('dashboard/reports/purchase/pdf/pdf.html', data)
-	return HttpResponse(pdf, content_type='application/pdf')
+	if request.is_ajax():
+		q = request.GET.get('q')
+		gid = request.GET.get('gid')
+
+		if gid:
+			gid = gid
+		else:
+			gid = None
+
+		if q is not None:
+			purchases = PurchaseProduct.objects.filter(
+				Q(invoice_number__icontains=q) |
+				Q(stock__variant__product__name__icontains=q) |
+				Q(created__icontains=q) |
+				Q(supplier__name__icontains=q)).order_by('id')
+			all_purchases = 0
+			for purchase in purchases:
+				all_purchases += purchase.get_total_cost()
+
+			if gid:
+				purchases = purchases.filter(created__icontains=gid)
+
+			data = {
+				'today': date.today(),
+				"purchases": purchases,
+				'puller': request.user,
+				'gid':gid
+			}
+			pdf = render_to_pdf('dashboard/reports/purchase/pdf/pdf.html', data)
+			return HttpResponse(pdf, content_type='application/pdf')
+		else:
+			purchases = PurchaseProduct.objects.all().order_by('id')
+			all_purchases = 0
+			for purchase in purchases:
+				all_purchases += purchase.get_total_cost()
+
+			if gid:
+				purchases = purchases.filter(created__icontains=gid)
+
+			data = {
+				'today': date.today(),
+				"purchases": purchases,
+				'puller': request.user,
+				'gid': gid
+			}
+			pdf = render_to_pdf('dashboard/reports/purchase/pdf/pdf.html', data)
+			return HttpResponse(pdf, content_type='application/pdf')
 
 @staff_member_required
 def purchase_export_csv(request):
-    pdfname = 'products'+str(random.random())
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
-    qs = PurchaseProduct.objects.all().order_by('id')
-    writer = csv.writer(response, csv.excel)
-    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
-    writer.writerow([
-        smart_str(u"Transaction Date"),
-        smart_str(u"Supplier Name"),
-        smart_str(u"Item Name"),
-        smart_str(u"Unit Cost"),
-		smart_str(u"Quantity (unit)"),
-		smart_str(u"Total Purchase"),
-    ])
-    for obj in qs:
-        writer.writerow([
-            smart_str(obj.created),
-            smart_str(obj.supplier),
-            smart_str(obj.stock.variant.display_product()),
-			smart_str(obj.stock.variant.get_price_per_item().gross),
-            smart_str(obj.quantity),
-			smart_str(obj.get_total_cost()),
-        ])
-    return response
+	if request.is_ajax():
+		q = request.GET.get('q')
+		gid = request.GET.get('gid')
+
+		if gid:
+			gid = gid
+		else:
+			gid = None
+
+		if q is not None:
+			purchases = PurchaseProduct.objects.filter(
+				Q(invoice_number__icontains=q) |
+				Q(stock__variant__product__name__icontains=q) |
+				Q(created__icontains=q) |
+				Q(supplier__name__icontains=q)).order_by('id')
+			if gid:
+				purchases = purchases.filter(created__icontains=gid)
+		else:
+			purchases = PurchaseProduct.objects.all().order_by('id')
+			if gid:
+				purchases = purchases.filter(created__icontains=gid)
+
+		pdfname = 'products'+str(random.random())
+		response = HttpResponse(content_type='text/csv')
+		response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+		# qs = PurchaseProduct.objects.all().order_by('id')
+		qs = purchases
+		writer = csv.writer(response, csv.excel)
+		response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+		if gid:
+			writer.writerow([
+				smart_str(''),
+				smart_str(''),
+				smart_str(''),
+				smart_str(''),
+				smart_str(''),
+				smart_str(''),
+			])
+			writer.writerow([
+				smart_str(''),
+				smart_str(''),
+				smart_str(u"Purchase Date"),
+				smart_str('09-08-2017'),
+				smart_str(''),
+				smart_str(''),
+			])
+		writer.writerow([
+			smart_str(u"Transaction Date"),
+			smart_str(u"Supplier Name"),
+			smart_str(u"Item Name"),
+			smart_str(u"Unit Cost"),
+			smart_str(u"Quantity (unit)"),
+			smart_str(u"Total Purchase"),
+		])
+
+		for obj in qs:
+			writer.writerow([
+				smart_str(obj.created),
+				smart_str(obj.supplier),
+				smart_str(obj.stock.variant.display_product()),
+				smart_str(obj.stock.variant.get_price_per_item().gross),
+				smart_str(obj.quantity),
+				smart_str(obj.get_total_cost()),
+			])
+		return response
