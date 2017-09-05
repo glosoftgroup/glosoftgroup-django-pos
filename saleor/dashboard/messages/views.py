@@ -254,16 +254,8 @@ def write_single(request):
         single = request.POST.get('single');
         subject = request.POST.get('subject')
         body = request.POST.get('body')
-
         if single:
-            try:
-                user = Supplier.objects.get(mobile=single)
-                if user:
-                    notif = Notification(to='supplier', actor=request.user, recipient=request.user, sent_to=user.id, verb=subject, description=body)
-                    notif.save()
-            except:            
-                notif = Notification(to='anonymous', actor=request.user, recipient=request.user, sent_to=single, verb=subject, description=body)
-                notif.save()        
+            sms_response = sendSms(str(single),body,subject,actor=request.user,tag='supplier')                       
         
     ctx = {'users':User.objects.all().order_by('-id'),
            'templates':SmsTemplate.objects.all().order_by('-id')}
