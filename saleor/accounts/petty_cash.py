@@ -158,7 +158,6 @@ def expenditure(request):
 		else:
 			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
-		# pettyCash = PettyCash.objects.filter(created__icontains=date)
 		pettyCash = dateFactorial(date)
 		lastEntry = pettyCash.latest('id')
 
@@ -171,14 +170,22 @@ def expenditure(request):
 		else:
 			dateToday = 0
 			try:
-				expenses = Expenses.objects.filter(added_on__icontains=pd).aggregate(Sum('amount'))['amount__sum']
+				expenses = Expenses.objects.filter(added_on__icontains=date).aggregate(Sum('amount'))['amount__sum']
+				if expenses:
+					expenses = expenses
+					added = lastEntry.added
+					opening = lastEntry.opening
+				else:
+					expenses = 0
+					added = 0
+					opening = lastEntry.closing
 			except:
 				expenses = 0
 
-		date = lastEntry.created
+		date = DateFormat(datetime.datetime.strptime(date, '%Y-%m-%d')).format('jS F Y')
 		amount = lastEntry.closing
-		opening = lastEntry.opening
-		added = lastEntry.added
+		opening = opening
+		added = added
 		closing = lastEntry.closing
 		data = {
 			'pdate': date,
