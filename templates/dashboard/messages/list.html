@@ -31,6 +31,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'backend/js/plugins/protip/css/protip.css' %}">
 <style type="text/css">
 	.protip{z-index: 0;}
+	.resendmessage{cursor: pointer;}
 </style>
 {% endblock %}
 {% block content %}
@@ -70,6 +71,7 @@
 								
 								<li><a href="{% url 'dashboard:message_list_slug' 'pending' %}"><i class="icon-drawer-out"></i> Pending </a></li>
 								<li><a href="{% url 'dashboard:message_list_slug' 'sent_to_sms' %}"><i class="icon-drawer-out"></i> Sent</a></li>
+								<li><a href="{% url 'dashboard:message_list_slug' 'fetch' %}"><i class="icon-drawer-out"></i> Fetch from gateway</a></li>
 								
 								<li class="navigation-divider"></li>
 								<li><a href="{% url 'dashboard:message_list_slug' 'unread' %}"><i class="icon-envelope"></i> Unread <span class="badge badge-success"></span></a></li>
@@ -187,7 +189,10 @@
 				<div class="text-muted text-size-small">
 				{% if not notification.sent %}
 				<span class="status-mark border-danger position-left"></span>
-				{{notification.status}}
+				{{notification.status}}<br>
+				<span data-id="{{notification.id}}" data-url="{% url 'dashboard:resend-message' pk=notification.pk %}" id='resendmessage' class="label label-primary resendmessage">  
+
+						<i class="sendspinner icon-database-refresh" id="sendspinner"></i> Resend</span>
 				{% else %}
 				<span class="status-mark border-success position-left"></span> Sent
 				{% endif %}
@@ -216,8 +221,12 @@
 					<ul class="dropdown-menu dropdown-menu-right">
 						<li>
 						{% if mark_read %}
-						 <a href="{% url 'dashboard:read-message' notification.id %}">               
+						 <a href="{% url 'dashboard:read-message' notification.id %}">           
 						<i class="icon-eye"></i> View</a></li>
+						{% endif %}
+						{% if not notification.sent %}
+						 <li><span data-id="{{notification.id}}" data-url="{% url 'dashboard:resend-message' pk=notification.pk %}" id='resendmessage' class="resendmessage">           
+						<i class="icon-database-refresh"></i> Resend</span></li>
 						{% endif %}
 						
 					</ul>
@@ -247,12 +256,54 @@
  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switch.min.js' %}"></script>
  <script type="text/javascript" src="{% static 'backend/js/pages/mail_list.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/protip/js/protip.min.js' %}"></script>
-
+{% csrf_token %}
 <script type="text/javascript">
 // IIFE - Immediately Invoked Function Expression
   (function($, window, document) {
-  
-    $.protip();
+    function alertUser(msg,status='bg-success',header='Well done!')
+	{ $.jGrowl(msg,{header: header,theme: status}); }
+	//add productDetails
+	function resendMessagefunc(dynamicData,url,method){
+	  dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+	  return $.ajax({
+	      url: url,
+	      type: method,
+	      data: dynamicData
+	    });
+
+	}
+   /* resend message */
+	var resendMessage = $('.resendmessage');
+	var resendUrl = resendMessage.data('url');
+	var sendspinnerId = $('.resendmessage');
+	resendMessage.on('click',function(){
+	    var pk = $(this).data('id');
+	    dynamicData = {};
+	    dynamicData['pk'] = pk;
+	    dynamicData['track'] = 'resending message';
+	    $(this).find('.sendspinner').removeClass('icon-database-refresh');
+        $(this).find('.sendspinner').addClass('icon-spinner').addClass('spinner');
+        var thisspin = $(this).find('.sendspinner');
+	    resendMessagefunc(dynamicData,resendUrl,'post')
+	    .done(function(data){	    	
+	    	if(data['message'] == 'Success')
+	    	{
+	    	   alertUser('Message Resent');	  
+	    	   window.location.reload();  	  
+	    	}else{
+	    	   alertUser(data['message'],'bg-danger', 'error');
+	    	  sendspinnerId.find('.sendspinner').addClass('icon-database-refresh');
+    		  sendspinnerId.find('.sendspinner').removeClass('icon-spinner').removeClass('spinner');
+	    	}
+	    	//console.log(data['message']);
+	    })
+	    .fail(function(data){
+	    	alertUser('Error resending message','bg-danger', 'error');
+	    	sendspinnerId.addClass('icon-database-refresh');
+    		sendspinnerId.removeClass('icon-spinner').removeClass('spinner');
+	    });
+	    
+	});
 
     var el = $('.tip-el');
 

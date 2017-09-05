@@ -51,17 +51,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-2">
-              <label>display list size</label>
-              <div class="form-group">
-                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="0" selected>No:</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                  </select>
-              </div>
-            </div>
+            
             <div class="col-md-2 hidden">
               <label>Select expense type</label>
               <div class="form-group">
@@ -178,14 +168,45 @@
 
         </div>
         </div>
-          {% if options %}
-             <div class="my-paginate">
-                <div class="text-center bootpag-callback" style="padding:20px;">
-                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav">Page 1 of {{pn}}</div>
-                </div>
-                <input type="hidden" id="page_size" val="">
+          {% if options %}                          
+         <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
               </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
+              
           {% endif %}
       </div>
     </div><!-- pagination -->

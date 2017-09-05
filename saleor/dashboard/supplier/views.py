@@ -166,8 +166,9 @@ def fetch_suppliers(request):
 	suppliers = Supplier.objects.all()
 	ctx = {'suppliers':suppliers}
 	return TemplateResponse(request, 'dashboard/supplier/refreshed_supplier.html',ctx)
+
+
 @staff_member_required
-@csrf_exempt
 def user_process(request):
 	user = Supplier.objects.all()
 	if request.method == 'POST':

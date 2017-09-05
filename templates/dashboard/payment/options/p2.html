@@ -60,12 +60,43 @@
             </div>
         </div>
           {% if options %}
-             <div class="my-paginate">
-                <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
-                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
-                </div>
+             <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" name="list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
               </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
           {% endif %}
       </div>
 
@@ -140,4 +171,65 @@
             });
 
    });
+    // Basic select
+    $('.bootstrap-select').selectpicker();
+     //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var groupSizeVal = $('.group-sz').find(":selected").val();
+        var url = "{% url 'dashboard:payment-option-search' %}";
+
+        if(searchData && groupSizeVal && groupSizeVal != 'all' && groupSizeVal !='none'){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+       }else if(searchData){
+           if(listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+
+       }else if(groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+           if(listSizeVal != '0'){
+                $.get("{% url 'dashboard:options_paginate' %}",{page:1,gid:groupSizeVal, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }else{
+                $.get("{% url 'dashboard:options_paginate' %}",{page:1,gid:groupSizeVal, size:10},function(data){
+                 $('#pagination-div').html(data);
+               });
+
+           }
+       }else{
+           if(listSizeVal != '0'){
+               $.ajax({ url: "{% url 'dashboard:options_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.ajax({ url: "{% url 'dashboard:options_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+           }
+       }
+
+     });
+    
+    {% if sz %}
+    $.when( $.ready ).then(function() {     
+       $('.bootstrap-select').selectpicker();
+       $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
+    });
+    {% endif %}    
  </script>

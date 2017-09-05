@@ -29,7 +29,9 @@
          
       {% url "dashboard:tax-add-ajax" as url %} 
       var url = "{{ url }}";
-      var posting = $.post( url, {} );
+      var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+      var posting = $.post( url, {
+                    csrfmiddlewaretoken:csrf_token,} );
       // Put the results in a div
       posting.done(function( data ) {    
       $("#add_tax_form" ).empty().append( data ); 

@@ -1,0 +1,66 @@
+{% if option %}
+    <div class="col-md-12 detail-column">
+        <div class="col-md-12">
+            <p><span style="font-weight:500"></span> {{option.name}}</p> 
+          <div class="form-group">
+              <label>option name:</label>
+              <input type="text" value="{{option.name}}" name="optname" id="optname" class="form-control">
+          </div>           
+        </div>
+        
+        <div class="col-md-12">
+          <div class="form-group">
+            <label style="font-weight:500">Description</label>
+            <textarea name='optdescription' id="optdescription" class="form-control">{{option.description}}</textarea>
+         </div>
+        </div>
+    </div>
+<script type="text/javascript">
+    var updateOptionBtn = $('#updateOption');
+    var optdescription = $('#optdescription');
+    var optname = $('#optname');
+    var updateUrl = "{% url 'dashboard:update-payment-option' pk=option.pk %}"
+
+    function updatePaymentOption(dynamicData,url,method){
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      return $.ajax({
+          url: url,
+          type: method,
+          data: dynamicData
+        });
+
+    }
+    // alertUser
+    function alertUser(msg,status='bg-success',header='Well done!')
+    { $.jGrowl(msg,{header: header,theme: status}); }
+    updateOptionBtn.on('click',function(){
+       var name = optname.val();
+       var description = optdescription.val();
+       var dynamicData = {};     
+
+       if(!name){
+        alertUser('Name required','bg-danger','Missing Field Error!');
+        return false;
+       }
+       if(description){
+        dynamicData['description'] = description;
+       }
+       dynamicData['name'] = name;
+       dynamicData['track'] = 'updating payment option';
+
+       updatePaymentOption(dynamicData,updateUrl,'post')
+       .done(function(data){
+        alertUser('Updated successfully');
+        window.location.reload();
+       })
+       .fail(function(){
+        alertUser('Error occured. Try another name','bg-danger','Error!')
+       });
+    });
+
+</script>
+{% else %}
+<div class="alert bg-info col-md-12">
+    <h4 class="text-center">No details for this option</h4>
+</div>
+{% endif %}

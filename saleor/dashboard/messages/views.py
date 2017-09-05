@@ -47,13 +47,12 @@ def get_template(request,pk=None):
 def add_template(request):
     if request.method == 'POST':
         t_name = request.POST.get('tname')
-        t_content = request.POST.get('tcontent','')
-        # print template_content
-        # print template_name
+        t_content = request.POST.get('tcontent','')        
         temp = SmsTemplate(name=t_name,content=t_content)
         temp.save()
         return HttpResponse(temp.pk)
     return HttpResponse('Post request expected')
+
 @staff_member_required
 def list_messages(request,status=None):
     # read users messages
@@ -83,6 +82,13 @@ def list_messages(request,status=None):
     elif status == 'sent':
         mark_read = False
         messages = Notification.objects.filter(actor_object_id=request.user.id)
+    elif status == 'fetch':
+        title = 'Fetch From SMS Gateway'
+        fetch = fetch_messages()
+        mark_read = False
+        messages = {}
+        if fetch:
+            messages = messages
     else:
         messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
     ctx = {
@@ -157,6 +163,21 @@ def read(request, pk=None):
     return TemplateResponse(request,
                             'dashboard/messages/list.html',
                             ctx)
+
+@staff_member_required
+def resend(request, pk=None):
+    if request.method == 'POST':
+        if pk:
+            message = get_object_or_404(Notification, pk=pk)
+            #message.mark_as_read()
+            sms_response = sendSms(message.to_number,message.description,message.verb,actor=request.user,message_id=message.pk)
+            
+            if not sms_response:                
+                return HttpResponse(json.dumps({'message':message.status}), content_type='application/json')
+            return HttpResponse(json.dumps({'message':'Success'}), content_type='application/json')
+        else:
+            return HttpResponse('message id required')
+    return HttpResponse('Invalid method GET')
 
 
 @staff_member_required
@@ -291,13 +312,12 @@ def contacts(request):
         l.append(contact)
     return HttpResponse(json.dumps(l), content_type='application/json')
 
-def sendSms(to,message,subject,actor,tag='user'):
+def sendSms(to,message,subject,actor,tag='user',message_id=None):
     # Specify your login credentials
     site = SiteSettings.objects.get(pk=1)
-    username = site.sms_gateway_username #"MyAfricasTalkingUsername"
-    apikey   = site.sms_gateway_apikey #"MyAfricasTalkingAPIKey"
-    if username == "pkinuthia10@gmail.com":
-        username = 'sandbox'    
+    username = site.sms_gateway_username 
+    apikey   = site.sms_gateway_apikey 
+        
     gateway = AfricasTalkingGateway(username, str(apikey), "sandbox")
     report = []
     try:
@@ -315,10 +335,59 @@ def sendSms(to,message,subject,actor,tag='user'):
                                                                 recipient['cost'])
 
             
-            send_notification(recipient['number'],actor,tag,message,subject,recipient['status'])
+            if not message_id:
+                send_notification(recipient['number'],actor,tag,message,subject,recipient['status'])
+            else:
+                update_message(message_id,recipient['status'])
     except AfricasTalkingGatewayException, e:
         print 'Encountered an error while sending: %s' % str(e)
         return None
+
+#from django.test.client import RequestFactory
+def fetch_messages():
+    site = SiteSettings.objects.get(pk=1)
+    username = site.sms_gateway_username 
+    apikey   = site.sms_gateway_apikey
+    # rf = RequestFactory()
+    # post_request = rf.post('/submit/', {'username': username})        
+    # username = post_request.POST.get('username')
+    gateway = AfricasTalkingGateway(username, str(apikey), "sandbox")   
+    try:
+        # Our gateway will return 10 messages at a time back to you, starting with
+        # what you currently believe is the lastReceivedId. Specify 0 for the first
+        # time you access the gateway, and the ID of the last message we sent you
+        # on subsequent results
+        lastReceivedId = 0;
+        
+        while True:
+            messages = gateway.fetchMessages(lastReceivedId)
+            
+            for message in messages:
+                print 'from=%s;to=%s;date=%s;text=%s;linkId=%s;' % (message['from'],
+                                                                    message['to'],
+                                                                    message['date'],
+                                                                    message['text'],
+                                                                    message['linKId']
+                                                                   )
+                lastReceivedId = message['id']
+        if len(messages) == 0:
+            return False
+        else:
+            return message
+                
+    except AfricasTalkingGatewayException, e:
+        print 'Encountered an error while fetching messages: %s' % str(e)
+        #return False
+
+
+def update_message(message_id,status):
+    message = Notification.objects.get(pk=message_id)
+    if status == 'Success':
+        message.status
+        message.sent=True
+        message.save()
+        return True
+    return False
 
 def send_notification(number=None,actor=None,tag='user',body=None,subject=None,status=None):
     if not number or not actor or not body or not subject:

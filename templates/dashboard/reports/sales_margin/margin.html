@@ -6,10 +6,10 @@
 {% load humanize %}
 
 {% block title %}
-  Sales Margin Report
+  Sales Profit Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:sales_margin' %}">Sales Margin</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_margin' %}">Sales Profit</a></li>
  {% endblock %}
 
 {% block menu_report_margin_class %}active{% endblock %}
@@ -106,17 +106,17 @@
                <p class="text-center address-block">
                 Company Name.<br />
                 P.O Box 23333-00100, Nairobi, Kenya<br />
-                Sales Margin<br/>
+                Sales Profit<br/>
                 As at: {{date}}
                </p>
             </div>
         </div>
             <div class="row">
              <div class="col-md-10 col-md-offset-1">
-              <div class="col-md-6">
-                 <h3 class="text-centers hs">Gross Margin</h3>
+              <div class="col-md-6 col-md-offset-3">
+                 <h3 class="text-center hs">Gross Profit</h3>
                  <div class="b-details">
-                   <h5>Margin</h5>
+                   <h5>Profit</h5>
                    <p>
                      <ul class="blist">
                        <li>Total Sales<span class="pull-right"> {{totalSales|intcomma }}</span></li>
@@ -126,31 +126,31 @@
                    </p>
                  </div>
               </div>
-              <div class="col-md-6">
-                 <h3 class="text-centers hs">Markup</h3>
-                 <div class="b-details">
-                   <h5>Net Profit</h5>
-                   <p>
-                     <ul class="blist">
-                       <li>Total Sales <span class="pull-right"> {{totalSales|intcomma }}</span></li>
-                       <li>Total Costs(Purchases) <span class="pull-right"> {{totalCostPrice|intcomma }}</span></li>
-                     </ul>
-                     <p><span class="total-text">Gross Profit</span> <span class="pull-right total-amount">Kshs {{grossProfit|intcomma }}</span></p>
-                   </p>
-                 </div>
-              </div>
-              <div class="col-md-12 totals">
-                <div class="col-md-6">
-                  <div class="b-details">
-                  <p><span class="total-b-texts">Profit Margin</span> <span class="pull-right total-b-amount">{{margin|intcomma }}%</span></p>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="b-details">
-                  <p><span class="total-b-texts">Percentage Markup</span> <span class="total-b-amount pull-right">{{markup|intcomma }}%</span></p>
-                  </div>
-                </div>
-              </div>
+              <!--<div class="col-md-6">-->
+                 <!--<h3 class="text-centers hs">Markup</h3>-->
+                 <!--<div class="b-details">-->
+                   <!--<h5>Net Profit</h5>-->
+                   <!--<p>-->
+                     <!--<ul class="blist">-->
+                       <!--<li>Total Sales <span class="pull-right"> {{totalSales|intcomma }}</span></li>-->
+                       <!--<li>Total Costs(Purchases) <span class="pull-right"> {{totalCostPrice|intcomma }}</span></li>-->
+                     <!--</ul>-->
+                     <!--<p><span class="total-text">Gross Profit</span> <span class="pull-right total-amount">Kshs {{grossProfit|intcomma }}</span></p>-->
+                   <!--</p>-->
+                 <!--</div>-->
+              <!--</div>-->
+              <!--<div class="col-md-12 totals">-->
+                <!--<div class="col-md-6">-->
+                  <!--<div class="b-details">-->
+                  <!--<p><span class="total-b-texts">Profit Margin</span> <span class="pull-right total-b-amount">{{margin|intcomma }}%</span></p>-->
+                  <!--</div>-->
+                <!--</div>-->
+                <!--<div class="col-md-6">-->
+                  <!--<div class="b-details">-->
+                  <!--<p><span class="total-b-texts">Percentage Markup</span> <span class="total-b-amount pull-right">{{markup|intcomma }}%</span></p>-->
+                  <!--</div>-->
+                <!--</div>-->
+              <!--</div>-->
              </div>
             </div>
             <div class="row">
@@ -175,7 +175,7 @@
    <div class="panel bg-info">
      <div class="panel-body">
        <div style="text-align: center;font-size:16px;">
-          No Sales Margin report available momas
+          No Sales Profit report available momas
        </div>
       </div>
     </div>
