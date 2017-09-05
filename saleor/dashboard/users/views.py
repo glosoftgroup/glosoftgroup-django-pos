@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
+from django.views.decorators.csrf import csrf_protect
 import os
 import base64
 
@@ -235,7 +236,7 @@ def user_add(request):
         return HttpResponse('error accessing add users page')
 
 @staff_member_required
-@csrf_exempt
+@csrf_protect
 def user_process(request):
     user = User.objects.all()
     if request.method == 'POST':
@@ -315,6 +316,7 @@ def user_edit(request, pk):
     return TemplateResponse(request, 'dashboard/users/edit_user.html', ctx)
 
 @staff_member_required
+@csrf_protect
 def user_update(request, pk):
     user = get_object_or_404(User, pk=pk)
     user_permissions = Permission.objects.filter(user=user)
@@ -392,7 +394,7 @@ def user_update(request, pk):
 
 
 @staff_member_required
-@csrf_exempt
+@csrf_protect
 def user_assign_permission(request):
     if request.method == 'POST':
         user_id = request.POST.get('user_id')

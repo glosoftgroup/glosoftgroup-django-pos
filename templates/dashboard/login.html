@@ -46,7 +46,6 @@
   </head>
 
   <body class="{% block body_class %}{% endblock %} login-container">
-    
      <!-- Page container -->
   <div class="page-container">
     <!-- Page content -->
@@ -154,6 +153,8 @@
     <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
     <!-- <script type="text/javascript" src="{% static 'backend/js/chart.js'%}"></script> -->
     {% block custom_js %}{% endblock %}
+     <script type="text/javascript" src="{% static 'backend/js/plugins/js-cookie/src/js.cookie.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/test-cookie.js' %}"></script>
     <script type="text/javascript">
          $("#loginForm").submit(function(e)
           {

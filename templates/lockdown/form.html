@@ -148,6 +148,9 @@
             var activation_form = document.getElementById('addlicensekey');
             var formData = new FormData(activation_form);
 
+            alert('submit...');
+            alert(formData.toString());
+
             if (formData) {
                     $.ajax({
                         url: "{% url 'dashboard:addsitekeys' %}",

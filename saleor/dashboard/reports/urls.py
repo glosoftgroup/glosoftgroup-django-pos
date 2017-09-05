@@ -43,6 +43,7 @@ urlpatterns = [
 
 		url(r'^mrg/sls/itms/paginate/$', sales_margin2.sales_items_paginate, name='sales_margin_items_paginate'),
 		url(r'^mrg/sls/itms/search/$', sales_margin2.sales_items_search, name='sales_margin_items_search'),
+		url(r'^mrg/sales/list/items/pdf/$', sales_margin2.sales_list_margin_items_pdf, name='reports_sales_margin_items_pdf'),
 
 
 
