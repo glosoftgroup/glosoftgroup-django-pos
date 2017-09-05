@@ -213,7 +213,6 @@ def terminal_add(request):
 		return HttpResponse('error accessing add terminal page')
 
 @staff_member_required
-@csrf_exempt
 def terminal_process(request):
 	user = Terminal.objects.all()
 	if request.method == 'POST':
@@ -264,42 +263,7 @@ def terminal_update(request, pk):
 		info_logger.info('User: '+str(request.user.name)+' updated terminal: '+str(terminal.terminal_name))
 		return HttpResponse("success")
 
-@csrf_exempt
-def user_assign_permission(request):
-	if request.method == 'POST':
-		user_id = request.POST.get('user_id')
-		user = get_object_or_404(User, pk=user_id)
-		user_has_permissions = Permission.objects.filter(user=user)
-		login_status = request.POST.get('check_login')
-		permission_list = request.POST.getlist('checklist[]')
-		if login_status == 'inactive':
-			user.is_staff = False
-			user.is_active = False
-			user.user_permissions.remove(*user_has_permissions)
-			user.save()
-			user_trail(request.user.name, 'deactivated and removed all permissions for user: '+ str(user.name))
-			info_logger.info('User: '+str(request.user.name)+' deactivated and removed all permissions for user: '+str(user.name))
-			return HttpResponse('deactivated')
-		else:
-			if user_has_permissions in permission_list:
-				not_in_user_permissions = list(set(permission_list) - set(user_has_permissions))
-				user.is_staff = True
-				user.is_active = True
-				user.user_permissions.add(*not_in_user_permissions)
-				user.save()
-				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name))
-				info_logger.info('User: '+str(request.user)+' assigned permissions for user: '+str(user.name))
-				return HttpResponse('permissions added')
-			else:
-				not_in_user_permissions = list(set(permission_list) - set(user_has_permissions))
-				user.is_staff = True
-				user.is_active = True
-				user.user_permissions.remove(*user_has_permissions)
-				user.user_permissions.add(*not_in_user_permissions)
-				user.save()
-				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name))
-				info_logger.info('User: '+str(request.user.name)+' assigned permissions for user: '+str(user.name))
-				return HttpResponse('permissions updated')
+
 
 @staff_member_required
 def terminal_history(request,pk=None):

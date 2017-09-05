@@ -1,6 +1,5 @@
              {% load staticfiles %}
                {% for option in options %}
-
                   <tr class='clickable-row'>
                     <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{ option.name}}</td>
                     <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.description}}</td>
@@ -74,5 +73,4 @@
                     });
       
                  });
-                 
                </script>

@@ -37,6 +37,7 @@ def update(request, site_id=None):
     ctx = {'site': site, 'form': form}
     return TemplateResponse(request, 'dashboard/sites/detail.html', ctx)
 
+@staff_member_required
 def update_settings(request,site_id=None):
     if request.method == 'POST':
         site = get_object_or_404(SiteSettings, pk=site_id)

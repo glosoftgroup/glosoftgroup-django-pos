@@ -18,6 +18,7 @@ urlpatterns = [
      url(r'^template/detail/(?P<pk>[0-9]+)$', views.get_template, name='template-detail'),
      url(r'^template/delete/(?P<pk>[0-9]+)$', views.delete_template, name='delete-sms-template'),
      url(r'^read/message/(?P<pk>[0-9]+)$', views.read, name='read-message'),
+     url(r'^resend/message/(?P<pk>[0-9]+)$', views.resend, name='resend-message'),
      url(r'^trash/message/(?P<pk>[0-9]+)$', views.delete, name='delete-message'),
      url(r'^delete/permanently/(?P<pk>[0-9]+)$', views.delete_permanently, name='delete-sms-permanently'),
 ]
