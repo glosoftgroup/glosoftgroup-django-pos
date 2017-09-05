@@ -11,6 +11,7 @@ from .forms import AuthorizationKeyFormSet, SiteSettingForm
 from ..views import staff_member_required
 from ...site.models import AuthorizationKey, SiteSettings, Files
 from ...site.utils import get_site_settings_from_request
+from django.views.decorators.csrf import csrf_protect
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -67,7 +68,12 @@ def add_sitekeys(request):
             error_logger.info('Error when saving ')
 
         if new_key.id:
-            return HttpResponse('success', content_type='application/json')
-        return HttpResponse('Error: Not saved', content_type='application/json')
+            return HttpResponse('success')
+        return HttpResponse('Error: Not saved')
 
-    return HttpResponse('Invalid request', content_type='application/json')
+    return HttpResponse('Invalid request')
+
+
+def test(request):
+    print ('testKeys')
+    return HttpResponse('success 123')
