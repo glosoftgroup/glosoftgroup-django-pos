@@ -260,7 +260,7 @@ def sales_paginate(request):
 def sales_search(request):
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
-		list_sz = request.GET.get('size',10)
+		list_sz = request.GET.get('size')
 		p2_sz = request.GET.get('psize')
 		q = request.GET.get( 'q' )
 		if list_sz is None:
@@ -653,7 +653,7 @@ def sales_items_paginate(request):
 def sales_items_search(request):
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
-		list_sz = request.GET.get('size', 10)
+		list_sz = request.GET.get('size')
 		p2_sz = request.GET.get('psize')
 		q = request.GET.get('q')
 		if list_sz is None:

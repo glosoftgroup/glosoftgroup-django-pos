@@ -188,7 +188,7 @@ def sales_paginate(request):
 			except InvalidPage:
 				sales = paginator.page(1)
 			except EmptyPage:
-				sales = paginator.page(paginator.num_pages)
+				sales = paginator.page(1)
 			return TemplateResponse(request,'dashboard/reports/sales/paginate.html',{'sales':sales})
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/p2.html', {'date': date})
@@ -196,8 +196,8 @@ def sales_paginate(request):
 @staff_member_required
 def sales_search(request):
 	if request.is_ajax():
-		page = request.GET.get('page', 1)
-		list_sz = request.GET.get('size',10)
+		page = int(request.GET.get('page', 1))
+		list_sz = request.GET.get('size')
 		p2_sz = request.GET.get('psize')
 		q = request.GET.get( 'q' )
 		if list_sz is None:
@@ -248,6 +248,7 @@ def sales_search(request):
 					sales.append(sale)
 
 				if list_sz:
+					print ('lst')
 					paginator = Paginator(sales, int(list_sz))
 					sales = paginator.page(page)
 					return TemplateResponse(request, 'dashboard/reports/sales/search.html',
@@ -255,6 +256,7 @@ def sales_search(request):
 											 'q': q})
 
 				if p2_sz:
+					print ('pst')
 					paginator = Paginator(sales, int(p2_sz))
 					sales = paginator.page(page)
 					return TemplateResponse(request, 'dashboard/reports/sales/paginate.html', {'sales': sales})
@@ -356,7 +358,7 @@ def products_paginate(request):
 def products_search(request):
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
-		list_sz = request.GET.get('size',10)
+		list_sz = request.GET.get('size')
 		p2_sz = request.GET.get('psize')
 		q = request.GET.get( 'q' )
 		if list_sz is None:
@@ -388,7 +390,7 @@ def products_search(request):
 def products_reorder_search(request):
 	if request.is_ajax():
 		page = request.GET.get('page', 1)
-		list_sz = request.GET.get('size',10)
+		list_sz = request.GET.get('size')
 		p2_sz = request.GET.get('psize')
 		q = request.GET.get( 'q' )
 		if list_sz is None:

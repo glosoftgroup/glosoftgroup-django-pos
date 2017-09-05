@@ -158,27 +158,36 @@ def expenditure(request):
 		else:
 			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
-		# pettyCash = PettyCash.objects.filter(created__icontains=date)
 		pettyCash = dateFactorial(date)
 		lastEntry = pettyCash.latest('id')
 
 		pd = DateFormat(lastEntry.created).format('Y-m-d')
 		td = DateFormat(datetime.datetime.today()).format('Y-m-d')
 		if td == pd:
-
 			dateToday = 1
 			expenses = Expenses.objects.filter(added_on__icontains=pd).aggregate(Sum('amount'))['amount__sum']
+			expenses = expenses
+			added = lastEntry.added
+			opening = lastEntry.opening
 		else:
 			dateToday = 0
 			try:
-				expenses = Expenses.objects.filter(added_on__icontains=pd).aggregate(Sum('amount'))['amount__sum']
+				expenses = Expenses.objects.filter(added_on__icontains=date).aggregate(Sum('amount'))['amount__sum']
+				if expenses:
+					expenses = expenses
+					added = lastEntry.added
+					opening = lastEntry.opening
+				else:
+					expenses = 0
+					added = 0
+					opening = lastEntry.closing
 			except:
 				expenses = 0
 
 		date = DateFormat(datetime.datetime.strptime(date, '%Y-%m-%d')).format('jS F Y')
 		amount = lastEntry.closing
-		opening = lastEntry.opening
-		added = lastEntry.added
+		opening = opening
+		added = added
 		closing = lastEntry.closing
 		data = {
 			'pdate': date,
@@ -190,7 +199,8 @@ def expenditure(request):
 			'expenses':expenses
 		}
 		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html', data)
-	except BaseException:
+	except BaseException,e:
+		print (e)
 		return TemplateResponse(request, 'dashboard/accounts/petty_cash/expenditure.html', {})
 
 
