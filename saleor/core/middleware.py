@@ -65,6 +65,7 @@ class SettingsMiddleware(object):
     def process_request(self, request):
         excluded_path = reverse('dashboard:addsitekeys')
         if request.path.startswith(excluded_path):
+            setattr(request, '_dont_enforce_csrf_checks', True)
             return None
 
         try:

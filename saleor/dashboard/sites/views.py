@@ -5,13 +5,13 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import FieldError
 from django.db import DatabaseError
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect, requires_csrf_token
 
 from .forms import AuthorizationKeyFormSet, SiteSettingForm
 from ..views import staff_member_required
 from ...site.models import AuthorizationKey, SiteSettings, Files
 from ...site.utils import get_site_settings_from_request
-from django.views.decorators.csrf import csrf_protect
+# from django.views.decorators.csrf import csrf_protect
 import logging
 
 debug_logger = logging.getLogger('debug_logger')
@@ -51,7 +51,7 @@ def update_settings(request,site_id=None):
         return HttpResponse('success')
     return HttpResponse('Invalid method')
 
-@csrf_exempt
+@csrf_protect
 def add_sitekeys(request):
     if request.method == 'POST':
         keyfile = request.POST.get('lic_key').strip()
