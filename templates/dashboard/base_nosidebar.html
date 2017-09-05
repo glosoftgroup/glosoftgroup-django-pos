@@ -46,7 +46,6 @@
       body {
       position: relative;
     }
-
     </style>
     {% endblock %}
     <link rel="stylesheet" type="text/css" href="{% static 'backend/css/fixed_table_header.css' %}">
@@ -159,7 +158,6 @@
     var selector = $('.fix-breadcrumb');
     $( "label" ).addClass( "text-bold" );
       });
-
   </script>
    
     
@@ -182,16 +180,12 @@
   getNotification().done(function (data) {
        $(".status-mark22").text(data);
     }); 
-
   $(document).ready(function(){
     setInterval(function(){ getNotification().done(function (data) {
        $(".status-mark22").text(data);
     }) }, 9920000);  
     
   });
-
-
-
   
   </script>
     {% block custom_js %}{% endblock %}
