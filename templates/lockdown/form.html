@@ -149,8 +149,6 @@
             var formData = new FormData(activation_form);
 
             if (formData) {
-                    var key = $("#lic_key").val();
-                    alert(key);
 
                     $.ajax({
                         url: "{% url 'dashboard:addsitekeys' %}",
