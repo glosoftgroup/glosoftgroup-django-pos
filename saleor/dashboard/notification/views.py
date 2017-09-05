@@ -117,14 +117,25 @@ def write(request):
 
         # send notification/emails
         if single:
-            user = Supplier.objects.get(email=single)
-            context = {'user': user.name, 'body': body, 'subject': subject}
-            emailit.api.send_mail(user.email,
-                                      context,
-                                      'notification/emails/notification_email',
-                                      from_email=request.user.email)
-            notif = Notification(actor=request.user, recipient=request.user, verb=subject, description=body, emailed=True)
-            notif.save()
+            try:
+                user = Supplier.objects.get(email=single)
+                context = {'user': user.name, 'body': body, 'subject': subject}
+                emailit.api.send_mail(user.email,
+                                          context,
+                                          'notification/emails/notification_email',
+                                          from_email=request.user.email)
+                notif = Notification(actor=request.user, recipient=request.user, verb=subject, description=body, emailed=True)
+                notif.save()
+            except:
+                #user = Supplier.objects.get(email=single)
+                context = {'user': single, 'body': body, 'subject': subject}
+                emailit.api.send_mail(single,
+                                          context,
+                                          'notification/emails/notification_email',
+                                          from_email=request.user.email)
+                notif = Notification(actor=request.user, recipient=request.user, verb=subject, description=body, emailed=True)
+                notif.save()
+            return HttpResponse('success')
             
         for email in email_list:
             user = User.objects.get(email=email)
@@ -167,7 +178,9 @@ def write(request):
         if request.GET.get('pk'):
             product = get_object_or_404(Product, pk=int(request.GET.get('pk')))
             ctx = {'product':product,'users':User.objects.all().order_by('-id')}
-    
+            return TemplateResponse(request,
+                            'dashboard/notification/write_single.html',
+                            ctx)
     return TemplateResponse(request,
                             'dashboard/notification/write.html',
                             ctx)

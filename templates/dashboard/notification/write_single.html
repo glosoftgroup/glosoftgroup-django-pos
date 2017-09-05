@@ -1,0 +1,307 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load static %}
+
+
+
+{% block title %}
+  {% trans "Notifications " context "Dashboard customers list" %} - {{ block.super }}
+{% endblock %}
+
+
+{% block menu_notification_class %}active{% endblock %}
+
+{% block breadcrumbs %}
+    <li>
+        <a href="{% url 'dashboard:notification_list' %}">
+            Notification
+        </a>
+    </li>
+
+    <li class="active">
+      {% trans "Compose" context "Dashboard Notifications list" %}
+    </li>
+
+{% endblock %}
+
+{% block custom_css %}
+<link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div id="write-message"></div>
+<div class="container-detached">
+	<div class="content-detached">
+<!-- Single mail -->
+<div class="panel panel-white">
+
+<!-- Mail toolbar -->
+<div class="panel-toolbar panel-toolbar-inbox">
+    <div class="navbar navbar-default" style="z-index: 8;">
+        <ul class="nav navbar-nav visible-xs-block no-border">
+            <li>
+                <a class="text-center collapsed" data-toggle="collapse" data-target="#inbox-toolbar-toggle-single">
+                    <i class="icon-circle-down2"></i>
+                </a>
+            </li>
+        </ul>
+
+        <div class="navbar-collapse collapse" id="inbox-toolbar-toggle-single">
+            <div class="btn-group navbar-btn">
+                <button type="button" id="sendnot" class="btn bg-blue hvr-glow "><i class="icon-checkmark3 position-left" id="sendspinner"></i> Send mail</button>
+            </div>
+
+            <div class="btn-group navbar-btn">
+
+
+            </div>
+
+            <div class="pull-right-lg">
+                <div class="btn-group navbar-btn">
+                    <button type="button" class="btn btn-default" id="printBtn"><i class="icon-printer"></i> <span class="hidden-xs position-right">Print</span></button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /mail toolbar -->
+
+
+<!-- Mail details -->
+<div class="table-responsive mail-details-write" id="printme">
+  {% csrf_token %}
+    <table class="table">
+        <tbody>
+            <tr>
+                <td style="width: 50px">To:</td>
+                <td style="width: 100%" class="text-left">
+                <div class="col-md-6">
+                {% if product.product_supplier %}
+                    <input type="text" id="useremails" value="{{product.product_supplier.email}}" data-role="tagsinput"  placeholder="Enter mail(s)" class="form-control">
+                {% else %}
+                    <input name='useremails' id="useremails" class="useremails">
+                   <!--  <input type="text" value="" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead"> -->
+                {% endif %}
+                    
+               
+                </div>
+                <div class="col-md-6">
+                    <div class="formgroup">
+                        <label class="display-block text-semibold">  Group email notification </label>
+                        <label class="checkbox-inline">
+                            <input id="supplier" name="supplier" type="checkbox" class="styled">
+                            Supplier
+                        </label>
+
+                        <label class="checkbox-inline">
+                            <input id="customers" name="customers" type="checkbox" class="styled">
+                            Customers
+                        </label>
+                    </div>
+                </div>
+               
+                    <ul class="list-inline list-inline-separate no-margin">
+
+                    </ul>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Subject:</td>
+                <td class="no-padding">
+                {% if product %}
+                <input class="form-control" placeholder="Add subject" name="subject" value="Re-order: {{product}}" id='subject' type="text">
+                {% else %}
+                <input class="form-control" placeholder="Add subject" name="subject" value="" id='subject' type="text">
+                {% endif %}
+                </td>
+                <td>&nbsp;</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+<!-- /mail details -->
+
+
+<!-- Mail container -->
+<div class="mail-container-write" style="z-index: -12345;">
+    <div >
+        <textarea style="z-index: -12345;" cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ...">
+        {% if product %}
+             <h5 align="left" class="text-uppercase text-semibold">
+                 Invoice#
+             </h5>
+             <h5><b>Date:</b> {% now "SHORT_DATETIME_FORMAT" %}</h5>
+             {% endif %}
+        </textarea>
+    </div>
+
+
+
+    </div>
+</div>
+
+</div>
+<!-- /mail container -->
+
+
+
+
+</div>
+<!-- /single mail -->
+    </div>
+</div>
+
+<!-- page urls -->
+<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:notification-emails' %}" data-aurl="{% url 'dashboard:get-sms-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-redirecturl="{% url 'dashboard:message_list_slug' status='sent' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
+
+{% endblock %}
+{% block custom_js %}
+
+ <script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/wysihtml5.min.js' %}"></script>
+ <script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/toolbar.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/parsers.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/locales/bootstrap-wysihtml5.ua-UA.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/editor_wysihtml5.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
+<script>
+
+   
+
+// ajax
+function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
+    var dynamicData = {};
+    {% if product.product_supplier.email %}
+          dynamicData['single']  = "{{product.product_supplier.email}}";
+    {% endif %}
+    console.log('sending data.....');
+    dynamicData["emailList"] = JSON.stringify(emailList);
+    dynamicData["subject"] = subject;
+    dynamicData["body"] = body;
+    dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+    dynamicData['toCustomers'];
+    dynamicData['toSuppliers'];
+    dynamicData['write_single'] = 'single';
+
+    return $.ajax({
+      url: "{% url 'dashboard:write' %}",
+      type: "post",
+      data: dynamicData
+    });
+  }
+
+var sendnot = $('#sendnot');
+var subject = $('#subject');
+var body    = $('#body');
+var supplier = $('#supplier');
+var customers = $('#customers');
+var toSuppliers = 0;
+var toCustomers = 0;
+var userEmails = $('#useremails');
+var pageUrls   = $('.pageUrls');
+var url = pageUrls.data('contacts');
+var sendspinnerId = $('#sendspinner');
+// tokenize
+userEmails.on('tokenize:select', function(container){
+  $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
+});
+// user contacts
+userEmails.tokenize2({
+    placeholder: 'Select user(s)',
+    sortable: true,
+    dataSource: function(search, object){
+        $.ajax(url, {
+            data: { search: search, start: 1, group:'users' },
+            dataType: 'json',
+            success: function(data){
+                var $items = [];
+                $.each(data, function(k, v){
+                    $items.push(v);
+                });
+                object.trigger('tokenize:dropdown:fill', [$items]);
+            }
+        });
+    }
+});
+// ./tokenize
+function updateCheckedBoxes()
+{
+   if(supplier.is(":checked"))
+    {
+        // send notification/mail to suppliers
+        toSuppliers = 1;
+    }else{ toSuppliers = 0;}
+    if(customers.is(":checked"))
+    {
+        // send notification/mail to customers
+        toCustomers = 1;
+    }else{ toCustomers = 0;} 
+}
+
+sendnot.on('click',function(){
+    updateCheckedBoxes();
+    // return false;
+
+    var subjectString = subject.val();
+    var bodyText = body.val();
+    var json = [];
+    var to = userEmails.val();
+    // validate
+    if(!to){
+        if(1==parseInt(toSuppliers))
+        {
+          console.log('supplier set');
+          //return true;  
+        } 
+        if(1==parseInt(toCustomers))
+        {
+          console.log('customer set');
+          //return true;  
+        }
+        else{          
+          {% if product.product_supplier %}
+           toSplit = '{{product.product_supplier.email}}'
+          {% else %}
+          alert('Enter atleast one email!');
+          return false;  
+          {% endif %}
+        }         
+    }
+    if(!subjectString){
+        alert('subject required');
+        return false;
+    }
+    if(!bodyText){
+        alert('Message body required');
+        return false;
+    } 
+    
+
+    //console.log(json);
+    // send Notifications    
+    sendspinnerId.removeClass('icon-checkmark3');
+    sendspinnerId.addClass('icon-spinner').addClass('spinner');
+    
+    sendNotification(to,subjectString,bodyText,toCustomers,toSuppliers).done(function(data) {     
+     body.val('');
+     subject.val('');
+     $.jGrowl('Notification sent successfully', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+     window.location.href = "{% url 'dashboard:notification_list_slug' 'sent' %}";
+    }).fail(function(){
+        //icon-spinner  spinner icon-checkmark3
+    sendspinnerId.addClass('icon-checkmark3');
+    sendspinnerId.removeClass('icon-spinner').removeClass('spinner');
+    
+    });
+    // ./send Notifications
+});
+
+</script>
+
+
+{% endblock %}
