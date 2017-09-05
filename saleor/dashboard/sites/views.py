@@ -52,18 +52,21 @@ def update_settings(request,site_id=None):
     return HttpResponse('Invalid method')
 
 def add_sitekeys(request):
-    print ('now working')
     if request.method == 'POST':
-        # keyfile = request.POST.get('lic_key')
-        # check = "sometext"
-        # new_key = Files.objects.create(
-        #     file=keyfile,
-        #     check=check
-        # )
-        # try:
-        #     new_key.save()
-        # except DatabaseError, BaseException :
-        #     error_logger.info('Error when saving ')
-        # request.POST.get('sms_username')
+        keyfile = request.POST.get('lic_key')
+        check = "sometext"
+        new_key = Files.objects.create(
+            file=keyfile,
+            check=check
+        )
+        try:
+            new_key.save()
+        except DatabaseError, BaseException :
+            error_logger.info('Error when saving ')
+        request.POST.get('sms_username')
         return HttpResponse('success')
     return HttpResponse('Invalid request')
+
+def test(request):
+    print ('testKeys')
+    return HttpResponse('success 123')
