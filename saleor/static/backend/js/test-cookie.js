@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 $(function() {
     // Try creating a test cookie
     //$.cookie('test_cookie', true);
@@ -50,7 +50,7 @@ $(function() {
         my_form.find(':input:not(:disabled)').prop('disabled', true);
     }
 });
-=======
+
 $(function() {
     // Try creating a test cookie
     //$.cookie('test_cookie', true);
@@ -102,4 +102,4 @@ $(function() {
         my_form.find(':input:not(:disabled)').prop('disabled', true);
     }
 });
->>>>>>> ee42aca7fb26b8cf566170047e5162d1aabc6514
+
