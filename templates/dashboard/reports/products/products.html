@@ -26,7 +26,7 @@
 <div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
-        
+
         <div class="panel-body search-panel">
             <div class="col-md-6">
              <label>Search Products</label>
@@ -78,7 +78,7 @@
       <div class="panel-body">
         <div class="row">
           <div class="col-md-12">
-            <div class="table-responsives">     
+            <div class="table-responsives">
                 <table class="table  datatable-header-footer">
                       <thead>
                         <tr class="bg-primary">
@@ -101,7 +101,7 @@
                             <td class="text-center">{{item.product.get_first_category}}</td>
                             <td class="text-center">{{item.product.product_class.name}}</td>
                             <td class="text-center">{{item.product.low_stock_threshold}}</td>
-                            
+
                             <td class="text-center">{{item.get_stock_quantity}}</td>
                               <td><span class="pull-right">{{item.get_price_per_item.gross|intcomma }}</span></td>
                               <td><span class="pull-right">{{item.get_total_price_cost|intcomma }}</span></td>
@@ -133,7 +133,7 @@
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
                   <span>Report pullled by User</span></p>
-                  
+
               </div>
              </div>
           {% endif %}
@@ -149,7 +149,7 @@
 
 {% endblock%}
 {% block custom_js %}
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
@@ -162,7 +162,7 @@ $(document).ready(function(){
         leaps: true,
         firstLastUse: true,
         first: 'First',
-        last: 'Last',       
+        last: 'Last',
         wrapClass: 'pagination',
         activeClass: 'active',
         disabledClass: 'disabled',
@@ -175,9 +175,9 @@ $(document).ready(function(){
             $.get("{% url 'dashboard:products_paginate' %}",{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
-    }).children('.pagination').addClass('pagination-flat pagination-sm'); 
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
 
-    $('.daterange-single').daterangepicker({ 
+    $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true
@@ -412,7 +412,7 @@ $(document).ready(function(){
 
     $('.search_user').keyup(function() {
       var searchData = $(this).val();
-      delay(function(){ 
+      delay(function(){
          var url = "{% url 'dashboard:products_search' %}";
          var url2 = "{% url 'dashboard:products_reorder_search' %}";
 
