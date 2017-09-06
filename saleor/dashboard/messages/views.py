@@ -11,6 +11,7 @@ from ...decorators import permission_decorator, user_trail
 import logging
 import json
 from django.db.models import Q
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 
 
 debug_logger = logging.getLogger('debug_logger')
@@ -52,6 +53,361 @@ def add_template(request):
         temp.save()
         return HttpResponse(temp.pk)
     return HttpResponse('Post request expected')
+
+@staff_member_required
+def list_messagessdweq(request,status=None):
+    try:
+        mark_read = True
+        title = 'Inbox' 
+        status = 'sent'       
+        delete_permanently = False
+        if status == 'trash':
+            delete_permanently = True
+            title = 'Trashed'
+            messages = Notification.objects.deleted()
+        elif status == 'unread':
+            title = 'Unread '
+            messages = Notification.objects.unread()
+        elif status == 'read':
+            title = 'Read'
+            messages = Notification.objects.read()
+        elif status == 'sent_to_sms':
+            title = 'Sent'
+            mark_read = False
+            print request.user.mobile
+            messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=True)
+        elif status == 'pending':
+            title = 'Pending'
+            mark_read = False
+            messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=False)
+        
+        elif status == 'sent':            
+            mark_read = False
+            messages = Notification.objects.filter(actor_object_id=request.user.id)
+        elif status == 'fetch':
+            title = 'Fetch From SMS Gateway'
+            fetch = fetch_messages()
+            mark_read = False
+            messages = {}
+            if fetch:
+                messages = messages
+        else:
+            messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
+       
+        #messages = PaymentOption.objects.all().order_by('-id')
+        #expense_types = ExpenseType.objects.all()
+        page = request.GET.get('page', 1)
+        paginator = Paginator(messages, 10)
+        try:
+            messages = paginator.page(page)
+        except PageNotAnInteger:
+            messages = paginator.page(1)
+        except InvalidPage:
+            messages = paginator.page(1)
+        except EmptyPage:
+            messages = paginator.page(paginator.num_pages)
+        
+        ctx = {
+        "pn": paginator.num_pages,
+        'title':title,
+        'status':status,
+        'delete_permanently': delete_permanently,
+        'mark_read': mark_read,
+        'status': status,
+        'deleted': len(Notification.objects.deleted()),
+        'notifications': messages,
+        'total_notifications': len(messages),
+        'users': User.objects.all()}
+        user_trail(request.user.name, 'accessed messaging', 'views')
+        info_logger.info('User: ' + str(request.user.name) + 'accessed payment option page')
+        if request.GET.get('initial'):
+            return HttpResponse(paginator.num_pages)
+        else:
+            return TemplateResponse(request,
+                                        'dashboard/messages/list.html',
+                                        ctx)
+    except TypeError as e:
+        error_logger.error(e)
+        return HttpResponse('error accessing messaging')
+
+@staff_member_required
+def messages_paginate(request):
+    page = int(request.GET.get('page', 1))
+    list_sz = request.GET.get('size')
+    p2_sz = request.GET.get('psize')
+    select_sz = request.GET.get('select_size')
+    if request.GET.get('gid'):
+        #type = ExpenseType.objects.get(pk=request.GET.get('gid'))
+        mark_read = True
+        title = 'Inbox'
+        delete_permanently = False
+        if status == 'trash':
+            delete_permanently = True
+            title = 'Trashed'
+            messages = Notification.objects.deleted()
+        elif status == 'unread':
+            title = 'Unread '
+            messages = Notification.objects.unread()
+        elif status == 'read':
+            title = 'Read'
+            messages = Notification.objects.read()
+        elif status == 'sent_to_sms':
+            title = 'Sent'
+            mark_read = False
+            print request.user.mobile
+            messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=True)
+        elif status == 'pending':
+            title = 'Pending'
+            mark_read = False
+            messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=False)
+        
+        elif status == 'sent':
+            mark_read = False
+            messages = Notification.objects.filter(actor_object_id=request.user.id)
+        elif status == 'fetch':
+            title = 'Fetch From SMS Gateway'
+            fetch = fetch_messages()
+            mark_read = False
+            messages = {}
+            if fetch:
+                messages = messages
+        else:
+            messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
+        
+        if p2_sz:
+            paginator = Paginator(messages, int(p2_sz))
+            messages = paginator.page(page)
+            ctx = {
+            "pn": paginator.num_pages,
+            'title':title,
+            'delete_permanently': delete_permanently,
+            'mark_read': mark_read,
+            'status': status,
+            'deleted': len(Notification.objects.deleted()),
+            'notifications': messages,
+            'total_notifications': len(messages),
+            'users': User.objects.all()}
+            return TemplateResponse(request,'dashboard/payment/options/paginate.html',ctx)
+
+        if list_sz:
+            paginator = Paginator(messages, int(list_sz))
+            messages = paginator.page(page)
+            ctx = {
+            "pn": paginator.num_pages,
+            'title':title,
+            'delete_permanently': delete_permanently,
+            'mark_read': mark_read,
+            'status': status,
+            'sz':list_sz, 'gid':request.GET.get('gid'),
+            'deleted': len(Notification.objects.deleted()),
+            'notifications': messages,
+            'total_notifications': len(messages),
+            'users': User.objects.all()}
+            return TemplateResponse(request,'dashboard/messages/paginate/p2.html',ctx)
+
+        paginator = Paginator(messages, 10)
+        messages = paginator.page(page)
+        ctx = {
+            "pn": paginator.num_pages,
+            'title':title,
+            'delete_permanently': delete_permanently,
+            'mark_read': mark_read,
+            'status': status,
+            'sz':10, 'gid':request.GET.get('gid'),
+            'deleted': len(Notification.objects.deleted()),
+            'notifications': messages,
+            'total_notifications': len(messages),
+            'users': User.objects.all()}
+        return TemplateResponse(request,'dashboard/mesages/paginate/p2.html',ctx)
+    else:
+        try:
+            mark_read = True
+            title = 'Inbox'
+            delete_permanently = False
+            if status == 'trash':
+                delete_permanently = True
+                title = 'Trashed'
+                messages = Notification.objects.deleted()
+            elif status == 'unread':
+                title = 'Unread '
+                messages = Notification.objects.unread()
+            elif status == 'read':
+                title = 'Read'
+                messages = Notification.objects.read()
+            elif status == 'sent_to_sms':
+                title = 'Sent'
+                mark_read = False
+                print request.user.mobile
+                messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=True)
+            elif status == 'pending':
+                title = 'Pending'
+                mark_read = False
+                messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=False)
+            
+            elif status == 'sent':
+                mark_read = False
+                messages = Notification.objects.filter(actor_object_id=request.user.id)
+            elif status == 'fetch':
+                title = 'Fetch From SMS Gateway'
+                fetch = fetch_messages()
+                mark_read = False
+                messages = {}
+                if fetch:
+                    messages = messages
+            else:
+                messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
+            
+            if list_sz:
+                paginator = Paginator(messages, int(list_sz))
+                messages = paginator.page(page)
+                ctx = {
+                "pn": paginator.num_pages,
+                'title':title,
+                'delete_permanently': delete_permanently,
+                'mark_read': mark_read,
+                'sz': list_sz,
+                'gid': 0,
+                'status': status,
+                'deleted': len(Notification.objects.deleted()),
+                'notifications': messages,
+                'total_notifications': len(messages),
+                'users': User.objects.all()}
+                
+                return TemplateResponse(request, 'dashboard/messages/paginate/p2.html', ctx)
+            else:
+                paginator = Paginator(messages, 10)
+            if p2_sz:
+                paginator = Paginator(messages, int(p2_sz))
+                messages = paginator.page(page)
+                ctx = {
+                "pn": paginator.num_pages,
+                'title':title,
+                'delete_permanently': delete_permanently,
+                'mark_read': mark_read,
+                'sz': list_sz,
+                'gid': 0,
+                'status': status,
+                'deleted': len(Notification.objects.deleted()),
+                'notifications': messages,
+                'total_notifications': len(messages),
+                'users': User.objects.all()}
+                return TemplateResponse(request, 'dashboard/messages/paginate/paginate.html', ctx)
+
+            try:
+                messages = paginator.page(page)
+            except PageNotAnInteger:
+                messages = paginator.page(1)
+            except InvalidPage:
+                messages = paginator.page(1)
+            except EmptyPage:
+                messages = paginator.page(paginator.num_pages)
+            ctx = {
+            "pn": paginator.num_pages,
+            'title':title,
+            'delete_permanently': delete_permanently,
+            'mark_read': mark_read,
+            'sz': list_sz,
+            'gid': 0,
+            'status': status,
+            'deleted': len(Notification.objects.deleted()),
+            'notifications': messages,
+            'total_notifications': len(messages),
+            'users': User.objects.all()}
+            return TemplateResponse(request, 'dashboard/messages/paginate/paginate.html', ctx)
+        except Exception, e:
+            return  HttpResponse()
+
+@staff_member_required
+def message_searchs(request):
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+        mark_read = True
+        title = 'Inbox'
+        delete_permanently = False
+        if status == 'trash':
+            delete_permanently = True
+            title = 'Trashed'
+            messages = Notification.objects.deleted()
+        elif status == 'unread':
+            title = 'Unread '
+            messages = Notification.objects.unread()
+        elif status == 'read':
+            title = 'Read'
+            messages = Notification.objects.read()
+        elif status == 'sent_to_sms':
+            title = 'Sent'
+            mark_read = False
+            print request.user.mobile
+            messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=True)
+        elif status == 'pending':
+            title = 'Pending'
+            mark_read = False
+            messages = Notification.objects.filter(from_number=str(request.user.mobile),sent=False)
+        
+        elif status == 'sent':
+            mark_read = False
+            messages = Notification.objects.filter(actor_object_id=request.user.id)
+        elif status == 'fetch':
+            title = 'Fetch From SMS Gateway'
+            fetch = fetch_messages()
+            mark_read = False
+            messages = {}
+            if fetch:
+                messages = messages
+        else:
+            messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
+        
+
+        if q is not None:
+            messages = messages.filter(
+                Q(name__icontains=q) |
+                Q(description__icontains=q)                
+                ).order_by('-id')
+            paginator = Paginator(messages, 10)
+            try:
+                messages = paginator.page(page)
+            except PageNotAnInteger:
+                messages = paginator.page(1)
+            except InvalidPage:
+                messages = paginator.page(1)
+            except EmptyPage:
+                messages = paginator.page(paginator.num_pages)
+            if p2_sz:
+                messages = paginator.page(page)
+                ctx = {
+                    "pn": paginator.num_pages,
+                    'title':title,
+                    'delete_permanently': delete_permanently,
+                    'mark_read': mark_read,
+                    'sz': sz,
+                    'gid': 0,
+                    'status': status,
+                    'deleted': len(Notification.objects.deleted()),
+                    'notifications': messages,
+                    'total_notifications': len(messages),
+                    'users': User.objects.all()}
+                return TemplateResponse(request, 'dashboard/messages/payment/paginate.html', ctx)
+            ctx = {
+            "pn": paginator.num_pages,
+            'title':title,
+            'delete_permanently': delete_permanently,
+            'mark_read': mark_read,
+            'sz': list_sz,
+            'gid': 0,'q': q,
+            'status': status,
+            'deleted': len(Notification.objects.deleted()),
+            'notifications': messages,
+            'total_notifications': len(messages),
+            'users': User.objects.all()}
+            return TemplateResponse(request, 'dashboard/messages/payment/search.html',
+                                    ctx)
 
 @staff_member_required
 def list_messages(request,status=None):

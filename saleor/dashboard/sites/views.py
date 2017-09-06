@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import FieldError
 from django.db import DatabaseError
 from django.views.decorators.csrf import csrf_exempt
-
+from ...decorators import permission_decorator, user_trail
 from .forms import AuthorizationKeyFormSet, SiteSettingForm
 from ..views import staff_member_required
 from ...site.models import AuthorizationKey, SiteSettings, Files
@@ -19,12 +19,14 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
+@permission_decorator('site.view_sitesettings')
 def index(request):
     settings = get_site_settings_from_request(request)
     return redirect('dashboard:site-update', site_id=settings.pk)
 
 
 @staff_member_required
+@permission_decorator('site.change_sitesettings')
 def update(request, site_id=None):
     site = get_object_or_404(SiteSettings, pk=site_id)
     form = SiteSettingForm(request.POST or None, instance=site)
@@ -38,6 +40,7 @@ def update(request, site_id=None):
     return TemplateResponse(request, 'dashboard/sites/detail.html', ctx)
 
 @staff_member_required
+@permission_decorator('site.change_sitesettings')
 def update_settings(request,site_id=None):
     if request.method == 'POST':
         site = get_object_or_404(SiteSettings, pk=site_id)

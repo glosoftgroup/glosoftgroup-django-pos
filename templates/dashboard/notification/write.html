@@ -26,6 +26,7 @@
 
 {% block custom_css %}
 <link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'backend/js/plugins/editors/summernote/summernote.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
@@ -127,15 +128,75 @@
 
 <!-- Mail container -->
 <div class="mail-container-write" style="z-index: -12345;">
-    <div >
-        <textarea style="z-index: -12345;" cols="18" rows="18" id="body" name="body" class="wysihtml5 wysihtml5-min form-control" placeholder="Enter text ...">
-        {% if product %}
-             <h5 align="left" class="text-uppercase text-semibold">
-                 Invoice#
-             </h5>
-             <h5><b>Date:</b> {% now "SHORT_DATETIME_FORMAT" %}</h5>
-             {% endif %}
-        </textarea>
+<div class="panel-group content-group-lg" id="accordion1">
+    <div class="panel panel-white">
+        <div class="panel-heading">
+            <h6 class="panel-title">
+                <a data-toggle="collapse" id="toggle-template" data-parent="#accordion1" href="#accordion-group1" class="text-semibold"><i class='toggleme icon-touch'></i>&nbsp;&nbsp;Select Template</a>
+            </h6>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                  <li id="add-template">
+                  <a href="#newTemplateModal" data-toggle="modal" data-target="#newTemplateModal" class="btn btn-xs btn-primary text-white" >Add New</a>
+                  </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div id="accordion-group1" class="panel-collapse collapse out bg-grey-300">
+            <div class="row p-15">
+              <div class="col-md-12">
+              <!-- append new template here -->
+               <div id="newTemplate"></div>
+               <!-- ./new temp -->
+               {% if templates %}
+               {% for template in templates %}
+               <!-- list templates -->
+                <div class="col-sm-4 col-lg-2 mb-15" id="trackDiv{{template.pk}}">
+                    <div class="panel">
+                        <div class="bg-purple demo-color" style="height:31px;"><span>{{template.name}}</span></div>
+                        
+                        <div class="p-15">
+                            <div class="media-body">
+                                <span><a href="#"
+                                data-href="{% url 'dashboard:template-detail' template.pk %}"
+                                data-spk='{{template.pk}}'
+                                class="stemplate text-purple" data-toggle="modal" data-target="#tempDetail"
+                                data-popup="tooltip"
+                                data-original-title="Preview"><i class="icon-eye"></i></a>
+                                </span>
+
+                                <span><a href="#"
+                                data-href="{% url 'dashboard:email-template-detail' template.pk %}"
+                                data-spk='{{template.pk}}'
+                                class="stemplate text-warning" data-toggle="modal" data-target="#tempDetail"
+                                data-popup="tooltip"
+                                data-original-title="Delete"><i class="icon-trash"></i></a>
+                                </span>                              
+                            </div>
+
+                            <div class="media-right">
+                            <ul class="icons-list">
+                                <li data-popup="tooltip"
+                                data-original-title="Select" class="text-bold selectedTemp" data-tid="{{template.pk}}"><i class="icon-touch"></i></li>
+                                
+
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ./templates -->
+                {% endfor %}
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    </div>
+    <div  class="rebody">
+      <div class='ebody' id="body"></div>        
     </div>
 
 
@@ -154,8 +215,11 @@
     </div>
 </div>
 
+<!-- initailize modals -->
+{% include "dashboard/notification/modals/contacts.html" %}
+
 <!-- page urls -->
-<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:notification-emails' %}" data-aurl="{% url 'dashboard:get-sms-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-redirecturl="{% url 'dashboard:message_list_slug' status='sent' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
+<input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:notification-emails' %}" data-aurl="{% url 'dashboard:get-email-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-redirecturl="{% url 'dashboard:message_list_slug' status='sent' %}" data-turl="{% url 'dashboard:add-email-template' %}" id="pageUrls" name="pageUrls">
 
 {% endblock %}
 {% block custom_js %}
@@ -166,9 +230,16 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/editors/wysihtml5/locales/bootstrap-wysihtml5.ua-UA.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/editor_wysihtml5.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
+<!-- summer note -->
+<script type="text/javascript" src="{% static 'backend/js/plugins/editors/summernote/summernote.min.js' %}"></script>
 <script>
 
-   
+ $(document).ready(function() {
+  $('#summernote').summernote();
+});
+$(document).ready(function() {
+  $('#body').summernote();
+});  
 
 // ajax
 function sendNotification(emailList,subject,body,toCustomers,toSuppliers) {
@@ -300,6 +371,115 @@ sendnot.on('click',function(){
     // ./send Notifications
 });
 
+
+// template script
+function alertUser(msg,status,header='Well done!')
+{
+    $.jGrowl(msg, 
+    {header: header,theme: status});
+}
+    
+    var toggleTemplate = $('#toggle-template');
+    var toggleicon = $('.toggleme');
+    var tname = $('#tname');
+    var tcontent =  $('#summernote');
+    var turl = $('.pageUrls').data('turl');
+    var appendUrl = $('.pageUrls').data('aurl');
+    var addTemplateBtn = $('#addTemplateBtn');
+    var newTemplate = $('#newTemplate');
+    var stemplate = $('.stemplate');
+    var templateDetail = $('#tData');
+    var selectedTemp = $('.selectedTemp');
+    var deleteTemp = $('.deleteTempBtn');
+
+    
+    // select template
+    selectedTemp.on('click',function(){
+      url = $(this).data('href');
+      spk = $(this).data('tid'); 
+      appendTemplate(spk,'select',url).done(function(data){
+        $(".rebody").replaceWith(data); 
+        //$('#ebody').replaceWith(data);
+
+          alertUser('Template selected','bg-success');
+          $('#accordion-group1').removeClass('in');
+        }); 
+    });
+    // .selectedTemp
+
+    stemplate.on('click',function(){
+        url = $(this).data('href');
+        spk = $(this).data('spk');
+        templateDetail.empty().html('Loading.....');
+        appendTemplate(spk,'detail',url).done(function(data){
+          templateDetail.empty().html(data);  
+        });
+    });
+
+
+    // ajax
+    function addTemplate(tname,tcontent) {
+        var dynamicData = {};
+        if(!tname){
+            alertUser('Template Name required','bg-danger','Error!');
+            return false;
+        }
+        dynamicData['tname']=tname;
+        dynamicData['tcontent']=tcontent;
+        dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+    
+        return $.ajax({
+          url: turl,
+          type: "post",
+          data: dynamicData
+        });
+    }
+
+    // ajax
+    function appendTemplate(pk,template=false) {
+        var dynamicData = {};
+        dynamicData['pk']=pk;
+        if(template){
+            dynamicData['template'] = template;
+        }
+        return $.ajax({
+          url: appendUrl,
+          type: "get",
+          data: dynamicData
+        });
+    }
+
+    addTemplateBtn.on('click',function(){
+        var templateName = tname.val();
+        var templateContent = tcontent.summernote('code');
+        if(!templateContent && !templateName)
+        {
+            alertUser('Both template name/content required','bg-danger','Error!');
+            return false;
+        }
+        addTemplate(templateName,templateContent).
+        done(function(data) {            
+        alertUser('Message Template added successfully', 'bg-success');
+        $('#newTemplateModal').modal('hide');
+        appendTemplate(data).done(function(data){
+            newTemplate.append(data);
+            $('#accordion-group1').addClass('in');
+        });
+    });
+
+    });
+
+
+
+
+    toggleTemplate.on('hidden.bs.collapse',function(){
+        if(!$('.panel-collapse').hasClass('in')){
+            //console.log('collapsed');
+            toggleicon.removeClass('icon-touch').addClass('icon-cross');
+        }else{
+            toggleicon.removeClass('icon-cross').addClass('icon-touch');
+        }
+    });
 </script>
 
 
