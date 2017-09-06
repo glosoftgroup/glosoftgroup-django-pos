@@ -298,6 +298,12 @@ def user_delete(request, pk):
     user = get_object_or_404(User, pk=pk)
     if request.method == 'POST':
         user.delete()
+        # if user.image != '':
+        #     image_path = os.path.join(settings.MEDIA_ROOT, str(user.image))
+        #     try:
+        #         os.unlink(image_path)
+        #     except:
+        #         pass
         user_trail(request.user.name, 'deleted user: '+ str(user.name),'delete')
         return HttpResponse('success')
 
