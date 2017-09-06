@@ -41,6 +41,7 @@
 
     {% block custom_css %}
        <style type="text/css">
+         .spinner{display: none;}
        </style>
     {% endblock %}
   </head>
@@ -83,7 +84,10 @@
               </div>
 
               <div class="form-group">
-                <button type="submit" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i><br><i class="fa fa-spinner fa-spin fa-2x fa-fw position-right spinner" style="display: none;"></i></button>
+                <button type="submit" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i>
+                  <br>
+                  <i class="fa fa-spinner fa-spin fa-2x fa-fw position-right spinner">
+                  </i></button>
               </div>
               <div class="text-center">
                 <a class="link--styled" href="{% url 'account_reset_password' %}">
@@ -158,7 +162,8 @@
     <script type="text/javascript">
          $("#loginForm").submit(function(e)
           {
-              $('.spinner').show();
+              var spinner = $('.spinner');
+              spinner.show();
               var postData = $(this).serializeArray();
               var formURL = "{% url 'account_login' %}";
 
@@ -170,6 +175,7 @@
                   data : postData,
                   success:function(data, textStatus, jqXHR) 
                   {
+                      $('#status').remove();
                       if(data == 'success'){ 
                          window.location = "{% url 'dashboard:index' %}";
                          $('.email').val('');
