@@ -1,3 +1,4 @@
+
 {% extends "dashboard/base.html" %}
 {% load staticfiles i18n %}
 {% load i18n %}
@@ -25,7 +26,7 @@
 <div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
-        
+
         <div class="panel-body search-panel">
             <div class="col-md-6">
              <label>Search Products</label>
@@ -77,7 +78,7 @@
       <div class="panel-body">
         <div class="row">
           <div class="col-md-12">
-            <div class="table-responsives">     
+            <div class="table-responsives">
                 <table class="table  datatable-header-footer">
                       <thead>
                         <tr class="bg-primary">
@@ -100,7 +101,7 @@
                             <td class="text-center">{{item.product.get_first_category}}</td>
                             <td class="text-center">{{item.product.product_class.name}}</td>
                             <td class="text-center">{{item.product.low_stock_threshold}}</td>
-                            
+
                             <td class="text-center">{{item.get_stock_quantity}}</td>
                               <td><span class="pull-right">{{item.get_price_per_item.gross|intcomma }}</span></td>
                               <td><span class="pull-right">{{item.get_total_price_cost|intcomma }}</span></td>
@@ -132,7 +133,7 @@
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
                   <span>Report pullled by User</span></p>
-                  
+
               </div>
              </div>
           {% endif %}
@@ -148,19 +149,20 @@
 
 {% endblock%}
 {% block custom_js %}
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
+
      $('.bootpag-callback').bootpag({
         total: parseInt('{{pn}}'),
         maxVisible: 3,
         leaps: true,
         firstLastUse: true,
         first: 'First',
-        last: 'Last',       
+        last: 'Last',
         wrapClass: 'pagination',
         activeClass: 'active',
         disabledClass: 'disabled',
@@ -173,8 +175,9 @@ $(document).ready(function(){
             $.get("{% url 'dashboard:products_paginate' %}",{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
-    }).children('.pagination').addClass('pagination-flat pagination-sm'); 
-    $('.daterange-single').daterangepicker({ 
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+    $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true
@@ -238,12 +241,14 @@ $(document).ready(function(){
             }
         }
   });
+
    $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
           pdfIcon:'fa-file-pdf-o',
           excelIcon:'fa-file-excel-o'
     }).on('change', function(){
+
         var ts = $(this).val();
         var prolist = $('.products-category').find(":selected").val();
         var searchData = $('.search_user').val();
@@ -312,10 +317,6 @@ $(document).ready(function(){
                     });
                 }
 
-          var url = "{% url 'dashboard:reports_products_pdf' %}";
-          window.open(url, '_blank');
-        }else if(ts=='excel'){
-          window.location="{% url 'dashboard:reports_products_export_csv' %}";
         }else{
           $(this).val('')
         }
@@ -398,6 +399,9 @@ $(document).ready(function(){
 
         }
      });
+
+
+
       var delay = (function(){
       var timer = 0;
       return function(callback, ms){
@@ -405,9 +409,10 @@ $(document).ready(function(){
           timer = setTimeout(callback, ms);
         };
       })();
+
     $('.search_user').keyup(function() {
       var searchData = $(this).val();
-      delay(function(){ 
+      delay(function(){
          var url = "{% url 'dashboard:products_search' %}";
          var url2 = "{% url 'dashboard:products_reorder_search' %}";
 
@@ -419,22 +424,6 @@ $(document).ready(function(){
                   $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listVal},success: function(data){
                         $('#pagination-div').html(data);
                   }});
-         $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
-                $('#pagination-div').html(data);
-         }});
-         var listVal = $('.list-sz').find(":selected").val();
-         var prolist = $('.products-category').find(":selected").val();
-         if (searchData && listVal && prolist){
-           if(prolist == 'list'){
-                    if (listVal != '0'){
-                       $.ajax({ url:url,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
-                              $('#pagination-div').html(data);
-                        }});
-                    }else{
-                        $.ajax({ url:url,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
-                              $('#pagination-div').html(data);
-                        }});
-                    }
               }else if(prolist == 'reorder'){
                 $.ajax({ url:url2, type: 'GET',data: {page:1, q:searchData, size:listVal},success: function(data){
                         $('#pagination-div').html(data);
@@ -461,7 +450,11 @@ $(document).ready(function(){
                   }});
          }
       }, 500 );
+
     });
+
+
 });
+
 </script>
 {% endblock %}
