@@ -18,6 +18,7 @@ import simplejson
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from django.core.paginator import Paginator
+from ...utils import image64
 
 from ...userprofile.models import User
 from ...decorators import permission_decorator, user_trail
@@ -298,7 +299,7 @@ def get_group_users(request):
 			if user.image:
 				user_dict['image'] = str(user.image.url)
 			else:
-				user_dict['image'] = "/static/images/user.png"
+				user_dict['image'] = image64()
 			to_json.append(user_dict)
 		response_data = simplejson.dumps(to_json)
 		return HttpResponse(response_data, content_type='application/json')

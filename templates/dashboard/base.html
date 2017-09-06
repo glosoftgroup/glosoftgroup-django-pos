@@ -2,6 +2,7 @@
 {% load staticfiles i18n %}
 {% load render_bundle from webpack_loader %}
 {% load version %}
+{% load default_user_image %}
 
 <html lang="{{ LANGUAGE_CODE }}" class="no-js">
   <head>
@@ -46,6 +47,7 @@
       body {
       position: relative;
     }
+    .default_img{width:40px;height:40px;}
 
     </style>
     {% endblock %}
@@ -59,7 +61,8 @@
     <div class="navbar-header" style="padding-right: : 30px;">
       <a class="navbar-brand logo" href="{% url 'dashboard:index' %}">
           <span style="font-size: 2.3em;font-family: monospace;font-weight: bolder;">G-POS</span>
-        <svg data-src="{% static "dashboard/images/saleor_logo.svg" %}" height="38px" width="176px" />
+        <svg data-src="{% static 'dashboard/images/saleor_logo.svg' %}" height="38px" width="176px" />
+
       </a>
 
       <ul class="nav navbar-nav pull-right visible-xs-block">
@@ -93,7 +96,7 @@
            {% if request.user.image %}
               <img src="{{request.user.image.url }}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;" />
            {% else %}
-              <img src="{% static 'images/user.png' %}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;">
+              <img src="{% default_user_image %}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;">
            {% endif %}
         </li>
           <li class="dropdown">

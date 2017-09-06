@@ -1,8 +1,8 @@
-
 {% extends "dashboard/base.html" %}
 {% load staticfiles i18n %}
 {% load i18n %}
 {% load prices_i18n %}
+{% load default_user_image %}
 
 {% block title %}
   Supplier Update
@@ -122,7 +122,7 @@
                 <!-- <label for="exampleInputEmail1">User Image</label> -->
                 <div class="fileinput fileinput-new" data-provides="fileinput">
                   <div class="fileinput-new thumbnail" style="width: 150px; height: auto;">
-                    <img data-src="holder.js/100%x100%" alt="..." src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'images/user.png' %} {% endif %}">
+                    <img data-src="holder.js/100%x100%" alt="..." src="{% if user.image %}{{ user.image.url }}{% else %} {% default_user_image %} {% endif %}">
                   </div>
                   <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
                   <div style="text-align: center;">

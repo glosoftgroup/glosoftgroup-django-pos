@@ -58,11 +58,11 @@
           </div>
 
           
-          <div class="col-md-12 text-right" >
-            <a class="btn btn-flat" href="{% url "dashboard:index" %}" traget="_blank">
+          <div class="col-md-6 col-md-offset-3 text-right" >
+            <a class="btn btn-default pull-left" href="{% url 'dashboard:index' %}" traget="_blank">
               {% trans "Cancel" context "Dashboard cancel action" %}
             </a>
-            <button type="submit" class="btn  btn-primary waves-effect waves-light">
+            <button type="submit" class="btn  btn-primary waves-effect waves-light pull-right">
               {% trans "Update" context "Dashboard update action" %}
             </button>
           </div>

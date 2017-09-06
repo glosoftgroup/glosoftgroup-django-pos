@@ -3,6 +3,7 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load prices_i18n %}
+{% load default_user_image %}
 
 {% block title %}
   users
@@ -125,7 +126,7 @@
                    {% if user.image %}
                       <img src="{{user.image.url }}" alt="" class="circle teal img-responsive img-circle" style="width: 40px;height: 40px;"/>
                    {% else %}
-                      <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
+                      <img src="{% default_user_image %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
                    {% endif %}
                    </td>
                      <!-- product name -->

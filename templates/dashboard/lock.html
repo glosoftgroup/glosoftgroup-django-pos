@@ -2,6 +2,7 @@
 {% load staticfiles i18n %}
 {% load render_bundle from webpack_loader %}
 {% load version %}
+{% load default_user_image %}
 
 <html lang="{{ LANGUAGE_CODE }}" class="no-js">
   <head>
@@ -64,7 +65,7 @@
                 {% if request.user.image %}
                 <img src="{{request.user.image.url }}" alt="" class="img-circle" style="width: 150px;height: 150px;margin-top: 7px;" />
                 {% else %}
-                  <img src="{% static 'images/user.png' %}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;">
+                  <img src="{% default_user_image %}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;">
                 {% endif %}
                  <h6 class="content-group text-center text-semibold no-margin-top">{{ request.user.name }} <small class="display-block">Unlock your account</small></h6>
                  <h6></h6>
