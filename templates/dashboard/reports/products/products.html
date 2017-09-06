@@ -1,4 +1,3 @@
-
 {% extends "dashboard/base.html" %}
 {% load staticfiles i18n %}
 {% load i18n %}
@@ -155,7 +154,6 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-
      $('.bootpag-callback').bootpag({
         total: parseInt('{{pn}}'),
         maxVisible: 3,
@@ -176,7 +174,6 @@ $(document).ready(function(){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm'); 
-
     $('.daterange-single').daterangepicker({ 
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
@@ -220,22 +217,18 @@ $(document).ready(function(){
             window.location = "{% url 'dashboard:products_reorder' %}";
         }
   });
-
    $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
           pdfIcon:'fa-file-pdf-o',
           excelIcon:'fa-file-excel-o'
     }).on('change', function(){
-
         var ts = $(this).val();
         if(ts == 'pdf'){
           var url = "{% url 'dashboard:reports_products_pdf' %}";
           window.open(url, '_blank');
-
         }else if(ts=='excel'){
           window.location="{% url 'dashboard:reports_products_export_csv' %}";
-
         }else{
           $(this).val('')
         }
@@ -247,9 +240,6 @@ $(document).ready(function(){
               $('#pagination-div').html(data);
         }});
      });
-
-
-
       var delay = (function(){
       var timer = 0;
       return function(callback, ms){
@@ -257,7 +247,6 @@ $(document).ready(function(){
           timer = setTimeout(callback, ms);
         };
       })();
-
     $('.search_user').keyup(function() {
       var searchData = $(this).val();
       delay(function(){ 
@@ -266,10 +255,8 @@ $(document).ready(function(){
          $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
                 $('#pagination-div').html(data);
          }});
-
          var listVal = $('.list-sz').find(":selected").val();
          var prolist = $('.products-category').find(":selected").val();
-
          if (searchData && listVal && prolist){
            if(prolist == 'list'){
                     if (listVal != '0'){
@@ -304,11 +291,7 @@ $(document).ready(function(){
               }
          }
       }, 500 );
-
     });
-
-
 });
-
 </script>
 {% endblock %}

@@ -42,10 +42,44 @@
         </div>
           {% if sales %}
              <div class="my-paginate">
-                <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
-                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
-                </div>
+                
+  <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
               </div>
           {% endif %}
           </div>
@@ -141,4 +175,133 @@
             });
 
    });
+    //**@ display size select
+     $('.list-sz').selectpicker().on('change', function(){
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var date = $('.daterange-single').val();
+        var url = "{% url 'dashboard:sales_margin_items_search' %}";
+        var scategory = $('.sales-category').find(":selected").val();
+
+        if((scategory == 'items' && date && searchData)){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(scategory == 'items' && searchData){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(scategory == 'items' && date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_items_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_items_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(scategory == 'items'){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_items_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_items_paginate' %}", type: 'GET',data: {page:1, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if((scategory == 'sales' && date && searchData)){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(scategory == 'sales' && searchData){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(scategory == 'sales' && date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(searchData && date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, size:10, q:searchData, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else if(searchData){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, size:listSizeVal, q:searchData},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_search' %}", type: 'GET',data: {page:1, size:10, q:searchData},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else if(date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:"{% url 'dashboard:sales_margin_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:"{% url 'dashboard:sales_margin_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else{
+           if(listSizeVal != '0'){
+               $.ajax({ url: "{% url 'dashboard:sales_margin_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.ajax({ url: "{% url 'dashboard:sales_margin_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+           }
+       }
+
+     });
+   {% if sz %}
+   $.when( $.ready ).then(function() {     
+         $('.bootstrap-select').selectpicker();
+         $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
+      });
+   {% endif %}
+
+
  </script>
