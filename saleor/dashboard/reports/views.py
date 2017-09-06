@@ -297,10 +297,7 @@ def product_reports(request):
 			items = paginator.page(paginator.num_pages)
 		user_trail(request.user.name, 'accessed products reports','view')
 		info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
-		if request.GET.get('initial'):
-			return HttpResponse(paginator.num_pages)
-		else:
-			return TemplateResponse(request, 'dashboard/reports/products/products.html', {'items':items, 'total_cost':total_cost})
+		return TemplateResponse(request, 'dashboard/reports/products/products.html', {'pn':paginator.num_pages,'items':items, 'total_cost':total_cost})
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing products reports')
@@ -371,6 +368,19 @@ def products_search(request):
 				Q( sku__icontains = q ) |
 				Q( product__name__icontains = q ) |
 				Q(product__product_class__name__icontains = q) ).order_by( '-id' )
+
+			if p2_sz:
+				paginator = Paginator(items, int(p2_sz))
+				items = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/reports/products/paginate.html', {'items': items})
+
+			if list_sz:
+				paginator = Paginator(items, int(list_sz))
+				items = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/reports/products/search.html',
+										{'items': items, 'pn': paginator.num_pages, 'sz': list_sz,
+										 'gid': request.GET.get('gid'), 'q': q})
+
 			paginator = Paginator(items, 10)
 			try:
 				items = paginator.page(page)

@@ -9,12 +9,17 @@ from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from django.shortcuts import redirect
 import json
+import logging
+import datetime
 
 from saleor.cart.utils import find_and_assign_anonymous_cart
 from .forms import LoginForm, SignupForm, SetPasswordForm
 from saleor.decorators import permission_decorator, user_trail
 from saleor.userprofile.models import User
 
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 # @find_and_assign_anonymous_cart()
 # def login(request):
@@ -31,6 +36,7 @@ def login(request):
 		if user.is_active:
 			auth.login(request, user)
 			user_trail(request.user,"logged in ", "login")
+			info_logger.info(request.user.name+' logged in at '+str(datetime.datetime.now()))
 			return HttpResponse('success')
 		else: 
 			return HttpResponse('cannot login')
@@ -41,6 +47,7 @@ def login(request):
 @login_required
 def logout(request):
 	user_trail(request.user.name, 'logged out','logout')
+	info_logger.info(request.user.name + ' logged out at ' + str(datetime.datetime.now()))
 	auth.logout(request)
 	messages.success(request, _('You have been successfully logged out.'))
 	return redirect(settings.LOGIN_REDIRECT_URL)
