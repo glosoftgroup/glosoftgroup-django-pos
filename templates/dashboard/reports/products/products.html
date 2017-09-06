@@ -189,12 +189,13 @@ $(document).ready(function(){
     });
   $('.products-category').selectpicker().on('change', function(){
         var sv = $(this).val();
+        var searchData = $('.search_user').val();
+        var listVal = $('.list-sz').find(":selected").val();
+        var url = "{% url 'dashboard:products_paginate' %}";
+        var url2 = "{% url 'dashboard:products_search' %}";
+        var url3 = "{% url 'dashboard:products_reorder_paginate' %}";
+        var url4 = "{% url 'dashboard:products_reorder_search' %}";
         if(sv == 'list'){
-            var searchData = $('.search_user').val();
-            var listVal = $('.list-sz').find(":selected").val();
-            <!--window.location = "{% url 'dashboard:products_reports' %}";-->
-            var url = "{% url 'dashboard:products_paginate' %}";
-            var url2 = "{% url 'dashboard:products_search' %}";
             if (searchData && listVal){
                 if (listVal != '0'){
                        $.ajax({ url:url2,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
@@ -217,7 +218,27 @@ $(document).ready(function(){
                   }
             }
         }else if(sv == 'reorder'){
-            window.location = "{% url 'dashboard:products_reorder' %}";
+            if (searchData && listVal){
+                if (listVal != '0'){
+                       $.ajax({ url:url4,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                  }else{
+                        $.ajax({ url:url4,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                  }
+            }else{
+                if (listVal != '0'){
+                       $.ajax({ url: url3,type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                  }else{
+                        $.ajax({ url: url3,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                              $('#pagination-div').html(data);
+                        }});
+                  }
+            }
         }
   });
 
@@ -229,12 +250,72 @@ $(document).ready(function(){
     }).on('change', function(){
 
         var ts = $(this).val();
+        var prolist = $('.products-category').find(":selected").val();
+        var searchData = $('.search_user').val();
+
+        var url = "{% url 'dashboard:reports_products_pdf' %}";
+        var url2 = "{% url 'dashboard:reports_reorder_pdf' %}";
+        var url3 = "{% url 'dashboard:reports_products_export_csv' %}";
+        var url4 = "{% url 'dashboard:reports_reorder_export_csv' %}";
         if(ts == 'pdf'){
-          var url = "{% url 'dashboard:reports_products_pdf' %}";
-          window.open(url, '_blank');
+          <!--window.open(url, '_blank');-->
+                if(searchData && (prolist == 'list')){
+                    $.get(url, {q:searchData}, function(data){
+                              window.open("data:application/pdf," + escape(data));
+                    });
+                }else if(searchData && (prolist == 'reorder')){
+                    $.get(url2, {q:searchData}, function(data){
+                              window.open("data:application/pdf," + escape(data));
+                    });
+
+                }else if(searchData){
+                    $.get(url, {q:searchData}, function(data){
+                              window.open("data:application/pdf," + escape(data));
+                    });
+
+                }else if(prolist == 'list'){
+                    $.get(url, function(data){
+                              window.open("data:application/pdf," + escape(data));
+                    });
+                }else if(prolist == 'reorder'){
+                    $.get(url2, function(data){
+                              window.open("data:application/pdf," + escape(data));
+                    });
+                }else{
+                    $.get(url, function(data){
+                              window.open("data:application/pdf," + escape(data));
+                    });
+                }
 
         }else if(ts=='excel'){
-          window.location="{% url 'dashboard:reports_products_export_csv' %}";
+          <!--window.location="{% url 'dashboard:reports_products_export_csv' %}";-->
+                if(searchData && (prolist == 'list')){
+                    $.get(url3, {q:searchData}, function(data){
+                              window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false)
+                    });
+                }else if(searchData && (prolist == 'reorder')){
+                    $.get(url4, {q:searchData}, function(data){
+                              window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false)
+                    });
+
+                }else if(searchData){
+                    $.get(url3, {q:searchData}, function(data){
+                              window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false)
+                    });
+
+                }else if(prolist == 'list'){
+                    $.get(url3, function(data){
+                              window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false)
+                    });
+                }else if(prolist == 'reorder'){
+                    $.get(url4, function(data){
+                              window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false)
+                    });
+                }else{
+                    $.get(url3, function(data){
+                              window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false)
+                    });
+                }
 
         }else{
           $(this).val('')
@@ -242,10 +323,81 @@ $(document).ready(function(){
     });
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
-        var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:products_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
+        var listVal = $(this).val();
+        var prolist = $('.products-category').find(":selected").val();
+        var searchData = $('.search_user').val();
+
+        var url = "{% url 'dashboard:products_paginate' %}";
+        var url2 = "{% url 'dashboard:products_search' %}";
+        var url3 = "{% url 'dashboard:products_reorder_paginate' %}";
+        var url4 = "{% url 'dashboard:products_reorder_search' %}";
+
+        if(searchData && (prolist == 'list')){
+              if (listVal != '0'){
+                   $.ajax({ url:url2,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url:url2,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+
+        }else if(searchData && (prolist == 'reorder')){
+              if (listVal != '0'){
+                   $.ajax({ url:url4,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url:url4,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+
+        }else if(searchData){
+              if (listVal != '0'){
+                   $.ajax({ url:url2,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url:url2,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+
+        }else if(prolist == 'list'){
+            if (listVal != '0'){
+                   $.ajax({ url: url,type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url: url,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+
+        }else if(prolist == 'reorder'){
+              if (listVal != '0'){
+                   $.ajax({ url: url3,type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url: url3,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+        }else{
+              if (listVal != '0'){
+                   $.ajax({ url: url,type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }else{
+                    $.ajax({ url: url,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+              }
+
+        }
      });
 
 
@@ -263,45 +415,39 @@ $(document).ready(function(){
       delay(function(){ 
          var url = "{% url 'dashboard:products_search' %}";
          var url2 = "{% url 'dashboard:products_reorder_search' %}";
-         $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
-                $('#pagination-div').html(data);
-         }});
 
          var listVal = $('.list-sz').find(":selected").val();
          var prolist = $('.products-category').find(":selected").val();
 
-         if (searchData && listVal && prolist){
-           if(prolist == 'list'){
-                    if (listVal != '0'){
-                       $.ajax({ url:url,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
-                              $('#pagination-div').html(data);
-                        }});
-                    }else{
-                        $.ajax({ url:url,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
-                              $('#pagination-div').html(data);
-                        }});
-                    }
+         if ((listVal && listVal != '0') && (prolist && prolist!='none')){
+              if(prolist == 'list'){
+                  $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listVal},success: function(data){
+                        $('#pagination-div').html(data);
+                  }});
               }else if(prolist == 'reorder'){
-                    if (listVal != '0'){
-                       $.ajax({ url:url2,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
-                              $('#pagination-div').html(data);
-                        }});
-                    }else{
-                        $.ajax({ url:url2,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
-                              $('#pagination-div').html(data);
-                        }});
-                    }
-              }else{
-                    <!--if (listVal != '0'){-->
-                       <!--$.ajax({ url:url,type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){-->
-                              <!--$('#pagination-div').html(data);-->
-                        <!--}});-->
-                    <!--}else{-->
-                        <!--$.ajax({ url:url,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){-->
-                              <!--$('#pagination-div').html(data);-->
-                        <!--}});-->
-                    <!--}-->
+                $.ajax({ url:url2, type: 'GET',data: {page:1, q:searchData, size:listVal},success: function(data){
+                        $('#pagination-div').html(data);
+                  }});
               }
+         }else if(prolist && prolist!='none'){
+             console.log('reorder only')
+             if(prolist == 'list'){
+                  $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                        $('#pagination-div').html(data);
+                  }});
+              }else if(prolist == 'reorder'){
+                  $.ajax({ url:url2, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                        $('#pagination-div').html(data);
+                  }});
+              }
+         }else if(listVal && listVal != '0'){
+                  $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listVal},success: function(data){
+                        $('#pagination-div').html(data);
+                  }});
+         }else{
+                  $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                        $('#pagination-div').html(data);
+                  }});
          }
       }, 500 );
 
