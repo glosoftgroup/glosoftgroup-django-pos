@@ -54,12 +54,16 @@ def update_settings(request,site_id=None):
 @csrf_exempt
 def add_sitekeys(request):
     if request.method == 'POST':
-        keyfile = request.POST.get('lic_key').strip()
-        info_logger.info("***************")
-        info_logger.info(keyfile)
-        info_logger.info("***************")
-        check = "sometext"
-        if keyfile:
+        keyfiles = request.POST.get('lic_key').strip()
+
+        # check = "04feac9f3028e9887ea9087570edf86dff536ac71e977b1944e0891aee231d25"
+        if keyfiles:
+
+            keyfile, check = keyfiles.split('###')
+
+            print keyfile
+            print check
+
             new_key = Files.objects.create(
                 file=keyfile,
                 check=check

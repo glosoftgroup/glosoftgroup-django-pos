@@ -16,6 +16,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.http import QueryDict, HttpResponse
 from saleor.dashboard.sites.views import add_sitekeys
+from ..core.encryptor import Encryptor
 
 logger = logging.getLogger(__name__)
 info_logger = logging.getLogger('info_logger')
@@ -75,16 +76,21 @@ class SettingsMiddleware(object):
         filecontent  = ufile.file
         filename = ufile.check
 
+        #  check hashlib
         h = hashlib.sha256()
         h.update(filecontent)
         hex = h.hexdigest()
 
+        secretkey = settings.CUSTOMER_CODE
+
+        en = Encryptor()
 
         if filename != hex:
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
 
         if self.is_not_empty(filecontent):
-            jsonvalue = base64.b64decode(filecontent)
+            # jsonvalue = base64.b64decode(filecontent)
+            jsonvalue = en.decrptcode(filecontent, secretkey)
             info_logger.info('jsonvalue: '+ jsonvalue)
 
             if self.is_json(jsonvalue):

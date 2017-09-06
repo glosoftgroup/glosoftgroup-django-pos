@@ -98,6 +98,7 @@ EMAIL_USE_SSL = email_config['EMAIL_USE_SSL']
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 ORDER_FROM_EMAIL = os.getenv('ORDER_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 
+CUSTOMER_CODE = os.environ.get('CUSTOMER_CODE')
 
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 MEDIA_URL = '/media/'
