@@ -235,9 +235,7 @@ $(function() {
 
     // Editable input
     $('.pickadate-editable').pickadate({
-        editable: true,
-        format:'H A',
-        formatSubmit:'H'
+        editable: true
     });
 
 

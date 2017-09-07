@@ -31,21 +31,25 @@ def login(request):
 		if serializer.is_valid():
 			password = serializer.data['password']
 			username = serializer.data['email']
-			terminal = serializer.data['terminal']		
+			try:
+				terminal = serializer.data['terminal']		
+			except:
+				terminal = 'Terminal not set'
 			if '@' in username:
 				kwargs = {'email': username}
 			else:
 				kwargs = {'name': username}
 			try:
 				user = get_user_model().objects.get(**kwargs)
-				if user.check_password(password) and user.has_perm('sales.add_drawercash') and user.has_perm('sales.change_drawercash'):
+				if user.check_password(password) and user.has_perm('sale.add_drawercash') and user.has_perm('sale.change_drawercash'):
 					record_trail(request.user.name,user,terminal)
 					return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 				else:
-					return Response({'Permission Denied!'}, status=status.HTTP_401_UNAUTHORIZED)
+					return Response({'message':'Permission Denied!'}, status=status.HTTP_401_UNAUTHORIZED)
 			except:										
 				return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)			
-			
+		else:
+			return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)				
 	elif request.method == 'GET':		
 			return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -70,8 +74,8 @@ class UserTransactionAPIView(generics.CreateAPIView,):
 	serializer_class = UserTransactionSerializer
 	def perform_create(self, serializer):              
 		serializer.save(user=self.request.user)
-		user_trail(self.request.user.name,'Drawer Cash:#'+str(serializer.data['amount'])+' added '+str(self.request.user.name),'add')
-		info_logger.info('User: '+str(self.request.user)+' Drawer Cash:'+str(serializer.data['amount']))
+		#user_trail(self.request.user,'Drawer Cash:#'+str(serializer.data['amount'])+' added ','add')
+		#info_logger.info('User: '+str(self.request.user)+' Drawer Cash:'+str(serializer.data['amount']))
 
 class TerminalListAPIView(generics.ListAPIView):
     pagination_class = PostLimitOffsetPagination
