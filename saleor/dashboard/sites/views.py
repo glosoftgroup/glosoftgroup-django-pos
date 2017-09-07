@@ -57,16 +57,17 @@ def add_sitekeys(request):
     if request.method == 'POST':
         keyfiles = request.POST.get('lic_key').strip()
 
-        # check = "04feac9f3028e9887ea9087570edf86dff536ac71e977b1944e0891aee231d25"
         if keyfiles:
             try:
                 keyfile, check = keyfiles.split('###')
             except Exception as e:
-                result = json.dumps({'message':'Invalid License Key'})
+                result = json.dumps({'message':'Invalid License Key', 'status':500})
                 return HttpResponse(result, content_type="application/json")
-
-            print keyfile
-            print check
+            try:
+                Files.objects.all().delete()
+            except DatabaseError, BaseException:
+                result = json.dumps({'message': 'Failed to Add license', 'status':500})
+                return HttpResponse(result, content_type="application/json")
 
             new_key = Files.objects.create(
                 file=keyfile,
@@ -74,7 +75,8 @@ def add_sitekeys(request):
             )
         else:
             error_logger.info('License Key is empty ')
-            return HttpResponse('Empty Key license')
+            result = json.dumps({'message': 'Empty Key license', 'status': 500})
+            return HttpResponse(result, content_type="application/json")
 
         try:
             new_key.save()

@@ -85,19 +85,16 @@ class SettingsMiddleware(object):
 
         en = Encryptor()
 
-        # secretkey = settings.CUSTOMER_CODE
-
         fm = FetchMac()
 
         secretkey = replace_last(fm.getnumber())
+        print secretkey
 
         if filename != hex:
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
 
         if self.is_not_empty(filecontent):
-            # jsonvalue = base64.b64decode(filecontent)
             jsonvalue = en.decrptcode(filecontent, secretkey)
-            info_logger.info('jsonvalue: '+ jsonvalue)
 
             if self.is_json(jsonvalue):
                 data = json.loads(jsonvalue)
