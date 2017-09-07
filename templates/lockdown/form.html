@@ -158,7 +158,6 @@
                         contentType: false,
                         success:function(data){
                            console.log(data);
-                           alert(data.status)
                            $("#lic_key").val('');
                             if(data.status == 200){
                                 $.jGrowl( data.message, {

@@ -84,7 +84,8 @@ def add_sitekeys(request):
             error_logger.info('Error when saving ')
 
         if new_key.id:
-            return HttpResponse('success')
+            result = json.dumps({'message': 'success', 'status': 200})
+            return HttpResponse(result, content_type="application/json")
         return HttpResponse('Error: Not saved')
 
     return HttpResponse('Invalid request')
