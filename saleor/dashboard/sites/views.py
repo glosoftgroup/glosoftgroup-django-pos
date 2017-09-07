@@ -13,6 +13,7 @@ from ...site.models import AuthorizationKey, SiteSettings, Files
 from ...site.utils import get_site_settings_from_request
 from django.views.decorators.csrf import csrf_protect
 import logging
+import json
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -58,8 +59,11 @@ def add_sitekeys(request):
 
         # check = "04feac9f3028e9887ea9087570edf86dff536ac71e977b1944e0891aee231d25"
         if keyfiles:
-
-            keyfile, check = keyfiles.split('###')
+            try:
+                keyfile, check = keyfiles.split('###')
+            except Exception as e:
+                result = json.dumps({'message':'Invalid License Key'})
+                return HttpResponse(result, content_type="application/json")
 
             print keyfile
             print check

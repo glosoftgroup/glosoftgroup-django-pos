@@ -160,7 +160,7 @@
                            console.log(data);
                            $("#lic_key").val('');
 
-                           $.jGrowl('License key added', {
+                           $.jGrowl( data.message, {
                               header: 'Successful!',
                               theme: 'bg-success'
                            });
