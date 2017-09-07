@@ -98,3 +98,4 @@ xhtml2pdf==0.0.6
 xmltodict==0.10.2
 django-macaddress==1.4.1
 pycrypto==2.6.1
+netifaces==0.10.6

@@ -1,6 +1,7 @@
 import fcntl, socket, struct
 import sys
 import os
+import netifaces
 
 class FetchMac():
 
@@ -35,10 +36,14 @@ class FetchMac():
                     mac = line.split()[-1]
                     break
         else:
+            inf = netifaces.interfaces()
             for line in os.popen("/sbin/ifconfig"):
-                if line.find('ether') > -1:
-                    mac = line.split()[4]
-                    break
+                for i in inf:
+                    if i.startswith('en'):
+                        if line.find(i) > -1:
+                            mac = line.split()[4]
+                            break
+
         return mac
 
     def test(self):
