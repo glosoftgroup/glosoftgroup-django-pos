@@ -1,0 +1,64 @@
+{% if template %}
+
+<!-- list templates -->
+<div class="col-sm-4 col-lg-2 mb-15" id="trackDiv{{template.pk}}">
+    <div class="panel">
+        <div class="bg-purple demo-color" style="height:31px;"><span>{{template.name}}</span></div>
+        
+        <div class="p-15">
+            <div class="media-body">
+                <span><a href="#"
+                data-href="{% url 'dashboard:email-template-detail' template.pk %}"
+                data-spk='{{template.pk}}'
+                class="stemplate text-purple" data-toggle="modal" data-target="#tempDetail"
+                data-popup="tooltip"
+                data-original-title="Preview"><i class="icon-eye"></i></a>
+                </span>
+
+                <span><a href="#"
+                data-href="{% url 'dashboard:email-template-detail' template.pk %}"
+                data-spk='{{template.pk}}'
+                class="stemplate text-warning" data-toggle="modal" data-target="#tempDetail"
+                data-popup="tooltip"
+                data-original-title="Delete"><i class="icon-trash"></i></a>
+                </span>                              
+            </div>
+
+            <div class="media-right">
+            <ul class="icons-list">
+                <li data-popup="tooltip"
+                data-original-title="Select" class="text-bold selectedTemp" data-tid="{{template.pk}}"><i class="icon-touch"></i></li>
+                
+
+            </ul>
+        </div>
+        </div>
+    </div>
+</div>
+<!-- ./templates -->
+<script type="text/javascript">
+    var stemplate = $('.stemplate');
+    stemplate.on('click',function(){
+        url = $(this).data('href');
+        spk = $(this).data('spk');
+        templateDetail.empty().html('Loading.....');
+        appendTemplate(spk,'detail',url).done(function(data){
+          templateDetail.empty().html(data);  
+        });
+    });
+
+    var selectedTemp = $('.selectedTemp');
+    // select template
+    selectedTemp.on('click',function(){
+      url = $(this).data('href');
+      spk = $(this).data('tid'); 
+      appendTemplate(spk,'select',url).done(function(data){
+          $('#body').val(data); 
+          alertUser('Template selected','bg-success');
+          $('#accordion-group1').removeClass('in');
+        }); 
+    });
+    // .selectedTemp
+    
+</script>
+{% endif %}

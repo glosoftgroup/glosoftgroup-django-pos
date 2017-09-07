@@ -1,0 +1,11 @@
+{% load static %}
+<div class="rebody">
+<div id="snotee">{{ template.content}}</div>
+<script type="text/javascript" src="{% static 'backend/js/plugins/editors/summernote/summernote.min.js' %}"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+    $('#snotee').summernote(
+      );
+  });
+</script>
+</div>

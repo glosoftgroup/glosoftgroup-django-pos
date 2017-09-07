@@ -17,8 +17,46 @@ from ...userprofile.models import User
 from ...supplier.models import Supplier
 from ...customer.models import Customer
 from ...product.models import Product
+from ...smessages.models import EmailTemplate
 from notifications.signals import notify
 from notifications.models import Notification
+
+
+@staff_member_required
+@staff_member_required
+def add_template(request):
+    if request.method == 'POST':
+        t_name = request.POST.get('tname')
+        t_content = request.POST.get('tcontent','')        
+        temp = EmailTemplate(name=t_name,content=t_content)
+        temp.save()
+        return HttpResponse(temp.pk)
+    return HttpResponse('Post request expected')
+
+@staff_member_required
+def get_template(request,pk=None):
+    if request.method == 'GET':
+        if request.is_ajax():
+            if request.GET.get('pk'):
+                stemplate = get_object_or_404(EmailTemplate,pk=(int(request.GET.get('pk'))))
+                ctx = {'template':stemplate}
+                if request.GET.get('template'):                
+                    template = request.GET.get('template')
+                    return TemplateResponse(request, 'dashboard/notification/includes/'+template+'.html', ctx)
+                
+                return TemplateResponse(request, 'dashboard/notification/includes/single-template.html', ctx)
+        sms_templates = EmailTemplate.objects.all().order_by('-id')
+        ctx = {'sms_templates':sms_templates}
+        return TemplateResponse(request, 'dashboard/notification/includes/templates.html', ctx)
+
+@staff_member_required
+def delete_template(request,pk=None):
+    if pk:
+        template = get_object_or_404(EmailTemplate,pk=pk)
+        template.delete()
+        return HttpResponse('Template Deleted successfully')
+    return HttpResponse('Select template id')
+
 
 @staff_member_required
 def notification_list(request,status=None):
@@ -173,18 +211,27 @@ def write(request):
                 notif.save()
 
         HttpResponse(email_list)
-    ctx = {'users':User.objects.all().order_by('-id')}
+    ctx = {
+            'users':User.objects.all().order_by('-id'),
+            'templates':EmailTemplate.objects.all().order_by('-id')
+          }
     if request.method == 'GET':
         if request.GET.get('pk'):
             product = get_object_or_404(Product, pk=int(request.GET.get('pk')))
-            ctx = {'product':product,'users':User.objects.all().order_by('-id')}
+            ctx = {
+                    'product':product,
+                    'users':User.objects.all().order_by('-id'),
+                    'templates':EmailTemplate.objects.all().order_by('-id')
+                    }
             return TemplateResponse(request,
                             'dashboard/notification/write_single.html',
                             ctx)
     return TemplateResponse(request,
                             'dashboard/notification/write.html',
                             ctx)
-def emails(request):
+
+@staff_member_required
+def emails(request):    
     search = request.GET.get('search')
     group = request.GET.get('group')
     if 'users' == str(group):

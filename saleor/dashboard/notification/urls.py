@@ -15,6 +15,12 @@ urlpatterns = [
      url(r'^emails/ajax/$', views.emails, name='notification-emails'),
      url(r'^delete/notification/(?P<pk>[0-9]+)$', views.delete, name='delete-notification'),
      url(r'^delete/permanently/(?P<pk>[0-9]+)$', views.delete_permanently, name='delete-permanently'),
+     # templates
+     url(r'^add/template/$', views.add_template, name='add-email-template'),
+     url(r'^get/template/$', views.get_template, name='get-email-template'),
+     url(r'^template/detail/(?P<pk>[0-9]+)$', views.get_template, name='email-template-detail'),
+     url(r'^template/delete/(?P<pk>[0-9]+)$', views.delete_template, name='delete-email-template'),
+     
 ]
 
 if settings.DEBUG:
