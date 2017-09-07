@@ -18,6 +18,7 @@ from django.http import QueryDict, HttpResponse
 from saleor.dashboard.sites.views import add_sitekeys
 from ..core.encryptor import Encryptor
 from ..core.readmac import FetchMac
+from ..core.utils import replace_last
 
 logger = logging.getLogger(__name__)
 info_logger = logging.getLogger('info_logger')
@@ -84,11 +85,11 @@ class SettingsMiddleware(object):
 
         en = Encryptor()
 
-        secretkey = settings.CUSTOMER_CODE
+        # secretkey = settings.CUSTOMER_CODE
 
         fm = FetchMac()
 
-        print (fm.getnumber())
+        secretkey = replace_last(fm.getnumber())
 
         if filename != hex:
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
