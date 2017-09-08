@@ -38,7 +38,7 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def re_order(request):
     try:
-        queryset_list = ProductVariant.objects.get_low_stock().order_by('-id') #get_low_stock_products()
+        queryset_list = ProductVariant.objects.get_low_stock().order_by('-id')
 
         page = request.GET.get('page', 1)
         paginator = Paginator(queryset_list, 10)
@@ -72,7 +72,7 @@ def reorder_pagination(request):
     p2_sz = request.GET.get('psize')
     select_sz = request.GET.get('select_size')
 
-    low_stock = get_low_stock_products()
+    low_stock = ProductVariant.objects.get_low_stock().order_by('-id')
     if list_sz:
         paginator = Paginator(low_stock, int(list_sz))
         low_stock = paginator.page(page)
@@ -108,10 +108,12 @@ def reorder_search(request):
             sz = list_sz
 
         if q is not None:
-            stock = get_low_stock_products()
+            q = q.strip()
+            stock = ProductVariant.objects.get_low_stock()
             queryset_list = stock.filter(
                 Q(name__icontains=q)|
-                Q(total_stock__icontains=q)
+                Q(sku__icontains=q) |
+                Q(product__name__icontains=q) 
             ).order_by('-id')
             paginator = Paginator(queryset_list, 10)
 
@@ -532,6 +534,8 @@ def product_data(request):
             #try:
             variant = ProductVariant.objects.get(product=product)
             variant.name = request.POST.get('sku')
+            if request.POST.get('threshold'):
+                 variant.low_stock_threshold = request.POST.get('threshold')
             variant.save();
             print variant
             #except:
@@ -923,6 +927,8 @@ def add_attributes(request):
             product_variant.price_override = request.POST.get('price')
         if request.POST.get('wholesale'):
             product_variant.wholesale_override = request.POST.get('wholesale')
+        if request.POST.get('low_stock_threshold'):
+            product_variant.low_stock_threshold = int(request.POST.get('low_stock_threshold'))
         if request.POST.get('attributes'):
             attr_list = json.loads(request.POST.get('attributes'))
             attrs = {}
