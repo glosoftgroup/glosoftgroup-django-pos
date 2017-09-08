@@ -95,7 +95,7 @@
                       {% for product in low_stock %}
                         <tr data-action-go="{% url 'dashboard:product-update' pk=product.pk %}#stock">
                           <td>
-                            {{ product }}
+                            {{ product.display_product }}
                           </td>
                           <td class="right-align">
                             {{ product.get_stock_quantity }}

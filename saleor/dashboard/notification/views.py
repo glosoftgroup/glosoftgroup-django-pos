@@ -16,7 +16,7 @@ from django.contrib.auth import get_user_model
 from ...userprofile.models import User
 from ...supplier.models import Supplier
 from ...customer.models import Customer
-from ...product.models import Product
+from ...product.models import Product, ProductVariant
 from ...smessages.models import EmailTemplate
 from notifications.signals import notify
 from notifications.models import Notification
@@ -217,15 +217,18 @@ def write(request):
           }
     if request.method == 'GET':
         if request.GET.get('pk'):
-            product = get_object_or_404(Product, pk=int(request.GET.get('pk')))
-            ctx = {
-                    'product':product,
-                    'users':User.objects.all().order_by('-id'),
-                    'templates':EmailTemplate.objects.all().order_by('-id')
-                    }
-            return TemplateResponse(request,
-                            'dashboard/notification/write_single.html',
-                            ctx)
+            try:
+                product = ProductVariant.objects.get(pk=int(request.GET.get('pk')))
+                ctx = {
+                        'product':product,
+                        'users':User.objects.all().order_by('-id'),
+                        'templates':EmailTemplate.objects.all().order_by('-id')
+                        }
+                return TemplateResponse(request,
+                                'dashboard/notification/write_single.html',
+                                ctx)
+            except Exception, e:
+                return HttpResponse(e)
     return TemplateResponse(request,
                             'dashboard/notification/write.html',
                             ctx)

@@ -24,7 +24,7 @@ from ...supplier.models import Supplier
 from ...customer.models import Customer
 from ...smessages.signals import sms as notify
 from ...smessages.models import SMessage as Notification, SmsTemplate
-from ...product.models import Product
+from ...product.models import Product, ProductVariant
 from ...site.models import SiteSettings
 
 
@@ -593,7 +593,7 @@ def write(request):
            'templates':SmsTemplate.objects.all().order_by('-id')}
     
     if request.GET.get('pk'):
-            product = get_object_or_404(Product, pk=int(request.GET.get('pk')))
+            product = get_object_or_404(ProductVariant, pk=int(request.GET.get('pk')))
             ctx = {'product':product, 'users':User.objects.all().order_by('-id'),
            'templates':SmsTemplate.objects.all().order_by('-id')}
             return TemplateResponse(request,
