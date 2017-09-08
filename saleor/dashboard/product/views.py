@@ -38,7 +38,7 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def re_order(request):
     try:
-        queryset_list = ProductVariant.objects.get_low_stock() #get_low_stock_products()
+        queryset_list = ProductVariant.objects.get_low_stock().order_by('-id') #get_low_stock_products()
 
         page = request.GET.get('page', 1)
         paginator = Paginator(queryset_list, 10)
