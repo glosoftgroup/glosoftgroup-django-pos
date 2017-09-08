@@ -4,7 +4,7 @@
 {% load static %}
 {% block title %}
   {% if site.pk %}
-    {{ site }}
+    {{ site.name }}
   {% else %}
     {% trans "Add new site settings" context "Site settings page title" %}
   {% endif %}
