@@ -306,12 +306,13 @@
       <table class="table table-hover">
         <thead>
         <tr class="bg-primary">  
-        <th>SKU</th>    
+        <th>SKU</th> 
+        <th>Re-order Level</th>   
         {% for v in pc %} 
          <th>{{v}}</th>       
         {% endfor %}
         <th>Retail Price</th>
-        <th>Wholesale Price</th>
+        <th>Wholesale Price</th>        
         <th></th>
         </tr>
         </thead>
@@ -319,6 +320,9 @@
           <tr>
           <td>
             <input type="text" id="new-sku-td" placeholder="Enter SKU" class="form-control" name='new-sku-td'>
+          </td>
+          <td>
+            <input type="number" placeholder="(e.g 10)" class="form-control" value="10" id="reorder_level" name="reorder_level">
           </td>
           {% for v in pc%}
           <td>
@@ -332,7 +336,7 @@
             </td>
             
           {% endfor %}
-          <td>
+           <td>
             <input type="number" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
             </td>
             <td>
@@ -401,6 +405,7 @@
                     <th>
                       {% trans "SKU" context "Product variant table header" %}
                     </th>
+                    <th>Re-order Threshold</th>
                     {% for attribute in attributes %}
                       <th>
                         {{ attribute.name|capfirst }}
@@ -422,6 +427,9 @@
                       
                       <td>
                         {{ variant.sku }}
+                      </td>
+                      <td>
+                        {{variant.low_stock_threshold}}
                       </td>
                       {% for attr_display in variant|attributes_values_with_empty:attributes %}
                         <td>

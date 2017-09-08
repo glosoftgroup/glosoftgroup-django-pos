@@ -124,6 +124,7 @@ $(function() {
   var wholePriceId  = $('#wprice');
   var dynamicVariants = $('.dynamicvxx');
   var newSkuId = $('#new-sku-td');
+  var reorder_levelId = $('#reorder_level');
   var refreshVaraintsContent = $('#refreshvaraintscontent');
   var refreshStockVariants = $('#refreshStockVariants');
   var json = [];
@@ -143,6 +144,7 @@ $(function() {
     wholePrice  = wholePriceId.val();
     retailPrice = retailPriceId.val();
     newSku      = newSkuId.val();
+    reorder_level = reorder_levelId.val();
     if(!retailPrice || !newSku){
       alertUser('Retail Price & SKU required','bg-danger','Fill required fields!');
       return false;
@@ -151,6 +153,10 @@ $(function() {
     if(wholePrice){
       dynamicData['wholesale'] = wholePrice;
     }
+    if(reorder_level){
+      dynamicData['low_stock_threshold'] = reorder_level;
+    }
+    
     if ( json.length < 1) {
       //alertUser(json.length);
       alertUser('Please Select variants','bg-danger','Varaints Required!');
@@ -180,7 +186,7 @@ $(function() {
       });
     })
     .fail(function(){
-      alertUser('Error adding attributes','bg-danger','Error!');
+      alertUser('Error adding attributes, Add a unique SKU','bg-danger','Error!');
       json = [];
     });
   });
@@ -271,12 +277,14 @@ $(function() {
       alertUser('Sub category name required!','bg-danger','Error!');
       return false;
     }
-    addNewClassD(cname,variants,attributes).done(function(data){
-      alertUser('Sub category name required!');     
+    addNewClassD(cname,variants,attributes)
+    .done(function(data){
+      alertUser('Attribute added successfully!');     
       //refreshAttributes();
       window.location.href = $('#xaddClassBtnD').data('refreshme');
       $('#daddProductClass').modal('hide');
-    }).fail(function(){
+    })
+    .fail(function(){
       alertUser('Variant already added. Please add a unique variant name','bg-danger','Error!');
     });
 

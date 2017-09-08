@@ -11,6 +11,7 @@
                     <th>
                       {% trans "SKU" context "Product variant table header" %}
                     </th>
+                    <th>Re-order Threshold</th>
                     {% for attribute in attributes %}
                       <th>
                         {{ attribute.name|capfirst }}
@@ -35,6 +36,9 @@
                       </td>
                       <td>
                         {{ variant.sku }}
+                      </td>
+                      <td>
+                        {{ variant.low_stock_threshold }}
                       </td>
                       {% for attr_display in variant|attributes_values_with_empty:attributes %}
                         <td>
@@ -62,7 +66,8 @@
                         <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
                        
                         <li>
-                          <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" 
+                          <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}"
+                          data-tabname='?tab=variants' 
                          data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ variant.name }}" data-id="{{ variant.pk }}"
                        class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
                        </a>

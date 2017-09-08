@@ -923,6 +923,8 @@ def add_attributes(request):
             product_variant.price_override = request.POST.get('price')
         if request.POST.get('wholesale'):
             product_variant.wholesale_override = request.POST.get('wholesale')
+        if request.POST.get('low_stock_threshold'):
+            product_variant.low_stock_threshold = int(request.POST.get('low_stock_threshold'))
         if request.POST.get('attributes'):
             attr_list = json.loads(request.POST.get('attributes'))
             attrs = {}
