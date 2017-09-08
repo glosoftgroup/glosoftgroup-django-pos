@@ -35,9 +35,9 @@ $(function() {
  var tax = 0;
 
  // stock variables
- var thresholdId = $('#id_low_stock_threshold');
+ var thresholdId = $('#id_variant-low_stock_threshold');
  var supplierId  = $('#id_product_supplier');
- var skuId       = $('#id_variant-sku');
+ var skuId       = $('#id_variant-sku'); 
  var updateStockBtn = $('#updatestock'); 
  skuId.attr('disabled','disabled');
  
@@ -50,19 +50,16 @@ $(function() {
  	var sku = skuId.val();
  	var supplier = supplierId.val();
  	var threshold = thresholdId.val();
+ 
  	url = $(this).data('stockurl');
-    pk  = $(this).data('productpk');
+  pk  = $(this).data('productpk');
 
- 	// if(!sku){
- 	//   alertUser('Stock keeping unit required','bg-danger','SKU missing!');
- 	//   return false; 	  
- 	// }
- 	dynamicData = {};
+ 	 	dynamicData = {};
     dynamicData['sku'] = sku;
     dynamicData['pk'] = pk;
     if(supplier){
     dynamicData['supplier'] = supplier;
-    }
+    }    
     if(threshold){
     dynamicData['threshold'] = threshold;
     }     
@@ -77,10 +74,12 @@ $(function() {
     });
 
  });
- updatePricing.on('click',function(){    
+ updatePricing.on('click',function(){
     tax = tax_id.val();
     price = newPrice.val();
     wholesalePrice = wholesaleId.val();
+    var threshold = thresholdId.val();
+    var sku = skuId.val();
     url = $(this).data('priceurl');
     pk  = $(this).data('productpk');
     dynamicData = {};
@@ -88,6 +87,12 @@ $(function() {
     dynamicData['price'] = price;
     if(tax){
     dynamicData['tax'] = tax;
+    }
+    if(threshold){
+    dynamicData['threshold'] = threshold;
+    }
+    if(sku){
+    dynamicData['sku'] = sku;
     }
     if(wholesalePrice){
     dynamicData['wholesale_price'] =wholesalePrice;	

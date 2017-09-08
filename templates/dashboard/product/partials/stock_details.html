@@ -2,12 +2,7 @@
 <!-- stock reorder limit -->
      <div class="col-md-12">        
       <!-- stock reorder limit -->      
-      <div class="col-md-3">
-        <div class="form-group">
-            <label>Reorder Stock Threshold:</label>
-           {{ product_form.low_stock_threshold }}
-        </div>
-      </div>
+      
       <!-- ./stock reorder limit -->
       <!-- supplier -->
       <div class="col-md-3">
@@ -16,7 +11,7 @@
            <div class="input-group supplier-refresh">
              {{ product_form.product_supplier }}
              <span class="input-group-btn">
-             <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-primary "
+             <a id="add-supplier" onclick="return false;" class="btn hvr-glow btn-icon bg-primary "
                 data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
                 href="#modal_attribute"  data-popup="tooltip"
                 data-original-title="Add New Supplier" data-title="Add New Supplier">

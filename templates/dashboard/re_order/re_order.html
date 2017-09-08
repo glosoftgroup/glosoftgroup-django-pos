@@ -232,7 +232,7 @@ $(document).ready(function(){
             firstClass: 'first',
 
             }).on("page", function(event, num){
-                $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+                $(".pages-nav").html("Page " + num +" of "+parseInt({{totalp}})); // or some ajax content loading...
                 $.get("{% url 'dashboard:reorder_pagination' %}",{page:num},function(data){
                    $('#tb').html(data);
                 });
