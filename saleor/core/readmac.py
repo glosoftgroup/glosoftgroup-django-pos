@@ -1,6 +1,7 @@
 import sys
 import os
 import netifaces
+from uuid import getnode as get_mac
 
 class FetchMac():
 
@@ -8,6 +9,11 @@ class FetchMac():
         pass
 
     def getnumber(self):
+        ''' get mac as int form then converts back to hex form'''
+        # mac = get_mac()
+        # h = iter(hex(mac)[2:].zfill(12))
+        # mac_addr = ":".join(i+ next(h) for i in h)
+        
         mac = "00:00:00:00:00:00"
         if sys.platform == 'win32':
             for line in os.popen("ipconfig /all"):
