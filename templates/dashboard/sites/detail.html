@@ -70,4 +70,13 @@ $( document ).ready(function() {
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/anytime.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/picker_date.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/site-settings.js' %}"></script>
+<script type="text/javascript">
+  // Editable input
+   
+    $('.octime').pickatime({
+        editable: true,
+        format:'HH:i A',
+        formatSubmit:'HH:i A'
+    });
+</script>
 {% endblock %}

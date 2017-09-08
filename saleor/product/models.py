@@ -248,6 +248,13 @@ class Product(models.Model, ItemRange, index.Indexed):
                 discounts=discounts, **kwargs)
 
 
+class ProductVariantManager(models.Manager):
+
+    def get_low_stock(self):
+        today = datetime.date.today()
+        return self.get_queryset().filter(stock__quantity__lte=F('low_stock_threshold'))
+
+
 @python_2_unicode_compatible
 class ProductVariant(models.Model, Item):
     sku = models.CharField(
@@ -270,7 +277,11 @@ class ProductVariant(models.Model, Item):
     images = models.ManyToManyField(
         'ProductImage', through='VariantImage',
         verbose_name=pgettext_lazy('Product variant field', 'images'))
-
+    low_stock_threshold = models.IntegerField(
+        pgettext_lazy('Product variant field', 'low stock threshold'),
+        validators=[MinValueValidator(0)], null=True,blank=True, default=Decimal(10))
+    objects = ProductVariantManager()
+    
     class Meta:
         app_label = 'product'
         verbose_name = pgettext_lazy('Product variant model', 'product variant')

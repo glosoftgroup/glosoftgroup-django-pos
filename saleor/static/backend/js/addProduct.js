@@ -415,14 +415,17 @@ $(function(){
    var stockInvoiceId  = $('#stockInvoiceNumber');
    var stockLocationId = $('#id_location');
    var stockQuantityId = $('#stock_quantity');
+   var reorder_levelId = $('#reorder_level');
    var addnewStockBtn  = $('#addnewStockBtn');
    // success
    var refreshDiv = $('#refreshStockitems');   
    addnewStockBtn.on('click',function(){
+    var dynamicData = {};
     var variant = stockVariantId.val();
     var cost_price = costPriceId.val();
     var location = stockLocationId.val();
     var quantity = stockQuantityId.val();
+    var reorder_level = reorder_levelId.val();
     var invoice_number  = stockInvoiceId.val();
     var addStockUrl = $(this).data('contenturl');
     var refreshStockUrl = $(this).data('refreshstockurl');
@@ -443,9 +446,11 @@ $(function(){
       alertUser('Invoice number required','bg-danger','Field Required!');
       return false;
     }
+    if(reorder_level){
+      dynamicData['low_stock_threshold'] = reorder_level;
+    }
     
-    // ./validation
-    dynamicData = {};
+    // ./validation    
     dynamicData['variant'] = variant;
     dynamicData['quantity'] = quantity;
     dynamicData['cost_price'] = cost_price;

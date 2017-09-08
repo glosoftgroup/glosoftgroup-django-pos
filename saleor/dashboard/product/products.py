@@ -190,7 +190,6 @@ def search(request):
 									{'product_results':product_results, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 @staff_member_required
-
 def products_pdf(request):
 	product_results = Product.objects.all()
 	data = {
