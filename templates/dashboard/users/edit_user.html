@@ -73,7 +73,7 @@
                   </div>
                   <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
                   <div style="text-align: center;">
-                    <span class="btn btn-warning btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="image" id="image"></span>
+                    <span class="btn btn-warning btn-file"><span class="fileinput-new">{% if user.image %}Change Image{% else %}Select Image {% endif %}</span><span class="fileinput-exists">Change</span><input type="file" name="image" id="image"></span>
                     <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
                   </div>
                 </div>

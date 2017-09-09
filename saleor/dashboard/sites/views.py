@@ -50,6 +50,16 @@ def update_settings(request,site_id=None):
         if request.POST.get('sms_api_key'):
             site.sms_gateway_apikey = request.POST.get('sms_api_key')
             print site.sms_gateway_apikey
+        if request.POST.get('company_name'):
+            site.name = request.POST.get('company_name')
+        if request.POST.get('loyalty_point_equiv'):
+            site.loyalty_point_equiv = request.POST.get('loyalty_point_equiv')
+        if request.POST.get('opening_time'):
+            site.opening_time = request.POST.get('opening_time')
+        if request.POST.get('closing_time'):
+            site.closing_time = request.POST.get('closing_time')
+        if request.FILES.get('image'):
+            site.image = request.FILES.get('image')
         site.save()
         return HttpResponse('success')
     return HttpResponse('Invalid method')
