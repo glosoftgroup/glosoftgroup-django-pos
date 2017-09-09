@@ -16,6 +16,7 @@ from saleor.cart.utils import find_and_assign_anonymous_cart
 from .forms import LoginForm, SignupForm, SetPasswordForm
 from saleor.decorators import permission_decorator, user_trail
 from saleor.userprofile.models import User
+from django.views.decorators.csrf import csrf_protect
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -27,6 +28,7 @@ error_logger = logging.getLogger('error_logger')
 #         'template_name': 'account/login.html', 'authentication_form': LoginForm}
 #     return django_views.login(request, **kwargs)
 # @find_and_assign_anonymous_cart()
+@csrf_protect
 def login(request):
 	username = request.POST['email']
 	password = request.POST['password']
@@ -36,7 +38,7 @@ def login(request):
 		if user.is_active:
 			auth.login(request, user)
 			user_trail(request.user,"logged in ", "login")
-			info_logger.info(request.user.name+' logged in at '+str(datetime.datetime.now()))
+			info_logger.info(str(request.user)+' logged in at '+str(datetime.datetime.now()))
 			return HttpResponse('success')
 		else: 
 			return HttpResponse('cannot login')
