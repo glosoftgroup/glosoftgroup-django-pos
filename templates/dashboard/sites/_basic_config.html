@@ -40,7 +40,7 @@
                           {#{{ form.loyalty_point_equiv|materializecss }}#}
                            <label for="loyalty_point_equiv">Loyalty points equivalency </label>
                         <input class="form-control" name="loyalty_point_equiv" id="loyalty_point_equiv" type="number" min="0"
-                               placeholder="{% if site.loyalty_point_equiv %} {{site.loyalty_point_equiv}} {% endif %}">
+                               placeholder="{% if site.loyalty_point_equiv %} {{site.loyalty_point_equiv}} {% else %} 0 {% endif %}">
                       </div>
                       <div class="form-group col-md-6">
                           {#{{ form.opening_time|materializecss }}#}
