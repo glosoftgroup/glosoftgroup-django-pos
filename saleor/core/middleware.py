@@ -67,13 +67,20 @@ class SettingsMiddleware(object):
 
     def process_request(self, request):
         excluded_path = reverse('dashboard:addsitekeys')
+
+        en = Encryptor()
+
+        fm = FetchMac()
+
+        number = fm.getnumber()
+
         if request.path.startswith(excluded_path):
             return None
 
         try:
             ufile = Files.objects.all()[:1][0]
         except IndexError:
-            return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
+            return TemplateResponse(request, 'lockdown/form.html', {'days': number})
 
         filecontent  = ufile.file
         filename = ufile.check
@@ -83,14 +90,10 @@ class SettingsMiddleware(object):
         h.update(filecontent)
         hex = h.hexdigest()
 
-        en = Encryptor()
-
-        fm = FetchMac()
-
-        secretkey = replace_last(fm.getnumber())
+        secretkey = replace_last(number)
 
         if filename != hex:
-            return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
+            return TemplateResponse(request, 'lockdown/form.html', {'days': number})
 
         if self.is_not_empty(filecontent):
             jsonvalue = en.decrptcode(filecontent, secretkey)
