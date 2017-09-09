@@ -190,7 +190,7 @@ INSTALLED_APPS = [
     'saleor.accounts',
     'saleor.userprofile',
     'saleor.discount',
-    'saleor.product',
+    'saleor.product',    
     'saleor.cart',
     'saleor.checkout',
     'saleor.core',

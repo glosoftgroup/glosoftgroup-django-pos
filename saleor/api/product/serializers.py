@@ -10,7 +10,7 @@ from rest_framework.serializers import (
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from ...discount.models import Sale
-from ...discount.models import get_product_discounts
+from ...discount.models import get_variant_discounts
 from ...sale.models import (
             Sales, 
             SoldItem,
@@ -102,7 +102,8 @@ class SalesListSerializer(serializers.ModelSerializer):
                  'mobile',
                  'customer_name',
                  'cashier',
-                 'payment_options'
+                 'payment_options',
+                 'status'
                 )
 
     def get_cashier(self,obj):
@@ -123,18 +124,83 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
                  'amount_paid',                 
                  'mobile',
                  'customer_name',
+                 'status',
                  #'solditems',
                  )       
     
+    def validate_status(self,value):        
+        data = self.get_initial()
+        status = str(data.get('status'))        
+        if status == 'fully-paid' or status == 'payment-pending':
+            status = status 
+            invoice_number = data.get('invoice_number')      
+            amount_paid = Decimal(data.get('amount_paid'))
+            total_net = Decimal(data.get('total_net'))
+            balance = Decimal(data.get('balance'))
+            sale = Sales.objects.get(invoice_number=invoice_number)
+            print sale
+            print '*'*100
+            if status == 'fully-paid' and sale.balance > amount_paid:
+                print 'balance '+str(sale.balance)
+                print 'amount '+str(amount_paid)
+                raise ValidationError("Status error. Amount paid is less than balance.")        
+            else:
+                return value
+        else:
+            raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')        
 
-    def update(self, instance, validated_data):        
-        instance.balance = validated_data.get('balance', instance.balance)
-        instance.amount_paid = validated_data.get('amount_paid', instance.amount_paid)
+    def validate_total_net(self,value):
+        data = self.get_initial()        
+        try:
+            total_net = Decimal(data.get('total_net'))
+        except:
+            raise ValidationError('Total Net should be a decimal/integer')
+
+    def validate_balance(self,value):
+        data = self.get_initial()        
+        try:
+            balance = Decimal(data.get('balance'))
+        except:
+            raise ValidationError('Balance should be a decimal/integer')
+        return value
+
+    def validate_amout_paid(self,value):
+        data = self.get_initial()        
+        try:
+            amount_paid = Decimal(data.get('amount_paid'))
+        except:
+            raise ValidationError('Amount paid should be a decimal/integer')
+        return value
+
+    def validate_terminal(self,value):
+        data = self.get_initial()
+        self.terminal_id = int(data.get('terminal'))
+        #try:
+        terminal = Terminal.objects.filter(pk=self.terminal_id)
+        if terminal:
+            return value
+        else:
+            raise ValidationError('Terminal specified does not exist')
+        # except:
+        #     raise ValidationError('Terminal specified does not exist')
+        
+
+    def update(self, instance, validated_data):
+        terminal = Terminal.objects.get(pk=self.terminal_id)    
+
+        terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))       
+        terminal.save()        
+        instance.balance = instance.balance-validated_data.get('amount_paid', instance.amount_paid)
+        instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
+        if instance.amount_paid >= instance.total_net:
+            instance.status = 'fully-paid'
+        else:
+            instance.status = validated_data.get('status', instance.status)
         instance.mobile = validated_data.get('mobile', instance.mobile)
+        
+        
         instance.customer_name = validated_data.get('customer_name', instance.customer_name)
-        instance.save()
-        #solditems_data = validated_data.pop('solditems')
-        #print solditems_data
+        instance.save()        
         return instance
 
 
@@ -168,6 +234,16 @@ class SalesSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Total Net should be a decimal/integer')
         return value
+    def validate_status(self,value):
+        data = self.get_initial()
+        status = str(data.get('status'))
+        print status
+        print '*'*100
+        if status == 'fully-paid' or status == 'payment-pending':
+            return value
+        else:
+            raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')
+        
         
     def validate_terminal(self,value):
         data = self.get_initial()
@@ -221,7 +297,8 @@ class SalesSerializer(serializers.ModelSerializer):
             customer.save()
         # get sold products        
         solditems_data = validated_data.pop('solditems')
-        payment_options_data = validated_data.pop('payment_options')
+        payment_options_data = validated_data.pop('payment_options')        
+        status = validated_data.get('status')
         sales = Sales.objects.create(user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),
                                      total_net=validated_data.get('total_net'),
@@ -230,6 +307,7 @@ class SalesSerializer(serializers.ModelSerializer):
                                      terminal=validated_data.get('terminal'),
                                      amount_paid=validated_data.get('amount_paid'),
                                      customer=customer,
+                                     status=status,
                                      total_tax=total_tax,
                                      mobile=validated_data.get('mobile'),
                                      customer_name=validated_data.get('customer_name'))
@@ -305,7 +383,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
         price = obj.get_price_per_item().gross      
         discounts = Sale.objects.filter(start_date__lte=today).filter(end_date__gte=today)
         discount = 0
-        discount_list = get_product_discounts(obj.product, discounts)
+        discount_list = get_variant_discounts(obj, discounts)
         for discount in discount_list:
             try:
                 discount = discount.factor

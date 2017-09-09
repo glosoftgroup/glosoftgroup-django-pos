@@ -25,7 +25,9 @@
       <!-- variants -->
       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
 
-      {{ product.get_variants_count }}
+       <span class="semi-bold">{{ product.get_variants_count }}</span>
+                      <span class='superscript'> in</span><span class="semi-bold"> {{ product.total_variants}} </span>
+                      <span class="superscript"> variant(s)</span>
 
       </td>
   <!-- actions -->
@@ -36,6 +38,12 @@
             action <span class="caret"></span>
           </button>
           <ul class="dropdown-menu edit-dropdown">
+              <li>
+                <a href="{% url 'dashboard:product-variant-list' pk=product.pk %}">
+                    <i class="icon-eye" data-popup="tooltip" title='Edit product' data-placement="bottom" data-original-title="Edit me">
+                    </i> View variants
+                </a>
+            </li>
             <li>
                 <a href="{% url 'dashboard:product-update' pk=product.pk %}">
                     <i class="icon-pencil7" data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Edit me">
