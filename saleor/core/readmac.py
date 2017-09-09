@@ -8,11 +8,8 @@ class FetchMac():
     def __init__(self):
         pass
 
-    def getnumber(self):
+    def getnumber_mac(self):
         ''' get mac as int form then converts back to hex form'''
-        # mac = get_mac()
-        # h = iter(hex(mac)[2:].zfill(12))
-        # mac_addr = ":".join(i+ next(h) for i in h)
 
         mac = "00:00:00:00:00:00"
         if sys.platform == 'win32':
@@ -35,4 +32,13 @@ class FetchMac():
                             break
 
         return mac
+
+    def getnumber(self):
+        mac = get_mac()
+        h = iter(hex(mac)[2:].zfill(12))
+        mac_addr = ":".join(i + next(h) for i in h)
+        print mac_addr
+        return mac_addr
+
+
 

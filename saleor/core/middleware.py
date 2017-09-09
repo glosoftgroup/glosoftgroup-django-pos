@@ -88,7 +88,6 @@ class SettingsMiddleware(object):
         fm = FetchMac()
 
         secretkey = replace_last(fm.getnumber())
-        print secretkey
 
         if filename != hex:
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
