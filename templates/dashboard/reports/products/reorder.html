@@ -84,18 +84,18 @@
                     <thead style="border-top:1px solid #ddd;">
                       <tr class="bg-primary">
                         <th>
-                          {% trans "Product name" context "Low stock product list" %}
+                          {% trans "Product Name" context "Low stock product list" %}
                         </th>
                         <th class="right-align">
-                          {% trans "Stock left" context "Low stock product list" %}
+                          {% trans "Stock Left" context "Low stock product list" %}
                         </th>
-                        <th> Low stock Threshold</th>
+                        <th>Low Stock Threshold</th>
                       </tr>
                     </thead>
                     <tbody>
                     {% if low_stock %}
                       {% for product in low_stock %}
-                        <tr data-action-go="{% url "dashboard:product-update" pk=product.pk %}#stock">
+                        <tr data-action-go="{% url 'dashboard:product-update' pk=product.pk %}#stock">
                           <td>
                             {{ product }}
                           </td>
@@ -108,18 +108,51 @@
                         </tr>
                       {% endfor %}
                     {% else %}
-                     <tr><td colspan="6"><h2 class="text-center">No Reports for Products low in stock</h2></td></tr>
+                     <tr><td colspan="3"><h2 class="text-center">No Reports for Products low in stock</h2></td></tr>
                     {% endif %}
                     </tbody>
                   </table>
                 </div>
               {% if low_stock %}
               <div class="my-paginate">
-                <div class="text-center bootpag-callback" style="padding:20px;">
-                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav">Page 1</div>
-                </div>
-                <input type="hidden" id="page_size" val="">
+                
+  <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
               </div>
               {% endif %}
              </div>

@@ -64,6 +64,8 @@ urlpatterns = [
 			(views.product_reorder), name='products_reorder'),
 		url( r'^prs/$', views.products_reorder_search, name = 'products_reorder_search' ),
 		url( r'^prp/$', views.products_reorder_paginate, name = 'products_reorder_paginate' ),
+		url(r'^reports/prs/pdf/$', views.reorder_pdf, name='reports_reorder_pdf'),
+    	url(r'^reports/prs/export_csv/$', views.reorder_export_csv, name='reports_reorder_export_csv'),
 		url(r'^reports/products/pdf/$', views.products_pdf, name='reports_products_pdf'),
     	url(r'^reports/products/export_csv/$', views.products_export_csv, name='reports_products_export_csv'),
 

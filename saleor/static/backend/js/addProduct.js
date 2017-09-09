@@ -35,9 +35,9 @@ $(function() {
  var tax = 0;
 
  // stock variables
- var thresholdId = $('#id_low_stock_threshold');
+ var thresholdId = $('#id_variant-low_stock_threshold');
  var supplierId  = $('#id_product_supplier');
- var skuId       = $('#id_variant-sku');
+ var skuId       = $('#id_variant-sku'); 
  var updateStockBtn = $('#updatestock'); 
  skuId.attr('disabled','disabled');
  
@@ -50,19 +50,16 @@ $(function() {
  	var sku = skuId.val();
  	var supplier = supplierId.val();
  	var threshold = thresholdId.val();
+ 
  	url = $(this).data('stockurl');
-    pk  = $(this).data('productpk');
+  pk  = $(this).data('productpk');
 
- 	// if(!sku){
- 	//   alertUser('Stock keeping unit required','bg-danger','SKU missing!');
- 	//   return false; 	  
- 	// }
- 	dynamicData = {};
+ 	 	dynamicData = {};
     dynamicData['sku'] = sku;
     dynamicData['pk'] = pk;
     if(supplier){
     dynamicData['supplier'] = supplier;
-    }
+    }    
     if(threshold){
     dynamicData['threshold'] = threshold;
     }     
@@ -77,10 +74,12 @@ $(function() {
     });
 
  });
- updatePricing.on('click',function(){    
+ updatePricing.on('click',function(){
     tax = tax_id.val();
     price = newPrice.val();
     wholesalePrice = wholesaleId.val();
+    var threshold = thresholdId.val();
+    var sku = skuId.val();
     url = $(this).data('priceurl');
     pk  = $(this).data('productpk');
     dynamicData = {};
@@ -88,6 +87,12 @@ $(function() {
     dynamicData['price'] = price;
     if(tax){
     dynamicData['tax'] = tax;
+    }
+    if(threshold){
+    dynamicData['threshold'] = threshold;
+    }
+    if(sku){
+    dynamicData['sku'] = sku;
     }
     if(wholesalePrice){
     dynamicData['wholesale_price'] =wholesalePrice;	
@@ -124,6 +129,7 @@ $(function() {
   var wholePriceId  = $('#wprice');
   var dynamicVariants = $('.dynamicvxx');
   var newSkuId = $('#new-sku-td');
+  var reorder_levelId = $('#reorder_level');
   var refreshVaraintsContent = $('#refreshvaraintscontent');
   var refreshStockVariants = $('#refreshStockVariants');
   var json = [];
@@ -143,6 +149,7 @@ $(function() {
     wholePrice  = wholePriceId.val();
     retailPrice = retailPriceId.val();
     newSku      = newSkuId.val();
+    reorder_level = reorder_levelId.val();
     if(!retailPrice || !newSku){
       alertUser('Retail Price & SKU required','bg-danger','Fill required fields!');
       return false;
@@ -151,6 +158,10 @@ $(function() {
     if(wholePrice){
       dynamicData['wholesale'] = wholePrice;
     }
+    if(reorder_level){
+      dynamicData['low_stock_threshold'] = reorder_level;
+    }
+    
     if ( json.length < 1) {
       //alertUser(json.length);
       alertUser('Please Select variants','bg-danger','Varaints Required!');
@@ -180,7 +191,7 @@ $(function() {
       });
     })
     .fail(function(){
-      alertUser('Error adding attributes','bg-danger','Error!');
+      alertUser('Error adding attributes, Add a unique SKU','bg-danger','Error!');
       json = [];
     });
   });
@@ -271,12 +282,14 @@ $(function() {
       alertUser('Sub category name required!','bg-danger','Error!');
       return false;
     }
-    addNewClassD(cname,variants,attributes).done(function(data){
-      alertUser('Sub category name required!');     
+    addNewClassD(cname,variants,attributes)
+    .done(function(data){
+      alertUser('Attribute added successfully!');     
       //refreshAttributes();
       window.location.href = $('#xaddClassBtnD').data('refreshme');
       $('#daddProductClass').modal('hide');
-    }).fail(function(){
+    })
+    .fail(function(){
       alertUser('Variant already added. Please add a unique variant name','bg-danger','Error!');
     });
 
@@ -415,14 +428,17 @@ $(function(){
    var stockInvoiceId  = $('#stockInvoiceNumber');
    var stockLocationId = $('#id_location');
    var stockQuantityId = $('#stock_quantity');
+   var reorder_levelId = $('#reorder_level');
    var addnewStockBtn  = $('#addnewStockBtn');
    // success
    var refreshDiv = $('#refreshStockitems');   
    addnewStockBtn.on('click',function(){
+    var dynamicData = {};
     var variant = stockVariantId.val();
     var cost_price = costPriceId.val();
     var location = stockLocationId.val();
     var quantity = stockQuantityId.val();
+    var reorder_level = reorder_levelId.val();
     var invoice_number  = stockInvoiceId.val();
     var addStockUrl = $(this).data('contenturl');
     var refreshStockUrl = $(this).data('refreshstockurl');
@@ -443,9 +459,11 @@ $(function(){
       alertUser('Invoice number required','bg-danger','Field Required!');
       return false;
     }
+    if(reorder_level){
+      dynamicData['low_stock_threshold'] = reorder_level;
+    }
     
-    // ./validation
-    dynamicData = {};
+    // ./validation    
     dynamicData['variant'] = variant;
     dynamicData['quantity'] = quantity;
     dynamicData['cost_price'] = cost_price;

@@ -301,6 +301,11 @@ class SmsTemplate(models.Model):
     content = models.TextField(blank=True, null=True)
 
 
+class EmailTemplate(models.Model):
+    name = models.CharField(max_length=255, blank=True, null=True)
+    content = models.TextField(blank=True, null=True)
+
+
 # connect the signal
 #notify.connect(notify_handler, dispatch_uid='notifications.models.notification')
 #smessage_handler.connect(smessage_handler, dispatch_uid='smessages.models.smessage')

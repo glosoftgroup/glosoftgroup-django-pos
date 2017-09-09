@@ -7,13 +7,15 @@ from . import AuthenticationBackends
 from decimal import Decimal
 from django.core.validators import MinValueValidator
 from datetime import datetime
+import datetime as t
 
 @python_2_unicode_compatible
 class SiteSettings(models.Model):
     domain = models.CharField(
         pgettext_lazy('Site field', 'domain'), max_length=100,
-        validators=[_simple_domain_name_validator], unique=True)
-    name = models.CharField(pgettext_lazy('Site field', 'name'), max_length=50)
+        validators=[_simple_domain_name_validator],blank=True, null=True,default='')
+    name = models.CharField(pgettext_lazy('Site field', 'name'), 
+        max_length=50,blank=True, null=True)
     header_text = models.CharField(
         pgettext_lazy('Site field', 'header text'), max_length=200, blank=True)
     description = models.CharField(
@@ -22,9 +24,9 @@ class SiteSettings(models.Model):
     loyalty_point_equiv = models.IntegerField( pgettext_lazy('Site field', 'loyalty points equivalency'),
         validators=[MinValueValidator(0)], default=Decimal(0)) 
     opening_time = models.TimeField(pgettext_lazy('Site field', 'opening time'),
-        auto_now=False, null=True, blank=True)
+        default=t.time(6, 00))
     closing_time = models.TimeField(pgettext_lazy('Site field', 'closing time'),
-        auto_now=False, null=True, blank=True)
+        default=t.time(21, 00))
     sms_gateway_username = models.CharField(
         pgettext_lazy('Site field', 'sms gateway username'), max_length=500,
         blank=True)

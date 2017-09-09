@@ -19,7 +19,7 @@ class SaleForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
-        field = self.fields['products'] 
+        field = self.fields['variant'] 
         field.widget.attrs['class'] = 'form-control multiselect'
         field.widget.attrs['multiple'] = 'multiple'
 

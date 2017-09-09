@@ -11,13 +11,6 @@
 
 $(function() {
 /* resend message */
-var resendMessage = $('.resendmessage');
-var resendUrl = resendmessage.data('url');
-resendmessage.on('click',function(){
-    var pk = $(this).data('id');
-    alertUser('sdlfjewl');
-    console.log(resendUrl);
-});
 
     // Custom code
     // ------------------------------

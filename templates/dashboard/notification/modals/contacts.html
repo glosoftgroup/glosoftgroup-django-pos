@@ -1,0 +1,92 @@
+<!-- supplier modal -->
+<div class="modal fade" id="supplierModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Select Suppliers</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label class="text-purple-800">Supplier(s)</label>
+                        <select class="getSupplier" multiple>
+                            
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        
+                    </div>
+                </div>
+            </div>
+</div>
+<!-- customer modal -->
+<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Select Customers</h4>
+            </div>
+            <div class="modal-body">
+                <label>Customer(s)</label>
+                <select class="getCustomer" multiple='multiple'></select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- view template modals -->
+ 
+<div id="tempDetail" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h5 class="modal-title">Template details</h5>
+            </div>
+            <div id="tData">
+                <div class="modal-body">
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- / -->
+<!-- template add  -->
+<div id="newTemplateModal" class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h5 class="modal-title">Add Template</h5>
+            </div>
+
+            <div class="modal-body">
+              <div class="form-group">
+                  <label>Template Name:</label>
+                  <input placeholder="(e.g Shopping confirmation)" type="text" class="form-control" id="tname" name="tname">
+              </div>
+              <div class="form-group">
+                <label>Content:</label>
+                <div id="summernote"> “[Glosoft Group]: Thanks for shopping with us! Your order is confirmed, and will be shipped shortly. Check your status here: Tap
+
+                    Th.is/order-status”
+                </div>                
+                   
+                </textarea>                
+              </div>
+            </div>            
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link btn-xs text-uppercase text-semibold" data-dismiss="modal">Close</button>
+                <button class="btn btn-primary text-semibold" id="addTemplateBtn" type="button">Add Template</button>
+            </div>
+        </div>
+    </div>
+</div>

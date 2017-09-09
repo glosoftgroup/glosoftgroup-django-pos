@@ -17,7 +17,7 @@
         <th> Variant</th>
         <th> Cost Price</th>             
         <th class="wide"> Location</th>
-        <th class="right-align">Quantity</th>       
+        <th class="right-align">Quantity</th>          
         <th>Actions</th>
       </tr>
     </thead>
@@ -40,6 +40,9 @@
     	<td width="15%">
     		<input type="number" placeholder="Quantity" class="form-control" id="stock_quantity" name="stock_quantity">
     	</td>
+        <td class="hidden">
+            <input type="hidden" placeholder="(e.g 10)" class="form-control" id="reorderasdas_level" name="reorder_sfsdasdlevel">
+        </td>
     	<td>
     		<button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-add' product_pk=product.pk %}" id='addnewStockBtn' class="btn btn-xs btn-primary">Add</button>
     	</td>

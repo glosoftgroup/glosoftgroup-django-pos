@@ -9,7 +9,7 @@ from django.utils.http import is_safe_url
 from django.utils.translation import pgettext_lazy
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template.loader import render_to_string
 from django.db.models import Q
 from django.db import IntegrityError
@@ -18,6 +18,7 @@ import simplejson
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from django.core.paginator import Paginator
+from ...utils import image64
 
 from ...userprofile.models import User
 from ...decorators import permission_decorator, user_trail
@@ -132,7 +133,7 @@ def perms(request):
 
 @staff_member_required
 @permission_decorator('group.add_group')
-@csrf_exempt
+@csrf_protect
 def create_group(request):
 	if request.method == 'POST':
 		group_name = request.POST.get('group_name')
@@ -155,6 +156,7 @@ def create_group(request):
 
 @staff_member_required
 @permission_decorator('group.add_group')
+@csrf_protect
 def group_assign_permission(request):
 	if request.method == 'POST':
 		group_id = request.POST.get('group_id')
@@ -214,6 +216,7 @@ def refine_users_permissions(users_in_group, permission_list):
 
 
 @staff_member_required
+@csrf_protect
 def get_search_users(request):
 	if request.is_ajax() and request.method == 'POST': 
 		group_id = request.POST.get('id')
@@ -223,6 +226,7 @@ def get_search_users(request):
 
 @staff_member_required
 @permission_decorator('group.change_group')
+@csrf_protect
 def group_edit(request):
 	group_id = request.POST.get('id')
 	group = Group.objects.get(id=group_id)
@@ -295,7 +299,7 @@ def get_group_users(request):
 			if user.image:
 				user_dict['image'] = str(user.image.url)
 			else:
-				user_dict['image'] = "/static/images/user.png"
+				user_dict['image'] = image64()
 			to_json.append(user_dict)
 		response_data = simplejson.dumps(to_json)
 		return HttpResponse(response_data, content_type='application/json')

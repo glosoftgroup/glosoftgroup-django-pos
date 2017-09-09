@@ -7,26 +7,21 @@
 {% if product_results %}
                        {% for product in product_results %}
                         <tr data-title=" {{ product.name }} ">
-                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">#{{ product.id }}</td>
-                          <!-- image -->
-                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}"
-                           srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"
-                           alt="" class="circle teal"></td>
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.id }}</td>
+                          
                            <!-- product name -->
-                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.name }}</td>
-                          <!-- product category -->
-                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
-                            {% with product.get_first_category as category %}
-                            {% if category %}
-                            {{ category }}
-                            {% endif %}
-                            {% endwith %}
-                          </td>
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.display_product }}</td>
+                          
                           <!-- price -->
-                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> {% gross product.price html=True %}</td>
+                          <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+                          {% if product.price_override.gross %} {{ product.price_override.gross }}
+                          {% else %}
+                          --
+                          {% endif %} 
+                          </td>
                           <!-- variants -->
                           <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
-                          {{ product.get_variants_count }}
+                          {{ product.get_stock_quantity }}
                           </td>
                         </tr>
                           {% endfor %}

@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load default_user_image %}
       <div class="panel panel-flat">
         <div class="table-responsives">
          
@@ -26,7 +27,7 @@
                    {% if user.image %}
                       <img src="{{user.image.url }}" alt="" class="circle teal img-responsive img-circle" style="width: 40px;height: 40px;"/>
                    {% else %}
-                      <img src="{% static 'images/user.png' %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
+                      <img src="{% default_user_image %}" alt="" class="circle teal" style="width: 40px;height: 40px;">
                    {% endif %}
                      <!-- product name -->
                     <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{user.name}}</td>

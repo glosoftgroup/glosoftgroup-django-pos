@@ -10,12 +10,12 @@
                           <thead style="border-top:1px solid #ddd;">
                              <tr class="bg-primary">
                             <th>
-                              Product name
+                              Product Name
                             </th>
                             <th class="right-align">
-                              Stock left
+                              Stock Left
                             </th>
-                            <th> Low stock Threshold</th>
+                            <th> Low Stock Threshold</th>
                       </tr>
                       </thead>
                       <tbody id="p-tb">
@@ -34,7 +34,7 @@
                             </tr>
                           {% endfor %}
                         {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">No Reports for Products low in stock</h2></td></tr>
+                         <tr><td colspan="3"><h2 class="text-center">No Reports for Products low in stock</h2></td></tr>
                         {% endif %}
                         </tbody>
                         </tbody>
@@ -43,10 +43,44 @@
         </div>
           {% if items %}
              <div class="my-paginate">
-                <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
-                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
-                </div>
+                
+  <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
               </div>
           {% endif %}
           </div>
@@ -145,4 +179,20 @@
             });
 
    });
+   
+    //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:products_reorder_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
+   {% if sz %}
+   $.when( $.ready ).then(function() {     
+         $('.bootstrap-select').selectpicker();
+         $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
+      });
+  {% endif %}
+
+
  </script>

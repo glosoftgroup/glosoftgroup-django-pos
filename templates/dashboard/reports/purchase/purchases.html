@@ -194,15 +194,8 @@ $(document).ready(function(){
     }, function(chosen_date){
         $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
     }).on('change',function(){
-        <!--var date = $(this).val();-->
-        <!--alert(date);-->
         var searchData =  $('.search_purchase').val();
         var listSizeVal = $('.list-sz').find(":selected").val();
-        <!--$.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, date:date}, async:false,success: function(data){-->
-              <!--$('#pagination-div').html(data);-->
-        <!--}});-->
-
-
     });
         $('.daterange-single').daterangepicker({
         singleDatePicker: true,

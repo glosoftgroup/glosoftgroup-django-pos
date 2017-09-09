@@ -426,6 +426,13 @@ def products_reorder_search(request):
 				items = paginator.page(page)
 				return TemplateResponse(request,'dashboard/reports/products/reorder_paginate.html',{'items':items})
 
+			if list_sz:
+				paginator = Paginator(items, int(list_sz))
+				items = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html',
+										{'items': items, 'pn': paginator.num_pages, 'sz': list_sz,
+										 'gid': request.GET.get('gid'), 'q': q})
+
 			return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
 
 
@@ -479,45 +486,89 @@ def sales_list_export_csv(request):
 
 @staff_member_required
 def products_pdf(request):
-	items = ProductVariant.objects.all().order_by('-id')
-	data = {
-		'today': date.today(),
-		'items': items,
-		'puller': request.user
-	}
-	pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
-	return HttpResponse(pdf, content_type='application/pdf')
+	if request.is_ajax():
+		q = request.GET.get('q')
+		gid = request.GET.get('gid')
+
+		if gid:
+			gid = gid
+		else:
+			gid = None
+
+		if q is not None:
+			items = ProductVariant.objects.filter(
+				Q(sku__icontains=q) |
+				Q(product__name__icontains=q) |
+				Q(product__product_class__name__icontains=q)).order_by('-id')
+
+			data = {
+				'today': date.today(),
+				'items': items,
+				'puller': request.user,
+				'gid':gid
+			}
+			pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
+			return HttpResponse(pdf, content_type='application/pdf')
+		else:
+			items = ProductVariant.objects.all().order_by('id')
+
+			data = {
+				'today': date.today(),
+				'items': items,
+				'puller': request.user,
+				'gid': gid
+			}
+			pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
+			return HttpResponse(pdf, content_type='application/pdf')
 
 @staff_member_required
 def products_export_csv(request):
-    pdfname = 'products'+str(random.random())
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
-    qs = ProductVariant.objects.all().order_by('-id')
-    writer = csv.writer(response, csv.excel)
-    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
-    writer.writerow([
-        smart_str(u"sku"),
-        smart_str(u"Product Name"),
-        smart_str(u"Category"),
-        smart_str(u"Sub-Category"),
-		smart_str(u"Reorder-level"),
-		smart_str(u"Current Quantity"),
-		smart_str(u"Unit Cost"),
-		smart_str(u"Total Cost"),
-    ])
-    for obj in qs:
-        writer.writerow([
-            smart_str(obj.sku),
-            smart_str(obj.display_product()),
-            smart_str(obj.product.get_first_category()),
-			smart_str(obj.product.product_class.name),
-            smart_str(obj.product.low_stock_threshold),
-			smart_str(obj.get_stock_quantity()),
-			smart_str(obj.get_price_per_item().gross),
-			smart_str(obj.get_total_price_cost()),
-        ])
-    return response
+    if request.is_ajax():
+		q = request.GET.get('q')
+		gid = request.GET.get('gid')
+
+		if gid:
+			gid = gid
+		else:
+			gid = None
+
+		if q is not None:
+			items = ProductVariant.objects.filter(
+				Q(sku__icontains=q) |
+				Q(product__name__icontains=q) |
+				Q(product__product_class__name__icontains=q)).order_by('-id')
+		else:
+			items = ProductVariant.objects.all().order_by('id')
+
+		pdfname = 'products' + str(random.random())
+		response = HttpResponse(content_type='text/csv')
+		response['Content-Disposition'] = 'attachment; filename="' + pdfname + '.csv"'
+		qs = items
+		writer = csv.writer(response, csv.excel)
+		response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
+		writer.writerow([
+			smart_str(u"sku"),
+			smart_str(u"Product Name"),
+			smart_str(u"Category"),
+			smart_str(u"Sub-Category"),
+			smart_str(u"Reorder-level"),
+			smart_str(u"Current Quantity"),
+			smart_str(u"Unit Cost"),
+			smart_str(u"Total Cost"),
+		])
+		for obj in qs:
+			writer.writerow([
+				smart_str(obj.sku),
+				smart_str(obj.display_product()),
+				smart_str(obj.product.get_first_category()),
+				smart_str(obj.product.product_class.name),
+				smart_str(obj.product.low_stock_threshold),
+				smart_str(obj.get_stock_quantity()),
+				smart_str(obj.get_price_per_item().gross),
+				smart_str(obj.get_total_price_cost()),
+			])
+		return response
+
 
 @staff_member_required
 @permission_decorator('reports.view_balancesheet')
@@ -673,3 +724,82 @@ def products_reorder_paginate(request):
 		except EmptyPage:
 			items = paginator.page(paginator.num_pages)
 		return TemplateResponse(request, 'dashboard/reports/products/reorder_paginate.html', {'items': items})
+
+@staff_member_required
+def reorder_pdf(request):
+	return HttpResponse(pdf, content_type='application/pdf')
+	if request.is_ajax():
+		q = request.GET.get('q')
+		gid = request.GET.get('gid')
+
+		if gid:
+			gid = gid
+		else:
+			gid = None
+
+		if q is not None:
+			products = Product.objects.annotate(
+				total_stock=Sum('variants__stock__quantity'))
+			products2 = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
+			items = products2.filter(name__icontains=q).order_by('-id')
+
+			data = {
+				'today': date.today(),
+				'items': items,
+				'puller': request.user,
+				'gid':gid
+			}
+			pdf = render_to_pdf('dashboard/reports/products/pdf/reorder_pdf.html', data)
+			return HttpResponse(pdf, content_type='application/pdf')
+		else:
+			items = get_low_stock_products()
+
+			data = {
+				'today': date.today(),
+				'items': items,
+				'puller': request.user,
+				'gid': gid
+			}
+			pdf = render_to_pdf('dashboard/reports/products/pdf/reorder_pdf.html', data)
+			return HttpResponse(pdf, content_type='application/pdf')
+
+
+@staff_member_required
+def reorder_export_csv(request):
+	if request.is_ajax():
+		q = request.GET.get('q')
+		gid = request.GET.get('gid')
+
+		if gid:
+			gid = gid
+		else:
+			gid = None
+
+		if q is not None:
+			products = Product.objects.annotate(
+				total_stock=Sum('variants__stock__quantity'))
+			products2 = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
+			items = products2.filter(name__icontains=q).order_by('-id')
+		else:
+			items = get_low_stock_products()
+
+		pdfname = 'low stock products-'+str(random.random())
+		response = HttpResponse(content_type='text/csv')
+		response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+		# qs = PurchaseProduct.objects.all().order_by('id')
+		qs = items
+		writer = csv.writer(response, csv.excel)
+		response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+		writer.writerow([
+			smart_str(u"Product name"),
+			smart_str(u"Stock left"),
+			smart_str(u"Low stock Threshold"),
+		])
+
+		for obj in qs:
+			writer.writerow([
+				smart_str(obj),
+				smart_str(obj.total_stock),
+				smart_str(obj.low_stock_threshold)
+			])
+		return response

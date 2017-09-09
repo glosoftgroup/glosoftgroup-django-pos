@@ -37,7 +37,7 @@
                           </tr>
                         {% endfor %}
                         {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">No Products Reports available</h2></td></tr>
+                         <tr><td colspan="8" class="text-center"><h2 class="text-center">No Products Reports Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
@@ -45,10 +45,44 @@
         </div>
               {% if items %}
              <div class="my-paginate">
-                <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
-                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-                  <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
-                </div>
+               
+  <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12 mt-10">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
               </div>
               {% endif %}
           </div>
@@ -151,5 +185,21 @@
             });
 
    });
+
+   //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:products_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
+   {% if sz %}
+   $.when( $.ready ).then(function() {     
+         $('.bootstrap-select').selectpicker();
+         $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
+      });
+  {% endif %}
+
+
  </script>
   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
