@@ -13,6 +13,7 @@ from ...site.models import AuthorizationKey, SiteSettings, Files
 from ...site.utils import get_site_settings_from_request
 from django.views.decorators.csrf import csrf_protect
 import logging
+import json
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -54,21 +55,44 @@ def update_settings(request,site_id=None):
         return HttpResponse('success')
     return HttpResponse('Invalid method')
 
+@csrf_exempt
 def add_sitekeys(request):
     if request.method == 'POST':
-        keyfile = request.POST.get('lic_key')
-        check = "sometext"
-        new_key = Files.objects.create(
-            file=keyfile,
-            check=check
-        )
+        keyfiles = request.POST.get('lic_key').strip()
+
+        if keyfiles:
+            try:
+                keyfile, check = keyfiles.split('###')
+            except Exception as e:
+                result = json.dumps({'message':'Invalid License Key', 'status':500})
+                return HttpResponse(result, content_type="application/json")
+            try:
+                Files.objects.all().delete()
+            except DatabaseError, BaseException:
+                result = json.dumps({'message': 'Failed to Add license', 'status':500})
+                return HttpResponse(result, content_type="application/json")
+
+            new_key = Files.objects.create(
+                file=keyfile,
+                check=check
+            )
+        else:
+            error_logger.info('License Key is empty ')
+            result = json.dumps({'message': 'Empty Key license', 'status': 500})
+            return HttpResponse(result, content_type="application/json")
+
         try:
             new_key.save()
         except DatabaseError, BaseException :
             error_logger.info('Error when saving ')
-        request.POST.get('sms_username')
-        return HttpResponse('success')
+
+        if new_key.id:
+            result = json.dumps({'message': 'success', 'status': 200})
+            return HttpResponse(result, content_type="application/json")
+        return HttpResponse('Error: Not saved')
+
     return HttpResponse('Invalid request')
+
 
 def test(request):
     print ('testKeys')

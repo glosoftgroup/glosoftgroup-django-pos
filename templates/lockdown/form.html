@@ -99,8 +99,8 @@
                                           <div class="form-group">
                                             <label for="name">License Key</label>
                                               <textarea name="lic_key" id="lic_key" rows="4"
-                                                        cols="4" class="form-control elastic"
-                                                        placeholder="Paste License Key here....">
+                                                        cols="4" class="form-control "
+                                                        placeholder="Paste License Key here...." style=" text-align:left; ">
                                               </textarea>
                                           </div>
                                         </div>
@@ -149,6 +149,7 @@
             var formData = new FormData(activation_form);
 
             if (formData) {
+
                     $.ajax({
                         url: "{% url 'dashboard:addsitekeys' %}",
                         type: "POST",
@@ -158,15 +159,22 @@
                         success:function(data){
                            console.log(data);
                            $("#lic_key").val('');
+                            if(data.status == 200){
+                                $.jGrowl( data.message, {
+                                  header: 'Successful!',
+                                  theme: 'bg-success'
+                               });
+                            }else{
+                                $.jGrowl( data.message, {
+                                  header: 'Error!',
+                                  theme: 'bg-danger'
+                               });
+                           }
 
-                           $.jGrowl('License key added', {
-                              header: 'Successful!',
-                              theme: 'bg-success'
-                           });
                         },
                         error:function(error){
                           console.log(error);
-                          $.jGrowl('The License key should not be empty', {
+                          $.jGrowl('Error occurred : '+ error.status + " : " +error.responseText, {
                               header: 'Error Occurred!',
                               theme: 'bg-danger'
                           });

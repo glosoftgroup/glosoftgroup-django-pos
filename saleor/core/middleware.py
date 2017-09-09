@@ -16,6 +16,9 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.http import QueryDict, HttpResponse
 from saleor.dashboard.sites.views import add_sitekeys
+from ..core.encryptor import Encryptor
+from ..core.readmac import FetchMac
+from ..core.utils import replace_last
 
 logger = logging.getLogger(__name__)
 info_logger = logging.getLogger('info_logger')
@@ -65,8 +68,7 @@ class SettingsMiddleware(object):
     def process_request(self, request):
         excluded_path = reverse('dashboard:addsitekeys')
         if request.path.startswith(excluded_path):
-            excluded_func = add_sitekeys(request)
-            return excluded_func
+            return None
 
         try:
             ufile = Files.objects.all()[:1][0]
@@ -76,17 +78,22 @@ class SettingsMiddleware(object):
         filecontent  = ufile.file
         filename = ufile.check
 
+        #  check hashlib
         h = hashlib.sha256()
         h.update(filecontent)
         hex = h.hexdigest()
 
+        en = Encryptor()
+
+        fm = FetchMac()
+
+        secretkey = replace_last(fm.getnumber())
 
         if filename != hex:
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'Error'})
 
         if self.is_not_empty(filecontent):
-            jsonvalue = base64.b64decode(filecontent)
-            info_logger.info('jsonvalue: '+ jsonvalue)
+            jsonvalue = en.decrptcode(filecontent, secretkey)
 
             if self.is_json(jsonvalue):
                 data = json.loads(jsonvalue)
