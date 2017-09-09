@@ -12,7 +12,6 @@ from django_countries.fields import Country, CountryField
 from ..search import index
 from ..site.models import Bank, BankBranch, UserRole, Department
 
-
 class AddressManager(models.Manager):
 
     def as_data(self, address):
@@ -129,7 +128,7 @@ class User(PermissionsMixin, AbstractBaseUser, index.Indexed):
         verbose_name=pgettext_lazy('User field', 'job title'))
     nid = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
-    image = models.ImageField(upload_to='employee', default='employee/user.png')
+    image = models.ImageField(upload_to='employee', null=True, blank=True)
     date_joined = models.DateTimeField(
         pgettext_lazy('User field', 'date joined'),
         default=timezone.now, editable=False)
