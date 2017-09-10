@@ -138,8 +138,7 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
             total_net = Decimal(data.get('total_net'))
             balance = Decimal(data.get('balance'))
             sale = Sales.objects.get(invoice_number=invoice_number)
-            print sale
-            print '*'*100
+            
             if status == 'fully-paid' and sale.balance > amount_paid:
                 print 'balance '+str(sale.balance)
                 print 'amount '+str(amount_paid)
