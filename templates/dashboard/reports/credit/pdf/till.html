@@ -1,0 +1,61 @@
+ {% load staticfiles %}
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+ <html>
+     <head>
+         <title>Sales Report</title>
+         <style type="text/css">
+             body {sans-serif; color: #384047;}
+             .header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}
+             .title {font-size: 16px;font-weight: 100;}
+             .header p{color:#384047;}
+
+             .img-circle{border-radius: 50%;}
+             table {ax-width: 960px; margin: 10px auto;}
+            tr{border-bottom:0.5px solid #ddd;border-right:0.5px solid #ddd;
+                border-left:0.5px solid #ddd;
+            }
+            td{border:none;}
+            th {
+                  font-weight: bold;
+                  background:#2196F3;
+                  color: #FFF;
+                  border:none;
+                  font-size:11px;
+                  vertical-align:middle;
+                }
+             .td{text-align: center;font-size:11px;}
+             tr{padding:5px;}
+             .img{width:50px;height:50px;}
+         </style>
+     </head>
+     <body>
+         <div class='wrapper'>
+             <div class='header'>
+                 <p style="margin-bottom:0px;"><img class="img" src="{{image}}" alt="Red dot" /></p>
+                 <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;"> TILLS SALES REPORT
+                 {% if sales_date is not None %}
+                     <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
+                        SALES DATE: {{sales_date}}
+                 </p>{% endif %}
+                   <p style="margin-top:2px;font-size:11px;">{{today | date:'jS F Y'}}</p>
+                 </p>
+             </div>
+         <div>
+         <div class='details'>
+            <img class="img" src="{{category}}" alt="Red dot" style="width:1000px;height:auto;"/>
+         </div>
+
+
+             <div class="foot" id="footerContent">
+                 <p style="text-align: center;font-size:11px;">Report Pulled by:
+                     <span style="font-weight:bold">
+                         {% if puller.name %}
+                            {{ puller.name | upper }}
+                         {% else %}
+                            {{ puller.email | upper }}
+                         {% endif %}
+                     </span></p>
+
+             </div>
+     </body>
+ </html>

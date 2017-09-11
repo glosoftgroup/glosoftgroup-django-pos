@@ -10,6 +10,7 @@ from graphene_django.views import GraphQLView
 from .accounts.urls import urlpatterns as accounts_urls
 from .api.cash.urls import urlpatterns as api_cash_urls
 from .api.invoice.urls import urlpatterns as api_invoice_urls
+from .api.credit.urls import urlpatterns as api_credit_urls
 from .api.payment.urls import urlpatterns as api_payment_urls
 from .api.product.urls import urlpatterns as api_urls
 from .api.sms.urls import urlpatterns as api_sms_urls
@@ -37,6 +38,7 @@ urlpatterns = [
     url(r'^accounts/', include(accounts_urls, namespace='accounts')),
     url(r'^api/cash/', include(api_cash_urls, namespace='cash-api')),
     url(r'^api/invoice/', include(api_invoice_urls, namespace='invoice-api')),
+    url(r'^api/credit/', include(api_credit_urls, namespace='credit-api')),
     url(r'^api/products/', include(api_urls, namespace='product-api')),
     url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),
     url(r'^api/sms/', include(api_sms_urls, namespace='sms-api')),

@@ -14,6 +14,7 @@ from .permgroups.urls import urlpatterns as group_urls
 from .product.urls import urlpatterns as product_urls
 from .variants.urls import urlpatterns as variants_urls
 from .reports.urls import urlpatterns as reports_urls
+from .credit.urls import urlpatterns as credit_urls
 from .search.urls import urlpatterns as search_urls
 from .sites.urls import urlpatterns as site_urls
 from .shipping.urls import urlpatterns as shipping_urls
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^$', core_views.index, name='index'),
     url(r'^categories/', include(category_urls)),
     url(r'^customers/', include(customer_urls)),
+    url(r'^credit/', include(credit_urls)),
     url(r'^discounts/', include(discount_urls)),
     url(r'^drawercash/', include(drawercash_urls)),
     url(r'^hr/', include(hr_urls)),    

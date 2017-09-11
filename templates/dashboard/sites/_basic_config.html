@@ -1,60 +1,73 @@
 {% load i18n %}
 {% load materializecss %}
+{% load default_user_image %}
 <div class="row">
       <div class="panel-body">
-        <form method="post" id="form-category" enctype="multipart/form-data" novalidate>
+        <form id="form-category" name="form-category" enctype="multipart/form-data" novalidate>
           <div class="card-content card-content-form">
             {% csrf_token %}
              <div class="col-md-6">
-                
+
               </div>
               <div class="col-md-6">
-                
-             </div>
 
-             <div class="col-md-12">
-               <div class="text-center content-text-muted content-divider">
-                  <span class="pt-10 pb-10 text-bold">
-                  Sales Settings
-                 </span>  
-               </div> 
-             </div> 
-             <!-- sdlfj       -->
-             <div class="col-md-3">
-                <div class="form-group">
-                  {{ form.loyalty_point_equiv|materializecss }}
-                </div>
-                <div class="form-group">
-                  
-                </div>
              </div>
-             <div class="col-md-6">
-              <div class="row">
-                 <div class="col-md-6">
-                    <div class="form-group">          
-                    {{ form.opening_time|materializecss }}
+              <div class="col-md-12">
+                  <div class="col-md-4">
+                    <label for="image" class="text-center" style="padding-left:50px;">Business Logo</label>
+                      <div class="form-group">
+                        <!-- <label for="exampleInputEmail1">User Image</label> -->
+                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                          <div class="fileinput-new thumbnail" style="width: 150px; height: auto;">
+                            <img data-src="holder.js/100%x100%" alt="..." src="{% if site.image %}{{ site.image.url }}{% else %}{% default_user_image %} {% endif %}">
+                          </div>
+                          <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                          <div style="text-align: center;">
+                            <span class="btn btn-warning btn-file"><span class="fileinput-new">{% if site.image %}Change Logo{% else %}Select Logo {% endif %}</span><span class="fileinput-exists">Change</span><input type="file" name="image" id="image"></span>
+                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                 </div>
-              
-                 <div class="col-md-6">
-                    <div class="form-group">
-                       
-                       {{ form.closing_time|materializecss }}
-                     </div>
-                 </div>
-              </div>              
-                
-             </div>
+                  <div class="col-md-8">
+                      <div class="form-group col-md-12">
+                        <label for="company_name">Business Name</label>
+                        <input type="text" class="form-control" name="company_name" id="company_name" placeholder="Company Name"
+                        value="{% if site.name %} {{site.name}} {% else %} {% endif %}">
+                      </div>
+                      <div class="col-md-12"> <h6 style="font-weight:bold;">Sales Settings</h6></div>
+                      <div class="form-group col-md-12">
+                          {#{{ form.loyalty_point_equiv|materializecss }}#}
+                           <label for="loyalty_point_equiv">Loyalty points equivalency </label>
+                        <input class="form-control" name="loyalty_point_equiv" id="loyalty_point_equiv" type="number" min="0"
+                               placeholder="{% if site.loyalty_point_equiv %} {{site.loyalty_point_equiv}} {% else %} 0 {% endif %}">
+                      </div>
+                      <div class="form-group col-md-6">
+                          {#{{ form.opening_time|materializecss }}#}
+                           <label for="opening_time">Opening Time </label>
+                          <input onkeydown="return false;" class="form-control octime" name="opening_time" id="opening_time" type="text"
+                                 placeholder="{% if site.opening_time %} {{site.opening_time}} {% endif %}">
+                      </div>
+                      <div class="form-group col-md-6">
+                          {#{{ form.closing_time|materializecss }}#}
+                           <label for="closing_time">Closing Time </label>
+                          <input onkeydown="return false;" class="form-control octime" name="closing_time" id="closing_time" type="text"
+                                 placeholder="{% if site.closing_time %} {{site.closing_time}} {% endif %}">
+                      </div>
+                  </div>
+              </div>
+
           </div>
 
-          
-          <div class="col-md-6 col-md-offset-3 text-right" >
-            <a class="btn btn-default pull-left" href="{% url 'dashboard:index' %}" traget="_blank">
-              {% trans "Cancel" context "Dashboard cancel action" %}
-            </a>
-            <button type="submit" class="btn  btn-primary waves-effect waves-light pull-right">
-              {% trans "Update" context "Dashboard update action" %}
-            </button>
+          <div class="row">
+              <div class="col-md-6 col-md-offset-3 text-right" >
+                <a class="btn btn-default pull-left" href="{% url 'dashboard:index' %}" traget="_blank">
+                  {% trans "Cancel" context "Dashboard cancel action" %}
+                </a>
+                <button type="submit" class="btn  btn-primary waves-effect waves-light pull-right">
+                  {% trans "Update" context "Dashboard update action" %}
+                </button>
+              </div>
           </div>
         </form>
       </div>

@@ -1,0 +1,230 @@
+  {% load staticfiles i18n %}
+  {% if category %}
+  {% block custom_css %}
+   <style type="text/css">
+    /* chart */
+          canvas{
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+    .chartjs-tooltip {
+      opacity: 1;
+      position: absolute;
+      background: rgba(0, 0, 0, .7);
+      color: white;
+      border-radius: 3px;
+      -webkit-transition: all .1s ease;
+      transition: all .1s ease;
+      pointer-events: none;
+      -webkit-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+      padding: 4px;
+    }
+
+    .chartjs-tooltip-key {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+    }
+    /* chart*/
+  </style>
+ {% endblock %}
+  <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-12">
+            <div class="alert bg-primary">
+                <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                <span class="text-semibold">User: {{category}}</span> Last Date sales made were {{last_sales.total_net__sum}} on date {{last_sales.created}}
+            </div>
+
+        </div>
+      </div>
+  </div>
+  <div class="col-md-12">
+      <div class="row">
+        <!-- this month -->
+        <div class="col-md-3 {% if not this_month_sales %} pull-right{% endif %}">
+            <div class="panel text-center">
+                <div class="panel-body">
+                    <div class="col-md-12"><h6>This Month Sales: <br>Kshs {% if this_month_sales %}{{this_month_sales}}{% else %}0.00{% endif %}</h6>
+                        {% if this_month_sales %}
+                        <div style="width:200px;height:200px;margin:auto;">
+                            <canvas id="thisMonthChart" width="200" height="200"></canvas>
+                        </div>
+                        {% else %}
+                        <img src="{% static 'backend/images/zero-percent.png' %}" style="width:100px;height:100px;margin:auto;"/>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div><!-- this month -->
+        <!-- last month -->
+        <div class="col-md-3 {% if not last_month_sales %} pull-right{% endif %}">
+            <div class="panel text-center">
+                <div class="panel-body">
+                    <div class="col-md-12"><h6>Last Month Sales: <br>Kshs {% if last_month_sales %}{{last_month_sales}}{% else %}0.00{% endif %}</h6>
+                         {% if last_month_sales %}
+                        <div style="width:200px;height:200px;margin:auto;">
+                            <canvas id="lastMonthChart" width="200" height="200"></canvas>
+                        </div>
+                        {% else %}
+                        <img src="{% static 'backend/images/zero-percent.png' %}" style="width:100px;height:100px;margin:auto;"/>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div><!-- last month -->
+        <!-- this year -->
+        <div class="col-md-3 {% if not this_year_sales %} pull-right{% endif %}">
+            <div class="panel text-center">
+                <div class="panel-body">
+                    <div class="col-md-12"><h6>This Year Sales: <br>Kshs {% if this_year_sales %}{{this_year_sales}}{% else %}0.00{% endif %}</h6>
+                        {% if this_year_sales %}
+                        <div style="width:200px;height:200px;margin:auto;">
+                            <canvas id="thisYearChart" width="200" height="200"></canvas>
+                        </div>
+                        {% else %}
+                        <img src="{% static 'backend/images/zero-percent.png' %}" style="width:100px;height:100px;margin:auto;"/>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div><!-- this year -->
+        <!-- last year -->
+        <div class="col-md-3 {% if not last_year_sales %} pull-right{% endif %}">
+            <div class="panel text-center">
+                <div class="panel-body">
+                    <div class="col-md-12"><h6>Last Year Sales: <br>Kshs {% if last_year_sales %}{{last_year_sales}}{% else %}0.00{% endif %}</h6>
+                       {% if last_year_sales %}
+                        <div style="width:200px;height:200px;margin:auto;">
+                            <canvas id="lastYearChart" width="200" height="200"></canvas>
+                        </div>
+                        {% else %}
+                        <img src="{% static 'backend/images/zero-percent.png' %}" style="width:100px;height:100px;margin:auto;"/>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div><!-- last year -->
+
+    </div>
+</div>
+
+   <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/chart.min.js' %}"></script>
+   <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+{% if this_month_sales %}
+//** this month chart
+      var ctx = document.getElementById("thisMonthChart").getContext('2d');
+      var thisMonthChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: ['{{category}} ({{tm_percent}}%)','Others ({{tm_others}}%)'],
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: [{{tm_percent}}, {{tm_others}}],
+                  backgroundColor: ['#f3a','#1cf' ],
+                  //borderColor: ['rgba(255,99,132,1)','rgba(54, 162, 235, 1)'],
+                  borderWidth: 1
+              }]
+          },
+          options:{
+              cutoutPercentage: 50,
+              legend:{
+              position:'bottom'
+              }
+          }
+
+      });
+//----** this month chart
+{% endif %}
+{% if last_month_sales %}
+//** last month chart
+      var ctx1 = document.getElementById("lastMonthChart").getContext('2d');
+      var lastMonthChart = new Chart(ctx1, {
+          type: 'doughnut',
+          data: {
+              labels: ['{{category}} ({{lm_percent}}%)','Others ({{lm_others}}%)'],
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: [{{lm_percent}}, {{lm_others}}],
+                  backgroundColor: ['#f9f504','#8cc414' ],
+                  //borderColor: ['rgba(255,99,132,1)','rgba(54, 162, 235, 1)'],
+                  borderWidth: 1
+              }]
+          },
+          options:{
+              cutoutPercentage: 50,
+              legend:{
+              position:'bottom'
+              }
+          }
+
+      });
+//** last month chart
+{% endif %}
+{% if this_year_sales %}
+//** this year chart
+      var ctx2 = document.getElementById("thisYearChart").getContext('2d');
+      var thisYearChart = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+              labels: ['{{category}} ({{ty_percent}}%)','Others ({{ty_others}}%)'],
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: [{{ty_percent}}, {{ty_others}}],
+                  backgroundColor: ['#f74302','#963613' ],
+                  //borderColor: ['rgba(255,99,132,1)','rgba(54, 162, 235, 1)'],
+                  borderWidth: 1
+              }]
+          },
+          options:{
+              cutoutPercentage: 50,
+              legend:{
+              position:'bottom'
+              }
+          }
+
+      });
+//---------** this year chart
+{% endif %}
+{% if last_year_sales %}
+//** last year chart
+      var ctx3 = document.getElementById("lastYearChart").getContext('2d');
+      var lastYearChart = new Chart(ctx3, {
+          type: 'doughnut',
+          data: {
+              labels: ['{{category}} ({{ly_percent}}%)','Others ({{ly_others}}%)'],
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: [{{ly_percent}}, {{ly_others}}],
+                  backgroundColor: ['#f70125','#7c01f7' ],
+                  //borderColor: ['rgba(255,99,132,1)','rgba(54, 162, 235, 1)'],
+                  borderWidth: 1
+              }]
+          },
+          options:{
+              cutoutPercentage: 50,
+              legend:{
+              position:'bottom'
+              }
+          }
+
+      });
+//------** last year sale
+{% endif %}
+});
+</script>
+ {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-info">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+        No sales summary available for that category
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}

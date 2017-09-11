@@ -17,6 +17,7 @@ from saleor.cart.utils import find_and_assign_anonymous_cart
 from .forms import LoginForm, SignupForm, SetPasswordForm
 from saleor.decorators import permission_decorator, user_trail
 from saleor.userprofile.models import User
+from django.views.decorators.csrf import csrf_protect
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
