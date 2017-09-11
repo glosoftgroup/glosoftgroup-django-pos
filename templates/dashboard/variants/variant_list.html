@@ -1,0 +1,432 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load humanize %}
+{% load materializecss %}
+{% load staticfiles %}
+{% load product_first_image from product_images %}
+{% block title %}
+Product Variants - {{ block.super }}
+{% endblock %}
+{% block breadcrumbs %}
+
+<li >
+  <a href="{% url 'dashboard:product-list">Products</a>
+</li>
+<li class=""><a href="{% url 'dashboard:variant-list' %}">Product Variants</a></li>
+{% if product %}
+<li class="active">
+  {{product}}
+</li>
+{% endif %}
+
+{% endblock %}
+{% block menu_purchase_list %}active{% endblock %}
+
+ {% block custom_css %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+         .table{border:1px solid #ccc}
+   </style>
+ {% endblock %}
+
+{% block content %}
+ <script type="text/javascript" src="{% static 'backend/js/jquery-1.11.3.min.js' %}"></script>
+ <div class="row animated fadeIn">
+   <div class="col-md-12">
+      <div class="panel panel-flat">
+      
+        <div class="panel-body search-panel">
+            <div class="col-md-4">
+             <label>Search Variants</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search Variants" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 hidden">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>Select Category</label>
+              <div class="form-group">
+                  <select class="bootstrap-select group-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
+                  {% if categories %}
+                   <option value='1'>--</option>
+                  {% for category in categories %}
+                       <option value="{{category.id}}">
+                            {{category.name}}
+                       </option>
+                  {% endfor %}
+                  {% else %}
+                   <option value="none" data-icon="fa-dot-circle-o">No categories</option>
+                  {% endif %}
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2 hidden">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              
+            </div>
+        </div>
+      </div>
+   </div>
+  <div class="col-md-12">
+   <div id="pagination-div">
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-body">
+        <div class="table-responsive">
+         
+
+          <table class="table  table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
+                <thead>
+                  <tr class="bg-primary">        
+                    <th>Product Name/sku</th>            
+                    <th>Retail price (KShs)</th>
+                    <th>Current Quantity</th>
+                    <th>stock in</th>
+                    <th>Tax %</th>         
+                  </tr>
+                </thead>
+                <tbody id="tb">           
+               {% if product_results %}
+                  {% for variant in product_results %}
+                    <tr>
+                        <!-- product name/sku -->
+                      <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.get_stock_pk %}">
+                        <div class="media-left">
+                          <div class=""><a href="javascript:;" class="text-default text-semibolds"> {{ variant.display_product }} </a></div>
+                          <div class="text-muted text-size-small">  {{ variant.sku }} </div>
+                        </div>
+                      </td>
+
+                      <!-- Retail price -->
+                      <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.get_stock_pk %}">
+                      <h6 class="text-semibolds text-centers">
+                          <span class="pull-">
+                      {% if variant.get_price_per_item %}
+                       {#{% gross variant.get_price_per_item html=True %}#}
+                          {{variant.get_price_per_item.gross|intcomma}}
+                      {% endif %}
+                          </span>
+                      </h6>
+                      </td>
+                      <!--current stock quantity -->
+                      <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.get_stock_pk %}">
+                        <span class="old_value{{ variant.get_stock_pk }}" data-quantity="{{ variant.get_stock_quantity }}"
+                        data-href="{% url 'dashboard:add_stock_ajax' %}">
+                        {{ variant.get_stock_quantity }}
+                        </span>
+                      </td>
+                      <!-- stock in  -->
+                      <td>
+                      {% if variant.get_stock_pk == 0 %}
+                      <a href="{% url 'dashboard:product-update' pk=variant.product.pk %}?tab=stock" id="type-number{{ variant.get_stock_pk }}" data-type="number"
+                      data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Add stock</a>
+                      {% else %}
+                      <a href="javascript:;" id="type-number{{ variant.get_stock_pk }}" data-type="number"
+                      data-csrf-token="{{ csrf_token }}" data-inputclass="form-control" data-pk="{{ variant.get_stock_pk }}" data-title="Number">Add stock</a>
+                      <script type="text/javascript">
+                      $(document).ready(function(){
+
+                        function notifyme(msg) {
+                              new PNotify({
+                                  text: msg,
+                                  addclass: 'bg-success-400'
+                              });
+                          }
+                         // Number
+                        $('#type-number{{ variant.get_stock_pk }}').editable({
+                            //url: "{% url 'dashboard:stock_pages' %}",
+                            ajaxOptions: {
+                                type: 'get',
+                                dataType: 'json',
+                            },
+                            validate: function(value) {
+                                if($.trim(value) == ''){
+                                 return 'This field is required';
+                                }else{
+                                 var old_quantity = $('.old_value{{ variant.get_stock_pk }}').data('quantity');
+                                 var url = $('.old_value{{ variant.get_stock_pk }}').data('href');
+                                 var total = parseInt($.trim(value)) + parseInt(old_quantity);
+                                  $('.old_value{{ variant.get_stock_pk }}').html($.trim(total));
+
+                            var posting = $.post(
+                              url,
+                               {
+                                'csrfmiddlewaretoken':"{{ csrf_token }}",
+                                product:"{{ variant.display_product }}",
+                                stock_pk:{{ variant.get_stock_pk }},
+                                  quantity:total,
+                               } );
+                            posting.done(function( data ){
+                                //alert(data);
+                                notifyme(data);
+                             });
+                                }
+                            },
+                            title: 'Enter any number',
+                            response: function(settings) {
+                                console.log(settings);
+                            },
+
+                        });
+                        });
+                      </script>
+                      {% endif %}
+                      </td>
+                      <!-- product tax -->
+                      <td class="modal-trigger-ajax" href="#modal_instance" data-title="{{ variant.display_product }} History" data-href="{% url 'dashboard:stock-history' stock_pk=variant.get_stock_pk %}">
+                      <span class="text-warning">
+                      {% if variant.product.get_product_tax %}
+                      {{ variant.product.get_product_tax }}
+                      {% else %}
+                      <i class="icon-menu position-left"></i>
+                      {% endif %}
+                      </span></td>
+                   </tr>
+              {% endfor %}
+                {% else %}
+                   <tr><td colspan="6"><h2 class="text-center">No Stock Available</h2></td></tr>
+               {% endif %}
+                  </tbody>
+           </table>
+
+        </div>
+        </div>
+          {% if product_results %}
+        <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
+          {% endif %}
+      </div>
+    </div><!-- pagination -->
+  </div>
+</div>
+
+{% include "dashboard/includes/_modal_add_stock.html"  %}
+{% endblock%}
+{% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/editable/editable.min.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+
+        $( ".modal-trigger-ajax").on('click',function() {
+            var url = $(this).data('href')
+            var prompt_text = $(this).data('title');
+            var modal = $(this).attr('href');
+            var csrf_token = $(this).data('csrf_token')
+            $('#form-stock').attr('action',url);
+            $('.modal-title').html(prompt_text);
+            $(".results" ).empty().append('<span class="text-center" style="padding:23px">Loading...<i class=" icon-spinner"></i></span>');
+            $(modal).modal();
+              var posting = $.get( url, {'csrfmiddlewaretoken':csrf_token });
+              // Put the results in a div
+              posting.done(function( data ) {
+              $(".results" ).empty().append( data );
+              });
+
+       });
+
+      $(".td").click(function(){
+          window.location = $(this).data("href");
+      });
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change', function(){
+
+        var ts = $(this).val();
+        if(ts == 'pdf'){
+          var url = "{% url 'dashboard:users_pdf' %}";
+          window.open(url, '_blank');
+
+        }else if(ts=='excel'){
+          window.location="{% url 'dashboard:users_export_csv' %}";
+
+        }else{
+          $(this).val('')
+        }
+    });
+    //**@ display size select
+    {% if product.pk %}
+     var lurl = "{% url 'dashboard:variant_paginate2' pk=product.pk %}";
+    {% else %}
+     var lurl = "{% url 'dashboard:variant_paginate' %}";
+    {% endif %}
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        $.ajax({ url: lurl,type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
+
+    {% if product.pk %}
+     var purl = "{% url 'dashboard:variant_paginate2' pk=product.pk%}";
+    {% else %}
+     var purl = "{% url 'dashboard:variant_paginate' %}";
+    {% endif %}
+
+    $('.bootpag-callback').bootpag({
+        total: parseInt("{{pn}}"),
+        maxVisible: 4,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
+        
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+"{{pn}}"); // or some ajax content l
+            
+            $.get(purl,{page:num},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+    //**@ group name select
+    $('.group-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o'
+    }).on('change', function(){
+       var group_id = $(this).val();
+        $.get(purl,{page:1,gid:group_id},function(data){
+             $('#pagination-div').html(data);
+        });
+    });
+
+     
+
+      
+      /* clicked the submit button */
+      $('.del').on('click', function (e) {
+          var f = document.getElementById('delform');
+          var formData = new FormData(f);
+          var id = $(this).data('id');
+          var url = $(this).data('href');
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){        
+                $('#modal_instance').modal('hide');
+                $('#tb #'+id).remove();            
+                $.jGrowl('User deleted successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                window.location.reload();
+             // $("#mydiv").load(location.href + " #mydiv");
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error deleting Staff', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });
+      });
+
+
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+      {% if product.pk %}
+       var surl = "{% url 'dashboard:variant_search2' pk=product.pk%}";
+      {% else %}
+       var surl = "{% url 'dashboard:variant_search' %}";
+      {% endif %}
+      $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        delay(function(){ 
+           var url = surl;
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                  $('#pagination-div').html(data);
+           }});
+        }, 500 );
+
+      });
+
+
+
+  });
+
+
+</script>
+{% endblock %}

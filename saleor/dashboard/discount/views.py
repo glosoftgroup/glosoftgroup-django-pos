@@ -6,8 +6,11 @@ from django.template.response import TemplateResponse
 from django.utils.translation import pgettext_lazy
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.db.models import Q
+from django.http import HttpResponse
+import json
 
 from ...discount.models import Sale, Voucher
+from ...product.models import ProductVariant
 from ...decorators import permission_decorator, user_trail
 from . import forms
 import logging
@@ -110,7 +113,7 @@ def discount_detail(request,pk=None):
         if pk:
             try:
                 instance = get_object_or_404(Sale, pk=pk)
-                products = instance.products.all()
+                products = instance.variant.all()
 
                 page = request.GET.get('page', 1)
                 paginator = Paginator(products, 10)
@@ -140,7 +143,7 @@ def disc_products_paginate(request):
     pk = request.GET.get('pk')
 
     instance = get_object_or_404(Sale, pk=pk)
-    products = instance.products.all()
+    products = instance.variant.all()
     if list_sz:
         paginator = Paginator(products, int(list_sz))
         products = paginator.page(page)
@@ -179,7 +182,7 @@ def disc_products_search(request):
 
         if q is not None:
             instance = get_object_or_404(Sale, pk=pk)
-            products = instance.products.all()
+            products = instance.variant.all()
 
             queryset_list = products.filter(
                 Q(name__icontains=q)
@@ -222,6 +225,30 @@ def sale_edit(request, pk=None):
     ctx = {'sale': instance, 'form': form}
     return TemplateResponse(request, 'dashboard/discount/sale_form.html', ctx)
 
+
+@staff_member_required
+def create_discount(request):
+    if request.method == 'POST':
+        discount = Sale()
+        if request.POST.get('variants'):
+            variants = json.loads(request.POST.get('variants'))
+        if request.POST.get('type'):
+            discount.type = request.POST.get('type')
+        if request.POST.get('value'):
+            discount.value = request.POST.get('value')
+        if request.POST.get('name'):
+            discount.name = request.POST.get('name')
+        if request.POST.get('start_date'):
+            discount.start_date = request.POST.get('start_date')
+        if request.POST.get('end_date'):
+            discount.end_date = request.POST.get('end_date')
+        discount.save()
+        for variant in variants:
+            discount.variant.add(variant)
+        return HttpResponse(json.dumps({'message':discount.name}))
+    else:
+        return HttpResponse(json.dumps({'message':'Invalid method'}))
+        
 
 @staff_member_required
 def sale_delete(request, pk):
@@ -300,3 +327,18 @@ def voucher_delete(request, pk):
     ctx = {'voucher': instance}
     return TemplateResponse(
         request, 'dashboard/discount/voucher_modal_confirm_delete.html', ctx)
+
+@staff_member_required
+def token_variants(request):
+    search = request.GET.get('search')
+    group = request.GET.get('group')    
+    variants = ProductVariant.objects.all().filter(
+        Q(name__icontains=search) |
+        Q(sku__icontains=search) |
+        Q(product__product_class__name__icontains=search) |
+        Q(product__name__icontains=search)
+    ).order_by('-id')[:10:1]
+    l = []
+    for variant in variants:        
+        l.append({'text':variant.display_product(),'value': variant.pk})
+    return HttpResponse(json.dumps(l), content_type='application/json')

@@ -35,7 +35,8 @@
         <div class="alert alert-warning no-border">
             <span class="text-semibold">Sorry!</span> Systems seems to have locked!! Please
             <span class="text-semibold">activate</span> the system. Contact systems
-            administrator or glosoftgroup on +254711727778
+            administrator or glosoftgroup on +254711727778<br/>
+            Machine Number : {{ days }}
         </div>
     </div>
 </div>
@@ -59,14 +60,14 @@
                 <div class="panel-body">
                     <div class="tabbable">
                         <ul class="nav nav-tabs nav-tabs-highlight">
-                            <li class="active"><a href="#highlighted-tab2" data-toggle="tab">Activate Online</a></li>
-                            <li><a href="#highlighted-tab3" data-toggle="tab">Add License Key</a></li>
+                            <li style="display: none;"><a href="#highlighted-tab2" data-toggle="tab">Activate Online</a></li>
+                            <li class="active"><a href="#highlighted-tab3" data-toggle="tab">Add License Key</a></li>
 
                         </ul>
 
                         <div class="tab-content">
 
-                            <div class="tab-pane active" id="highlighted-tab2">
+                            <div class="tab-pane active" id="highlighted-tab2" style="display: none;">
                                 <form class="form" method="post" name="online_activation">
                                 {% csrf_token %}
                                    <div class="col-md-8">
@@ -90,7 +91,7 @@
                                 </form>
                             </div>
 
-                            <div class="tab-pane" id="highlighted-tab3">
+                            <div class="tab-pane active" id="highlighted-tab3">
                                 <form class="form" method="post" name="license_activation" id="addlicensekey">
                                 {% csrf_token %}
                                     <div class="col-md-8">
@@ -98,10 +99,7 @@
                                         <div class="col-md-6">
                                           <div class="form-group">
                                             <label for="name">License Key</label>
-                                              <textarea name="lic_key" id="lic_key" rows="4"
-                                                        cols="4" class="form-control elastic"
-                                                        placeholder="Paste License Key here....">
-                                              </textarea>
+                                              <textarea name="lic_key" id="lic_key" rows="4" cols="4" class="form-control "  placeholder="Paste License Key here...." wrap="physical"></textarea>
                                           </div>
                                         </div>
                                         </div>
@@ -130,6 +128,9 @@
 {% endblock%}
 {% block custom_js %}
     <script type="text/javascript">
+    $(document).ready(function (){
+
+
         $('#addlicensekey').validate({
           rules:{
             lic_key: {
@@ -149,6 +150,7 @@
             var formData = new FormData(activation_form);
 
             if (formData) {
+
                     $.ajax({
                         url: "{% url 'dashboard:addsitekeys' %}",
                         type: "POST",
@@ -158,15 +160,22 @@
                         success:function(data){
                            console.log(data);
                            $("#lic_key").val('');
+                            if(data.status == 200){
+                                $.jGrowl( data.message, {
+                                  header: 'Successful!',
+                                  theme: 'bg-success'
+                               });
+                            }else{
+                                $.jGrowl( data.message, {
+                                  header: 'Error!',
+                                  theme: 'bg-danger'
+                               });
+                           }
 
-                           $.jGrowl('License key added', {
-                              header: 'Successful!',
-                              theme: 'bg-success'
-                           });
                         },
                         error:function(error){
                           console.log(error);
-                          $.jGrowl('The License key should not be empty', {
+                          $.jGrowl('Error occurred : '+ error.status + " : " +error.responseText, {
                               header: 'Error Occurred!',
                               theme: 'bg-danger'
                           });
@@ -176,6 +185,7 @@
 
           }
         });
+      });
 
     </script>
 

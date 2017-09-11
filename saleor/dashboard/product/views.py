@@ -56,7 +56,8 @@ def re_order(request):
 
         data ={
             "low_stock":low_stock,
-            "totalp":paginator.num_pages
+            "totalp":paginator.num_pages,
+            'pn': paginator.num_pages
                }
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
@@ -83,7 +84,7 @@ def reorder_pagination(request):
     if p2_sz:
         paginator = Paginator(low_stock, int(p2_sz))
         low_stock = paginator.page(page)
-        return TemplateResponse(request, 'dashboard/re_order/pagination/paginate.html', {"low_stock":low_stock})
+        return TemplateResponse(request, 'dashboard/re_order/pagination/paginate.html', {"low_stock":low_stock,'pn': paginator.num_pages})
 
     try:
         low_stock = paginator.page(page)
@@ -93,7 +94,7 @@ def reorder_pagination(request):
         low_stock = paginator.page(1)
     except EmptyPage:
         low_stock = paginator.page(paginator.num_pages)
-    return TemplateResponse(request, 'dashboard/re_order/pagination/paginate.html', {"low_stock":low_stock})
+    return TemplateResponse(request, 'dashboard/re_order/pagination/paginate.html', {"low_stock":low_stock,'pn': paginator.num_pages})
 
 @staff_member_required
 def reorder_search(request):

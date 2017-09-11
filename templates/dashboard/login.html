@@ -2,6 +2,8 @@
 {% load staticfiles i18n %}
 {% load render_bundle from webpack_loader %}
 {% load version %}
+{% load business_name %}
+{% load business_logo %}
 
 <html lang="{{ LANGUAGE_CODE }}" class="no-js">
   <head>
@@ -61,7 +63,13 @@
             {% csrf_token %} 
             <div class="panel panel-body login-form animated bounceIn">
               <div class="text-center">
-                <div class="icon-object border-pink-400 text-pink-400"><i class="icon-reading"></i></div>
+                {% business_logo as p %}
+                  {% if p %}
+                <img src="{{p}}" style="max-height:100px;width:auto;"/>
+                  {% else %}
+                  <div class="icon-object border-pink-400 text-pink-400"><i class="icon-reading"></i></div>
+                  {% endif %}
+
                 <h5 class="content-group">Login to your account <small class="display-block">Enter your credentials below</small></h5>
               </div>
               <div id="status" class="alert bg-danger animated slideInUp" style="display: none;">

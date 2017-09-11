@@ -23,6 +23,15 @@
     </li>
 {% endblock %}
 
+{% block custom_css %}
+<style type="text/css">
+  .error {
+        color: #ff5722;
+    }
+
+</style>
+{% endblock %}
+
 {% block content %}
  <div class="panel panel-flat">  
     <div class="panel-body">
@@ -58,6 +67,7 @@
   </div>
 <!-- page usrls -->
 <input type="hidden" class="pageUrls" data-updateurl="{% url 'dashboard:update-settings' site_id=1 %}" name="">
+<input type="hidden" class="redirectUrls" data-redirecturl="{% url 'dashboard:site-index' %}" name="">
 {% endblock %}
 
 {% block custom_js %}

@@ -16,6 +16,7 @@ $(function() {
 	var api_username = $('#api_username');
 	var pageUrls   = $('.pageUrls');
 	var updateSettingsUrl = pageUrls.data('updateurl');
+	var redirectSettingsUrl = $('.redirectUrls').data('redirecturl');
 	var dynamicData = {};
 
 	smsApiBtn.on('click',function(){		
@@ -43,4 +44,58 @@ $(function() {
 		}
 		);
 	});
+
+	/* end each check*/
+  $('#form-category').validate({
+    onkeyup: function(element) {$(element).valid()},
+    rules:{
+        company_name: {
+          required:true,
+          minlength:3
+        },
+        loyalty_point_equiv:{
+          required:true,
+          digits: true,
+          minlength: 1
+        }
+
+    },
+    messages:{
+      company_name:{
+        required: "please provide the business name",
+        minlength: "name must be atleast 3 characters long"
+      }
+    },
+    submitHandler: function() {
+          var file = $('#image')[0].files[0];
+          var f = document.getElementById('form-category');
+          var formData = new FormData(f);
+          if(file != ''){
+            formData.append("image", file);
+          }
+          if (formData) {
+                $.ajax({
+                    url: updateSettingsUrl,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       console.log(data);
+
+                       alertUser('Settings Updated successfully');
+                       // window.location = redirectSettingsUrl;
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Unsuccessful in updating settings', {
+                          header: 'Error!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+          }
+      }
+//    }
+  });
 });

@@ -207,7 +207,10 @@ class Product(models.Model, ItemRange, index.Indexed):
         return any(variant.is_in_stock() for variant in self)
 
     def total_stock(self):
-        return Sum(variant.stock_available())
+        return Sum(self.variant.stock.stock_available())
+    def total_variants(self):
+        return len(self.variants.all())
+
 
     def get_first_category(self):
         for category in self.categories.all():

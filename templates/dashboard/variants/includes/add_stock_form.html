@@ -1,0 +1,48 @@
+{% load i18n %}
+{% load mptt_tags %}
+{% load materializecss %}
+{% load staticfiles %}
+  
+      <div class="card-content">
+        {% csrf_token %}
+        <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=stock">
+     
+         <div class="col-md-6">
+            <div class="form-group">
+              {{ form.variant|materializecss }}
+            </div>
+            <div class="form-group">
+              {{ form.location|materializecss }}
+            </div>
+         </div>
+         <div class="col-md-6">
+            <div class="form-group">
+                  {{ form.quantity|materializecss }}
+            </div>
+            <div class="form-group">
+              {{ form.cost_price|materializecss }}
+            </div>
+         </div>
+         <!-- action buttons -->
+         <div class="text-right">
+           {% if stock.pk %}
+              <a href="{% url "dashboard:product-update" pk=product.pk %}?tab=stock" class="btn btn-flat">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+              <button type="submit" class="btn btn-primary waves-effect waves-light">
+                {% trans "Update" context "Dashboard update action" %}
+              </button>
+            {% else %}
+              <a href="{% url "dashboard:product-update" pk=product.pk %}?tab=stock" class="btn btn-link">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+              <button type="submit" class="btn btn-primary waves-effect waves-light">
+                {% trans "Create" context "Dashboard create action" %}
+              </button>
+            {% endif %}
+         </div>        
+      </div> 
+      <script type="text/javascript">
+        // Basic select
+          $('.bootstrap-select').selectpicker();
+      </script>

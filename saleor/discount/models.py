@@ -253,6 +253,10 @@ class Sale(models.Model):
     products = models.ManyToManyField(
         'product.Product', blank=True,
         verbose_name=pgettext_lazy('Sale (discount) field', 'products'))
+    variant = models.ManyToManyField(
+        'product.ProductVariant', blank=True,
+        verbose_name=pgettext_lazy('Sale (discount) field', 'products'))
+    
     categories = models.ManyToManyField(
         'product.Category', blank=True,
         verbose_name=pgettext_lazy('Sale (discount) field', 'categories'))
@@ -304,7 +308,25 @@ class Sale(models.Model):
                 'Voucher not applicable',
                 'Discount not applicable for this product'))
 
+    def modifier_for_variant(self, variant):
+        discounted_variants = {p.pk for p in self.variant.all()}
+        discounted_categories = set(self.categories.all())
+        if variant.pk in discounted_variants:
+            return self.get_discount()        
+        raise NotApplicable(
+            pgettext(
+                'Voucher not applicable',
+                'Discount not applicable for this product'))
 
+
+
+
+def get_variant_discounts(variant, discounts, **kwargs):
+    for discount in discounts:
+        try:
+            yield discount.modifier_for_variant(variant, **kwargs)
+        except NotApplicable:
+            pass
 def get_product_discounts(product, discounts, **kwargs):
     for discount in discounts:
         try:

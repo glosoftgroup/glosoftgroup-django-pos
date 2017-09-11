@@ -18,6 +18,12 @@ urlpatterns = [
     url(r'sale/(?P<pk>[0-9]+)/delete/$', permission_required('sale.delete_sale', login_url='not_found')
         (views.sale_delete), name='sale-delete'),
 
+    url(r'token/search/variants/$', permission_required('sale.add_sale', login_url='not_found')
+        (views.token_variants), name='token-search-variants'),
+    url(r'add/discount/data/$', permission_required('sale.add_sale', login_url='not_found')
+        (views.create_discount), name='create-discount'),
+    
+
     url(r'voucher/$', views.voucher_list, name='voucher-list'),
     url(r'voucher/(?P<pk>[0-9]+)/$', views.voucher_edit, name='voucher-update'),
     url(r'voucher/add/$', views.voucher_edit, name='voucher-add'),
