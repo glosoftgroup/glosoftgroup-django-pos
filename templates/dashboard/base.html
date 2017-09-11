@@ -385,6 +385,11 @@
                         </li>
                       {% endif %}
                       {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_creditreport_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:credit_reports' %}"><i class='icon-cash3'></i>Credit Sales</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_sales_reports %}
                         <li class="{% block menu_report_margin_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>
                         </li>
