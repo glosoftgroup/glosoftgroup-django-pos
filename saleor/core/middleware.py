@@ -93,6 +93,7 @@ class SettingsMiddleware(object):
         secretkey = replace_last(number)
 
         if filename != hex:
+            print 'hex filename not equal'
             return TemplateResponse(request, 'lockdown/form.html', {'days': number})
 
         if self.is_not_empty(filecontent):
