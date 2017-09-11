@@ -15,23 +15,14 @@ thisDate = dateToday.strftime('%d-%m-%Y')
 thisMonth = dateToday.strftime('%b')
 dayName = dateToday.strftime("%a")
 
-thisMonthDirectory = "saleor/logs/"+thisMonth
-thisDateDirectory = "saleor/logs/"+thisMonth+"/"+thisDate+'('+ dayName+')'
-info_path = thisDateDirectory+'/info'
-error_path = thisDateDirectory+'/error'
-debug_path = thisDateDirectory+'/debug'
-warning_path = thisDateDirectory+'/warning'
+thisMonthDirectory = "C:\\Users\\Public\\PosServer\\logs\\"
+info_path = thisMonthDirectory+'\\'+thisDate+'_info.log'
+error_path = thisMonthDirectory+'\\'+thisDate+'_error.log'
+debug_path = thisMonthDirectory+'\\'+thisDate+'_debug.log'
+warning_path = thisMonthDirectory+'\\'+thisDate+'_warning.log'
 
 if not os.path.exists(thisMonthDirectory):
     os.makedirs(thisMonthDirectory)
-if not os.path.exists(thisDateDirectory):
-    os.makedirs(thisDateDirectory)
-if not os.path.exists(info_path) or not os.path.exists(error_path) \
-        or not os.path.exists(debug_path) or not os.path.exists(warning_path):
-    os.makedirs(info_path)
-    os.makedirs(error_path)
-    os.makedirs(debug_path)
-    os.makedirs(warning_path)
 
 DEBUG = ast.literal_eval(os.environ.get('DEBUG', 'True'))
 
@@ -154,7 +145,8 @@ TEMPLATES = [{
         'string_if_invalid': '<< MISSING VARIABLE "%s" >>' if DEBUG else ''}}]
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = os.environ.get('SECRET_KEY')
+# SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = 'dc62qi9pc0h=8a(mggch-%qr*ya5l4wrpapal7t(=sa=gs4@j8'
 
 MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -278,7 +270,7 @@ LOGGING = {
         'debug_logfile': {
             'level': 'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename':debug_path+'/debug.log',
+            'filename':debug_path,
             'maxBytes': U_LOGFILE_SIZE,
             'backupCount': U_LOGFILE_COUNT,
             'formatter': 'standard'
@@ -286,7 +278,7 @@ LOGGING = {
         'error_logfile': {
             'level': 'ERROR',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename':error_path+'/error.log',
+            'filename':error_path,
             'maxBytes': U_LOGFILE_SIZE,
             'backupCount': U_LOGFILE_COUNT,
             'formatter': 'standard'
@@ -294,7 +286,7 @@ LOGGING = {
         'warning_logfile': {
             'level': 'WARNING',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename':warning_path+'/warning.log',
+            'filename':warning_path,
             'maxBytes': U_LOGFILE_SIZE,
             'backupCount': U_LOGFILE_COUNT,
             'formatter': 'standard'
@@ -302,7 +294,7 @@ LOGGING = {
         'info_logfile': {
             'level': 'INFO',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename':info_path+'/info.log',
+            'filename':info_path,
             'maxBytes': U_LOGFILE_SIZE,
             'backupCount': U_LOGFILE_COUNT,
             'formatter': 'standard'
