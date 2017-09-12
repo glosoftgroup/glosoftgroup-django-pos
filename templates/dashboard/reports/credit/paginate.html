@@ -6,6 +6,13 @@
       <tr class='clickable-row' id="{{sale.pk }}">
         <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
         <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
+        <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
+        {% if sale.is_fully_paid %}
+        <span class="text-success  icon-checkmark-circle"><i></i></span>
+        {% else %}
+        <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+        {% endif %}
+        </td>
           <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
         <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
         <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.payment_options.name}}</td>

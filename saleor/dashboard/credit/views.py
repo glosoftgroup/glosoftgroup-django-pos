@@ -131,19 +131,18 @@ def credit_paginate(request):
 	sales = Sales.objects.all().order_by('-id')
 	today_formart = DateFormat(datetime.date.today())
 	today = today_formart.format('Y-m-d')
-	ts = Sales.objects.filter(created__icontains=today)
+	ts = Credit.objects.filter(created__icontains=today)
 	tsum = ts.aggregate(Sum('total_net'))
-	total_sales = Sales.objects.aggregate(Sum('total_net'))
-	total_tax = Sales.objects.aggregate(Sum('total_tax'))
-
+	total_sales = Credit.objects.aggregate(Sum('total_net'))
+	total_tax = Credit.objects.aggregate(Sum('total_tax'))
 
 	if date:
 		try:
-			all_salesd = Sales.objects.filter(created__icontains=date).order_by('-id')
-			that_date_sum = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))
+			all_salesd = Credit.objects.filter(created__icontains=date).order_by('-id')
+			that_date_sum = Credit.objects.filter(created__contains=date).aggregate(Sum('total_net'))
 			sales = []
 			for sale in all_salesd:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 
@@ -164,9 +163,9 @@ def credit_paginate(request):
 
 	else:
 		try:
-			last_sale = Sales.objects.latest('id')
+			last_sale = Credit.objects.latest('id')
 			last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
-			all_sales = Sales.objects.filter(created__contains=last_date_of_sales)
+			all_sales = Credit.objects.filter(created__contains=last_date_of_sales)
 			total_sales_amount = all_sales.aggregate(Sum('total_net'))
 			total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 			sales = []
