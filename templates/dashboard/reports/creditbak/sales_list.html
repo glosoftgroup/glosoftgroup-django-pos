@@ -210,6 +210,8 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript">
+var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
+    var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
 $(document).ready(function(){
 
     $(".td").click(function(){
@@ -232,7 +234,7 @@ $(document).ready(function(){
         firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){
+            $.get(creditPaginateUrl,{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm');
@@ -247,7 +249,7 @@ $(document).ready(function(){
         var group_id = $('.daterange-single').val();
         var searchData = $('.search_user').val();
         var listSizeVal = $('.list-sz').find(":selected").val();
-        var url = "{% url 'dashboard:sales_search' %}";
+        var url = creditSearchUrl;
        var categs = $('.sales-category').find(":selected").val();
 
        if((categs == 'category') || (categs == 'category' && listSizeVal) || (categs == 'category' && searchData) || (categs == 'category' && listSizeVal && searchData) ){
@@ -288,21 +290,21 @@ $(document).ready(function(){
            }
        }else if(listSizeVal && listSizeVal != '0'){
            if(!group_id){
-               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.get("{% url 'dashboard:sales_paginate' %}",{page:1,gid:group_id, size:listSizeVal},function(data){
+                $.get(creditPaginateUrl,{page:1,gid:group_id, size:listSizeVal},function(data){
                  $('#pagination-div').html(data);
                });
            }
        }else{
            if(!group_id){
-               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.get("{% url 'dashboard:sales_paginate' %}",{page:1,gid:group_id},function(data){
+                $.get(creditPaginateUrl,{page:1,gid:group_id},function(data){
                  $('#pagination-div').html(data);
                });
            }
@@ -318,49 +320,49 @@ $(document).ready(function(){
 
          if(sv == 'list' && date && listSizeVal && searchData){
             if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date, q:searchData}, async:false,success: function(data){
+               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:listSizeVal, gid:date, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }
         }else if(sv == 'list' && listSizeVal && searchData){
             if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:listSizeVal, q:searchData}, async:false,success: function(data){
+               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:listSizeVal, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }
         }else if(sv == 'list' && listSizeVal && date){
             if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }
         }else if(sv == 'list' && date){
-         $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+         $.ajax({ url:creditPaginateUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
                   $('#pagination-div').html(data);
             }});
         }else if(sv == 'list' && searchData){
-         $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:10, gid:date,q:searchData}, async:false,success: function(data){
+         $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, gid:date,q:searchData}, async:false,success: function(data){
                   $('#pagination-div').html(data);
             }});
         }else if(sv == 'list' && listSizeVal){
             if(listSizeVal != '0'){
-                 $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                 $.ajax({ url:creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
             }else{
-            $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+            $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
             }
@@ -565,7 +567,7 @@ $(document).ready(function(){
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
         var date = $('.daterange-single').val();
-        var url = "{% url 'dashboard:sales_search' %}";
+        var url =creditPaginateUrl;
         var scategory = $('.sales-category').find(":selected").val();
 
         if((scategory == 'list' && date && searchData)){
@@ -590,11 +592,11 @@ $(document).ready(function(){
             }
         }else if(scategory == 'list' && date){
             if(listSizeVal != '0'){
-               $.ajax({ url:"{% url 'dashboard:sales_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:"{% url 'dashboard:sales_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }
@@ -622,21 +624,21 @@ $(document).ready(function(){
              }
         }else if(date){
             if(listSizeVal != '0'){
-               $.ajax({ url:"{% url 'dashboard:sales_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:"{% url 'dashboard:sales_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
              }
         }else{
            if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
            }
@@ -668,7 +670,7 @@ $(document).ready(function(){
         var search_text = $(this).val();
         var date = $('.daterange-single').val();
         var listSizeVal = $('.list-sz').find(":selected").val();
-        var url = "{% url 'dashboard:sales_search' %}";
+        var url = creditSearchUrl;
         var scategory = $('.sales-category').find(":selected").val();
 
         delay(function(){

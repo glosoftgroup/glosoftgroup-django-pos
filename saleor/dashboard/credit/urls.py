@@ -9,9 +9,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
 		url(r'^$', permission_required('reports.view_sales_reports', login_url='not_found')
-			(views.credit_reports), name='credit_reports'),
-		url(r'^credit/$', permission_required('reports.view_sales_reports', login_url='not_found')
 			(views.credit_list), name='credit_list'),
+		url(r'^credit/$', permission_required('reports.view_sales_reports', login_url='not_found')
+			(views.credit_reports), name='credit_reports'),
 		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
 			(views.credit_detail), name='credit-detail'),
 
