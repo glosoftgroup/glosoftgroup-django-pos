@@ -1,0 +1,613 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Sales Report
+{% endblock %}
+
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:sales_date_chart' %}">Sales Date Chart</a></li>
+ {% endblock %}
+
+{% block menu_report_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+    .daterangepicker-inputs{display: none;}
+
+    /* chart */
+          canvas{
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+    .chartjs-tooltip {
+      opacity: 1;
+      position: absolute;
+      background: rgba(0, 0, 0, .7);
+      color: white;
+      border-radius: 3px;
+      -webkit-transition: all .1s ease;
+      transition: all .1s ease;
+      pointer-events: none;
+      -webkit-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+      padding: 4px;
+    }
+
+    .chartjs-tooltip-key {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+    }
+    /* chart*/
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+  <div class="col-md-12">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Sales Reports Charts by Date</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+        <div class="panel-body">
+         <div class="row">
+            <div class="col-md-2">
+              <label>select single date</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                  <input class="form-control daterange-single" type="text">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label>select a date range and click search button for results</label>
+              <div class="form-group">
+                 <div class="col-md-8">
+                    <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="icon-calendar22"></i>
+                      </span>
+                      <input class="form-control daterange-to to" type="text" placeholder="to">
+                    </div>
+                 </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+                <label>categories</label>
+              <div class="form-group">
+                 <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="summary">sales summary</option>
+                     <option value="list">sales list</option>
+                    <option value="category">by category</option>
+                    <option value="items">by items</option>
+                    <option value="user">by user</option>
+                     <option value="terminal">by terminal</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o" onclick="alert('hi')">export excel</option>
+                  </select>
+              </div>
+            </div>
+        </div>
+      </div>
+   </div>
+   </div>
+{% if date_total_sales %}
+<div class="p-sales">
+    <div class="col-md-12">
+  <div class="panel panel-flat" id="st">
+    <div class="panel-body">
+     <div class="row">
+        <h3 style="padding-left: 20px;">Daily Gross Sales</h3>
+              <p class="text-centers" style="padding-left: 20px;">Gross Sales on {{date}} were <span class="text-primary">KShs. {{date_total_sales}}</span>.
+                {% if prevdate_total_sales %}
+                  This was
+                  {% if sales_percent < 0 %}
+                      <span class="text-danger">down {{sales_percent}} %</span>
+                   {% elif sales_percent > 0 %}
+                      <span class="text-success">up {{sales_percent}} %</span>
+                   {% endif %}
+                  from <span class="text-primary">Kshs {{previous_sales}}</span> the prior sales of date {{prevdate}}
+                {% endif %}
+              </p>
+     </div>
+      <div class="row">
+          <div class="col-md-10">
+              <div id="canvas-holder1">
+                <canvas id="chart1" width="900" height="300"></canvas>
+                <div class="chartjs-tooltip" id="tooltip-0"></div>
+                <div class="text-center"><span style="color: #72726d;">Hours</span></div>
+              </div>
+          </div>
+          <div class="col-md-2">
+
+            <div class="col-md-12">
+                <h6 class="no-margin text-center">Total Sales</h6>
+                <div class="col-sm-12 text-center">
+                  <span class="label label-primary label-rounded" style="padding:10px;font-size:1.0em;">
+                     Kshs. {{date_total_sales}}<br>
+                    {% if sales_percent < 0 %}
+                      ({{sales_percent}} % ) dec <i class="icon-stats-decline2"></i>
+                   {% elif sales_percent > 0 %}
+                      ({{sales_percent}} % ) inc <i class="icon-stats-growth2"></i>
+                   {% else %}
+                   {% endif %}
+                  </span>
+                </div>
+            </div>
+
+           <div class="col-md-12" style="margin-top:10px;">
+                <h6 class="no-margin text-center">Customers<br> Visited</h6>
+                <div class="col-sm-12 text-center">
+                  <span class="label bg-purple-600 label-rounded" style="padding:10px;font-size:1.0em">
+                        {{no_of_customers}}<br>
+                       {% if customer_percent < 0 %}
+                          ({{customer_percent}} % ) dec <i class="icon-stats-decline2"></i>
+                       {% elif sales_percent > 0 %}
+                          ({{customer_percent}} % ) inc <i class="icon-stats-growth2"></i>
+                       {% else %}
+                       {% endif %}
+                  </span>
+                </div>
+            </div>
+
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="col-md-12">
+      <div class="panel panel-flat" id="ss">
+        <div class="panel-heading">
+          <h6 class="panel-title">Sales Summary</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+        <div class="panel-body">
+
+            <div class="card">
+
+              {% if cashiers %}
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead>
+                      <tr>
+                        <th>
+                        </th>
+                        <th class="right-align">
+                          Sales
+                        </th>
+                        <th> Refund </th>
+                        <th> Net </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-action-go="">
+                          <td>
+                            <span style="font-weight: bold;">Gross Sales</span>
+                          </td>
+                          <td class="right-align">
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                          <td class="right-align">
+                            <span style="font-weight: bold;">0.00</span>
+                          </td>
+                          <td>
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Discounts</td>
+                          <td class="right-align">0.00</td>
+                          <td>0.00</td>
+                          <td>0.00</td>
+                        </tr>
+                        <tr>
+                          <td>Tax</td>
+                          <td class="right-align">0.00</td>
+                          <td>0.00</td>
+                          <td>0.00</td>
+                        </tr>
+                        <tr data-action-go="">
+                          <td>
+                            <span style="font-weight: bold;">Net Sales</span>
+                          </td>
+                          <td class="right-align">
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                          <td class="right-align">
+                            <span style="font-weight: bold;">0.00</span>
+                          </td>
+                          <td>
+                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_sales }}
+                            </div>
+                          </td>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+    </div>
+
+  <div class="col-md-12">
+      <div class="panel panel-flat" id="ct">
+        <div class="panel-heading">
+          <h6 class="panel-title">Cashiers in Terminals</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+        <div class="panel-body">
+
+            <div class="card">
+
+              {% if cashiers %}
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead>
+                      <tr>
+                        <th>
+                          Cashier Name
+                        </th>
+                        <th class="right-align">
+                          Terminal
+                        </th>
+                        <th> Total Sales</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for user in users %}
+                        <tr data-action-go="">
+                          <td>
+                            {{ user.user__name }} - {{user.user__email}}
+                          </td>
+                          <td class="right-align">
+                            {{ user.terminal }}
+                          </td>
+                          <td class="right-align">
+                            <div><span style="font-size: 0.7em;">Ksh. </span>{{ user.total_net__sum }}</div>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+    </div>
+</div>
+</div>
+{% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-info">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+       No sales summary available for {{date}}
+       </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/html2canvas.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+
+    $('.daterange-single').daterangepicker({ 
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:date },success: function(data){
+              $('.p-sales').html(data);
+        }});
+    });
+  $('.sales-category').selectpicker().on('change', function(){
+        var sv = $(this).val();
+        if(sv == 'list'){
+            window.location = "{% url 'dashboard:sales_list' %}";
+        }else if(sv == 'summary'){
+            window.location = "{% url 'dashboard:sales_date_chart' %}";
+        }else if(sv == 'category'){
+            window.location = "{% url 'dashboard:sales_category_chart' %}";
+        }else if(sv == 'items'){
+            window.location = "{% url 'dashboard:sales_product_chart' %}";
+        }else if(sv == 'user'){
+            window.location = "{% url 'dashboard:sales_user_chart' %}";
+        }else if(sv == 'terminal'){
+            window.location = "{% url 'dashboard:sales_terminal_chart' %}";
+        }
+  });
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change',function(){
+         $('.setValue').val($(this).val());
+         $('.setName').val('export');
+         // $('.set').value = $(this).val();
+
+         if($(this).val() == 'pdf'){
+             /*html2canvas($("#st"), {
+                    onrendered: function(canvas) {
+                        var myImage = canvas.toDataURL("image/png");
+                        //window.open(myImage);
+                        var url = "/dashboard/reports/cpdf/"+myImage;
+                        window.open(url, '_blank');
+                    }
+                });*/
+            var img = document.getElementById('chart1').toDataURL("image/png");
+            var url = "/dashboard/reports/datechartimage/"+img;
+            window.open(url, '_blank');
+         }else if($(this).val() == 'excel'){
+             var url ="/dashboard/reports/csv/"+img;
+             window.open(url, '_blank');
+         }
+    });
+    //**@ daterange from
+    $('.daterange-from').daterangepicker({ 
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    });
+    //**@ daterange to
+    $('.daterange-to').daterangepicker({
+            alwaysShowCalendars: true,
+            showCustomRangeLabel: true,
+            linkedCalendars:false,
+            locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
+            opens: 'right',
+            applyClass: 'btn-small bg-slate',
+            cancelClass: 'btn-small btn-default',
+            ranges: {
+               'Today': [moment(), moment()],
+               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+               'This week':[moment().startOf('week'), moment()],
+               'Last Week': [moment().subtract(13, 'days'), moment().startOf('week').subtract(1, 'days')],
+               'This Month': [moment().startOf('month'), moment()],
+               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+               'This Year': [moment().startOf('year'), moment()],
+               'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+            }
+    }, function(start, end){
+        $('.daterangepicker ').addClass('show-calendar');
+    });
+    $('.daterange-to').on('apply.daterangepicker', function(ev, picker) {
+      var from = picker.startDate.format('YYYY-MM-DD'), to = picker.endDate.format('YYYY-MM-DD');
+        if(from == to ){
+            $(this).val(from);
+            $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:from },success: function(data){
+                    $('.p-sales').html(data);
+            }});
+         }else{
+            $(this).val(from + ' - ' + to);
+            $.ajax({ url: "{% url 'dashboard:get_sales_by_week' %}",type: 'GET',data: {from:from, to:to },success: function(data){
+                    $('.p-sales').html(data);
+            }});
+         }   
+    });
+    $('.daterange-to').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+
+    //**@ put placeholders
+    $('.to').val('');
+    $('.to').attr("placeholder","To");
+    //**@ date search button
+    $('.search_daterange').click(function(){
+      var from = $('.daterange-from').val();
+      var to = $('.daterange-to').val();
+       alert('from: '+from+' to: '+to);
+    });
+
+
+//**@ chart
+ var customTooltips = function (tooltip) {
+      $(this._chart.canvas).css("cursor", "pointer");
+
+      var positionY = this._chart.canvas.offsetTop;
+      var positionX = this._chart.canvas.offsetLeft;
+
+      $(".chartjs-tooltip").css({
+        opacity: 0,
+      });
+
+      if (!tooltip || !tooltip.opacity) {
+        return;
+      }
+
+      if (tooltip.dataPoints.length > 0) {
+        tooltip.dataPoints.forEach(function (dataPoint) {
+          var content = [dataPoint.xLabel, '(Kshs) '+dataPoint.yLabel].join(": ");
+          var $tooltip = $("#tooltip-" + dataPoint.datasetIndex);
+
+          $tooltip.html('Sales '+content);
+          $tooltip.css({
+            opacity: 1,
+            top: positionY + dataPoint.y + "px",
+            left: positionX + dataPoint.x + "px",
+          });
+        });
+      }
+    };
+    var color = Chart.helpers.color;
+  // alert(x.substring(0,3));
+    var lineChartData = {
+      labels: [{% for i in labels2 %} "{{ i }}", {% endfor %}],
+      datasets: [{
+        label: "Sales of {{date}}",
+        backgroundColor:"pink",
+        borderColor: window.chartColors.red,
+        fill: true,
+        data: [{% for d in default %} {{ d }}, {% endfor %}],
+        pointRadius:4,
+        pointBorderColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointBackgroundColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointHoverBackgroundColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointHoverBorderColor:  color(window.chartColors.red).alpha(0.2).rgbString()
+      }]
+    };
+
+      var chartEl = document.getElementById("chart1").getContext('2d');
+      var chart = new Chart(chartEl, {
+        type: "bar",
+        data: lineChartData,
+        options: {
+          title:{
+            display: false,
+            text: "Hourly Sales"
+          },
+          legend: {
+              display: true,
+          },
+          tooltips: {
+            enabled: false,
+            mode: 'index',
+            intersect: false,
+            custom: customTooltips
+          },
+          elements: {
+            line: {
+              tension: 0.000001
+            },
+            point:{
+                pointStyle:'circle'
+            }
+          },
+          scales: {
+                yAxes: [{
+                    ticks: {
+                        fontColor: "rgba(0,0,0,1)",
+                        beginAtZero: true,
+                        maxTicksLimit: 5,
+                        padding: 20
+                    },
+                    gridLines: {
+                        drawTicks: false,
+                        display: false
+                    }
+
+                }],
+                xAxes: [{
+                    gridLines: {
+                        zeroLineColor: "transparent"
+                    },
+                    ticks: {
+                        padding: 20,
+                        fontColor: "rgba(0,0,0,1)",
+                        beginAtZero: true,
+                        maxTicksLimit: 10
+                    }
+                }]
+          }
+        }
+      });
+//-----chart**/
+    // Define a plugin to provide data labels
+    Chart.plugins.register({
+        afterDatasetsDraw: function(chart, easing) {
+            // To only draw at the end of animation, check for easing === 1
+            var ctx = chart.ctx;
+
+            chart.data.datasets.forEach(function (dataset, i) {
+                var meta = chart.getDatasetMeta(i);
+                if (!meta.hidden) {
+                    meta.data.forEach(function(element, index) {
+                        // Draw the text in black, with the specified font
+                        ctx.fillStyle = 'rgba(0, 0, 0,0.8)';
+
+                        var fontSize = 10;
+                        var fontStyle = 'normal';
+                        var fontFamily = 'Helvetica Neue';
+                        ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+                        // Just naively convert to string for now
+                        var dataString = dataset.data[index].toString();
+
+                        // Make sure alignment settings are correct
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        var padding = 5;
+                        var position = element.tooltipPosition();
+                        ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
+                    });
+                }
+            });
+        }
+    });
+
+});
+
+</script>
+{% endblock %}

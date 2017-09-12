@@ -6,10 +6,10 @@
 {% load humanize %}
 
 {% block title %}
-  Credit Sales List Report
+  Sales List Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:sales_list' %}">Credit Sales Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_list' %}">Sales Reports</a></li>
  {% endblock %}
 
 {% block menu_report_class %}active{% endblock %}
@@ -210,12 +210,8 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript">
-var creditPaginationUrl = "{% url 'dashboard:credit_paginate' %}";
-var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
-var categoryChartUrl = "{% url 'dashboard:sales_category_chart' %}";
-var productChartUrl = "{% url 'dashboard:sales_product_chart' %}";
-var userChartUrl = "{% url 'dashboard:sales_user_chart' %}";
-var terminalChartUrl  ="{% url 'dashboard:sales_terminal_chart' %}";
+var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
+    var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
 $(document).ready(function(){
 
     $(".td").click(function(){
@@ -238,7 +234,7 @@ $(document).ready(function(){
         firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get(creditPaginationUrl,{page:parseInt(num)},function(data){
+            $.get(creditPaginateUrl,{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm');
@@ -257,19 +253,19 @@ $(document).ready(function(){
        var categs = $('.sales-category').find(":selected").val();
 
        if((categs == 'category') || (categs == 'category' && listSizeVal) || (categs == 'category' && searchData) || (categs == 'category' && listSizeVal && searchData) ){
-               $.get(categoryChartUrl, {date:group_id},function(data){
+               $.get("{% url 'dashboard:sales_category_chart' %}", {date:group_id},function(data){
                       $('#pagination-div').html(data)
                 });
        }else if((categs == 'items') || (categs == 'items' && listSizeVal) || (categs == 'items' && searchData) || (categs == 'items' && listSizeVal && searchData) ){
-               $.get(productChartUrl, {date:group_id},function(data){
+               $.get("{% url 'dashboard:sales_product_chart' %}", {date:group_id},function(data){
                       $('#pagination-div').html(data)
                 });
        }else if((categs == 'user') || (categs == 'user' && listSizeVal) || (categs == 'user' && searchData) || (categs == 'user' && listSizeVal && searchData) ){
-               $.get(userChartUrl, {date:group_id},function(data){
+               $.get("{% url 'dashboard:sales_user_chart' %}", {date:group_id},function(data){
                       $('#pagination-div').html(data)
                 });
        }else if((categs == 'terminal') || (categs == 'terminal' && listSizeVal) || (categs == 'terminal' && searchData) || (categs == 'terminal' && listSizeVal && searchData) ){
-               $.get(terminalChartUrl, {date:group_id},function(data){
+               $.get("{% url 'dashboard:sales_terminal_chart' %}", {date:group_id},function(data){
                       $('#pagination-div').html(data)
                 });
        }else if(searchData && listSizeVal && listSizeVal != '0'){
@@ -294,21 +290,21 @@ $(document).ready(function(){
            }
        }else if(listSizeVal && listSizeVal != '0'){
            if(!group_id){
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.get(creditPaginationUrl,{page:1,gid:group_id, size:listSizeVal},function(data){
+                $.get(creditPaginateUrl,{page:1,gid:group_id, size:listSizeVal},function(data){
                  $('#pagination-div').html(data);
                });
            }
        }else{
            if(!group_id){
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.get(creditPaginationUrl,{page:1,gid:group_id},function(data){
+                $.get(creditPaginateUrl,{page:1,gid:group_id},function(data){
                  $('#pagination-div').html(data);
                });
            }
@@ -344,16 +340,16 @@ $(document).ready(function(){
             }
         }else if(sv == 'list' && listSizeVal && date){
             if(listSizeVal != '0'){
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }
         }else if(sv == 'list' && date){
-         $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+         $.ajax({ url:creditPaginateUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
                   $('#pagination-div').html(data);
             }});
         }else if(sv == 'list' && searchData){
@@ -362,11 +358,11 @@ $(document).ready(function(){
             }});
         }else if(sv == 'list' && listSizeVal){
             if(listSizeVal != '0'){
-                 $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                 $.ajax({ url:creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
             }else{
-            $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+            $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
             }
@@ -571,7 +567,7 @@ $(document).ready(function(){
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
         var date = $('.daterange-single').val();
-        var url = creditSearchUrl;
+        var url =creditPaginateUrl;
         var scategory = $('.sales-category').find(":selected").val();
 
         if((scategory == 'list' && date && searchData)){
@@ -596,11 +592,11 @@ $(document).ready(function(){
             }
         }else if(scategory == 'list' && date){
             if(listSizeVal != '0'){
-               $.ajax({ url:creditPaginationUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:creditPaginationUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }
@@ -628,21 +624,21 @@ $(document).ready(function(){
              }
         }else if(date){
             if(listSizeVal != '0'){
-               $.ajax({ url:creditPaginationUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:creditPaginationUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
              }
         }else{
            if(listSizeVal != '0'){
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
            }
@@ -666,7 +662,7 @@ $(document).ready(function(){
         clearTimeout (timer);
         timer = setTimeout(callback, ms);
       };
-    })();    
+    })();
 
 
     //** search
@@ -676,7 +672,7 @@ $(document).ready(function(){
         var listSizeVal = $('.list-sz').find(":selected").val();
         var url = creditSearchUrl;
         var scategory = $('.sales-category').find(":selected").val();
-        
+
         delay(function(){
             if(scategory == 'list' && (listSizeVal && listSizeVal != '0') && date ){
                     $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text, gid:date}, async:false,success: function(data){

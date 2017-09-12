@@ -73,6 +73,13 @@ def add_sitekeys(request):
         if keyfiles:
             try:
                 keyfile, check = keyfiles.split('###')
+<<<<<<< HEAD
+=======
+
+                keyfile = keyfile.replace('\r', '').replace('\n', '')
+                check = check.replace('\r', '').replace('\n', '')
+
+>>>>>>> a82994a10f39d2d0929cf9084d45039380aed711
             except Exception as e:
                 result = json.dumps({'message':'Invalid License Key', 'status':500})
                 return HttpResponse(result, content_type="application/json")
@@ -104,6 +111,18 @@ def add_sitekeys(request):
     return HttpResponse('Invalid request')
 
 
+<<<<<<< HEAD
+=======
+def removenewline(data):
+    for n, line in enumerate(data):
+        if line.startswith("line"):
+            data[n] = "\n" + line.strip()
+        else:
+            data[n] = line.strip()
+    return ''.join(data)
+
+
+>>>>>>> a82994a10f39d2d0929cf9084d45039380aed711
 def test(request):
     print ('testKeys')
     return HttpResponse('success 123')

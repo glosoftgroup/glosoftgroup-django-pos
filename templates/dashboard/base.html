@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+{% load staticfiles i18n %}
+{% load render_bundle from webpack_loader %}
+{% load version %}
+{% load default_user_image %}
+{% load business_name %}
+{% load business_logo %}
+
+<html lang="{{ LANGUAGE_CODE }}" class="no-js">
+  <head>
+    <title>
+      {% block title %}
+        {% trans "Dashboard - Saleor" context "Dashboard default page title" %}
+      {% endblock %}
+    </title>
+    {% block meta %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+      <meta http-equiv="refresh" content = "1200; url=/lock/?next={{request.path}}">
+    {% endblock meta %}
+
+    {% include 'favicon.html' %}    
+   
+    
+
+    <!-- Global stylesheets -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/icons/icomoon/styles.css' %}" rel="stylesheet" type="text/css">
+ <link href="{% static 'backend/css/icons/fontawesome/styles.min.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/bootstrap.css' %}" rel="stylesheet" type="text/css">
+
+  <link href="{% static 'backend/css/core.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/components.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/colors.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/hover-min.css' %}" rel="stylesheet" type="text/css">
+   <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
+  <!--image preview -->
+  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css"> 
+  <script type="text/javascript" src="{% static 'backend/js/jquery-1.11.3.min.js' %}"></script> 
+  <!-- /global stylesheets -->
+  <style type="text/css">
+    .search-panel{padding: 6px;}
+  </style>
+
+    {% block custom_css %}
+    <style type="text/css">
+      .error{ color: red; }
+      #refreshAttributes { cursor: pointer; }
+      body {
+      position: relative;
+    }
+    .default_img{width:40px;height:40px;}
+    .superscript{font-size: 0.7em;}
+
+    </style>
+    {% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'backend/css/fixed_table_header.css' %}">
+  </head>
+
+  <body class="{% block body_class %}{% endblock %} navbar-top">
+ <div class='content-area '>
+  <!-- Main navbar -->
+  <div class="navbar navbar-inverse navbar-fixed-top bg-primary-600" >
+    <div class="navbar-header" style="padding-right: : 30px;">
+      <a class="navbar-brand logo" href="{% url 'dashboard:index' %}">
+          <span style="font-size: 1.8em;font-family: monospace;font-weight: bolder;">{% business_name %}</span>
+        <svg data-src="{% static 'dashboard/images/saleor_logo.svg' %}" height="38px" width="176px" />
+
+      </a>
+
+      <ul class="nav navbar-nav pull-right visible-xs-block">
+        <li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
+        <li><a class="sidebar-mobile-main-toggle"><i class="icon-paragraph-justify3"></i></a></li>
+      </ul>
+    </div>
+
+    <div class="navbar-collapse collapse" id="navbar-mobile">
+      <ul class="nav navbar-nav">
+        <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a></li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+      <!-- notifications -->
+      <ul class="nav navbar-nav">
+       
+      <li class="">
+            <a href="{% url 'dashboard:notification_list' %}">
+            <i class="icon-bubbles4"></i>
+            <span class="visible-xs-inline-block position-right">messages</span>
+            <span class="badge status-mark22 bg-warning-400"></span>
+          </a>
+            
+            
+          </li>         
+        
+      </ul>
+      <!-- ./notifications --> 
+    <li>
+           {% if request.user.image %}
+              <img src="{{request.user.image.url }}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;" />
+           {% else %}
+              <img src="{% default_user_image %}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;">
+           {% endif %}
+        </li>
+          <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+
+          {% if request.user.name %}{{ request.user.name|title }} {% else %} {{ request.user.email }}{% endif %}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+             <li>
+                <a href="{% url 'dashboard:user-detail' pk=user.id %}">
+                 <i class="icon-user-plus"></i> My profile
+                </a>
+             </li>
+            <li role="separator" class="divider"></li>
+            <li>
+                <a href="{% url 'account_logout' %}" class="waves-effect waves-teal">
+                <i class="icon-switch"></i>
+                  {% trans "Log out" context "Dashboard top navigation action" %}
+                </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /main navbar -->
+  <!-- Page container -->
+  <div class="page-container">
+
+    <!-- Page content -->
+    <div class="page-content">
+      <!-- Main sidebar -->
+      <div class="sidebar sidebar-main sidebar-primary sidebar-fixed">
+        <div class="sidebar-content">
+
+         
+
+
+          <!-- Main navigation -->
+          <div class="sidebar-category sidebar-category-visible">
+            <div class="category-content no-padding">
+              <ul class="navigation navigation-main navigation-accordion">
+
+                <!-- Main -->
+                <li class="navigation-header"><span>Home</span> <i class="icon-menu" title="Main pages"></i></li>
+
+                <li>
+                  <a href="{% url 'dashboard:index' %}">
+                    <i class="icon-home4"></i> 
+                    <span>Dashboard</span>
+                  </a>
+                </li>
+                {% if perms.userprofile.view_user %}
+                <li>
+                  <a href="javascript:;">
+                    <i class="icon-users"></i> 
+                    <span>User Management</span>
+                  </a>
+                  <ul>
+                    {% if perms.userprofile.view_user %}
+                    <li class="{% block menu_user_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:users' %}"><i class='icon-users2'></i>Users</a>
+                    </li>
+                    {% endif %}
+                    {% if perms.auth.view_group %}
+                    <li class="{% block menu_perm_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:groups' %}"><i class='icon-users4'></i>Groups</a>
+                    </li>
+                    {% endif %}
+                    {% if perms.userprofile.view_usertrail %}
+                      <li class="{% block menu_trail_class %}{% endblock %}">
+                      <a href="{% url 'dashboard:user_trail' %}"><i class='icon-history'></i>User Trail</a>
+                    </li>
+                    {% endif  %}
+                  </ul>
+                </li>
+                  {% endif %}
+                  {% if perms.userprofile.view_user %}
+                <!--<li>-->
+                  <!--<a href="javascript:;">-->
+                    <!--<i class="icon-height"></i>-->
+                    <!--<span>Human Resource</span>-->
+                  <!--</a>-->
+                  <!--<ul>-->
+                    <!--{% if perms.userprofile.view_user %}-->
+                    <!--<li class="{% block menu_hremployees_class %}{% endblock %}">-->
+                      <!--<a href="{% url 'dashboard:employees' %}"><i class='icon-users2'></i>Manage Employees</a>-->
+                    <!--</li>-->
+                    <!--{% endif %}-->
+                    <!--{% if perms.auth.view_group %}-->
+                    <!--<li class="{% block menu_hrattendance_class %}{% endblock %}">-->
+                      <!--<a href="{% url 'dashboard:attendance' %}"><i class='icon-users4'></i>Manage Attendance</a>-->
+                    <!--</li>-->
+                    <!--{% endif %}-->
+                    <!--{% if perms.userprofile.view_usertrail %}-->
+                      <!--<li class="{% block menu_hrleaves_class %}{% endblock %}">-->
+                      <!--<a href="{% url 'dashboard:user_trail' %}"><i class='icon-history'></i>Manage Leaves</a>-->
+                    <!--</li>-->
+                    <!--{% endif  %}-->
+                    <!--<li class="{% block menu_hr_default_class %}{% endblock %}">-->
+                    <!--<a href="{% url 'dashboard:hr-defaults' %}">-->
+                        <!--<i class=" icon-earth"></i>-->
+                         <!--settings-->
+                    <!--</a>-->
+                    <!--</li>-->
+                  <!--</ul>-->
+                <!--</li>-->
+                  {% endif %}
+                {% if perms.product.view_product %}
+                <li id="first">
+                  <a href="{% url 'dashboard:product-list' %}"><i class="icon-stack"></i> <span>
+                     {% trans "Inventory Management" context "Dashboard catalogue" %}
+                  </span></a>
+                  <ul>
+                   {% if perms.product.view_product %}
+                    <li class="{% block menu_products_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:product-list' %}"><i class='icon-bag'></i>{% trans "Products" context "Dashboard products list" %}</a>
+                    </li>
+                    {% endif %}
+                    {% if perms.product.view_stock %}
+                    <li class="{% block menu_purchase_list %}{% endblock %}">
+                    <a href="{% url 'dashboard:purchase-list' %}"><i class=' icon-coin-dollar'></i>
+                    Add Stock</a>
+                    </li>
+                    {% endif %}
+                      {% if perms.product.view_category %}
+                    <!-- categories -->
+                     <li class="{% block menu_categories_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:category-list' %}"><i class='icon-package'></i> {% trans "Categories" context "Dashboard categories list" %}</a>
+                    </li>
+                      {% endif %}
+                      {% if perms.product.view_productclass %}
+                    <!-- product type -->
+                    <li class="{% block menu_product_classes_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:product-class-list' %}">
+                      <i class="icon-books"></i>
+                       {% trans "Sub Categories" context "Dashboard product types list" %}
+                    </a>
+                    </li>
+                      {% endif %}
+                      {% if perms.product.view_productattribute %}
+                    <!-- product attributes -->
+                    <li class="{% block menu_attributes_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:product-attributes' %}">
+                      <i class="icon-stack2"></i>
+                        {% trans "Product Attributes" context "Dashboard attributes list" %}
+                    </a>
+                    </li>
+                      {% endif %}
+                      {#{% if perms.product.view_stocklocation %}#}
+                    <!-- stock location -->
+                    <li class="{% block menu_location_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:product-stock-location-list' %}"><i class="icon-location4"></i>
+                       {% trans "Stock locations" context "Dashboard stock locations list" %}
+                    </a>
+                    </li>
+                    <!-- stock reorder -->
+                      {#{% endif %}#}
+                       {% if perms.product.view_stocklocation %}
+                    <li class="{% block menu_reorder_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:re_order' %}"><i class="icon-toggle"></i>
+                       {% trans "Stock Reorder" context "Dashboard stock reorder list" %}
+                    </a>
+                    </li>
+                      {% endif %}
+                    
+                  </ul>
+                </li>
+                  {% endif %}
+                   {% if perms.customer.view_customer %}
+                <li >
+                  <a href="{% url 'dashboard:customers' %}"><i class="icon-theater"></i> <span>
+                    Customer Management
+                  </span></a>
+                  <ul>
+                    <li class="{% block menu_addCustomer_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:customers' %}">
+                    <i class="icon-users2"></i> Customers
+                    </a>
+                    </li>
+                  </ul>
+                </li>
+                  {% endif %}
+                   {% if perms.supplier.view_supplier %}
+                <li >
+                  <a href="{% url 'dashboard:supplier' %}"><i class="icon-collaboration"></i> <span>
+                    Supplier Management
+                  </span></a>
+                  <ul>
+                    <li class="{% block menu_supplier_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:supplier' %}">
+                    <i class="icon-users2"></i>Supplier
+                    </a>
+                    </li>
+                  </ul>
+                </li>
+                <!-- communications -->
+                <li>
+                  <a href="#"><i class=" icon-bubbles4"></i> <span>Communications</span></a>
+                  <ul>
+                    <li
+                    class="{% block menu_notification_class %}{% endblock %}"
+                    ><a href="{% url 'dashboard:notification_list' %}"><i class='icon-bell3'></i> Notifications/Mailing</a></li>
+                    <li
+                    class="{% block menu_messages_class %}{% endblock %}"
+                    ><a href="{% url 'dashboard:message_list' %}">
+                    <i class="icon-mobile2"></i>Messages</a></li>                    
+                  </ul>
+                </li>
+                <!-- ./communications -->
+                  {% endif %}
+                   
+                   {% if perms.sale.view_sale %}
+                <li><a href="#"><i class="icon-coins"></i> <span>{% trans "Customer Rewards" context "Dashboard discounts list" %}</span></a>
+                  <ul>
+                    <li class="{% block menu_sales_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:sale-list' %}">
+                    <i class="icon-price-tags"></i>Discounts
+                    </a>
+                    </li>
+                    
+                    </ul>
+                </li>
+                  {% endif %}
+                   {% if perms.sale.view_terminals %}
+                 <li>
+                  <a href="javascript:;">
+                    <i class="icon-wallet"></i> 
+                    <span>Drawer Cash</span>
+                  </a>
+                  <ul>
+                    <li class="{% block menu_terminal_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:terminals' %}">
+                    <i class="icon-versions"></i>Tills
+                    </a>
+                    </li>
+                    <li class="{% block menu_cashmovement_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:transactions' %}">
+                    <i class="icon-cash4"></i>
+                    Cash movement
+                    </a>
+                    </li>
+                     <li class="{% block menu_paymentoptions_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:payments-list' %}">
+                    <i class="icon-cash4"></i>
+                    Payment Options
+                    </a>
+                    </li>
+                  </ul>
+                </li>
+                  {% endif %}
+                   {% if perms.sale.view_sale %}
+                <li><a href="#"><i class="icon-coins"></i> <span>Accounting</span></a>
+                  <ul>
+                    <li class="{% block menu_personal_expenses_class %}{% endblock %}">
+                        <a href="{% url 'accounts:personal_expenses' %}">
+                        <i class="icon-align-center-vertical"></i>Business Expenses
+                        </a>
+                    </li>
+                      <li class="{% block menu_expenses_class %}{% endblock %}">
+                        <a href="{% url 'accounts:expenses' %}">
+                        <i class="icon-price-tags"></i>Petty Cash Expenses
+                        </a>
+                    </li>
+                      <li class="{% block menu_petty_cash_class %}{% endblock %}">
+                        <a href="{% url 'accounts:petty_cash' %}">
+                        <i class="icon-notebook"></i>Petty Cash
+                        </a>
+                    </li>
+
+                    </ul>
+                </li>
+                  {% endif %}
+
+                  {% if perms.reports.view_sale_reports or perms.reports.view_products_reports or perms.reports.view_purchase_reports or perms.reports.view_balancesheet %}
+                <li>
+                  <a href="javascript:;">
+                    <i class="icon-notebook"></i> 
+                    <span>Reports</span>
+                  </a>
+
+                  <ul>
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_list' %}"><i class='icon-cash3'></i>Sales</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_creditreport_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:credit_reports' %}"><i class='icon-cash3'></i>Credit Sales</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_margin_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_margin2_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin</a>
+                        </li>
+                      {% endif %}
+                      {#{% if perms.reports.view_sales_reports %}#}
+                        <!--<li class="{% block menu_report_tax_class %}{% endblock %}">-->
+                          <!--<a href="{% url 'dashboard:sales_tax' %}"><i class='icon-cash2'></i>Sales Tax</a>-->
+                        <!--</li>-->
+                      {#{% endif %}#}
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_tax2_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_tax_list' %}"><i class='icon-cash2'></i>Sales Tax</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_products_reports %}
+                        <li class="{% block menu_product_report_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_purchase_reports %}
+                        <li class="{% block menu_purchase_report_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:purchases_reports' %}"><i class='icon-price-tag'></i>Purchases</a>
+                        </li>
+                      {% endif %}
+
+
+
+                   {#{% if perms.product.view_producttax %}#}
+                        <!--<li class="{% block menu_tax_list %}{% endblock %}">-->
+                            <!--<a href="{% url 'dashboard:tax-list' %}">-->
+                            <!--<i class="icon-drawer-out"></i>Tax-->
+                            <!--</a>-->
+                        <!--</li>-->
+                   {#{% endif %}#}
+                   {% if perms.reports.view_balancesheet %}
+                        <li class="{% block menu_balancesheet_report_class %}{% endblock %}" style="display:none;">
+                             <a href="{% url 'dashboard:balancesheet_reports' %}"><i class='icon-book'></i>Balance Sheet</a>
+                        </li>
+                    {% endif %}
+                  </ul>
+                </li>
+               {% endif %}
+               {% if request.user.is_superuser %}
+                <!-- configuration menu -->
+                 <li><a href="#"><i class="icon-cogs"></i> <span> {% trans "Configuration"  context "Dashboard configuration" %}</span></a>
+                  <ul>                 
+                    
+                    <li class="{% block menu_settings_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:site-index' %}">
+                        <i class=" icon-earth"></i>
+                         {% trans "Site settings" context "Dashboard site settings" %}
+                    </a>
+                    </li>
+                  </ul>
+                </li>
+                {% endif %}
+                <!-- /main -->
+
+              </ul>
+            </div>
+          </div>
+          <!-- /main navigation -->
+
+        </div>
+      </div>
+      <!-- /main sidebar -->
+
+      <!-- Main content -->
+      <div class="content-wrapper">
+      <div class="page-header page-header-default">
+          <div class="breadcrumb-line fix-breadcrumb" style="position: fixed;width: 100%;">
+            <ul class="breadcrumb">
+               <li><a href="{% url 'dashboard:index' %}"><span class="icon-home">
+                 
+               <span data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Back to dashboard"> Home</span></a></li>
+               {% block breadcrumbs %}
+              <li class="active">{% trans "Home" context "Dashboard homepage" %}</li>
+               {% endblock %}              
+            </ul>
+            <ul class="breadcrumb-elements">
+              {% block header_extra %}
+              {% endblock %}
+            </ul>
+            <!--  -->
+          <a class="breadcrumb-elements-toggle"><i class="icon-menu-open"></i></a></div>
+        </div>
+      
+
+
+        <!-- Content area -->
+        <div class="content" id="content" style="padding: 30px 20px 60px">   
+
+                {% block content %}{% endblock %}
+            
+          
+          <!-- Footer -->
+          <div class="footer text-muted">
+            &copy; . <a href="#">Glosoft Group</a> <a href="http://glosoftgroup.com" target="_blank"></a>
+          </div>
+          <!-- /footer -->
+
+        </div>
+        <!-- /content area -->
+        
+    </div>
+    <!-- end page content -->
+  </div>
+  <!-- end page container -->
+
+   
+   
+    <div id="base-modal" class="modal"></div>
+    <div id="base-modal-fixed" class="modal modal-fixed-footer"></div>
+    <!-- Core JS files -->
+
+  <script type="text/javascript" src="{% static 'backend/js/core/libraries/bootstrap.min.js' %}"></script>
+  <!-- /core JS files -->
+   <script src="{% static 'backend/js/plugins/ui/jquery-validation/jquery.validate.js' %} "></script>
+
+  <!-- Theme JS files -->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/moment/moment.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/core/app.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/core/libraries/jquery_ui/interactions.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_select2.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/ripple.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/chart.min.js' %}"></script>
+  <!-- /theme JS files -->
+ 
+  <!-- form js -->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/loaders/blockui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_layouts.js' %}"></script>
+  <!-- image preview-->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/jasny-bootstrap/js/jasny-bootstrap.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/components_popups.js' %}"></script>
+  <!-- datepicker -->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/daterangepicker.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/legacy.js' %}"></script>
+
+  <!-- Theme JS files -->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/pnotify.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/noty.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/jgrowl.min.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'backend/js/pages/components_notifications_other.js' %}"></script>
+  
+
+  
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+   <script type="text/javascript" src="{% static 'backend/js/fixed_breadcrumb.js' %}"></script>
+           <script type="text/javascript" src="{% static 'backend/js/plugins/js-cookie/src/js.cookie.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/test-cookie.js' %}"></script>
+  <style type="text/css">
+    .toper{top:50px;}
+  </style>
+  <script type="text/javascript">
+  $( document ).ready(function() {
+
+    var selector = $('.fix-breadcrumb');
+    $( "label" ).addClass( "text-bold" );
+   
+      });
+ 
+
+  
+  </script>
+   
+    
+    {% include "dashboard/includes/_messages.html" %}
+    <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/printThis/printThis.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/printThis/printer.js' %}"></script>
+
+    <script type="text/javascript">
+   
+  function getNotification() {
+    var dynamicData = {};    
+    return $.ajax({
+      url: "{% url 'dashboard:unread_count'%}",
+      type: "get",
+      data: dynamicData
+    });
+  }
+  getNotification().done(function (data) {
+       $(".status-mark22").text(data);
+    }); 
+
+  $(document).ready(function(){
+    setInterval(function(){ getNotification().done(function (data) {
+       $(".status-mark22").text(data);
+    }) }, 9920000);  
+    
+  });
+
+
+
+  
+  </script>
+    {% block custom_js %}{% endblock %}
+   </div>
+  </body>
+</html>
