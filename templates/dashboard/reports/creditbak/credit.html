@@ -6,13 +6,13 @@
 {% load humanize %}
 
 {% block title %}
-  Sales Report
+  Credit Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:sales_reports' %}">Sales</a></li>
- {% endblock %}Cardenas and Sons
+     <li class="active"><a href="{% url 'dashboard:credit_reports' %}">Credit</a></li>
+ {% endblock %}
 
-{% block menu_report_class %}active{% endblock %}
+{% block menu_creditreport_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -26,7 +26,7 @@
     <div class="col-md-12">
       <div class="panel panel-flat">
       <div class="panel-heading">
-        <h6 class="panel-title">Sales Reports</h6>
+        <h6 class="panel-title">Credit Reports</h6>
         <div class="heading-elements">
           <ul class="icons-list">
             <li><a data-action="collapse"></a></li>
@@ -37,7 +37,7 @@
       <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
         <div class="panel-body">
             <div class="col-md-6">
-             <label>Search Sales</label>
+             <label>Search Credit Sale</label>
               <div class="form-group form-group-material has-feedback">
                 <input class="form-control search_user" placeholder="Search details" type="text">
                 <div class="form-control-feedback">
@@ -104,9 +104,9 @@
                         {% if items %}
                         {% for item in items %}
                           <tr>
-                            <td>{{item.sales.created|date:"d-m-Y H:i a"}}</td>
-                            <td>{{item.sales.invoice_number }}</td>
-                            <td>{% if item.sales.user.email %}{{item.sales.user.email}}{% else %}{{item.sales.user.name}}{% endif %}</td>
+                            <td>{{item.credit.created|date:"d-m-Y H:i a"}}</td>
+                            <td>{{item.credit.invoice_number }}</td>
+                            <td>{% if item.credit.user.email %}{{item.credit.user.email}}{% else %}{{item.credit.user.name}}{% endif %}</td>
                             <td>{{item.product_name}}</td>
                             <td>{{item.unit_cost}}</td>
                             <td>{{item.quantity}}</td>
@@ -170,12 +170,16 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
 <script type="text/javascript">
+ var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
+    var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
 $(document).ready(function(){
 
     var pagination_totalsize;
     var status;
+    var reportUrl = "{% url 'dashboard:credit_reports' %}";
+   
     //**@ get
-    $.ajax({ url: "{% url 'dashboard:sales_reports' %}",type: 'GET',data: {initial:'initial'},
+    $.ajax({ url: reportUrl,type: 'GET',data: {initial:'initial'},
         async:false,success: function(data){
          pagination_totalsize = data;
     }}); 
@@ -186,7 +190,7 @@ $(document).ready(function(){
         leaps: false
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){
+            $.get(creditPaginateUrl,{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm'); 
@@ -197,7 +201,7 @@ $(document).ready(function(){
         showDropdowns:true
     }).on('change',function(){
       var date = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+        $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
     });
@@ -234,7 +238,7 @@ $(document).ready(function(){
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+        $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
      });
@@ -252,7 +256,7 @@ $(document).ready(function(){
     $('.search_user').keyup(function() {
       var search_text = $(this).val();
       delay(function(){ 
-         var url = "{% url 'dashboard:sales_search' %}";
+         var url = creditSearchUrl;
          $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
                 $('#pagination-div').html(data);
          }});
