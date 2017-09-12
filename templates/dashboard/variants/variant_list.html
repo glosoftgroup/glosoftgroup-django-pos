@@ -11,12 +11,12 @@ Product Variants - {{ block.super }}
 {% block breadcrumbs %}
 
 <li >
-  <a href="{% url 'dashboard:product-list">Products</a>
+  <a href="{% url 'dashboard:product-list' %}">Products</a>
 </li>
-<li class=""><a href="{% url 'dashboard:variant-list' %}">Product Variants</a></li>
+
 {% if product %}
 <li class="active">
-  {{product}}
+  {{product}} Variant(s)
 </li>
 {% endif %}
 

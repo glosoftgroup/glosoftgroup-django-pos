@@ -36,6 +36,7 @@ from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, Terminal
+from ...credit.models import Credit, CreditedItem
 from ...product.models import Product, ProductVariant, Category
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, convert_html_to_pdf, image64
@@ -59,7 +60,7 @@ def chart_pdf(request, image):
 		'puller': request.user,
 		'image':ImageData
 		}
-	pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
+	pdf = render_to_pdf('dashboard/reports/credit/charts/pdf/pdf.html', data)
 	return HttpResponse(pdf, content_type='application/pdf')
 
 @staff_member_required
@@ -107,43 +108,43 @@ def sales_list_pdf( request ):
 
 		sales = []
 		if q is not None:
-			all_sales = Sales.objects.filter(
+			all_sales = Credit.objects.filter(
 				Q(invoice_number__icontains=q) |
 				Q(terminal__terminal_name__icontains=q) |
 				Q(created__icontains=q) |
 				Q(customer__name__icontains=q) | Q(customer__mobile__icontains=q) |
-				Q(solditems__product_name__icontains=q) |
+				Q(credititems__product_name__icontains=q) |
 				Q(user__email__icontains=q) |
 				Q(user__name__icontains=q)).order_by('id').distinct()
 
 			if gid:
 				csales = all_sales.filter(created__icontains=gid)
 				for sale in csales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 			else:
 				for sale in all_sales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 
 		elif gid:
-			csales = Sales.objects.filter(created__icontains=gid)
+			csales = Credit.objects.filter(created__icontains=gid)
 			for sale in csales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 		else:
 			try:
-				last_sale = Sales.objects.latest('id')
+				last_sale = Credit.objects.latest('id')
 				gid = DateFormat(last_sale.created).format('Y-m-d')
 			except:
 				gid = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
-			csales = Sales.objects.filter(created__icontains=gid)
+			csales = Credit.objects.filter(created__icontains=gid)
 			for sale in csales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 
@@ -155,15 +156,15 @@ def sales_list_pdf( request ):
 			'image': img,
 			'gid':gid
 		}
-		pdf = render_to_pdf('dashboard/reports/sales/pdf/saleslist_pdf.html', data)
+		pdf = render_to_pdf('dashboard/reports/credit/pdf/saleslist_pdf.html', data)
 		return HttpResponse(pdf, content_type='application/pdf')
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
 def sales_detail(request, pk=None):
 	try:
-		sale = Sales.objects.get(pk=pk)
-		items = SoldItem.objects.filter(sales=sale)
+		sale = Credit.objects.get(pk=pk)
+		items = CreditedItem.objects.filter(credit=sale)
 		img = image64()
 		data = {
 			'today': date.today(),
@@ -172,7 +173,7 @@ def sales_detail(request, pk=None):
 			'puller': request.user,
 			'image': img
 		}
-		pdf = render_to_pdf('dashboard/reports/sales/pdf/pdf.html',data)
+		pdf = render_to_pdf('dashboard/reports/credit/pdf/pdf.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
@@ -195,7 +196,7 @@ def sales_category(request):
 			'sales_date':sales_date
 		}
 		print (sales_date)
-		pdf = render_to_pdf('dashboard/reports/sales/pdf/category.html',data)
+		pdf = render_to_pdf('dashboard/reports/credit/pdf/category.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
@@ -218,7 +219,7 @@ def sales_items(request):
 			'sales_date':sales_date
 		}
 		print (sales_date)
-		pdf = render_to_pdf('dashboard/reports/sales/pdf/items.html',data)
+		pdf = render_to_pdf('dashboard/reports/credit/pdf/items.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
@@ -241,7 +242,7 @@ def sales_user(request):
 			'sales_date':sales_date
 		}
 		print (sales_date)
-		pdf = render_to_pdf('dashboard/reports/sales/pdf/user.html',data)
+		pdf = render_to_pdf('dashboard/reports/credit/pdf/user.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
@@ -264,7 +265,7 @@ def sales_tills(request):
 			'sales_date':sales_date
 		}
 		print (sales_date)
-		pdf = render_to_pdf('dashboard/reports/sales/pdf/till.html',data)
+		pdf = render_to_pdf('dashboard/reports/credit/pdf/till.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
