@@ -13,6 +13,7 @@
                         <tr class="bg-primary">
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
+                          <th>Status</th>
                           <th>Customer</th>
                           <th>Cashier</th>
                           <th>Payment Mode</th>
@@ -26,6 +27,13 @@
                           <tr class='clickable-row' id="{{sale.pk }}">
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
+                            <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
+                            {% if sale.is_fully_paid %}
+                            <span class="text-success  icon-checkmark-circle"><i></i></span>
+                            {% else %}
+                            <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+                            {% endif %}
+                            </td>
                               <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.payment_options.name}}</td>
@@ -177,88 +185,32 @@
             });
 
    });
-   //**@ display size select
+
+    //**@ display size select
      $('.list-sz').selectpicker().on('change', function(){
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
         var date = $('.daterange-single').val();
         var url = creditSearchUrl;
+        var paginationUrl = creditPaginationUrl;
         var scategory = $('.sales-category').find(":selected").val();
-
-        if((scategory == 'list' && date && searchData)){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(scategory == 'list' && searchData){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(scategory == 'list' && date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(((scategory && scategory != 'list' && scategory != 'none') && (!searchData && !date)) || (scategory && scategory != 'list' && scategory != 'none' && date)){           
-        }else if(searchData && date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
-        }else if(searchData){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
-        }else if(date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
+        dynamicData = {}
+        dynamicData['page'] = 1;
+        dynamicData['q'] = searchData;
+        dynamicData['gid'] = date;
+        if(listSizeVal == '0'){
+          dynamicData['size'] = '10';
         }else{
-           if(listSizeVal != '0'){
-               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
-                  $('#pagination-div').html(data);
-              }});
-           }else{
-                $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
-           }
-       }
+          dynamicData['size'] = listSizeVal;
+        } 
+        paginationData(dynamicData,url,'GET').
+         done(function(data){
+          $('#pagination-div').html(data);
+         })
+         .fail();        
 
      });
+   
    {% if sz %}
    $.when( $.ready ).then(function() {     
          $('.bootstrap-select').selectpicker();

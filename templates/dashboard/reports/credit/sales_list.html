@@ -31,7 +31,7 @@
      
         <div class="panel-body search-panel">
             <div class="col-md-4">
-             <label>Search Sales (for date format: yyyy-mm-dd)</label>
+             <label>Search Credit Sales (for date format: yyyy-mm-dd)</label>
               <div class="form-group form-group-material has-feedback">
                 <input class="form-control search_user" placeholder="Search details" type="text">
                 <div class="form-control-feedback">
@@ -39,7 +39,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 hidden">
                 <label>categories</label>
               <div class="form-group">
                  <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
@@ -100,6 +100,7 @@
                         <tr class="bg-primary">
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
+                          <th>Status</th>
                           <th>Customer Name</th>
                           <th>Cashier</th>
                           <th>Payment Mode</th>
@@ -111,13 +112,20 @@
                         {% if sales %}
                         {% for sale in sales %}
                           <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.payment_options.name %}{{sale.payment_options.name}}{% else %} Cash {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td >
+                            <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
+                            {% if sale.is_fully_paid %}
+                            <span class="text-success  icon-checkmark-circle"><i></i></span>
+                            {% else %}
+                            <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+                            {% endif %}
+                            </td>
+                              <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.payment_options.name %}{{sale.payment_options.name}}{% else %} Cash {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
@@ -132,7 +140,7 @@
                  <style type="text/css">
            .pagination{margin-bottom: 0px;}
          </style> 
-         <div class="row">   
+         <div class="row mt-10">   
          <div class="col-md-12">               
           <div class="col-md-4">
            <div class="col-md-12">
@@ -216,6 +224,17 @@ var categoryChartUrl = "{% url 'dashboard:sales_category_chart' %}";
 var productChartUrl = "{% url 'dashboard:sales_product_chart' %}";
 var userChartUrl = "{% url 'dashboard:sales_user_chart' %}";
 var terminalChartUrl  ="{% url 'dashboard:sales_terminal_chart' %}";
+var dynamicData = {}
+
+function paginationData(dynamicData,url,method){
+  dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+  return $.ajax({
+      url: url,
+      type: method,
+      data: dynamicData
+    });
+}
+
 $(document).ready(function(){
 
     $(".td").click(function(){
@@ -432,7 +451,7 @@ $(document).ready(function(){
             var listSizeVal = $('.list-sz').find(":selected").val();
             var groupSizeVal = $('.group-sz').find(":selected").val();
             var date = $('.daterange-single').val();
-            var url = "{% url 'dashboard:reports_sales_list_pdf' %}";
+            var url = "{% url 'dashboard:reports_credit_list_pdf' %}";
             var scategory = $('.sales-category').find(":selected").val();
 
             if(date && (scategory == 'category')){
@@ -441,7 +460,7 @@ $(document).ready(function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_category_pdf' %}",{image:dataUrl, date:date}, function(data){
+                        $.get("{% url 'dashboard:reports_credit_category_pdf' %}",{image:dataUrl, date:date}, function(data){
                                   window.open("data:application/pdf," + escape(data));
                        });
                     })
@@ -454,7 +473,7 @@ $(document).ready(function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_category_pdf' %}",{image:dataUrl}, function(data){
+                        $.get("{% url 'dashboard:reports_credit_category_pdf' %}",{image:dataUrl}, function(data){
                                   window.open("data:application/pdf," + escape(data));
                        });
                     })
@@ -467,7 +486,7 @@ $(document).ready(function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_items_pdf' %}",{image:dataUrl, date:date}, function(data){
+                        $.get("{% url 'dashboard:reports_credit_items_pdf' %}",{image:dataUrl, date:date}, function(data){
                                   window.open("data:application/pdf," + escape(data));
                        });
                     })
@@ -480,7 +499,7 @@ $(document).ready(function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_items_pdf' %}",{image:dataUrl}, function(data){
+                        $.get("{% url 'dashboard:reports_credit_items_pdf' %}",{image:dataUrl}, function(data){
                                   window.open("data:application/pdf," + escape(data));
                        });
                     })
@@ -493,7 +512,7 @@ $(document).ready(function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl, date:date}, function(data){
+                        $.get("{% url 'dashboard:reports_credit_user_pdf' %}",{image:dataUrl, date:date}, function(data){
                                   window.open("data:application/pdf," + escape(data));
                        });
                     })
@@ -506,7 +525,7 @@ $(document).ready(function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl}, function(data){
+                        $.get("{% url 'dashboard:reports_credit_user_pdf' %}",{image:dataUrl}, function(data){
                                   window.open("data:application/pdf," + escape(data));
                        });
                     })
@@ -519,7 +538,7 @@ $(document).ready(function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_tills_pdf' %}",{image:dataUrl, date:date}, function(data){
+                        $.get("{% url 'dashboard:reports_credit_tills_pdf' %}",{image:dataUrl, date:date}, function(data){
                                   window.open("data:application/pdf," + escape(data));
                        });
                     })
@@ -532,7 +551,7 @@ $(document).ready(function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_tills_pdf' %}",{image:dataUrl}, function(data){
+                        $.get("{% url 'dashboard:reports_credit_tills_pdf' %}",{image:dataUrl}, function(data){
                                   window.open("data:application/pdf," + escape(data));
                        });
                     })
@@ -572,81 +591,22 @@ $(document).ready(function(){
         var searchData = $('.search_user').val();
         var date = $('.daterange-single').val();
         var url = creditSearchUrl;
+        var paginationUrl = creditPaginationUrl;
         var scategory = $('.sales-category').find(":selected").val();
-
-        if((scategory == 'list' && date && searchData)){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(scategory == 'list' && searchData){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(scategory == 'list' && date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:creditPaginationUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:creditPaginationUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(((scategory && scategory != 'list' && scategory != 'none') && (!searchData && !date)) || (scategory && scategory != 'list' && scategory != 'none' && date)){
-           console.log('nothinh')
-        }else if(searchData && date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
-        }else if(searchData){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
-        }else if(date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:creditPaginationUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:creditPaginationUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
+        dynamicData = {}
+        dynamicData['page'] = 1;
+        dynamicData['q'] = searchData;
+        dynamicData['gid'] = date;
+        if(listSizeVal == '0'){
+          dynamicData['size'] = '10';
         }else{
-           if(listSizeVal != '0'){
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
-                  $('#pagination-div').html(data);
-              }});
-           }else{
-                $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
-           }
-       }
+          dynamicData['size'] = listSizeVal;
+        } 
+        paginationData(dynamicData,url,'GET').
+         done(function(data){
+          $('#pagination-div').html(data);
+         })
+         .fail();        
 
      });
 
@@ -672,51 +632,34 @@ $(document).ready(function(){
 
     //** search
     $('.search_user').keyup(function() {
-        var search_text = $(this).val();
-        var date = $('.daterange-single').val();
-        var listSizeVal = $('.list-sz').find(":selected").val();
-        var url = creditSearchUrl;
-        var scategory = $('.sales-category').find(":selected").val();
-        
-        delay(function(){
-            if(scategory == 'list' && (listSizeVal && listSizeVal != '0') && date ){
-                    $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text, gid:date}, async:false,success: function(data){
-                          $('#pagination-div').html(data);
-                    }});
-            }else if(scategory == 'list' && (listSizeVal && listSizeVal != '0')){
-                    $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text}, async:false,success: function(data){
-                          $('#pagination-div').html(data);
-                    }});
-            }else if((scategory == 'list' &&  listSizeVal == '0' && date) || (scategory == 'none' &&  listSizeVal == '0' && date)){
-                    $.ajax({ url: url,type: 'GET',data: {page:1, size:10, q:search_text, gid:date}, async:false,success: function(data){
-                          $('#pagination-div').html(data);
-                    }});
-            }else if((scategory == 'list' &&  listSizeVal == '0') || (scategory == 'none' &&  listSizeVal == '0')){
-                    $.ajax({ url: url,type: 'GET',data: {page:1, size:10, q:search_text}, async:false,success: function(data){
-                          $('#pagination-div').html(data);
-                    }});
-            }else if((scategory != 'none' && scategory != 'list') || (scategory != 'none' && scategory != 'list' && listSizeVal != '0')){
-                console.log('nothing');
-            }else if(listSizeVal && listSizeVal != '0' && date){
-                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else if(listSizeVal && listSizeVal != '0'){
-                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else if(date){
-                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
-                        $('#pagination-div').html(data);
-               }});
-            }
-        }, 500 );
+      var url = creditSearchUrl;
+      var search_text = $(this).val();     
+      var date = $('.daterange-single').val();
+      var listSizeVal = $('.list-sz').find(":selected").val();
+      var scategory = $('.sales-category').find(":selected").val();
+      dynamicData = {};
 
-      });
+      delay(function(){         
+         dynamicData['']
+         dynamicData['page'] = 1;
+         dynamicData['q'] = search_text;
+         if(listSizeVal == '0'){
+          dynamicData['size'] = 10;
+         }else{
+          dynamicData['size'] = listSizeVal;
+         }         
+         dynamicData['gid'] = date;         
+         paginationData(dynamicData,url,'GET').
+         done(function(data){
+          $('#pagination-div').html(data);
+         })
+         .fail();
+         
+      }, 500 );
+
+    });
+
+    
 
 
 });

@@ -100,6 +100,11 @@ class Credit(models.Model):
    		return len(self.credititems.all());
    	def items(self):
    		return self.credititems.all()
+   	def is_fully_paid(self):
+   		if self.status == 'fully-paid':
+   			return True
+   		else:
+   			return False
 								
 class CreditedItem(models.Model):
 	credit = models.ForeignKey(Credit,related_name='credititems',on_delete=models.CASCADE)
