@@ -88,7 +88,7 @@
                    {% if request.GET.tab %}                   
                      <li>             
                     {% else %}
-                      <li class="active">
+                      <li class="active bordered-tab1">
                     {% endif %}
                         <a href="#bordered-tab1" data-toggle="tab">Product Name</a>
                       </li>
@@ -100,7 +100,7 @@
                     {% if request.GET.tab == 'variants'  %}                   
                      <li class="active">
                     {% else %}
-                      <li>             
+                      <li class="bordered-tab2">             
                     {% endif %}
                     <a href="#bordered-tab2" class="tabProductAdded" data-toggle="tab">Pricing</a></li>
                     <!-- stock tab -->
@@ -1444,7 +1444,17 @@ $('#form-product').validate({
 {% if product.pk %}
 <script type="text/javascript" src="{% static 'backend/js/plugins/media/fancybox.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/gallery.js' %}"></script>
-
+  {% if go %}
+   <script type="text/javascript">
+   $.when( $.ready ).then(function() {     
+       $('.bordered-tab1').removeClass('active');
+       $('#bordered-tab1').removeClass('active');
+       //activate pricing tab
+       $('.bordered-tab2').addClass('active');
+       $('#bordered-tab2').addClass('active');              
+    });
+     console.log("{{go}}");
+   </script>
+  {% endif %}
 {% endif %}
- {% endblock %}}
-}
+ {% endblock %}
