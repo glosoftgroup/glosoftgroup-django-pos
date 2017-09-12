@@ -57,11 +57,7 @@ def credit_list(request):
 		total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 		total_sales = []
 		for sale in all_sales:
-<<<<<<< HEAD
-			quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
-=======
 			quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
->>>>>>> a82994a10f39d2d0929cf9084d45039380aed711
 			setattr(sale, 'quantity', quantity['c'])
 			total_sales.append(sale)
 
