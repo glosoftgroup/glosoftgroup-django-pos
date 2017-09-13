@@ -344,7 +344,8 @@ $(function() {
 
     // Editable input
     $('.pickatime-editable').pickatime({
-        editable: true
+        editable: true,
+        formatSubmit: 'H A'
     });
 
 

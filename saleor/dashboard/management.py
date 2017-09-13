@@ -2,7 +2,15 @@ from django.db.models.signals import post_migrate
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from ..sale.models import PaymentOption
+from ..product.models import StockLocation
 
+def add_stock_location(sender,**kwargs):
+    try:
+        store = StockLocation.objects.filter(name='default')
+            if not store.exists():
+                StockLocation.objects.create(name="default")
+    except Exception as e:
+        print e
 def add_payment_options(sender, **kwargs):
     try:
         cash = PaymentOption.objects.filter(name='Cash')

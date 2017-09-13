@@ -400,6 +400,7 @@ class ProductVariant(models.Model, Item):
 
 @python_2_unicode_compatible
 class StockLocation(models.Model):
+    DEFAULT_PK=1
     name = models.CharField(
         pgettext_lazy('Stock location field', 'location'), max_length=100)
 
@@ -433,7 +434,7 @@ class Stock(models.Model):
     variant = models.ForeignKey(
         ProductVariant, related_name='stock',
         verbose_name=pgettext_lazy('Stock item field', 'variant'))
-    location = models.ForeignKey(StockLocation, null=True)
+    location = models.ForeignKey(StockLocation, default=StockLocation.DEFAULT_PK)
     quantity = models.IntegerField(
         pgettext_lazy('Stock item field', 'quantity'),
         validators=[MinValueValidator(0)], default=Decimal(1))
