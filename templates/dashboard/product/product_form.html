@@ -922,7 +922,9 @@
   });
   </script>
 <script type="text/javascript">
-
+ $.when( $.ready ).then(function() {
+  $('#id_categories').removeAttr('multiple');
+ });
 
  {% if product.pk %}
    
