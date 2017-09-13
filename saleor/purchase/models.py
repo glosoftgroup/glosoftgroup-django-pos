@@ -65,8 +65,9 @@ class PurchaseProduct(models.Model):
 	def get_total_cost(self):
 		if not self.cost_price:
 			# return self.cost_price.gross * self.quantity
-			return self.stock.variant.get_price_per_item().gross * self.quantity
-		return 0
+			# return self.stock.variant.get_price_per_item().gross * self.quantity
+			return 0
+		return self.cost_price.gross * self.quantity
 
 	def get_cost_price(self):
 		if not self.cost_price:

@@ -258,7 +258,6 @@ $(document).ready(function(){
         var url3 = "{% url 'dashboard:reports_products_export_csv' %}";
         var url4 = "{% url 'dashboard:reports_reorder_export_csv' %}";
         if(ts == 'pdf'){
-          <!--window.open(url, '_blank');-->
                 if(searchData && (prolist == 'list')){
                     $.get(url, {q:searchData}, function(data){
                               window.open("data:application/pdf," + escape(data));
@@ -288,7 +287,6 @@ $(document).ready(function(){
                 }
 
         }else if(ts=='excel'){
-          <!--window.location="{% url 'dashboard:reports_products_export_csv' %}";-->
                 if(searchData && (prolist == 'list')){
                     $.get(url3, {q:searchData}, function(data){
                               window.open("data:text/csv;charset=utf-8," + escape(data), '_self',false)
