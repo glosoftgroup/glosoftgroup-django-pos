@@ -40,7 +40,7 @@
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
                 {% if perms.product.add_product %}
-                 <a class="btn btn-primary text-white btn-xs  hvr-glow btn-raised legitRipple waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:product-add' %}" title="{% trans "Add product" context "Product list add button text" %}">
+                 <a class="btn btn-primary text-white btn-xs  hvr-glow btn-raised legitRipple waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:product-add' %}?new=e23fg" title="{% trans "Add product" context "Product list add button text" %}">
                   <i class="icon-plus2 position-left"></i>Add Product
                 </a>
                 {% endif %}

@@ -618,7 +618,7 @@ def product_create(request):
             'Dashboard message', 'Added product %s') % product
         messages.success(request, msg)
         return redirect('dashboard:product-update',
-                        pk=product.pk)
+                        pk=product.pk,name='123')
     else:
         errors = product_form.errors
         product_cl = ProductClass()
@@ -634,7 +634,7 @@ def product_create(request):
 
 @staff_member_required
 @permission_decorator('product.change_product')
-def product_edit(request, pk):
+def product_edit(request, pk,name=None):
     product = get_object_or_404(
         Product.objects.prefetch_related(
             'images', 'variants'), pk=pk)
@@ -674,6 +674,8 @@ def product_edit(request, pk):
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
            'variant_form': variant_form}
+    if name:
+        ctx['go'] = 'True'
     if request.is_ajax():
         return TemplateResponse(
                     request, 
@@ -824,10 +826,13 @@ def stock_edit(request, product_pk, stock_pk=None):
     errors = form.errors
     ctx = {'form': form, 'product': product, 'stock': stock, 'errors':errors}
     if request.is_ajax():
-        if not stock:
-            return HttpResponse(json.dumps({'message':0},content_type='application/json'))
+        if form.errors:            
+            return HttpResponse(json.dumps({'success': False,'errors': form.errors.items(),}),content_type='application/json')
         else:
-            return HttpResponse(json.dumps({'message':1},content_type='application/json'))
+            return HttpResponse(json.dumps({'message':form.errors}),content_type='application/json')
+        # except Exception as e:
+        #     print e
+
         #return TemplateResponse(request, 'dashboard/purchase/includes/add_stock_form.html', ctx)
     return TemplateResponse(request, 'dashboard/product/stock_form.html', ctx)
 
