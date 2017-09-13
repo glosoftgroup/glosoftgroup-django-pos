@@ -360,9 +360,12 @@ class ProductVariant(models.Model, Item):
         values = get_attributes_display_map(self, attributes)
         if values:
             return ', '.join(
-                ['%s: %s' % (smart_text(attributes.get(id=int(key))),
-                             smart_text(value))
+                [' %s' % ( smart_text(value))
                  for (key, value) in six.iteritems(values)])
+            # return ', '.join(
+            #     ['%s: %s' % (smart_text(attributes.get(id=int(key))),
+            #                  smart_text(value))
+            #      for (key, value) in six.iteritems(values)])
         else:
             return smart_text(self.sku)
 
@@ -419,6 +422,10 @@ class StockManager(models.Manager):
         #stock.quantity_allocated = F('quantity_allocated') - quantity
         stock.save(update_fields=['quantity', 'quantity_allocated'])
 
+    def get_low_stock(self):
+        today = datetime.date.today()
+        return self.get_queryset().filter(quantity__lte=F('low_stock_threshold'))
+
 
 
 @python_2_unicode_compatible
@@ -432,6 +439,9 @@ class Stock(models.Model):
         validators=[MinValueValidator(0)], default=Decimal(1))
     invoice_number = models.CharField(
         pgettext_lazy('Stock item field', 'invoice_number'), null=True, max_length=36,)  
+    low_stock_threshold = models.IntegerField(
+        pgettext_lazy('Stock item field', 'low stock threshold'),
+        validators=[MinValueValidator(0)], null=True,blank=True, default=Decimal(10))
     
     quantity_allocated = models.IntegerField(
         pgettext_lazy('Stock item field', 'allocated quantity'),

@@ -668,7 +668,7 @@ def product_edit(request, pk):
         msg = pgettext_lazy(
             'Dashboard message', 'Updated product %s') % product
         messages.success(request, msg)
-        return redirect('dashboard:product-update', pk=product.pk)
+        return redirect('dashboard:product-update', pk=product.pk,go='pricing')
     ctx = {'stock_form':stock_form,'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
            'product': product, 'stock_delete_form': stock_delete_form,
            'stock_items': stock_items, 'variants': variants,
@@ -1515,7 +1515,7 @@ def stocks(request):
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
-            return TemplateResponse(request, 'dashboard/purchase/purchase_list.html', {'product_results':product_results,'categories':categories})
+            return TemplateResponse(request, 'dashboard/purchase/purchase_list.html', {'product_results':product_results,'categories':categories,'pn':paginator.num_pages})
     except TypeError as e:
         error_logger.error(e)
         return HttpResponse('error accessing users')
