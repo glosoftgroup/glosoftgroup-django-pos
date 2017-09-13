@@ -11,7 +11,7 @@
                     <th>
                       {% trans "SKU" context "Product variant table header" %}
                     </th>
-                    <th>Re-order Threshold</th>
+                   
                     {% for attribute in attributes %}
                       <th>
                         {{ attribute.name|capfirst }}
@@ -37,9 +37,7 @@
                       <td>
                         {{ variant.sku }}
                       </td>
-                      <td>
-                        {{ variant.low_stock_threshold }}
-                      </td>
+                      
                       {% for attr_display in variant|attributes_values_with_empty:attributes %}
                         <td>
                           {{ attr_display }}

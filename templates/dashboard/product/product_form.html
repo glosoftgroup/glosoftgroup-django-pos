@@ -306,8 +306,7 @@
       <table class="table table-hover">
         <thead>
         <tr class="bg-primary">  
-        <th>SKU</th> 
-        <th>Re-order Level</th>   
+        <th>SKU</th>          
         {% for v in pc %} 
          <th>{{v}}</th>       
         {% endfor %}
@@ -321,9 +320,9 @@
           <td>
             <input type="text" id="new-sku-td" placeholder="Enter SKU" class="form-control" name='new-sku-td'>
           </td>
-          <td>
+         <!--  <td>
             <input type="number" placeholder="(e.g 10)" class="form-control" value="10" id="reorder_level" name="reorder_level">
-          </td>
+          </td> -->
           {% for v in pc%}
           <td>
            <select placeholder="{{v}}" data-pk={{v.pk}} name="{{v}}" class="bootstrap-select form-control dynamicvxx">
@@ -405,7 +404,7 @@
                     <th>
                       {% trans "SKU" context "Product variant table header" %}
                     </th>
-                    <th>Re-order Threshold</th>
+                    <!-- <th>Re-order Threshold</th> -->
                     {% for attribute in attributes %}
                       <th>
                         {{ attribute.name|capfirst }}
@@ -428,9 +427,9 @@
                       <td>
                         {{ variant.sku }}
                       </td>
-                      <td>
+                     <!--  <td>
                         {{variant.low_stock_threshold}}
-                      </td>
+                      </td> -->
                       {% for attr_display in variant|attributes_values_with_empty:attributes %}
                         <td>
                           {{ attr_display }}
@@ -923,7 +922,9 @@
   });
   </script>
 <script type="text/javascript">
-
+ $.when( $.ready ).then(function() {
+  $('#id_categories').removeAttr('multiple');
+ });
 
  {% if product.pk %}
    

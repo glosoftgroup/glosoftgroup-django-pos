@@ -43,8 +43,7 @@
    <tr class="bg-primary">  
     <th>SKU</th>  
     <th>Retail Price</th>
-    <th>Wholesale Price</th>
-    <th>Reorder Threshold</th>
+    <th>Wholesale Price</th>   
     <th>&nbsp;</th>
    </tr>
   </thead>
@@ -66,9 +65,7 @@
       <td>
         {{ product_form.wholesale_price }}
       </td>
-      <td>
-        {{variant_form.low_stock_threshold}}
-      </td>
+      
       <td>
         <span>
          <a  class="btn hvr-glow btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing">Save</a>

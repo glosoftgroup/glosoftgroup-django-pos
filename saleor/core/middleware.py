@@ -66,7 +66,7 @@ class CurrencyMiddleware(object):
 class SettingsMiddleware(object):
 
     def process_request(self, request):
-        #return None
+        return None
         excluded_path = reverse('dashboard:addsitekeys')
 
         en = Encryptor()
