@@ -297,8 +297,12 @@ class ProductVariant(models.Model, Item):
         available_quantity = self.get_stock_quantity()
         if quantity > available_quantity:
             raise InsufficientStock(self)
-    def get_cost_price(self):
-        cost_price = self.stock.cost_price
+    # def get_cost_price(self):
+    #     cost_price = self.stock.cost_price
+    #     if cost_price:
+    #         return cost_price
+    #     return 0
+
 
     def get_stock_pk(self):
         stock_pk = self.stock.all().values('pk')

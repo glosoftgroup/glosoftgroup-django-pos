@@ -95,11 +95,5 @@
               $('#pagination-div').html(data);
         }});
      });
-   {% if sz %}
-   $.when( $.ready ).then(function() {     
-         $('.bootstrap-select').selectpicker();
-         $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
-      });
-  {% endif %}
  </script>
   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

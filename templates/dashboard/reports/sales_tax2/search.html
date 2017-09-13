@@ -10,28 +10,28 @@
                    </caption> 
                       <thead style="border-top:1px solid #ddd;">
                         <tr class="bg-primary">
-                          <th>Item Name</th>
-                          <th class="text-center">Unit Cost (KShs)</th>
+                          <th>Transaction Date</th>
+                          <th>Receipt No</th>
+                          <th>Customer Name</th>
                           <th>Quantity</th>
-                          <th class="text-center"><span class="text-center">Total Sales (KShs)</span></th>
-                          <th>Unit Margin (Kshs)</th>
-                          <th>Sales Margin (Kshs)</th>
+                          <th class="text-center">Total Sales (KShs)</th>
+                          <th class="text-center">Total Tax (KShs)</th>
                         </tr>
                       </thead>
                       <tbody id="p-tb">
-                        {% if items %}
-                        {% for item in items %}
-                          <tr>
-                            <td>{{item.product_name}}</td>
-                            <td><span class="pull-right">{{item.unit_cost}}</span></td>
-                            <td>{{item.quantity__sum}}</td>
-                            <td><span class="pull-right">{{item.total_cost__sum|intcomma}}</span></td>
-                            <td><span>{{item.unitMargin|intcomma}}</span></td>
-                              <td><span>{{item.salesMargin|intcomma}}</span></td>
+                        {% if sales %}
+                        {% for sale in sales %}
+                          <tr class='clickable-row' id="{{sale.pk }}">
+                            <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
+                              <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                              <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">No Items Report Available</h2></td></tr>
+                         <tr><td colspan="6"><h2 class="text-center">No Sales Reports Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
@@ -39,7 +39,7 @@
 
         </div>
       </div>
-          {% if items %}
+          {% if sales %}
          <div class="my-paginate">
             <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
               <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
@@ -79,11 +79,11 @@
 
                 var gid = '{{gid}}';
                 if(gid == 0){
-                    $.get("{% url 'dashboard:sales_margin_items_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                    $.get("{% url 'dashboard:sales_tax_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
                       $('#p-tb').html(data);
                     });
                 }else{
-                    $.get("{% url 'dashboard:sales_margin_items_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}', gid:'{{gid}}'},function(data){
+                    $.get("{% url 'dashboard:sales_tax_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}', gid:'{{gid}}'},function(data){
                        $('#p-tb').html(data);
                     });
                 }

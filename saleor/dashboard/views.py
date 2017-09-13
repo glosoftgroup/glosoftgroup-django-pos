@@ -12,9 +12,10 @@ from ..product.models import Product
 from ..core.utils import get_paginator_items
 from ..userprofile.models import User
 from ..sale.models import Sales, SoldItem, Terminal
-from ..product.models import Product, ProductVariant, Category
+from ..product.models import Product, ProductVariant, Category, Stock
 from ..decorators import permission_decorator, user_trail
 from ..utils import render_to_pdf, convert_html_to_pdf
+from ..credit.models import Credit, CreditedItem
 
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -150,7 +151,9 @@ def top_categories():
             date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))[
                 'total_net__sum']
 
-            no_of_customers = Sales.objects.filter(created__contains=date).count()
+            sales_customers = Sales.objects.filter(created__contains=date).count()
+            credit_customers = Credit.objects.filter(created__contains=date).count()
+            no_of_customers = sales_customers + credit_customers
 
             data = {
                 "sales_by_category": new_sales,
@@ -230,8 +233,5 @@ def styleguide(request):
     return TemplateResponse(request, 'dashboard/styleguide/index.html', {})
 
 def get_low_stock_products():
-    #threshold = getattr(settings, 'LOW_STOCK_THRESHOLD', 10)
-    products = Product.objects.annotate(
-        total_stock=Sum('variants__stock__quantity'))
-    products = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
+    products = Stock.objects.get_low_stock()
     return products
