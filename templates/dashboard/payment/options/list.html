@@ -53,7 +53,7 @@
             </div>
             
             <div class="col-md-2 hidden">
-              <label>Select expense type</label>
+              <label>Select payment type</label>
               <div class="form-group">
                   <select class="bootstrap-select group-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
                       <option value="all">Select All</option>
@@ -144,7 +144,7 @@
                       <ul class="icons-list">
                          {% if perms.accounts.delete_expense %}
                         <li>
-                          <a data-ta="#modal_instance" data-title="Delete Expense {{ option.name }} ?" data-href="{% url 'dashboard:option-delete' pk=option.pk %}" data-name="{{ option.name}}" data-id="{{ option.pk }}"
+                          <a data-ta="#modal_instance" data-title="Delete Payment option {{ option.name }} ?" data-href="{% url 'dashboard:option-delete' pk=option.pk %}" data-name="{{ option.name}}" data-id="{{ option.pk }}"
                          class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
                          </a>
                         </li>

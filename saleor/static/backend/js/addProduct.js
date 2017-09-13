@@ -464,7 +464,7 @@ $(function(){
     var refreshStockUrl = $(this).data('refreshstockurl');
     // validation
     if(!invoice_number){
-      alertUser('Invoice number required','bg-danger','Field Required!');
+      //alertUser('Invoice number required','bg-danger','Field Required!');
       stockInvoiceId.focus();
       stockInvoiceId.prop('autofocus');      
       stockInvoiceId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
@@ -473,7 +473,7 @@ $(function(){
       stockInvoiceId.nextAll('.help-block:first').addClass('text-danger').html('');
     }
     if(!variant){
-      alertUser('Please select a variant','bg-danger','Field Required!');
+      //alertUser('Please select a variant','bg-danger','Field Required!');
       stockVariantId.focus();
       stockVariantId.prop('autofocus');      
       stockVariantId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
@@ -485,7 +485,7 @@ $(function(){
        
     }
     if(!cost_price){
-      alertUser('Enter cost price','bg-danger','Field Required!');
+      //alertUser('Enter cost price','bg-danger','Field Required!');
       costPriceId.focus();
       costPriceId.prop('autofocus');      
       costPriceId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
@@ -495,7 +495,7 @@ $(function(){
       costPriceId.nextAll('.help-block:first').addClass('text-danger').html('');
     }
     if(!quantity){
-      alertUser('Stock Quantity required','bg-danger','Field Required!');
+      //alertUser('Stock Quantity required','bg-danger','Field Required!');
       stockQuantityId.focus();
       stockQuantityId.prop('autofocus');      
       stockQuantityId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
@@ -519,15 +519,19 @@ $(function(){
 
     addProductDetails(dynamicData,addStockUrl,'post')
     .done(function(data){
-      //console.log(data)
-      data = $.parseJSON(data);
-      $.each(data, function(i, item) {
-          alert(item);
-      });
-      if(data.errors){
-        console.log(data.errors)
+            
+      if(data.errors){        
+        var message = ' ';
+        $.each(data, function(i, item) {
+           if(item != '__all__'){
+            message += item+ ' ';
+           }            
+        });
+        alertUser(message.replace('__all__', ' '),'bg-warning','Error!');
+      }else{
+        alertUser('Stock information sent successfully');
       }
-      alertUser('Stock information sent successfully');
+      
       /* toggle form */
       $('#toggleStock').slideUp();
       refreshStockDiv(refreshStockUrl)

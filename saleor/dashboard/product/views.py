@@ -827,7 +827,7 @@ def stock_edit(request, product_pk, stock_pk=None):
     ctx = {'form': form, 'product': product, 'stock': stock, 'errors':errors}
     if request.is_ajax():
         if form.errors:            
-            return HttpResponse(json.dumps({'success': False,'errors': form.errors.items(),}),content_type='application/json')
+            return HttpResponse(json.dumps({'errors': form.errors.items()}),content_type='application/json')
         else:
             return HttpResponse(json.dumps({'message':form.errors}),content_type='application/json')
         # except Exception as e:
