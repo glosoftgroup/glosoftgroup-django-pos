@@ -199,7 +199,7 @@
      <!-- product attributes -->
      <div class="col-md-12">
        <!-- Product attributes -->
-        <div class="col-md-12">
+        <div class="col-md-12 hidden">
           
          <div class="form-group">         
           <label> Product Attributes</label>
@@ -217,9 +217,10 @@
           </div>
         </div>
       <!-- product attribute -->
-      <div class="col-md-12" style="margin-bottom:20px;">
+      <div class="col-md-12 hidden" style="margin-bottom:20px;">
         <!-- product attributes -->
-        <div class="form-group" id='div_attributes'>
+        <!-- add id='div_attributes' below div -->
+        <div class="form-group" >
            {% for attribute_field in product_form.iter_attribute_fields %}
           <div class="col-md-4">
            <label>{{ attribute_field.label }}</label>
