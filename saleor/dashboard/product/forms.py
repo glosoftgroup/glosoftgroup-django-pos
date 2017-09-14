@@ -176,7 +176,7 @@ class ProductForm(forms.ModelForm):
         field = self.fields['categories']        
         field.widget.attrs['data-placeholder'] = pgettext_lazy(
             'Product form placeholder', 'Select')
-        field.widget.attrs['class'] = 'form-control bootstrap-select'
+        field.widget.attrs['class'] = 'form-control '
         #field.widget.attrs['multiple'] = 'multiple'         
 
         field = self.fields['product_tax']
