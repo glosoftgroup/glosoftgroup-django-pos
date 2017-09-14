@@ -20,11 +20,11 @@
   <!-- sales price -->
   <td> 
   {% gross item.variant.get_price_per_item html=True %}
-  </td>
+  </td>  
   
   <td>
-    {{ item.location }}
-  </td>
+      {{item.low_stock_threshold}}
+    </td>
   <td class="right-align">
     {{ item.quantity }}
   </td>

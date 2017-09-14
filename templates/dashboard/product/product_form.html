@@ -161,7 +161,7 @@
                 <label>Product Category:<i class='text-danger'> *</i> </label>
                 <div class="input-group">
                              
-                      <div class="multi-select-full input-group-btn" id='category_field' >
+                      <div class=" input-group-btn" id='category_field' >
                         {{ product_form.categories }}
                       </div>
                   
@@ -562,13 +562,15 @@
                 <th> Cost Price</th>
                 <th>
                   Retail Price
-                </th>
-                
-                <th class="wide">
+                </th>                
+                <!-- <th class="wide">
                   {% trans "Location" context "Stock table header" %}
-                </th>
+                </th> -->
                 <th class="right-align">
                   {% trans "Quantity" context "Stock table header" %}
+                </th>
+                <th>
+                  Reorder Threshold
                 </th>
                 <th class="right-align">
                   {% trans "Allocated" context "Stock table header" %}
@@ -596,11 +598,12 @@
                   {% gross item.variant.get_price_per_item html=True %}
                   </td>
                   
-                  <td>
-                    {{ item.location }}
-                  </td>
+                  
                   <td class="right-align">
                     {{ item.quantity }}
+                  </td>
+                  <td>
+                    {{item.low_stock_threshold}}
                   </td>
                   <td class="right-align">
                     {{ item.quantity_allocated }}
@@ -924,6 +927,7 @@
 <script type="text/javascript">
  $.when( $.ready ).then(function() {
   $('#id_categories').removeAttr('multiple');
+  $('#id_categories').selectpicker();
  });
 
  {% if product.pk %}
@@ -1095,6 +1099,7 @@
 
     // Basic select
     $('.bootstrap-select').selectpicker();
+
   </script>
   <script>
 

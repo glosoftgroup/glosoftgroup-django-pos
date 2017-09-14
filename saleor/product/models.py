@@ -363,13 +363,13 @@ class ProductVariant(models.Model, Item):
             attributes = self.product.product_class.variant_attributes.all()
         values = get_attributes_display_map(self, attributes)
         if values:
-            return ', '.join(
-                [' %s' % ( smart_text(value))
-                 for (key, value) in six.iteritems(values)])
             # return ', '.join(
-            #     ['%s: %s' % (smart_text(attributes.get(id=int(key))),
-            #                  smart_text(value))
+            #     [' %s' % ( smart_text(value))
             #      for (key, value) in six.iteritems(values)])
+            return ', '.join(
+                ['%s: %s' % (smart_text(attributes.get(id=int(key))),
+                             smart_text(value))
+                 for (key, value) in six.iteritems(values)])
         else:
             return smart_text(self.sku)
 
