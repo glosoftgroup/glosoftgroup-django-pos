@@ -21,6 +21,7 @@ function addProductDetails(dynamicData,url,method){
     });
 
 }
+var dynamicData = {};
 
 $(function() {  
  
@@ -565,5 +566,30 @@ $(function(){
     });
     modalIds.modal();
   });
+});
+
+/* edit variant script */
+$(function(){
+  var EditRefreshDiv = $('#div-edit-variant');
+  var editButton = $('.editVariantBtn');
+
+  editButton.on('click',function(){
+    EditRefreshDiv.html('Processing form ...');
+    var pk = $(this).data('pk');
+    var url = $(this).data('href');
+    dynamicData = {};
+    dynamicData['template'] = 'edit_variant';    
+
+    addProductDetails(dynamicData,url,'get')
+    .done(function(data){      
+      EditRefreshDiv.html(data);
+    })
+    .fail(function(){
+      alertUser('failed to get edit form');
+    });
+    
+  
+  });
+
 });
 

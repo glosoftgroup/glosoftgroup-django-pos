@@ -38,7 +38,7 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def re_order(request):
     try:
-        queryset_list = ProductVariant.objects.get_low_stock().order_by('-id')
+        queryset_list = Stock.objects.get_low_stock().order_by('-id')
 
         page = request.GET.get('page', 1)
         paginator = Paginator(queryset_list, 10)
@@ -73,7 +73,7 @@ def reorder_pagination(request):
     p2_sz = request.GET.get('psize')
     select_sz = request.GET.get('select_size')
 
-    low_stock = ProductVariant.objects.get_low_stock().order_by('-id')
+    low_stock = Stock.objects.get_low_stock().order_by('-id')
     if list_sz:
         paginator = Paginator(low_stock, int(list_sz))
         low_stock = paginator.page(page)
@@ -110,11 +110,10 @@ def reorder_search(request):
 
         if q is not None:
             q = q.strip()
-            stock = ProductVariant.objects.get_low_stock()
+            stock = Stock.objects.get_low_stock()
             queryset_list = stock.filter(
-                Q(name__icontains=q)|
-                Q(sku__icontains=q) |
-                Q(product__name__icontains=q) 
+                Q(variant__product__name__icontains=q)|
+                Q(variant__sku__icontains=q)                 
             ).order_by('-id')
             paginator = Paginator(queryset_list, 10)
 
@@ -992,6 +991,10 @@ def variant_edit(request, product_pk, variant_pk=None):
     form_errors = form.errors
     ctx = {'attribute_form': attribute_form, 'form': form, 'product': product,
            'variant': variant,'errors':errors,'form_errors':form_errors}
+    if request.is_ajax():
+        return TemplateResponse(
+        request, 'dashboard/product/partials/'+str(request.GET['template'])+'.html', ctx)
+
     return TemplateResponse(
         request, 'dashboard/product/variant_form.html', ctx)
 

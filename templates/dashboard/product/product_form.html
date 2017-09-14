@@ -290,11 +290,11 @@
                     {% endif %}
                     {% include "dashboard/product/partials/pricing.html" with product=product %}
                     {% if product.pk %}
-
+     
                       {% if product.product_class.has_variants %}
       <!-- CODE V -->
       <div id="variants" class="">
-      
+      <div id="div-edit-variant"></div>
       <div class="mb-15">
         <button class="btn btn-primary" id="btntogglev">
           Add variant
@@ -349,6 +349,7 @@
         </tbody>
       </table>
       </div>
+      
       <!-- <button class="btn btn-primary" id="addNewvaraints">New variant</button> -->
         <form method="post" action="{% url 'dashboard:variant-bulk-delete' product_pk=product.pk %}" novalidate>
           {% csrf_token %}
@@ -454,7 +455,7 @@
                         action <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu edit-dropdown">   
-                        <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                        <li><a onclick="return false;" class="editVariantBtn" data-pk="{{variant.pk}}" data-href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
                        
                         <li>
                           <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" data-tabname='?tab=variants' 
