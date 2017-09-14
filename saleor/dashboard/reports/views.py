@@ -56,7 +56,7 @@ def sales_list(request):
 		total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 		total_sales = []
 		for sale in all_sales:
-			quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+			quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 			setattr(sale, 'quantity', quantity['c'])
 			total_sales.append(sale)
 
@@ -409,10 +409,10 @@ def products_reorder_search(request):
 			sz = list_sz
 
 		if q is not None:
-			products = Product.objects.annotate(
-				total_stock=Sum('variants__stock__quantity'))
-			products2 = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
-			items = products2.filter(name__icontains = q).order_by( '-id' )
+			products = get_low_stock_products()
+			items = products.filter(
+				Q(variant__product__name__icontains=q) |
+				Q(variant__name__icontains=q)).order_by('id').distinct()
 			paginator = Paginator(items, 10)
 			try:
 				items = paginator.page(page)
@@ -682,9 +682,7 @@ def products_reorder_paginate(request):
 	p2_sz = request.GET.get('psize')
 	select_sz = request.GET.get('select_size')
 	gid = request.GET.get('gid')
-	products = Product.objects.annotate(
-		total_stock=Sum('variants__stock__quantity'))
-	items = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
+	items = get_low_stock_products()
 	if request.GET.get('sth'):
 		if action:
 			try:
@@ -727,7 +725,6 @@ def products_reorder_paginate(request):
 
 @staff_member_required
 def reorder_pdf(request):
-	return HttpResponse(pdf, content_type='application/pdf')
 	if request.is_ajax():
 		q = request.GET.get('q')
 		gid = request.GET.get('gid')
@@ -738,10 +735,10 @@ def reorder_pdf(request):
 			gid = None
 
 		if q is not None:
-			products = Product.objects.annotate(
-				total_stock=Sum('variants__stock__quantity'))
-			products2 = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
-			items = products2.filter(name__icontains=q).order_by('-id')
+			products = items = get_low_stock_products()
+			items = products.filter(
+				Q(variant__product__name__icontains=q) |
+				Q(variant__name__icontains=q)).order_by('id').distinct()
 
 			data = {
 				'today': date.today(),
@@ -776,10 +773,8 @@ def reorder_export_csv(request):
 			gid = None
 
 		if q is not None:
-			products = Product.objects.annotate(
-				total_stock=Sum('variants__stock__quantity'))
-			products2 = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
-			items = products2.filter(name__icontains=q).order_by('-id')
+			products = items = get_low_stock_products()
+			items = products.filter(name__icontains=q).order_by('-id')
 		else:
 			items = get_low_stock_products()
 

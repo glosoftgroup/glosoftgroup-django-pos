@@ -58,20 +58,24 @@ def sales_list(request):
 		total_sales = []
 		costPrice = []
 		for sale in all_sales:
-			quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+			quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 			setattr(sale, 'quantity', quantity['c'])
 			for i in SoldItem.objects.filter(sales=sale):
 				product = ProductVariant.objects.get(sku=i.sku)
 				try:
-					quantity = product.get_cost_price().gross
+					quantity = product.get_cost_price().gross * i.quantity
+				except ValueError, e:
+					quantity = product.get_cost_price() * i.quantity
 				except:
-					quantity = product.get_cost_price()
+					quantity = 0
+				print quantity
 				costPrice.append(quantity)
 			totalCostPrice = sum(costPrice)
 			setattr(sale, 'totalCostPrice', totalCostPrice)
 			try:
 				grossProfit = sale.total_net - totalCostPrice
-				margin = round((grossProfit / sale.total_net) * 100, 2)
+				# margin = round((grossProfit / sale.total_net) * 100, 2)
+				margin = sale.total_net - totalCostPrice
 			except:
 				grossProfit = 0
 				margin = 0
@@ -80,7 +84,8 @@ def sales_list(request):
 
 		try:
 			grossProfit = total_sales_amount['total_net__sum'] - totalCostPrice
-			totalMargin = round((grossProfit / total_sales_amount['total_net__sum']) * 100, 2)
+			# totalMargin = round((grossProfit / total_sales_amount['total_net__sum']) * 100, 2)
+			totalMargin = total_sales_amount['total_net__sum'] - totalCostPrice
 		except:
 			grossProfit = 0
 			totalMargin = 0
@@ -108,6 +113,7 @@ def sales_list(request):
 		return TemplateResponse(request, 'dashboard/reports/sales_margin2/sales_list.html',data)
 	except Exception as e:
 		error_logger.error(e)
+		return HttpResponse(e)
 		print (e)
 
 
@@ -121,16 +127,20 @@ def sales_detail(request, pk=None):
 		for t in items:
 			product = ProductVariant.objects.get(sku=t.sku)
 			try:
-				itemPrice = product.get_cost_price().gross
+				itemPrice = product.get_cost_price().gross * i.quantity
+			except ValueError, e:
+				itemPrice = product.get_cost_price() * i.quantity
 			except:
-				itemPrice = product.get_cost_price()
+				itemPrice = 0
 			unitSalesCost = t.unit_cost
 			totalSalesCost = t.total_cost
 			try:
 				grossProfit = unitSalesCost - itemPrice
-				unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+				unitMargin = unitSalesCost - itemPrice
+				# unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
 				salesGrossProfit = totalSalesCost - (itemPrice * t.quantity)
-				salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+				salesMargin = totalSalesCost - (itemPrice * t.quantity)
+				# salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
 			except:
 				grossProfit = 0
 				unitMargin = 0
@@ -166,21 +176,24 @@ def sales_paginate(request):
 			sales = []
 			costPrice = []
 			for sale in all_salesd:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				for i in SoldItem.objects.filter(sales=sale):
 					product = ProductVariant.objects.get(sku=i.sku)
 					try:
-						quantity = product.get_cost_price().gross
+						quantity = product.get_cost_price().gross * i.quantity
+					except ValueError, e:
+						quantity = product.get_cost_price() * i.quantity
 					except:
-						quantity = product.get_cost_price()
+						quantity = 0
 					costPrice.append(quantity)
 				totalCostPrice = sum(costPrice)
 				setattr(sale, 'totalCostPrice', totalCostPrice)
 				try:
 					grossProfit = sale.total_net - totalCostPrice
+					margin = sale.total_net - totalCostPrice
 					status = 'true'
-					margin = round((grossProfit / sale.total_net) * 100, 2)
+					# margin = round((grossProfit / sale.total_net) * 100, 2)
 				except:
 					grossProfit = 0
 					margin = 0
@@ -212,21 +225,24 @@ def sales_paginate(request):
 			sales = []
 			costPrice = []
 			for sale in all_sales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				for i in SoldItem.objects.filter(sales=sale):
 					product = ProductVariant.objects.get(sku=i.sku)
 					try:
-						quantity = product.get_cost_price().gross
+						quantity = product.get_cost_price().gross * i.quantity
+					except ValueError, e:
+						quantity = product.get_cost_price() * i.quantity
 					except:
-						quantity = product.get_cost_price()
+						quantity = 0
 					costPrice.append(quantity)
 				totalCostPrice = sum(costPrice)
 				setattr(sale, 'totalCostPrice', totalCostPrice)
 				try:
 					grossProfit = sale.total_net - totalCostPrice
+					margin = sale.total_net - totalCostPrice
 					status = 'true'
-					margin = round((grossProfit / sale.total_net) * 100, 2)
+					# margin = round((grossProfit / sale.total_net) * 100, 2)
 				except:
 					grossProfit = 0
 					margin = 0
@@ -283,21 +299,24 @@ def sales_search(request):
 			if request.GET.get('gid'):
 				csales = all_sales.filter(created__icontains=request.GET.get('gid'))
 				for sale in csales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					for i in SoldItem.objects.filter(sales=sale):
 						product = ProductVariant.objects.get(sku=i.sku)
 						try:
-							quantity = product.get_cost_price().gross
+							quantity = product.get_cost_price().gross * i.quantity
+						except ValueError, e:
+							quantity =product.get_cost_price() * i.quantity
 						except:
-							quantity = product.get_cost_price()
+							quantity = 0
 						costPrice.append(quantity)
 					totalCostPrice = sum(costPrice)
 					setattr(sale, 'totalCostPrice', totalCostPrice)
 					try:
 						grossProfit = sale.total_net - totalCostPrice
+						margin = sale.total_net - totalCostPrice
 						status = 'true'
-						margin = round((grossProfit / sale.total_net) * 100, 2)
+						# margin = round((grossProfit / sale.total_net) * 100, 2)
 					except:
 						grossProfit = 0
 						margin = 0
@@ -324,21 +343,24 @@ def sales_search(request):
 
 			else:
 				for sale in all_sales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					for i in SoldItem.objects.filter(sales=sale):
 						product = ProductVariant.objects.get(sku=i.sku)
 						try:
-							quantity = product.get_cost_price().gross
+							quantity = product.get_cost_price().gross * i.quantity
+						except ValueError, e:
+							quantity = product.get_cost_price() * i.quantity
 						except:
-							quantity = product.get_cost_price()
+							quantity = 0
 						costPrice.append(quantity)
 					totalCostPrice = sum(costPrice)
 					setattr(sale, 'totalCostPrice', totalCostPrice)
 					try:
 						grossProfit = sale.total_net - totalCostPrice
+						margin = sale.total_net - totalCostPrice
 						status = 'true'
-						margin = round((grossProfit / sale.total_net) * 100, 2)
+						# margin = round((grossProfit / sale.total_net) * 100, 2)
 					except:
 						grossProfit = 0
 						margin = 0
@@ -413,16 +435,20 @@ def pdf_sale_tax_detail(request, pk=None):
 		for t in items:
 			product = ProductVariant.objects.get(sku=t.sku)
 			try:
-				itemPrice = product.get_cost_price().gross
+				itemPrice = product.get_cost_price().gross * i.quantity
+			except ValueError, e:
+				itemPrice = product.get_cost_price() * i.quantity
 			except:
-				itemPrice = product.get_cost_price()
+				itemPrice = 0
 			unitSalesCost = t.unit_cost
 			totalSalesCost = t.total_cost
 			try:
 				grossProfit = unitSalesCost - itemPrice
-				unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+				unitMargin = unitSalesCost - itemPrice
+				# unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
 				salesGrossProfit = totalSalesCost - (itemPrice * t.quantity)
-				salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+				salesMargin = totalSalesCost - (itemPrice * t.quantity)
+				# salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
 			except:
 				grossProfit = 0
 				unitMargin = 0
@@ -470,21 +496,24 @@ def sales_list_tax_pdf( request ):
 			if gid:
 				csales = all_sales.filter(created__icontains=gid)
 				for sale in csales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					for i in SoldItem.objects.filter(sales=sale):
 						product = ProductVariant.objects.get(sku=i.sku)
 						try:
-							quantity = product.get_cost_price().gross
+							quantity = product.get_cost_price().gross * i.quantity
+						except ValueError, e:
+							quantity = product.get_cost_price() * i.quantity
 						except:
-							quantity = product.get_cost_price()
+							quantity = 0
 						costPrice.append(quantity)
 					totalCostPrice = sum(costPrice)
 					setattr(sale, 'totalCostPrice', totalCostPrice)
 					try:
 						grossProfit = sale.total_net - totalCostPrice
+						margin = sale.total_net - totalCostPrice
 						status = 'true'
-						margin = round((grossProfit / sale.total_net) * 100, 2)
+						# margin = round((grossProfit / sale.total_net) * 100, 2)
 					except:
 						grossProfit = 0
 						margin = 0
@@ -492,21 +521,24 @@ def sales_list_tax_pdf( request ):
 					sales.append(sale)
 			else:
 				for sale in all_sales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					for i in SoldItem.objects.filter(sales=sale):
 						product = ProductVariant.objects.get(sku=i.sku)
 						try:
-							quantity = product.get_cost_price().gross
+							quantity = product.get_cost_price().gross * i.quantity
+						except ValueError, e:
+							quantity = product.get_cost_price() * i.quantity
 						except:
-							quantity = product.get_cost_price()
+							quantity = 0
 						costPrice.append(quantity)
 					totalCostPrice = sum(costPrice)
 					setattr(sale, 'totalCostPrice', totalCostPrice)
 					try:
 						grossProfit = sale.total_net - totalCostPrice
+						margin = sale.total_net - totalCostPrice
 						status = 'true'
-						margin = round((grossProfit / sale.total_net) * 100, 2)
+						# margin = round((grossProfit / sale.total_net) * 100, 2)
 					except:
 						grossProfit = 0
 						margin = 0
@@ -516,21 +548,24 @@ def sales_list_tax_pdf( request ):
 		elif gid:
 			csales = Sales.objects.filter(created__icontains=gid)
 			for sale in csales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				for i in SoldItem.objects.filter(sales=sale):
 					product = ProductVariant.objects.get(sku=i.sku)
 					try:
-						quantity = product.get_cost_price().gross
+						quantity = product.get_cost_price().gross * i.quantity
+					except ValueError, e:
+						quantity = product.get_cost_price() * i.quantity
 					except:
-						quantity = product.get_cost_price()
+						quantity = 0
 					costPrice.append(quantity)
 				totalCostPrice = sum(costPrice)
 				setattr(sale, 'totalCostPrice', totalCostPrice)
 				try:
 					grossProfit = sale.total_net - totalCostPrice
+					margin = sale.total_net - totalCostPrice
 					status = 'true'
-					margin = round((grossProfit / sale.total_net) * 100, 2)
+					# margin = round((grossProfit / sale.total_net) * 100, 2)
 				except:
 					grossProfit = 0
 					margin = 0
@@ -545,21 +580,24 @@ def sales_list_tax_pdf( request ):
 
 			csales = Sales.objects.filter(created__icontains=gid)
 			for sale in csales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				for i in SoldItem.objects.filter(sales=sale):
 					product = ProductVariant.objects.get(sku=i.sku)
 					try:
-						quantity = product.get_cost_price().gross
+						quantity = product.get_cost_price().gross * i.quantity
+					except ValueError, e:
+						quantity = product.get_cost_price() * i.quantity
 					except:
-						quantity = product.get_cost_price()
+						quantity = 0
 					costPrice.append(quantity)
 				totalCostPrice = sum(costPrice)
 				setattr(sale, 'totalCostPrice', totalCostPrice)
 				try:
 					grossProfit = sale.total_net - totalCostPrice
+					margin = sale.total_net - totalCostPrice
 					status = 'true'
-					margin = round((grossProfit / sale.total_net) * 100, 2)
+					# margin = round((grossProfit / sale.total_net) * 100, 2)
 				except:
 					grossProfit = 0
 					margin = 0
@@ -608,16 +646,20 @@ def sales_items_paginate(request):
 		for t in items:
 			product = ProductVariant.objects.get(sku=t['sku'])
 			try:
-				itemPrice = product.get_cost_price().gross
+				itemPrice = product.get_cost_price().gross * t['quantity']
+			except ValueError, e:
+				itemPrice = product.get_cost_price() * t['quantity']
 			except:
-				itemPrice = product.get_cost_price()
+				itemPrice = 0
 			unitSalesCost = t['unit_cost']
 			totalSalesCost = t['total_cost__sum']
 			try:
 				grossProfit = unitSalesCost - itemPrice
-				unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+				unitMargin = unitSalesCost - itemPrice
+				# unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
 				salesGrossProfit = totalSalesCost - (itemPrice * t['quantity__sum'])
-				salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+				salesMargin = totalSalesCost - (itemPrice * t['quantity__sum'])
+				# salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
 			except:
 				grossProfit = 0
 				unitMargin = 0
@@ -678,16 +720,20 @@ def sales_items_search(request):
 			for t in items:
 				product = ProductVariant.objects.get(sku=t['sku'])
 				try:
-					itemPrice = product.get_cost_price().gross
+					itemPrice = product.get_cost_price().gross * t['quantity']
+				except ValueError, e:
+					itemPrice = product.get_cost_price() * t['quantity']
 				except:
-					itemPrice = product.get_cost_price()
+					itemPrice = 0
 				unitSalesCost = t['unit_cost']
 				totalSalesCost = t['total_cost__sum']
 				try:
 					grossProfit = unitSalesCost - itemPrice
-					unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+					unitMargin = unitSalesCost - itemPrice
+					# unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
 					salesGrossProfit = totalSalesCost - (itemPrice * t['quantity__sum'])
-					salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+					salesMargin = totalSalesCost - (itemPrice * t['quantity__sum'])
+					# salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
 				except:
 					grossProfit = 0
 					unitMargin = 0
@@ -756,16 +802,20 @@ def sales_list_margin_items_pdf( request ):
 			for t in items:
 				product = ProductVariant.objects.get(sku=t['sku'])
 				try:
-					itemPrice = product.get_cost_price().gross
+					itemPrice = product.get_cost_price().gross * t['quantity']
+				except ValueError, e:
+					itemPrice = product.get_cost_price() * t['quantity']
 				except:
-					itemPrice = product.get_cost_price()
+					itemPrice = 0
 				unitSalesCost = t['unit_cost']
 				totalSalesCost = t['total_cost__sum']
 				try:
 					grossProfit = unitSalesCost - itemPrice
-					unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+					unitMargin = unitSalesCost - itemPrice
+					# unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
 					salesGrossProfit = totalSalesCost - (itemPrice * t['quantity__sum'])
-					salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+					salesMargin = totalSalesCost - (itemPrice * t['quantity__sum'])
+					# salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
 				except:
 					grossProfit = 0
 					unitMargin = 0
@@ -786,16 +836,20 @@ def sales_list_margin_items_pdf( request ):
 			for t in items:
 				product = ProductVariant.objects.get(sku=t['sku'])
 				try:
-					itemPrice = product.get_cost_price().gross
+					itemPrice = product.get_cost_price().gross * t['quantity']
+				except ValueError, e:
+					itemPrice = product.get_cost_price() * t['quantity']
 				except:
-					itemPrice = product.get_cost_price()
+					itemPrice = 0
 				unitSalesCost = t['unit_cost']
 				totalSalesCost = t['total_cost__sum']
 				try:
 					grossProfit = unitSalesCost - itemPrice
-					unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
+					unitMargin = unitSalesCost - itemPrice
+					# unitMargin = round((grossProfit / unitSalesCost) * 100, 2)
 					salesGrossProfit = totalSalesCost - (itemPrice * t['quantity__sum'])
-					salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
+					salesMargin = totalSalesCost - (itemPrice * t['quantity__sum'])
+					# salesMargin = round((salesGrossProfit / totalSalesCost) * 100, 2)
 				except:
 					grossProfit = 0
 					unitMargin = 0

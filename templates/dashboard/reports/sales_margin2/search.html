@@ -16,7 +16,7 @@
                           <th>Quantity</th>
                           <th class="text-center">Total Cost Price (KShs)</th>
                           <th class="text-center">Total Sales (KShs)</th>
-                          <th class="text-center">Margin (%)</th>
+                          <th class="text-center">Margin (Kshs)</th>
                         </tr>
                       </thead>
                       <tbody id="p-tb">
@@ -298,11 +298,4 @@
        }
 
      });
-   {% if sz %}
-   $.when( $.ready ).then(function() {     
-         $('.bootstrap-select').selectpicker();
-         $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
-      });
-   {% endif %}
-
  </script>

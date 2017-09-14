@@ -8,7 +8,7 @@
   users
 {% endblock %}
  {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:user_trail'">User Trail</a></li>
+     <li class="active"><a href="{% url 'dashboard:user_trail'%}">User Trail</a></li>
  {% endblock %}
 
 
@@ -52,7 +52,8 @@
               <label>Select Action</label>
               <div class="form-group">
                   <select class="bootstrap-select action-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
-                       <option value="view">view </option>
+                      <option value="none">None </option>
+                      <option value="view">view </option>
                        <option value="add">Add </option>
                        <option value="update">Update </option>
                        <option value="delete">Delete </option>
@@ -221,10 +222,16 @@
     //**@ group name select
     $('.action-sz').selectpicker().on('change', function(){
        var action = $(this).val();
-        $.get("{% url 'dashboard:usertrail_paginate' %}",{page:1,action:action},function(data){
+       if(action=='none'){
+           $.ajax({ url: "{% url 'dashboard:usertrail_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+            }});
+       }else{
+       $.get("{% url 'dashboard:usertrail_paginate' %}",{page:1,action:action},function(data){
              $('#pagination-div').html(data);
         });
-        // console.log(action);
+       }
+
     });
 
       var delay = (function(){
