@@ -113,7 +113,7 @@ class SettingsMiddleware(object):
                     info_logger.info('No issue on expiry date')
                     return None
             else:
-                return TemplateResponse(request, 'lockdown/form.html', {'days': 'error'})
+                return TemplateResponse(request, 'lockdown/form.html', {'days': number})
 
 
     def is_json(self, myjson):

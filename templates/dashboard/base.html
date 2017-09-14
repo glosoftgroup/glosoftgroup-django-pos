@@ -391,11 +391,11 @@
                           <a href="{% url 'dashboard:credit_list' %}"><i class='icon-cash3'></i>Credit Sales</a>
                         </li>
                       {% endif %}
-                      {% if perms.reports.view_sales_reports %}
-                        <li class="{% block menu_report_margin_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>
-                        </li>
-                      {% endif %}
+                      {#{% if perms.reports.view_sales_reports %}#}
+                        <!--<li class="{% block menu_report_margin_class %}{% endblock %}">-->
+                          <!--<a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>-->
+                        <!--</li>-->
+                      {#{% endif %}#}
                       {% if perms.reports.view_sales_reports %}
                         <li class="{% block menu_report_margin2_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin</a>
@@ -493,7 +493,7 @@
             
           
           <!-- Footer -->
-          <div class="footer text-muted">
+          <div class="footer text-muted" style="bottom:20px;z-index:0">
             &copy; . <a href="#">Glosoft Group</a> <a href="http://glosoftgroup.com" target="_blank"></a>
           </div>
           <!-- /footer -->

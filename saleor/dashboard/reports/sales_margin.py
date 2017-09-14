@@ -100,8 +100,10 @@ def sales_margin(request):
 			product = ProductVariant.objects.get(sku=i.sku)
 			try:
 				quantity = product.get_cost_price().gross
-			except:
+			except ValueError, e:
 				quantity = product.get_cost_price()
+			except:
+				quantity =0
 			costPrice.append(quantity)
 
 		totalCostPrice = sum(costPrice)
@@ -141,6 +143,8 @@ def sales_margin(request):
 		else:
 			return TemplateResponse(request, 'dashboard/reports/sales_margin/margin.html', data)
 	except Exception, e:
+		print (e)
+		# return HttpResponse(e)
 		data = {
 			'status': 'false',
 			'date':date2

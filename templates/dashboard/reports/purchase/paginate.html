@@ -7,7 +7,7 @@
       <!--<td>{{purchase.invoice_number}}</td>-->
       <td>{{purchase.supplier}}</td>
       <td>{{purchase.stock.variant.display_product}}</td>
-        <td><span class="pull-right"> {{purchase.stock.variant.get_price_per_item.gross|intcomma}}</span></td>
+      <td><span class="pull-right"> {% if purchase.cost_price %}{{purchase.cost_price.gross|intcomma}}{% else %} 0.00{% endif %}</span></td>
       <td>{{purchase.quantity}}</td>
         <td><span class="pull-right"> {{purchase.get_total_cost|intcomma}}</span></td>
     </tr>
