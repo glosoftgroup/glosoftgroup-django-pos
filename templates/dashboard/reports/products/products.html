@@ -132,7 +132,11 @@
                    Total Product Valuation: Kshs {{total_cost}}<br />
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
+                  <span>Report pulled by  {% if request.user.name %}
+                        {{request.user.name}}
+                      {% else %}
+                      {{ request.user.email}}
+                      {% endif %}</span></p>
 
               </div>
              </div>
