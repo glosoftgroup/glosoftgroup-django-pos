@@ -37,7 +37,7 @@ class FetchMac():
         mac = get_mac()
         h = iter(hex(mac)[2:].zfill(12))
         mac_addr = ":".join(i + next(h) for i in h)
-        print mac_addr
+        print("macadd : "+ mac_addr)
         return mac_addr
 
 

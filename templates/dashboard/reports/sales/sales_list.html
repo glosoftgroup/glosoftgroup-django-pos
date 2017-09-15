@@ -46,10 +46,10 @@
                     <option value="none">None</option>
                      <option value="list">sales list</option>
                      <option value="summary">sales summary</option>
-                    <option value="category">category sales chart</option>
-                    <option value="items">items sales chart</option>
-                    <option value="user">user sales chart</option>
-                     <option value="terminal">till sales chart</option>
+                    <!-- <option value="category">category sales chart</option>
+                    <!--<option value="items">items sales chart</option>-->
+                    <!--<option value="user">user sales chart</option>-->
+                     <!--<option value="terminal">till sales chart</option>-->
                   </select>
               </div>
             </div>
@@ -105,6 +105,7 @@
                           <th>Payment Mode</th>
                           <th>Quantity</th>
                           <th>Total Sales (KShs)</th>
+                            <th class="text-center">Total Tax (KShs)</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
@@ -118,6 +119,7 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.payment_options.name %}{{sale.payment_options.name}}{% else %} Cash {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                              <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}

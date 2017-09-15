@@ -109,7 +109,7 @@
             }).on("page", function(event, num){
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
 
-                $.get("{% url 'dashboard:purchase_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                $.get("{% url 'dashboard:purchase_reports_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
                    $('#p-tb').html(data);
                 });
         }).children('.pagination').addClass('pagination-flat pagination-sm')
