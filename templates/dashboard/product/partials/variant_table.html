@@ -59,7 +59,7 @@
                         action <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu edit-dropdown">   
-                        <li><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                        <li><a onclick="return false;" class="editVariantBtn" data-pk="{{variant.pk}}" data-href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
                        
                         <li>
                           <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" data-tabname='?tab=variants' 
@@ -89,3 +89,35 @@
   </table>
 
 <script type="text/javascript" src="{% static 'backend/js/deleteModal.js' %}"></script>
+<script type="text/javascript">
+  /* edit variant script */
+$(function(){
+  var EditRefreshDiv = $('#div-edit-variant');
+  var editButton = $('.editVariantBtn');
+  var editvariantBtn = $('#editvariantBtn');
+  var url = '#';  
+
+  editButton.on('click',function(){
+    EditRefreshDiv.html('Processing form ...');
+    var pk = $(this).data('pk');
+    var url = $(this).data('href');
+    dynamicData = {};
+    dynamicData['template'] = 'edit_variant';    
+    
+    $('html, body').animate({
+     scrollTop: $('#div-edit-variant').offset().top
+    }, 1000);
+    addProductDetails(dynamicData,url,'get')
+    .done(function(data){      
+      EditRefreshDiv.html(data);
+    })
+    .fail(function(){
+      alertUser('failed to get edit form');
+    });    
+  
+  }); 
+
+});
+
+
+</script>
