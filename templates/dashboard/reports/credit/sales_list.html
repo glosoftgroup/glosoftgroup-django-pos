@@ -102,8 +102,7 @@
                           <th>Receipt No</th>
                           <th>Status</th>
                           <th>Customer Name</th>
-                          <th>Cashier</th>
-                          <th>Payment Mode</th>
+                          <th>Cashier</th>           
                           <th>Quantity</th>
                           <th>Total Sales (KShs)</th>
                         </tr>
@@ -123,7 +122,7 @@
                             </td>
                               <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.payment_options.name %}{{sale.payment_options.name}}{% else %} Cash {% endif %}</td>
+                            
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                           </tr>
@@ -182,17 +181,16 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Last Sales Sales: Kshs
-                    {% if total_sales_amount.total_net__sum %}
-                       {{total_sales_amount.total_net__sum}}
-                    {% else %}
-                       0.00<br />
-                    {% endif %}<br />
-                   Total Sales: Kshs {{total_sales_amount.total_net__sum}}<br />
-                   Total Tax: Kshs {{ total_tax_amount.total_tax__sum}}
+                  
+                   Total Credit Sales: Kshs {{total_sales_amount.total_net__sum}}<br />
+                   
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
+                  <span>Report pullled by  {% if request.user.name %}
+                        {{request.user.name}}
+                      {% else %}
+                      {{ request.user.email}}
+                      {% endif %}</span></p>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
 

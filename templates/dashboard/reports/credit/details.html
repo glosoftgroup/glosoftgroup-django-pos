@@ -42,9 +42,10 @@
                <div>
                       <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
 
-                         <img src="{% if sale.user.image %}{{sale.user.image.url}}{% else %}{% default_user_image %}{% endif %}" class="center-block circle teal img-responsive img-circle" style="width: 60px;height: 60px;"/>
-                        <h6 class="">Cashier: {{sale.user.name}}</h6>
-                          <h5 class="">Invoice Number: {{sale.invoice_number}}</h5>
+                        <h6><span class="text-bold">Customer:</span> {{sale.customer}}</h6> 
+                        <h6 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h6>
+                          <h5 class=""><span class="text-bold">Invoice Number:</span> {{sale.invoice_number}}</h5>
+
                       </div>
                     </div>
             <div class="table-responsives">
@@ -53,7 +54,7 @@
                       <thead style="border-top:1px solid #ddd;">
                         <tr class="bg-primary">
                           <th>Transaction Date</th>
-                          <th>Item Name</th>
+                          <th>Item Name</th>         
                           <th>Unit Cost</th>
                           <th>Quantity</th>
                           <th>Total Sales (KShs)</th>
@@ -65,6 +66,7 @@
                           <tr>
                             <td>{{item.credit.created|date:"d-m-Y H:i a"}}</td>
                             <td>{{item.product_name}}</td>
+
                             <td>{{item.unit_cost}}</td>
                             <td>{{item.quantity}}</td>
                               <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
