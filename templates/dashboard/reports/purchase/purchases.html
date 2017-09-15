@@ -180,10 +180,14 @@ $(document).ready(function(){
         lastClass: 'last',
         firstClass: 'first',
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get("{% url 'dashboard:purchase_paginate' %}",{page:parseInt(num)},function(data){
-               $('#tb').html(data);
-            });
+            $(".pages-nav").html("Page " + num +" of "+"{{totalp}}");
+            // $.get("{% url 'dashboard:purchase_reports_paginate' %}",{page:parseInt(num)},function(data){
+            //    $('#tb').html(data);
+            //    console.log(data);
+            // });
+            $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:num}, async:false,success: function(data){
+                          $('#tb').html(data);
+                    }});
     }).children('.pagination').addClass('pagination-flat pagination-sm');
 
     $('.daterange-single').daterangepicker({
@@ -207,25 +211,25 @@ $(document).ready(function(){
         var date = $('.daterange-single').val();
         var searchData = $('.search_purchase').val();
         var listVal = $('.list-sz').find(":selected").val();
-        var url = "{% url 'dashboard:purchase_search' %}";
+        var url = "{% url 'dashboard:purchase_reports_search' %}";
 
        if (searchData && listVal){
             if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
         }else{
             if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal, gid:date, date:date}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:listVal, gid:date, date:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date, date:date}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date, date:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
@@ -295,36 +299,36 @@ $(document).ready(function(){
 
         if (searchData && date){
               if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
         }else if (searchData){
                 if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
         }else if (date){
                if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal, date:date}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:listVal, date:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:10, date:date}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:10, date:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
         }else{
-                $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
+                $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
         }
@@ -346,7 +350,7 @@ $(document).ready(function(){
           var listSizeVal = $('.list-sz').find(':selected').val();
           var date = $('.daterange-single').val();
 
-          var url = "{% url 'dashboard:purchase_search' %}";
+          var url = "{% url 'dashboard:purchase_reports_search' %}";
           delay(function(){
               if (date && listSizeVal){
                  if(listSizeVal != '0'){

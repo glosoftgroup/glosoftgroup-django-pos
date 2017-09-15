@@ -18,6 +18,7 @@
                           <th>Payment Mode</th>
                           <th>Quantity</th>
                           <th>Total Sales (KShs)</th>
+                            <th class="text-center">Total Tax (KShs)</th>
                         </tr>
                       </thead>
                       <tbody id="p-tb">
@@ -31,6 +32,7 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.payment_options.name}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                              <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}

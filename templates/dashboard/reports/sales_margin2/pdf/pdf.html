@@ -52,8 +52,7 @@
                           <th>Unit Cost</th>
                           <th>Quantity</th>
                           <th>Total Sales</th>
-                          <th>Unit Margin (Kshs)</th>
-                          <th>Sales Margin (Kshs)</th>
+                          <th>Margin (Kshs)</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -66,7 +65,6 @@
                             <td>{{item.quantity}}</td>
                             <td>{{item.total_cost}}</td>
                             <td><span>{{item.unitMargin}}</span></td>
-                            <td><span>{{item.salesMargin}}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}

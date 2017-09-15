@@ -321,66 +321,14 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-  var endpoint = "{% url 'dashboard:chart' %}";
-  var defaultData = [];
-  var labels = [];
-
-  $.ajax({
-    method:"GET",
-    url:endpoint,
-    success:function(data){
-      labels = data.label;
-      defaultData = data.default;
-      // console.log(defaultData);
-      // console.log(labels)
-      console.log(data.net);
-      console.log(data.todays_sales);
-      setChart();
-    },
-    error:function(error_data){
-
-    }
-  });
-
-  function setChart(){
-      var ctx = document.getElementById("myChart").getContext('2d');
-      var myChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-              labels: labels,
-              datasets: [{
-                  label: 'Amount of sale',
-                  data: defaultData,
-                  backgroundColor: [
-                      'rgba(255, 99, 132, 0.2)',
-                      'rgba(54, 162, 235, 0.2)',
-                      'rgba(255, 206, 86, 0.2)',
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                      'rgba(255, 159, 64, 0.2)'
-                  ],
-                  borderColor: [
-                      'rgba(255,99,132,1)',
-                      'rgba(54, 162, 235, 1)',
-                      'rgba(255, 206, 86, 1)',
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(153, 102, 255, 1)',
-                      'rgba(255, 159, 64, 1)'
-                  ],
-                  borderWidth: 1
-              }]
-          }
-      });
-  }
-
   //**@ category chart
   //-----chart**/
 //**@ doughnut chart
-    var defaultData2 = [{% for d in sales_by_category %} {% if forloop.last %}{{ d.total_cost__sum }} {% else %}{{ d.total_cost__sum }}, {% endif %} {% endfor %}];
-    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}", {% endfor %}];
-    var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
-    // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
-      var ctx = document.getElementById("catChart").getContext('2d');
+    var defaultData2 = [{% for d in sales_by_category %} "{{ d.total_cost }}", {% endfor %}];
+    <!--var defaultData2 = ["10.5","20.7"];-->
+    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}",{% endfor %}];
+    var backColor = [{% for d in sales_by_category %} {% if forloop.last %} "{{ d.color }}" {% else %} "{{ d.color }}", {% endif %} {% endfor %}];
+    var ctx = document.getElementById("catChart").getContext('2d');
       var catChart = new Chart(ctx, {
           type: 'doughnut',
           data: {
@@ -400,10 +348,9 @@ $(document).ready(function(){
 //--------- /doghnut chart
 
 //-----item chart**/
-    var defaultData3 = [{% for d in sales_by_item %} {% if forloop.last %}{{ d.total_cost__sum }} {% else %}{{ d.total_cost__sum }}, {% endif %} {% endfor %}];
-    var labels3 = [{% for d in sales_by_item %} "{{ d.product_name }}", {% endfor %}];
-    var backColor = [{% for d in sales_by_item %} "{{ d.color }}", {% endfor %}];
-    // console.log({% for d in sales_by_item %} "{{ d.color }}", {% endfor %});
+    var defaultData3 = [{% for d in sales_by_item %} {% if forloop.last %} "{{ d.total_cost__sum }}" {% else %} "{{ d.total_cost__sum }}", {% endif %} {% endfor %}];
+    var labels3 = [{% for d in sales_by_item %} {% if forloop.last %} "{{ d.product_name }}" {% else %} "{{ d.product_name }}", {% endif %}{% endfor %}];
+    var backColor3 = [{% for d in sales_by_item %} "{{ d.color }}", {% endfor %}];
       var ctx = document.getElementById("itemChart").getContext('2d');
       var itemChart = new Chart(ctx, {
           type: 'doughnut',
@@ -412,7 +359,7 @@ $(document).ready(function(){
               datasets: [{
                   label: 'Amount of sale',
                   data: defaultData3,
-                  backgroundColor:backColor,
+                  backgroundColor:backColor3,
                   borderWidth: 1
               }]
           },

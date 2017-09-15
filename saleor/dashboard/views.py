@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.admin.views.decorators import \
     staff_member_required as _staff_member_required
-from django.db.models import F, Q, Sum
 from django.template.response import TemplateResponse
 from payments import PaymentStatus
 
@@ -29,11 +28,10 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max
+from django.db.models import Count, Min, Sum, Avg, Max, F
 from django.core import serializers
 from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 # from lockdown.decorators import lockdown
 import datetime
@@ -63,6 +61,13 @@ def staff_member_required(f):
 
 @staff_member_required
 def index(request):
+    today = datetime.datetime.now()
+    try:
+        last_sale = Sales.objects.latest('id')
+        date = DateFormat(last_sale.created).format('Y-m-d')
+    except:
+        date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
     try:
         orders_to_ship = Order.objects.filter(status=OrderStatus.FULLY_PAID)
         orders_to_ship = (orders_to_ship
@@ -132,6 +137,7 @@ def top_categories():
                 for s in range(0, sales_by_category.count(), 1):
                     sales['count'] = s
                 new_sales.append(sales)
+                sales['total_cost'] = int(sales['total_cost__sum'])
                 # new_sales.append(sales_by_category.setdefault(sales, {'data':'None'}))
             categs = Category.objects.all()
             this_year = today.year
