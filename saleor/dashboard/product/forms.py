@@ -176,7 +176,7 @@ class ProductForm(forms.ModelForm):
         field = self.fields['categories']        
         field.widget.attrs['data-placeholder'] = pgettext_lazy(
             'Product form placeholder', 'Select')
-        field.widget.attrs['class'] = 'form-control bootstrap-select'
+        field.widget.attrs['class'] = 'form-control '
         #field.widget.attrs['multiple'] = 'multiple'         
 
         field = self.fields['product_tax']
@@ -261,7 +261,9 @@ class VariantAttributeForm(forms.ModelForm):
         super(VariantAttributeForm, self).__init__(*args, **kwargs)
         attrs = self.instance.product.product_class.variant_attributes.all()
         self.available_attrs = attrs.prefetch_related('values')
+        ats = []
         for attr in self.available_attrs:
+            ats.append(attr.pk)
             field_defaults = {'label': attr.name,
                               'required': True,
                               'initial': self.instance.get_attribute(attr.pk)}
@@ -271,9 +273,11 @@ class VariantAttributeForm(forms.ModelForm):
             else:
                 field = forms.CharField(**field_defaults)
             self.fields[attr.get_formfield_name()] = field
-        for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control bootstrap-select'
-            # field.widget.attrs['data-pk'] = field.pk
+        i = 0
+        for field_name, field in self.fields.items():            
+            field.widget.attrs['class'] = 'form-control bootstrap-select dynamicxedit'
+            field.widget.attrs['data-pk'] = ats[i]
+            i+=1
 
     def save(self, commit=True):
         attributes = {}

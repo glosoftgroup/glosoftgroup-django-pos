@@ -26,6 +26,7 @@ $(function() {
 	var pageUrls = $('.pageUrls');
 	var getVariants = $('#variants');
 	var url   = pageUrls.data('variants');
+	var redirectUrl = pageUrls.data('redirect');
 	var name  = $('#id_name');
 	var value = $('#id_value');
 	var type  = $('#id_type');
@@ -92,6 +93,7 @@ $(function() {
 	 sendDiscountData(dynamicData,createUrl,'post')
 	 .done(function(){
 	 	alertUser('Discount Added successfully');
+	 	window.location.href = redirectUrl;
 	 })
 	 .fail(function(){
 	 	alertUser('Error adding discount','bg-danger','Oops!');

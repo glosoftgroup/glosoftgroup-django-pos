@@ -21,6 +21,7 @@ function addProductDetails(dynamicData,url,method){
     });
 
 }
+var dynamicData = {};
 
 $(function() {  
  
@@ -135,8 +136,7 @@ $(function() {
   var json = [];
   addvariantBtn.on('click',function(){    
     // map each varaint
-    dynamicVariants.map(function() { 
-      //console.log($(this).data('pk'));
+    dynamicVariants.map(function() {       
       var id = $(this).data('pk');      
       var value = $(this).val(); 
       if(id && value){
@@ -162,8 +162,7 @@ $(function() {
       dynamicData['low_stock_threshold'] = reorder_level;
     }
     
-    if ( json.length < 1) {
-      //alertUser(json.length);
+    if ( json.length < 1) {      
       alertUser('Please Select variants','bg-danger','Varaints Required!');
       return false;
     }  
@@ -567,3 +566,59 @@ $(function(){
   });
 });
 
+/* edit variant script */
+$(function(){
+  var EditRefreshDiv = $('#div-edit-variant');
+  var editButton = $('.editVariantBtn');
+  var editvariantBtn = $('#editvariantBtn');
+  var url = '#';  
+
+  editButton.on('click',function(){
+    EditRefreshDiv.html('Processing form ...');
+    var pk = $(this).data('pk');
+    var url = $(this).data('href');
+    dynamicData = {};
+    dynamicData['template'] = 'edit_variant';    
+    
+    $('html, body').animate({
+     scrollTop: $('#div-edit-variant').offset().top
+    }, 1000);
+    addProductDetails(dynamicData,url,'get')
+    .done(function(data){      
+      EditRefreshDiv.html(data);
+    })
+    .fail(function(){
+      alertUser('failed to get edit form');
+    });    
+  
+  });  
+
+});
+
+/* edit variant script */
+$(function(){
+  var editStockRefreshDiv = $('#div-edit-stock');
+  var editSelectOption = $('.edit-stock-Btn');  
+  var url = '#';  
+
+  editSelectOption.on('click',function(){
+    editStockRefreshDiv.html('Processing form ...');
+    var pk = $(this).data('pk');
+    url = $(this).data('href');
+    dynamicData = {};
+    dynamicData['template'] = 'edit_stock';    
+    
+    $('html, body').animate({
+     scrollTop: $('#stock-tab').offset().top
+    }, 1000);
+    addProductDetails(dynamicData,url,'get')
+    .done(function(data){      
+      editStockRefreshDiv.html(data);
+    })
+    .fail(function(){
+      alertUser('failed to get edit form');
+    });    
+  
+  });  
+
+});

@@ -14,8 +14,7 @@
                           <th>Receipt No</th>
                           <th>Status</th>
                           <th>Customer Name</th>
-                          <th>Cashier</th>
-                          <th>Payment Mode</th>
+                          <th>Cashier</th>           
                           <th>Quantity</th>
                            <th>Total Sales (KShs)</th>
                         </tr>
@@ -34,8 +33,7 @@
                             {% endif %}
                             </td>
                               <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.payment_options.name}}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>                         
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.total_items}}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                           </tr>
@@ -274,7 +272,7 @@
    <!--{% if sz %}-->
    <!--$.when( $.ready ).then(function() {     -->
          <!--$('.bootstrap-select').selectpicker();-->
-         <!--$('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              -->
+         <!--$('.list-sz').selectpicker('val', ["{{sz}}"]);              -->
       <!--});-->
   <!--{% endif %}-->
  </script>
