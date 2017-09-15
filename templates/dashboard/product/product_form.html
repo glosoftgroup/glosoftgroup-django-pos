@@ -294,7 +294,7 @@
                       {% if product.product_class.has_variants %}
       <!-- CODE V -->
       <div id="variants" class="">
-      <div id="div-edit-variant"></div>
+      <div id="div-edit-variant" class="mb-20"></div>
       <div class="mb-15">
         <button class="btn btn-primary" id="btntogglev">
           Add variant
@@ -303,7 +303,7 @@
       <style type="text/css">
         #toggleVariant{display:none;}
       </style>
-      <div id="toggleVariant">
+      <div id="toggleVariant" class="card-3">
       <table class="table table-hover">
         <thead>
         <tr class="bg-primary">  
@@ -333,8 +333,7 @@
                 <option value="{{value.pk}}">{{ value }}</option>
               {% endfor %}
             </select>
-            </td>
-            
+            </td>            
           {% endfor %}
            <td>
             <input type="number" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
@@ -506,9 +505,10 @@
                      {% if product.pk %}
                   <!-- CODE S -->
       <!-- STOCK DETAILS -->
+      <div id="div-edit-stock" class="mb-20"></div>
       {% include "dashboard/product/partials/stock_details.html" with product=product %}
       {% include 'dashboard/product/partials/stock_table_form.html' with product=product %}
-                      <div id="stock" class="card">
+                      <div id="stock" class="">
       <form method="post" action="{% url 'dashboard:stock-bulk-delete' product_pk=product.pk %}" novalidate>
         {% csrf_token %}
         <div class="data-table-header-action" style="padding: 8px;">
@@ -616,7 +616,7 @@
                         action <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu edit-dropdown">   
-                        <li><a href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                        <li><a onclick="return false;" data-href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" class="edit-stock-Btn"><i class="icon-pencil7"></i> EDIT</a></li>
                        
                         <li>
                           <a data-ta="#modal_delete_instance" data-title="Delete {{item.variant.sku}}?" data-href="{% url 'dashboard:single-stock-delete' product_pk=product.pk stock_pk=item.pk %}" data-tabname='?tab=stock'

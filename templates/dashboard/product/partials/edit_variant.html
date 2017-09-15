@@ -1,5 +1,21 @@
+{% load i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+<style type="text/css">
+.hvr-pulsew {
+    -webkit-animation-name: hvr-pulse;
+    animation-name: hvr-pulse;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+}
+
+</style>
 <div id="edit-varaints-here">
-      <table class="table table-hover">
+      <table class="table table-hover card-3">
         <thead>
         <tr class="bg-primary">  
         <th>SKU</th>          
@@ -18,9 +34,7 @@
           <td>
             {{form.sku}}
           </td>
-         <!--  <td>
-            <input type="number" placeholder="(e.g 10)" class="form-control" value="10" id="reorder_level" name="reorder_level">
-          </td> -->
+         
           {% if attribute_form.fields %}
                   {% for attribute_field in attribute_form %}
                   <td>
@@ -36,9 +50,15 @@
               {{form.wholesale_override}}
             </td>     
             <td>
-              <button class="btn btn-xs btn-primary" id="editvariantBtn" data-refreshvurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
+              <button class="btn btn-xs btn-primary hvr-pulsew" id="editvariantBtn" data-pk="{{variant.pk}}" data-refreshvurl="{% url 'dashboard:product-update' pk=product.pk %}" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Edit</button>
             </td>
           </tr>
         </tbody>
       </table>
       </div>
+
+<script type="text/javascript">
+  // Basic select
+    $('.bootstrap-select').selectpicker();
+</script>
+<script type="text/javascript" src="{% static 'backend/js/edit_variant.js' %}"></script>

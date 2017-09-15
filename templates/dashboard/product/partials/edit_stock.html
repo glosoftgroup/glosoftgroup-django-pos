@@ -1,0 +1,71 @@
+{% load materializecss %}
+{% load prices_i18n %}
+{% load static %}
+
+<style type="text/css">
+.hvr-pulsew {
+    -webkit-animation-name: hvr-pulse;
+    animation-name: hvr-pulse;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+}
+
+</style>
+<div id="" class="card-2">
+<table class="table  datatable-header-footer responsive data-table">            
+    <thead>
+      <tr class='bg-primary'>        
+        <th> Invoice</th>
+        <th> Variant</th>
+        <th> Cost Price</th>        
+        <th class="right-align">Quantity</th>
+        <th>Reorder Threshold</th>         
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+     <tr>
+    	<td width="15%">
+    		{{ form.invoice_number }}
+            <span class="help-block"></span>
+    	</td>
+    	<td width="25%">
+        <div id="feditv">
+    		{{ form.variant }}
+            <span class="help-block"></span>
+        </div>
+    	</td>
+    	<td width="15%">
+    		{{ form.cost_price }}
+            <span class="help-block"></span>
+    	</td>    	
+    	
+    	<td width="15%">
+    		{{form.quantity}}
+            <span class="help-block"></span>
+    	</td>
+        <td>
+         <div class="hidden">
+             {{ form.location}}
+         </div>
+         <input type="number" class="form-control" id="reorder-threshold" placeholder="Reorder Threshold" value="{{ form.low_stock_threshold.value|default_if_none:''}}" name="reorder-threshold">         
+           
+        <span class="help-block"></span>
+        </td>
+    	<td>
+    		<button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:product-update' pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=stock.pk %}" id='editStockBtn' class="btn btn-xs btn-primary hvr-pulsew">Edit</button>
+    	</td>
+      </tr>
+    </tbody>
+   </table>
+  
+</div>
+<script type="text/javascript">
+  // Basic select
+    $('.bootstrap-select').selectpicker();
+</script>
+<script type="text/javascript" src="{% static 'backend/js/edit_stock.js' %}"></script>

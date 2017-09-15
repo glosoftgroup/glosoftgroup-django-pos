@@ -828,7 +828,7 @@ def stock_edit(request, product_pk, stock_pk=None):
         if form.errors:            
             return HttpResponse(json.dumps({'errors': form.errors.items()}),content_type='application/json')
         else:
-            return HttpResponse(json.dumps({'message':form.errors}),content_type='application/json')
+            return TemplateResponse(request, 'dashboard/product/partials/edit_stock.html', ctx)
         # except Exception as e:
         #     print e
 
@@ -925,7 +925,12 @@ def product_image_delete(request, product_pk, img_pk):
 @permission_decorator('product.change_productvariants')
 def add_attributes(request):
     if request.method == 'POST':
-        product_variant = ProductVariant()        
+        if request.POST.get('vpk'):
+            v_id = int(request.POST.get('vpk'))
+            #product_variant = get_object_or_404(ProductVariant, pk=v_id)
+            product_variant = ProductVariant.objects.get(pk=v_id)
+        else:
+            product_variant = ProductVariant()        
         if request.POST.get('sku'):
             product_variant.sku = request.POST.get('sku')
         if request.POST.get('price'):
@@ -941,7 +946,9 @@ def add_attributes(request):
                 attrs[att['id']] =att['value']
             print attrs
             product_variant.attributes = attrs
-        if request.POST.get('pk'):            
+        if not request.POST.get('pk'): 
+            product_variant.save()
+        else:           
             product = Product.objects.get(pk=int(request.POST.get('pk')))
             product_variant.product = product
             attributes = product.product_class.variant_attributes.prefetch_related('values')    
@@ -952,11 +959,9 @@ def add_attributes(request):
                    'variants':variants}
             return TemplateResponse(request,
                 'dashboard/product/partials/variant_table.html', ctx)
-
-
-
-
     return HttpResponse('Error!');
+
+
 @staff_member_required
 @permission_decorator('product.change_productvariants')
 def variant_edit(request, product_pk, variant_pk=None):
