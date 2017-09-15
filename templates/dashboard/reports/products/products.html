@@ -6,10 +6,10 @@
 {% load humanize %}
 
 {% block title %}
- Products Report
+    Stock Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:products_reports' %}">Products Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:products_reports' %}">Stock Reports</a></li>
  {% endblock %}
 
 {% block menu_product_report_class %}active{% endblock %}
@@ -103,8 +103,8 @@
                             <td class="text-center">{{item.product.low_stock_threshold}}</td>
 
                             <td class="text-center">{{item.get_stock_quantity}}</td>
-                              <td><span class="pull-right">{{item.get_price_per_item.gross|intcomma }}</span></td>
-                              <td><span class="pull-right">{{item.get_total_price_cost|intcomma }}</span></td>
+                              <td><span class="pull-right">{% if item.get_cost_price%}{{item.get_cost_price.gross|intcomma }}{% else %} 0.00{% endif %}</span></td>
+                              <td><span class="pull-right">{% if item.get_total_price_cost %}{{item.get_total_price_cost.gross|intcomma }} {% else %} 0.00 {% endif %}</span></td>
                           </tr>
                         {% endfor %}
                         {% else %}
@@ -129,7 +129,7 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Total Product Valuation: Kshs {{total_cost}}<br />
+                   Total Stock Valuation: Kshs {{total_cost}}<br />
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
                   <span>Report pullled by User</span></p>

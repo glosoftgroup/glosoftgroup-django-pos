@@ -44,7 +44,7 @@
 
                         <img src="{% if sale.user.image %}{{sale.user.image.url}}{% else %} {% default_user_image%} {% endif %}" class="center-block circle teal img-responsive img-circle" style="width: 60px;height: 60px;"/>
                         <h6 class="">Cashier: {{sale.user.name}}</h6>
-                          <h5 class="">Invoice Number: {{sale.invoice_number}}</h5>
+                          <h5 class="">Receipt Number: {{sale.invoice_number}}</h5>
                       </div>
                     </div>
             <div class="table-responsives">
@@ -54,11 +54,10 @@
                         <tr class="bg-primary">
                           <th>Transaction Date</th>
                           <th>Item Name</th>
-                          <th>Unit Cost</th>
+                          <th>Retail Cost</th>
                           <th>Quantity</th>
                           <th>Total Sales (KShs)</th>
-                          <th>Unit Margin (%)</th>
-                          <th>Sales Margin (%)</th>
+                          <th>Margin (KShs)</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
@@ -71,7 +70,6 @@
                             <td>{{item.quantity}}</td>
                             <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
                             <td><span>{{item.unitMargin|intcomma}}</span></td>
-                              <td><span>{{item.salesMargin|intcomma}}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
@@ -88,7 +86,7 @@
               <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
                   <span>
                    Total Sales: Kshs {{sale.total_net}}<br />
-                   Total Tax: Kshs {{sale.total_tax}}
+                   Total Margin: Kshs {{totalMargin}}
                  </span><br>
                   <span> Thank you for partnering with us.<br />
                   <span>Report pullled by {{request.user.name}}</span></span>

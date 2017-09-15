@@ -329,7 +329,7 @@ class ProductVariant(models.Model, Item):
         return price
 
     def get_total_price_cost(self):
-        cost = self.get_price_per_item().gross * self.get_stock_quantity()
+        cost = self.get_cost_price() * self.get_stock_quantity()
         return cost
 
     def get_absolute_url(self):
@@ -396,6 +396,8 @@ class ProductVariant(models.Model, Item):
                 return stock.cost_price
             else:
                 return 0
+        else:
+            return 0
 
     def product_category(self):
         category = self.product.categories.first().name
