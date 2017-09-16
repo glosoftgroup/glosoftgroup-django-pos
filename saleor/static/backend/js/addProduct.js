@@ -163,8 +163,8 @@ $(function() {
     }
     
     if ( json.length < 1) {      
-      alertUser('Please Select variants','bg-danger','Varaints Required!');
-      return false;
+      //alertUser('Please Select variants','bg-danger','Varaints Required!');
+      //return false;
     }  
     
     dynamicData['price'] = retailPrice;

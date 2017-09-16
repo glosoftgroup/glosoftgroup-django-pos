@@ -61,7 +61,9 @@ class TrackSerializer(serializers.ModelSerializer):
                 'unit_cost',
                 'total_cost',
                 'product_name',
-                'product_category'
+                'product_category',
+                'tax',
+                'discount'
                  )
 
 class ItemsSerializer(serializers.ModelSerializer):
@@ -76,11 +78,16 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'total_cost',
                 'product_name',
                 'product_category',
-                'available_stock'
+                'available_stock',
+                'tax',
+                'discount'
                  )
     def get_available_stock(self,obj):
-        stock = ProductVariant.objects.get(sku=obj.sku)
-        return stock.get_stock_quantity()
+        try:
+            stock = ProductVariant.objects.get(sku=obj.sku)
+            return stock.get_stock_quantity()
+        except:
+            return 0
 
 class SalesListSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
@@ -140,8 +147,8 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
             sale = Sales.objects.get(invoice_number=invoice_number)
             
             if status == 'fully-paid' and sale.balance > amount_paid:
-                print 'balance '+str(sale.balance)
-                print 'amount '+str(amount_paid)
+                #print 'balance '+str(sale.balance)
+                #print 'amount '+str(amount_paid)
                 raise ValidationError("Status error. Amount paid is less than balance.")        
             else:
                 return value
@@ -223,7 +230,8 @@ class SalesSerializer(serializers.ModelSerializer):
                  'customer_name',
                  'status',
                  'payment_options',
-                 'total_tax'
+                 'total_tax',
+                 'discount_amount'
                 )
 
     def validate_total_net(self,value):
@@ -235,9 +243,7 @@ class SalesSerializer(serializers.ModelSerializer):
         return value
     def validate_status(self,value):
         data = self.get_initial()
-        status = str(data.get('status'))
-        print status
-        print '*'*100
+        status = str(data.get('status'))        
         if status == 'fully-paid' or status == 'payment-pending':
             return value
         else:
@@ -309,9 +315,10 @@ class SalesSerializer(serializers.ModelSerializer):
                                      status=status,
                                      total_tax=total_tax,
                                      mobile=validated_data.get('mobile'),
+                                     discount_amount=validated_data.get('discount_amount'),
                                      customer_name=validated_data.get('customer_name'))
         for payment_option_data in payment_options_data:
-            print payment_option_data
+            #print payment_option_data
             sales.payment_options.add(payment_option_data)
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
@@ -319,7 +326,7 @@ class SalesSerializer(serializers.ModelSerializer):
                 stock = Stock.objects.get(variant__sku=solditem_data['sku'])
                 if stock:                
                     Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
-                    print stock.quantity
+                    #print stock.quantity
                 else: 
                     print 'stock not found'
             except:
@@ -386,9 +393,10 @@ class ProductStockListSerializer(serializers.ModelSerializer):
         for discount in discount_list:
             try:
                 discount = discount.factor
+                discount = (Decimal(discount)*Decimal(price))
             except:
                 discount = discount.amount.gross
-                discount = Decimal(discount)/Decimal(price)*Decimal(100)
+                #discount = Decimal(discount)/Decimal(price)*Decimal(100)
 
         return discount
 

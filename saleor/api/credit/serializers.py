@@ -41,7 +41,9 @@ class TrackSerializer(serializers.ModelSerializer):
                 'unit_cost',
                 'total_cost',
                 'product_name',
-                'product_category'
+                'product_category',
+                'tax',
+                'discount',
                  )
 
 class ItemsSerializer(serializers.ModelSerializer):
@@ -166,8 +168,8 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                 loyalty_points = 0
             else:
                 loyalty_points = total_net/points_eq
-            customer.loyalty_points += loyalty_points
-            customer.save()
+            #customer.loyalty_points += loyalty_points
+            #customer.save()
         # get sold products        
         solditems_data = validated_data.pop('credititems')
         # sales = Sales.objects.create(**validated_data)

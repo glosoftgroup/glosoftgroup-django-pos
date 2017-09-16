@@ -926,11 +926,12 @@ def product_image_delete(request, product_pk, img_pk):
 def add_attributes(request):
     if request.method == 'POST':
         if request.POST.get('vpk'):
-            v_id = int(request.POST.get('vpk'))
-            #product_variant = get_object_or_404(ProductVariant, pk=v_id)
+            v_id = int(request.POST.get('vpk'))            
             product_variant = ProductVariant.objects.get(pk=v_id)
+            action = 'edit'
         else:
-            product_variant = ProductVariant()        
+            product_variant = ProductVariant() 
+            action = 'add'       
         if request.POST.get('sku'):
             product_variant.sku = request.POST.get('sku')
         if request.POST.get('price'):
@@ -1877,11 +1878,15 @@ def have_variants(request):
             HttpResponse('Invalid class ID')
 
 @staff_member_required
-def add_new_attribute(request):
+def add_new_attribute(request,pk=None):
     if request.method == 'POST':
-        if request.POST.get('name'):
+        if pk:
+            attribute = ProductAttribute.objects.get(pk=pk)
+        elif request.POST.get('name'):
             slug = request.POST.get('name').replace(' ','_')
             attribute = ProductAttribute.objects.create(name=request.POST.get('name'),slug=slug)
+        else:
+            return HttpResponse(json.dumps({'error':'Name or pk expected'}))
         if request.POST.get('attributes'):
             choices = json.loads(request.POST.get('attributes'))
             for choice in choices:
