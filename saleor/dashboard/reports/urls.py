@@ -71,8 +71,8 @@ urlpatterns = [
 
 		url(r'^purchases/$',  permission_required('reports.view_purchase_reports', login_url='not_found')
 			(purchase.purchase_reports), name='purchases_reports'),
-		url(r'^purchases/paginate$',  purchase.purchase_paginate, name='purchase_paginate'),
-		url(r'^purchases/search$',  purchase.purchase_search, name='purchase_search'),
+		url(r'^purchases/paginate$',  purchase.purchase_paginate, name='purchase_reports_paginate'),
+		url(r'^purchases/search$',  purchase.purchase_search, name='purchase_reports_search'),
 		url(r'^reports/purchases/pdf/$', purchase.purchase_pdf, name='reports_purchase_pdf'),
     	url(r'^reports/purchases/export_csv/$', purchase.purchase_export_csv, name='reports_purchases_export_csv'),
 

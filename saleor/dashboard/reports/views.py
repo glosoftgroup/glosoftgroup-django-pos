@@ -284,7 +284,10 @@ def product_reports(request):
 		items = ProductVariant.objects.all().order_by('-id')
 		total_cost = 0
 		for i in items:
-			total_cost+=i.get_total_price_cost()
+			try:
+				total_cost+=i.get_total_price_cost().gross
+			except:
+				total_cost+=i.get_total_price_cost()
 		page = request.GET.get('page', 1)
 		paginator = Paginator(items, 10)
 		try:
@@ -300,6 +303,7 @@ def product_reports(request):
 		return TemplateResponse(request, 'dashboard/reports/products/products.html', {'pn':paginator.num_pages,'items':items, 'total_cost':total_cost})
 	except TypeError as e:
 		error_logger.error(e)
+		print (e)
 		return HttpResponse('error accessing products reports')
 
 
