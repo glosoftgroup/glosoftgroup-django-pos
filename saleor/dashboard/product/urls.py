@@ -164,6 +164,8 @@ urlpatterns = [
         views.search_attribute, name='search-attribute'),
     url(r'attributes/add/new/$',
         views.add_new_attribute, name='add-new-attribute'),
+    url(r'attributes/(?P<pk>[0-9]+)/add/ney/$',
+        views.add_new_attribute, name='edit-new-attribute'),
     
     url(r'attributes/(?P<pk>[0-9]+)/$', permission_required('product.change_productattribute', login_url='not_found')
         (views.attribute_edit), name='product-attribute-update'),

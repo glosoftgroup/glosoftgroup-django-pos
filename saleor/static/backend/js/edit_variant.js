@@ -44,8 +44,8 @@ $(function(){
 
     // validation    
     if ( json.length < 1) {      
-      alertUser('Please Select variants','bg-danger','Varaints Required!');
-      return false;
+      //alertUser('Please Select variants','bg-danger','Varaints Required!');
+      //return false;
     }
     console.log(JSON.stringify(json));
     dynamicData['attributes'] = JSON.stringify(json);

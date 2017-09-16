@@ -154,10 +154,9 @@ class Sales(models.Model):
     balance = models.DecimalField(
         pgettext_lazy('Sales field', 'balance'), default=Decimal(0), max_digits=100, decimal_places=2)
     
-    discount_amount = PriceField(
-        verbose_name=pgettext_lazy('Sales field', 'discount amount'),
-        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
-        blank=True, null=True)
+    discount_amount = models.DecimalField(
+        pgettext_lazy('Sales field', 'total discount'), default=Decimal(0), max_digits=100, decimal_places=2)
+    
     discount_name = models.CharField(
         verbose_name=pgettext_lazy('Sales field', 'discount name'),
         max_length=255, default='', blank=True)
@@ -191,6 +190,9 @@ class SoldItem(models.Model):
         pgettext_lazy('SoldItem field', 'unit cost'), default=Decimal(0), max_digits=100, decimal_places=2)
     product_category = models.CharField(
         pgettext_lazy('SoldItem field', 'product_category'), max_length=128, null=True)
+    discount = models.DecimalField(
+        pgettext_lazy('SoldItem field', 'discount'), default=Decimal(0), max_digits=100, decimal_places=2)
+    tax = models.IntegerField(default=Decimal(0))
     
 
     class Meta:
