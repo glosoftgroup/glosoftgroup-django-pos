@@ -343,7 +343,8 @@ sendnot.on('click',function(){
         alert('subject required');
         return false;
     }
-    if(!bodyText){
+    var isEmpty = $('#body').summernote('isEmpty');
+    if(isEmpty){
         alert('Message body required');
         return false;
     } 
