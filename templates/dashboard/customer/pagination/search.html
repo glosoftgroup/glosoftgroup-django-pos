@@ -18,6 +18,7 @@
                         <th>Phone no.</th>
                         <th>Email</th>
                         <th>Sales</th>
+                        <th>Creditable</th>
                         <th>Loyalty Points</th>
                         {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                         <th class="text-center">Actions</th>
@@ -42,6 +43,10 @@
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.email}}
                         </td>
                         <td>{{ user.get_sales }}</td>
+                        <!-- creditabale\ -->
+                        <td>
+                        <input class='switch-size' name='switch-size' id="switch-size" type="checkbox" data-pk="{{user.pk}}" data-size="mini" {{user.is_creditable_check_box}} >
+                        </td>
                         <!-- loyalty points -->
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
                         {{ user.loyalty_points }}
@@ -122,6 +127,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
    <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+   <script type="text/javascript" src="{% static 'backend/js/customer/customer-listing.js' %}"></script>
  <script type="text/javascript">
    $(document).ready(function(){
 

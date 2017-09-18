@@ -22,6 +22,7 @@ from ...customer.models import Customer
 from ...sale.models import Sales, SoldItem, DrawerCash
 from ...decorators import permission_decorator, user_trail
 import logging
+import json
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -257,4 +258,17 @@ def customer_search(request):
 			{"users":users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 
-		
+@staff_member_required
+def is_creditable(request):
+    if request.method == "POST":
+        if request.POST.get('pk'):        	 
+            customer = Customer.objects.get(pk=int(request.POST.get("pk")))
+            if request.POST.get('is_creditable'):
+            	if int(request.POST.get('is_creditable')) == 1:
+            		customer.creditable = True;
+            	if int(request.POST.get('is_creditable')) == 0:
+            		customer.creditable = False;
+            	customer.save()
+            return HttpResponse(json.dumps({'success':customer.creditable}),content_type='application/json')
+    else:
+        return HttpResponse(json.dumps({'error':'Invalid method GET'}),content_type='applicatoin/json')

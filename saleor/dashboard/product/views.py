@@ -1888,6 +1888,11 @@ def add_new_attribute(request,pk=None):
         else:
             return HttpResponse(json.dumps({'error':'Name or pk expected'}))
         if request.POST.get('attributes'):
+            try:
+                del(choices)
+                del(choice)
+            except:
+                pass
             choices = json.loads(request.POST.get('attributes'))
             for choice in choices:
                 slug = choice.replace(' ','_')

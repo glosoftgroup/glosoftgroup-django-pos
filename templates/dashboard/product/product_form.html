@@ -833,7 +833,7 @@
     var addVariantChBtn = $('#addVariantChBtn');
 
     addVariantChBtn.on('click',function(){
-      var newattrName = $('#newvName').val();
+      var newattrName = $('#newvName').val();      
       var choices = getVariantChoice.val();
       if(!newattrName)
       {
@@ -855,9 +855,14 @@
       .done(function(data){
         alertUser('Success');
         getAttributesChoice.val('');
+        choices = '';
+        newattrName = '';
+        dynamicData = {};
+        newattrName = '';
          
-         getVariantChoice.parents('div').find('li.token').remove();
-        $('#newvName').val('');
+        getVariantChoice.parents('div').find('li.token').remove();
+        $(".selectVariantChoice option[data-type='custom']").remove();
+        $('#newvName').val('');        
       })
       .fail(function(){
         alertUser('Variant already exist','bg-danger','Add unique variant name');

@@ -65,13 +65,13 @@ class AddressBook(models.Model):
         max_length=128, blank=True)
     phone = models.CharField(
         pgettext_lazy('AddressBook field', 'phone number'),
-        max_length=30, blank=True)
-    creditable = models.BooleanField(default=False)
+        max_length=30, blank=True)    
     objects = AddressBookManager()
 
     @property
     def full_name(self):
         return '%s %s' % (self.first_name, self.last_name)
+    
 
     class Meta:
         verbose_name = pgettext_lazy('AddressBook model', 'address book')
@@ -116,6 +116,7 @@ class Customer(models.Model):
     is_active = models.BooleanField(
         pgettext_lazy('Customer field', 'active'),
         default=True)
+    creditable = models.BooleanField(default=False)
     loyalty_points = models.DecimalField(
         pgettext_lazy('Customer field', 'loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
     nid = models.CharField(max_length=100, null=True,blank=True)
@@ -149,6 +150,11 @@ class Customer(models.Model):
 
     def get_full_name(self):
         return self.email
+        
+    def is_creditable_check_box(self):
+        if self.creditable:
+            return "checked='checked'"
+        return ''
 
     def get_short_name(self):
         return self.email

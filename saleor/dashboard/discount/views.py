@@ -343,11 +343,3 @@ def token_variants(request):
         l.append({'text':variant.display_product(),'value': variant.pk})
     return HttpResponse(json.dumps(l), content_type='application/json')
 
-@staff_member_required
-def is_creditable(request):
-    if request.method == "POST":
-        if request.POST.get('pk'):
-            customer = Customer.objects.get(pk=int(request.POST.get("pk")))
-            return HttpResponse(json.dumps({'success':customer.creditable}),content_type='application/json')
-    else:
-        return HttpResponse(json.dumps({'error':'Invalid method GET'}),content_type='applicatoin/json')

@@ -22,6 +22,8 @@ urlpatterns = [
 
         url( r'^customer/sales/paginate/$', sales.sales_paginate, name = 'customer_sales_paginate'),
         url( r'^customer/sales/search/$', sales.sales_search, name = 'customer_sales_search'),
+
+        url( r'^customer/canbe/creditable/$', views.is_creditable, name = 'is_creditable'),
         # url(r'^add/', permission_required('userprofile.add_user', login_url='account_login')(views.user_add)),
         
 ]
