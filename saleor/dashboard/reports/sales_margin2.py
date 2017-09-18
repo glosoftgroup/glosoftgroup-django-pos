@@ -111,8 +111,7 @@ def sales_list(request):
 		return TemplateResponse(request, 'dashboard/reports/sales_margin2/sales_list.html',data)
 	except Exception as e:
 		error_logger.error(e)
-		return HttpResponse(e)
-		print (e)
+		return TemplateResponse(request, 'dashboard/reports/sales_margin2/sales_list.html',{})
 
 
 @staff_member_required
@@ -146,7 +145,7 @@ def sales_detail(request, pk=None):
 		data = {'items': total_items, "sale":sale, "totalMargin": totalMargin}
 		return TemplateResponse(request, 'dashboard/reports/sales_margin2/details.html',data)
 	except ObjectDoesNotExist as e:
-		error_logger.error(e)
+		return TemplateResponse(request, 'dashboard/reports/sales_margin2/details.html',data)
 
 @staff_member_required
 def sales_paginate(request):
@@ -418,7 +417,7 @@ def sales_reports(request):
 			return TemplateResponse(request, 'dashboard/reports/sales_margin2/sales.html', {'items':items, 'total_sales':total_sales,'total_tax':total_tax, 'ts':ts, 'tsum':tsum})
 	except TypeError as e:
 		error_logger.error(e)
-		return HttpResponse('error accessing sales reports')
+		return TemplateResponse(request, 'dashboard/reports/sales_margin2/sales.html', {})
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
