@@ -224,6 +224,7 @@ $('.selectAttributesChoice').tokenize2({
       addAttributePlusChoice(dynamicData,myUrl)
       .done(function(data){
         alertUser('Success');
+         window.location.href = "{% url 'dashboard:product-attributes' %}";
         getAttributesChoice.val('');
          
          getVariantChoice.parents('div').find('li.token').remove();
@@ -255,12 +256,13 @@ $('.selectAttributesChoice').tokenize2({
       dynamicData['track'] = 'Add attribute plus choice';
       addAttributePlusChoice(dynamicData,myUrl)
       .done(function(data){
+        window.location.href = "{% url 'dashboard:product-attributes' %}";
+        console.log('redirecting');
         alertUser('Success');
-        getAttributesChoice.val('');
-         
+        getAttributesChoice.val('');         
          $(".selectAttributesChoice").parents('div').find('li.token').remove();
         $('#newattrName').val('');
-        window.location.href = "{% url 'dashboard:product-attributes' %}";
+        
       })
       .fail(function(){
         alertUser('Attribute already exist','bg-danger','Add unique attribute name');
