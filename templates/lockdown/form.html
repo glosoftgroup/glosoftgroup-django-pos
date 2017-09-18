@@ -36,7 +36,8 @@
             <span class="text-semibold">Sorry!</span> Systems seems to have locked!! Please
             <span class="text-semibold">activate</span> the system. Contact systems
             administrator or glosoftgroup on +254711727778<br/>
-            Machine Number : {{ days }}
+            Machine Number : {{ machine }} <br/>
+            Days  : {{ days }}
         </div>
     </div>
 </div>
@@ -164,7 +165,8 @@
                                 $.jGrowl( data.message, {
                                   header: 'Successful!',
                                   theme: 'bg-success'
-                               });
+                                 });
+                                setTimeout(function(){ window.location.reload(true); }, 2000);
                             }else{
                                 $.jGrowl( data.message, {
                                   header: 'Error!',
