@@ -44,6 +44,7 @@ class TrackSerializer(serializers.ModelSerializer):
                 'product_category'
                  )
 
+
 class ItemsSerializer(serializers.ModelSerializer):
     available_stock = SerializerMethodField()
     item_pk = SerializerMethodField()
@@ -69,6 +70,7 @@ class ItemsSerializer(serializers.ModelSerializer):
             return stock.get_stock_quantity()
         except:
             return 0
+
 
 class CreditListSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
@@ -96,6 +98,7 @@ class CreditListSerializer(serializers.ModelSerializer):
     def get_cashier(self,obj):
         name = User.objects.get(pk=obj.user.id)
         return name.name
+
 
 class CreateCreditSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
@@ -125,6 +128,17 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Total Net should be a decimal/integer')
         return value
+
+    def validate_customer(self,value):
+        data = self.get_initial()
+        customer = Customer.objects.get(pk=data.get("customer"))
+        if customer.creditable:
+            print 'creditable'
+        else:
+            raise ValidationError('Customer is not creditable')
+            print 'not creditable'
+        print customer
+        return value
         
     def validate_terminal(self,value):
         data = self.get_initial()
@@ -145,16 +159,19 @@ class CreateCreditSerializer(serializers.ModelSerializer):
            total_net = Decimal(0)
         try:
             if validated_data.get('customer'):
-                customer = Customer.objects.get(name=validated_data.get('customer'))
+                customer = Customer.objects.get(pk=validated_data.get('customer'))
+                if not customer.creditable:
+                    raise ValidationError('customer is not creditable')
             else:
                 customer = Customer.objects.get(name=validated_data.get('customer_name'))
         except:
             name = validated_data.get('customer_name')
-            if validated_data.get('mobile'):
+            if validated_data.get('mobile') and validated_data.get('customer_name'):
                 mobile = validated_data.get('mobile')
                 customer = Customer.objects.create(name=name, mobile=mobile)
             else:
-                customer = Customer.objects.create(name=name)
+                print 'Customer name and mobile not set'
+                #customer = Customer.objects.create(name=name)
 
         invoice_number = validated_data.get('invoice_number')
         # calculate loyalty_points

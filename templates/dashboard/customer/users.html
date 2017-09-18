@@ -80,7 +80,7 @@
                         <th>Phone no.</th>
                         <th>Email</th>
                         <th>Sales</th>
-                        <!-- <th>Creditable</th> -->
+                        <th>Creditable</th>
                         <th>Loyalty Points</th>
                         {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                         <th class="text-center">Actions</th>
@@ -108,9 +108,9 @@
                         <!-- slaes -->
                         <td>{{ user.get_sales }}</td>
                         <!-- creditabale\ -->
-                        <!-- <td>
-                        <input class='switch-size' name='switch-size' id="switch-size" type="checkbox" >
-                        </td> -->
+                        <td>
+                        <input class='switch-size' name='switch-size' id="switch-size" type="checkbox" data-pk="{{user.pk}}" data-size="mini" {{user.is_creditable_check_box}} >
+                        </td>
                         <!-- loyalty points -->
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
                         {{ user.loyalty_points }}
@@ -227,6 +227,7 @@
      </div>
    </div>
  </div>
+ <input type="hidden" id="pageUrls" class="pageUrls" data-iscreditable="{% url 'dashboard:is_creditable' %}" >
  <!-- /blue modal -->
 {% endblock%}
 {% block custom_js %}
@@ -235,25 +236,11 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/bootstrap-switch.min.js' %}"></script>
 
-<!-- <script type="text/javascript" src="{% static 'backend/js/customer/.js' %}"></script> -->
+<script type="text/javascript" src="{% static 'backend/js/customer/customer-listing.js' %}"></script>
 
 
 <script type="text/javascript">
   $(document).ready(function() {    
-    var creditabale = $("[name='switch-size']");
-    $.fn.bootstrapSwitch.defaults.size = 'mini';
-    $.fn.bootstrapSwitch.defaults.onText = 'Yes';
-    $.fn.bootstrapSwitch.defaults.offText = 'No';
-    $.fn.bootstrapSwitch.defaults.onColor = 'success';
-    $.fn.bootstrapSwitch.defaults.animate = 'true';
-    $.fn.bootstrapSwitch.defaults.labelWidth = 'auto';
-
-    creditabale.bootstrapSwitch();
-    creditabale.on('switchChange.bootstrapSwitch', function(event, state) {      
-      console.log(state); // true | false
-    });
-
-    
         $('.bootpag-callback').bootpag({
             total: parseInt({{pn}}),
             maxVisible: 4,

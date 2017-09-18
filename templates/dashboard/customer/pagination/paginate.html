@@ -21,6 +21,10 @@
     <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.email}}
     </td>
     <td>{{ user.get_sales }}</td>
+    <!-- creditabale\ -->
+      <td>
+      <input class='switch-size' name='switch-size' id="switch-size" type="checkbox" data-pk="{{user.pk}}" data-size="mini" {{user.is_creditable_check_box}} >
+      </td>
     <!-- loyalty points -->
     <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
     {{ user.loyalty_points }}
