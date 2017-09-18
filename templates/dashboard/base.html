@@ -406,14 +406,14 @@
                           <!--<a href="{% url 'dashboard:sales_tax' %}"><i class='icon-cash2'></i>Sales Tax</a>-->
                         <!--</li>-->
                       {#{% endif %}#}
-                      {#{% if perms.reports.view_sales_reports %}#}
-                        <!-- <li class="{% block menu_report_tax2_class %}{% endblock %}">
+                      {% if perms.reports.view_sales_reports %}
+                        <li class="{% block menu_report_tax2_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_tax_list' %}"><i class='icon-cash2'></i>Sales Tax</a>
-                        </li> -->
-                      {#{% endif %}#}
+                        </li>
+                      {% endif %}
                       {% if perms.reports.view_products_reports %}
                         <li class="{% block menu_product_report_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Stock</a>
+                          <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
                         </li>
                       {% endif %}
                       {% if perms.reports.view_purchase_reports %}
