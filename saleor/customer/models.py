@@ -66,6 +66,7 @@ class AddressBook(models.Model):
     phone = models.CharField(
         pgettext_lazy('AddressBook field', 'phone number'),
         max_length=30, blank=True)
+    creditable = models.BooleanField(default=False)
     objects = AddressBookManager()
 
     @property

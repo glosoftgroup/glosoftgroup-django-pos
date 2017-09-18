@@ -3,6 +3,7 @@
 {% load staticfiles i18n %}
 {% load i18n %}
 {% load prices_i18n %}
+{% load default_user_image %}
 
 {% block title %}
   Sales Report
@@ -43,9 +44,9 @@
                     <caption>
                       <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
 
-                        <img src="{{sale.user.image.url}}" class="center-block circle teal img-responsive img-circle" style="width: 60px;height: 60px;"/>
-                        <h6 class="">Cashier: {{sale.user.name}}</h6>
-                          <h5 class="">Invoice Number: {{sale.invoice_number}}</h5>
+                        <h6><span class="text-bold">Customer:</span> {{sale.customer}}</h6> 
+                        <h6 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h6>
+                          <h5 class=""><span class="text-bold">Invoice Number:</span> {{sale.invoice_number}}</h5>
                       </div>
                     </caption>
                       <thead style="border-top:1px solid #ddd;">

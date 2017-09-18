@@ -28,4 +28,6 @@ urlpatterns = [
     url(r'voucher/(?P<pk>[0-9]+)/$', views.voucher_edit, name='voucher-update'),
     url(r'voucher/add/$', views.voucher_edit, name='voucher-add'),
     url(r'voucher/(?P<pk>[0-9]+)/delete/$', views.voucher_delete, name='voucher-delete'),
+
+    url(r'creditable/customer$', views.is_creditable, name='is_creditable'),
 ]
