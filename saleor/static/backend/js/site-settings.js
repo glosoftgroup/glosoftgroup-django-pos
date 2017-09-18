@@ -54,7 +54,7 @@ $(function() {
           minlength:3
         },
         loyalty_point_equiv:{
-          required:true,
+          required:false,
           digits: true,
           minlength: 1
         }

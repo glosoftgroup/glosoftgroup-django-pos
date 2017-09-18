@@ -406,14 +406,14 @@
                           <!--<a href="{% url 'dashboard:sales_tax' %}"><i class='icon-cash2'></i>Sales Tax</a>-->
                         <!--</li>-->
                       {#{% endif %}#}
-                      {% if perms.reports.view_sales_reports %}
-                        <li class="{% block menu_report_tax2_class %}{% endblock %}">
+                      {#{% if perms.reports.view_sales_reports %}#}
+                        <!-- <li class="{% block menu_report_tax2_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_tax_list' %}"><i class='icon-cash2'></i>Sales Tax</a>
-                        </li>
-                      {% endif %}
+                        </li> -->
+                      {#{% endif %}#}
                       {% if perms.reports.view_products_reports %}
                         <li class="{% block menu_product_report_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
+                          <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Stock</a>
                         </li>
                       {% endif %}
                       {% if perms.reports.view_purchase_reports %}
@@ -528,7 +528,6 @@
   <!-- form js -->
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
-  
   <script type="text/javascript" src="{% static 'backend/js/plugins/loaders/blockui.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_layouts.js' %}"></script>
   <!-- image preview-->
@@ -539,7 +538,6 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
-
   <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/legacy.js' %}"></script>
 
   <!-- Theme JS files -->

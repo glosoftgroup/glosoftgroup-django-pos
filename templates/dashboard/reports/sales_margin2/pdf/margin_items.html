@@ -41,27 +41,31 @@
                 <thead>
                   <tr class="bg-primary">
                           <th>Item Name</th>
-                          <th>Unit Cost (KShs)</th>
+                          <th class="text-center">Unit Cost (KShs.)</th>
+                            <th class="text-center">Retail Cost (KShs.)</th>
+                            <th class="text-center">Margin (KShs)</th>
                           <th>Quantity</th>
+                            <th>Total Cost (KShs)</th>
                           <th>Total Sales (KShs)</th>
-                          <th>Unit Margin (Kshs)</th>
                           <th>Sales Margin (Kshs)</th>
-                  </tr>
+                        </tr>
                 </thead>
                 <tbody id="tb">
                     {% if items %}
                         {% for item in items %}
                           <tr>
                             <td>{{item.product_name}}</td>
-                              <td><span style="margin-right:1px;">{{item.unit_cost}}</span></td>
+                              <td><span class="pull-right">{{item.retailPrice}}</span></td>
+                              <td><span class="pull-right">{{item.unit_cost}}</span></td>
+                              <td><span class="pull-right">{{item.unitMargin}}</span></td>
                             <td>{{item.quantity__sum}}</td>
-                            <td>{{item.total_cost__sum}}</td>
-                            <td><span>{{item.unitMargin}}</span></td>
-                            <td><span>{{item.salesMargin}}</span></td>
+                            <td><span class="pull-right">{{item.totalCost}}</span></td>
+                            <td><span class="pull-right">{{item.total_cost__sum}}</span></td>
+                              <td><span>{{item.salesMargin}}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">No Items Available</h2></td></tr>
+                         <tr><td colspan="8"><h2 class="text-center">No Items Available</h2></td></tr>
                         {% endif %}
                   </tbody>
            </table>

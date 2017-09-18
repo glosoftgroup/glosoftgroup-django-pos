@@ -10,7 +10,7 @@
 {% endblock %}
 {% block breadcrumbs %}
      <li class="active"><a href="{% url 'dashboard:sales_list' %}">Sales</a></li>
-     <li>Invoice</li>
+     <li>Receipt</li>
  {% endblock %}
 
 {% block menu_report_class %}active{% endblock %}
@@ -41,9 +41,10 @@
                <div>
                       <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
 
-                        <img src="{{sale.user.image.url}}" class="center-block circle teal img-responsive img-circle" style="width: 60px;height: 60px;"/>
-                        <h6 class="">Cashier: {{sale.user.name}}</h6>
-                          <h5 class="">Invoice Number: {{sale.invoice_number}}</h5>
+                        <!--<img src="{{sale.user.image.url}}" class="center-block circle teal img-responsive img-circle" style="width: 60px;height: 60px;"/>-->
+                        <h5>{% if sale.customer.name %} {{sale.customer.name}} {% else %} Customer {% endif %}</h5>
+                          <h5 class="">Receipt Number: {{sale.invoice_number}}</h5>
+                          <h6 class="">Served By: {{sale.user.name}}</h6>
                       </div>
                     </div>
             <div class="table-responsives">
