@@ -66,7 +66,6 @@ class CurrencyMiddleware(object):
 class SettingsMiddleware(object):
 
     def process_request(self, request):
-        return None
         excluded_path = reverse('dashboard:addsitekeys')
 
         en = Encryptor()
@@ -81,7 +80,7 @@ class SettingsMiddleware(object):
         try:
             ufile = Files.objects.all()[:1][0]
         except IndexError:
-            return TemplateResponse(request, 'lockdown/form.html', {'days': number})
+            return TemplateResponse(request, 'lockdown/form.html', {'days': "unknown", 'machine': number})
 
         filecontent  = ufile.file
         filename = ufile.check
@@ -95,7 +94,7 @@ class SettingsMiddleware(object):
 
         if filename != hex:
             print 'hex filename not equal'
-            return TemplateResponse(request, 'lockdown/form.html', {'days': number})
+            return TemplateResponse(request, 'lockdown/form.html', {'days': 'unknown', 'machine': number})
 
         if self.is_not_empty(filecontent):
             jsonvalue = en.decrptcode(filecontent, secretkey)
@@ -108,12 +107,12 @@ class SettingsMiddleware(object):
                 info_logger.info('expiry date: ' + str(exp))
 
                 if exp < timedelta(seconds=0):
-                    return TemplateResponse(request, 'lockdown/form.html', {'days': exp})
+                    return TemplateResponse(request, 'lockdown/form.html', {'days': exp, 'machine': number})
                 else:
                     info_logger.info('No issue on expiry date')
                     return None
             else:
-                return TemplateResponse(request, 'lockdown/form.html', {'days': number})
+                return TemplateResponse(request, 'lockdown/form.html', {'days':'unknown', 'machine': number})
 
 
     def is_json(self, myjson):
