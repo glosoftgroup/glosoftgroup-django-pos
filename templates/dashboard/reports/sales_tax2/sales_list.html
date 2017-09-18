@@ -6,7 +6,7 @@
 {% load humanize %}
 
 {% block title %}
-  Sales List Report
+  Sales Tax Report
 {% endblock %}
 {% block breadcrumbs %}
      <li class="active"><a href="{% url 'dashboard:sales_tax_list' %}">Sales  Tax Report</a></li>
@@ -53,7 +53,7 @@
                   </select>
               </div>
             </div>
-            <div class="col-md-2 hidden">
+            <div class="col-md-2">
               <label>display list size</label>
               <div class="form-group">
                  <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
@@ -112,7 +112,7 @@
                           <tr class='clickable-row' id="{{sale.pk }}">
                             <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                              <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                              <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{% if sale.customer.name %}{{sale.customer.name}}{% else %} Customer {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                               <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
@@ -127,43 +127,11 @@
               </div>
               {% if sales %}
               <div class="my-paginate">
-                 <style type="text/css">
-           .pagination{margin-bottom: 0px;}
-         </style> 
-         <div class="row">   
-         <div class="col-md-12">               
-          <div class="col-md-4">
-           <div class="col-md-12">
-            <div class="col-md-6 mt-10">
-             <label>display list size</label>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
-                    <option value="0" selected>No:</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                  </select>
-              </div>
-            </div>
-          </div>
-          </div>
-          <div class="col-md-4">
-           <div class="text-center bootpag-callback" style="">
-             <div class="my-paginate"> 
-             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
-             </div>
-            </div>
-           </div>
-            <div class="col-md-4">
-             <div class="col-md-12">
-              <div class="pull-right pages-nav">Page 1 of {{pn}}</div>
-             </div>
-            </div>
-          </div>
-         </div>                 
-         <input type="hidden" id="page_size" val="">
+                <div class="text-center bootpag-callback" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav">Page 1 of {{pn}}</div>
+                </div>
+                <input type="hidden" id="page_size" val="">
               </div>
               {% endif %}
              </div>
@@ -176,7 +144,11 @@
                    Total Tax: Kshs {{ total_tax_amount.total_tax__sum}}
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
+                  <span>Report pulled by  {% if request.user.name %}
+                        {{request.user.name}}
+                      {% else %}
+                      {{ request.user.email}}
+                      {% endif %}</span></p>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
 
@@ -200,7 +172,7 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/highcharts.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/exporting.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dist/dom-to-image.min.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 

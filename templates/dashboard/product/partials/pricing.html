@@ -4,9 +4,11 @@
         <!-- Product Pricing Details -->      
         <div class="col-md-12">
           <div class="row">
+          {% if product.product_class.has_variants %}
             <div class="col-md-2" style="padding:0px;margin-top: 25px;margin-right: 0px;margin-left: 0px;">
             <button data-attributes="{% url 'dashboard:attr_list_f32b' %}" class="btn btn-primary" id="addNewvaraints">New attribute</button>
             </div>
+          {% endif %}
             <div class="col-md-4">
               <div class="form-group" id='tax_field'>
                 <label>Tax: % </label>
@@ -41,8 +43,7 @@
    <tr class="bg-primary">  
     <th>SKU</th>  
     <th>Retail Price</th>
-    <th>Wholesale Price</th>
-    <th>Reorder Threshold</th>
+    <th>Wholesale Price</th>   
     <th>&nbsp;</th>
    </tr>
   </thead>
@@ -64,9 +65,7 @@
       <td>
         {{ product_form.wholesale_price }}
       </td>
-      <td>
-        {{variant_form.low_stock_threshold}}
-      </td>
+      
       <td>
         <span>
          <a  class="btn hvr-glow btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing">Save</a>

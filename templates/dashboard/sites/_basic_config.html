@@ -36,11 +36,17 @@
                         value="{% if site.name %} {{site.name}} {% else %} {% endif %}">
                       </div>
                       <div class="col-md-12"> <h6 style="font-weight:bold;">Sales Settings</h6></div>
-                      <div class="form-group col-md-12">
-                          {#{{ form.loyalty_point_equiv|materializecss }}#}
-                           <label for="loyalty_point_equiv">Loyalty points equivalency </label>
-                        <input class="form-control" name="loyalty_point_equiv" id="loyalty_point_equiv" type="number" min="0"
-                               placeholder="{% if site.loyalty_point_equiv %} {{site.loyalty_point_equiv}} {% else %} 0 {% endif %}">
+                      <div class="col-md-12">
+                          <div class="form-group col-md-6">
+                              {#{{ form.loyalty_point_equiv|materializecss }}#}
+                               <label for="loyalty_point_equiv">Loyalty points equivalency </label>
+                            <input class="form-control" name="loyalty_point_equiv" id="loyalty_point_equiv" type="text" min="0"
+                                   placeholder="{% if site.loyalty_point_equiv %} {{site.loyalty_point_equiv}} {% else %} 0 {% endif %}">
+                          </div>
+                          <div class="col-md-6">
+                              <label for="loyalty_point_equiv" style="visibility:hidden">Loyalty points equivalency </label>
+                              <p class="col-sm-12">Shillings per loyalty point</p>
+                          </div>
                       </div>
                       <div class="form-group col-md-6">
                           {#{{ form.opening_time|materializecss }}#}

@@ -297,8 +297,12 @@ class ProductVariant(models.Model, Item):
         available_quantity = self.get_stock_quantity()
         if quantity > available_quantity:
             raise InsufficientStock(self)
-    def get_cost_price(self):
-        cost_price = self.stock.cost_price
+    # def get_cost_price(self):
+    #     cost_price = self.stock.cost_price
+    #     if cost_price:
+    #         return cost_price
+    #     return 0
+
 
     def get_stock_pk(self):
         stock_pk = self.stock.all().values('pk')
@@ -325,7 +329,7 @@ class ProductVariant(models.Model, Item):
         return price
 
     def get_total_price_cost(self):
-        cost = self.get_price_per_item().gross * self.get_stock_quantity()
+        cost = self.get_cost_price() * self.get_stock_quantity()
         return cost
 
     def get_absolute_url(self):
@@ -359,6 +363,9 @@ class ProductVariant(models.Model, Item):
             attributes = self.product.product_class.variant_attributes.all()
         values = get_attributes_display_map(self, attributes)
         if values:
+            # return ', '.join(
+            #     [' %s' % ( smart_text(value))
+            #      for (key, value) in six.iteritems(values)])
             return ', '.join(
                 ['%s: %s' % (smart_text(attributes.get(id=int(key))),
                              smart_text(value))
@@ -389,6 +396,8 @@ class ProductVariant(models.Model, Item):
                 return stock.cost_price
             else:
                 return 0
+        else:
+            return 0
 
     def product_category(self):
         category = self.product.categories.first().name
@@ -397,6 +406,7 @@ class ProductVariant(models.Model, Item):
 
 @python_2_unicode_compatible
 class StockLocation(models.Model):
+    DEFAULT_PK=1
     name = models.CharField(
         pgettext_lazy('Stock location field', 'location'), max_length=100)
 
@@ -419,6 +429,10 @@ class StockManager(models.Manager):
         #stock.quantity_allocated = F('quantity_allocated') - quantity
         stock.save(update_fields=['quantity', 'quantity_allocated'])
 
+    def get_low_stock(self):
+        today = datetime.date.today()
+        return self.get_queryset().filter(quantity__lte=F('low_stock_threshold'))
+
 
 
 @python_2_unicode_compatible
@@ -426,12 +440,15 @@ class Stock(models.Model):
     variant = models.ForeignKey(
         ProductVariant, related_name='stock',
         verbose_name=pgettext_lazy('Stock item field', 'variant'))
-    location = models.ForeignKey(StockLocation, null=True)
+    location = models.ForeignKey(StockLocation, default=StockLocation.DEFAULT_PK)
     quantity = models.IntegerField(
         pgettext_lazy('Stock item field', 'quantity'),
         validators=[MinValueValidator(0)], default=Decimal(1))
     invoice_number = models.CharField(
         pgettext_lazy('Stock item field', 'invoice_number'), null=True, max_length=36,)  
+    low_stock_threshold = models.IntegerField(
+        pgettext_lazy('Stock item field', 'low stock threshold'),
+        validators=[MinValueValidator(0)], null=True,blank=True, default=Decimal(10))
     
     quantity_allocated = models.IntegerField(
         pgettext_lazy('Stock item field', 'allocated quantity'),

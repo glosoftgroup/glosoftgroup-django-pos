@@ -10,7 +10,7 @@
                     <th>Image</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>User Role</th>
+                    <th>Job Title</th>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <th class="text-center">Options</th>
                     {% endif %}
@@ -36,7 +36,12 @@
                     </td>
                     <!-- role -->
                     <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}"> 
-                    {% if user.is_superuser == True %}admin{% else %} staff {% endif %}</td>
+                    {% if not user.job_title %}
+                    <span class="text-center">&ndash;</span>
+                    {% else %}
+                    {{ user.job_title }}
+                    {% endif %}
+                    </td>
                     <!-- actions -->
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <!-- actions -->
@@ -241,11 +246,5 @@
        }
 
      });
-   {% if sz %}
-   $.when( $.ready ).then(function() {     
-         $('.bootstrap-select').selectpicker();
-         $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
-      });
-  {% endif %}
  </script>
   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

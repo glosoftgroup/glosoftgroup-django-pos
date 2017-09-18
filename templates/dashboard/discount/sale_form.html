@@ -7,9 +7,9 @@
   {% if sale.pk %}
     {{ sale }}
   {% else %}
-    {% trans "Add new sale"  context "Sale (discount) page title" %}
+    {% trans "Add new sale (discount)"  context "Sale (discount) page title" %}
   {% endif %} 
-  - {% trans "Sales" context "Dashboard sales (discounts) list." %} - {{ block.super }}
+  - {% trans "Sales discount" context "Dashboard sales (discounts) list." %} - {{ block.super }}
 {% endblock %}
 
 {% block body_class %}body-sales{% endblock %}
@@ -125,7 +125,7 @@
     </div>
     <div class="col m12 l3 help-box"></div>
   </div>
-  <input type="hidden" data-variants="{% url 'dashboard:token-search-variants' %}" class="pageUrls" id='pageUrls' name="pageUrls">
+  <input type="hidden" data-variants="{% url 'dashboard:token-search-variants' %}" class="pageUrls" data-redirect="{% url 'dashboard:sale-list' as url %}" id='pageUrls' name="pageUrls">
   {% include "dashboard/includes/_modal_template.html"  %}
 {% endblock %}
 {% block custom_js %}

@@ -32,6 +32,8 @@ class SaleForm(forms.ModelForm):
         
         field = self.fields['end_date']
         field.widget.attrs['class'] = 'form-control pickadate-selectors'
+        field = self.fields['value']
+        field.widget.attrs['required'] = 'required'
     def clean(self):
         cleaned_data = super(SaleForm, self).clean()
         discount_type = cleaned_data['type']

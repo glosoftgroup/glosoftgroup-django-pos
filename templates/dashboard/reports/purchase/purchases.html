@@ -98,7 +98,7 @@
                           <!--<td>{{purchase.invoice_number}}</td>-->
                           <td>{{purchase.supplier}}</td>
                           <td>{{purchase.stock.variant.display_product}}</td>
-                          <td><span class="pull-right"> {{purchase.stock.variant.get_price_per_item.gross|intcomma}}</span></td>
+                          <td><span class="pull-right"> {% if purchase.cost_price %}{{purchase.cost_price.gross|intcomma}}{% else %} 0.00{% endif %}</span></td>
                           <td>{{purchase.quantity}}</td>
                           <td><span class="pull-right"> {{purchase.get_total_cost|intcomma}}</span></td>
                       </tr>
@@ -128,7 +128,7 @@
                    Total Purchases: Kshs {{ all_purchases}}<br />
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by
+                  <span>Report pulled by
                       {% if request.user.name %}
                         {{request.user.name}}
                       {% else %}
@@ -180,10 +180,14 @@ $(document).ready(function(){
         lastClass: 'last',
         firstClass: 'first',
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get("{% url 'dashboard:purchase_paginate' %}",{page:parseInt(num)},function(data){
-               $('#tb').html(data);
-            });
+            $(".pages-nav").html("Page " + num +" of "+"{{totalp}}");
+            // $.get("{% url 'dashboard:purchase_reports_paginate' %}",{page:parseInt(num)},function(data){
+            //    $('#tb').html(data);
+            //    console.log(data);
+            // });
+            $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:num}, async:false,success: function(data){
+                          $('#tb').html(data);
+                    }});
     }).children('.pagination').addClass('pagination-flat pagination-sm');
 
     $('.daterange-single').daterangepicker({
@@ -207,25 +211,25 @@ $(document).ready(function(){
         var date = $('.daterange-single').val();
         var searchData = $('.search_purchase').val();
         var listVal = $('.list-sz').find(":selected").val();
-        var url = "{% url 'dashboard:purchase_search' %}";
+        var url = "{% url 'dashboard:purchase_reports_search' %}";
 
        if (searchData && listVal){
             if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
         }else{
             if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal, gid:date, date:date}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:listVal, gid:date, date:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date, date:date}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date, date:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
@@ -295,36 +299,36 @@ $(document).ready(function(){
 
         if (searchData && date){
               if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:listVal, gid:date, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
         }else if (searchData){
                 if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:listVal, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
         }else if (date){
                if (listVal != '0'){
-                   $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal, date:date}, async:false,success: function(data){
+                   $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:listVal, date:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }else{
-                    $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:10, date:date}, async:false,success: function(data){
+                    $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:10, date:date}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
               }
         }else{
-                $.ajax({ url: "{% url 'dashboard:purchase_paginate' %}",type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
+                $.ajax({ url: "{% url 'dashboard:purchase_reports_paginate' %}",type: 'GET',data: {page:1, size:listVal}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
         }
@@ -346,7 +350,7 @@ $(document).ready(function(){
           var listSizeVal = $('.list-sz').find(':selected').val();
           var date = $('.daterange-single').val();
 
-          var url = "{% url 'dashboard:purchase_search' %}";
+          var url = "{% url 'dashboard:purchase_reports_search' %}";
           delay(function(){
               if (date && listSizeVal){
                  if(listSizeVal != '0'){

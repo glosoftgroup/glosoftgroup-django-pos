@@ -24,7 +24,7 @@ from ..product.models import Product
 from ..userprofile.models import Address
 from ..customer.models import Customer
 from ..site.models import SiteSettings
-from ..sale.models import Terminal
+from ..sale.models import Terminal, PaymentOption
 
 from . import OrderStatus
 from . import TransactionStatus
@@ -83,6 +83,10 @@ class Credit(models.Model):
 	discount_name = models.CharField(
 		verbose_name=pgettext_lazy('Credit field', 'discount name'),
 		max_length=255, default='', blank=True)
+	payment_options = models.ManyToManyField(
+        PaymentOption, related_name='credit_payment_option', blank=True,
+        verbose_name=pgettext_lazy('Sales field',
+                                   'sales options'))
 	class Meta:
 		ordering = ('-last_status_change',)
 		verbose_name = pgettext_lazy('Credit model', 'Credit')
@@ -92,6 +96,15 @@ class Credit(models.Model):
 		return self.invoice_number
 	def __unicode__(self):
    		return unicode(self.invoice_number)
+   	def total_items(self):
+   		return len(self.credititems.all());
+   	def items(self):
+   		return self.credititems.all()
+   	def is_fully_paid(self):
+   		if self.status == 'fully-paid':
+   			return True
+   		else:
+   			return False
 								
 class CreditedItem(models.Model):
 	credit = models.ForeignKey(Credit,related_name='credititems',on_delete=models.CASCADE)

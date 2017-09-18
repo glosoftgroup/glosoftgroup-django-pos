@@ -44,7 +44,7 @@ error_logger = logging.getLogger('error_logger')
 @permission_decorator('reports.view_purchase_reports')
 def purchase_reports(request):
 	try:
-		queryset_list = PurchaseProduct.objects.all().order_by('-id')
+		queryset_list = PurchaseProduct.objects.all().order_by('id')
 		page = request.GET.get('page', 1)
 		paginator = Paginator(queryset_list, 10)
 		try:
@@ -117,47 +117,48 @@ def purchase_paginate(request):
 
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/purchase/p2.html', {'date': date})
-	try:
-		purchases = PurchaseProduct.objects.all().order_by('id')
-		total_purchases = 0
-		for purchase in purchases:
-			total_purchases += purchase.get_total_cost()
-
-		if list_sz:
-			paginator = Paginator(purchases, int(list_sz))
-			purchases = paginator.page(page)
-			ctx = {
-				'all_purchases':total_purchases,
-				'purchases': purchases,
-				'pn': paginator.num_pages,
-				'sz': list_sz, 'gid': 0
-			}
-			return TemplateResponse(request,'dashboard/reports/purchase/p2.html',ctx)
-		else:
-			paginator = Paginator(purchases, 10)
-		if p2_sz:
-			paginator = Paginator(purchases, int(p2_sz))
-			purchases = paginator.page(page)
-			return TemplateResponse(request,'dashboard/reports/purchase/paginate.html',{'purchases':purchases})
-
+	else:
 		try:
-			purchases = paginator.page(page)
-		except PageNotAnInteger:
-			purchases = paginator.page(1)
-		except InvalidPage:
-			purchases = paginator.page(1)
-		except EmptyPage:
-			purchases = paginator.page(paginator.num_pages)
+			purchases = PurchaseProduct.objects.all().order_by('id')
+			total_purchases = 0
+			for purchase in purchases:
+				total_purchases += purchase.get_total_cost()
+
+			if list_sz:
+				paginator = Paginator(purchases, int(list_sz))
+				purchases = paginator.page(page)
+				ctx = {
+					'all_purchases':total_purchases,
+					'purchases': purchases,
+					'pn': paginator.num_pages,
+					'sz': list_sz, 'gid': 0
+				}
+				return TemplateResponse(request,'dashboard/reports/purchase/p2.html',ctx)
+			elif p2_sz:
+				paginator = Paginator(purchases, int(p2_sz))
+				purchases = paginator.page(page)
+				return TemplateResponse(request,'dashboard/reports/purchase/paginate.html',{'purchases':purchases})
+			else:
+				paginator = Paginator(purchases, 10)
+
+			try:
+				purchases = paginator.page(page)
+			except PageNotAnInteger:
+				purchases = paginator.page(1)
+			except InvalidPage:
+				purchases = paginator.page(1)
+			except EmptyPage:
+				purchases = paginator.page(paginator.num_pages)
 			data = {
 				"purchases": purchases,
 				"all_purchases": total_purchases,
 				"gid": date, 'pn': paginator.num_pages, 'sz': 10,
 				'date': date
 			}
-
-		return TemplateResponse(request,'dashboard/reports/purchase/paginate.html',data)
-	except Exception, e:
-		error_logger.error(e)
+			return TemplateResponse(request,'dashboard/reports/purchase/paginate.html',data)
+		except Exception, e:
+			error_logger.error(e)
+			print (e)
 
 @staff_member_required
 def purchase_search(request):

@@ -83,6 +83,7 @@ def sales_list(request):
 		return TemplateResponse(request, 'dashboard/reports/sales_tax2/sales_list.html',data)
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
+		print (e)
 
 
 @staff_member_required

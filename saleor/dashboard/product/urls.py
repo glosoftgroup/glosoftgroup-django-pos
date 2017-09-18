@@ -14,6 +14,8 @@ urlpatterns = [
     url(r'^list/search/$', products.search, name='product-list-search'),
     url(r'^(?P<pk>[0-9]+)/update/$', permission_required('product.change_product', login_url='not_found')
         (views.product_edit), name='product-update'),
+    url(r'^(?P<pk>[0-9]+)/update/(?P<name>[\w\-]+)$', permission_required('product.change_product', login_url='not_found')
+        (views.product_edit), name='product-update'),
     url(r'^(?P<pk>[0-9]+)/delete/$', permission_required('product.delete_product', login_url='not_found')
         (views.product_delete), name='product-delete'),
     url(r'^add/(?P<class_pk>[0-9]+)/$', permission_required('product.add_product', login_url='not_found')
@@ -162,6 +164,8 @@ urlpatterns = [
         views.search_attribute, name='search-attribute'),
     url(r'attributes/add/new/$',
         views.add_new_attribute, name='add-new-attribute'),
+    url(r'attributes/(?P<pk>[0-9]+)/add/ney/$',
+        views.add_new_attribute, name='edit-new-attribute'),
     
     url(r'attributes/(?P<pk>[0-9]+)/$', permission_required('product.change_productattribute', login_url='not_found')
         (views.attribute_edit), name='product-attribute-update'),

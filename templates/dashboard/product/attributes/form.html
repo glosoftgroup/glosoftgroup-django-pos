@@ -46,6 +46,9 @@
 
 {% block menu_catalogue_class %} active{% endblock %}
 
+{% block custom_css %}
+<link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
 {% block content %}
   <div class="panel panel-flat">
     <div class="panel-heading">
@@ -60,6 +63,31 @@
     </div> 
     <div class="panel-body">
     <div class="row">
+    {% if not attribute.pk %}
+       <div class="">
+      <!-- new fields -->
+      <div class="col-md-3">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Attribute Name</label>
+          <input type="text" placeholder="Attribute Name" id="newvName" class="form-control" name="newvName">
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="form-group">
+          <label>Attribute choices</label>
+          <select class="selectVariantChoice" multiple></select>
+        </div>
+      </div>
+      <div class="col-md-2 text-right" style="margin-top: 20px;">
+        <button class="btn btn-primary btn-xs" id="addVariantChBtn">Add</button>
+      </div>
+      <!-- ./new fields -->
+        <br/>
+        
+      </div>
+    {% endif %}
+    {% if attribute.pk %}
     <form method="post" enctype="multipart/form-data" id="form-attributes" novalidate>       
       {% csrf_token %}
            
@@ -129,6 +157,7 @@
             {% endif %}
      </div>
       </form>
+      {% endif %}
     </div>
    
     </div>
@@ -143,14 +172,114 @@
 <!-- add custom javascripts -->
 {% block custom_js %}
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
-<script type="text/javascript">
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
 
-  $("#id_name").on("change keyup paste keydown", function(event) {
+<script type="text/javascript">
+// alertUser
+function alertUser(msg,status='bg-success',header='Well done!')
+{ $.jGrowl(msg,{header: header,theme: status}); }
+//add productDetails
+// add script
+$('.selectAttributesChoice').tokenize2({
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
+    tokensAllowCustom:true,      
+    });
+    $('.selectVariantChoice').tokenize2({
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
+    tokensAllowCustom:true,      
+    });
+    function addAttributePlusChoice(dynamicData,myUrl) 
+    {     
+       return $.ajax({
+          url: myUrl,
+          type: "post",
+          data: dynamicData
+        });
+    }
     
+    var getAttributesChoice = $('.selectAttributesChoice');
+    var getVariantChoice = $('.selectVariantChoice');
+    var addAttributeChBtn = $('#addAttributeChBtn');
+    var addVariantChBtn = $('#addVariantChBtn');
+
+    addVariantChBtn.on('click',function(){
+      var newattrName = $('#newvName').val();
+      var choices = getVariantChoice.val();
+      if(!newattrName)
+      {
+        alertUser('Variant name required','bg-danger','Variant name required');
+        return false;
+      }
+      if(!choices)
+      {
+        alertUser('Variant name required','bg-danger','Variant name required');
+        return false;
+      }
+      var dynamicData = {};
+      var myUrl = "{% url 'dashboard:add-new-attribute' %}";
+      dynamicData["attributes"] = JSON.stringify(choices);
+      dynamicData["name"] = newattrName;
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      dynamicData['track'] = 'Add attribute plus choice';
+      addAttributePlusChoice(dynamicData,myUrl)
+      .done(function(data){
+        alertUser('Success');
+        getAttributesChoice.val('');
+         
+         getVariantChoice.parents('div').find('li.token').remove();
+        $('#newvName').val('');
+      })
+      .fail(function(){
+        alertUser('Variant already exist','bg-danger','Add unique variant name');
+      });
+    });
+
+    addAttributeChBtn.on('click',function(){
+      var newattrName = $('#newattrName').val();
+      var choices = getAttributesChoice.val();
+      if(!newattrName)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      if(!choices)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      var dynamicData = {};
+      var myUrl = "{% url 'dashboard:add-new-attribute' %}";
+      dynamicData["attributes"] = JSON.stringify(choices);
+      dynamicData["name"] = newattrName;
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      dynamicData['track'] = 'Add attribute plus choice';
+      addAttributePlusChoice(dynamicData,myUrl)
+      .done(function(data){
+        alertUser('Success');
+        getAttributesChoice.val('');
+         
+         $(".selectAttributesChoice").parents('div').find('li.token').remove();
+        $('#newattrName').val('');
+        window.location.href = "{% url 'dashboard:product-attributes' %}";
+      })
+      .fail(function(){
+        alertUser('Attribute already exist','bg-danger','Add unique attribute name');
+      });
+    });
+// end scripts
+
+  $("#id_name").on("change keyup paste keydown", function(event) {    
        var slug = $(this).val(); 
        slug = slug.split(' ').join('_')            
        $('#id_slug').attr('value',slug);
        var slug = $(this).val();   
+  });
+  
+  $('#id_value').on('focusout','focusin',function(){
+    alert($(this).val());
+    if(!$(this).val()){
+      $(this).val('0');
+    }
   });
   
 </script>

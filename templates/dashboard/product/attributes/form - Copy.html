@@ -1,0 +1,313 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+
+{% block title %}
+  {% if attribute.pk %}
+    {{ attribute }}
+  {% else %}
+    {% trans "Add new attribute" context "Attribute detail page title" %}
+  {% endif %}
+  - {% trans "Attributes" context "Dashboard attributes list" %} - {{ block.super }}
+{% endblock %}
+
+{% block body_class %}body-attributes{% endblock %}
+
+{% block menu_attributes_class %}active{% endblock %}
+
+{% block header_menu %}
+  {% url "dashboard:product-attributes" as url %}
+  {% include "dashboard/includes/_back-link.html" with url=url %}
+{% endblock %}
+
+{% block header_extra %}
+{% endblock %}
+
+{% block breadcrumbs %}
+  
+    <li>
+      <a href="{% url 'dashboard:product-attributes' %}" class="breadcrumbs--ellipsed-item">
+      {% trans "Attributes" context "Dashboard attributes list" %}
+      </a>
+    </li>
+    
+    <li class="active">
+     
+        {% if attribute.pk %}
+          {{ attribute }}
+        {% else %}
+          {% trans "Add new attribute" context "Attribute detail breadcrumbs" %}
+        {% endif %}
+  
+    </li>
+  
+{% endblock %}
+
+{% block menu_catalogue_class %} active{% endblock %}
+
+{% block custom_css %}
+<link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+  <div class="panel panel-flat">
+    <div class="panel-heading">
+      <h5 class="panel-title">Product attribute</h5>
+      <div class="heading-elements">
+        <ul class="icons-list">
+          <li><a data-action="collapse"></a></li>
+          <li><a data-action="reload"></a></li>
+          <li><a data-action="close"></a></li>
+        </ul>
+      </div>
+    </div> 
+    <div class="panel-body">
+    <div class="row">
+    {% if  attribute.pk %}
+       <div class="">
+      <!-- new fields -->
+      <div class="col-md-3">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Attribute Name</label>
+          <input type="text" placeholder="Attribute Name" value="{{attribute.name}}" id="newvName" class="form-control" name="newvName">
+        </div>
+      </div>
+      <div class="col-md-4">    
+      
+        <div class="form-group">
+          <label>Attribute choices</label>
+          <select class="selectVariantChoice" multiple>
+            {% for value in attribute.values.all %}
+             <option selected value="{{value}}">{{value}}</option>
+             <option selected value="{{value}}">{{value}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-md-2 text-right" style="margin-top: 20px;">
+        <button class="btn btn-primary btn-xs" id="addVariantChBtn">Edit</button>
+      </div>
+      <!-- ./new fields -->
+        <br/>
+        
+      </div>
+    {% else %}
+     <div class="">
+      <!-- new fields -->
+      <div class="col-md-3">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Attribute Name</label>
+          <input type="text" placeholder="Attribute Name" value="{{attribute.name}}" id="newvName" class="form-control" name="newvName">
+        </div>
+      </div>
+      <div class="col-md-7">      
+        <div class="form-group">
+          <label>Attribute choices</label>
+          <select class="selectVariantChoice" multiple></select>
+        </div>
+      </div>
+      <div class="col-md-2 text-right" style="margin-top: 20px;">
+        <button class="btn btn-primary btn-xs" id="addVariantChBtn">Add</button>
+      </div>
+      <!-- ./new fields -->
+        <br/>
+        
+      </div>
+    {% endif %}
+    {% if attributepk %}
+    <form method="post" enctype="multipart/form-data" id="form-attributes" novalidate>       
+      {% csrf_token %}
+           
+         <div class="col-md-6">
+            <div class="form-group">
+             {{ form.name|materializecss }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+             {{ form.slug|materializecss }}
+            </div>
+          </div>
+          <!-- attribute table -->
+          <div class="col-md-12">
+            <h5 class="panel-heading">
+              {% trans "Attribute values" context "Attribute values formset title" %}
+            </h5>   
+            {{ formset.management_form }}
+            {{ formset.non_form_errors.as_ul }}                   
+         </div>
+         
+         <div class="col-md-12 ">
+           <table id="formset"  class="table  datatable-header-footer">
+              {% for form in formset.forms %}
+                {% if forloop.first %}
+                  <thead>
+                    <tr class="bg-primary">
+                      {% for field in form.visible_fields %}
+                        <th>{{ field.label|capfirst }}</th>
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  
+                {% endif %}
+                <tr>
+                  {% for field in form.visible_fields %}
+                    <td{% if forloop.last %} class="center-align"{% endif %}>
+                      {% if forloop.first %}
+                        {% for hidden in form.hidden_fields %}
+                          {{ hidden }}
+                        {% endfor %}
+                      {% endif %}
+                      {{ field|materializecss }}
+                    </td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </table>
+         </div>
+      <!-- action buttons -->
+         <div class="text-right col-md-12">
+         {% if attribute.pk %}
+              <a href="{% url 'dashboard:product-attributes' %}" class="btn btn-flat">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+              <button type="submit" class="btn btn-primary btn-primary waves-effect waves-light">
+                {% trans "Update" context "Dashboard update action" %}
+              </button>
+            {% else %}
+              <a href="{% url 'dashboard:product-attributes' %}" class="btn btn-flat">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+              <button type="submit" class="btn btn-primary waves-effect waves-light">
+                {% trans "Create" context "Dashboard create action" %}
+              </button>
+            {% endif %}
+     </div>
+      </form>
+      {% endif %}
+    </div>
+   
+    </div>
+
+   </div>
+  
+    <div class="col m12 l3 help-box"></div>
+  </div>
+{% include "dashboard/includes/_modal_template.html"  %}
+{% endblock %}
+
+<!-- add custom javascripts -->
+{% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
+
+<script type="text/javascript">
+// alertUser
+function alertUser(msg,status='bg-success',header='Well done!')
+{ $.jGrowl(msg,{header: header,theme: status}); }
+//add productDetails
+// add script
+$('.selectAttributesChoice').tokenize2({
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
+    tokensAllowCustom:true,      
+    });
+    $('.selectVariantChoice').tokenize2({
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
+    tokensAllowCustom:true,      
+    });
+    function addAttributePlusChoice(dynamicData,myUrl) 
+    {     
+       return $.ajax({
+          url: myUrl,
+          type: "post",
+          data: dynamicData
+        });
+    }
+    
+    var getAttributesChoice = $('.selectAttributesChoice');
+    var getVariantChoice = $('.selectVariantChoice');
+    var addAttributeChBtn = $('#addAttributeChBtn');
+    var addVariantChBtn = $('#addVariantChBtn');
+
+    addVariantChBtn.on('click',function(){
+      var newattrName = $('#newvName').val();
+      var choices = getVariantChoice.val();
+      if(!newattrName)
+      {
+        alertUser('Variant name required','bg-danger','Variant name required');
+        return false;
+      }
+      if(!choices)
+      {
+        alertUser('Variant name required','bg-danger','Variant name required');
+        return false;
+      }
+      var dynamicData = {};
+      {% if attribute.pk %}
+      var myUrl = "{% url 'dashboard:edit-new-attribute' pk=attribute.pk %}";
+      {% else %}
+      var myUrl = "{% url 'dashboard:add-new-attribute' %}";
+      {% endif %}
+      dynamicData["attributes"] = JSON.stringify(choices);
+      dynamicData["name"] = newattrName;
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      dynamicData['track'] = 'Add attribute plus choice';
+      addAttributePlusChoice(dynamicData,myUrl)
+      .done(function(data){
+        alertUser('Success');
+        getAttributesChoice.val('');
+         
+         getVariantChoice.parents('div').find('li.token').remove();
+        $('#newvName').val('');
+      })
+      .fail(function(){
+        alertUser('Variant already exist','bg-danger','Add unique variant name');
+      });
+    });
+
+    addAttributeChBtn.on('click',function(){
+      var newattrName = $('#newattrName').val();
+      var choices = getAttributesChoice.val();
+      if(!newattrName)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      if(!choices)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      var dynamicData = {};
+      var myUrl = "{% url 'dashboard:add-new-attribute' %}";
+      dynamicData["attributes"] = JSON.stringify(choices);
+      dynamicData["name"] = newattrName;
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      dynamicData['track'] = 'Add attribute plus choice';
+      addAttributePlusChoice(dynamicData,myUrl)
+      .done(function(data){
+        alertUser('Success');
+        getAttributesChoice.val('');
+         
+         $(".selectAttributesChoice").parents('div').find('li.token').remove();
+        $('#newattrName').val('');
+        window.location.href = "{% url 'dashboard:product-attributes' %}";
+      })
+      .fail(function(){
+        alertUser('Attribute already exist','bg-danger','Add unique attribute name');
+      });
+    });
+// end scripts
+
+  $("#id_name").on("change keyup paste keydown", function(event) {
+    
+       var slug = $(this).val(); 
+       slug = slug.split(' ').join('_')            
+       $('#id_slug').attr('value',slug);
+       var slug = $(this).val();   
+  });
+  
+</script>
+{% endblock %}

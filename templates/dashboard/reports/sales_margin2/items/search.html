@@ -11,11 +11,13 @@
                       <thead style="border-top:1px solid #ddd;">
                         <tr class="bg-primary">
                           <th>Item Name</th>
-                          <th class="text-center">Unit Cost (KShs)</th>
+                          <th class="text-center">Unit Cost (KShs.)</th>
+                            <th class="text-center">Retail Cost (KShs.)</th>
+                            <th class="text-center">Margin (KShs)</th>
                           <th>Quantity</th>
-                          <th class="text-center"><span class="text-center">Total Sales (KShs)</span></th>
-                          <th>Unit Margin (%)</th>
-                          <th>Sales Margin (%)</th>
+                            <th>Total Cost (KShs)</th>
+                          <th>Total Sales (KShs)</th>
+                          <th>Sales Margin (Kshs)</th>
                         </tr>
                       </thead>
                       <tbody id="p-tb">
@@ -23,15 +25,17 @@
                         {% for item in items %}
                           <tr>
                             <td>{{item.product_name}}</td>
-                            <td><span class="pull-right">{{item.unit_cost}}</span></td>
+                              <td><span class="pull-right">{{item.retailPrice}}</span></td>
+                              <td><span class="pull-right">{{item.unit_cost}}</span></td>
+                              <td><span class="pull-right">{{item.unitMargin|intcomma}}</span></td>
                             <td>{{item.quantity__sum}}</td>
+                            <td><span class="pull-right">{{item.totalCost|intcomma}}</span></td>
                             <td><span class="pull-right">{{item.total_cost__sum|intcomma}}</span></td>
-                            <td><span>{{item.unitMargin|intcomma}}</span></td>
                               <td><span>{{item.salesMargin|intcomma}}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">No Items Report Available</h2></td></tr>
+                         <tr><td colspan="8"><h2 class="text-center">No Items Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 

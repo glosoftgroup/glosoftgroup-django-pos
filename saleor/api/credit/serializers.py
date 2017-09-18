@@ -183,7 +183,16 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                                      mobile=validated_data.get('mobile'),
                                      customer_name=validated_data.get('customer_name'))
         for solditem_data in solditems_data:
-            CreditedItem.objects.create(invoice=credit,**solditem_data)           
+            CreditedItem.objects.create(credit=credit,**solditem_data)           
+            try:
+                stock = Stock.objects.get(variant__sku=solditem_data['sku'])
+                if stock:                
+                    Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
+                    print stock.quantity
+                else: 
+                    print 'stock not found'
+            except:
+                print 'Error reducing stock!'
             
                 
         return credit
@@ -211,10 +220,8 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             invoice_number = data.get('invoice_number')      
             amount_paid = Decimal(data.get('amount_paid'))
             total_net = Decimal(data.get('total_net'))
-            balance = Decimal(data.get('balance'))
-            sale = Credit.objects.get(invoice_number=invoice_number)
-            print sale
-            print '*'*100
+            balance = Decimal(data.get('balance'))            
+            sale = Credit.objects.get(invoice_number=str(invoice_number))
             if status == 'fully-paid' and sale.balance > amount_paid:
                 print 'balance '+str(sale.balance)
                 print 'amount '+str(amount_paid)
@@ -268,7 +275,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         instance.balance = instance.balance-validated_data.get('amount_paid', instance.amount_paid)
         instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
         if instance.amount_paid >= instance.total_net:
-            instance.status = 'fully-paid'
+            instance.status = 'fully-paid'            
         else:
             instance.status = validated_data.get('status', instance.status)
         instance.mobile = validated_data.get('mobile', instance.mobile)
@@ -277,4 +284,5 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         instance.customer_name = validated_data.get('customer_name', instance.customer_name)
         instance.save()        
         return instance
+
 

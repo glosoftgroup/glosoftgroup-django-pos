@@ -28,7 +28,7 @@
   <link href="{% static 'backend/css/icons/icomoon/styles.css' %}" rel="stylesheet" type="text/css">
  <link href="{% static 'backend/css/icons/fontawesome/styles.min.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/bootstrap.css' %}" rel="stylesheet" type="text/css">
-
+  <link href="{% static 'backend/css/cards-shadow.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/core.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/components.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/css/colors.css' %}" rel="stylesheet" type="text/css">
@@ -387,10 +387,15 @@
                         </li>
                       {% endif %}
                       {% if perms.reports.view_sales_reports %}
-                        <li class="{% block menu_report_margin_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>
+                        <li class="{% block menu_creditreport_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:credit_list' %}"><i class='icon-cash3'></i>Credit Sales</a>
                         </li>
                       {% endif %}
+                      {#{% if perms.reports.view_sales_reports %}#}
+                        <!--<li class="{% block menu_report_margin_class %}{% endblock %}">-->
+                          <!--<a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>-->
+                        <!--</li>-->
+                      {#{% endif %}#}
                       {% if perms.reports.view_sales_reports %}
                         <li class="{% block menu_report_margin2_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin</a>
@@ -401,14 +406,14 @@
                           <!--<a href="{% url 'dashboard:sales_tax' %}"><i class='icon-cash2'></i>Sales Tax</a>-->
                         <!--</li>-->
                       {#{% endif %}#}
-                      {% if perms.reports.view_sales_reports %}
-                        <li class="{% block menu_report_tax2_class %}{% endblock %}">
+                      {#{% if perms.reports.view_sales_reports %}#}
+                        <!-- <li class="{% block menu_report_tax2_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_tax_list' %}"><i class='icon-cash2'></i>Sales Tax</a>
-                        </li>
-                      {% endif %}
+                        </li> -->
+                      {#{% endif %}#}
                       {% if perms.reports.view_products_reports %}
                         <li class="{% block menu_product_report_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Products</a>
+                          <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Stock</a>
                         </li>
                       {% endif %}
                       {% if perms.reports.view_purchase_reports %}
@@ -488,7 +493,7 @@
             
           
           <!-- Footer -->
-          <div class="footer text-muted">
+          <div class="footer text-muted" style="bottom:20px;z-index:0">
             &copy; . <a href="#">Glosoft Group</a> <a href="http://glosoftgroup.com" target="_blank"></a>
           </div>
           <!-- /footer -->

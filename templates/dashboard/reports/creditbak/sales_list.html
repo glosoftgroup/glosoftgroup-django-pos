@@ -1,0 +1,720 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load humanize %}
+
+{% block title %}
+  Sales List Report
+{% endblock %}
+{% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:sales_list' %}">Sales Reports</a></li>
+ {% endblock %}
+
+{% block menu_report_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+   .highcharts-credits{display:none;}
+    label.error{
+      color: #FF5722;
+    }
+    .td{cursor:pointer}
+    .table{border:1px solid #ccc}
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+    <div class="col-md-12">
+      <div class="panel panel-flat">
+     
+        <div class="panel-body search-panel">
+            <div class="col-md-4">
+             <label>Search Sales (for date format: yyyy-mm-dd)</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search details" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+                <label>categories</label>
+              <div class="form-group">
+                 <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none">None</option>
+                     <option value="list">sales list</option>
+                     <option value="summary">sales summary</option>
+                    <option value="category">category sales chart</option>
+                    <option value="items">items sales chart</option>
+                    <option value="user">user sales chart</option>
+                     <option value="terminal">till sales chart</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2 hidden">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>pick a date</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control daterange-single" type="text" placeholder="yyyy-mm-dd">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                  </select>
+              </div>
+            </div>
+      </div>
+   </div>
+   </div>
+
+<div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsives">
+                <table class="table  datatable-header-footer table-hover">
+                  <caption style="margin-bottom: 10px;">
+                   </caption>
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr class="bg-primary">
+                          <th>Transaction Date</th>
+                          <th>Receipt No</th>
+                          <th>Customer Name</th>
+                          <th>Cashier</th>
+                          <th>Payment Mode</th>
+                          <th>Quantity</th>
+                          <th>Total Sales (KShs)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tb">
+                        {% if sales %}
+                        {% for sale in sales %}
+                          <tr class='clickable-row' id="{{sale.pk }}">
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
+                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.payment_options.name %}{{sale.payment_options.name}}{% else %} Cash {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                          </tr>
+                        {% endfor %}
+                         {% else %}
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Summary Available</h2></td></tr>
+                        {% endif %}
+                        </tbody>
+
+                 </table>
+              </div>
+              {% if sales %}
+              <div class="my-paginate">
+                 <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
+              </div>
+              {% endif %}
+             </div>
+            </div>
+          {% if sales %}
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                 <p class="text-center" style="margin: 20px 0px;">
+                   Last Sales Sales: Kshs
+                    {% if total_sales_amount.total_net__sum %}
+                       {{total_sales_amount.total_net__sum}}
+                    {% else %}
+                       0.00<br />
+                    {% endif %}<br />
+                   Total Sales: Kshs {{total_sales_amount.total_net__sum}}<br />
+                   Total Tax: Kshs {{ total_tax_amount.total_tax__sum}}
+                 </p>
+                  <p class="text-center"> Thank you for partnering with us.<br />
+                  <span>Report pullled by User</span></p>
+                  <input type="hidden" class="setValue">
+                  <input type="hidden" class="setName">
+
+              </div>
+             </div>
+          {% endif %}
+            </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+
+
+</div>
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/highcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/exporting.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
+<script type="text/javascript">
+var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
+    var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
+$(document).ready(function(){
+
+    $(".td").click(function(){
+          window.location = $(this).data("href");
+      });
+
+     $('.bootpag-callback').bootpag({
+        total: parseInt({{pn}}),
+        maxVisible: 3,
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',       
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
+            $.get(creditPaginateUrl,{page:parseInt(num)},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true,
+        autoUpdateInput:false
+    }, function(chosen_date) {
+        $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
+        var group_id = $('.daterange-single').val();
+        var searchData = $('.search_user').val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var url = creditSearchUrl;
+       var categs = $('.sales-category').find(":selected").val();
+
+       if((categs == 'category') || (categs == 'category' && listSizeVal) || (categs == 'category' && searchData) || (categs == 'category' && listSizeVal && searchData) ){
+               $.get("{% url 'dashboard:sales_category_chart' %}", {date:group_id},function(data){
+                      $('#pagination-div').html(data)
+                });
+       }else if((categs == 'items') || (categs == 'items' && listSizeVal) || (categs == 'items' && searchData) || (categs == 'items' && listSizeVal && searchData) ){
+               $.get("{% url 'dashboard:sales_product_chart' %}", {date:group_id},function(data){
+                      $('#pagination-div').html(data)
+                });
+       }else if((categs == 'user') || (categs == 'user' && listSizeVal) || (categs == 'user' && searchData) || (categs == 'user' && listSizeVal && searchData) ){
+               $.get("{% url 'dashboard:sales_user_chart' %}", {date:group_id},function(data){
+                      $('#pagination-div').html(data)
+                });
+       }else if((categs == 'terminal') || (categs == 'terminal' && listSizeVal) || (categs == 'terminal' && searchData) || (categs == 'terminal' && listSizeVal && searchData) ){
+               $.get("{% url 'dashboard:sales_terminal_chart' %}", {date:group_id},function(data){
+                      $('#pagination-div').html(data)
+                });
+       }else if(searchData && listSizeVal && listSizeVal != '0'){
+            if(!group_id){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:group_id},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(searchData){
+            if(!group_id){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:group_id},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(listSizeVal && listSizeVal != '0'){
+           if(!group_id){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get(creditPaginateUrl,{page:1,gid:group_id, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }else{
+           if(!group_id){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get(creditPaginateUrl,{page:1,gid:group_id},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }
+
+    });
+
+  $('.sales-category').selectpicker().on('change', function(){
+        var sv = $(this).val();
+        var date = $('.daterange-single').val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var searchData = $('.search_user').val();
+
+         if(sv == 'list' && date && listSizeVal && searchData){
+            if(listSizeVal != '0'){
+               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:listSizeVal, gid:date, q:searchData}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+            }
+        }else if(sv == 'list' && listSizeVal && searchData){
+            if(listSizeVal != '0'){
+               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:listSizeVal, q:searchData}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+            }
+        }else if(sv == 'list' && listSizeVal && date){
+            if(listSizeVal != '0'){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+            }
+        }else if(sv == 'list' && date){
+         $.ajax({ url:creditPaginateUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+            }});
+        }else if(sv == 'list' && searchData){
+         $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, gid:date,q:searchData}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+            }});
+        }else if(sv == 'list' && listSizeVal){
+            if(listSizeVal != '0'){
+                 $.ajax({ url:creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+            }else{
+            $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+            }
+        }else if(sv == 'summary'){
+            window.location = "{% url 'dashboard:sales_date_chart' %}";
+
+        }else if(sv == 'category' && date){
+            $.get("{% url 'dashboard:sales_category_chart' %}", {date:date},function(data){
+                      $('#pagination-div').html(data)
+                      updateSelectListnSearch();
+                });
+        }else if(sv == 'category'){
+            url = "{% url 'dashboard:sales_category_chart' %}";
+            $.get(url, function(data){
+                      $('#pagination-div').html(data)
+                      updateSelectListnSearch();
+
+                });
+        }else if(sv == 'items' && date){
+            $.get("{% url 'dashboard:sales_product_chart' %}", {date:date}, function(data){
+                      $('#pagination-div').html(data)
+                      updateSelectListnSearch();
+                });
+        }else if(sv == 'items'){
+            $.get("{% url 'dashboard:sales_product_chart' %}", function(data){
+                      $('#pagination-div').html(data)
+                      updateSelectListnSearch();
+                });
+        }else if(sv == 'user' && date){
+            $.get("{% url 'dashboard:sales_user_chart' %}",{date:date}, function(data){
+                      $('#pagination-div').html(data)
+                      updateSelectListnSearch();
+                });
+        }else if(sv == 'user'){
+            $.get("{% url 'dashboard:sales_user_chart' %}", function(data){
+                      $('#pagination-div').html(data)
+                      updateSelectListnSearch();
+                });
+        }else if(sv == 'terminal' && date){
+             $.get("{% url 'dashboard:sales_terminal_chart' %}", {date:date}, function(data){
+                      $('#pagination-div').html(data)
+                      updateSelectListnSearch();
+                });
+        }else if(sv == 'terminal'){
+             $.get("{% url 'dashboard:sales_terminal_chart' %}", function(data){
+                      $('#pagination-div').html(data)
+                      updateSelectListnSearch();
+                });
+        }
+  });
+
+   $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change', function(){
+
+        var ts = $(this).val();
+
+        if(ts == 'pdf'){
+            var searchData = $('.search_user').val();
+            var listSizeVal = $('.list-sz').find(":selected").val();
+            var groupSizeVal = $('.group-sz').find(":selected").val();
+            var date = $('.daterange-single').val();
+            var url = "{% url 'dashboard:reports_sales_list_pdf' %}";
+            var scategory = $('.sales-category').find(":selected").val();
+
+            if(date && (scategory == 'category')){
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_category_pdf' %}",{image:dataUrl, date:date}, function(data){
+                                  window.open("data:application/pdf," + escape(data));
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+            }else if(scategory == 'category'){
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_category_pdf' %}",{image:dataUrl}, function(data){
+                                  window.open("data:application/pdf," + escape(data));
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+            }else if(date && (scategory == 'items')){
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_items_pdf' %}",{image:dataUrl, date:date}, function(data){
+                                  window.open("data:application/pdf," + escape(data));
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+            }else if(scategory == 'items'){
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_items_pdf' %}",{image:dataUrl}, function(data){
+                                  window.open("data:application/pdf," + escape(data));
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+            }else if(date && (scategory == 'user')){
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl, date:date}, function(data){
+                                  window.open("data:application/pdf," + escape(data));
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+            }else if(scategory == 'user'){
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl}, function(data){
+                                  window.open("data:application/pdf," + escape(data));
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+            }else if(date && (scategory == 'terminal')){
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_tills_pdf' %}",{image:dataUrl, date:date}, function(data){
+                                  window.open("data:application/pdf," + escape(data));
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+            }else if(scategory == 'terminal'){
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_tills_pdf' %}",{image:dataUrl}, function(data){
+                                  window.open("data:application/pdf," + escape(data));
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+            }else if (searchData && date ){
+                $.get(url, {q:searchData, gid:date}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (searchData){
+                $.get(url, {q:searchData}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (date){
+                $.get(url, {gid:date}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else{
+                $.get(url, function(data){
+                          window.open("data:application/pdf," + escape(data));
+               });
+            }
+
+        }else if(ts=='excel'){
+          <!--window.location="{% url 'dashboard:users_export_csv' %}";-->
+
+        }else{
+          $(this).val('')
+        }
+    });
+
+
+    //**@ display size select
+     $('.list-sz').selectpicker().on('change', function(){
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var date = $('.daterange-single').val();
+        var url =creditPaginateUrl;
+        var scategory = $('.sales-category').find(":selected").val();
+
+        if((scategory == 'list' && date && searchData)){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(scategory == 'list' && searchData){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(scategory == 'list' && date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+        }else if(((scategory && scategory != 'list' && scategory != 'none') && (!searchData && !date)) || (scategory && scategory != 'list' && scategory != 'none' && date)){
+           console.log('nothinh')
+        }else if(searchData && date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else if(searchData){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else if(date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else{
+           if(listSizeVal != '0'){
+               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+           }
+       }
+
+     });
+
+  function updateSelectListnSearch(){
+      $('.search_user').val('');
+      $('.list-sz').find(":selected").removeAttr('selected')
+      $(".list-sz option[value=0]").attr('selected', 'selected');
+      $(".list-sz").val(0);
+      $(".list-sz .filter-option").text('No:');
+      $(".list-sz ul.dropdown-menu li.active").removeClass('active');
+      $(".list-sz ul.dropdown-menu li[data-original-index='0']").addClass('active');
+  }
+
+    var delay = (function(){
+    var timer = 0;
+    return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+
+    //** search
+    $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        var date = $('.daterange-single').val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var url = creditSearchUrl;
+        var scategory = $('.sales-category').find(":selected").val();
+
+        delay(function(){
+            if(scategory == 'list' && (listSizeVal && listSizeVal != '0') && date ){
+                    $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text, gid:date}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+            }else if(scategory == 'list' && (listSizeVal && listSizeVal != '0')){
+                    $.ajax({ url: url,type: 'GET',data: {page:1, size:listSizeVal, q:search_text}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+            }else if((scategory == 'list' &&  listSizeVal == '0' && date) || (scategory == 'none' &&  listSizeVal == '0' && date)){
+                    $.ajax({ url: url,type: 'GET',data: {page:1, size:10, q:search_text, gid:date}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+            }else if((scategory == 'list' &&  listSizeVal == '0') || (scategory == 'none' &&  listSizeVal == '0')){
+                    $.ajax({ url: url,type: 'GET',data: {page:1, size:10, q:search_text}, async:false,success: function(data){
+                          $('#pagination-div').html(data);
+                    }});
+            }else if((scategory != 'none' && scategory != 'list') || (scategory != 'none' && scategory != 'list' && listSizeVal != '0')){
+                console.log('nothing');
+            }else if(listSizeVal && listSizeVal != '0' && date){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(listSizeVal && listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(date){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                        $('#pagination-div').html(data);
+               }});
+            }
+        }, 500 );
+
+      });
+
+
+});
+
+</script>
+{% endblock %}

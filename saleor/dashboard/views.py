@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.admin.views.decorators import \
     staff_member_required as _staff_member_required
-from django.db.models import F, Q, Sum
 from django.template.response import TemplateResponse
 from payments import PaymentStatus
 
@@ -12,9 +11,10 @@ from ..product.models import Product
 from ..core.utils import get_paginator_items
 from ..userprofile.models import User
 from ..sale.models import Sales, SoldItem, Terminal
-from ..product.models import Product, ProductVariant, Category
+from ..product.models import Product, ProductVariant, Category, Stock
 from ..decorators import permission_decorator, user_trail
 from ..utils import render_to_pdf, convert_html_to_pdf
+from ..credit.models import Credit, CreditedItem
 
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -28,11 +28,10 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max
+from django.db.models import Count, Min, Sum, Avg, Max, F
 from django.core import serializers
 from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 # from lockdown.decorators import lockdown
 import datetime
@@ -62,6 +61,13 @@ def staff_member_required(f):
 
 @staff_member_required
 def index(request):
+    today = datetime.datetime.now()
+    try:
+        last_sale = Sales.objects.latest('id')
+        date = DateFormat(last_sale.created).format('Y-m-d')
+    except:
+        date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
     try:
         orders_to_ship = Order.objects.filter(status=OrderStatus.FULLY_PAID)
         orders_to_ship = (orders_to_ship
@@ -131,6 +137,7 @@ def top_categories():
                 for s in range(0, sales_by_category.count(), 1):
                     sales['count'] = s
                 new_sales.append(sales)
+                sales['total_cost'] = int(sales['total_cost__sum'])
                 # new_sales.append(sales_by_category.setdefault(sales, {'data':'None'}))
             categs = Category.objects.all()
             this_year = today.year
@@ -150,7 +157,9 @@ def top_categories():
             date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))[
                 'total_net__sum']
 
-            no_of_customers = Sales.objects.filter(created__contains=date).count()
+            sales_customers = Sales.objects.filter(created__contains=date).count()
+            credit_customers = Credit.objects.filter(created__contains=date).count()
+            no_of_customers = sales_customers + credit_customers
 
             data = {
                 "sales_by_category": new_sales,
@@ -230,8 +239,5 @@ def styleguide(request):
     return TemplateResponse(request, 'dashboard/styleguide/index.html', {})
 
 def get_low_stock_products():
-    #threshold = getattr(settings, 'LOW_STOCK_THRESHOLD', 10)
-    products = Product.objects.annotate(
-        total_stock=Sum('variants__stock__quantity'))
-    products = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
+    products = Stock.objects.get_low_stock()
     return products

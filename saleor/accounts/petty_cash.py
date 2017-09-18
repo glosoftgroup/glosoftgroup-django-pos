@@ -128,7 +128,7 @@ def add(request):
 				str(lastEntry.closing)+' current balance is '+str(lastEntry.closing + amount), 'update')
 			return HttpResponse(balance)
 		except:
-			new_petty_cash = PettyCash(opening=amount, added=amount, closing=amount)
+			new_petty_cash = PettyCash(opening=amount, added=0, closing=amount)
 			new_petty_cash.save()
 			balance = new_petty_cash.closing
 			user_trail(request.user.name, 'added KShs. ' + str(amount) + ' to petty cash, current balance is KShs. ' + str(balance), 'update')

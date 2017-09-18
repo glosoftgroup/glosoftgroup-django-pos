@@ -50,9 +50,9 @@
                {% if items %}
                         {% for item in items %}
                           <tr>
-                            <td>{{item}}</td>
-                            <td>{{item.total_stock}}</td>
-                            <td>{{item.plow_stock_threshold}}</td>
+                            <td>{{item.variant.display_product}}</td>
+                            <td>{{item.quantity}}</td>
+                            <td>{{item.low_stock_threshold}}</td>
                           </tr>
                         {% endfor %}
                         {% else %}

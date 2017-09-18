@@ -1,0 +1,180 @@
+
+{% load staticfiles i18n %}
+{% if sales_by_category %}
+<div class="row">
+    <div class="col-md-12 animated fadeIn" id="containers">
+        <div class="panel panel-flat">
+            <div class="panel-body">
+            <div class="col-md-6">
+             <div id="container" style="width:100%; height:400px;"></div>
+            </div>
+                <div class="col-md-6">
+                    <h6 class="text-center">Top 5 Categories on {{sales_date}}</h6>
+                     <div class="data-table-container">
+                        <table class="table bordered highlight responsive data-table" style="border-left:0px;border-right:0px;">
+                          <tbody>
+                          {% if sales_by_category %}
+                           {% for sales in sales_by_category %}
+                              <tr data-action-go="">
+                                <td class="td" data-href="{{sales.product_category}}">
+                                  <div class="sqaure" style="width: 15px;height: 15px;border-radius: 50%;background-color: {{sales.color}};">
+                                  </div>
+                                </td>
+                                <td class="td" data-href="{{sales.product_category}}">
+                                    {{forloop.counter }}.
+                                   {{sales.product_category}}
+                                </td>
+                                <td class="td" data-href="{{sales.product_category}}">
+                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
+                                </td>
+                                <td class="td" data-href="{{sales.product_category}}">
+                                  {{ sales.percentage }}%
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            {% endif %}
+
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+    </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+// Create the chart
+Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Top 5 Sales Categories {{sales_date}}'
+    },
+    xAxis: {
+        type: 'category',
+        labels: { enabled:false }
+    },
+    yAxis: {
+        title: {
+            text: 'Sales Amount in KShs.'
+        }
+
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            borderWidth: 0,
+            dataLabels: {
+                enabled: true,
+                format: '{point.p:.2f}%',
+                fontColor:'#8cc414'
+            }
+        }
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>KShs. {point.y:.2f}</b><br/>'
+    },
+
+    series: [{
+        name: 'Categories',
+        colorByPoint: true,
+        data: [{% for d in sales_by_category %}{ name:'{{d.product_category }}', p:{{d.percentage}} ,y:{{d.total_cost__sum}}, color:'{{d.color}}', drilldown:'{{d.product_category}}' }, {% endfor %}]
+    }],
+    drilldown: {
+        series: [{
+            name: 'Microsoft Internet Explorer',
+            id: 'Microsoft Internet Explorer',
+            data: [
+                [
+                    'v11.0',
+                    24.13
+                ],
+                [
+                    'v8.0',
+                    17.2
+                ]
+            ]
+        }, {
+            name: 'Chrome',
+            id: 'Chrome',
+            data: [
+                [
+                    'v40.0',
+                    5
+                ],
+                [
+                    'v41.0',
+                    4.32
+                ]
+            ]
+        }, {
+            name: 'Firefox',
+            id: 'Firefox',
+            data: [
+                [
+                    'v35',
+                    2.76
+                ],
+                [
+                    'v36',
+                    2.32
+                ]
+            ]
+        }, {
+            name: 'Safari',
+            id: 'Safari',
+            data: [
+                [
+                    'v7.0',
+                    0.26
+                ],
+                [
+                    'v6.2',
+                    0.17
+                ]
+            ]
+        }, {
+            name: 'Opera',
+            id: 'Opera',
+            data: [
+                [
+                    'v12.x',
+                    0.34
+                ]
+            ]
+        }]
+    }
+});
+
+
+$('.printDiv').on('click', function(){
+    var node = document.getElementById('containers')
+        domtoimage.toPng(node)
+        .then(function (dataUrl) {
+            var img = new Image();
+            img.src = dataUrl;
+            $('#pagination-div').append(img);
+        })
+        .catch(function (error) {
+            console.error('oops, something went wrong!', error);
+        });
+})
+
+</script>
+
+{% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-info">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+       No Category sales summary available for {{date}}
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}

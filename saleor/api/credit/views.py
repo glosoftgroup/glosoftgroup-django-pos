@@ -14,6 +14,7 @@ from ...product.models import (
     )
 from ...credit.models import Credit
 from ...sale.models import (
+                            Sales, SoldItem,
                             Terminal, 
                             TerminalHistoryEntry,
                             DrawerCash
@@ -44,7 +45,9 @@ class CreditCreateAPIView(generics.CreateAPIView):
     serializer_class = CreateCreditSerializer
 
     def perform_create(self, serializer):              
-        serializer.save(user=self.request.user)      
+        instance = serializer.save(user=self.request.user)      
+        if instance.status == 'fully-paid':
+            send_to_sale(instance)
 
         
 class CreditListAPIView(generics.ListAPIView):
@@ -79,7 +82,9 @@ class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):
     queryset = Credit.objects.all()
     serializer_class = CreditUpdateSerializer
     def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
+        instance = serializer.save(user=self.request.user)
+        if instance.status == 'fully-paid':
+            send_to_sale(instance)
         user_trail(self.request.user.name,'made a sale:#'+str(serializer.data['invoice_number'])+' sale worth: '+str(serializer.data['total_net']),'add')
         info_logger.info('User: '+str(self.request.user)+' made a sale:'+str(serializer.data['invoice_number']))
         terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
@@ -101,5 +106,29 @@ class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):
                                            trans_type='credit paid')
         
 
-
-
+def send_to_sale(credit):
+    #credit = Credit.objects.get(invoice_number=invoice_number)
+    sale = Sales.objects.create(
+                         user=credit.user,
+                         invoice_number=credit.invoice_number,
+                         total_net=credit.total_net,
+                         sub_total=credit.sub_total,
+                         balance=credit.balance,
+                         terminal=credit.terminal,
+                         amount_paid=credit.amount_paid,
+                         customer=credit.customer,
+                         status=credit.status,
+                         total_tax=credit.total_tax,
+                         mobile=credit.mobile,
+                         customer_name=credit.customer_name
+                         )
+    for item in credit.items():
+        item = SoldItem.objects.create(sales=sale,
+                        sku=item.sku,
+                        quantity=item.quantity,
+                        product_name=item.product_name,
+                        total_cost=item.total_cost,
+                        unit_cost=item.unit_cost,
+                        product_category=item.product_category
+                        )
+        print item

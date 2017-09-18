@@ -38,7 +38,7 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def re_order(request):
     try:
-        queryset_list = ProductVariant.objects.get_low_stock().order_by('-id')
+        queryset_list = Stock.objects.get_low_stock().order_by('-id')
 
         page = request.GET.get('page', 1)
         paginator = Paginator(queryset_list, 10)
@@ -73,7 +73,7 @@ def reorder_pagination(request):
     p2_sz = request.GET.get('psize')
     select_sz = request.GET.get('select_size')
 
-    low_stock = ProductVariant.objects.get_low_stock().order_by('-id')
+    low_stock = Stock.objects.get_low_stock().order_by('-id')
     if list_sz:
         paginator = Paginator(low_stock, int(list_sz))
         low_stock = paginator.page(page)
@@ -110,11 +110,10 @@ def reorder_search(request):
 
         if q is not None:
             q = q.strip()
-            stock = ProductVariant.objects.get_low_stock()
+            stock = Stock.objects.get_low_stock()
             queryset_list = stock.filter(
-                Q(name__icontains=q)|
-                Q(sku__icontains=q) |
-                Q(product__name__icontains=q) 
+                Q(variant__product__name__icontains=q)|
+                Q(variant__sku__icontains=q)                 
             ).order_by('-id')
             paginator = Paginator(queryset_list, 10)
 
@@ -618,7 +617,7 @@ def product_create(request):
             'Dashboard message', 'Added product %s') % product
         messages.success(request, msg)
         return redirect('dashboard:product-update',
-                        pk=product.pk)
+                        pk=product.pk,name='123')
     else:
         errors = product_form.errors
         product_cl = ProductClass()
@@ -634,7 +633,7 @@ def product_create(request):
 
 @staff_member_required
 @permission_decorator('product.change_product')
-def product_edit(request, pk):
+def product_edit(request, pk,name=None):
     product = get_object_or_404(
         Product.objects.prefetch_related(
             'images', 'variants'), pk=pk)
@@ -668,12 +667,14 @@ def product_edit(request, pk):
         msg = pgettext_lazy(
             'Dashboard message', 'Updated product %s') % product
         messages.success(request, msg)
-        return redirect('dashboard:product-update', pk=product.pk)
+        return redirect('dashboard:product-update', pk=product.pk,go='pricing')
     ctx = {'stock_form':stock_form,'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
            'product': product, 'stock_delete_form': stock_delete_form,
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
            'variant_form': variant_form}
+    if name:
+        ctx['go'] = 'True'
     if request.is_ajax():
         return TemplateResponse(
                     request, 
@@ -824,10 +825,13 @@ def stock_edit(request, product_pk, stock_pk=None):
     errors = form.errors
     ctx = {'form': form, 'product': product, 'stock': stock, 'errors':errors}
     if request.is_ajax():
-        if not stock:
-            return HttpResponse(json.dumps({'message':0},content_type='application/json'))
+        if form.errors:            
+            return HttpResponse(json.dumps({'errors': form.errors.items()}),content_type='application/json')
         else:
-            return HttpResponse(json.dumps({'message':1},content_type='application/json'))
+            return TemplateResponse(request, 'dashboard/product/partials/edit_stock.html', ctx)
+        # except Exception as e:
+        #     print e
+
         #return TemplateResponse(request, 'dashboard/purchase/includes/add_stock_form.html', ctx)
     return TemplateResponse(request, 'dashboard/product/stock_form.html', ctx)
 
@@ -921,7 +925,13 @@ def product_image_delete(request, product_pk, img_pk):
 @permission_decorator('product.change_productvariants')
 def add_attributes(request):
     if request.method == 'POST':
-        product_variant = ProductVariant()        
+        if request.POST.get('vpk'):
+            v_id = int(request.POST.get('vpk'))            
+            product_variant = ProductVariant.objects.get(pk=v_id)
+            action = 'edit'
+        else:
+            product_variant = ProductVariant() 
+            action = 'add'       
         if request.POST.get('sku'):
             product_variant.sku = request.POST.get('sku')
         if request.POST.get('price'):
@@ -937,7 +947,9 @@ def add_attributes(request):
                 attrs[att['id']] =att['value']
             print attrs
             product_variant.attributes = attrs
-        if request.POST.get('pk'):            
+        if not request.POST.get('pk'): 
+            product_variant.save()
+        else:           
             product = Product.objects.get(pk=int(request.POST.get('pk')))
             product_variant.product = product
             attributes = product.product_class.variant_attributes.prefetch_related('values')    
@@ -948,11 +960,9 @@ def add_attributes(request):
                    'variants':variants}
             return TemplateResponse(request,
                 'dashboard/product/partials/variant_table.html', ctx)
-
-
-
-
     return HttpResponse('Error!');
+
+
 @staff_member_required
 @permission_decorator('product.change_productvariants')
 def variant_edit(request, product_pk, variant_pk=None):
@@ -987,6 +997,10 @@ def variant_edit(request, product_pk, variant_pk=None):
     form_errors = form.errors
     ctx = {'attribute_form': attribute_form, 'form': form, 'product': product,
            'variant': variant,'errors':errors,'form_errors':form_errors}
+    if request.is_ajax():
+        return TemplateResponse(
+        request, 'dashboard/product/partials/'+str(request.GET['template'])+'.html', ctx)
+
     return TemplateResponse(
         request, 'dashboard/product/variant_form.html', ctx)
 
@@ -1515,7 +1529,7 @@ def stocks(request):
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
-            return TemplateResponse(request, 'dashboard/purchase/purchase_list.html', {'product_results':product_results,'categories':categories})
+            return TemplateResponse(request, 'dashboard/purchase/purchase_list.html', {'product_results':product_results,'categories':categories,'pn':paginator.num_pages})
     except TypeError as e:
         error_logger.error(e)
         return HttpResponse('error accessing users')
@@ -1864,11 +1878,15 @@ def have_variants(request):
             HttpResponse('Invalid class ID')
 
 @staff_member_required
-def add_new_attribute(request):
+def add_new_attribute(request,pk=None):
     if request.method == 'POST':
-        if request.POST.get('name'):
+        if pk:
+            attribute = ProductAttribute.objects.get(pk=pk)
+        elif request.POST.get('name'):
             slug = request.POST.get('name').replace(' ','_')
             attribute = ProductAttribute.objects.create(name=request.POST.get('name'),slug=slug)
+        else:
+            return HttpResponse(json.dumps({'error':'Name or pk expected'}))
         if request.POST.get('attributes'):
             choices = json.loads(request.POST.get('attributes'))
             for choice in choices:

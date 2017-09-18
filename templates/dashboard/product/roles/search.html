@@ -48,7 +48,13 @@
                         {% endwith %}
                       </td>
                       <!-- price -->
-                        <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"> <span class="pull-right">{{product.price.gross|intcomma}}</span> </td>
+                        <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
+                        {% if not product.product_class.has_variants %}
+                       {{product.price.gross|intcomma}}
+                      {% else %}
+                      --
+                      {% endif %}
+                         </td>
                       <!-- variants -->
                       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
 
@@ -182,7 +188,7 @@
     {% if sz %}
     $.when( $.ready ).then(function() {     
        $('.bootstrap-select').selectpicker();
-       $('.bootstrap-select').selectpicker('val', ["{{sz}}"]);              
+       $('.list-sz').selectpicker('val', ["{{sz}}"]);              
     });
     {% endif %}
     

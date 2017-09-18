@@ -59,7 +59,7 @@
                   <tr class='clickable-row' id="{{user.pk }}">
                     <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer.name %}{{sale.customer.name}}{% else %} Customer {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.total_net}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax}}</span></td>

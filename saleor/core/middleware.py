@@ -66,6 +66,7 @@ class CurrencyMiddleware(object):
 class SettingsMiddleware(object):
 
     def process_request(self, request):
+        #return None
         excluded_path = reverse('dashboard:addsitekeys')
 
         en = Encryptor()
@@ -93,6 +94,7 @@ class SettingsMiddleware(object):
         secretkey = replace_last(number)
 
         if filename != hex:
+            print 'hex filename not equal'
             return TemplateResponse(request, 'lockdown/form.html', {'days': number})
 
         if self.is_not_empty(filecontent):
@@ -111,7 +113,7 @@ class SettingsMiddleware(object):
                     info_logger.info('No issue on expiry date')
                     return None
             else:
-                return TemplateResponse(request, 'lockdown/form.html', {'days': 'error'})
+                return TemplateResponse(request, 'lockdown/form.html', {'days': number})
 
 
     def is_json(self, myjson):
