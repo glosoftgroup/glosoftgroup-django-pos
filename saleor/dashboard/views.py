@@ -157,8 +157,12 @@ def top_categories():
             date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))[
                 'total_net__sum']
 
-            sales_customers = Sales.objects.filter(created__contains=date).count()
-            credit_customers = Credit.objects.filter(created__contains=date).count()
+            try:
+                sales_customers = Sales.objects.filter(created__contains=date).count()
+                credit_customers = Credit.objects.filter(created__contains=date).count()
+            except:
+                sales_customers = 0
+                credit_customers = 0
             no_of_customers = sales_customers + credit_customers
 
             data = {

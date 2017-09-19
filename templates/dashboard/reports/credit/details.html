@@ -11,7 +11,7 @@
 {% endblock %}
 {% block breadcrumbs %}
      <li class="active"><a href="{% url 'dashboard:credit_list' %}">Credit Sales</a></li>
-     <li>Invoice</li>
+     <li>Receipt</li>
  {% endblock %}
 
 {% block menu_report_class %}active{% endblock %}
@@ -42,9 +42,9 @@
                <div>
                       <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
 
-                        <h6><span class="text-bold">Customer:</span> {{sale.customer}}</h6> 
-                        <h6 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h6>
-                          <h5 class=""><span class="text-bold">Invoice Number:</span> {{sale.invoice_number}}</h5>
+                        <h6><span class="text-bold">Customer:</span> {% if sale.customer.name %} {{sale.customer.name}} {% else %} <span class="text-bold">-</span>{% endif %}</h6>
+                          <h6 class=""><span class="text-bold">Receipt Number:</span> {{sale.invoice_number}}</h6>
+                          <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
 
                       </div>
                     </div>

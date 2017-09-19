@@ -186,13 +186,5 @@
 
    });
 
-   //**@ display size select
-    $('.list-sz').selectpicker().on('change', function(){
-        var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:products_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
-     });
-
  </script>
   <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

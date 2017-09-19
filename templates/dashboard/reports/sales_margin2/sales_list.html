@@ -175,7 +175,7 @@
                    Total Margin: KShs {{totalMargin}}
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
+                  <span>Report pullled by {% if request.user.name %}{{request.user.name}}{% else %} {{request.user}}{% endif %}</span></p>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
 
