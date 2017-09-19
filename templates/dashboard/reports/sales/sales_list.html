@@ -6,7 +6,7 @@
 {% load humanize %}
 
 {% block title %}
-  Sales List Report
+  Sales Report
 {% endblock %}
 {% block breadcrumbs %}
      <li class="active"><a href="{% url 'dashboard:sales_list' %}">Sales Reports</a></li>
@@ -46,6 +46,7 @@
                     <option value="none">None</option>
                      <option value="list">sales list</option>
                      <!-- <option value="summary">sales summary</option> -->
+                     <option value="solditems">Items Sales</option>
                      <option value="category">category sales chart</option>
                      <option value="items">items sales chart</option>
                      <option value="user">user sales chart</option>

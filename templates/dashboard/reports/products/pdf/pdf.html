@@ -63,7 +63,7 @@
 
                             <td>{{item.get_stock_quantity}}</td>
                              <td>{{item.get_price_per_item.gross}}</td>
-                            <td>{{item.get_total_price_cost.gross}}</td>
+                            <td>{% if item.get_total_price_cost %}{{item.get_total_price_cost.gross }} {% else %} 0.00 {% endif %}</td>
                           </tr>
                         {% endfor %}
                         {% else %}

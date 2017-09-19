@@ -33,7 +33,7 @@
                             
                             <td class="text-center">{{item.get_stock_quantity}}</td>
                               <td><span class="pull-right"> {{item.get_price_per_item.gross|intcomma}}</span></td>
-                              <td><span class="pull-right"> {{item.get_total_price_cost|intcomma}}</span></td>
+                              <td><span class="pull-right"> {% if item.get_total_price_cost %}{{item.get_total_price_cost.gross|intcomma }} {% else %} 0.00 {% endif %}</span></td>
                           </tr>
                         {% endfor %}
                         {% else %}
