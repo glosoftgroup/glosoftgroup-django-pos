@@ -152,7 +152,8 @@ def category_search(request, root_pk=None):
 def category_create32(request):
     if request.method == 'POST':
         name = request.POST.get('name')
-        category = Category()        
+        category = Category() 
+        all_cats = Category.objects.all().order_by('-id')       
         description = request.POST.get('description')
         new_category = Category.objects.create(name=name,description=description)
         product = Product()
@@ -160,7 +161,7 @@ def category_create32(request):
         product_class = get_object_or_404(ProductClass, pk=class_pk)
         product.product_class = product_class
         product_form = ProductForm(request.POST or None, instance=product)
-        ctx = {'category': category, 'product_form': product_form}
+        ctx = {'all_cats':all_cats,'category': category, 'product_form': product_form}
         return TemplateResponse(request, 'dashboard/category/_category_add_success.html', ctx)
     else:
         return HttpResponse('Unexpected get method')
