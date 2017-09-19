@@ -26,6 +26,7 @@ from ...product.models import (Product, ProductAttribute, Category,
 from ..views import staff_member_required
 from ..views import get_low_stock_products
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ...decorators import permission_decorator, user_trail
@@ -807,7 +808,7 @@ def stock_edit(request, product_pk, stock_pk=None):
         cost_price = request.POST.get('cost_price')     
         invoice_number = request.POST.get('invoice_number')
         #try:
-        PurchaseProduct.objects.create(
+        p = PurchaseProduct.objects.create(
                             variant=stock.variant,
                             stock=stock,
                             invoice_number=invoice_number,
@@ -815,6 +816,8 @@ def stock_edit(request, product_pk, stock_pk=None):
                             quantity=quantity,
                             supplier=product.product_supplier,
                             )
+        print p
+        print '*'*21
         messages.success(
             request, pgettext_lazy('Dashboard message', 'Saved stock'))
         product_url = reverse(
@@ -825,8 +828,11 @@ def stock_edit(request, product_pk, stock_pk=None):
     errors = form.errors
     ctx = {'form': form, 'product': product, 'stock': stock, 'errors':errors}
     if request.is_ajax():
-        if form.errors:            
-            return HttpResponse(json.dumps({'errors': form.errors.items()}),content_type='application/json')
+        if form.errors:
+            response = JsonResponse({'status':'false','message':form.errors.items()})
+            response.status_code = 500
+            return response            
+            #return HttpResponse(json.dumps({'errors': form.errors.items()}),content_type='application/json')
         else:
             return TemplateResponse(request, 'dashboard/product/partials/edit_stock.html', ctx)
         # except Exception as e:

@@ -41,7 +41,9 @@ class TrackSerializer(serializers.ModelSerializer):
                 'unit_cost',
                 'total_cost',
                 'product_name',
-                'product_category'
+                'product_category',
+                'tax',
+                'discount',
                  )
 
 
@@ -61,6 +63,8 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'product_category',
                 'available_stock',
                 'item_pk',
+                'tax',
+                'discount',
                  )
     def get_item_pk(self,obj):
         return obj.pk
@@ -92,7 +96,10 @@ class CreditListSerializer(serializers.ModelSerializer):
                  'mobile',
                  'customer_name',
                  'cashier',
-                 'status'
+                 'status',
+                 'total_tax',
+                 'discount_amount',
+                 'debt',
                 )
 
     def get_cashier(self,obj):
@@ -119,6 +126,9 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                  'mobile',
                  'customer_name',
                  'status',
+                 'total_tax',
+                 'discount_amount',
+                 'debt',
                 )
 
     def validate_total_net(self,value):
@@ -170,8 +180,8 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                 mobile = validated_data.get('mobile')
                 customer = Customer.objects.create(name=name, mobile=mobile)
             else:
-                print 'Customer name and mobile not set'
-                #customer = Customer.objects.create(name=name)
+                customer = None
+                raise ValidationError('customer details provided dont meet adding customer criteria')
 
         invoice_number = validated_data.get('invoice_number')
         # calculate loyalty_points
@@ -183,8 +193,8 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                 loyalty_points = 0
             else:
                 loyalty_points = total_net/points_eq
-            customer.loyalty_points += loyalty_points
-            customer.save()
+            # customer.loyalty_points += loyalty_points
+            # customer.save()
         # get sold products        
         solditems_data = validated_data.pop('credititems')
         # sales = Sales.objects.create(**validated_data)
@@ -198,6 +208,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                                      customer=customer,
                                      status='payment-pending',
                                      mobile=validated_data.get('mobile'),
+                                     debt=validated_data.get('debt'),
                                      customer_name=validated_data.get('customer_name'))
         for solditem_data in solditems_data:
             CreditedItem.objects.create(credit=credit,**solditem_data)           
@@ -215,6 +226,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         return credit
 
 class CreditUpdateSerializer(serializers.ModelSerializer):      
+    credititems = TrackSerializer(many=True)
     class Meta:
         model = Credit
         fields = ('id',                 
@@ -226,7 +238,11 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
                  'amount_paid',                 
                  'mobile',
                  'customer_name',
-                 'status',                
+                 'status',
+                 'total_tax',
+                 'discount_amount',
+                 'debt',
+                 'credititems',
                  )       
     
     def validate_status(self,value):        
@@ -255,12 +271,12 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Total Net should be a decimal/integer')
 
-    def validate_balance(self,value):
+    def validate_debt(self,value):
         data = self.get_initial()        
         try:
-            balance = Decimal(data.get('balance'))
+            debt = Decimal(data.get('debt'))
         except:
-            raise ValidationError('Balance should be a decimal/integer')
+            raise ValidationError('Debt should be a decimal/integer')
         return value
 
     def validate_amout_paid(self,value):
@@ -289,7 +305,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
 
         terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))       
         terminal.save()        
-        instance.balance = instance.balance-validated_data.get('amount_paid', instance.amount_paid)
+        instance.debt = instance.debt-validated_data.get('amount_paid', instance.amount_paid)
         instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
         if instance.amount_paid >= instance.total_net:
             instance.status = 'fully-paid'            

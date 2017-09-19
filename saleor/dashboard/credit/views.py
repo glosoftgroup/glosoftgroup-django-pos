@@ -86,6 +86,7 @@ def credit_detail(request, pk=None):
 		return TemplateResponse(request, 'dashboard/reports/credit/details.html',{'items': items, "sale":sale})
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
+		return HttpResponse('No items found')
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')

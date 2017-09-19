@@ -41,7 +41,9 @@ class TrackSerializer(serializers.ModelSerializer):
                 'unit_cost',
                 'total_cost',
                 'product_name',
-                'product_category'
+                'product_category',
+                'tax',
+                'discount'
                  )
 
 class ItemsSerializer(serializers.ModelSerializer):
@@ -60,6 +62,8 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'product_category',
                 'available_stock',
                 'item_pk',
+                'tax',
+                'discount',
                  )
     def get_item_pk(self,obj):
         return obj.pk
@@ -155,8 +159,10 @@ class CreateInvoiceSerializer(serializers.ModelSerializer):
             if validated_data.get('mobile'):
                 mobile = validated_data.get('mobile')
                 customer = Customer.objects.create(name=name, mobile=mobile)
-            else:
-                customer = Customer.objects.create(name=name)
+            else:                
+                customer = None
+                print 'customer details provided dont meet adding customer criteria'
+
 
         invoice_number = validated_data.get('invoice_number')
         # calculate loyalty_points
@@ -168,8 +174,8 @@ class CreateInvoiceSerializer(serializers.ModelSerializer):
                 loyalty_points = 0
             else:
                 loyalty_points = total_net/points_eq
-            customer.loyalty_points += loyalty_points
-            customer.save()
+            # customer.loyalty_points += loyalty_points
+            # customer.save()
         # get sold products        
         solditems_data = validated_data.pop('invoiceitems')
         # sales = Sales.objects.create(**validated_data)

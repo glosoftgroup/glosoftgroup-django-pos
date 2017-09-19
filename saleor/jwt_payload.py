@@ -65,7 +65,11 @@ def custom_exception_handler(exc, context):
 
     # Now add the HTTP status code to the response.
     if response is not None:
-        response.data['status_code'] = response.status_code
+        try:
+            response.data['status_code'] = response.status_code
+        except Exception as e:
+                error_logger.error(e)
+
         # log errors
        	debug_logger.debug(response.data)
        	error_logger.error(response.data)

@@ -24,7 +24,8 @@ from .serializers import (
     ProductListSerializer,
     SalesSerializer, 
     SalesListSerializer,
-    SalesUpdateSerializer, 
+    SalesUpdateSerializer,
+    
      )
 from rest_framework import generics
 
@@ -33,6 +34,7 @@ import logging
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
+
 
 
 class CreateStockAPIView(CreateAPIView):
@@ -82,6 +84,9 @@ class SalesCreateAPIView(generics.CreateAPIView):
                                            terminal=terminal,
                                            amount=serializer.data['total_net'],
                                            trans_type='sale')
+        user_trail(self.request.user.name,'made a sale:#'+str(serializer.data['invoice_number'])+' sale worth: '+str(serializer.data['total_net']),'add')
+        info_logger.info('User: '+str(self.request.user)+' made a sale:'+str(serializer.data['invoice_number']))
+        
         
 
 class SalesUpdateAPIView(generics.RetrieveUpdateAPIView):    
