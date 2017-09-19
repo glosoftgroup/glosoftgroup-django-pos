@@ -6,7 +6,7 @@
     $.fn.bootstrapSwitch.defaults.size = 'mini';
     $.fn.bootstrapSwitch.defaults.onText = 'Yes';
     $.fn.bootstrapSwitch.defaults.offText = 'No';
-    $.fn.bootstrapSwitch.defaults.onColor = 'success';
+    $.fn.bootstrapSwitch.defaults.onColor = 'primary';
     $.fn.bootstrapSwitch.defaults.animate = 'true';
     $.fn.bootstrapSwitch.defaults.labelWidth = 'auto';
     var dynamicData = {};

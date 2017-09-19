@@ -518,7 +518,7 @@ $(function(){
 
     addProductDetails(dynamicData,addStockUrl,'post')
     .done(function(data){
-            
+        console.log(data.errors);
       if(data.errors){        
         var message = ' ';
         $.each(data, function(i, item) {
@@ -538,7 +538,9 @@ $(function(){
         refreshDiv.html(data);
       });
     })
-    .fail(function(){
+    .fail(function(err){
+      var msg = JSON.stringify(err).message;
+      console.log(msg);
       alertUser('Stock already exist','bg-danger','Error!');
     });
    });

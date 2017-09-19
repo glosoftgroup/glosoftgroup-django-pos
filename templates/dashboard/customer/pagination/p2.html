@@ -19,6 +19,7 @@
                     <th>Sales</th>
                     <th>Creditable</th>
                     <th>Loyalty Points</th>
+                    <th>Total Discount</th>
                     {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
                     <th class="text-center">Actions</th>
                     {% endif %}
@@ -49,7 +50,10 @@
                         </td>
                         <!-- loyalty points -->
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
-                        {{ user.loyalty_points }}
+                        {{ user.get_loyalty_points }}
+                        </td>
+                        <td>
+                          {{user.get_total_discount}}
                         </td>
                         <!-- actions -->
                         <td class="text-center">

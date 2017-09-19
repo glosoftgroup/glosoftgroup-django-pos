@@ -14,6 +14,7 @@ from .api.credit.urls import urlpatterns as api_credit_urls
 from .api.payment.urls import urlpatterns as api_payment_urls
 from .api.product.urls import urlpatterns as api_urls
 from .api.sms.urls import urlpatterns as api_sms_urls
+from .api.terminal.urls import urlpatterns as api_terminal_urls
 from .cart.urls import urlpatterns as cart_urls
 from .checkout.urls import urlpatterns as checkout_urls
 from .core.sitemaps import sitemaps
@@ -40,8 +41,9 @@ urlpatterns = [
     url(r'^api/invoice/', include(api_invoice_urls, namespace='invoice-api')),
     url(r'^api/credit/', include(api_credit_urls, namespace='credit-api')),
     url(r'^api/products/', include(api_urls, namespace='product-api')),
-    url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),
-    url(r'^api/sms/', include(api_sms_urls, namespace='sms-api')),
+    url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),    
+    url(r'^api/sms/', include(api_sms_urls, namespace='terminal-api')),
+    url(r'^api/terminal/', include(api_terminal_urls, namespace='terminal-api')),
     url(r'^cart/', include(cart_urls, namespace='cart')),
     url(r'^checkout/', include(checkout_urls, namespace='checkout')),
     url(r'^dashboard/', include(dashboard_urls, namespace='dashboard')),

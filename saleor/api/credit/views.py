@@ -85,8 +85,8 @@ class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):
         instance = serializer.save(user=self.request.user)
         if instance.status == 'fully-paid':
             send_to_sale(instance)
-        user_trail(self.request.user.name,'made a sale:#'+str(serializer.data['invoice_number'])+' sale worth: '+str(serializer.data['total_net']),'add')
-        info_logger.info('User: '+str(self.request.user)+' made a sale:'+str(serializer.data['invoice_number']))
+        user_trail(self.request.user.name,'made a credit sale:#'+str(serializer.data['invoice_number'])+' credit sale worth: '+str(serializer.data['total_net']),'add')
+        info_logger.info('User: '+str(self.request.user)+' made a credit sale:'+str(serializer.data['invoice_number']))
         terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
         trail = 'User: '+str(self.request.user)+\
                 ' updated a credited sale :'+str(serializer.data['invoice_number'])+\

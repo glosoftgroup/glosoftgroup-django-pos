@@ -27,7 +27,10 @@
       </td>
     <!-- loyalty points -->
     <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
-    {{ user.loyalty_points }}
+    {{ user.get_loyalty_points }}
+    </td>
+    <td>
+      {{user.get_total_discount}}
     </td>
     <!-- actions -->
     <td class="text-center">

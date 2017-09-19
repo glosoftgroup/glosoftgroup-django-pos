@@ -80,7 +80,7 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'product_category',
                 'available_stock',
                 'tax',
-                'discount'
+                'discount',
                  )
     def get_available_stock(self,obj):
         try:
@@ -110,7 +110,9 @@ class SalesListSerializer(serializers.ModelSerializer):
                  'customer_name',
                  'cashier',
                  'payment_options',
-                 'status'
+                 'status',
+                 'total_tax',
+                 'discount_amount',
                 )
 
     def get_cashier(self,obj):
@@ -241,6 +243,25 @@ class SalesSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Total Net should be a decimal/integer')
         return value
+
+    def validate_total_tax(self,value):
+        data = self.get_initial()        
+        try:
+            total_net = Decimal(data.get('total_net'))
+            total_tax = Decimal(data.get('total_tax'))
+            if total_tax >= total_net:
+                raise ValidationError('Total tax cannot be more than total net')
+        except:
+            raise ValidationError('Total Net should be a decimal/integer')
+        return value
+
+    def validate_discount_amount(self,value):
+        data = self.get_initial()        
+        try:
+            discount = Decimal(data.get('discount_amount'))            
+        except:
+            raise ValidationError('Discount should be a decimal/integer *'+str(discount)+'*')
+        return value
     def validate_status(self,value):
         data = self.get_initial()
         status = str(data.get('status'))        
@@ -252,12 +273,10 @@ class SalesSerializer(serializers.ModelSerializer):
         
     def validate_terminal(self,value):
         data = self.get_initial()
-        self.terminal_id = int(data.get('terminal'))
-        self.l=[]
-        terminals = Terminal.objects.all()
-        for term in terminals:
-            self.l.append(term.pk)
-        if not self.terminal_id in self.l:      
+        terminal_id = int(data.get('terminal'))        
+        try:
+            terminals = Terminal.objects.get(pk=terminal_id)
+        except:      
             raise ValidationError('Terminal specified does not exist')
         return value    
 
@@ -271,8 +290,8 @@ class SalesSerializer(serializers.ModelSerializer):
             total_tax = Decimal(validated_data.get('total_tax'))
         except:
             total_tax = Decimal(0)
-        terminal = Terminal.objects.get(pk=self.terminal_id)    
-        terminal.amount += Decimal(total_net)       
+        terminal = validated_data.get('terminal')               
+        terminal.amount += Decimal(total_net)  
         terminal.save() 
 
         try:
@@ -286,11 +305,12 @@ class SalesSerializer(serializers.ModelSerializer):
                 mobile = validated_data.get('mobile')
                 customer = Customer.objects.create(name=name, mobile=mobile)
             else:
-                customer = Customer.objects.create(name=name)
+                pass
+                #customer = Customer.objects.create(name=name)
 
         invoice_number = validated_data.get('invoice_number')
         # calculate loyalty_points
-        if customer:
+        try:
             total_net = validated_data.get('total_net')
             points_eq = SiteSettings.objects.get(pk=1)      
             points_eq = points_eq.loyalty_point_equiv #settings.LOYALTY_POINT_EQUIVALENCE
@@ -300,9 +320,19 @@ class SalesSerializer(serializers.ModelSerializer):
                 loyalty_points = total_net/points_eq
             customer.loyalty_points += loyalty_points
             customer.save()
-        # get sold products        
-        solditems_data = validated_data.pop('solditems')
-        payment_options_data = validated_data.pop('payment_options')        
+        except:
+            customer = None
+            print 'customer details provided dont meet adding customer criteria'
+
+        # get sold products 
+        try:       
+            solditems_data = validated_data.pop('solditems')
+        except:
+            raise ValidationError('Solditems field should not be empty')
+        try:
+            payment_options_data = validated_data.pop('payment_options')        
+        except:
+            raise ValidationError('Payment options field required')
         status = validated_data.get('status')
         sales = Sales.objects.create(user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),

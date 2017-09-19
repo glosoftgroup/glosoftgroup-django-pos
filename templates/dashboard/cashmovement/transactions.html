@@ -216,7 +216,7 @@
         firstClass: 'first',
         leaps: false
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+            $(".pages-nav").html("Page " + num +" of "+{{pn}}); // or some ajax content loading...
             $.get("{% url 'dashboard:transaction-paginate' %}",{page:num},function(data){
                $('#tb').html(data);
             });

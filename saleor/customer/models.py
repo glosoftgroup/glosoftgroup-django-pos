@@ -160,3 +160,12 @@ class Customer(models.Model):
         return self.email
     def get_sales(self):
         return len(self.customers.all())
+    def get_total_discount(self):
+        total = self.customers.aggregate(models.Sum('discount_amount'))['discount_amount__sum']
+        if total:
+            return total
+        return '--'
+    def get_loyalty_points(self):
+        if self.loyalty_points != 0.00:
+            return self.loyalty_points
+        return '--'
