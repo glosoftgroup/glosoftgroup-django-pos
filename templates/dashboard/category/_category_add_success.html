@@ -1,30 +1,33 @@
 {% load static %}
-<!--<div class="col-md-12" id='category_field'>-->
-  <!--<div class="multi-select-full new_ajax">-->
-    {#{{ product_form.categories }}#}
-  <!--</div>                         -->
-<!--</div>-->
- <div class="multi-select-full input-group-btn" id='category_field' >
-  {{ product_form.categories }}
+
+  <div class="input-group-btn" id='category_field' >
+  <select name="categories" class="form-control" id="id_categories">
+   {% if all_cats %}
+    {% for cat in all_cats %}
+    <option value="{{cat.pk}}">{{cat}}</option>
+    {% endfor %}
+   {% endif %}
+  </select>
+   <!-- product_form.categories }} -->
  </div>
 <!-- scripts -->
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
   <!--<script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>-->
 <script type="text/javascript">
 $(document).ready(function(){
 	// Default initialization
-    $(".styled, .multiselect-container input").uniform({
-        radioClass: 'choice'
-    });
+    // $(".styled, .multiselect-container input").uniform({
+    //     radioClass: 'choice'
+    // });
 
     //$('.multiselect').off('MultiSelect');
 
     // Basic initialization
-    $('#id_categories').multiselect({
-        onChange: function() {
-            $.uniform.update();
-        }
-    });
+    $.when( $.ready ).then(function() {
+    //$('#id_categories').removeAttr('multiple');
+    $('#id_categories').selectpicker();
+    $('#id_categories').selectpicker('refresh');
+   });
+    
 });
 </script>
