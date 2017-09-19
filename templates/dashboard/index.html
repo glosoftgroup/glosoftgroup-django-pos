@@ -101,141 +101,148 @@
           </div>
           <!-- /quick stats boxes -->
       </div>
-<div class="row">
-
-  {% if sales_by_item %}
-    <div class="col-md-6">
-    <div class="panel panel-flat" id="itemdiv">
-      <div class="panel-heading">
-          <h6 class="panel-title" style="text-align:center;">Top 5 Items in last sales</h6>
-          <div class="heading-elements">
-            <ul class="icons-list">
-              <li><a data-action="collapse"></a></li>
-              <li><a data-action="reload"></a></li>
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
-      </div>
-      <div class="panel-body">
-        <div class="col-md-5">
-           <canvas id="itemChart" width="400" height="400"></canvas>
-        </div>
-        <div class="col-md-7">
-            <div class="row">
-                <div class="col-md-12">
-                     <div class="data-table-container">
-                        <table class="table bordered highlight responsive data-table">
-                          <tbody>
-                          {% if sales_by_item %}
-                           {% for sales in sales_by_item %}
-                              <tr data-action-go="">
-                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_name}}">
-                                  <div class="sqaure" style="width: 10px;height: 10px;border-radius: 50%;background-color: {{sales.color}};">
-                                  </div>
-                                </td>
-                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
-                                    {{forloop.counter }}. {{sales.product_name}}
-                                </td>
-                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
-                                    ({{sales.quantity__sum}} {% if h.quantity__sum is 1%} item {% else %} items {% endif %} )
-                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
-                                </td>
-                              </tr>
-                              {% endfor %}
-                            {% endif %}
-                          </tbody>
-                        </table>
-                      </div>
+      <div class="row">
+      <!-- item chart-->
+      {% if sales_by_item %}
+        <div class="col-md-12">
+            <div class="panel panel-flat" id="itemdiv">
+              <div class="panel-heading">
+                  <h6 class="panel-title" style="text-align:center;">Top 5 Items in last sales</h6>
+                  <div class="heading-elements">
+                    <ul class="icons-list">
+                      <li><a data-action="collapse"></a></li>
+                      <li><a data-action="reload"></a></li>
+                      <li><a data-action="close"></a></li>
+                    </ul>
+                  </div>
+                <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+              </div>
+              <div class="panel-body">
+                <div class="col-md-6">
+                   <div id="itemChartContainer" style="width:100%; height:320px;"></div>
                 </div>
-            </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                             <div class="data-table-container">
+                                <table class="table bordered highlight responsive data-table">
+                                  <tbody>
+                                  {% if sales_by_item %}
+                                   {% for sales in sales_by_item %}
+                                      <tr data-action-go="">
+                                        <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_name}}">
+                                          <div class="sqaure" style="width: 10px;height: 10px;border-radius: 50%;background-color: {{sales.color}};">
+                                          </div>
+                                        </td>
+                                        <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                            {{forloop.counter }}. {{sales.product_name}}
+                                        </td>
+                                        <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                            ({{sales.quantity__sum}} {% if h.quantity__sum is 1%} item {% else %} items {% endif %} )
+                                             <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
+                                        </td>
+                                      </tr>
+                                      {% endfor %}
+                                    {% endif %}
+                                  </tbody>
+                                </table>
+                              </div>
+                        </div>
+                    </div>
 
-        </div>
-      </div>
-    </div>
-  </div>
-  {% else %}
-
-     <div class="col-md-6">
-      <div class="panel bg-info">
-        <div class="panel-heading">
-            <h4 class="panel-title" style="text-align:center;">No Items Sold Yet</h4>
-            <div class="heading-elements">
-              <ul class="icons-list">
-                <li><a data-action="close"></a></li>
-              </ul>
-            </div>
-        </div>
-     </div>
-     </div>
- {% endif %}
-{% if sales_by_category %}
-    <div class="col-md-6">
-    <div class="panel panel-flat" id="catdiv">
-      <div class="panel-heading">
-          <h6 class="panel-title" style="text-align:center;">Top 5 Categories in last sales</h6>
-          <div class="heading-elements">
-            <ul class="icons-list">
-              <li><a data-action="collapse"></a></li>
-              <li><a data-action="reload"></a></li>
-              <li><a data-action="close"></a></li>
-            </ul>
-          </div>
-        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
-      </div>
-      <div class="panel-body">
-        <div class="col-md-5">
-           <canvas id="catChart" width="400" height="400"></canvas>
-        </div>
-        <div class="col-md-7">
-            <div class="row">
-                <div class="col-md-12">
-                     <div class="data-table-containers">
-                        <table class="table bordered highlight responsive data-table">
-                          <tbody>
-                          {% if sales_by_category %}
-                           {% for sales in sales_by_category %}
-                              <tr data-action-go="">
-                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
-                                  <div class="sqaure" style="width: 10px;height: 10px;border-radius: 50%;background-color: {{sales.color}};">
-                                  </div>
-                                </td>
-                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
-                                    {{forloop.counter }}.  {{sales.product_category}}
-                                </td>
-                                <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
-                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}} ({{ sales.percentage }}%)</div>
-                                </td>
-                              </tr>
-                              {% endfor %}
-                            {% endif %}
-
-                          </tbody>
-                        </table>
-                      </div>
                 </div>
+              </div>
             </div>
+          </div>
+          {% else %}
 
-        </div>
+             <div class="col-md-12">
+              <div class="panel bg-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title" style="text-align:center;">No Items Sold Yet</h4>
+                    <div class="heading-elements">
+                      <ul class="icons-list">
+                        <li><a data-action="close"></a></li>
+                      </ul>
+                    </div>
+                </div>
+             </div>
+             </div>
+         {% endif %}
+        <!-- end of item chart-->
       </div>
-    </div>
-  </div>
-{% else %}
+      
+      <!-- category chart -->
+      <div class="row">
+      {% if sales_by_category %}
+        <div class="col-md-12">
+            <div class="panel panel-flat" id="itemdiv">
+              <div class="panel-heading">
+                  <h6 class="panel-title" style="text-align:center;">Top 5 Categories in last sales</h6>
+                  <div class="heading-elements">
+                    <ul class="icons-list">
+                      <li><a data-action="collapse"></a></li>
+                      <li><a data-action="reload"></a></li>
+                      <li><a data-action="close"></a></li>
+                    </ul>
+                  </div>
+                <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+              </div>
+              <div class="panel-body">
+                <div class="col-md-6">
+                   <div id="categoryChartContainer" style="width:100%; height:320px;"></div>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                      <div class="col-md-12">
+                           <div class="data-table-containers">
+                              <table class="table bordered highlight responsive data-table">
+                                <tbody>
+                                {% if sales_by_category %}
+                                 {% for sales in sales_by_category %}
+                                    <tr data-action-go="">
+                                      <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                        <div class="sqaure" style="width: 10px;height: 10px;border-radius: 50%;background-color: {{sales.color}};">
+                                        </div>
+                                      </td>
+                                      <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                          {{forloop.counter }}.  {{sales.product_category}}
+                                      </td>
+                                      <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
+                                           <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}} ({{ sales.percentage }}%)</div>
+                                      </td>
+                                    </tr>
+                                    {% endfor %}
+                                  {% endif %}
 
-     <div class="col-md-6">
-      <div class="panel bg-info">
-        <div class="panel-heading">
-            <h4 class="panel-title" style="text-align:center;">No Categories Sold Yet</h4>
-            <div class="heading-elements">
-              <ul class="icons-list">
-                <li><a data-action="close"></a></li>
-              </ul>
-            </div>
+                                </tbody>
+                              </table>
+                            </div>
+                      </div>
+                  </div>
+
         </div>
-     </div>
-     </div>
- {% endif %}
- </div>
+              </div>
+            </div>
+          </div>
+         {% else %}
+
+             <div class="col-md-12">
+              <div class="panel bg-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title" style="text-align:center;">No Categories Sold Yet</h4>
+                    <div class="heading-elements">
+                      <ul class="icons-list">
+                        <li><a data-action="close"></a></li>
+                      </ul>
+                    </div>
+                </div>
+             </div>
+             </div>
+         {% endif %}
+        
+      </div>
+      <!-- end of category chart-->
 
 {% if low_stock %}
   <div class="row">
@@ -318,58 +325,228 @@
 {% endif %}
 {% endblock %}
 {% block custom_js %}
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/highcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/exporting.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
 <script type="text/javascript">
-$(document).ready(function(){
-  //**@ category chart
-  //-----chart**/
-//**@ doughnut chart
-    var defaultData2 = [{% for d in sales_by_category %} "{{ d.total_cost }}", {% endfor %}];
-    <!--var defaultData2 = ["10.5","20.7"];-->
-    var labels2 = [{% for d in sales_by_category %} "{{ d.product_category }}",{% endfor %}];
-    var backColor = [{% for d in sales_by_category %} {% if forloop.last %} "{{ d.color }}" {% else %} "{{ d.color }}", {% endif %} {% endfor %}];
-    var ctx = document.getElementById("catChart").getContext('2d');
-      var catChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-              labels: labels2,
-              datasets: [{
-                  label: 'Amount of sale',
-                  data: defaultData2,
-                  backgroundColor:backColor,
-                  borderWidth: 1
-              }]
-          },
-          options:{
-             legend:{
-             display:false}
-          }
-      });
-//--------- /doghnut chart
+// Create the chart
+Highcharts.chart('itemChartContainer', {
+    chart: {
+        type: 'pie'
+    },
+    title: {
+        text: 'Top 5 Sales Items',
+        verticalAlign: 'bottom',
+        style:{"display":"none"}
+    },
+    xAxis: {
+        type: 'category',
+        labels: { enabled:false }
+    },
+    yAxis: {
+        title: {
+            text: 'Sales Amount in KShs.'
+        }
 
-//-----item chart**/
-    var defaultData3 = [{% for d in sales_by_item %} {% if forloop.last %} "{{ d.total_cost__sum }}" {% else %} "{{ d.total_cost__sum }}", {% endif %} {% endfor %}];
-    var labels3 = [{% for d in sales_by_item %} {% if forloop.last %} "{{ d.product_name }}" {% else %} "{{ d.product_name }}", {% endif %}{% endfor %}];
-    var backColor3 = [{% for d in sales_by_item %} "{{ d.color }}", {% endfor %}];
-      var ctx = document.getElementById("itemChart").getContext('2d');
-      var itemChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-              labels: labels3,
-              datasets: [{
-                  label: 'Amount of sale',
-                  data: defaultData3,
-                  backgroundColor:backColor3,
-                  borderWidth: 1
-              }]
-          },
-          options:{
-             legend:{
-             display:false}
-          }
-      });
-//------- /item doghnut chart
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            borderWidth: 0,
+            dataLabels: {
+                enabled: true,
+                format: '{point.p:.2f}%',
+                fontColor:'#8cc414'
+            }
+        }
+    },
 
+    tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>KShs. {point.y:.2f}</b><br/>'
+    },
+
+    series: [{
+        name: 'Items',
+        colorByPoint: true,
+        data: [{% for d in sales_by_item %}{ name:'{{d.product_name }}', p:{{d.percentage}} ,y:{{d.total_cost__sum}}, color:'{{d.color}}', drilldown:'{{d.product_name}}' }, {% endfor %}]
+    }],
+    drilldown: {
+        series: [{
+            name: 'Microsoft Internet Explorer',
+            id: 'Microsoft Internet Explorer',
+            data: [
+                [
+                    'v11.0',
+                    24.13
+                ],
+                [
+                    'v8.0',
+                    17.2
+                ]
+            ]
+        }, {
+            name: 'Chrome',
+            id: 'Chrome',
+            data: [
+                [
+                    'v40.0',
+                    5
+                ],
+                [
+                    'v41.0',
+                    4.32
+                ]
+            ]
+        }, {
+            name: 'Firefox',
+            id: 'Firefox',
+            data: [
+                [
+                    'v35',
+                    2.76
+                ],
+                [
+                    'v36',
+                    2.32
+                ]
+            ]
+        }, {
+            name: 'Safari',
+            id: 'Safari',
+            data: [
+                [
+                    'v7.0',
+                    0.26
+                ],
+                [
+                    'v6.2',
+                    0.17
+                ]
+            ]
+        }, {
+            name: 'Opera',
+            id: 'Opera',
+            data: [
+                [
+                    'v12.x',
+                    0.34
+                ]
+            ]
+        }]
+    }
+});
+
+Highcharts.chart('categoryChartContainer', {
+    chart: {
+        type: 'pie'
+    },
+    title: {
+        text: 'Top 5 Sales Categories',
+        verticalAlign: 'bottom',
+        style:{"display":"none"}
+    },
+    xAxis: {
+        type: 'category',
+        labels: { enabled:false }
+    },
+    yAxis: {
+        title: {
+            text: 'Sales Amount in KShs.'
+        }
+
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            borderWidth: 0,
+            dataLabels: {
+                enabled: true,
+                format: '{point.p:.2f}%',
+                fontColor:'#8cc414'
+            }
+        }
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>KShs. {point.y:.2f}</b><br/>'
+    },
+
+    series: [{
+        name: 'Items',
+        colorByPoint: true,
+        data: [{% for d in sales_by_category %}{ name:'{{d.product_category }}', p:{{d.percentage}} ,y:{{d.total_cost__sum}}, color:'{{d.color}}', drilldown:'{{d.product_category}}' }, {% endfor %}]
+    }],
+    drilldown: {
+        series: [{
+            name: 'Microsoft Internet Explorer',
+            id: 'Microsoft Internet Explorer',
+            data: [
+                [
+                    'v11.0',
+                    24.13
+                ],
+                [
+                    'v8.0',
+                    17.2
+                ]
+            ]
+        }, {
+            name: 'Chrome',
+            id: 'Chrome',
+            data: [
+                [
+                    'v40.0',
+                    5
+                ],
+                [
+                    'v41.0',
+                    4.32
+                ]
+            ]
+        }, {
+            name: 'Firefox',
+            id: 'Firefox',
+            data: [
+                [
+                    'v35',
+                    2.76
+                ],
+                [
+                    'v36',
+                    2.32
+                ]
+            ]
+        }, {
+            name: 'Safari',
+            id: 'Safari',
+            data: [
+                [
+                    'v7.0',
+                    0.26
+                ],
+                [
+                    'v6.2',
+                    0.17
+                ]
+            ]
+        }, {
+            name: 'Opera',
+            id: 'Opera',
+            data: [
+                [
+                    'v12.x',
+                    0.34
+                ]
+            ]
+        }]
+    }
 });
 </script>
+
 {% endblock %}
