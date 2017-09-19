@@ -416,7 +416,7 @@ def products_reorder_search(request):
 			products = get_low_stock_products()
 			items = products.filter(
 				Q(variant__product__name__icontains=q) |
-				Q(variant__name__icontains=q)).order_by('id').distinct()
+				Q(variant__name__icontains=q)).order_by('-id').distinct()
 			paginator = Paginator(items, 10)
 			try:
 				items = paginator.page(page)
@@ -514,7 +514,7 @@ def products_pdf(request):
 			pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
 			return HttpResponse(pdf, content_type='application/pdf')
 		else:
-			items = ProductVariant.objects.all().order_by('id')
+			items = ProductVariant.objects.all().order_by('-id')
 
 			data = {
 				'today': date.today(),
