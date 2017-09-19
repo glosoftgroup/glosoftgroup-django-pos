@@ -226,6 +226,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         return credit
 
 class CreditUpdateSerializer(serializers.ModelSerializer):      
+    credititems = TrackSerializer(many=True)
     class Meta:
         model = Credit
         fields = ('id',                 
@@ -239,7 +240,9 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
                  'customer_name',
                  'status',
                  'total_tax',
+                 'discount_amount',
                  'debt',
+                 'credititems',
                  )       
     
     def validate_status(self,value):        
