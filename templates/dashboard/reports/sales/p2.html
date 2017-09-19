@@ -260,4 +260,10 @@
        }
 
      });
+{% if sz %}
+   $.when( $.ready ).then(function() {     
+       $('.bootstrap-select').selectpicker();
+       $('.list-sz').selectpicker('val', ["{{sz}}"]);              
+    });
+   {% endif %}
  </script>
