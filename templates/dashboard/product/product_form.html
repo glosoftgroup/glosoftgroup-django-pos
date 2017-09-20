@@ -666,14 +666,16 @@
         
         <div class="row">
           <div class="col-md-12">
+            <div class="col-md-4">
             <div class="text-left" style="margin-bottom: 8px;">
               <a class="btn btn-primary  waves-effect waves-light images-bt" id="images-bt" onclick="return false;" data-href="{% url 'dashboard:product-image-add' product_pk=product.pk %}" title=""> Add Image 
                  </a>
             </div>
+
           </div>         
-          <br/>
-          <div  class='col-md-12 hidden' id="add-image-form-div">
-            <div class="cs-loader">
+          
+          <div  class='col-md-8 hidden' id="myloader">
+            <div class="cs-loader mt-15">
               <div class="cs-loader-inner text-primary">
                 <label> ●</label>
                 <label> ●</label>
@@ -684,6 +686,9 @@
               </div>
             </div>
           </div>
+          </div>
+          <div class="col-md-12" id="add-image-form-div"></div>
+          <br>
           {% if images %}    
             
               {% for image in images %}
