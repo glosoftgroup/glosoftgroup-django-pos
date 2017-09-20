@@ -624,3 +624,24 @@ $(function(){
   });  
 
 });
+
+/* add image script */
+$(function(){
+  var addImageBtn = $('.images-bt');
+  var editImageRefreshDiv = $('#add-image-form-div');
+  // get template  
+  addImageBtn.on('click',function(){
+    editImageRefreshDiv.removeClass('hidden');
+    var url = $(this).data('href');    
+    dynamicData = {};
+    dynamicData['url'] = url;
+    addProductDetails(dynamicData,url,'get')
+    .done(function(data){      
+      editImageRefreshDiv.html(data);
+    })
+    .fail(function(){
+      alertUser('failed to get edit form');
+    });
+  });
+  // ./add get template
+});

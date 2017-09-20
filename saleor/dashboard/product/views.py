@@ -902,6 +902,12 @@ def product_image_edit(request, product_pk, img_pk=None):
             return redirect(success_url)
     ctx = {'form': form, 'product': product, 'product_image': product_image,
            'show_variants': show_variants}
+    if request.GET.get('url'):
+        ctx['post_url'] = request.GET.get('url')
+    if request.is_ajax():
+        return TemplateResponse(
+        request, 'dashboard/product/partials/product_image_form.html', ctx)
+
     return TemplateResponse(
         request, 'dashboard/product/product_image_form.html', ctx)
 
