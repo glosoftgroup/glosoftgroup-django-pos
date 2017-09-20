@@ -230,6 +230,7 @@ def re_order_form(request, pk):
 #   return TemplateResponse(request, 'dashboard/product/class_list.html', ctx)
 
 @staff_member_required
+@permission_decorator('product.view_productclass')
 def class_list_view(request):
     try:
         queryset_list = ProductClass.objects.all().exclude(name='None').prefetch_related(
@@ -928,7 +929,7 @@ def product_image_delete(request, product_pk, img_pk):
 
 
 @staff_member_required
-@permission_decorator('product.change_productvariants')
+@permission_decorator('product.add_product')
 def add_attributes(request):
     if request.method == 'POST':
         if request.POST.get('vpk'):
@@ -970,7 +971,7 @@ def add_attributes(request):
 
 
 @staff_member_required
-@permission_decorator('product.change_productvariants')
+@permission_decorator('product.change_productvariant')
 def variant_edit(request, product_pk, variant_pk=None):
     product = get_object_or_404(Product.objects.all(),
                                 pk=product_pk)
@@ -1012,7 +1013,7 @@ def variant_edit(request, product_pk, variant_pk=None):
 
 
 @staff_member_required
-@permission_decorator('product.delete_productvariants')
+@permission_decorator('product.delete_productvariant')
 def variant_delete(request, product_pk, variant_pk):
     product = get_object_or_404(Product, pk=product_pk)
     variant = get_object_or_404(product.variants, pk=variant_pk)
@@ -1034,7 +1035,7 @@ def variant_delete(request, product_pk, variant_pk):
 
 
 @staff_member_required
-@permission_decorator('product.delete_productvariants')
+@permission_decorator('product.delete_productvariant')
 @require_http_methods(['POST'])
 def variants_bulk_delete(request, product_pk):
     product = get_object_or_404(Product, pk=product_pk)
@@ -1905,7 +1906,7 @@ def add_new_attribute(request,pk=None):
                 AttributeChoiceValue.objects.create(attribute=attribute,slug=slug,name=choice);        
         return HttpResponse(attribute)
 
-@permission_decorator('product.delete_productvariants')
+@permission_decorator('product.delete_productvariant')
 @staff_member_required
 def single_variant_delete(request,product_pk,variant_pk):
     product = get_object_or_404(Product, pk=product_pk)
@@ -1916,7 +1917,7 @@ def single_variant_delete(request,product_pk,variant_pk):
     return HttpResponse('invalid method')
     
     
-@permission_decorator('product.delete_productvariants')
+@permission_decorator('product.delete_productvariant')
 @staff_member_required
 def single_stock_delete(request,product_pk,stock_pk):
     stock = Stock.objects.get(pk=stock_pk)

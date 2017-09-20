@@ -83,7 +83,7 @@ Highcharts.chart('container', {
     series: [{
         name: 'Items',
         colorByPoint: true,
-        data: [{% for d in sales_by_category %}{ name:'{{d.product_name }}', p:{{d.percentage}} ,y:{{d.total_cost__sum}}, color:'{{d.color}}', drilldown:'{{d.product_name}}' }, {% endfor %}]
+        data: [{% for d in sales_by_category %}{ name:'{% if d.product_name %}{{d.product_name }}{% else %}None{% endif %}', p:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} ,y:{% if d.total_cost__sum %}{{d.total_cost__sum}}{% else %}0{% endif %}, color:'{{d.color}}', drilldown:'{% if d.product_name %}{{d.product_name }}{% else %}None{% endif %}' }, {% endfor %}]
     }],
     drilldown: {
         series: [{

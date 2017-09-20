@@ -42,7 +42,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def sales_list(request):
 	try:
 		try:
@@ -77,7 +77,7 @@ def sales_list(request):
 		error_logger.error(e)
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def sales_detail(request, pk=None):
 	try:
 		sale = Sales.objects.get(pk=pk)
@@ -87,7 +87,7 @@ def sales_detail(request, pk=None):
 		error_logger.error(e)
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def sales_reports(request):
 	try:
 		today = datetime.date.today()

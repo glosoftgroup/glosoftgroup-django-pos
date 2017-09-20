@@ -36,7 +36,7 @@
             <div class="col-md-2">
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
-                {% if perms.userprofile.add_user %}
+                {% if perms.sale.add_paymentoption %}
                    
                   <a href="javascript:;" id="addExpenseBtn" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Option</a>
                 {% endif %}
@@ -123,7 +123,7 @@
                   <tr class="bg-primary">                  
                     <th>Name</th>
                     <th>Description</th>                   
-                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                    {% if perms.sale.delete_paymentoption %}
                     <th class="text-center">Options</th>
                     {% endif %}
                   </tr>
@@ -138,17 +138,15 @@
                     <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.description}}" data-m="#pdetail">{{option.description}}</td>
                     
                     
-                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                    {% if perms.sale.delete_paymentoption %}
                     <!-- actions -->
                     <td class="text-center">
                       <ul class="icons-list">
-                         {% if perms.accounts.delete_expense %}
                         <li>
                           <a data-ta="#modal_instance" data-title="Delete Payment option {{ option.name }} ?" data-href="{% url 'dashboard:option-delete' pk=option.pk %}" data-name="{{ option.name}}" data-id="{{ option.pk }}"
                          class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
                          </a>
                         </li>
-                        {% endif %}
                       </ul>
                     </td>
                     {% endif %}

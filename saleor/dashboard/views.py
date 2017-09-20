@@ -79,12 +79,11 @@ def index(request):
         #top categories
         cat = top_categories()
         items = top_items()
-        # low stock
-        low_stock = get_low_stock_products()
+        low_stock_order = Stock.objects.get_low_stock()
 
         ctx = {'preauthorized_payments': payments,
                'orders_to_ship': orders_to_ship,
-               'low_stock': low_stock,
+               'low_stock': low_stock_order,
                #top_cat
                "sales_by_category": cat['sales_by_category'],
                "categs": cat['categs'],
@@ -178,7 +177,17 @@ def top_categories():
             return data
         except Exception,e:
             error_logger.error(e)
-            return HttpResponse(e)
+            data = {
+                "sales_by_category": None,
+                "categs": None,
+                "avg": None,
+                "labels": None,
+                "default": None,
+                "hcateg": None,
+                "date_total_sales": None,
+                "no_of_customers": None,
+            }
+            return data
 
 def top_items():
     today = datetime.datetime.now()
@@ -235,7 +244,17 @@ def top_items():
             return data
         except IndexError as e:
             error_logger.error(e)
-            return HttpResponse(e)
+            data = {
+                "sales_by_item": None,
+                "items": None,
+                "items_avg": None,
+                "items_labels": None,
+                "items_default": None,
+                "items_hcateg": None,
+                "highest_item": None,
+                "lowest_item": None,
+            }
+            return data
 
 
 @staff_member_required

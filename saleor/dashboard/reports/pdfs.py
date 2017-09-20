@@ -38,7 +38,7 @@ from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, Terminal
 from ...product.models import Product, ProductVariant, Category
 from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf, image64
+from ...utils import render_to_pdf, convert_html_to_pdf, image64, default_logo
 
 from .hours_chart import get_item_results, get_terminal_results, get_user_results, get_hours_results, get_hours_results_range, get_date_results_range, get_date_results, get_category_results
 
@@ -147,7 +147,7 @@ def sales_list_pdf( request ):
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 
-		img = image64()
+		img = default_logo
 		data = {
 			'today': date.today(),
 			'sales': sales,
@@ -164,7 +164,7 @@ def sales_detail(request, pk=None):
 	try:
 		sale = Sales.objects.get(pk=pk)
 		items = SoldItem.objects.filter(sales=sale)
-		img = image64()
+		img = default_logo()
 		data = {
 			'today': date.today(),
 			'items': items,
@@ -186,7 +186,7 @@ def sales_category(request):
 		if not sales_date:
 			sales_date = None
 
-		img = image64()
+		img = default_logo()
 		data = {
 			'today': date.today(),
 			'puller': request.user,
@@ -194,7 +194,6 @@ def sales_category(request):
 			'category':image,
 			'sales_date':sales_date
 		}
-		print (sales_date)
 		pdf = render_to_pdf('dashboard/reports/sales/pdf/category.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
@@ -209,7 +208,7 @@ def sales_items(request):
 		if not sales_date:
 			sales_date = None
 
-		img = image64()
+		img = default_logo()
 		data = {
 			'today': date.today(),
 			'puller': request.user,
@@ -217,7 +216,6 @@ def sales_items(request):
 			'category':image,
 			'sales_date':sales_date
 		}
-		print (sales_date)
 		pdf = render_to_pdf('dashboard/reports/sales/pdf/items.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
@@ -232,7 +230,7 @@ def sales_user(request):
 		if not sales_date:
 			sales_date = None
 
-		img = image64()
+		img = default_logo()
 		data = {
 			'today': date.today(),
 			'puller': request.user,
@@ -240,7 +238,6 @@ def sales_user(request):
 			'category':image,
 			'sales_date':sales_date
 		}
-		print (sales_date)
 		pdf = render_to_pdf('dashboard/reports/sales/pdf/user.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
@@ -255,7 +252,7 @@ def sales_tills(request):
 		if not sales_date:
 			sales_date = None
 
-		img = image64()
+		img = default_logo()
 		data = {
 			'today': date.today(),
 			'puller': request.user,
@@ -263,7 +260,6 @@ def sales_tills(request):
 			'category':image,
 			'sales_date':sales_date
 		}
-		print (sales_date)
 		pdf = render_to_pdf('dashboard/reports/sales/pdf/till.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:

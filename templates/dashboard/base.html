@@ -151,7 +151,7 @@
                     <span>Dashboard</span>
                   </a>
                 </li>
-                {% if perms.userprofile.view_user %}
+                {% if perms.userprofile.view_user or perms.auth.view_group or perms.userprofile.view_usertrail %}
                 <li>
                   <a href="javascript:;">
                     <i class="icon-users"></i> 
@@ -207,7 +207,7 @@
                   <!--</ul>-->
                 <!--</li>-->
                   {% endif %}
-                {% if perms.product.view_product %}
+                {% if perms.product.view_product or perms.product.view_stock or perms.product.view_category or perms.product.view_productclass or perms.product.view_productattribute or perms.product.view_stocklocation %}
                 <li id="first">
                   <a href="{% url 'dashboard:product-list' %}"><i class="icon-stack"></i> <span>
                      {% trans "Inventory Management" context "Dashboard catalogue" %}
@@ -248,7 +248,7 @@
                     </a>
                     </li>
                       {% endif %}
-                      {#{% if perms.product.view_stocklocation %}#}
+                      {% if perms.product.view_stocklocation %}
                     <!-- stock location -->
                     <li class="{% block menu_location_class %}{% endblock %}">
                     <a href="{% url 'dashboard:product-stock-location-list' %}"><i class="icon-location4"></i>
@@ -256,8 +256,8 @@
                     </a>
                     </li>
                     <!-- stock reorder -->
-                      {#{% endif %}#}
-                       {% if perms.product.view_stocklocation %}
+                      {% endif %}
+                       {% if perms.product.view_stock %}
                     <li class="{% block menu_reorder_class %}{% endblock %}">
                     <a href="{% url 'dashboard:re_order' %}"><i class="icon-toggle"></i>
                        {% trans "Stock Reorder" context "Dashboard stock reorder list" %}
@@ -310,8 +310,7 @@
                 </li>
                 <!-- ./communications -->
                   {% endif %}
-                   
-                   {% if perms.sale.view_sale %}
+                   {% if perms.discount.add_voucher %}
                 <li><a href="#"><i class="icon-coins"></i> <span>{% trans "Customer Rewards" context "Dashboard discounts list" %}</span></a>
                   <ul>
                     <li class="{% block menu_sales_class %}{% endblock %}">
@@ -323,34 +322,40 @@
                     </ul>
                 </li>
                   {% endif %}
-                   {% if perms.sale.view_terminals %}
+                   {% if perms.sale.view_terminal or perms.sale.view_paymentoption or perms.sale.view_drawercash %}
                  <li>
                   <a href="javascript:;">
                     <i class="icon-wallet"></i> 
                     <span>Drawer Cash</span>
                   </a>
                   <ul>
+                      {% if perms.sale.view_terminal %}
                     <li class="{% block menu_terminal_class %}{% endblock %}">
                     <a href="{% url 'dashboard:terminals' %}">
                     <i class="icon-versions"></i>Tills
                     </a>
                     </li>
+                      {% endif %}
+                      {% if perms.sale.view_drawercash %}
                     <li class="{% block menu_cashmovement_class %}{% endblock %}">
                     <a href="{% url 'dashboard:transactions' %}">
                     <i class="icon-cash4"></i>
                     Cash movement
                     </a>
                     </li>
+                      {% endif %}
+                      {% if perms.sale.view_paymentoption %}
                      <li class="{% block menu_paymentoptions_class %}{% endblock %}">
                     <a href="{% url 'dashboard:payments-list' %}">
                     <i class="icon-cash4"></i>
                     Payment Options
                     </a>
                     </li>
+                      {% endif %}
                   </ul>
                 </li>
                   {% endif %}
-                   {% if perms.sale.view_sale %}
+                   {% if perms.accounts.view_expenses %}
                 <li><a href="#"><i class="icon-coins"></i> <span>Accounting</span></a>
                   <ul>
                     <li class="{% block menu_personal_expenses_class %}{% endblock %}">
@@ -381,22 +386,22 @@
                   </a>
 
                   <ul>
-                      {% if perms.reports.view_sales_reports %}
+                      {% if perms.reports.view_sale_reports %}
                         <li class="{% block menu_report_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_list' %}"><i class='icon-cash3'></i>Sales</a>
                         </li>
                       {% endif %}
-                      {% if perms.reports.view_sales_reports %}
+                      {% if perms.reports.view_sale_reports %}
                         <li class="{% block menu_creditreport_class %}{% endblock %}">
                           <a href="{% url 'dashboard:credit_list' %}"><i class='icon-cash3'></i>Credit Sales</a>
                         </li>
                       {% endif %}
-                      {#{% if perms.reports.view_sales_reports %}#}
+                      {#{% if perms.reports.view_sale_reports %}#}
                         <!--<li class="{% block menu_report_margin_class %}{% endblock %}">-->
                           <!--<a href="{% url 'dashboard:sales_margin' %}"><i class='icon-drawer3'></i>Sales Profit</a>-->
                         <!--</li>-->
                       {#{% endif %}#}
-                      {% if perms.reports.view_sales_reports %}
+                      {% if perms.reports.view_sale_reports %}
                         <li class="{% block menu_report_margin2_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_margin_list' %}"><i class='icon-cash2'></i>Sales Margin</a>
                         </li>
@@ -419,8 +424,7 @@
                   </ul>
                 </li>
                {% endif %}
-               {% if request.user.is_superuser %}
-                <!-- configuration menu -->
+               {% if request.user.is_active %}
                  <li><a href="#"><i class="icon-cogs"></i> <span> {% trans "Configuration"  context "Dashboard configuration" %}</span></a>
                   <ul>                 
                     

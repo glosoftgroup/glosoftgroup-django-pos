@@ -8,36 +8,36 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-		url(r'^$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(views.sales_reports), name='sales_reports'),
-		url(r'^sales/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^sales/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(views.sales_list), name='sales_list'),
-		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(views.sales_detail), name='sale-detail'),
 
 		# Sales Tax
-		url(r'^tx/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^tx/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(sales_tax.sales_reports), name='sales_tax_reports'),
-		url(r'^tx/sales/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^tx/sales/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(sales_tax.sales_list), name='sales_tax_list'),
-		url(r'^tx/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^tx/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(sales_tax.sales_detail), name='sale_tax_detail'),
 		url( r'^tx/sales_search/$', sales_tax.sales_search, name = 'sales_tax_search' ),
 		url( r'^tx/sales_paginate/$', sales_tax.sales_paginate, name = 'sales_tax_paginate'),
-		url(r'^tx/pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^tx/pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(sales_tax.pdf_sale_tax_detail), name='pdf-sale-tax-detail'),
 		url(r'^tx/reports/sales/list/pdf/$', sales_tax.sales_list_tax_pdf, name='reports_sales_tax_list_pdf'),
 
 		# Sales Margin
-		url(r'^mrg/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^mrg/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(sales_margin2.sales_reports), name='sales_margin_list_reports'),
-		url(r'^mrg/sales/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^mrg/sales/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(sales_margin2.sales_list), name='sales_margin_list'),
-		url(r'^mrg/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^mrg/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(sales_margin2.sales_detail), name='sale_margin_detail'),
 		url( r'^mrg/sales_search/$', sales_margin2.sales_search, name = 'sales_margin_search' ),
 		url( r'^mrg/sales_paginate/$', sales_margin2.sales_paginate, name = 'sales_margin_paginate'),
-		url(r'^mrg/pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^mrg/pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(sales_margin2.pdf_sale_tax_detail), name='pdf-sale-margin-detail'),
 		url(r'^mrg/sales/list/pdf/$', sales_margin2.sales_list_tax_pdf, name='reports_sales_margin_list_pdf'),
 
@@ -52,7 +52,7 @@ urlpatterns = [
 		url(r'^reports/items/pdf/$', pdfs.sales_items, name='reports_sales_items_pdf'),
 		url(r'^reports/user/pdf/$', pdfs.sales_user, name='reports_sales_user_pdf'),
 		url(r'^reports/till/pdf/$', pdfs.sales_tills, name='reports_sales_tills_pdf'),
-		url(r'^pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sales_reports', login_url='not_found')
+		url(r'^pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(pdfs.sales_detail), name='pdf-sale-detail'),
     	url(r'^reports/sales/list/export_csv/$', views.sales_list_export_csv, name='reports_sales_list_export_csv'),
 
@@ -85,20 +85,20 @@ urlpatterns = [
 		url(r'^cpdf/(?P<image>.+)/$', pdfs.chart_pdf, name='chart_pdf'),
 		url(r'^csv/(?P<image>.+)/$', pdfs.sales_export_csv, name='chart_csv'),
 
-		url( r'^datechart/$',  permission_required('reports.view_sales_reports', login_url='not_found')
+		url( r'^datechart/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_date_chart), name = 'sales_date_chart' ),
 		url( r'^datechartimage/(?P<image>.+)/$', charts.sales_date_chart, name = 'sales_date_chart' ),
 		url( r'^productchart/$',  permission_required('reports.view_products_reports', login_url='not_found')
 			(charts.sales_product_chart), name = 'sales_product_chart' ),
 		url( r'^ptd/$', charts.get_product_sale_details, name = 'get_product_sale_details' ),
-		url( r'^category/$',  permission_required('reports.view_sales_reports', login_url='not_found')
+		url( r'^category/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_category_chart), name = 'sales_category_chart' ),
 		url( r'^catimage/(?P<image>.+)/$', charts.sales_category_chart, name = 'sales_category_chart' ),
 		url( r'^catd/$', charts.get_category_sale_details, name = 'get_category_sale_details' ),
-		url( r'^userchart/$',  permission_required('reports.view_sales_reports', login_url='not_found')
+		url( r'^userchart/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_user_chart), name = 'sales_user_chart' ),
 		url( r'^utd/$', charts.get_user_sale_details, name = 'get_user_sale_details' ),
-		url( r'^tellerchart/$',  permission_required('reports.view_sales_reports', login_url='not_found')
+		url( r'^tellerchart/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_terminal_chart), name = 'sales_terminal_chart' ),
 		url( r'^ttd/$', charts.get_terminal_sale_details, name = 'get_terminal_sale_details' ),
 		url( r'^weekfilter/$', charts.get_sales_by_week, name = 'get_sales_by_week' ),

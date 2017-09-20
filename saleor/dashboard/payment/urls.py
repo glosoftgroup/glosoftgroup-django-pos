@@ -8,9 +8,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # paymentoption urls
-    url(r'^$', views.payments_list, name='payments-list'),       
-    url(r'^add/$', views.payment_add, name='payment-add'),       
-    url(r'^delete/(?P<pk>[0-9]+)/$', views.delete, name='option-delete'),
+    url(r'^$', permission_required('sale.view_paymentoption', login_url='account_login')
+            (views.payments_list), name='payments-list'),
+    url(r'^add/$', permission_required('sale.add_paymentoption', login_url='account_login')
+            (views.payment_add), name='payment-add'),
+    url(r'^delete/(?P<pk>[0-9]+)/$', permission_required('sale.delete_paymentoption', login_url='account_login')
+            (views.delete), name='option-delete'),
     url(r'^detail/(?P<pk>[0-9]+)/$', views.detail, name='payment-option-detail'),
     url(r'^update/(?P<pk>[0-9]+)/$', views.edit, name='update-payment-option'),
     url( r'^option/search/$', views.option_searchs, name = 'payment-option-search' ),

@@ -20,7 +20,7 @@
                         <th>Expense</th>
                         <th>Paid To</th>
                         <th>Amount (KShs)</th>
-                        {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                        {% if perms.accounts.delete_expenses %}
                         <th class="text-center">Actions</th>
                         {% endif %}
                       </tr>
@@ -34,17 +34,15 @@
                             <td>{{expense.paid_to}}</td>
                             <td>
                                 <span class="pull-right">{{ expense.amount|intcomma }}</span></td>
-                            {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                            {% if perms.accounts.delete_expenses %}
                             <!-- actions -->
                             <td class="text-center">
                               <ul class="icons-list">
-                                 {% if perms.accounts.delete_expense %}
                                 <li>
                                   <a data-ta="#modal_instance" data-title="Delete Expense {{ expense.expense_type }} ?" data-href="{% url 'accounts:personal-expense-delete' pk=expense.pk %}" data-name="{{ expense.expense_type}}" data-id="{{ expense.pk }}"
                                  class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
                                  </a>
                                 </li>
-                                {% endif %}
                               </ul>
                             </td>
                             {% endif %}

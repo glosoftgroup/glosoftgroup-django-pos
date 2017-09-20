@@ -33,7 +33,7 @@
             <div class="col-md-2">
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
-                {% if perms.userprofile.add_customer %}
+                {% if perms.customer.add_customer %}
                     <a href="{% url 'dashboard:customer-add' %}" class="btn btn-primary  hvr-glow btn-raised legitRipple ">
                     <i class="icon-plus3 position-left"></i>Add Customer</a>
                 {% endif %}
@@ -83,7 +83,7 @@
                         <th>Creditable</th>
                         <th>Loyalty Points</th>
                         <th>Total Discount</th>
-                        {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                        {% if perms.customer.change_customer or perms.customer.delete_customer %}
                         <th class="text-center">Actions</th>
                         {% endif %}
                       </tr>
@@ -127,13 +127,13 @@
                                 action <span class="caret"></span>
                               </button>
                               <ul class="dropdown-menu edit-dropdown">
-                                  {% if perms.userprofile.view_customer %}
+                                  {% if perms.customer.view_customer %}
                                   <li><a href="{% url 'dashboard:customer-sales-detail' pk=user.pk %}"><i class="icon-cash2"></i> SALES DETAILS</a></li>
                                 {% endif %}
-                                 {% if perms.userprofile.change_customer %}
+                                 {% if perms.customer.change_customer %}
                                       <li><a href="{% url 'dashboard:customer-edit' pk=user.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
                                  {% endif %}
-                                 {% if perms.userprofile.delete_customer %}
+                                 {% if perms.customer.delete_customer %}
                                       <li>
                                       <a data-ta="#modal_instance" data-title="Delete Customer {{ user.name }} ?" data-href="{% url 'dashboard:customer-delete' pk=user.pk %}" data-name="{{ user.name }}" data-id="{{ user.pk }}"
                                      class="modal-trigger"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE

@@ -16,7 +16,7 @@ urlpatterns = [
         url(r'^user_process/$',  permission_required('userprofile.add_user')
         (views.user_process), name='user_process'),
         url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('userprofile.change_user', login_url='not_found')(views.user_detail), name='user-detail'),
-        url(r'user_trail/$', permission_required('unused.view_trail', login_url='not_found')
+        url(r'user_trail/$', permission_required('userprofile.view_usertrail', login_url='not_found')
                 (views.user_trails), name='user_trail'),
         url(r'^usertrail_paginate/', views.usertrail_paginate, name='usertrail_paginate'),
         url( r'^usertrail_search/$', views.usertrail_search, name = 'usertrail_search' ),

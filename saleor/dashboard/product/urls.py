@@ -94,17 +94,17 @@ urlpatterns = [
     url(r'^subcategory/products/paginate/$', subcategory_products.paginate, name='subcategory-products-paginate'),
     url(r'^subcategory/products/search/$', subcategory_products.search, name='subcategory-products-search'),
 
-    url(r'^(?P<product_pk>[0-9]+)/variants/(?P<variant_pk>[0-9]+)/$', permission_required('product.change_productvariants', login_url='not_found')
+    url(r'^(?P<product_pk>[0-9]+)/variants/(?P<variant_pk>[0-9]+)/$', permission_required('product.change_productvariant', login_url='not_found')
         (views.variant_edit), name='variant-update'),
     url(r'^have-variants/$',views.have_variants, name='have-variants'),
-    url(r'^(?P<product_pk>[0-9]+)/variants/add/$', permission_required('product.add_productvariants', login_url='not_found')
+    url(r'^(?P<product_pk>[0-9]+)/variants/add/$', permission_required('product.add_productvariant', login_url='not_found')
         (views.variant_edit), name='variant-add'),
-    url(r'^(?P<product_pk>[0-9]+)/variants/(?P<variant_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariants', login_url='not_found')
+    url(r'^(?P<product_pk>[0-9]+)/variants/(?P<variant_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariant', login_url='not_found')
         (views.variant_delete), name='variant-delete'),
-    url(r'^(?P<product_pk>[0-9]+)/single/variants/(?P<variant_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariants', login_url='not_found')
+    url(r'^(?P<product_pk>[0-9]+)/single/variants/(?P<variant_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariant', login_url='not_found')
         (views.single_variant_delete), name='single-variant-delete'),
     
-    url(r'^(?P<product_pk>[0-9]+)/variants/bulk_delete/', permission_required('product.delete_productvariants', login_url='not_found')
+    url(r'^(?P<product_pk>[0-9]+)/variants/bulk_delete/', permission_required('product.delete_productvariant', login_url='not_found')
         (views.variants_bulk_delete), name='variant-bulk-delete'),
     url(r'^products_pdf/$', products.products_pdf, name='products_pdf'),
     url(r'^products_export_csv/$', products.products_export_csv, name='products_export_csv'),
@@ -126,7 +126,7 @@ urlpatterns = [
         (views.stock_bulk_delete), name='stock-bulk-delete'),
     url(r'^add_stock_ajax/$',
         views.add_stock_ajax,name='add_stock_ajax'),
-    url(r'^(?P<product_pk>[0-9]+)/delete/single/stock/(?P<stock_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariants', login_url='not_found')
+    url(r'^(?P<product_pk>[0-9]+)/delete/single/stock/(?P<stock_pk>[0-9]+)/delete/$', permission_required('product.delete_productvariant', login_url='not_found')
         (views.single_stock_delete), name='single-stock-delete'),
     url(r'^re_order/$',
         views.re_order,name='re_order'),

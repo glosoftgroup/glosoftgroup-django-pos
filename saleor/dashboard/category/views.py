@@ -14,9 +14,11 @@ from ..views import staff_member_required
 from .forms import CategoryForm, ProductForm
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, InvalidPage
+from ...decorators import permission_decorator, user_trail
 
 @staff_member_required
+@permission_decorator('product.view_category')
 def category_list(request, root_pk=None):
     root = None
     path = None
@@ -149,6 +151,7 @@ def category_search(request, root_pk=None):
 
 
 @staff_member_required
+@permission_decorator('product.add_category')
 def category_create32(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -166,6 +169,7 @@ def category_create32(request):
     else:
         return HttpResponse('Unexpected get method')
 @staff_member_required
+@permission_decorator('product.add_category')
 def category_create(request, root_pk=None):
     category = Category()
     form = CategoryForm(request.POST or None, parent_pk=root_pk)
@@ -194,6 +198,7 @@ def category_create(request, root_pk=None):
 
 
 @staff_member_required
+@permission_decorator('product.change_category')
 def category_edit(request, root_pk=None):
     category = get_object_or_404(Category, pk=root_pk)
     form = CategoryForm(request.POST or None, instance=category,
@@ -216,6 +221,7 @@ def category_edit(request, root_pk=None):
     return TemplateResponse(request, template, ctx, status=status)
 
 @staff_member_required
+@permission_decorator('product.delete_category')
 def category_delete(request, pk):
     category = get_object_or_404(Category, pk=pk)
     if request.method == 'POST':

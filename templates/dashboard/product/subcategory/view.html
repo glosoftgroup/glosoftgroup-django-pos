@@ -83,7 +83,9 @@
                      <th>#</th>
                       <th>Sub Category Name</th>
                       <th>Product Attributes</th>
+                      {% if perms.product.change_productclass or perms.product.delete_productclass %}
                       <th class="text-center">Options</th>
+                      {% endif %}
                   </tr>
                 </thead>
                 <tbody id="tb">

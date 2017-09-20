@@ -115,7 +115,7 @@ def transaction_search(request):
 			{"transactions":transactions, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 @staff_member_required
-# @permission_decorator('userprofile.view_user')
+@permission_decorator('sale.view_terminal')
 def terminals(request):
 	try:
 		users = Terminal.objects.all().order_by('-id')
@@ -202,7 +202,7 @@ def terminal_search(request):
 
 
 @staff_member_required
-@permission_decorator('userprofile.add_terminal')
+@permission_decorator('sale.add_terminal')
 def terminal_add(request):
 	try:
 		user_trail(request.user.name, 'accessed add terminal page', 'view')

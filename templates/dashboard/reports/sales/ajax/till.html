@@ -83,7 +83,7 @@ Highcharts.chart('container', {
     series: [{
         name: 'Tills',
         colorByPoint: true,
-        data: [{% for d in sales_by_category %}{ name:'{{d.terminal__terminal_name }}', p:{{d.percentage}} ,y:{{d.total_net__sum}}, color:'{{d.color}}', drilldown:'{{d.terminal__terminal_name}}' }, {% endfor %}]
+        data: [{% for d in sales_by_category %}{ name:'{% if d.terminal__terminal_name %}{{d.terminal__terminal_name }}{% else %}None{% endif %}', p:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} ,y:{% if d.total_net__sum %}{{d.total_net__sum}}{% else %}0{% endif %}, color:'{{d.color}}', drilldown:'{% if d.terminal__terminal_name %}{{d.terminal__terminal_name }}{% else %}None{% endif %}' }, {% endfor %}]
     }],
     drilldown: {
         series: [{

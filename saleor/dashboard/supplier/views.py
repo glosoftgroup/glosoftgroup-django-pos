@@ -33,7 +33,7 @@ debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
-
+@permission_decorator('supplier.view_supplier')
 def users(request):
 	try:
 		users = Supplier.objects.all().order_by('-id')
@@ -134,7 +134,7 @@ def user_search(request):
 									{'users': users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 @staff_member_required
-@permission_decorator('userprofile.add_user')
+@permission_decorator('supplier.add_supplier')
 def user_add(request):
 	try:
 		permissions = Permission.objects.all()
@@ -155,6 +155,7 @@ def supplier_add_modal(request):
 		return HttpResponse('error accessing add suppliers page')
 
 @staff_member_required
+@permission_decorator('supplier.add_supplier')
 def supplier_add(request):
 	try:
 		return TemplateResponse(request, 'dashboard/supplier/add_supplier.html',{})
@@ -217,12 +218,15 @@ def user_detail(request, pk):
 	
 	return TemplateResponse(request, 'dashboard/supplier/detail.html', {'user':user})
 
+@permission_decorator('supplier.delete_supplier')
 def user_delete(request, pk):
 	user = get_object_or_404(Supplier, pk=pk)
 	if request.method == 'POST':
 		user.delete()
 		user_trail(request.user.name, 'deleted supplier: '+ str(user.name))
 		return HttpResponse('success')
+
+@permission_decorator('supplier.change_supplier')
 def user_edit(request, pk):
 	user = get_object_or_404(Supplier, pk=pk)
 	#addresses = user.get_address()		

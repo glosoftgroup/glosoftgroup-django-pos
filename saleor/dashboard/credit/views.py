@@ -43,7 +43,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def credit_list(request):
 	try:
 		try:
@@ -78,7 +78,7 @@ def credit_list(request):
 		error_logger.error(e)
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def credit_detail(request, pk=None):
 	try:
 		sale = Credit.objects.get(pk=pk)
@@ -89,7 +89,7 @@ def credit_detail(request, pk=None):
 		return HttpResponse('No items found')
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def credit_reports(request):
 	try:
 		today = datetime.date.today()
