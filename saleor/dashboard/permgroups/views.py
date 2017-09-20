@@ -29,7 +29,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-@permission_decorator('group.view_group')
+@permission_decorator('auth.view_group')
 def groups(request):
 	users = User.objects.all().order_by('id')
 	permissions = Permission.objects.all()
@@ -132,7 +132,7 @@ def perms(request):
 		{'users':users, 'permissions':permissions, 'groups':groups})
 
 @staff_member_required
-@permission_decorator('group.add_group')
+@permission_decorator('auth.add_group')
 @csrf_protect
 def create_group(request):
 	if request.method == 'POST':
@@ -155,7 +155,7 @@ def create_group(request):
 			return JsonResponse({"id":last_id_group.id, "name":last_id_group.name})
 
 @staff_member_required
-@permission_decorator('group.add_group')
+@permission_decorator('auth.add_group')
 @csrf_protect
 def group_assign_permission(request):
 	if request.method == 'POST':
@@ -225,7 +225,7 @@ def get_search_users(request):
 		return HttpResponse(html)
 
 @staff_member_required
-@permission_decorator('group.change_group')
+@permission_decorator('auth.change_group')
 @csrf_protect
 def group_edit(request):
 	group_id = request.POST.get('id')
@@ -238,7 +238,7 @@ def group_edit(request):
 	return HttpResponse(html)
 
 @staff_member_required
-@permission_decorator('group.view_group')
+@permission_decorator('auth.view_group')
 def group_detail(request, pk):
 	group = Group.objects.get(id=pk)
 	group_permissions = Permission.objects.filter(group=group)
@@ -254,7 +254,7 @@ def group_detail(request, pk):
 		return HttpResponse(html)
 
 @staff_member_required
-@permission_decorator('group.delete_group')
+@permission_decorator('auth.delete_group')
 def group_delete(request, pk):
 	group = Group.objects.get(id=pk)
 	group_permissions = Permission.objects.filter(group=group)
@@ -307,7 +307,7 @@ def get_group_users(request):
 		return HttpResponse('none')
 
 @staff_member_required
-@permission_decorator('group.change_group')
+@permission_decorator('auth.change_group')
 def group_update(request):
 	if request.method == 'POST':
 		group_id = request.POST.get('id')

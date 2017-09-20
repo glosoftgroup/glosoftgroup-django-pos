@@ -29,7 +29,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-# @permission_decorator('userprofile.view_user')
+@permission_decorator('customer.view_customer')
 def users(request):
 	try:
 		users = Customer.objects.all().order_by('-id')
@@ -54,7 +54,7 @@ def users(request):
 		return TemplateResponse(request, 'dashboard/customer/users.html', {'users': users, 'pn': paginator.num_pages})
 
 @staff_member_required
-@permission_decorator('userprofile.add_user')
+@permission_decorator('customer.add_customer')
 def user_add(request):
 	try:
 		user_trail(request.user.name, 'accessed add customer page', 'view')
@@ -150,12 +150,15 @@ def sales_items_detail(request, pk=None, ck=None):
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
 
+@permission_decorator('customer.delete_customer')
 def user_delete(request, pk):
 	user = get_object_or_404(Customer, pk=pk)
 	if request.method == 'POST':
 		user.delete()
 		user_trail(request.user.name, 'deleted customer: '+ str(user.name))
 		return HttpResponse('success')
+
+@permission_decorator('customer.change_customer')
 def user_edit(request, pk):
 	user = get_object_or_404(Customer, pk=pk)		
 	ctx = {'user': user}

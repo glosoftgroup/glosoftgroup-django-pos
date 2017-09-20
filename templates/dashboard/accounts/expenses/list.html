@@ -37,8 +37,7 @@
             <div class="col-md-2">
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
-                {% if perms.accounts.add_expense %}
-                   <!--<a href="{% url 'accounts:add_expense' %}" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>-->
+                {% if perms.accounts.add_expenses %}
                   <a href="javascript:;" id="addExpenseBtn" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Expense</a>
                 {% endif %}
               </div>
@@ -159,7 +158,7 @@
                     <th>Expense</th>
                     <th>Paid To</th>
                     <th>Amount (KShs)</th>
-                    {% if perms.accounts.change_expense or perms.accounts.delete_expense %}
+                    {% if perms.accounts.delete_expenses %}
                     <th class="text-center">Actions</th>
                     {% endif %}
                   </tr>
@@ -173,17 +172,15 @@
                     <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">{{expense.paid_to}}</td>
                     <td class="td" data-href="{% url 'accounts:pexpense-detail' pk=expense.pk %}" data-mtitle="{{expense.added_on|date:'jS F Y'|upper}}" data-m="#pdetail">
                         <span class="pull-right"> {{ expense.amount|intcomma }}</span></td>
-                    {% if perms.userprofile.change_user or perms.userprofile.delete_user %}
+                    {% if perms.accounts.delete_expenses %}
                     <!-- actions -->
                     <td class="text-center">
                       <ul class="icons-list">
-                         {% if perms.accounts.delete_expense %}
                         <li>
                           <a data-ta="#modal_instance" data-title="Delete Expense {{ expense.expense_type }} ?" data-href="{% url 'accounts:expense-delete' pk=expense.pk %}" data-name="{{ expense.expense_type}}" data-id="{{ expense.pk }}"
                          class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> delete
                          </a>
                         </li>
-                        {% endif %}
                       </ul>
                     </td>
                     {% endif %}

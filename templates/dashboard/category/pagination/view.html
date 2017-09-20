@@ -83,7 +83,9 @@
                     <th>Name</th>
                     <th>Description</th>
                     <th>Products</th>
+                      {% if perms.product.change_category or perms.product.delete_category %}
                     <th class="text-center">Actions</th>
+                      {% endif %}
                   </tr>
                 </thead>
                 <tbody id="tb">

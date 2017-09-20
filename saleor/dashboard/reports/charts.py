@@ -541,7 +541,7 @@ def get_sales_by_week(request):
 
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def sales_user_chart(request):
 	image = request.POST.get('img')
 	today = datetime.datetime.now()
@@ -709,7 +709,7 @@ def get_user_sale_details(request):
 			# return HttpResponse(e)
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def sales_terminal_chart(request):
 	image = request.POST.get('img')
 	today = datetime.datetime.now()
@@ -873,7 +873,7 @@ def get_terminal_sale_details(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_terminal.html',{})
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_products_reports')
 def sales_product_chart(request):
 	get_date = request.GET.get('date')
 	image = request.POST.get('img')

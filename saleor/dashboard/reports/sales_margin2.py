@@ -43,7 +43,7 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def sales_list(request):
 	try:
 		try:
@@ -115,7 +115,7 @@ def sales_list(request):
 
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def sales_detail(request, pk=None):
 	try:
 		sale = Sales.objects.get(pk=pk)
@@ -390,7 +390,7 @@ def sales_search(request):
 										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def sales_reports(request):
 	try:
 		today = datetime.date.today()
@@ -420,7 +420,7 @@ def sales_reports(request):
 		return TemplateResponse(request, 'dashboard/reports/sales_margin2/sales.html', {})
 
 @staff_member_required
-@permission_decorator('reports.view_sales_reports')
+@permission_decorator('reports.view_sale_reports')
 def pdf_sale_tax_detail(request, pk=None):
 	try:
 		sale = Sales.objects.get(pk=pk)

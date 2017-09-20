@@ -8,18 +8,23 @@ from django.conf.urls.static import static
 
 urlpatterns = [
         # terminal urls
-        url(r'^$', views.terminals, name='terminals'),       
-        url(r'^add/$', views.terminal_add, name='terminal-add'),
+        url(r'^$', permission_required('sale.view_terminal', login_url='account_login')
+            (views.terminals), name='terminals'),
+        url(r'^add/$', permission_required('sale.add_terminal', login_url='account_login')
+            (views.terminal_add), name='terminal-add'),
         url(r'^terminal_process/$', views.terminal_process, name='terminal_process'),
-        url(r'^edit/(?P<pk>[0-9]+)/$', views.terminal_edit, name='terminal-edit'),
+        url(r'^edit/(?P<pk>[0-9]+)/$', permission_required('sale.change_terminal', login_url='account_login')
+            (views.terminal_edit), name='terminal-edit'),
         url(r'^terminal/history/(?P<pk>[0-9]+)/$', views.terminal_history, name='terminal-history'),
         url(r'^terminal_update(?P<pk>[0-9]+)/$', views.terminal_update, name='terminal-update'),
         url(r'^detail/(?P<pk>[0-9]+)/$', views.terminal_detail, name='terminal-detail'),
-        url(r'^delete/(?P<pk>[0-9]+)/$', views.terminal_delete, name='terminal-delete'),
+        url(r'^delete/(?P<pk>[0-9]+)/$', permission_required('sale.delete_terminal', login_url='account_login')
+            (views.terminal_delete), name='terminal-delete'),
         url(r'^terminal/paginate/$', views.terminal_pagination, name='terminal-paginate'),
         url(r'^terminal/search/$', views.terminal_search, name='terminal-search'),
         # cashmovement urls
-        url(r'^transations/$', views.transactions, name='transactions'),
+        url(r'^transations/$', permission_required('sale.view_drawercash', login_url='account_login')
+            (views.transactions), name='transactions'),
         url(r'^transaction/paginate/$', views.transaction_pagination, name='transaction-paginate'),
         url(r'^transaction/search/$', views.transaction_search, name='transaction-search'),
         ]

@@ -7,15 +7,18 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-        url(r'^$', views.users, name='customers'),        
-        url(r'^add/$', permission_required('userprofile.add_user', login_url='account_login')
+        url(r'^$', permission_required('customer.view_customer', login_url='account_login')
+            (views.users), name='customers'),
+        url(r'^add/$', permission_required('customer.add_customer', login_url='account_login')
             (views.user_add), name='customer-add'),
         url(r'^customer_process/$', views.user_process, name='customer_process'),
         url(r'^d/(?P<pk>[0-9]+)/$', views.user_detail, name='customer-detail'),
         url(r'^sd/(?P<pk>[0-9]+)/$', views.sales_detail, name='customer-sales-detail'),
         url(r'^std/(?P<pk>[0-9]+)/(?P<ck>[0-9]+)/$', views.sales_items_detail, name='customer-sales-items-detail'),
-        url(r'^delete/(?P<pk>[0-9]+)/$', views.user_delete, name='customer-delete'),
-        url(r'^edit/(?P<pk>[0-9]+)/$', views.user_edit, name='customer-edit'),
+        url(r'^delete/(?P<pk>[0-9]+)/$', permission_required('customer.delete_customer', login_url='account_login')
+            (views.user_delete), name='customer-delete'),
+        url(r'^edit/(?P<pk>[0-9]+)/$', permission_required('customer.change_customer', login_url='account_login')
+            (views.user_edit), name='customer-edit'),
         url(r'^user_update(?P<pk>[0-9]+)/$', views.user_update, name='customer-update'),
         url(r'^customer/paginate/$', views.customer_pagination, name='customer-paginate'),
         url(r'^customer/search/$', views.customer_search, name='customer-search'),
