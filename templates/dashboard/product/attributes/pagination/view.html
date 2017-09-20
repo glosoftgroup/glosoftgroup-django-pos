@@ -14,6 +14,7 @@
 
 {% block menu_attributes_class %}active{% endblock %}
  {% block custom_css %}
+ <link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
    <style type="text/css">
      .clickable-row td.td{
       cursor: pointer;
@@ -39,7 +40,7 @@
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
                 {% if perms.product.add_productattribute %}
-                 <a class="btn btn-primary text-white btn-xs hvr-glow btn-raised legitRipple waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:product-attribute-add' %}" title="{% trans 'Add attribute' context 'Product Attribute add button text' %}">
+                 <a id="click-toggler" class="btn btn-primary text-white btn-xs hvr-glow btn-raised legitRipple waves-effect waves-light teal modal-trigger" onclick="return false;"  data-href="{% url 'dashboard:product-attribute-add' %}" title="{% trans 'Add attribute' context 'Product Attribute add button text' %}">
                   <i class="icon-plus3 position-left"></i>Add Attribute
                 </a>
                 {% endif %}
@@ -65,9 +66,39 @@
                   </select>
               </div>
             </div>
+            <div id="toggle-div" class="col-md-12" style="display: none;">
+       <!-- add attr form here -->
+       <form class="form" enctype="multipart/form-data" id="addoptionsform" name="addoptionsform">
+            {% csrf_token %}
+     <table class="table table-hover">
+        <thead>
+            <tr class="bg-primary">            
+            <th>Name</th>            
+            <th>Attribute Choices</th>
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>        
+
+          <td>
+            <input type="text" placeholder="Attribute Name" id="newvName" class="form-control" name="newvName">
+            </td>            
+            <td>
+              <select class="selectVariantChoice" multiple></select>
+            </td>
+            <td>
+              <button class="btn btn-xs btn-primary legitRipple" onclick="return false;" id="addVariantChBtn" data-token="{% csrf_token %}" data-url="{% url 'dashboard:payment-add' %}" type="submit">Add <i class="icon-arrow-right14 position-right"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table> </form>
+       <!-- ./form -->
+      </div>
             
         </div>
       </div>
+
    </div>
 
   <div class="col-md-12">
@@ -182,6 +213,7 @@
 {% include "dashboard/includes/_modal_template.html"  %}
 {% endblock%}
 {% block custom_js %}
+ <script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
@@ -206,6 +238,114 @@ $(document).ready(function() {
       });
 
    });
+
+  // asldfjsldfjsldfj
+  // alertUser
+function alertUser(msg,status='bg-success',header='Well done!')
+{ $.jGrowl(msg,{header: header,theme: status}); }
+//add productDetails
+var clickToggler = $('#click-toggler');
+var toggleDiv = $('#toggle-div');
+clickToggler.on('click',function(){
+  toggleDiv.removeClass('hidden');
+  toggleDiv.slideDown("slow");
+});
+// add script
+$('.selectAttributesChoice').tokenize2({
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
+    tokensAllowCustom:true,      
+    });
+    $('.selectVariantChoice').tokenize2({
+    placeholder: 'Add attribute choice(s) (eg. 1kg, 2kg)',
+    tokensAllowCustom:true,      
+    });
+    function addAttributePlusChoice(dynamicData,myUrl) 
+    {     
+       return $.ajax({
+          url: myUrl,
+          type: "post",
+          data: dynamicData
+        });
+    }
+    
+    var getAttributesChoice = $('.selectAttributesChoice');
+    var getVariantChoice = $('.selectVariantChoice');
+    var addAttributeChBtn = $('#addAttributeChBtn');
+    var addVariantChBtn = $('#addVariantChBtn');
+
+    addVariantChBtn.on('click',function(){
+      var newattrName = $('#newvName').val();
+      var choices = getVariantChoice.val();
+      if(!newattrName)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      if(!choices)
+      {
+        alertUser('Attribute choices required','bg-danger','Attribute choices required');
+        return false;
+      }
+      var dynamicData = {};
+      var myUrl = "{% url 'dashboard:add-new-attribute' %}";
+      dynamicData["attributes"] = JSON.stringify(choices);
+      dynamicData["name"] = newattrName;
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      dynamicData['track'] = 'Add attribute plus choice';
+      addAttributePlusChoice(dynamicData,myUrl)
+      .done(function(data){
+        alertUser('Success');
+        refreshData();
+        toggleDiv.slideUp('slow');
+         //window.location.href = "{% url 'dashboard:product-attributes' %}";
+        getAttributesChoice.val('');         
+         getVariantChoice.parents('div').find('li.token').remove();
+        $('#newvName').val('');
+        $(".selectVariantChoice option[data-type='custom']").remove();
+        
+      })
+      .fail(function(){
+        alertUser('Attribute already exist','bg-danger','Add unique variant name');
+      });
+    });
+
+    addAttributeChBtn.on('click',function(){
+      var newattrName = $('#newattrName').val();
+      var choices = getAttributesChoice.val();
+      if(!newattrName)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      if(!choices)
+      {
+        alertUser('Attribute name required','bg-danger','Attribute name required');
+        return false;
+      }
+      var dynamicData = {};
+      var myUrl = "{% url 'dashboard:add-new-attribute' %}";
+      dynamicData["attributes"] = JSON.stringify(choices);
+      dynamicData["name"] = newattrName;
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      dynamicData['track'] = 'Add attribute plus choice';
+      addAttributePlusChoice(dynamicData,myUrl)
+      .done(function(data){
+        window.location.href = "{% url 'dashboard:product-attributes' %}";
+        console.log('redirecting');
+        alertUser('Success');
+        getAttributesChoice.val('');         
+         $(".selectAttributesChoice").parents('div').find('li.token').remove();
+         $(".selectVariantChoice option[data-type='custom']").remove();
+        $('#newattrName').val('');
+        refreshData();
+        
+      })
+      .fail(function(){
+        alertUser('Attribute already exist','bg-danger','Add unique attribute name');
+      });
+    });
+// end scripts
+  // sdlfjsldfjsdflsjd
 
   //** view product modal
   $( "body").on('click', '.modal-trigger-ajax', function() {
@@ -246,7 +386,13 @@ $(document).ready(function() {
           $(this).val('')
         }
     });
+    function refreshData(){
+        var url = "{% url 'dashboard:search-attribute' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:'', },success: function(data){
+                  $('#pagination-div').html(data);
+           }});
 
+     }
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();

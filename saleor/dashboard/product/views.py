@@ -1750,7 +1750,7 @@ def search_attribute(request):
             search  = request.POST.get("search_product", "--") 
             attributes = [
                 (attribute.pk, attribute.name, attribute.values.all())
-            for attribute in ProductAttribute.objects.filter(name__icontains=search).prefetch_related('values')]
+            for attribute in ProductAttribute.objects.filter(name__icontains=search).prefetch_related('values').order_by('-id')]
     
             productAttribute_count = len(ProductAttribute.objects.all())
             productAttribute_results = ProductAttribute.objects.filter(name__icontains=search)            
@@ -1779,7 +1779,7 @@ def search_attribute(request):
         if q is not None:
             queryset_list = [
                 (attribute.pk, attribute.name, attribute.values.all())
-            for attribute in ProductAttribute.objects.filter(name__icontains=q).prefetch_related('values')]
+            for attribute in ProductAttribute.objects.filter(name__icontains=q).prefetch_related('values').order_by('-id')]
             paginator = Paginator(queryset_list, 10)
 
             try:

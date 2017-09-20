@@ -33,16 +33,7 @@
 <div class="row">
 <div class="col-md-12">
     <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Create User Details</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+      
 
       <div class="panel-body">
         <div class="tabbable">
@@ -56,21 +47,8 @@
               <form class="form" enctype="multipart/form-data" id="user-details" name="user-details">
                 {% csrf_token %}
                   <div class="row">
-                    <div class="col-md-4">
-                    <label for="exampleInputEmail1">User Image</label>
-                      <div class="form-group">
-                        <!-- <label for="exampleInputEmail1">User Image</label> -->
-                        <div class="fileinput fileinput-new" data-provides="fileinput">
-                          <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
-                            <img data-src="holder.js/100%x100%" alt="..." src="{% static 'images/user.png' %}">
-                          </div>
-                          <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
-                          <div style="text-align: center;">
-                            <span class="btn btn-warning btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="image" id="image"></span>
-                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
-                          </div>
-                        </div>
-                      </div>
+                    <div class="col-md-">
+                   
 
                     </div>
                     <div class="col-md-8">
@@ -209,25 +187,7 @@ $( ".check" ).on( "click", function(){
         name: {
           required:true,
           minlength:3
-        },
-        email:{
-          required: true,
-          email:true
-        },
-        password:{
-          required:true,
-          minlength: 6
-        },
-        confirm_password:{
-          required:true,
-          minlength:6,
-          equalTo: "#password"
-        },
-        nid:{
-          required:true,
-          digits: true,
-          minlength: 6
-        },
+        },                
         mobile:{
           required:true,
           //digits: true,
