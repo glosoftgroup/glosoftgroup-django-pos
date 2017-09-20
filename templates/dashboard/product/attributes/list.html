@@ -46,7 +46,7 @@
             <div class="col-md-2">
               <div class="form-group">
                 {% if perms.userprofile.add_user %}
-                   <a href="{% url 'dashboard:product-attribute-add' %}" class="btn-block btn-primary btn-lg text-center">ADD ATTRIBUTE</a>
+                   <a id="toggle-form" onclick="return false;" data-href="{% url 'dashboard:product-attribute-add' %}" class="btn-block btn-primary btn-lg text-center">ADD ATTRIBUTE</a>
                 {% endif %}
               </div>
             </div> 
@@ -147,13 +147,9 @@
 
    });
 
-    var maxHeight = 0;
-    $(".equalize").each(function() {
-        if ($(this).height() > maxHeight) {
-            maxHeight = $(this).height();
-        }
-    });
-    $(".equalize").height(maxHeight);
+var toggleForm = $('#toggle-form');
+
+    
 });
 
 </script>

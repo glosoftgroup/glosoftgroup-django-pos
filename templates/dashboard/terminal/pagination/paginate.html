@@ -7,7 +7,7 @@
 {% if users %}
       {% for user in users %}
       <tr class='clickable-row' id="{{user.pk }}">
-        <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+        <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{ forloop.counter }}</td>
         <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">
         {{user.terminal_number}}
         </td>

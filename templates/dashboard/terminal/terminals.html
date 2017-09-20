@@ -74,7 +74,7 @@
           <table class="table table-striped table-hover fixed_headers">
                 <thead style="border-top:1px solid #ddd;">
                   <tr class="bg-primary">
-                    <th>#ID</th>
+                    <th>#</th>
                     <th>Till Id</th>
                     <th>Till Name</th>
                     <th>Cash movements</th>
@@ -91,7 +91,7 @@
                {% if users %}
                   {% for user in users %}
                   <tr class='clickable-row' id="{{user.pk }}">
-                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">#{{ forloop.counter }}</td>
+                    <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{ forloop.counter }}</td>
                     <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">
                     {{user.terminal_number}}
                     </td>
