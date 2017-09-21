@@ -22,7 +22,7 @@
             </div>
             <div class="form-group">
               <label>Phone</label>
-              <input type="text" id="phone" name="phone" class="form-control">
+              <input type="text" id="phone" name="phone" data-mask="(+254)-999-999-999"  class="form-control">
             </div>
             <div class="form-group">
                 <label>Postal Code</label>
@@ -58,7 +58,7 @@
         },
         phone: {
           required:true,
-          digits:true,
+          //digits:true,
           minlength:6
         },      
 
@@ -124,4 +124,5 @@
   {
   	$("#contact-list").append(data)
   } 
+  
    </script>

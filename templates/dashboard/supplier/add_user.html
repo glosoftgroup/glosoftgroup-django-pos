@@ -33,26 +33,21 @@
 <div class="row">
 <div class="col-md-12">
     <div class="panel panel-flat">
-      <div class="panel-heading">
-        <h6 class="panel-title">Create Supplier Details</h6>
-        <div class="heading-elements">
-          <ul class="icons-list">
-            <li><a data-action="collapse"></a></li>
-            <li><a data-action="reload"></a></li>
-            <li><a data-action="close"></a></li>
-          </ul>
-        </div>
-      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
-
       <div class="panel-body">
         <div class="tabbable">
           <ul class="nav nav-tabs nav-tabs-highlight">
             <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">add supplier profile</a></li>
-            <!--<li class="" id="contacts-tab"><a href="#contacts" data-toggle="tab" class="legitRipple" aria-expanded="false">Contacts</a></li>-->
+            <li class="" id="contacts-tab"><a href="#contacts-disabled" data-toggle="tab" class="legitRipple contacts-tab" aria-expanded="false">Contacts</a></li>
           </ul>
 
           <div class="tab-content">
-            
+             <!-- contact -->
+             <div class="tab-pane animated fadeIn" id="contacts">
+             {% if supplier.pk %}
+              {% include 'dashboard/supplier/_address_add.html' %}
+             {% endif %}
+             </div>
+             <!-- ./contact -->
             <div class="tab-pane animated fadeIn active" id="profile">
               <form class="form" enctype="multipart/form-data" id="user-details" name="user-details">
                 {% csrf_token %}
@@ -156,7 +151,7 @@ function disable_profile_tab(){
           minlength:3
         },
         email:{
-          required: true,
+          required: false,
           email:true
         },
         city:{
@@ -177,7 +172,7 @@ function disable_profile_tab(){
             minlength: 6
         },
         description:{
-            required:true
+            required:false
         },
       website:{
             required:false,
@@ -305,5 +300,20 @@ $("#permission-btn").click(function(event){
      });
 
 });
+
+// alertUser
+  function alertUser(msg,status='bg-danger',header='Add Supplier first!')
+  {
+      $.jGrowl(msg, 
+      {header: header,theme: status});
+  }
+  var contactTab = $('.contacts-tab');
+  contactTab.addClass('disabled');
+  contactTab.removeAttr('data-toggle');
+  contactTab.on('click',function(e){
+    e.preventDefault();
+    alertUser('Add supplier to enable this tabs')
+    return false;
+  });
 </script>
 {% endblock %}
