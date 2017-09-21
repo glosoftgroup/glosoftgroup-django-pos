@@ -14,6 +14,7 @@
 
 {% block menu_product_classes_class %}active{% endblock %}
  {% block custom_css %}
+ <link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
    <style type="text/css">
      .clickable-row td.td{
       cursor: pointer;
@@ -39,7 +40,7 @@
                   <label style="visibility: hidden;"> add</label>
                   <div class="form-group">
                     {% if perms.product.add_productclass %}
-                     <a class="btn btn-primary  hvr-glow btn-raised legitRipple text-white btn-xs waves-effect waves-light teal modal-trigger" href="{% url 'dashboard:product-class-add' %}" title="{% trans 'Add attribute' context 'Product Attribute add button text' %}">
+                     <a id="toggle-add-form" onclick="return false;" class="btn btn-primary  hvr-glow btn-raised legitRipple text-white btn-xs waves-effect waves-light teal modal-trigger" data-href="{% url 'dashboard:product-class-add' %}" title="{% trans 'Add attribute' context 'Product Attribute add button text' %}">
                      <i class="icon-plus3 position-left"></i> Add Sub-Category
                     </a>
                     {% endif %}
@@ -66,6 +67,38 @@
                   </select>
               </div>
             </div>
+            <!-- add form -->
+            <div class="col-md-12">
+                 <div id="toggle-div" class="col-md-12" style="display: none;">
+       <!-- add attr form here -->
+       <div>
+            {% csrf_token %}
+     <table class="table table-hover">
+        <thead>
+            <tr class="bg-primary">            
+            <th>Name</th>            
+            <th>Attribute Choices</th>
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>        
+
+          <td>
+            <input type="text" placeholder="Attribute Name" id="newvName" class="form-control" name="newvName">  </td>            
+            <td>
+              <select class="xgetAttributesD" multiple></select>
+            </td>
+            <td>
+              <button class="btn btn-xs btn-primary hvr-glow btn-raised legitRipple waves-effect waves-light" id="xaddClassBtnD" data-token="{% csrf_token %}" data-url="{% url 'dashboard:payment-add' %}" type="submit">Add <i class="icon-arrow-right14 position-right"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table> </div>
+       <!-- ./form -->
+      </div>
+            </div>
+            <!-- ./add form -->
            
         </div>
       </div>
@@ -177,13 +210,15 @@
   </div>
 
 </div>
-
+<input type="hidden" class="pageUrls" data-attributes="{% url 'dashboard:attr_list_f32b' %}" data-refrehsurl="{% url 'dashboard:search-class-list' %}" data-variantdetail="{% url 'dashboard:have-variants' %}" data-addattrurl="{% url 'dashboard:product-attr-add' %}" data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}" data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
 {% include "dashboard/includes/_modal.html"  %}
 {% endblock%}
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/subcategory/addsubcateory.js' %}"></script>
 <!--<script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>-->
 <script type="text/javascript">
 $(document).ready(function() {
@@ -274,6 +309,109 @@ $(document).ready(function() {
 
   });
 
+var toggleBtn = $('#toggle-add-form');
+var toggleDiv = $('#toggle-div');
 
+toggleBtn.on('click',function(){
+  toggleDiv.slideDown('slow');
+});
+function refreshList(){
+  var url = "{% url 'dashboard:terminal-search' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:''},success: function(data){
+                  $('#pagination-div').html(data);
+           }});
+}
+$('#user-details').validate({
+    rules:{
+        name: {
+          required:true,
+          minlength:3
+        },        
+        nid:{
+          required:true,
+          digits: true,
+          minlength: 1
+        },
+        
+
+    },
+    messages:{
+      name:{
+        required: "please provide a name",
+        minlength: "name must be atleast 3 characters long"
+      },      
+    },
+    submitHandler: function() { 
+      
+      if(1 != ''){
+          var f = document.getElementById('user-details');
+          var formData = new FormData(f);
+          
+          for (var pair of formData.entries()) {
+              console.log(pair[0]+ ', ' + pair[1]); 
+          }
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:terminal_process' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       console.log(data);
+                       $("#name").val('');    
+                       $("#nid").val('');               
+                       toggleDiv.slideUp('slow');
+                       $.jGrowl('Terminal added successfully,', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+                       
+                      localStorage.setItem('user_id', data);
+                      $('.user_id').val(localStorage.getItem("user_id"));
+                      refreshList();
+                      //window.location = "{% url 'dashboard:terminals'%}";
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try submitting again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            } 
+      }else{
+        $.jGrowl('Image is empty fill and try submitting again', {
+            header: 'Oh snap!',
+            theme: 'bg-danger'
+        });
+      }
+    }
+  });
+//  var getAttributesD = $('.xgetAttributesD');
+//  getAttributesD.on('tokenize:select', function(container){
+//   $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
+//    });
+//   // get getAttributes
+//   getAttributesD.tokenize2({
+//     placeholder: 'Select Attributes(s) (eg. Brand)',
+//     displayNoResultsMessage:true,
+//     //searchMinLength:3,
+//     sortable: true,
+//     dataSource: function(search, object){
+//         $.ajax(url, {
+//             data: { search: search, start: 1, group:'users' },
+//             dataType: 'json',
+//             success: function(data){
+//                 var $items = [];
+//                 $.each(data, function(k, v){
+//                     $items.push(v);
+//                 });
+//                 object.trigger('tokenize:dropdown:fill', [$items]);
+//             }
+//         });
+//     }
+// });
 </script>
 {% endblock %}
