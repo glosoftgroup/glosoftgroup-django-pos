@@ -119,8 +119,10 @@ def sales_list(request):
 def sales_detail(request, pk=None):
 	try:
 		sale = Sales.objects.get(pk=pk)
-		customer = sale.customer.name
-		print customer
+		try:
+			customer = sale.customer.name
+		except:
+			customer = 'Customer'
 		items = SoldItem.objects.filter(sales=sale)
 		total_items = []
 		totalMargin = 0
@@ -145,7 +147,7 @@ def sales_detail(request, pk=None):
 		data = {'items': total_items, "sale":sale, "totalMargin": totalMargin}
 		return TemplateResponse(request, 'dashboard/reports/sales_margin2/details.html',data)
 	except ObjectDoesNotExist as e:
-		return TemplateResponse(request, 'dashboard/reports/sales_margin2/details.html',data)
+		return TemplateResponse(request, 'dashboard/reports/sales_margin2/details.html',{})
 
 @staff_member_required
 def sales_paginate(request):
