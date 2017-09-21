@@ -56,7 +56,7 @@
 
                <div class="form-group">
                 <label for="mobile">Phone</label>
-                <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile">
+                <input type="text" class="form-control" name="mobile" id="mobile" data-mask="(+254)-999-999-999" placeholder="Mobile">
                </div>
             </div>
           </div>
@@ -79,6 +79,7 @@
 
 <script type="text/javascript">
 /* disable th permissions tab code */
+
   $('#user-details').validate({
   onkeyup: function(element) {$(element).valid()},
     rules:{
@@ -87,7 +88,7 @@
           minlength:3
         },
         email:{
-          required: true,
+          required: false,
           email:true
         },
         city:{
@@ -188,7 +189,9 @@
       }
     }
   });
-
+  $('#mobile').inputmask({
+  mask: '(254)-000-000-000'
+ })
   /* permission button */
 $("#permission-btn").click(function(event){
     event.preventDefault();

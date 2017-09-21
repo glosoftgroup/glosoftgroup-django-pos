@@ -97,14 +97,14 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 			kwargs = {'email': username}
 		else:
 			kwargs = {'name': username}
-		#try:
-		user = get_user_model().objects.get(**kwargs)
-		if not user:	
-			raise PermissionDenied('Username/email error Authentication Failed!')
-		else:
-			return value
-		#except:
-		#	raise PermissionDenied('Username/email Failed!')
+		try:
+			user = get_user_model().objects.get(**kwargs)
+			if not user:	
+				raise PermissionDenied('Username/email error Authentication Failed!')
+			else:
+				return value
+		except:
+			raise PermissionDenied('Username/email Failed!')
 		return value
 
 	def validate_password(self,value):
