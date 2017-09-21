@@ -339,6 +339,16 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
+
+  function updateSelectListnSearch(){
+      $('.expense_type').find(":selected").removeAttr('selected')
+      $(".expense_type option[value='none']").attr('selected', 'selected');
+      $(".expense_type").val(0);
+      $(".expense_type .filter-option").text('Choose...');
+      $(".expense_type ul.dropdown-menu li.active").removeClass('active');
+      $(".expense_type ul.dropdown-menu li[data-original-index='0']").addClass('active');
+  }
+
   $('.input-group').on('change', '.sel', function(){
        var v = $(this).val();
 
@@ -453,6 +463,7 @@
                     contentType: false,
                     success:function(data){
                          $('#expenses')[0].reset();
+                         updateSelectListnSearch();
                          $('#addExpenseTable').slideUp();
                          $.ajax({ url: "{% url 'accounts:personal_expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                             $('#pagination-div').html(data);

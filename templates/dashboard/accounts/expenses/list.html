@@ -337,6 +337,16 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
+  function updateSelectListnSearch(){
+      $('.expense_type').find(":selected").removeAttr('selected')
+      $(".expense_type option[value='none']").attr('selected', 'selected');
+      $(".expense_type").val(0);
+      $(".expense_type .filter-option").text('Choose...');
+      $(".expense_type ul.dropdown-menu li.active").removeClass('active');
+      $(".expense_type ul.dropdown-menu li[data-original-index='0']").addClass('active');
+  }
+
+
     $('#addExpenseBtn').on('click', function(){
         $('#addExpenseTable').slideToggle();
     });
@@ -371,23 +381,6 @@
              $("#editform input[name='" + cat + "']").rules("add", {required:true});
        }
     });
-    <!--$('#submitExpenseBtn').on('click', function(){-->
-       <!--var token = $(this).data('token');-->
-       <!--var url = $(this).data('url');-->
-       <!--var expense_type = $('#expense_type').val();-->
-       <!--var amount = $('#amount').val();-->
-       <!--var paidTo = $('#paidTo').val();-->
-       <!--var description = $('#description').val();-->
-       <!--data = {csrfmiddlewaretoken: '{{ csrf_token }}',amount:amount, expense_type:expense_type,-->
-        <!--paid_to:paidTo, description:description};-->
-
-       <!--$.ajax({ url: url,type: 'POST',data: data, async:false,success: function(data){-->
-          <!--$('#addExpenseTable').slideUp();-->
-          <!--$.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){-->
-              <!--$('#pagination-div').html(data);-->
-            <!--}});-->
-       <!--}});-->
-    <!--});-->
     $('#editform').validate({
         onkeyup: function(element) {$(element).valid()},
         rules:{
@@ -634,6 +627,7 @@
                     contentType: false,
                     success:function(data){
                          $('#expenses')[0].reset();
+                         updateSelectListnSearch();
                          $('#addExpenseTable').slideUp();
                          $.ajax({ url: "{% url 'accounts:expenses_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                             $('#pagination-div').html(data);
