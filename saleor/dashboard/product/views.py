@@ -1854,24 +1854,25 @@ def product_class_form32b(request):
 
 @staff_member_required
 def attr_list_f32d(request):
-    if request.method == 'POST':
-        pk = request.POST.get('name')
+    if request.method == 'POST':        
         attributes = []
         if request.POST.get('attributes'):
             attributes = json.loads(request.POST.get('attributes'))
-        variants = json.loads(request.POST.get('variants'))
-        print pk
-        if pk:
-             product_class = get_object_or_404(ProductClass,pk=int(pk))
+        variants = json.loads(request.POST.get('variants'))        
+        if request.POST.get('name'):
+            pk = request.POST.get('name')
+            product_class = get_object_or_404(ProductClass,pk=int(pk))
+        if request.POST.get('newclass'):            
+            product_class = ProductClass.objects.create(name=request.POST.get('newclass'))
+        if product_class:
              if attributes:
                 for attribute in attributes:
                     product_class.product_attributes.add(attribute)
              if variants:
                 for variant in variants:
                     product_class.variant_attributes.add(variant)
-             #l = []
-             contact={'text':product_class.name,'value': product_class.id}
-             #l.append(contact)
+             
+             contact={'text':product_class.name,'value': product_class.id}            
              return HttpResponse(json.dumps(contact), content_type='application/json')
         return HttpResponse('Error')
 
