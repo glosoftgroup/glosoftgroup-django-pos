@@ -37,6 +37,12 @@
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
                             
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+                            <td>
+                            {% if sale.discount_amount %}
+                            {{sale.discount_amount}}
+                            {% else %}
+                            --
+                            {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
@@ -190,7 +196,7 @@
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
         var date = $('.daterange-single').val();
-        var url = creditSearchUrl;
+        var url = creditPaginationUrl;
         var paginationUrl = creditPaginationUrl;
         var scategory = $('.sales-category').find(":selected").val();
         dynamicData = {}

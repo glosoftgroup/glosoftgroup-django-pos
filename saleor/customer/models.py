@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from django.db import models
+from django.db.models import F
 from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
@@ -105,6 +106,15 @@ class CustomerManager(BaseUserManager):
             customer.set_password(password)
         customer.save()
         return customer
+
+    def redeem_points(self, customer, points):
+        customer.loyalty_points = F('loyalty_points') - points
+        print points
+        print '*'*12
+        print F('loyalty_points')
+        customer.redeemed_loyalty_points = F('redeemed_loyalty_points') + points
+        customer.save(update_fields=['loyalty_points', 'redeemed_loyalty_points'])
+
     
 
 class Customer(models.Model):
@@ -119,6 +129,9 @@ class Customer(models.Model):
     creditable = models.BooleanField(default=False)
     loyalty_points = models.DecimalField(
         pgettext_lazy('Customer field', 'loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
+    redeemed_loyalty_points = models.DecimalField(
+        pgettext_lazy('Customer field', 'Redeemed loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
+    
     nid = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
     image = models.FileField(upload_to='employee', blank=True, null=True)

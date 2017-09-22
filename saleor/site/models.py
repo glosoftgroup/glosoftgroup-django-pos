@@ -23,6 +23,9 @@ class SiteSettings(models.Model):
 		blank=True)
 	loyalty_point_equiv = models.IntegerField( pgettext_lazy('Site field', 'loyalty points equivalency'),
 		validators=[MinValueValidator(0)], default=Decimal(0))
+	max_credit_date = models.IntegerField( pgettext_lazy('Site field', 'Maximum credit sale expiration in days'),
+        validators=[MinValueValidator(0)], unique=True, default=Decimal(0)) 
+    
 	opening_time = models.TimeField(pgettext_lazy('Site field', 'opening time'),
 		default=t.time(6, 00))
 	closing_time = models.TimeField(pgettext_lazy('Site field', 'closing time'),

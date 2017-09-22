@@ -17,7 +17,7 @@ from payments import PaymentStatus, PurchasedItem
 from payments.models import BasePayment
 from prices import Price, FixedDiscount
 from satchless.item import ItemLine, ItemSet
-from datetime import date
+from datetime import date, datetime
 
 from ..discount.models import Voucher
 from ..product.models import Product
@@ -107,6 +107,14 @@ class Credit(models.Model):
             return True
         else:
             return False
+    def is_expired(self):       
+        difference = datetime.now() - self.created.replace(tzinfo=None)        
+        max_credit_date = SiteSettings.objects.get(pk=1).max_credit_date
+        print max_credit_date
+        if difference.days > max_credit_date:
+            return True
+        return False
+  
                                 
 class CreditedItem(models.Model):
     credit = models.ForeignKey(Credit,related_name='credititems',on_delete=models.CASCADE)

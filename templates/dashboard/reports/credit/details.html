@@ -57,6 +57,7 @@
                           <th>Item Name</th>         
                           <th>Unit Cost</th>
                           <th>Quantity</th>
+                          <th>Discount</th>
                           <th>Total Sales (KShs)</th>
                         </tr>
                       </thead>
@@ -69,6 +70,12 @@
 
                             <td>{{item.unit_cost}}</td>
                             <td>{{item.quantity}}</td>
+                            <td>
+                            {% if sale.discount %}
+                            {{sale.discount}}
+                            {% else %}
+                            --
+                            {% endif %}</td>
                               <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
                           </tr>
                         {% endfor %}
@@ -85,7 +92,7 @@
             <div class="row">
               <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
                   <span>
-                   Total Sales: Kshs {{sale.total_net}}<br />
+                   Total Credit Sales: Kshs {{sale.total_net}}<br />
                    Total Tax: Kshs {{sale.total_tax}}
                  </span><br>
                   <span> Thank you for partnering with us.<br />
