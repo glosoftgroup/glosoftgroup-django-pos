@@ -2,6 +2,10 @@ import sys
 import os
 import netifaces
 from uuid import getnode as get_mac
+import subprocess,time,socket
+from Crypto.Util.Counter import new
+from Crypto.Cipher import AES
+import base64
 
 class FetchMac():
 
@@ -38,7 +42,36 @@ class FetchMac():
         h = iter(hex(mac)[2:].zfill(12))
         mac_addr = ":".join(i + next(h) for i in h)
         print("macadd : "+ mac_addr)
+        if sys.platform == 'win32':
+            mac_addr = self.windows()
+            return mac_addr
         return mac_addr
+
+    def windows(self):
+        BLOCK_SIZE = 32
+        PADDING = '{'
+        pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
+        EncodeAES = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
+        DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
+
+        machine_id = subprocess.check_output('wmic csproduct get UUID').split('\n')[1].strip()
+        machine_model_number = subprocess.check_output('wmic csproduct get IdentifyingNumber').split('\n')[1].strip()
+        new_id = '*!%F{0}@/{1}*'.format(machine_id, machine_model_number)
+
+        # salt = b'!%F=-?Pst970'
+        salt = str(new_id)
+        bkey32 = salt.ljust(32)[:32]
+        return bkey32
+        # cipher = AES.new(bkey32, AES.MODE_ECB)
+        # print cipher
+
+        # # encode a string
+        # encoded = EncodeAES(cipher, 'secret')
+        # print 'Encrypted string:', encoded
+
+        # # decode the encoded string
+        # decoded = DecodeAES(cipher, encoded)
+        # print 'Decrypted string:', decoded
 
 
 
