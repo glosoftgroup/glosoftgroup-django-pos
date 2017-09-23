@@ -112,7 +112,7 @@
                         {% if sales %}
                         {% for sale in sales %}
                           <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|timesince}}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td >
                             <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
                             {% if sale.is_fully_paid %}
