@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from django.db import models
+from django.db.models import F
 from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
@@ -105,6 +107,15 @@ class CustomerManager(BaseUserManager):
             customer.set_password(password)
         customer.save()
         return customer
+
+    def redeem_points(self, customer, points):
+        customer.loyalty_points = F('loyalty_points') - points
+        print points
+        print '*'*12
+        print F('loyalty_points')
+        customer.redeemed_loyalty_points = F('redeemed_loyalty_points') + points
+        customer.save(update_fields=['loyalty_points', 'redeemed_loyalty_points'])
+
     
 
 class Customer(models.Model):
@@ -119,6 +130,9 @@ class Customer(models.Model):
     creditable = models.BooleanField(default=False)
     loyalty_points = models.DecimalField(
         pgettext_lazy('Customer field', 'loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
+    redeemed_loyalty_points = models.DecimalField(
+        pgettext_lazy('Customer field', 'Redeemed loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
+    
     nid = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
     image = models.FileField(upload_to='employee', blank=True, null=True)
@@ -158,14 +172,70 @@ class Customer(models.Model):
 
     def get_short_name(self):
         return self.email
+
     def get_sales(self):
         return len(self.customers.all())
+
     def get_total_discount(self):
         total = self.customers.aggregate(models.Sum('discount_amount'))['discount_amount__sum']
         if total:
-            return total
+            return cool_format(total)
         return '--'
+
+    def get_total_sales_amount(self):
+        total = self.customers.aggregate(models.Sum('total_net'))['total_net__sum']
+        if total:
+            return cool_format(total)+' '+settings.DEFAULT_CURRENCY
+        return '--'
+
+    def get_total_credit_amount(self):
+        total = self.credit_customers.aggregate(models.Sum('total_net'))['total_net__sum']
+        if total:
+            return cool_format(total)+' '+settings.DEFAULT_CURRENCY
+        return '--'
+
+    def get_credits(self):
+        return len(self.credit_customers.all())    
+
     def get_loyalty_points(self):
         if self.loyalty_points != 0.00:
-            return self.loyalty_points
-        return '--'
+            return cool_format(self.loyalty_points)
+        return 0
+
+    def get_redeemed_loyalty_points(self):
+        if self.redeemed_loyalty_points != 0.00:
+            return cool_format(self.redeemed_loyalty_points)
+        return 0
+
+    def get_loy_perc(self):        
+        redeemed = self.redeemed_loyalty_points
+        loyalty  = self.loyalty_points
+        total = redeemed + loyalty
+        print 'total '+str(total)
+        print 'loyalty '+str(loyalty)
+        print 'redeemed '+str(redeemed)
+        if not total:
+            return 0.00
+        return (100*loyalty)/total
+
+    def get_rem_perc(self):        
+        redeemed = self.redeemed_loyalty_points
+        loyalty  = self.loyalty_points
+        total = redeemed + loyalty
+        print 'total '+str(total)
+        print 'loyalty '+str(loyalty)
+        print 'redeemed '+str(redeemed)
+        if not total:
+            return 0.00
+        return (100*redeemed)/total
+
+
+def cool_format(value):
+     value = Decimal(value)
+     if value < 1000.00:
+        return str("%.2f" % value)
+     elif value < Decimal(1000000.0):
+        value = value/Decimal(1000.0)
+        return str("%.2f" % value) + 'K'
+     else:
+        return str("%.2f" % value/Decimal(1000000.0)) + 'M'

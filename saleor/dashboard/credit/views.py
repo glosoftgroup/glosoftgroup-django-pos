@@ -125,7 +125,7 @@ def credit_paginate(request):
 	p2_sz = request.GET.get('psize')
 	select_sz = request.GET.get('select_size')
 	date = request.GET.get('gid')
-	sales = Sales.objects.all().order_by('-id')
+	sales = Credit.objects.all().order_by('-id')
 	today_formart = DateFormat(datetime.date.today())
 	today = today_formart.format('Y-m-d')
 	ts = Credit.objects.filter(created__icontains=today)
@@ -156,7 +156,7 @@ def credit_paginate(request):
 				'that_date_sum':that_date_sum, 'date':date, 'today':today})
 
 		except ObjectDoesNotExist as e:
-			return TemplateResponse(request, 'dashboard/reports/sales/p2.html',{'date': date})
+			return TemplateResponse(request, 'dashboard/reports/credit/p2.html',{'date': date})
 
 	else:
 		try:
@@ -167,20 +167,20 @@ def credit_paginate(request):
 			total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 			sales = []
 			for sale in all_sales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 
 			if list_sz:
 				paginator = Paginator(sales, int(list_sz))
 				sales = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'sales':sales, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
+				return TemplateResponse(request,'dashboard/reports/credit/p2.html',{'sales':sales, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
 			else:
 				paginator = Paginator(sales, 10)
 			if p2_sz:
 				paginator = Paginator(sales, int(p2_sz))
 				sales = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/sales/paginate.html',{'sales':sales})
+				return TemplateResponse(request,'dashboard/reports/credit/paginate.html',{'sales':sales})
 
 			try:
 				sales = paginator.page(page)
@@ -190,9 +190,9 @@ def credit_paginate(request):
 				sales = paginator.page(1)
 			except EmptyPage:
 				sales = paginator.page(1)
-			return TemplateResponse(request,'dashboard/reports/sales/paginate.html',{'sales':sales})
+			return TemplateResponse(request,'dashboard/reports/credit/paginate.html',{'sales':sales})
 		except ObjectDoesNotExist as e:
-			return TemplateResponse(request, 'dashboard/reports/sales/p2.html', {'date': date})
+			return TemplateResponse(request, 'dashboard/reports/credit/p2.html', {'date': date})
 
 @staff_member_required
 def credit_search(request):

@@ -61,6 +61,8 @@ def update_settings(request,site_id=None):
             site.closing_time = request.POST.get('closing_time')
         if request.FILES.get('image'):
             site.image = request.FILES.get('image')
+        if request.POST.get('max_credit_date'):
+            site.max_credit_date = request.POST.get('max_credit_date')        
         site.save()
         return HttpResponse('success')
     return HttpResponse('Invalid method')

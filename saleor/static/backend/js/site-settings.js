@@ -84,7 +84,7 @@ $(function() {
                        console.log(data);
                        if(data=='success'){
                           alertUser('Settings Updated successfully');
-                          setTimeout(function(){ window.location.reload(true); }, 2000);
+                          //setTimeout(function(){ window.location.reload(true); }, 2000);
                        }else{
                           alertUser('Error Updating', 'bg-danger','Error');
                        }

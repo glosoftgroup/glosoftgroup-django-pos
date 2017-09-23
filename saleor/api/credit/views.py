@@ -23,8 +23,7 @@ from ...customer.models import Customer
 from .serializers import (
     CreditListSerializer,
     CreateCreditSerializer,
-    CreditUpdateSerializer,
-
+    CreditUpdateSerializer,    
      )
 from rest_framework import generics
 
@@ -49,7 +48,7 @@ class CreditCreateAPIView(generics.CreateAPIView):
         if instance.status == 'fully-paid':
             send_to_sale(instance)
 
-        
+
 class CreditListAPIView(generics.ListAPIView):
     serializer_class = CreditListSerializer
 

@@ -14,8 +14,9 @@
                           <th>Receipt No</th>
                           <th>Status</th>
                           <th>Customer Name</th>
-                          <th>Cashier</th>           
+                          <th>Cashier</th>        
                           <th>Quantity</th>
+                          <th>Discount</th>
                            <th>Total Sales (KShs)</th>
                         </tr>
                       </thead>
@@ -23,7 +24,7 @@
                         {% if sales %}
                         {% for sale in sales %}
                           <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|timesince}}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
                             <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
                             {% if sale.is_fully_paid %}
@@ -35,6 +36,12 @@
                               <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>                         
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.total_items}}</td>
+                            <td>
+          {% if sale.discount_amount %}
+          {{sale.discount_amount}}
+          {% else %}
+          --
+          {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
@@ -97,6 +104,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
  <script type="text/javascript">
  var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
+  var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
    $(document).ready(function(){
         var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
         var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
@@ -191,7 +199,7 @@
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
         var date = $('.daterange-single').val();
-        var url = creditSearchUrl;
+        var url = creditPaginationUrl;
         var scategory = $('.sales-category').find(":selected").val();
 
         if((scategory == 'list' && date && searchData)){

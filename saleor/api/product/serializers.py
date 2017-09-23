@@ -40,17 +40,6 @@ class CreateStockSerializer(ModelSerializer):
          exclude = ['quantity_allocated']
 
 
-class CustomerListSerializer(serializers.ModelSerializer):
-    url = HyperlinkedIdentityField(view_name='product-api:detail')
-    class Meta:
-        model = Customer
-        fields = ('id',
-                 'email', 
-                 'url',
-                 'nid',
-                 )
-
-
 class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = SoldItem

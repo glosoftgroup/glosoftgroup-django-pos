@@ -115,6 +115,10 @@ def index(request):
     except KeyError as e:
         return TemplateResponse(request, 'dashboard/index.html', {"e":e, "date":date})
 
+@staff_member_required
+def landing_page(request):
+    ctx = {}
+    return TemplateResponse(request, 'dashboard/landing-page.html', ctx)
 def top_categories():
     today = datetime.datetime.now()
     try:
