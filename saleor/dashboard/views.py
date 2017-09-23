@@ -79,11 +79,14 @@ def index(request):
         #top categories
         cat = top_categories()
         items = top_items()
-        low_stock_order = Stock.objects.get_low_stock()
+        low_stock_order = dashbord_get_low_stock_products()
 
         ctx = {'preauthorized_payments': payments,
                'orders_to_ship': orders_to_ship,
-               'low_stock': low_stock_order,
+               'low_stock': low_stock_order['low_stock'],
+               'pn':low_stock_order['pn'],
+               'sz': low_stock_order['sz'],
+               'gid': low_stock_order['gid'],
                #top_cat
                "sales_by_category": cat['sales_by_category'],
                "categs": cat['categs'],
@@ -261,6 +264,22 @@ def top_items():
 def styleguide(request):
     return TemplateResponse(request, 'dashboard/styleguide/index.html', {})
 
+def dashbord_get_low_stock_products():
+    products = Stock.objects.get_low_stock()
+    paginator = Paginator(products, 10)
+    try:
+        low_stock = paginator.page(1)
+    except PageNotAnInteger:
+        low_stock = paginator.page(1)
+    except InvalidPage:
+        low_stock = paginator.page(1)
+    except EmptyPage:
+        low_stock = paginator.page(paginator.num_pages)
+    data = {'low_stock': low_stock, 'pn': paginator.num_pages, 'sz': 10, 'gid': 0}
+    return data
+
 def get_low_stock_products():
     products = Stock.objects.get_low_stock()
     return products
+
+

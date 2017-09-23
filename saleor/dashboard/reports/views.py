@@ -713,8 +713,11 @@ def products_reorder_paginate(request):
 		else:
 			paginator = Paginator(items, 10)
 		if p2_sz:
+			print ('hello')
+			print (page)
+			print (p2_sz)
 			paginator = Paginator(items, int(p2_sz))
-			items = paginator.page(page)
+			items = paginator.page(int(page))
 			return TemplateResponse(request, 'dashboard/reports/products/reorder_paginate.html', {'items': items})
 
 		try:
