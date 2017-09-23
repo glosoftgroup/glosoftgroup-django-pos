@@ -3,8 +3,6 @@ import os
 import netifaces
 from uuid import getnode as get_mac
 import subprocess,time,socket
-from Crypto.Util.Counter import new
-from Crypto.Cipher import AES
 import base64
 
 class FetchMac():
@@ -37,6 +35,12 @@ class FetchMac():
 
         return mac
 
+    def format_machine(self, new_id):
+        formatted = str(new_id)
+        bb = base64.b64encode(bytes(formatted))
+        bkey322 = bb.ljust(32)[:32]
+        return bkey322
+
     def getnumber(self):
         mac = get_mac()
         h = iter(hex(mac)[2:].zfill(12))
@@ -45,33 +49,32 @@ class FetchMac():
         if sys.platform == 'win32':
             mac_addr = self.windows()
             return mac_addr
-        return mac_addr
+        elif sys.platform == 'darwin':
+            mac_addr = self.mac()
+            return mac_addr
+        else:
+            mac_addr = self.unix()
+            return mac_addr
 
     def windows(self):
-        BLOCK_SIZE = 32
-        PADDING = '{'
-        pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
-        EncodeAES = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
-        DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
-
         machine_id = subprocess.check_output('wmic csproduct get UUID').split('\n')[1].strip()
         machine_model_number = subprocess.check_output('wmic csproduct get IdentifyingNumber').split('\n')[1].strip()
-        new_id = '*!%F{0}@/{1}*'.format(machine_id, machine_model_number)
+        new_id = '{0}@/{1}*'.format(machine_id, machine_model_number)
+        mid = self.format_machine(new_id)
+        return mid
 
-        # salt = b'!%F=-?Pst970'
-        salt = str(new_id)
-        bkey32 = salt.ljust(32)[:32]
-        return bkey32
-        # cipher = AES.new(bkey32, AES.MODE_ECB)
-        # print cipher
+    def unix(self):
+        machine_id = subprocess.check_output("dmesg | grep Kernel | sed s/.*UUID=//g | sed s/\ ro\ quiet.*//g", shell=True)
+        new_id = '{0}'.format(machine_id)
+        mid = self.format_machine(new_id)
+        return mid
 
-        # # encode a string
-        # encoded = EncodeAES(cipher, 'secret')
-        # print 'Encrypted string:', encoded
 
-        # # decode the encoded string
-        # decoded = DecodeAES(cipher, encoded)
-        # print 'Decrypted string:', decoded
+    def mac(self):
+        machine_id = subprocess.check_output("ioreg -rd1 -c IOPlatformExpertDevice | grep -E '(UUID)'", shell=True)
+        new_id = '*!%F{0}@*'.format(machine_id)
+        mid = self.format_machine(new_id)
+        return mid
 
 
 
