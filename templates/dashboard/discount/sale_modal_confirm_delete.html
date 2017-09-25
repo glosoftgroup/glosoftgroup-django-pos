@@ -11,13 +11,15 @@
         You are about to delete <strong>{{ sale }}</strong>.
       {% endblocktrans %}
     </p>
-    <div class="modal-footer">
-    <button type="submit" class="modal-action btn btn-primary">
-      {% trans "Delete" context "Dashboard delete action" %}
-    </button>
-    <a href="#!" data-dismiss="modal" class="modal-action modal-close btn-flat">
-      {% trans "Cancel" context "Dashboard cancel action" %}
-    </a>
+    <div class="modal-footer ">
+      <div class="col-md-6 col-md-offset-3">
+      <button href="#!" data-dismiss="modal" class="modal-action modal-close btn-default pull-left btn">
+        {% trans "Cancel" context "Dashboard cancel action" %}
+      </button>
+      <button type="submit" class="pull-right modal-action btn btn-primary">
+        {% trans "Delete" context "Dashboard delete action" %}
+      </button>
+    </div>
   </div>
   </div>
   

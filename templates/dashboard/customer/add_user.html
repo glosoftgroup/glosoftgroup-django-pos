@@ -211,17 +211,17 @@ $( ".check" ).on( "click", function(){
       }
     },
     submitHandler: function() { 
-      var file = $('#image')[0].files[0];
+      //var file = $('#image')[0].files[0];
       var raw_groups = $("#multiple :selected").map(function(){
                return $(this).val();
             }).get();
       var groups = raw_groups.map(Number);
       console.log(groups);
 
-      if(file != ''){
+      
           var f = document.getElementById('user-details');
           var formData = new FormData(f);
-          formData.append("image", file);
+          //formData.append("image", file);
           for (var i = 0; i < raw_groups.length; i++) {
               formData.append('groups[]', raw_groups[i]);
           }
@@ -245,7 +245,7 @@ $( ".check" ).on( "click", function(){
                        $("#nid").val('');
                        $("#mobile").val('');              
 
-                       $.jGrowl('Staff added successfully, now add permissioins', {
+                       $.jGrowl('Customer added successfully', {
                           header: 'Well done!',
                           theme: 'bg-success'
                        });
@@ -265,12 +265,7 @@ $( ".check" ).on( "click", function(){
                     }
                 });
             } 
-      }else{
-        $.jGrowl('Image is empty fill and try submitting again', {
-            header: 'Oh snap!',
-            theme: 'bg-danger'
-        });
-      }
+      
     }
   });
 

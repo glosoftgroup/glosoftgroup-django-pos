@@ -296,12 +296,7 @@ class ProductVariant(models.Model, Item):
     def check_quantity(self, quantity):
         available_quantity = self.get_stock_quantity()
         if quantity > available_quantity:
-            raise InsufficientStock(self)
-    # def get_cost_price(self):
-    #     cost_price = self.stock.cost_price
-    #     if cost_price:
-    #         return cost_price
-    #     return 0
+            raise InsufficientStock(self)    
 
 
     def get_stock_pk(self):
@@ -312,6 +307,7 @@ class ProductVariant(models.Model, Item):
         else:
             stock_pk = 0        
         return stock_pk
+
     def get_stock_quantity(self):
         if not len(self.stock.all()):
             return 0
@@ -365,11 +361,7 @@ class ProductVariant(models.Model, Item):
         if values:
             return ', '.join(
                 [' %s' % ( smart_text(value))
-                 for (key, value) in six.iteritems(values)])
-            # return ', '.join(
-            #     ['%s: %s' % (smart_text(attributes.get(id=int(key))),
-            #                  smart_text(value))
-            #      for (key, value) in six.iteritems(values)])
+                 for (key, value) in six.iteritems(values)])            
         else:
             return smart_text(self.sku)
 

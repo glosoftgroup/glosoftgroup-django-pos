@@ -656,7 +656,10 @@ def contacts(request):
     l = []
     for user in users:
         # {"text": "Afghanistan", "value": "AF"},
-        contact={'text':user.name,'value': user.mobile}
+        if request.GET.get('returnId'):
+            contact={'text':user.name,'value': user.id}
+        else:
+            contact={'text':user.name,'value': user.mobile}
         l.append(contact)
     return HttpResponse(json.dumps(l), content_type='application/json')
 

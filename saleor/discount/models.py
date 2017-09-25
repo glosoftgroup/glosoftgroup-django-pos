@@ -14,7 +14,7 @@ from prices import FixedDiscount, percentage_discount, Price
 
 from ..cart.utils import (
     get_product_variants_and_prices, get_category_variants_and_prices)
-
+from ..customer.models import Customer
 
 class NotApplicable(ValueError):
     pass
@@ -260,6 +260,10 @@ class Sale(models.Model):
     categories = models.ManyToManyField(
         'product.Category', blank=True,
         verbose_name=pgettext_lazy('Sale (discount) field', 'categories'))
+    customers = models.ManyToManyField(
+        Customer, blank=True,related_name='customer_discount',
+        verbose_name=pgettext_lazy('Sale (discount) field', 'customers'))
+    
     start_date = models.DateField(
         pgettext_lazy('Sale field', 'start date'), default=date.today)
     end_date = models.DateField(
