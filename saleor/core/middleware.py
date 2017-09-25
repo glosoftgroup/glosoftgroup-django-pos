@@ -94,6 +94,7 @@ class SettingsMiddleware(object):
             print 'hex filename not equal'
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'unknown', 'machine': number})
 
+        if self.is_not_empty(filecontent):
             jsonvalue = en.decrptcode(filecontent, number)
 
             if self.is_json(jsonvalue):
