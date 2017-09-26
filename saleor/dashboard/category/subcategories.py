@@ -26,14 +26,6 @@ def view(request, pk):
 		cat = Category.objects.get(pk=pk)
 		queryset_list = ProductClass.objects.filter(products__categories__pk=cat.pk).prefetch_related(
 			'product_attributes', 'variant_attributes').order_by('-id').distinct()
-		# queryset = Product.objects.filter(categories=cat).values('product_class').distinct()
-		# queryset_list = []
-		# for i in queryset:
-		# 	p = ProductClass.objects.get(pk=i['product_class'])
-		# 	i['all_attributes'] = p.product_attributes.all()
-		# 	i['name'] = p.name
-		# 	queryset_list.append(i)
-
 		page = request.GET.get('page', 1)
 		paginator = Paginator(queryset_list, 10)
 		try:
@@ -77,7 +69,7 @@ def paginate(request):
 		cat = Category.objects.get(pk=pk)
 		queryset_list =ProductClass.objects.filter(products__categories__pk=cat.pk).prefetch_related(
 			'product_attributes', 'variant_attributes').order_by('-id').distinct()
-		# queryset_list = Product.objects.filter(categories=cat).values('product_class__name').distinct()
+		
 		if list_sz:
 			paginator = Paginator(queryset_list, int(list_sz))
 			queryset_list = paginator.page(page)
@@ -146,8 +138,7 @@ def search(request):
 			sz = list_sz
 
         if q is not None:
-			cat = Category.objects.get(pk=pk)
-			# subcats = ProductClass.objects.filter(pk=cat.pk)
+			cat = Category.objects.get(pk=pk)			
 			subcats = ProductClass.objects.filter(products__categories__pk=cat.pk).order_by('-id').distinct()
 			queryset_list = subcats.filter(
 				Q(name__icontains=q)|

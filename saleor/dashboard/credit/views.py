@@ -14,7 +14,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Count, Min, Sum, Avg, F, Q
 from django.core import serializers
-# from django.template.defaultfilters import date
+
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 import datetime
 from datetime import date, timedelta

@@ -52,8 +52,7 @@ def category_list(request, root_pk=None):
         ctx = {'categories': categories, 'path': path, 'root': root, 'totalp': paginator.num_pages}
         return TemplateResponse(request, 'dashboard/category/list_subcategories.html', ctx)
 
-    ctx = {'categories': categories, 'path': path, 'root': root, 'totalp':paginator.num_pages}
-    # return TemplateResponse(request, 'dashboard/category/list.html', ctx)
+    ctx = {'categories': categories, 'path': path, 'root': root, 'totalp':paginator.num_pages}    
     return TemplateResponse(request, 'dashboard/category/pagination/view.html', ctx)
 
 def paginate_category(request, root_pk=None):
