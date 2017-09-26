@@ -47,7 +47,6 @@ info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
 @staff_member_required
-# @permission_decorator('reports.view_sales_reports')
 def sales_category_chart(request, image=None):
 	get_date = request.GET.get('date')
 	today = datetime.datetime.now()
@@ -66,13 +65,13 @@ def sales_category_chart(request, image=None):
 		ImageData = dataUrlPattern.match(ImageData).group(2)
 
 		sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
-			c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
-		sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+			c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')[:5]
+		quantity_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
 		new_sales = []
 		for sales in sales_by_category:
 			color = "#%03x" % random.randint(0, 0xFFF)
 			sales['color'] = color
-			percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+			percent = (Decimal(sales['quantity__sum']) / Decimal(quantity_totals)) * 100
 			percentage = round(percent, 2)
 			sales['percentage'] = percentage
 			for s in range(0, sales_by_category.count(), 1):
@@ -91,18 +90,19 @@ def sales_category_chart(request, image=None):
 	if date:
 		try:
 			sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
-				c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
-			sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+				c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')
+			quantity_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
 			new_sales = []
 			for sales in sales_by_category:
 				color = "#%03x" % random.randint(0, 0xFFF)
 				sales['color'] = color
-				percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+				percent = (Decimal(sales['quantity__sum']) / Decimal(quantity_totals)) * 100
 				percentage = round(percent, 2)
 				sales['percentage'] = percentage
 				for s in range(0, sales_by_category.count(), 1):
 					sales['count'] = s
 				new_sales.append(sales)
+
 			categs = Category.objects.all()
 			this_year = today.year
 			avg_m = Sales.objects.filter(created__year=this_year).annotate(c=Count('total_net'))
@@ -118,23 +118,60 @@ def sales_category_chart(request, image=None):
 				labels.append(calendar.month_name[int(m)][0:3])
 				default.append(amount)
 
+			paginator = Paginator(new_sales, 5)
+			new_sales2 = paginator.page(1)
 			data = {
-				"sales_by_category": new_sales,
+				"sales_by_category": new_sales2,
 				"categs":categs,
 				"avg":avg_m,
 				"labels":labels,
 				"default":default,
 				"hcateg":highest_category_sales,
-				"sales_date":date
+				"sales_date":date,
+				"pn":paginator.num_pages,
+				"count": sales_by_category.count()
 			}
-			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', data)
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/category.html', data)
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/category.html', {"e":e, "date":date})
-			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e":e, "date":date})
 		except IndexError as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/category.html', {"e":e, "date":date})
-			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sale_by_category.html', {"e": e, "date":date})
+
+def sales_category_chart_paginate(request):
+	get_date = request.GET.get('date')
+	page = request.GET.get('page', 1)
+	list_sz = request.GET.get('size')
+	if list_sz:
+		size = list_sz
+	else:
+		size = 10
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			today = datetime.datetime.now()
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	try:
+		sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
+			c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by(
+			'-quantity__sum')
+		paginator = Paginator(sales_by_category, int(size))
+		sales = paginator.page(page)
+		data = {
+			'sales_by_category': sales,
+			'pn': paginator.num_pages, 'sz': size
+		}
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/cat_paginate.html', data)
+	except ObjectDoesNotExist as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/cat_paginate.html', {"e": e, "date": date})
+	except IndexError as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/cat_paginate.html', {"e": e, "date": date})
+
+
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
@@ -587,13 +624,14 @@ def sales_user_chart(request):
 	if date:
 		try:
 			users = Sales.objects.values('user__email', 'user__name', 'terminal').annotate(Count('user')).annotate(
-				Sum('total_net')).order_by().filter(created__contains=date)
-			sales_by_category_totals = users.aggregate(Sum('total_net__sum'))['total_net__sum__sum']
+				Sum('total_net')).annotate(
+				Sum('solditems__quantity')).order_by('solditems__quantity__sum').filter(created__contains=date)
+			sales_by_category_totals = users.aggregate(Sum('solditems__quantity__sum'))['solditems__quantity__sum__sum']
 			new_sales = []
 			for sales in users:
 				color = "#%03x" % random.randint(0, 0xFFF)
 				sales['color'] = color
-				percent = (Decimal(sales['total_net__sum']) / Decimal(sales_by_category_totals)) * 100
+				percent = (Decimal(sales['solditems__quantity__sum']) / Decimal(sales_by_category_totals)) * 100
 				percentage = round(percent, 2)
 				sales['percentage'] = percentage
 				for s in range(0, users.count(), 1):
@@ -617,13 +655,18 @@ def sales_user_chart(request):
 				labels.append(calendar.month_name[int(m)][0:3])
 				default.append(amount)
 
+			paginator = Paginator(new_sales, 5)
+			new_sales2 = paginator.page(1)
+
 			data = {
-				"sales_by_category": new_sales,
+				"sales_by_category": new_sales2,
 				"categs": categs,
 				"labels": labels,
 				"default": default,
 				"hcateg": highest_user_sales,
-				"sales_date":date
+				"sales_date":date,
+				"pn": paginator.num_pages,
+				"count": users.count()
 			}
 			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_user.html', data)
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/user.html', data)
@@ -631,6 +674,41 @@ def sales_user_chart(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/user.html',{"sales_date":date})
 		except IndexError:
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/user.html',{"sales_date":date})
+
+def sales_user_chart_paginate(request):
+	get_date = request.GET.get('date')
+	page = request.GET.get('page', 1)
+	list_sz = request.GET.get('size')
+	if list_sz:
+		size = list_sz
+	else:
+		size = 10
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			today = datetime.datetime.now()
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	try:
+		users = Sales.objects.values('user__email', 'user__name', 'terminal').annotate(Count('user')).annotate(
+			Sum('total_net')).annotate(
+			Sum('solditems__quantity')).order_by('solditems__quantity__sum').filter(created__contains=date)
+		paginator = Paginator(users, int(size))
+		sales = paginator.page(page)
+		data = {
+			'sales_by_category': sales,
+			'pn': paginator.num_pages, 'sz': size
+		}
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/user_paginate.html', data)
+	except ObjectDoesNotExist as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/user_paginate.html', {"e": e, "date": date})
+	except IndexError as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/user_paginate.html', {"e": e, "date": date})
+
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
@@ -755,13 +833,13 @@ def sales_terminal_chart(request):
 	if date:
 		try:
 			terminals = Sales.objects.values('terminal__terminal_name', 'terminal').annotate(Count('terminal')).annotate(
-				Sum('total_net')).order_by().filter(created__contains=date)
-			sales_by_category_totals = terminals.aggregate(Sum('total_net__sum'))['total_net__sum__sum']
+				Sum('solditems__quantity')).annotate(Sum('total_net')).order_by('solditems__quantity__sum').filter(created__contains = date)
+			sales_by_category_totals = terminals.aggregate(Sum('solditems__quantity__sum'))['solditems__quantity__sum__sum']
 			new_sales = []
 			for sales in terminals:
 				color = "#%03x" % random.randint(0, 0xFFF)
 				sales['color'] = color
-				percent = (Decimal(sales['total_net__sum']) / Decimal(sales_by_category_totals)) * 100
+				percent = (Decimal(sales['solditems__quantity__sum']) / Decimal(sales_by_category_totals)) * 100
 				percentage = round(percent, 2)
 				sales['percentage'] = percentage
 				for s in range(0, terminals.count(), 1):
@@ -782,13 +860,17 @@ def sales_terminal_chart(request):
 				labels.append(calendar.month_name[int(m)][0:3])
 				default.append(amount)
 
+			paginator = Paginator(new_sales, 5)
+			new_sales2 = paginator.page(1)
 			data = {
-				"sales_by_category": new_sales,
+				"sales_by_category": new_sales2,
 				"categs": categs,
 				"labels": labels,
 				"default": default,
 				"hcateg": highest_user_sales,
-				"sales_date":date
+				"sales_date":date,
+				"pn": paginator.num_pages,
+				"count": terminals.count()
 			}
 			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_teller.html', data)
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/till.html', data)
@@ -796,6 +878,41 @@ def sales_terminal_chart(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/till.html',{"sales_date":date})
 		except IndexError:
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/till.html',{"sales_date":date})
+
+def sales_till_chart_paginate(request):
+	get_date = request.GET.get('date')
+	page = request.GET.get('page', 1)
+	list_sz = request.GET.get('size')
+	if list_sz:
+		size = list_sz
+	else:
+		size = 10
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			today = datetime.datetime.now()
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	try:
+		terminals = Sales.objects.values('terminal__terminal_name', 'terminal').annotate(Count('terminal')).annotate(
+			Sum('solditems__quantity')).annotate(Sum('total_net')).order_by('solditems__quantity__sum').filter(
+			created__contains=date)
+		paginator = Paginator(terminals, int(size))
+		sales = paginator.page(page)
+		data = {
+			'sales_by_category': sales,
+			'pn': paginator.num_pages, 'sz': size
+		}
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/till_paginate.html', data)
+	except ObjectDoesNotExist as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/till_paginate.html', {"e": e, "date": date})
+	except IndexError as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/till_paginate.html', {"e": e, "date": date})
+
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
@@ -917,13 +1034,14 @@ def sales_product_chart(request):
 	if date:
 		try:
 			sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
-				c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
-			sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+				c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')
+
+			quantity_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
 			new_sales = []
 			for sales in sales_by_category:
 				color = "#%03x" % random.randint(0, 0xFFF)
 				sales['color'] = color
-				percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+				percent = (Decimal(sales['quantity__sum']) / Decimal(quantity_totals)) * 100
 				percentage = round(percent, 2)
 				sales['percentage'] = percentage
 				for s in range(0, sales_by_category.count(), 1):
@@ -944,14 +1062,19 @@ def sales_product_chart(request):
 				labels.append(calendar.month_name[int(m)][0:3])
 				default.append(amount)
 
+			paginator = Paginator(new_sales, 5)
+			new_sales2 = paginator.page(1)
+
 			data = {
-				"sales_by_category": new_sales,
+				"sales_by_category": new_sales2,
 				"categs":categs,
 				"avg":avg_m,
 				"labels":labels,
 				"default":default,
 				"hcateg":highest_category_sales,
-				"sales_date":date
+				"sales_date":date,
+				"pn":paginator.num_pages,
+				"count":sales_by_category.count()
 			}
 			# return TemplateResponse(request, 'dashboard/reports/sales/charts/sales_by_product.html', data)
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/items.html', data)
@@ -959,6 +1082,41 @@ def sales_product_chart(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/items.html',{'sales_date':date})
 		except IndexError as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/ajax/items.html',{'sales_date':date})
+
+def sales_product_chart_paginate(request):
+	get_date = request.GET.get('date')
+	page = request.GET.get('page', 1)
+	list_sz = request.GET.get('size')
+	if list_sz:
+		size = list_sz
+	else:
+		size = 10
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			today = datetime.datetime.now()
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	try:
+		sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
+			c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by(
+			'-quantity__sum')
+		paginator = Paginator(sales_by_category, int(size))
+		sales = paginator.page(page)
+		data = {
+			'sales_by_category': sales,
+			'pn': paginator.num_pages, 'sz': size
+		}
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/item_paginate.html', data)
+	except ObjectDoesNotExist as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/item_paginate.html', {"e": e, "date": date})
+	except IndexError as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/item_paginate.html', {"e": e, "date": date})
+
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')

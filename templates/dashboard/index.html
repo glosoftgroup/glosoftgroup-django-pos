@@ -137,9 +137,11 @@
                                         <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
                                             {{forloop.counter }}. {{sales.product_name}}
                                         </td>
+                                          <td class="td" data-href="{{sales.product_name}}">
+                                             <div>{{sales.quantity__sum}}<span style="font-size: 0.8em;"> ({% if sales.quantity__sum is 1%} item {% else %} items {% endif %} )</span></div>
+                                        </td>
                                         <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
-                                            ({{sales.quantity__sum}} {% if h.quantity__sum is 1%} item {% else %} items {% endif %} )
-                                             <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
+                                            <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}}</div>
                                         </td>
                                       </tr>
                                       {% endfor %}
@@ -208,6 +210,9 @@
                                       <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
                                           {{forloop.counter }}.  {{sales.product_category}}
                                       </td>
+                                        <td class="td" data-href="{{sales.product_name}}">
+                                             <div>{{sales.quantity__sum}}<span style="font-size: 0.8em;"> ({% if sales.quantity__sum is 1%} item {% else %} items {% endif %} )</span></div>
+                                        </td>
                                       <td class="ctd" style="padding:8px 10px;" data-href="{{sales.product_category}}">
                                            <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_cost__sum}} ({{ sales.percentage }}%)</div>
                                       </td>

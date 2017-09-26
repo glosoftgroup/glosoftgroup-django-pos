@@ -14,26 +14,25 @@
                         <table class="table bordered highlight responsive data-table" style="border-left:0px;border-right:0px;">
                           <tbody>
                           {% if sales_by_category %}
-                           {% for sales in sales_by_category %}
+                           {% for sales in sales_by_category|slice:":5" %}
                               <tr data-action-go="">
-                                <td class="td" data-href="{{sales.user__name}}">
+                                <td class="td">
                                   <div class="sqaure" style="width: 15px;height: 15px;border-radius: 50%;background-color: {{sales.color}};">
                                   </div>
                                 </td>
-                                <td class="td" data-href="{{sales.user__name}}">
+                                <td class="td" width="200px">
                                     {{forloop.counter }}.
                                    {{sales.terminal__terminal_name}}
                                 </td>
-                                <td class="td" data-href="{{sales.user__name}}">
+                                  <td class="td">
+                                         <div>{{sales.solditems__quantity__sum}}<span style="font-size: 0.8em;"> ({% if sales.quantity__sum is 1%} item {% else %} items {% endif %} )</span></div>
+                                    </td>
+                                <td class="td">
                                      <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_net__sum}}</div>
-                                </td>
-                                <td class="td" data-href="{{sales.user__name}}">
-                                  {{ sales.percentage }}%
                                 </td>
                               </tr>
                               {% endfor %}
                             {% endif %}
-
                           </tbody>
                         </table>
                       </div>
@@ -41,8 +40,132 @@
     </div>
         </div>
     </div>
+    <div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsives">
+                <table class="table  datatable-header-footer table-hover">
+                  <caption style="margin-bottom: 10px;">
+                   </caption>
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr class="bg-primary">
+                          <th>Till Name</th>
+                          <th>No. of Items</th>
+                          <th class="text-center">Total Sales (KShs)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="p-tb">
+                        {% if sales_by_category %}
+                           {% for sales in sales_by_category %}
+                          <tr class='clickable-row'>
+                            <td class="td">{{sales.terminal__terminal_name}}</td>
+                            <td class="td">{{sales.solditems__quantity__sum}}</td>
+                              <td class="td"><span class="pull-right">{{sales.total_net__sum}}</span></td>
+                          </tr>
+                        {% endfor %}
+                         {% else %}
+                         <tr><td colspan="3"><h2 class="text-center">No Till Sales Available</h2></td></tr>
+                        {% endif %}
+                        </tbody>
+
+                 </table>
+              </div>
+              {% if sales_by_category %}
+              <div class="my-paginate" style="margin-top:20px;">
+                 <div class="row">
+                 <div class="col-md-12">
+                  <div class="col-md-4">
+                   <div class="col-md-12">
+                    <div class="col-md-6 mt-10">
+                     <label>display list size</label>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                         <select class="bootstrap-select sales-category-ls" style="display: none;" data-width="100%" tabindex="-98">
+                            <option value="5" selected>No:</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                          </select>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="col-md-4">
+                   <div class="text-center bootpag-callback p2-pag" style="">
+                     <div class="my-paginate">
+                     <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+                     </div>
+                    </div>
+                   </div>
+                    <div class="col-md-4">
+                     <div class="col-md-12">
+                      <div class="pull-right pages-nav">Page 1 of {{pn}}</div>
+                     </div>
+                    </div>
+                  </div>
+                 </div>
+                 <input type="hidden" id="page_size" val="">
+              </div>
+              {% endif %}
+             </div>
+            </div>
+            </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
 </div>
 <script type="text/javascript">
+var t = {{pn}};
+$('.p2-pag').bootpag({
+        total: parseInt({{pn}}),
+        maxVisible: 3,
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
+        }).on("page", function(event, num){
+            var size = $('.sales-category-ls').find(":selected").val();
+            $(".pages-nav").html("Page " + num +" of "+ t);
+            $.get("{% url 'dashboard:sales_till_chart_paginate' %}",{page:parseInt(num), size:size, date:'{{sales_date}}'},function(data){
+               $('#p-tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+   $('.sales-category-ls').selectpicker().on('change', function(){
+            var size = parseInt($(this).val());
+            var totalItems = parseInt('{{count}}');
+            var rem = totalItems / size;
+            var remItems = ( totalItems % size);
+            var rempages = Math.floor(rem);
+            var pageNumber = $('.bootpag li.active a').text();
+
+            if(remItems == 0){
+               pages = rempages;
+            }else{
+               pages = rempages + 1;
+            }
+
+            $('.p2-pag').bootpag({
+                total: parseInt(pages),
+            });
+            t=pages;
+            $(".pages-nav").html("Page " + pageNumber +" of "+ t);
+
+            $.get("{% url 'dashboard:sales_till_chart_paginate' %}",{page:parseInt(pageNumber), size:size, date:'{{sales_date}}'},function(data){
+               $('#p-tb').html(data);
+            });
+    });
 // Create the chart
 Highcharts.chart('container', {
     chart: {
@@ -83,7 +206,7 @@ Highcharts.chart('container', {
     series: [{
         name: 'Tills',
         colorByPoint: true,
-        data: [{% for d in sales_by_category %}{ name:'{% if d.terminal__terminal_name %}{{d.terminal__terminal_name }}{% else %}None{% endif %}', p:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} ,y:{% if d.total_net__sum %}{{d.total_net__sum}}{% else %}0{% endif %}, color:'{{d.color}}', drilldown:'{% if d.terminal__terminal_name %}{{d.terminal__terminal_name }}{% else %}None{% endif %}' }, {% endfor %}]
+        data: [{% for d in sales_by_category|slice:":5" %}{ name:'{% if d.terminal__terminal_name %}{{d.terminal__terminal_name }}{% else %}None{% endif %}', p:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} ,y:{% if d.total_net__sum %}{{d.total_net__sum}}{% else %}0{% endif %}, color:'{{d.color}}', drilldown:'{% if d.terminal__terminal_name %}{{d.terminal__terminal_name }}{% else %}None{% endif %}' }, {% endfor %}]
     }],
     drilldown: {
         series: [{
