@@ -8,10 +8,6 @@ urlpatterns = [
     (views.category_list), name='category-list'),
     url(r'^(?P<root_pk>[0-9]+)/$', permission_required('product.view_category', login_url='not_found')
     (views.category_list), name='category-list'),
-    # url(r'^$',
-    #     views.category_list, name='category-list'),
-    # url(r'^(?P<root_pk>[0-9]+)/$',
-    #     views.category_list, name='category-list'),
     url(r'^paginate/$',
         views.paginate_category, name='category-paginate'),
     url(r'^paginate/(?P<root_pk>[0-9]+)/$',
