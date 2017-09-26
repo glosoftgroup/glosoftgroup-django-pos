@@ -13,11 +13,14 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
 from django_prices.models import PriceField
+
+from django.utils import timezone
 from payments import PaymentStatus, PurchasedItem
 from payments.models import BasePayment
 from prices import Price, FixedDiscount
+from django.db.models import F
 from satchless.item import ItemLine, ItemSet
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from ..discount.models import Voucher
 from ..product.models import Product
@@ -28,6 +31,13 @@ from ..sale.models import Terminal, PaymentOption
 
 from . import OrderStatus
 from . import TransactionStatus
+
+class CreditManager(models.Manager):
+    def expired_credit(self):        
+        max_credit_date = SiteSettings.objects.get(pk=1).max_credit_date 
+        days = timezone.now()-timedelta(days=max_credit_date)
+        return self.get_queryset().filter(created__lte=timezone.now()-timedelta(days=max_credit_date))
+
 
 class Credit(models.Model):
     status = models.CharField(
@@ -89,6 +99,11 @@ class Credit(models.Model):
         PaymentOption, related_name='credit_payment_option', blank=True,
         verbose_name=pgettext_lazy('Sales field',
                                    'sales options'))
+    due_date = models.DateTimeField(
+        pgettext_lazy('Credit field', 'due date'),
+        default=now, editable=False)
+    
+    objects = CreditManager()
     class Meta:
         ordering = ('-last_status_change',)
         verbose_name = pgettext_lazy('Credit model', 'Credit')
