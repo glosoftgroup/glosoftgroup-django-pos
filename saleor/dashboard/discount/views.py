@@ -22,7 +22,7 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def sale_list(request):
     try:
-        sales = Sale.objects.prefetch_related('products')
+        sales = Sale.objects.prefetch_related('products').order_by('-id')
         page = request.GET.get('page', 1)
         paginator = Paginator(sales, 10)
         try:
@@ -48,7 +48,7 @@ def disc_paginate(request):
     p2_sz = request.GET.get('psize')
     select_sz = request.GET.get('select_size')
 
-    sales = Sale.objects.prefetch_related('products')
+    sales = Sale.objects.prefetch_related('products').order_by('-id')
     if list_sz:
         paginator = Paginator(sales, int(list_sz))
         sales = paginator.page(page)
@@ -84,7 +84,7 @@ def disc_search(request):
             sz = list_sz
 
         if q is not None:
-            discounts = Sale.objects.prefetch_related('products')
+            discounts = Sale.objects.prefetch_related('products').order_by('-id')
             queryset_list = discounts.filter(
                 Q(name__icontains=q) |
                 Q(value__icontains=q)
@@ -232,6 +232,8 @@ def create_discount(request):
         discount = Sale()
         if request.POST.get('variants'):
             variants = json.loads(request.POST.get('variants'))
+        if request.POST.get('customers'):
+            customers = json.loads(request.POST.get('customers'))        
         if request.POST.get('type'):
             discount.type = request.POST.get('type')
         if request.POST.get('value'):
@@ -245,6 +247,8 @@ def create_discount(request):
         discount.save()
         for variant in variants:
             discount.variant.add(variant)
+        for customer in customers:
+            discount.customers.add(customer)
         return HttpResponse(json.dumps({'message':discount.name}))
     else:
         return HttpResponse(json.dumps({'message':'Invalid method'}))

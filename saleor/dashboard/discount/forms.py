@@ -23,6 +23,11 @@ class SaleForm(forms.ModelForm):
         field.widget.attrs['class'] = 'form-control multiselect'
         field.widget.attrs['multiple'] = 'multiple'
 
+        field = self.fields['customers'] 
+        field.widget.attrs['class'] = 'form-control multiselect'
+        field.widget.attrs['multiple'] = 'multiple'
+
+
         field = self.fields['categories'] 
         field.widget.attrs['class'] = 'form-control multiselect'
         field.widget.attrs['multiple'] = 'multiple'

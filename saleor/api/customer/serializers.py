@@ -51,11 +51,8 @@ class CustomerUpdateSerializer(serializers.ModelSerializer):
         except:
         	raise ValidationError('Invalid loyalty points')
     
-    def update(self, instance, validated_data):          
-    	# points = validated_data.get('loyalty_points')      
-    	# print points
+    def update(self, instance, validated_data):   	
     	instance.loyalty_points -= Decimal(self.points)
     	instance.redeemed_loyalty_points += Decimal(self.points)
-    	instance.save()
-        #redeem = Customer.objects.redeem_points(instance,points)        
+    	instance.save()        
         return instance

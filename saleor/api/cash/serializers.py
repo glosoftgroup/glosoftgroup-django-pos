@@ -173,13 +173,11 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 		terminal = validated_data['terminal']
 		user = validated_data['User']
 		note = validated_data['note']
-
-		#self.terminal = Terminal.objects.get(pk=self.terminal_id)	
+		
 		trail = str(manager)+' '+trans_type+' '+str(amount)+\
 					' from TERMINAL:'+str(terminal)
 		print trail
-		if trans_type == 'deposit':
-			#trail += '<br>Initial amount'+str('amount')			
+		if trans_type == 'deposit':			
 			self.terminal.amount += Decimal(amount)			
 			self.terminal.save()
 			TerminalHistoryEntry.objects.create(
