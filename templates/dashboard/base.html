@@ -393,7 +393,12 @@
                       {% endif %}
                       {% if perms.reports.view_sale_reports %}
                         <li class="{% block menu_creditreport_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:credit_list' %}"><i class='icon-cash3'></i>Credit Sales</a>
+                          <a href="{% url 'dashboard:credit_list' %}"><i class='icon-width'></i>Credit Sales</a>
+                        </li>
+                      {% endif %}
+                      {% if perms.reports.view_sale_reports %}
+                        <li class="{% block menu_report_summary_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:sales_date_chart' %}"><i class='icon-list-unordered'></i>Sales Summary</a>
                         </li>
                       {% endif %}
                       {#{% if perms.reports.view_sale_reports %}#}
@@ -431,7 +436,7 @@
                     <li class="{% block menu_settings_class %}{% endblock %}">
                     <a href="{% url 'dashboard:site-index' %}">
                         <i class=" icon-earth"></i>
-                         {% trans "Site settings" context "Dashboard site settings" %}
+                         {% trans "System Settings" context "system settings" %}
                     </a>
                     </li>
                   </ul>

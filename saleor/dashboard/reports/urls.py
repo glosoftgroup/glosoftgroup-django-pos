@@ -90,16 +90,25 @@ urlpatterns = [
 		url( r'^datechartimage/(?P<image>.+)/$', charts.sales_date_chart, name = 'sales_date_chart' ),
 		url( r'^productchart/$',  permission_required('reports.view_products_reports', login_url='not_found')
 			(charts.sales_product_chart), name = 'sales_product_chart' ),
+	    url( r'^productchart/pnt/$',  permission_required('reports.view_products_reports', login_url='not_found')
+			(charts.sales_product_chart_paginate), name = 'sales_product_chart_paginate' ),
 		url( r'^ptd/$', charts.get_product_sale_details, name = 'get_product_sale_details' ),
+
 		url( r'^category/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_category_chart), name = 'sales_category_chart' ),
+		url( r'^category/pnt/$',  permission_required('reports.view_sale_reports', login_url='not_found')
+			(charts.sales_category_chart_paginate), name = 'sales_category_chart_paginate' ),
 		url( r'^catimage/(?P<image>.+)/$', charts.sales_category_chart, name = 'sales_category_chart' ),
 		url( r'^catd/$', charts.get_category_sale_details, name = 'get_category_sale_details' ),
 		url( r'^userchart/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_user_chart), name = 'sales_user_chart' ),
+		url( r'user/tchart/pnt/$',  permission_required('reports.view_products_reports', login_url='not_found')
+			(charts.sales_user_chart_paginate), name = 'sales_user_chart_paginate' ),
 		url( r'^utd/$', charts.get_user_sale_details, name = 'get_user_sale_details' ),
-		url( r'^tellerchart/$',  permission_required('reports.view_sale_reports', login_url='not_found')
+		url( r'^till/chart/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_terminal_chart), name = 'sales_terminal_chart' ),
+		url( r'^till/tchart/pnt/$',  permission_required('reports.view_products_reports', login_url='not_found')
+			(charts.sales_till_chart_paginate), name = 'sales_till_chart_paginate' ),
 		url( r'^ttd/$', charts.get_terminal_sale_details, name = 'get_terminal_sale_details' ),
 		url( r'^weekfilter/$', charts.get_sales_by_week, name = 'get_sales_by_week' ),
 

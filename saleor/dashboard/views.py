@@ -131,13 +131,13 @@ def top_categories():
     if date:
         try:
             sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
-                c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
-            sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+                c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')[:5]
+            quantity_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
             new_sales = []
             for sales in sales_by_category:
                 color = "#%03x" % random.randint(0, 0xFFF)
                 sales['color'] = color
-                percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+                percent = (Decimal(sales['quantity__sum']) / Decimal(quantity_totals)) * 100
                 percentage = round(percent, 2)
                 sales['percentage'] = percentage
                 for s in range(0, sales_by_category.count(), 1):
@@ -212,12 +212,12 @@ def top_items():
                 c=Count('product_name', distinct=False)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')[:1]
             lowest_item = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
                 c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('quantity__sum')[:1]
-            sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+            sales_by_category_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
             new_sales = []
             for sales in sales_by_category:
                 color = "#%03x" % random.randint(0, 0xFFF)
                 sales['color'] = color
-                percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+                percent = (Decimal(sales['quantity__sum']) / Decimal(sales_by_category_totals)) * 100
                 percentage = round(percent, 2)
                 sales['percentage'] = percentage
                 for s in range(0, sales_by_category.count(), 1):
