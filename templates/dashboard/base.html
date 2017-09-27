@@ -279,6 +279,11 @@
                     <i class="icon-users2"></i> Customers
                     </a>
                     </li>
+                    <li class="{% block menu_reportCustomer_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:customer_report_list' %}">
+                    <i class="icon-gift"></i> Loyalty Points
+                    </a>
+                    </li>
                   </ul>
                 </li>
                   {% endif %}

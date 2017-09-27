@@ -109,12 +109,13 @@ class CustomerManager(BaseUserManager):
         return customer
 
     def redeem_points(self, customer, points):
-        customer.loyalty_points = F('loyalty_points') - points
-        print points
-        print '*'*12
-        print F('loyalty_points')
+        customer.loyalty_points = F('loyalty_points') - points        
         customer.redeemed_loyalty_points = F('redeemed_loyalty_points') + points
         customer.save(update_fields=['loyalty_points', 'redeemed_loyalty_points'])
+    
+    def gain_points(self, customer, points):
+        customer.loyalty_points = F('loyalty_points') + points        
+        customer.save(update_fields=['loyalty_points'])
 
     
 
@@ -210,10 +211,7 @@ class Customer(models.Model):
     def get_loy_perc(self):        
         redeemed = self.redeemed_loyalty_points
         loyalty  = self.loyalty_points
-        total = redeemed + loyalty
-        print 'total '+str(total)
-        print 'loyalty '+str(loyalty)
-        print 'redeemed '+str(redeemed)
+        total = redeemed + loyalty       
         if not total:
             return 0.00
         return (100*loyalty)/total
@@ -221,10 +219,7 @@ class Customer(models.Model):
     def get_rem_perc(self):        
         redeemed = self.redeemed_loyalty_points
         loyalty  = self.loyalty_points
-        total = redeemed + loyalty
-        print 'total '+str(total)
-        print 'loyalty '+str(loyalty)
-        print 'redeemed '+str(redeemed)
+        total = redeemed + loyalty        
         if not total:
             return 0.00
         return (100*redeemed)/total

@@ -247,8 +247,11 @@ def create_discount(request):
         discount.save()
         for variant in variants:
             discount.variant.add(variant)
-        for customer in customers:
-            discount.customers.add(customer)
+        try:            
+            for customer in customers:
+                discount.customers.add(customer)
+        except:
+            pass
         return HttpResponse(json.dumps({'message':discount.name}))
     else:
         return HttpResponse(json.dumps({'message':'Invalid method'}))
