@@ -90,11 +90,8 @@ class SettingsMiddleware(object):
         h.update(filecontent)
         hex = h.hexdigest()
 
-<<<<<<< HEAD
         secretkey = number
 
-=======
->>>>>>> a416d1261c8b26e11015aa15000afe80f0d65865
         if filename != hex:
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'unknown', 'machine': number})
 
