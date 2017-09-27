@@ -1034,4 +1034,4 @@ def get_product_sale_details(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_product.html', data)
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_product.html',{})
-			# return HttpResponse(e)
+			

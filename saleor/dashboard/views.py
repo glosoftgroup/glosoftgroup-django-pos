@@ -79,11 +79,14 @@ def index(request):
         #top categories
         cat = top_categories()
         items = top_items()
-        low_stock_order = Stock.objects.get_low_stock()
+        low_stock_order = dashbord_get_low_stock_products()
 
         ctx = {'preauthorized_payments': payments,
                'orders_to_ship': orders_to_ship,
-               'low_stock': low_stock_order,
+               'low_stock': low_stock_order['low_stock'],
+               'pn':low_stock_order['pn'],
+               'sz': low_stock_order['sz'],
+               'gid': low_stock_order['gid'],
                #top_cat
                "sales_by_category": cat['sales_by_category'],
                "categs": cat['categs'],
@@ -112,6 +115,10 @@ def index(request):
     except KeyError as e:
         return TemplateResponse(request, 'dashboard/index.html', {"e":e, "date":date})
 
+@staff_member_required
+def landing_page(request):
+    ctx = {}
+    return TemplateResponse(request, 'dashboard/landing-page.html', ctx)
 def top_categories():
     today = datetime.datetime.now()
     try:
@@ -124,13 +131,13 @@ def top_categories():
     if date:
         try:
             sales_by_category = SoldItem.objects.filter(sales__created__contains=date).values('product_category').annotate(
-                c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
-            sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+                c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')[:5]
+            quantity_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
             new_sales = []
             for sales in sales_by_category:
                 color = "#%03x" % random.randint(0, 0xFFF)
                 sales['color'] = color
-                percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+                percent = (Decimal(sales['quantity__sum']) / Decimal(quantity_totals)) * 100
                 percentage = round(percent, 2)
                 sales['percentage'] = percentage
                 for s in range(0, sales_by_category.count(), 1):
@@ -205,12 +212,12 @@ def top_items():
                 c=Count('product_name', distinct=False)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')[:1]
             lowest_item = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
                 c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('quantity__sum')[:1]
-            sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+            sales_by_category_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
             new_sales = []
             for sales in sales_by_category:
                 color = "#%03x" % random.randint(0, 0xFFF)
                 sales['color'] = color
-                percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+                percent = (Decimal(sales['quantity__sum']) / Decimal(sales_by_category_totals)) * 100
                 percentage = round(percent, 2)
                 sales['percentage'] = percentage
                 for s in range(0, sales_by_category.count(), 1):
@@ -261,6 +268,22 @@ def top_items():
 def styleguide(request):
     return TemplateResponse(request, 'dashboard/styleguide/index.html', {})
 
+def dashbord_get_low_stock_products():
+    products = Stock.objects.get_low_stock()
+    paginator = Paginator(products, 10)
+    try:
+        low_stock = paginator.page(1)
+    except PageNotAnInteger:
+        low_stock = paginator.page(1)
+    except InvalidPage:
+        low_stock = paginator.page(1)
+    except EmptyPage:
+        low_stock = paginator.page(paginator.num_pages)
+    data = {'low_stock': low_stock, 'pn': paginator.num_pages, 'sz': 10, 'gid': 0}
+    return data
+
 def get_low_stock_products():
     products = Stock.objects.get_low_stock()
     return products
+
+

@@ -1,0 +1,89 @@
+<div class="row">
+<div class="col-md-6">
+
+	<!-- Available hours -->
+	<div class="panel text-center">
+		<div class="panel-body">
+			
+
+        	<!-- Progress counter -->
+			<div class="content-group-sm svg-center position-relative" id="hours-available-progress">
+				<h2 class="mt-15 mb-5">{{customer.get_total_sales_amount}} </h2>
+				<i class="icon-cart text-pink-400 counter-icon" style="top: -28px"></i><div>{{customer.get_sales}} Sales</div><div class="text-size-small text-muted">{% if customer.customers.first.created %}
+				Last sale {{customer.customers.first.created|timesince}} ago
+			   {% endif %}</div></div>
+			<!-- /progress counter -->			
+
+		<a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+	</div>
+	<!-- /available hours -->
+</div>
+<div class="col-md-6">
+
+	<!-- credit sale -->
+	<div class="panel text-center">
+		<div class="panel-body">
+			
+
+        	<!-- Progress counter -->
+			<div class="content-group-sm svg-center position-relative" id="hours-available-progress">
+				<h2 class="mt-15 mb-5">{{customer.get_total_credit_amount}} </h2>
+				<i class="icon-cash3 text-pink-400 counter-icon" style="top: -28px"></i><div>{{customer.get_credits}} Credit</div><div class="text-size-small text-muted">
+				{% if customer.credit_customers.first.created %}
+					Last credit			
+				{{customer.credit_customers.first.created|timesince}} ago
+			  {% endif %}</div></div>
+			<!-- /progress counter -->			
+
+		<a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+	</div>
+	<!-- /available hours -->
+</div>
+
+<div class="col-md-6">
+	<!-- Productivity goal -->
+	<div class="panel text-center">
+		<div class="panel-body">			
+			<!-- loyalty points -->
+			<div class="content-group-sm svg-center position-relative" id="goal-progress"><h2 class="mt-15 mb-5">{{customer.get_loyalty_points}}</h2><i class="icon-trophy3 text-indigo-400 counter-icon" style="top: -28px"></i><div>Loyalty points</div><div class="text-size-small text-muted">{{customer.get_loy_perc}}% average</div></div>
+			<!-- /progress counter -->
+
+			
+
+		<a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+	</div>
+	<!-- /productivity goal -->
+
+</div>
+<div class="col-md-6">
+	<!-- Productivity goal -->
+	<div class="panel text-center">
+		<div class="panel-body">			
+			<!-- loyalty points -->
+			<div class="content-group-sm svg-center position-relative" id="goal-progress"><h2 class="mt-15 mb-5">{{customer.get_redeemed_loyalty_points}}</h2><i class="icon-drawer-in text-indigo-400 counter-icon" style="top: -28px"></i><div>Redeemed points</div><div class="text-size-small text-muted">{{customer.get_rem_perc}}% average</div></div>
+			<!-- /progress counter -->
+
+			
+
+		<a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+	</div>
+	<!-- /productivity goal -->
+
+</div>
+<div class="col-md-6">
+	<!-- Productivity goal -->
+	<div class="panel text-center">
+		<div class="panel-body">			
+			<!-- discount -->
+			<div class="content-group-sm svg-center position-relative" id="goal-progress"><h2 class="mt-15 mb-5">{{customer.get_total_discount }}</h2><i class="icon-gift text-indigo-400 counter-icon" style="top: -28px"></i><div>Total Discount</div><div class="text-size-small text-muted"></div></div>
+			<!-- /progress counter -->
+
+			
+
+		<a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+	</div>
+	<!-- /productivity goal -->
+
+</div>
+
+</div>

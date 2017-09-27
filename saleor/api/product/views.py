@@ -19,7 +19,6 @@ from ...sale.models import (Sales,
 from ...customer.models import Customer
 from .serializers import (
     CreateStockSerializer,
-    CustomerListSerializer,
     ProductStockListSerializer,
     ProductListSerializer,
     SalesSerializer, 
@@ -40,16 +39,6 @@ error_logger = logging.getLogger('error_logger')
 class CreateStockAPIView(CreateAPIView):
     serializer_class = CreateStockSerializer
     queryset = Stock.objects.all()
-
-
-class CustomerListAPIView(ListAPIView):
-    serializer_class = CustomerListSerializer
-    queryset = Customer.objects.all()
-
-
-class CustomerDetailAPIView(generics.RetrieveAPIView):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerListSerializer
 
 
 class SalesDeleteAPIView(DestroyAPIView):

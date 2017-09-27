@@ -30,13 +30,17 @@
                             {{ sale.value }}{{ sale.get_type_display }}
                           </td>
                           <!-- actions -->
-                          <td >
-                          <span  class="label label-primary disc-label">
-                          <a href="{% url 'dashboard:discount-detail' pk=sale.pk %}" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
-                          Detail
-                          </a>
-                          </span>
-                          </td>
+                      <td >
+                        <div class='btn-group'>
+                          <button class='btn dropdown-toggle' data-toggle='dropdown'>Action <i class='glyphicon glyphicon-caret-down'></i></button>
+                          <ul class='dropdown-menu pull-right'>
+                             <li><a href="{% url 'dashboard:discount-detail' pk=sale.pk %}"><i class='glyphicon glyphicon-eye-open'></i> DETAIL</a></li>
+                            <li><a  href="{% url 'dashboard:sale-update' pk=sale.pk %}"><i class='glyphicon glyphicon-edit'></i> EDIT</a></li>
+                            
+                            <li><a onclick="return false;" class="delete-discount" data-title="{{sale.name}}" data-href="{% url 'dashboard:sale-delete' pk=sale.pk %}" ><i class='glyphicon glyphicon-trash'></i> DELETE</a></li>
+                          </ul>
+                        </div>                     
+                      </td>
                         </tr>
                       {% endfor %}
                     {% else %}
@@ -147,3 +151,4 @@
   {% endif %}
  </script>
 <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/discount/delete-discount.js' %}"></script>

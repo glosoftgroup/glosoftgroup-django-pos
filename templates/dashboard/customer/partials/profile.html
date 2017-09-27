@@ -1,0 +1,55 @@
+{% load static %}
+<div class="row">
+	<div class="col-sm-12">
+
+		<!-- User details (with sample pattern) -->
+		<div class="content-group">
+			<div  class="panel-body bg-blue border-radius-top text-center" style="background-image: url('{% static 'backend/images/bg.png' %}'); background-size: contain;">
+				<div class="content-group-sm">
+					<h5 class="text-semibold no-margin-bottom">
+						{{user.name }}
+					</h5>
+					<span class="display-block"></span>
+				</div>
+
+				<a href="#" class="display-inline-block content-group-sm">
+					
+				</a>
+
+				
+			</div>
+
+			<div class="panel panel-body no-border-top no-border-radius-top">
+				<div class="form-group">
+					<label class="text-semibold">Full name:</label>
+					<span class="pull-right-sm">
+					{{user.name }}
+
+				</span>
+				</div>
+
+				<div class="form-group">
+					<label class="text-semibold">Phone number:</label>
+					<span class="pull-right-sm">
+					{% if user.mobile %} {{user.mobile }}
+				    {% else %}
+				    --
+				    {% endif %}
+				</span>
+				</div>
+
+				<div class="form-group">
+					<label class="text-semibold">Customer Email:</label>
+					<span class="pull-right-sm"><a href="#">{{user.email }}
+					</a></span>
+				</div>
+
+				<div class="form-group no-margin-bottom">
+					<label class="text-semibold">National ID No.:</label>
+					<span class="pull-right-sm"><a href="#"> {{user.nid }}</a></span>
+				</div>
+			</div>
+		</div>
+		<!-- /user details (with sample pattern) -->		
+	</div>
+</div>

@@ -12,6 +12,7 @@
 
 {% block menu_sales_class %}active{% endblock %}
  {% block custom_css %}
+ <link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
    <style type="text/css">
      .clickable-row td.td{
       cursor: pointer;
@@ -39,7 +40,7 @@
               <label style="visibility: hidden;"> add</label>
               <div class="form-group">
                 {% if perms.discount.add_voucher %}
-                    <a href="{% url 'dashboard:sale-add' %}" class="btn btn-primary hvr-glow btn-raised legitRipple"  title="{% trans 'Add sale' context 'Sale (discount) list add button text' %}">
+                    <a id="toggle-add-form" onclick="return false;" data-href="{% url 'dashboard:sale-add' %}" class="btn btn-primary hvr-glow btn-raised legitRipple"  title="{% trans 'Add sale' context 'Sale (discount) list add button text' %}">
                       <i class="icon-plus2 position-left"></i>
                       {% trans "Add" context "Dashboard add action" %}
                     </a>
@@ -66,6 +67,69 @@
                   </select>
               </div>
             </div>
+            <!-- add form -->
+            <div class="col-md-12">
+                 <div id="toggle-div" class="col-md-12" style="display: none;">
+       <!-- add attr form here -->
+       <form class="form" enctype="multipart/form-data" id="sale-details" name="sale-details">
+            {% csrf_token %}
+     <table class="table">
+        <thead>
+            <tr class="bg-primary">            
+            <th>Name</th>            
+            <th>Value</th>
+            <th>Type</th>
+            <th>Product(s)</th>
+            <th>Customer</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>        
+          <!-- name -->
+          <td>
+            <input type="text" placeholder="Discount Name" id="id_name" class="form-control" name="name">
+            </td> 
+            <!-- value  -->
+            <td width="10%">
+              <input type="number" placeholder="Value" id="id_value" class="form-control" name="value">
+            </td>
+            <!-- type -->
+            <td>
+              <select name="type" class="form-control bootstrap-select validate" required="" id="id_type">
+                <option>---</option>
+                <option value="fixed">KES</option>
+                <option value="percentage">%</option>                
+              </select>
+            </td>
+            <!-- product -->
+            <td>
+              <select id="variants" multiple=""></select>
+            </td>
+            <!-- customer -->
+            <td>
+              <select id="customers" multiple=""></select>
+            </td>
+            <!-- start date -->
+            <td>
+              <input type="text" class="form-control pickadate-selectors" placeholder="Start date" id="id_start_date" name="start_date">
+            </td>
+            <!-- end date -->
+            <td>
+              <input type="text" class="form-control pickadate-selectors" placeholder="End date" id="id_end_date" name="end_date">
+            </td>
+            <td>
+              <button class="btn btn-xs btn-primary hvr-glow btn-raised legitRipple waves-effect waves-light" id="createDiscountBtn" onclick="return false;" data-token="{% csrf_token %}" data-createurl="{% url 'dashboard:create-discount' %}" type="submit">Add <i class="icon-arrow-right14 position-right"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table> </form>
+       <!-- ./form -->
+      </div>
+            </div>
+            <!-- ./add form -->
 
         </div>
       </div>
@@ -85,7 +149,7 @@
                   <th>
                     {% trans "Discount" context "Sale (discount) table header" %}
                   </th>
-                  <th>Actions</th>
+                  <th>Options</th>
                 </tr>
               </thead>
               <tbody>
@@ -100,11 +164,15 @@
                       </td>
                       <!-- actions -->
                       <td >
-                      <span  class="label label-primary disc-label">
-                      <a href="{% url 'dashboard:discount-detail' pk=sale.pk %}" class="text-white modal-trigger-ajax" data-title="Products in this {{ sale.value}}{{ sale.get_type_display }} Discount" data-href="{% url 'dashboard:discount-detail' pk=sale.pk %}">
-                      Detail
-                      </a>
-                      </span>
+                        <div class='btn-group'>
+                          <button class='btn dropdown-toggle' data-toggle='dropdown'>Action <i class='glyphicon glyphicon-caret-down'></i></button>
+                          <ul class='dropdown-menu pull-right'>
+                             <li><a href="{% url 'dashboard:discount-detail' pk=sale.pk %}"><i class='glyphicon glyphicon-eye-open'></i> DETAIL</a></li>
+                            <li><a  href="{% url 'dashboard:sale-update' pk=sale.pk %}"><i class='glyphicon glyphicon-edit'></i> EDIT</a></li>
+                            
+                            <li><a onclick="return false;" class="delete-discount" data-title="{{sale.name}}" data-href="{% url 'dashboard:sale-delete' pk=sale.pk %}" ><i class='glyphicon glyphicon-trash'></i> DELETE</a></li>
+                          </ul>
+                        </div>                     
                       </td>
                     </tr>
                   {% endfor %}
@@ -165,6 +233,8 @@
       </div>
     </div>
  </div>
+ <input type="hidden" data-variants="{% url 'dashboard:token-search-variants' %}" data-refreshtable="{% url 'dashboard:discount_search' %}" data-curl="{% url 'dashboard:message-contacts' %}" class="pageUrls" data-redirect="{% url 'dashboard:sale-list' as url %}" id='pageUrls' name="pageUrls"
+ >
   {% include "dashboard/includes/_pagination.html" %}
   {% include "dashboard/includes/_modal_template.html"  %}
 {% endblock %}
@@ -174,8 +244,18 @@
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/discount/discount.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
+    var toggleBtn = $('#toggle-add-form');
+    var toggleDiv = $('#toggle-div');
+    var addurl = toggleBtn.data('href');
+
+    toggleBtn.on('click',function(){
+      toggleDiv.slideDown('slow');
+    });
+
       $(".td").click(function() {
             window.location = $(this).data("href");
         });
@@ -230,5 +310,8 @@
       });
 
  });
+
+
+
 </script>
 {% endblock %}
