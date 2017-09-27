@@ -61,8 +61,15 @@ def payments_list(request):
 def payment_add(request):
     if request.method == 'POST':
         description = request.POST.get('description')
+        if request.POST.get('loyalty_points'):
+            loyalty_points = request.POST.get('loyalty_points')        
+        else:
+            loyalty_points = 0
         if request.POST.get('name'):
-            option = PaymentOption.objects.create(name=request.POST.get('name'),description=description)
+            option = PaymentOption.objects.create(
+                            name=request.POST.get('name'),
+                            description=description,
+                            loyalty_point_equiv=loyalty_points)
             l = {'name':option.name}
             return HttpResponse(json.dumps(l), content_type='application/json')
         return HttpResponse(json.dumps({'message':'Invalid method'}))
@@ -90,6 +97,8 @@ def edit(request, pk=None):
                 option.name = request.POST.get('name')
                 if request.POST.get('description'):
                     option.description = request.POST.get('description')
+                if request.POST.get('loyalty_point_equiv'):
+                    option.loyalty_point_equiv = request.POST.get('loyalty_point_equiv')                
                 option.save()
                 user_trail(request.user.name, 'updated payment option : '+ str(option.name),'delete')
                 info_logger.info('updated payment option: '+ str(option.name))

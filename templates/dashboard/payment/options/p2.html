@@ -15,7 +15,8 @@
               <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                      <thead>
                       <tr class="bg-primary">             
-                        <th>Name</th>                      
+                        <th>Name</th>
+                        <th>Points equivalency</th>
                         <th>Description</th>
                         {% if perms.sale.delete_paymentoption %}
                         <th class="text-center">Options</th>
@@ -28,6 +29,8 @@
                           <tr class='clickable-row' id="{{user.pk }}">
                             
                             <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.name}}</td>
+                            <!-- loyalty -->
+                        <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.loyalty_point_equiv}}</td>
                             <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.description}}</td>
                             
                             {% if perms.sale.delete_paymentoption %}

@@ -1,12 +1,21 @@
 {% if option %}
-    <div class="col-md-12 detail-column">
+    <div class=" detail-column">
         <div class="col-md-12">
-            <p><span style="font-weight:500"></span> {{option.name}}</p> 
-          <div class="form-group">
-              <label>option name:</label>
-              <input type="text" value="{{option.name}}" name="optname" id="optname" class="form-control">
-          </div>           
+            <p><span style="font-weight:500"></span> {{option.name}}</p>
         </div>
+
+          <div class="form-group">            
+              <label class="text-left" style="font-weight:500">option name:</label>
+            
+              <input type="text" value="{{option.name}}" name="optname" id="optname" class="form-control">
+            </div>
+       
+          <div class="form-group">            
+              <label class="text-left" style="font-weight:500">Loyalty points equiv:</label>            
+              <input type="number" value="{{option.loyalty_point_equiv}}" name="loyalty_point_equiv" id="loyalty_point_equiv" class="form-control">
+            
+          </div>           
+      
         
         <div class="col-md-12">
           <div class="form-group">
@@ -19,6 +28,7 @@
     var updateOptionBtn = $('#updateOption');
     var optdescription = $('#optdescription');
     var optname = $('#optname');
+    var loyalty_point_equiv = $('#loyalty_point_equiv');
     var updateUrl = "{% url 'dashboard:update-payment-option' pk=option.pk %}"
 
     function updatePaymentOption(dynamicData,url,method){
@@ -45,8 +55,12 @@
        if(description){
         dynamicData['description'] = description;
        }
+       if(loyalty_point_equiv.val()){
+        dynamicData['loyalty_point_equiv'] = loyalty_point_equiv.val();
+       }
        dynamicData['name'] = name;
        dynamicData['track'] = 'updating payment option';
+
 
        updatePaymentOption(dynamicData,updateUrl,'post')
        .done(function(data){

@@ -338,7 +338,8 @@ class SalesSerializer(serializers.ModelSerializer):
                                      mobile=validated_data.get('mobile'),
                                      discount_amount=validated_data.get('discount_amount'),
                                      customer_name=validated_data.get('customer_name'))
-        for payment_option_data in payment_options_data:            
+        for payment_option_data in payment_options_data:
+            print payment_option_data.loyalty_point_equiv         
             sales.payment_options.add(payment_option_data)
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)

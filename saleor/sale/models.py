@@ -34,6 +34,8 @@ class PaymentOption(models.Model):
         max_length=52, unique=True,)    
     description = models.TextField(
         pgettext_lazy('Payment option field', 'description'), blank=True)
+    loyalty_point_equiv = models.IntegerField( pgettext_lazy('Site field', 'loyalty points equivalency'),
+        validators=[MinValueValidator(0)], default=Decimal(0))
     
     class Meta:     
         verbose_name = pgettext_lazy('Payment option model', 'Payment')
