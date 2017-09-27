@@ -90,14 +90,16 @@ class SettingsMiddleware(object):
         h.update(filecontent)
         hex = h.hexdigest()
 
-        secretkey = replace_last(number)
+<<<<<<< HEAD
+        secretkey = number
 
+=======
+>>>>>>> a416d1261c8b26e11015aa15000afe80f0d65865
         if filename != hex:
-            print 'hex filename not equal'
             return TemplateResponse(request, 'lockdown/form.html', {'days': 'unknown', 'machine': number})
 
         if self.is_not_empty(filecontent):
-            jsonvalue = en.decrptcode(filecontent, secretkey)
+            jsonvalue = en.decrptcode(filecontent, number)
 
             if self.is_json(jsonvalue):
                 data = json.loads(jsonvalue)
