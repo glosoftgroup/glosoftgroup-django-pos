@@ -17,198 +17,167 @@
      box-shadow: 1px 8px 20px grey;
     -webkit-transition:  box-shadow .6s ease-in;
   }
+  .gpos-text{
+     line-height: 1.2em; font-weight: 500; letter-spacing: 0px;font-size: 34px;     
+  }
 </style>
 {% endblock %}
 {% block content %}
-<div class="row">
+<div class="row">  
   {% if perms.userprofile.view_user or perms.auth.view_group or perms.userprofile.view_usertrail %}
  <!-- user -->
- <div class="col-md-4 hvr-float-shadow">
+ <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:users' %}">
-  <div class="panel panel-body">    
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">User Management</h6>
-          <span class="text-muted">Add user/ Manage Groups/ View user Trail</span>
+  <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/users.png' %}" alt="">       
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Users </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-users4 icon-2x text-purple-300"></i>
-        </div>
-      </div>      
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./users -->
   {% endif %}
   {% if perms.product.view_product or perms.product.view_stock or perms.product.view_category or perms.product.view_productclass or perms.product.view_productattribute or perms.product.view_stocklocation %}
   <!-- Inventory -->
-  <div class="col-md-4 hvr-float-shadow">
+  <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:product-list' %}">
-  <div class="panel panel-body">    
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">Inventory Management</h6>
-          <span class="text-muted">Add Product/ Manage Stock/ Manage Categories/ Manage Attributes</span>
+  <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/inventory.png' %}" alt="">       
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Inventory </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-stack icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
   </a>
   </div>
   <!-- ./inventory -->
   {% endif %}
   {% if perms.customer.view_customer %}
   <!-- customer management -->
-  <div class="col-md-4 hvr-float-shadow ">
+  <div class="col-md-3 hvr-float-shadow ">
   <a href="{% url 'dashboard:customers' %}">
-  <div class="panel panel-body">
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">Customer Management</h6>
-          <span class="text-muted">Add customer/ Credit Worth/ Customer Sales</span>
+ <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/customers.png' %}" alt="">   
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Customer </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-theater icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./customer -->
   {% endif %}
   {% if perms.supplier.view_supplier %}
   <!-- supplier management -->
-  <div class="col-md-4 hvr-float-shadow">
+  <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:supplier' %}">
-  <div class="panel panel-body">
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">Supplier Management</h6>
-          <span class="text-muted">Add supplier/ View Supplier </span>
+  <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/supplier.png' %}" alt="">     
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Supplier </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-collaboration icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./supplier -->
   {% endif %}
   <!-- communication management -->
-  <div class="col-md-4 hvr-float-shadow">
+  <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:notification_list' %}">
-  <div class="panel panel-body">
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">Communication Management</h6>
-          <span class="text-muted">Send SMS/ Emails / Notification</span>
+ <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/communication.png' %}" alt="">       
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Communication </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-bubbles4 icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./communication -->
   {% if perms.discount.add_voucher %}
   <!-- customer Reward -->
-  <div class="col-md-4 hvr-float-shadow">
+  <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:sale-list' %}">
-  <div class="panel panel-body">
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">Customer Reward</h6>
-          <span class="text-muted">Manage Discount/</span>
+  <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/customer-rewards.png' %}" alt="">       
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Customer Reward </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-coins icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./rewards -->
   {% endif %}
   {% if perms.sale.view_terminal or perms.sale.view_paymentoption or perms.sale.view_drawercash %}
   <!-- Drawer cash -->
-  <div class="col-md-4 hvr-float-shadow">
+  <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:terminals' %}">
-  <div class="panel panel-body">
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">Drawer Cash</h6>
-          <span class="text-muted">Manage Terminals
-            <br>Cash Movements</span>
+ <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/drawer-cash.png' %}" alt="">       
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Drawer Cash </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-wallet icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./drawer cash -->
   {% endif %}
   {% if perms.accounts.view_expenses %}
   <!-- accounting -->
-   <div class="col-md-4 hvr-float-shadow">
+   <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'accounts:personal_expenses' %}">
-  <div class="panel panel-body">
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">Accounting Module</h6>
-          <span class="text-muted">Manage Expenses/ Petty Cash/ Business Expenses</span>
+  <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/accounting.png' %}" alt="">       
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Accounting </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-coins icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./accounting -->
   {% endif %}
   {% if perms.reports.view_sale_reports or perms.reports.view_products_reports or perms.reports.view_purchase_reports or perms.reports.view_balancesheet %}
   <!-- reports -->
-   <div class="col-md-4 hvr-float-shadow">
+   <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:sales_list' %}">
-  <div class="panel panel-body">
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">
-            Reports Module
-          </h6>
-          <span class="text-muted">Sales / Credit/ Stock / Sales Margin / Purchase Reports</span>
+  <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/reports.png' %}" alt="">      
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Reports </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-notebook icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./reports -->
   {% endif %}
   {% if request.user.is_active %}
   <!-- configuration -->
-   <div class="col-md-4 hvr-float-shadow">
+   <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:site-index' %}">
-  <div class="panel panel-body">
-      <div class="media no-margin">
-        <div class="media-body">
-          <h6 class="media-heading text-semibold">
-          Site Settings</h6>
-          <span class="text-muted">Business Name/ Sales settings/ Gateway settings</span>
+  <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/setting.png' %}" alt="">       
+        </div>              
+        <div class="caption text-center">
+          <h6 class="text-semibold no-margin">Settings </h6>          
         </div>
-        <div class="media-right media-middle">
-          <i class="icon-cogs icon-2x text-purple-300"></i>
-        </div>
-      </div>
-    </div>
+     </div>
     </a>
   </div>
   <!-- ./configuration -->

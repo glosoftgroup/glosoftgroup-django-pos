@@ -9,6 +9,8 @@ from rest_framework.serializers import (
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from ...decorators import user_trail
+import logging
 from ...discount.models import Sale
 from ...discount.models import get_variant_discounts
 from ...sale.models import (
@@ -27,8 +29,7 @@ from ...customer.models import Customer
 
 
 User = get_user_model()
-from ...decorators import user_trail
-import logging
+
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
@@ -77,6 +78,7 @@ class ItemsSerializer(serializers.ModelSerializer):
             return stock.get_stock_quantity()
         except:
             return 0
+
 
 class SalesListSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
@@ -337,15 +339,14 @@ class SalesSerializer(serializers.ModelSerializer):
                                      discount_amount=validated_data.get('discount_amount'),
                                      customer_name=validated_data.get('customer_name'))
         for payment_option_data in payment_options_data:
-            #print payment_option_data
+            print payment_option_data.loyalty_point_equiv         
             sales.payment_options.add(payment_option_data)
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
             try:
                 stock = Stock.objects.get(variant__sku=solditem_data['sku'])
                 if stock:                
-                    Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
-                    #print stock.quantity
+                    Stock.objects.decrease_stock(stock,solditem_data['quantity'])                                    
                 else: 
                     print 'stock not found'
             except:

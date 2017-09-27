@@ -128,6 +128,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                  'status',
                  'total_tax',
                  'discount_amount',
+                 'due_date',
                  'debt',
                 )
 
@@ -193,11 +194,8 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                 loyalty_points = 0
             else:
                 loyalty_points = total_net/points_eq
-            # customer.loyalty_points += loyalty_points
-            # customer.save()
-        # get sold products        
-        solditems_data = validated_data.pop('credititems')
-        # sales = Sales.objects.create(**validated_data)
+                  
+        solditems_data = validated_data.pop('credititems')        
         credit = Credit.objects.create(user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),
                                      total_net=validated_data.get('total_net'),
@@ -311,8 +309,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             instance.status = 'fully-paid'            
         else:
             instance.status = validated_data.get('status', instance.status)
-        instance.mobile = validated_data.get('mobile', instance.mobile)
-        
+        instance.mobile = validated_data.get('mobile', instance.mobile)   
         
         instance.customer_name = validated_data.get('customer_name', instance.customer_name)
         instance.save()        

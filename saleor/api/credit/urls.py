@@ -18,6 +18,5 @@ urlpatterns = [
     url(r'^create-credit/$', 
     	CreditCreateAPIView.as_view(), name='create-credit'),
     
-
 ]
 
