@@ -1,0 +1,22 @@
+{% load staticfiles %}
+{% load prices_i18n %}
+{% load humanize %}
+{% if sales %}
+    {% for sale in sales %}
+      <tr class='clickable-row'>
+        <td class="td">{{date}}</td>
+        <td class="td">{{sale.product_name }}</td>
+          <td class="td">{{sale.product_category }}</td>
+        <td class="td">{% if sale.sales__customer_name %}{{sale.sales__customer_name}}{% else %} Customer {% endif %}</td>
+        <td class="td">{% if sale.sales__user__name %}{{sale.sales__user__name}}{% else %}{{sale.sales__user__email}}{% endif %}</td>
+        <td class="td">{{sale.sales__terminal__terminal_name}}</td>
+          <td class="td">{{sale.quantity__sum}}</td>
+        <td class="td"><span class="pull-right">{{sale.total_cost__sum|intcomma }}</span></td>
+          {% if margin %}
+          <td class="td"><span class="pull-right">{{sale.unitMargin|intcomma }}</span></td>
+          {% endif %}
+      </tr>
+    {% endfor %}
+     {% else %}
+     <tr><td colspan="6"><h2 class="text-center">No Products Sales Summary Available</h2></td></tr>
+    {% endif %}
