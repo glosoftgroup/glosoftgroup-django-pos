@@ -38,7 +38,8 @@ class CustomerListAPIView(generics.ListAPIView):
         query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(
-                Q(name__icontains=query)               
+                Q(name__icontains=query)|  
+                Q(mobile__icontains=query)             
                 ).distinct()
         return queryset_list
 

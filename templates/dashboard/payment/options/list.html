@@ -521,7 +521,8 @@
           var f = document.getElementById('delform');
           var formData = new FormData(f);
           var id = $(this).data('id');
-          var url = $(this).data('href');          
+          var url = $(this).data('href');
+          console.log(this);
           $.ajax({
               url: url,
               type: "POST",
@@ -530,13 +531,20 @@
               contentType: false,
               success:function(data){
                 $('#modal_instance').modal('hide');
-                $('#tb #'+id).remove();
-                $.jGrowl('User deleted successfully', {
+                if(!data.error){
+                $.jGrowl('Payment option deleted successfully', {
                   header: 'Well done!',
                   theme: 'bg-success'
                 });
-               window.location.reload();
-             // $("#mydiv").load(location.href + " #mydiv");
+                $('#tb #'+id).remove();
+                window.location.reload();
+               }else{
+                $.jGrowl(data.error, {
+                  header: 'Error!',
+                  theme: 'bg-danger'
+                });
+               
+               }            
               },
               error:function(error){
                 console.log(error);

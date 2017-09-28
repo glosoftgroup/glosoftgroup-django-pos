@@ -11,7 +11,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max
+from django.db.models import Q, Count, Min, Sum, Avg, Max
 from django.core import serializers
 from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
@@ -1193,3 +1193,134 @@ def get_product_sale_details(request):
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_product.html',{})
 			# return HttpResponse(e)
+
+
+# discount
+@staff_member_required
+@permission_decorator('reports.view_products_reports')
+def sales_discount_chart(request):
+	get_date = request.GET.get('date')
+	image = request.POST.get('img')
+	today = datetime.datetime.now()
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.filter(~Q(discount_amount = 0.00)).latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	if image:
+		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+		ImageData = image
+		ImageData = dataUrlPattern.match(ImageData).group(2)
+
+		sales_by_category = SoldItem.objects.filter(sales__created__contains=date).filter(~Q(discount = 0.00)).values('product_category').annotate(
+			c=Count('product_category', distinct=True)).annotate(Sum('total_cost')).order_by('-total_cost__sum')[:5]
+		sales_by_category_totals = sales_by_category.aggregate(Sum('total_cost__sum'))['total_cost__sum__sum']
+		new_sales = []
+		for sales in sales_by_category:
+			color = "#%03x" % random.randint(0, 0xFFF)
+			sales['color'] = color
+			percent = (Decimal(sales['total_cost__sum']) / Decimal(sales_by_category_totals)) * 100
+			percentage = round(percent, 2)
+			sales['percentage'] = percentage
+			for s in range(0, sales_by_category.count(), 1):
+				sales['count'] = s
+			new_sales.append(sales)
+
+		data = {
+			'today': last_sale.created,
+			'sales_by_category': new_sales,
+			'puller': request.user,
+			'image': ImageData,
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/product_pdf.html', data)
+		return HttpResponse(pdf, content_type='application/pdf')
+	if date:
+		try:
+			sales_by_category = SoldItem.objects.filter(sales__created__contains=date).filter(~Q(discount = 0.00)).values('product_name','discount').annotate(
+				c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')
+
+			quantity_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
+			new_sales = []
+			for sales in sales_by_category:
+				color = "#%03x" % random.randint(0, 0xFFF)
+				sales['color'] = color
+				percent = (Decimal(sales['quantity__sum']) / Decimal(quantity_totals)) * 100
+				percentage = round(percent, 2)
+				sales['percentage'] = percentage
+				for s in range(0, sales_by_category.count(), 1):
+					sales['count'] = s
+				new_sales.append(sales)
+			categs = SoldItem.objects.values('product_name','discount').annotate(Count('product_name', distinct=True)).order_by()
+			this_year = today.year
+			avg_m = Sales.objects.filter(created__year=this_year).filter(~Q(discount_amount = 0.00)).annotate(c=Count('total_net'))
+			highest_category_sales = new_sales[0]['product_name']
+			default = []
+			labels = []
+			for i in range(1, (today.month + 1), 1):
+				if len(str(i)) == 1:
+					m =  str('0' + str(i))
+				else:
+					m = str(i)
+				amount = get_item_results(highest_category_sales, str(today.year), m)
+				labels.append(calendar.month_name[int(m)][0:3])
+				default.append(amount)
+
+			paginator = Paginator(new_sales, 5)
+			new_sales2 = paginator.page(1)
+
+			data = {
+				"sales_by_category": new_sales2,
+				"categs":categs,
+				"avg":avg_m,
+				"labels":labels,
+				"default":default,
+				"hcateg":highest_category_sales,
+				"sales_date":date,
+				"pn":paginator.num_pages,
+				"count":sales_by_category.count()
+			}
+			
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/discount.html', data)
+		except ObjectDoesNotExist as e:
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/discount.html',{'sales_date':date})
+		except IndexError as e:
+			return TemplateResponse(request, 'dashboard/reports/sales/ajax/items.html',{'sales_date':date})
+
+def sales_discount_chart_paginate(request):
+	get_date = request.GET.get('date')
+	page = request.GET.get('page', 1)
+	list_sz = request.GET.get('size')
+	if list_sz:
+		size = list_sz
+	else:
+		size = 10
+	if get_date:
+		date = get_date
+	else:
+		try:
+			last_sale = Sales.objects.filter(~Q(discount_amount = 0.00)).latest('id')
+			date = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			today = datetime.datetime.now()
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+	try:
+		sales_by_category = SoldItem.objects.filter(sales__created__contains=date).filter(~Q(discount = 0.00)).values('product_name','discount').annotate(
+			c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by(
+			'-quantity__sum')
+		paginator = Paginator(sales_by_category, int(size))
+		sales = paginator.page(page)
+		data = {
+			'sales_by_category': sales,
+			'pn': paginator.num_pages, 'sz': size
+		}
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/discount_paginate.html', data)
+	except ObjectDoesNotExist as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/discount_paginate.html', {"e": e, "date": date})
+	except IndexError as e:
+		return TemplateResponse(request, 'dashboard/reports/sales/ajax/discount_paginate.html', {"e": e, "date": date})
+

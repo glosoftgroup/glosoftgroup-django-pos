@@ -55,6 +55,7 @@ urlpatterns = [
 		url(r'^reports/sales/list/pdf/$', pdfs.sales_list_pdf, name='reports_sales_list_pdf'),
 		url(r'^reports/category/pdf/$', pdfs.sales_category, name='reports_sales_category_pdf'),
 		url(r'^reports/items/pdf/$', pdfs.sales_items, name='reports_sales_items_pdf'),
+		url(r'^reports/discount/pdf/$', pdfs.discount_items, name='reports_discount_items_pdf'),
 		url(r'^reports/user/pdf/$', pdfs.sales_user, name='reports_sales_user_pdf'),
 		url(r'^reports/till/pdf/$', pdfs.sales_tills, name='reports_sales_tills_pdf'),
 		url(r'^pdf/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
@@ -97,6 +98,11 @@ urlpatterns = [
 			(charts.sales_product_chart), name = 'sales_product_chart' ),
 	    url( r'^productchart/pnt/$',  permission_required('reports.view_products_reports', login_url='not_found')
 			(charts.sales_product_chart_paginate), name = 'sales_product_chart_paginate' ),
+	    url( r'^discountchart/$',  permission_required('reports.view_products_reports', login_url='not_found')
+			(charts.sales_discount_chart), name = 'sales_discount_chart' ),
+	    url( r'^discountchart/pnt/$',  permission_required('reports.view_products_reports', login_url='not_found')
+			(charts.sales_discount_chart_paginate), name = 'sales_discount_chart_paginate' ),
+		
 		url( r'^ptd/$', charts.get_product_sale_details, name = 'get_product_sale_details' ),
 
 		url( r'^category/$',  permission_required('reports.view_sale_reports', login_url='not_found')

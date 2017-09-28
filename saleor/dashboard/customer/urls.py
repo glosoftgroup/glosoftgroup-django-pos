@@ -27,11 +27,16 @@ urlpatterns = [
         url( r'^customer/sales/search/$', sales.sales_search, name = 'customer_sales_search'),
 
         url( r'^customer/canbe/creditable/$', views.is_creditable, name = 'is_creditable'),
-        # url(r'^add/', permission_required('userprofile.add_user', login_url='account_login')(views.user_add)),
+
+        # reports urls
+        url(r'^reports/$', permission_required('customer.view_customer', login_url='not_found')
+            (views.customer_report), name='customer_report_list'),        
+        url(r'^report/paginate/$', views.report_pagination, name='customer-report-paginate'),
+        url(r'^report/search/$', views.report_search, name='customer-report-search'),
+
         
 ]
 
-if settings.DEBUG:
-    # urlpatterns += [ url(r'^static/(?P<path>.*)$', serve)] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:    
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

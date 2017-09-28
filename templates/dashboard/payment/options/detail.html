@@ -1,13 +1,11 @@
 {% if option %}
     <div class=" detail-column">
-        <div class="col-md-12">
-            <p><span style="font-weight:500"></span> {{option.name}}</p>
-        </div>
+        
 
           <div class="form-group">            
               <label class="text-left" style="font-weight:500">option name:</label>
             
-              <input type="text" value="{{option.name}}" name="optname" id="optname" class="form-control">
+              <input type="text" value="{{option.name}}" {{disabled}} name="optname" id="optname" class="form-control">
             </div>
        
           <div class="form-group">            

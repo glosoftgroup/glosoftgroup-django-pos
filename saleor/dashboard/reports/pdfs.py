@@ -221,6 +221,30 @@ def sales_items(request):
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
 
+# discount
+@staff_member_required
+@permission_decorator('reports.view_sales_reports')
+def discount_items(request):
+	try:
+		image = request.GET.get('image')
+		sales_date = request.GET.get('date')
+		if not sales_date:
+			sales_date = None
+
+		img = default_logo()
+		data = {
+			'today': date.today(),
+			'puller': request.user,
+			'image': img,
+			'category':image,
+			'sales_date':sales_date
+		}
+		pdf = render_to_pdf('dashboard/reports/sales/pdf/discount.html',data)
+		return HttpResponse(pdf, content_type='application/pdf')
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
+
+
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
 def sales_user(request):

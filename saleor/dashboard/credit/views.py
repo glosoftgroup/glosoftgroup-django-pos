@@ -30,6 +30,7 @@ from datetime import date
 
 from ...core.utils import get_paginator_items
 from ..views import staff_member_required
+from ..notification.views import custom_notification
 from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, DrawerCash
 from ...credit.models import Credit, CreditedItem
@@ -804,3 +805,23 @@ def reorder_export_csv(request):
 				smart_str(obj.low_stock_threshold)
 			])
 		return response
+
+@staff_member_required
+def due_credit_notifier(request):
+	due_credits = Credit.objects.due_credits().filter(notified=False)
+	for credit in due_credits:
+		subject = 'NOTIFICATION OF OVERDUE CREDIT: '+\
+		          str(credit.invoice_number)+\
+		          ' ('+str(DateFormat(credit.created).format('Y-m-d'))+\
+		          ')'
+		body = "Hi,<br>Customer:"+\
+			   str(credit.customer.name)+\
+		          '('+str(credit.customer.mobile)+\
+		          ')<br><b>Credit date:</b>'+str(DateFormat(credit.created).format('Y-m-d'))+\
+		          '<br><b>Due Date:</b>'+str(DateFormat(credit.due_date).format('Y-m-d'))+\
+		          '<br><b>Invoice Number:</b>'+str(credit.invoice_number)+\
+		          '<br><b>Amount:</b>'+str(credit.total_net)
+		custom_notification(request.user,body,subject)
+		credit.notified=True
+		credit.save()
+	return HttpResponse(len(due_credits))

@@ -32,6 +32,7 @@ urlpatterns = [
 		
 		url( r'^sales/margin/$', sales_margin.sales_margin, name = 'credit_margin' ),
 		url( r'^sales/tax/report/$', sales_margin.sales_tax, name = 'credit_tax' ),
+		url( r'^credit/sale/notifier/$', views.due_credit_notifier, name = 'due_credit_notifier' ),
 
 ]
 

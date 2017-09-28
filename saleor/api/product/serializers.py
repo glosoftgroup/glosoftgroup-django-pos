@@ -5,6 +5,7 @@ from rest_framework.serializers import (
                 HyperlinkedIdentityField,
                 SerializerMethodField,
                 ValidationError,
+                JSONField
                 )
 
 from rest_framework import serializers
@@ -25,6 +26,7 @@ from ...product.models import (
             Stock,
             )
 from decimal import Decimal
+import json
 from ...customer.models import Customer
 
 
@@ -139,9 +141,7 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
             balance = Decimal(data.get('balance'))
             sale = Sales.objects.get(invoice_number=invoice_number)
             
-            if status == 'fully-paid' and sale.balance > amount_paid:
-                #print 'balance '+str(sale.balance)
-                #print 'amount '+str(amount_paid)
+            if status == 'fully-paid' and sale.balance > amount_paid:                
                 raise ValidationError("Status error. Amount paid is less than balance.")        
             else:
                 return value
@@ -206,6 +206,7 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
 class SalesSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
     solditems = TrackSerializer(many=True)
+    payment_data = JSONField()
     class Meta:
         model = Sales
         fields = ('id',
@@ -223,6 +224,7 @@ class SalesSerializer(serializers.ModelSerializer):
                  'customer_name',
                  'status',
                  'payment_options',
+                 'payment_data',
                  'total_tax',
                  'discount_amount'
                 )
@@ -252,6 +254,11 @@ class SalesSerializer(serializers.ModelSerializer):
             discount = Decimal(data.get('discount_amount'))            
         except:
             raise ValidationError('Discount should be a decimal/integer *'+str(discount)+'*')
+        return value
+
+    def validate_payment_data(self,value):
+        data = self.get_initial()
+        dictionary_value = dict(data.get('payment_data'))
         return value
     def validate_status(self,value):
         data = self.get_initial()
@@ -297,23 +304,40 @@ class SalesSerializer(serializers.ModelSerializer):
                 customer = Customer.objects.create(name=name, mobile=mobile)
             else:
                 pass
-                #customer = Customer.objects.create(name=name)
-
+                
         invoice_number = validated_data.get('invoice_number')
         # calculate loyalty_points
-        try:
-            total_net = validated_data.get('total_net')
-            points_eq = SiteSettings.objects.get(pk=1)      
-            points_eq = points_eq.loyalty_point_equiv #settings.LOYALTY_POINT_EQUIVALENCE
+        payment_data = validated_data.get('payment_data')
+        
+        for option in payment_data:
+            print option['value']
+            print option['payment_id']
+            pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
+            print pay_opt
+            points_eq = pay_opt.loyalty_point_equiv
             if points_eq == 0:
                 loyalty_points = 0
             else:
-                loyalty_points = total_net/points_eq
-            customer.loyalty_points += loyalty_points
-            customer.save()
-        except:
-            customer = None
-            print 'customer details provided dont meet adding customer criteria'
+                loyalty_points = int(option['value'])/points_eq
+            try:
+                Customer.objects.gain_points(customer,loyalty_points)
+            except:
+                print 'customer details provided dont meet adding customer criteria'
+
+
+        # try:
+        #     total_net = validated_data.get('total_net')
+        #     points_eq = SiteSettings.objects.get(pk=1)      
+        #     points_eq = points_eq.loyalty_point_equiv #settings.LOYALTY_POINT_EQUIVALENCE
+        #     if points_eq == 0:
+        #         loyalty_points = 0
+        #     else:
+        #         loyalty_points = total_net/points_eq
+        #     customer.loyalty_points += loyalty_points
+        #     customer.save()
+        # except:
+        #     customer = None
+        #     print 'customer details provided dont meet adding customer criteria'
 
         # get sold products 
         try:       
@@ -325,6 +349,7 @@ class SalesSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Payment options field required')
         status = validated_data.get('status')
+        # make a sale       
         sales = Sales.objects.create(user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),
                                      total_net=validated_data.get('total_net'),
@@ -334,6 +359,7 @@ class SalesSerializer(serializers.ModelSerializer):
                                      amount_paid=validated_data.get('amount_paid'),
                                      customer=customer,
                                      status=status,
+                                     payment_data=validated_data.get('payment_data'),
                                      total_tax=total_tax,
                                      mobile=validated_data.get('mobile'),
                                      discount_amount=validated_data.get('discount_amount'),
