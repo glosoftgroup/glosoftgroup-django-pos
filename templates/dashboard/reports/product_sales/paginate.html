@@ -12,6 +12,9 @@
         <td class="td">{{sale.sales__terminal__terminal_name}}</td>
           <td class="td">{{sale.quantity__sum}}</td>
         <td class="td"><span class="pull-right">{{sale.total_cost__sum|intcomma }}</span></td>
+          {% if margin %}
+          <td class="td"><span class="pull-right">{{sale.unitMargin|intcomma }}</span></td>
+          {% endif %}
       </tr>
     {% endfor %}
      {% else %}

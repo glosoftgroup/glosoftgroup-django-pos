@@ -1,0 +1,98 @@
+ {% load staticfiles %}
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+ <html>
+     <head>
+         <title>Sales Report</title>
+         <style type="text/css">
+             body {sans-serif; color: #384047;}
+             .header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}
+             .title {font-size: 16px;font-weight: 100;}
+             .header p{color:#384047;}
+
+             .img-circle{border-radius: 50%;}
+             table {ax-width: 960px; margin: 10px auto;}
+            tr{border-bottom:0.5px solid #ddd;border-right:0.5px solid #ddd;
+                border-left:0.5px solid #ddd;
+            }
+            td{border:none;}
+            th {
+                  font-weight: bold;
+                  background:#2196F3;
+                  color: #FFF;
+                  border:none;
+                  font-size:11px;
+                  vertical-align:middle;
+                }
+             .td{text-align: center;font-size:11px;}
+             tr{padding:5px;}
+             .img{width:50px;height:50px;}
+         </style>
+     </head>
+     <body>
+         <div class='wrapper'>
+             <div class='header'>
+                  <p style="margin-bottom:0px;"><img class="img" src="{{image}}" alt="Red dot" /></p>
+                 <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;"> SALES REPORT
+                 {% if gid %}
+                     <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
+                        SALES DATE: {{gid}}
+                 </p>{% endif %}
+                   <p style="margin-top:2px;font-size:11px;">{{today | date:'jS F Y'}}</p>
+                 </p>
+             </div>
+         <div>
+         <div class='details'>
+            <table repeat="1" class="table  table-hover datatable-header-footer" style="">
+                <thead>
+                  <tr>
+                      <th>Transaction Date</th>
+                      <th>Product Name</th>
+                      <th>Category</th>
+                      <th>Customer</th>
+                      <th>Cashier</th>
+                      <th>Till</th>
+                      <th>Quantity</th>
+                      <th class="text-center">Total Sales (KShs)</th>
+                        {% if margin %}
+                        <th class="text-center">Margin (Kshs)</th>
+                        {% endif %}
+                  </tr>
+                </thead>
+                <tbody id="tb">
+               {% if sales %}
+                        {% for sale in sales %}
+                          <tr class='clickable-row'>
+                            <td class="td">{{date}}</td>
+                            <td class="td">{{sale.product_name }}</td>
+                              <td class="td">{{sale.product_category }}</td>
+                            <td class="td">{% if sale.sales__customer_name %}{{sale.sales__customer_name}}{% else %} Customer {% endif %}</td>
+                            <td class="td">{% if sale.sales__user__name %}{{sale.sales__user__name}}{% else %}{{sale.sales__user__email}}{% endif %}</td>
+                            <td class="td">{{sale.sales__terminal__terminal_name}}</td>
+                              <td class="td">{{sale.quantity__sum}}</td>
+                            <td class="td"><span class="pull-right">{{sale.total_cost__sum }}</span></td>
+                              {% if margin %}
+                              <td class="td"><span class="pull-right">{{sale.unitMargin}}</span></td>
+                              {% endif %}
+                          </tr>
+                        {% endfor %}
+                         {% else %}
+                         <tr><td colspan="6"><h2 class="text-center">No Products Sales Summary Available</h2></td></tr>
+                        {% endif %}
+                  </tbody>
+           </table>
+         </div>
+
+
+             <div class="foot" id="footerContent">
+                 <p style="text-align: center;font-size:11px;">Report Pulled by:
+                     <span style="font-weight:bold">
+                         {% if puller.name %}
+                            {{ puller.name | upper }}
+                         {% else %}
+                            {{ puller.email | upper }}
+                         {% endif %}
+                     </span></p>
+
+             </div>
+     </body>
+ </html>
