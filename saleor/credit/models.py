@@ -33,6 +33,9 @@ from . import OrderStatus
 from . import TransactionStatus
 
 class CreditManager(models.Manager):
+    def due_credits(self):        
+        return self.get_queryset().filter(due_date__lte=timezone.now())
+
     def expired_credit(self):        
         max_credit_date = SiteSettings.objects.get(pk=1).max_credit_date 
         days = timezone.now()-timedelta(days=max_credit_date)
@@ -99,9 +102,11 @@ class Credit(models.Model):
         PaymentOption, related_name='credit_payment_option', blank=True,
         verbose_name=pgettext_lazy('Sales field',
                                    'sales options'))
+    notified = models.BooleanField(default=False, blank=False)
+
     due_date = models.DateTimeField(
         pgettext_lazy('Credit field', 'due date'),
-        default=now, editable=False)
+        null=False)
     
     objects = CreditManager()
     class Meta:

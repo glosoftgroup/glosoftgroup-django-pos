@@ -583,6 +583,16 @@
       data: dynamicData
     });
   }
+
+  function checkDueCredit() {
+    var dynamicData = {};    
+    return $.ajax({
+      url: "{% url 'dashboard:due_credit_notifier'%}",
+      type: "get",
+      data: dynamicData
+    });
+  }
+  checkDueCredit();
   getNotification().done(function (data) {
        $(".status-mark22").text(data);
     }); 

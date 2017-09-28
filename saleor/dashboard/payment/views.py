@@ -80,10 +80,14 @@ def delete(request, pk=None):
     option = get_object_or_404(PaymentOption, pk=pk)
     if request.method == 'POST':
         try:
-            option.delete()
-            user_trail(request.user.name, 'deleted payment option : '+ str(option.name),'delete')
-            info_logger.info('deleted payment option: '+ str(option.name))
-            return HttpResponse('success')
+            if option.name == "Loyalty Points":
+                pass
+            else:
+                option.delete()
+                user_trail(request.user.name, 'deleted payment option : '+ str(option.name),'delete')
+                info_logger.info('deleted payment option: '+ str(option.name))
+                return HttpResponse('success')
+            return HttpResponse(json.dumps({'error':"Loyalty Points is not deletable"}),content_type='application/json')
         except Exception, e:
             error_logger.error(e)
             return HttpResponse(e)
@@ -94,7 +98,8 @@ def edit(request, pk=None):
     if request.method == 'POST':
         try:
             if request.POST.get('name'):
-                option.name = request.POST.get('name')
+                if request.POST.get('name') != 'Loyalty Points':
+                    option.name = request.POST.get('name')
                 if request.POST.get('description'):
                     option.description = request.POST.get('description')
                 if request.POST.get('loyalty_point_equiv'):
@@ -113,12 +118,17 @@ def detail(request, pk=None):
     if request.method == 'GET':
         try:
             option = get_object_or_404(PaymentOption, pk=pk)
+            ctx = {'option':option}
+            if option.name == "Loyalty Points":
+                ctx['disabled'] = "disabled"
+            else:
+                ctx['disabled'] = ''
             user_trail(request.user.name, 'access payment option details of: '+ str(option.name)+' ','view')
             info_logger.info('access payment option details of: '+ str(option.name)+'  ')
-            return TemplateResponse(request, 'dashboard/payment/options/detail.html', {'option':option})
+            return TemplateResponse(request, 'dashboard/payment/options/detail.html', ctx)
         except Exception, e:
             error_logger.error(e)
-            return TemplateResponse(request, 'dashboard/payment/options/detail.html', {'option': option})
+            return TemplateResponse(request, 'dashboard/payment/options/detail.html', {'error': e})
 
 @staff_member_required
 def transactions(request):

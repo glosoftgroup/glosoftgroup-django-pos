@@ -517,8 +517,7 @@ $(function(){
     dynamicData['track'] = 'adding stock details';
 
     addProductDetails(dynamicData,addStockUrl,'post')
-    .done(function(data){
-        console.log(data.errors);
+    .done(function(data){        
       if(data.errors){        
         var message = ' ';
         $.each(data, function(i, item) {

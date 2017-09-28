@@ -141,9 +141,7 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
             balance = Decimal(data.get('balance'))
             sale = Sales.objects.get(invoice_number=invoice_number)
             
-            if status == 'fully-paid' and sale.balance > amount_paid:
-                #print 'balance '+str(sale.balance)
-                #print 'amount '+str(amount_paid)
+            if status == 'fully-paid' and sale.balance > amount_paid:                
                 raise ValidationError("Status error. Amount paid is less than balance.")        
             else:
                 return value
