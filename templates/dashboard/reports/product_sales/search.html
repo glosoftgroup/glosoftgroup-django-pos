@@ -18,6 +18,9 @@
                           <th>Till</th>
                           <th>Quantity</th>
                           <th class="text-center">Total Sales (KShs)</th>
+                            {% if margin %}
+                            <th class="text-center">Margin (Kshs)</th>
+                            {% endif %}
                         </tr>
                       </thead>
                       <tbody id="p-tb">
@@ -32,6 +35,9 @@
                             <td class="td">{{sale.sales__terminal__terminal_name}}</td>
                               <td class="td">{{sale.quantity__sum}}</td>
                             <td class="td"><span class="pull-right">{{sale.total_cost__sum|intcomma }}</span></td>
+                              {% if margin %}
+                              <td class="td"><span class="pull-right">{{sale.unitMargin|intcomma }}</span></td>
+                              {% endif %}
                           </tr>
                         {% endfor %}
                          {% else %}
@@ -110,11 +116,11 @@
                 var gid = '{{gid}}';
                 console.log('yesad '+gid);
                 if(gid == 0 || gid =='None'){
-                    $.get("{% url 'dashboard:product_sales_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
+                    $.get("{% url 'dashboard:product_sales_search' %}",{order:'{{order}}', page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
                       $('#p-tb').html(data);
                     });
                 }else{
-                    $.get("{% url 'dashboard:product_sales_search' %}",{page:num, psize:'{{sz}}', q:'{{q}}', gid:'{{gid}}'},function(data){
+                    $.get("{% url 'dashboard:product_sales_search' %}",{order:'{{order}}', page:num, psize:'{{sz}}', q:'{{q}}', gid:'{{gid}}'},function(data){
                        $('#p-tb').html(data);
                     });
                 }
@@ -133,73 +139,82 @@
 
         if((scategory == 'list' && date && searchData)){
             if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:url, type: 'GET',data: {order:'{{order}}', page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
+               $.ajax({ url:url, type: 'GET',data: {order:'{{order}}', page:1, q:searchData, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }
         }else if(scategory == 'list' && searchData){
             if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+               $.ajax({ url:url, type: 'GET',data: {order:'{{order}}', page:1, q:searchData, size:listSizeVal},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+               $.ajax({ url:url, type: 'GET',data: {order:'{{order}}', page:1, q:searchData, size:10},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }
         }else if(scategory == 'list' && date){
             if(listSizeVal != '0'){
-               $.ajax({ url:"{% url 'dashboard:product_sales_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:product_sales_paginate' %}", type: 'GET',data: {order:'{{order}}', page:1, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:"{% url 'dashboard:product_sales_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:product_sales_paginate' %}", type: 'GET',data: {order:'{{order}}', page:1, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }
         }else if(((scategory && scategory != 'list' && scategory != 'none') && (!searchData && !date)) || (scategory && scategory != 'list' && scategory != 'none' && date)){
            console.log('nothinh')
-        }else if(searchData && date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
+           if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {order:scategory, page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData, gid:date},success: function(data){
+               $.ajax({ url:url, type: 'GET',data: {order:scategory, page:1, size:10, q:searchData, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else if(searchData && date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {order:'{{order}}', page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {order:'{{order}}', page:1, size:10, q:searchData, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
              }
         }else if(searchData){
             if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData},success: function(data){
+               $.ajax({ url:url, type: 'GET',data: {order:'{{order}}', page:1, size:listSizeVal, q:searchData},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData},success: function(data){
+               $.ajax({ url:url, type: 'GET',data: {order:'{{order}}', page:1, size:10, q:searchData},success: function(data){
                           $('#pagination-div').html(data);
                 }});
              }
         }else if(date){
             if(listSizeVal != '0'){
-               $.ajax({ url:"{% url 'dashboard:product_sales_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:product_sales_paginate' %}", type: 'GET',data: {order:'{{order}}', page:1, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:"{% url 'dashboard:product_sales_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:product_sales_paginate' %}", type: 'GET',data: {order:'{{order}}', page:1, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
              }
         }else{
            if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {order:'{{order}}', page:1, size:listSizeVal}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                $.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {order:'{{order}}', page:1, size:10}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
            }

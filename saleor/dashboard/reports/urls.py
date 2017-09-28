@@ -16,6 +16,7 @@ urlpatterns = [
 			(product_sales.sales_list), name='product_sales_list'),
 		url( r'^sales/prs/paginate/$', product_sales.sales_paginate, name = 'product_sales_paginate'),
 		url( r'^sales/prs/search/$', product_sales.sales_search, name = 'product_sales_search' ),
+		url( r'^sales/prs/pdf/$', product_sales.sales_list_pdf, name = 'product_sales_list_pdf' ),
 		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(views.sales_detail), name='sale-detail'),
 
