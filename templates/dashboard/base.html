@@ -284,6 +284,12 @@
                     <i class="icon-gift"></i> Loyalty Points
                     </a>
                     </li>
+                    <!-- credit -->
+                    <li class="{% block menu_creditCustomer_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:customer_credit_list' %}">
+                    <i class="icon-width"></i> Credit
+                    </a>
+                    </li>
                   </ul>
                 </li>
                   {% endif %}

@@ -31,7 +31,12 @@
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.mobile}}</td>
                         
                         <!-- slaes -->
-                        <td>{{ user.get_sales }}
+                        <td>
+                          {% if user.get_sales %}
+                          {{ user.get_sales }}
+                          {% else %}
+                          --
+                          {% endif %}
                           <div class="text-size-small text-muted">{% if user.customers.first.created %}
                     Last sale {{user.customers.first.created|timesince}} ago
                      {% endif %}</div>
@@ -39,14 +44,29 @@
                         
                         <!-- loyalty points -->
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
+                        {% if user.get_loyalty_points %}
                         {{ user.get_loyalty_points }}
-                        <div class="text-size-small text-muted">{{user.get_loy_perc}}% average</div>
+                        {% else %}
+                        --
+                        {% endif %}
+                        <div class="text-size-small text-muted">
+                        {% if user.get_loy_perc %}
+                        {{user.get_loy_perc}}% average
+                        {% endif %}
+                      </div>
                         </td>
                         <!-- redeemed loyalty points -->
                         <!-- loyalty points -->
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
+                        {% if user.get_redeemed_loyalty_points %}
                         {{ user.get_redeemed_loyalty_points }}
-                        <div class="text-size-small text-muted">{{user.get_rem_perc}}% average</div>
+                        {% else %}
+                        --
+                        {% endif %}
+                        <div class="text-size-small text-muted">
+                        {% if user.get_rem_perc %}
+                       {{user.get_rem_perc}}% average
+                        {% endif %}</div>
                         </td>
                         <td>
                           {{user.get_total_discount}}

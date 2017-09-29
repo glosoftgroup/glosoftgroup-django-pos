@@ -127,6 +127,12 @@ class Credit(models.Model):
             return True
         else:
             return False
+
+    def is_due(self):        
+        if self.due_date <= timezone.now():
+            return True
+        return False
+
     def is_expired(self):       
         difference = datetime.now() - self.created.replace(tzinfo=None)        
         max_credit_date = SiteSettings.objects.get(pk=1).max_credit_date

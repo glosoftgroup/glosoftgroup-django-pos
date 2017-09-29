@@ -5,9 +5,7 @@ from . import views, products, subcategory_products
 
 
 urlpatterns = [
-    # url(r'^$',permission_required('product.view_product', login_url='not_found')
-    # (views.product_list), name='product-list'),
-
+    
     url(r'^$',permission_required('product.view_product', login_url='not_found')
     (products.view), name='product-list'),
     url(r'^list-paginate/$', products.paginate, name='product-list-paginate'),

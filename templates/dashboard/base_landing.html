@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+{% load staticfiles i18n %}
+{% load render_bundle from webpack_loader %}
+{% load version %}
+
+<html lang="{{ LANGUAGE_CODE }}" class="no-js">
+  <head>
+    <title>
+      {% block title %}
+        {% trans "Dashboard - Saleor" context "Dashboard default page title" %}
+      {% endblock %}
+    </title>
+    {% block meta %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+      <meta http-equiv="refresh" content = "1200; url=/lock/?next={{request.path}}">
+    {% endblock meta %}
+
+    {% include 'favicon.html' %}
+   
+    
+
+    <!-- Global stylesheets -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/icons/icomoon/styles.css' %}" rel="stylesheet" type="text/css">
+ <link href="{% static 'backend/css/icons/fontawesome/styles.min.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/bootstrap.css' %}" rel="stylesheet" type="text/css">
+
+  <link href="{% static 'backend/css/core.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/components.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/colors.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'backend/css/hover-min.css' %}" rel="stylesheet" type="text/css">
+   <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
+  <!--image preview -->
+  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css"> 
+  <script type="text/javascript" src="{% static 'backend/js/jquery-1.11.3.min.js' %}"></script> 
+  <!-- /global stylesheets -->
+  <style type="text/css">
+    .search-panel{padding: 6px;}
+  </style>
+
+    {% block custom_css %}
+    <style type="text/css">
+      .error{ color: red; }
+      #refreshAttributes { cursor: pointer; }
+      body {
+      position: relative;
+    }
+    </style>
+    {% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'backend/css/fixed_table_header.css' %}">
+  </head>
+
+  <body class="{% block body_class %}{% endblock %} navbar-top">
+ <div class='content-area '>
+  <!-- Main navbar -->
+  <div class="navbar navbar-inverse navbar-fixed-top bg-primary-600" >
+    <div class="navbar-header" style="padding-right: : 30px;">
+      <a class="navbar-brand logo" href="{% url 'dashboard:index' %}">
+          <span style="font-size: 2.3em;font-family: monospace;font-weight: bolder;">G-POS</span>
+        <svg data-src="{% static "dashboard/images/saleor_logo.svg" %}" height="38px" width="176px" />
+      </a>
+
+    </div>
+
+
+  </div>
+  <!-- /main navbar -->
+  <!-- Page container -->
+  <div class="page-container">
+
+    <!-- Page content -->
+    <div class="page-content">
+
+      <!-- Main content -->
+      <div class="content-wrapper">         
+        <!-- Content area -->
+        <div class="content" id="content"> 
+
+                {% block content %}{% endblock %}
+            
+          
+          <!-- Footer -->
+          <div class="footer text-muted">
+            &copy; . <a href="#">Glosoft Group</a> <a href="http://glosoftgroup.com" target="_blank"></a>
+          </div>
+          <!-- /footer -->
+
+        </div>
+        <!-- /content area -->
+        
+    </div>
+    <!-- end page content -->
+  </div>
+  <!-- end page container -->
+
+   
+   
+    <div id="base-modal" class="modal"></div>
+    <div id="base-modal-fixed" class="modal modal-fixed-footer"></div>
+    <!-- Core JS files -->
+
+  <script type="text/javascript" src="{% static 'backend/js/core/libraries/bootstrap.min.js' %}"></script>
+  <!-- /core JS files -->
+   <script src="{% static 'backend/js/plugins/ui/jquery-validation/jquery.validate.js' %} "></script>
+
+  <!-- Theme JS files -->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/moment/moment.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/core/app.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/core/libraries/jquery_ui/interactions.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_select2.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/ripple.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/chart.min.js' %}"></script>
+  <!-- /theme JS files -->
+ 
+  <!-- form js -->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/loaders/blockui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_layouts.js' %}"></script>
+  <!-- image preview-->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ui/jasny-bootstrap/js/jasny-bootstrap.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/components_popups.js' %}"></script>
+  <!-- datepicker -->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/daterangepicker.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/legacy.js' %}"></script>
+
+  <!-- Theme JS files -->
+  <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/pnotify.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/noty.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/jgrowl.min.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'backend/js/pages/components_notifications_other.js' %}"></script>
+  
+
+  
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+   <script type="text/javascript" src="{% static 'backend/js/fixed_breadcrumb.js' %}"></script>
+  <style type="text/css">
+    .toper{top:50px;}
+  </style>
+  <script type="text/javascript">
+  $( document ).ready(function() {
+    var selector = $('.fix-breadcrumb');
+    $( "label" ).addClass( "text-bold" );
+      });
+  </script>
+   
+    
+    {% include "dashboard/includes/_messages.html" %}
+    <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/printThis/printThis.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/printThis/printer.js' %}"></script>
+
+    <script type="text/javascript">
+   
+  function getNotification() {
+    var dynamicData = {};    
+    return $.ajax({
+      url: "{% url 'dashboard:unread_count'%}",
+      type: "get",
+      data: dynamicData
+    });
+  }
+  getNotification().done(function (data) {
+       $(".status-mark22").text(data);
+    }); 
+  $(document).ready(function(){
+    setInterval(function(){ getNotification().done(function (data) {
+       $(".status-mark22").text(data);
+    }) }, 9920000);  
+    
+  });
+  
+  </script>
+    {% block custom_js %}{% endblock %}
+   </div>
+ </div>
+  </body>
+</html>

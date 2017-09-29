@@ -19,7 +19,8 @@ from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...customer.models import Customer
-from ...sale.models import Sales, SoldItem, DrawerCash
+from ...sale.models import (Sales, SoldItem, DrawerCash)
+from ...credit.models import Credit
 from ...decorators import permission_decorator, user_trail
 import logging
 import json
@@ -367,4 +368,95 @@ def report_pagination(request):
 	except EmptyPage:
 		users = paginator.page(paginator.num_pages)
 	return TemplateResponse(request, 'dashboard/customer/pagination/report_paginate.html', {"users":users})
+
+# credit views
+@staff_member_required
+@permission_decorator('customer.view_customer')
+def credit_report(request):
+	try:
+		users =  Credit.objects.filter(~Q(customer=None)).order_by('-id')
+		page = request.GET.get('page', 1)
+		paginator = Paginator(users, 10)
+		try:
+			users = paginator.page(page)
+		except PageNotAnInteger:
+			users = paginator.page(1)
+		except InvalidPage:
+			users = paginator.page(1)
+		except EmptyPage:
+			users = paginator.page(paginator.num_pages)
+		user_trail(request.user.name, 'accessed customers page', 'view')
+		info_logger.info('User: ' + str(request.user.name) + 'view customers')
+		if request.GET.get('initial'):
+			return HttpResponse(paginator.num_pages)
+		else:
+			return TemplateResponse(request, 'dashboard/customer/credit/list.html',{'users': users, 'pn': paginator.num_pages})
+	except TypeError as e:
+		error_logger.error(e)
+		return TemplateResponse(request, 'dashboard/customer/credit/list.html', {'users': users, 'pn': paginator.num_pages})
+
+@staff_member_required
+def credit_search(request):
+	if request.is_ajax():
+		page = request.GET.get('page', 1)
+		list_sz = request.GET.get('size', 10)
+		p2_sz = request.GET.get('psize')
+		q = request.GET.get('q')
+		if list_sz == 0:
+			sz = 10
+		else:
+			sz = list_sz
+		if q is not None:
+			queryset_list = Credit.objects.filter(~Q(customer=None)).filter(
+				Q(customer__name__icontains=q)|
+				Q(customer__email__icontains=q) |
+				Q(customer__mobile__icontains=q)
+			).order_by('-id')
+			paginator = Paginator(queryset_list, 10)
+
+			try:
+				queryset_list = paginator.page(page)
+			except PageNotAnInteger:
+				queryset_list = paginator.page(1)
+			except InvalidPage:
+				queryset_list = paginator.page(1)
+			except EmptyPage:
+				queryset_list = paginator.page(paginator.num_pages)
+			users = queryset_list
+			if p2_sz:
+				users = paginator.page(page)
+				return TemplateResponse(request, 'dashboard/customer/pagination/credit_paginate.html', {"users":users})
+
+			return TemplateResponse(request, 'dashboard/customer/pagination/credit_search.html',
+			{"users":users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+@staff_member_required
+def credit_pagination(request):
+	page = int(request.GET.get('page', 1))
+	list_sz = request.GET.get('size')
+	p2_sz = request.GET.get('psize')
+	select_sz = request.GET.get('select_size')
+
+	users = Credit.objects.filter(~Q(customer=None)).order_by('-id')
+	if list_sz:
+		paginator = Paginator(users, int(list_sz))
+		users = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/customer/pagination/credit_p2.html',
+								{'users':users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+	else:
+		paginator = Paginator(users, 10)
+	if p2_sz:
+		paginator = Paginator(users, int(p2_sz))
+		users = paginator.page(page)
+		return TemplateResponse(request, 'dashboard/customer/pagination/credit_paginate.html', {"users":users})
+
+	try:
+		users = paginator.page(page)
+	except PageNotAnInteger:
+		users = paginator.page(1)
+	except InvalidPage:
+		users = paginator.page(1)
+	except EmptyPage:
+		users = paginator.page(paginator.num_pages)
+	return TemplateResponse(request, 'dashboard/customer/pagination/credit_paginate.html', {"users":users})
 

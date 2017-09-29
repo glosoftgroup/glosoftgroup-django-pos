@@ -165,8 +165,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             raise ValidationError('Terminal specified does not exist')
         return value    
 
-    def create(self,validated_data):
-        # add sold amount to drawer 
+    def create(self,validated_data):        
         try:
            total_net = Decimal(validated_data.get('total_net'))
         except:
@@ -182,7 +181,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             name = validated_data.get('customer_name')
             if validated_data.get('mobile') and validated_data.get('customer_name'):
                 mobile = validated_data.get('mobile')
-                customer = Customer.objects.create(name=name, mobile=mobile)
+                customer = Customer.objects.create(name=name, mobile=mobile, creditable=True)
             else:
                 customer = None
                 raise ValidationError('customer details provided dont meet adding customer criteria')

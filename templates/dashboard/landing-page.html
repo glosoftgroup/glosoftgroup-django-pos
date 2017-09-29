@@ -1,4 +1,4 @@
-{% extends "dashboard/base.html" %}
+{% extends "dashboard/base_landing.html" %}
 {% load staticfiles i18n %}
 {% load i18n %}
 {% load prices_i18n %}
@@ -6,9 +6,7 @@
 {% block title %}
   Landing page 
 {% endblock %}
-{% block breadcrumbs %}
-    <li class="active"><a href="{% url 'dashboard:index' %}">Landing page</a></li>
-{% endblock %}
+
 {% block custom_css %}
 <style type="text/css">
   
@@ -23,7 +21,9 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="row">  
+<div class="row">
+ <div class="col-md-10 col-md-offset-1"> 
+  <div class="row"> 
   {% if perms.userprofile.view_user or perms.auth.view_group or perms.userprofile.view_usertrail %}
  <!-- user -->
  <div class="col-md-3 hvr-float-shadow">
@@ -32,7 +32,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/users.png' %}" alt="">       
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Users </h6>          
         </div>
      </div>
@@ -48,7 +48,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/inventory.png' %}" alt="">       
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Inventory </h6>          
         </div>
      </div>
@@ -64,7 +64,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/customers.png' %}" alt="">   
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Customer </h6>          
         </div>
      </div>
@@ -80,7 +80,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/supplier.png' %}" alt="">     
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Supplier </h6>          
         </div>
      </div>
@@ -95,7 +95,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/communication.png' %}" alt="">       
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Communication </h6>          
         </div>
      </div>
@@ -110,7 +110,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/customer-rewards.png' %}" alt="">       
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Customer Reward </h6>          
         </div>
      </div>
@@ -126,7 +126,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/drawer-cash.png' %}" alt="">       
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Drawer Cash </h6>          
         </div>
      </div>
@@ -142,7 +142,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/accounting.png' %}" alt="">       
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Accounting </h6>          
         </div>
      </div>
@@ -158,7 +158,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/reports.png' %}" alt="">      
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Reports </h6>          
         </div>
      </div>
@@ -174,7 +174,7 @@
         <div class="thumb bg-blue">
           <img src="{% static 'backend/images/landingpage/setting.png' %}" alt="">       
         </div>              
-        <div class="caption text-center">
+        <div class="caption text-center no-padding">
           <h6 class="text-semibold no-margin">Settings </h6>          
         </div>
      </div>
@@ -182,7 +182,8 @@
   </div>
   <!-- ./configuration -->
   {% endif %}
-
+</div>
+ </div>
 </div>
 {% endblock %}
 {% block custom_js %}

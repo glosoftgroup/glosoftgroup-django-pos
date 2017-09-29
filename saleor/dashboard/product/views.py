@@ -626,9 +626,10 @@ def product_create(request):
         form = forms.ProductClassForm(request.POST or None,
                                       instance=product_cl)
 
+        categories = Category.objects.all()
         ctx = {'product_form': product_form, 'variant_form': variant_form,
            'product': product,'form_classes':form_classes, 'errors':errors,
-               'form':form, 'product_class':product_cl}
+               'form':form, 'product_class':product_cl,'categories':categories}
     return TemplateResponse(
         request, 'dashboard/product/product_form.html', ctx)
 

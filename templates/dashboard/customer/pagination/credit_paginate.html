@@ -1,0 +1,53 @@
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load static %}
+{% load default_user_image %}
+
+{% if users %}
+  {% for user in users%}
+  <tr class='clickable-row' id="{{user.customer.pk }}">
+    <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">{{ forloop.counter }}</td>
+    
+    <!-- name -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">{{user.customer.name}}
+                        <div class="text-size-small text-muted">
+                          <i class="icon-mobile3"></i>{{user.customer.mobile}}
+                        </div>
+                        </td>                       
+                        <td>
+                          {% if sale.is_fully_paid %}
+                            <span class="text-success  icon-checkmark-circle"><i></i></span>
+                            {% else %}
+                            <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+                            {% endif %}
+                        </td>                      
+                        <!-- created -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">
+                        
+                         {% if user.created %}
+                    {{user.created|timesince}} ago
+                     {% endif %}
+                        </td>
+                       <!-- due date -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">
+                       {{user.due_date}}
+                        </td>
+                        <!-- is due -->
+                        <td>
+                          {% if user.is_due %}
+                          <i class="text-danger icon-checkmark4"></i>
+                          {% else %}
+                          <i class="text-success icon-menu"></i>
+                          {% endif %}
+                        </td>
+                        <!-- amount -->
+                        <td>
+                          {{user.total_net}}
+                        </td>    
+  </tr>
+  {% endfor %}
+ {% else %}
+  <tr><td colspan="8"><h2 class="text-center">No Customers available</h2></td></tr>
+ {% endif %}
+ <script type="text/javascript" src="{% static 'backend/js/customer/customer-listing.js' %}"></script>

@@ -13,65 +13,56 @@
                 <thead>
                   <tr class="bg-primary">
                         <th>Id</th>                 
-                        <th>Name</th>
-                        <th>Phone no.</th>         
-                        <th>Sales</th>              
-                        <th>Loyalty Points</th>
-                        <th>Redeemed Points</th>
-                        <th>Total Discount</th>
+                        <th>Customer</th>          
+                        <th>Status</th>           
+                        <th>Last Credit Sale</th>   
+                        <th>Due Date</th> 
+                        <th>Is Due</th>
+                        <th>Amount</th>
                         
                       </tr>
                 </thead>
                 <tbody id="p-tb">           
                     {% if users %}
                       {% for user in users%}
-                      <tr class='clickable-row' id="{{user.pk }}">
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{ forloop.counter }}</td>
+                      <tr class='clickable-row' id="{{user.customer.pk }}">
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">{{ forloop.counter }}</td>
                         
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.name}}</td>
-                        <!-- mobile -->
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.mobile}}</td>
-                        
-                        <!-- slaes -->
+                        <!-- name -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">{{user.customer.name}}
+                        <div class="text-size-small text-muted">
+                          <i class="icon-mobile3"></i>{{user.customer.mobile}}
+                        </div>
+                        </td>                       
                         <td>
-                          {% if user.get_sales %}
-                          {{ user.get_sales }}
+                          {% if sale.is_fully_paid %}
+                            <span class="text-success  icon-checkmark-circle"><i></i></span>
+                            {% else %}
+                            <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+                            {% endif %}
+                        </td>                      
+                        <!-- created -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">
+                        
+                         {% if user.created %}
+                    {{user.created|timesince}} ago
+                     {% endif %}
+                        </td>
+                       <!-- due date -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">
+                       {{user.due_date}}
+                        </td>
+                        <!-- is due -->
+                        <td>
+                          {% if user.is_due %}
+                          <i class="text-danger icon-checkmark4"></i>
                           {% else %}
-                          --
+                          <i class="text-success icon-menu"></i>
                           {% endif %}
-                          <div class="text-size-small text-muted">{% if user.customers.first.created %}
-                    Last sale {{user.customers.first.created|timesince}} ago
-                     {% endif %}</div>
                         </td>
-                        
-                        <!-- loyalty points -->
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
-                        {% if user.get_loyalty_points %}
-                        {{ user.get_loyalty_points }}
-                        {% else %}
-                        --
-                        {% endif %}
-                        <div class="text-size-small text-muted">
-                        {% if user.get_loy_perc %}
-                        {{user.get_loy_perc}}% average
-                        {% endif %}
-                      </div>
-                        </td>
-                        <!-- redeemed loyalty points -->
-                        <!-- loyalty points -->
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
-                        {% if user.get_redeemed_loyalty_points %}
-                        {{ user.get_redeemed_loyalty_points }}
-                        {% else %}
-                        --
-                        {% endif %}
-                        <div class="text-size-small text-muted">
-                        {% if user.get_rem_perc %}
-                       {{user.get_rem_perc}}% average
-                        {% endif %}</div>
-                        </td>
+                        <!-- amount -->
                         <td>
-                          {{user.get_total_discount}}
+                          {{user.total_net}}
                         </td>
                         
                       </tr>
@@ -131,10 +122,9 @@
    <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
    <script type="text/javascript" src="{% static 'backend/js/customer/customer-listing.js' %}"></script>
  <script type="text/javascript">
-   var paginateUrl = "{% url 'dashboard:customer-report-paginate' %}";
-   var searchUrl = "{% url 'dashboard:customer-report-search' %}";
+   var paginateUrl = "{% url 'dashboard:customer-credit-paginate' %}";
+   var searchUrl = "{% url 'dashboard:customer-credit-search' %}";
    $(document).ready(function(){
-
         $('.p2-pag').bootpag({
             total: parseInt('{{pn}}'),
             maxVisible: 3,
@@ -163,7 +153,7 @@
    });
 
    //**@ display size select
-        $('.list-sz').selectpicker().on('change', function(){
+      $('.list-sz').selectpicker().on('change', function(){
             var ts = $(this).val();
             $.ajax({ url: paginateUrl,type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
                   $('#pagination-div').html(data);
