@@ -11,7 +11,7 @@
 {% block breadcrumbs %}
 <li class="active"><a href="{% url 'dashboard:customers' %}">Customer</a></li>
 <li class="active"><a href="{% url 'dashboard:customer-sales-detail' pk=customer.pk %}">{{customer.name|title}}</a></li>
-     <li>Invoice</li>
+     <li>Receipt</li>
  {% endblock %}
 
 {% block menu_addCustomer_class %}active{% endblock %}
@@ -46,7 +46,7 @@
 
                         <h6><span class="text-bold">Customer:</span> {{sale.customer}}</h6> 
                         <h6 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h6>
-                          <h5 class=""><span class="text-bold">Invoice Number:</span> {{sale.invoice_number}}</h5>
+                          <h5 class=""><span class="text-bold">Receipt Number:</span> {{sale.invoice_number}}</h5>
                       </div>
                     </caption>
                       <thead style="border-top:1px solid #ddd;">

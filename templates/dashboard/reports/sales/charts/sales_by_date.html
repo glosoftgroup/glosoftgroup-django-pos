@@ -45,7 +45,20 @@
       width: 10px;
       height: 10px;
     }
+    .td{cursor:pointer}
+    .table{border:1px solid #ccc}
     /* chart*/
+    /*.daterangepicker .calendar {
+        display: none;
+        background-color: #fff;
+        margin: 0px !important;
+        padding: 16px;
+        box-shadow: none !important;
+        }
+        .daterangepicker .calendar, .ranges {
+            border-radius: 3px;
+            -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23);
+        }*/
   </style>
  {% endblock %}
 
@@ -194,8 +207,8 @@
               {% if cashiers %}
                 <div class="data-table-container">
                   <table class="table bordered highlight responsive data-table">
-                    <thead>
-                      <tr>
+                    <thead style="border-top:1px solid #ddd;">
+                      <tr class="bg-primary">
                         <th>
                         </th>
                         <th class="right-align">
@@ -212,7 +225,7 @@
                           </td>
                           <td class="right-align">
                             <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
+                              {{ date_gross_sales }}
                             </div>
                           </td>
                           <td class="right-align">
@@ -220,21 +233,32 @@
                           </td>
                           <td>
                             <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
+                              {{ date_gross_sales }}
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>Discounts</td>
-                          <td class="right-align">0.00</td>
+                          <td class="right-align">
+                              <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_discount }}
+                            </div>
+                          </td>
                           <td>0.00</td>
-                          <td>0.00</td>
+                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_discount }}</div></td>
                         </tr>
                         <tr>
                           <td>Tax</td>
-                          <td class="right-align">0.00</td>
+                          <td class="right-align">
+                              <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_tax }}
+                            </div>
+                          </td>
                           <td>0.00</td>
-                          <td>0.00</td>
+                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_tax }}
+                            </div></td>
                         </tr>
                         <tr data-action-go="">
                           <td>
@@ -290,8 +314,8 @@
               {% if cashiers %}
                 <div class="data-table-container">
                   <table class="table bordered highlight responsive data-table">
-                    <thead>
-                      <tr>
+                    <thead style="border-top:1px solid #ddd;">
+                      <tr class="bg-primary">
                         <th>
                           Cashier Name
                         </th>
@@ -418,22 +442,22 @@ $(document).ready(function(){
     //**@ daterange to
     $('.daterange-to').daterangepicker({
             alwaysShowCalendars: true,
-            showCustomRangeLabel: true,
+            <!--showCustomRangeLabel: true,-->
             linkedCalendars:false,
             locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
-            opens: 'right',
+            <!--opens: 'right',-->
             applyClass: 'btn-small bg-slate',
-            cancelClass: 'btn-small btn-default',
-            ranges: {
-               'Today': [moment(), moment()],
-               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-               'This week':[moment().startOf('week'), moment()],
-               'Last Week': [moment().subtract(13, 'days'), moment().startOf('week').subtract(1, 'days')],
-               'This Month': [moment().startOf('month'), moment()],
-               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-               'This Year': [moment().startOf('year'), moment()],
-               'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
-            }
+            cancelClass: 'btn-small btn-default'
+            <!--ranges: {-->
+               <!--'Today': [moment(), moment()],-->
+               <!--'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],-->
+               <!--'This week':[moment().startOf('week'), moment()],-->
+               <!--'Last Week': [moment().subtract(13, 'days'), moment().startOf('week').subtract(1, 'days')],-->
+               <!--'This Month': [moment().startOf('month'), moment()],-->
+               <!--'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],-->
+               <!--'This Year': [moment().startOf('year'), moment()],-->
+               <!--'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]-->
+            <!--}-->
     }, function(start, end){
         $('.daterangepicker ').addClass('show-calendar');
     });

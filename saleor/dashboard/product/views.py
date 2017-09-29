@@ -539,7 +539,6 @@ def product_data(request):
             if request.POST.get('threshold'):
                  variant.low_stock_threshold = request.POST.get('threshold')
             variant.save();
-            print variant
             #except:
             #   print('Error adding sku')
         if request.POST.get('wholesale_price'):

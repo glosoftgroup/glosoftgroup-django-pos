@@ -227,7 +227,7 @@ $(document).ready(function(){
     $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true,
+        showDropdowns:false,
         autoUpdateInput:false
     }, function(chosen_date) {
         $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
