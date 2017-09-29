@@ -265,3 +265,17 @@ def emails(request):
         contact={'text':user.email,'value': user.email}
         l.append(contact)
     return HttpResponse(json.dumps(l), content_type='application/json')
+
+
+def custom_notification(by,body,subject,superusers = True):
+    if superusers:
+        users = User.objects.filter(is_superuser=True)
+        for user in users:
+            context = {'user': user.name, 'body': body, 'subject': subject}
+            emailit.api.send_mail(user.email,
+                                      context,
+                                      'notification/emails/notification_email',
+                                      from_email=user.email)
+            notif = Notification(actor=by, recipient=user, verb=subject, description=body, emailed=True)
+            notif.save()
+        return True

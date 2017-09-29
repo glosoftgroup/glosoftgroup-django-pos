@@ -4,9 +4,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import (
-					SerializerMethodField,
-					ValidationError,					
-				 )
+				SerializerMethodField,
+				ValidationError,
+				)
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -18,14 +18,14 @@ class TerminalListSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Terminal
 		fields = ('id',
-				 'terminal_name', 
+				 'terminal_name',
 				 'terminal_number',
 				 'amount',
 				 'todaySales'
 				 )
 	def get_todaySales(self,obj):
 		return obj.get_todaySales()
-		
+
 class UserAuthorizationSerializer(serializers.Serializer):
 	email = serializers.CharField()
 	password = serializers.CharField(max_length=200)
@@ -45,7 +45,7 @@ class UserAuthorizationSerializer(serializers.Serializer):
 		data = self.get_initial()
 		try:
 			Terminal.objects.get(pk=int(data.get('terminal')))
-		except:		
+		except:
 			raise ValidationError('Terminal specified does not extist')
 		return value
 
@@ -68,14 +68,14 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 
 	def validate_terminal(self,value):
 		data = self.get_initial()
-		try:		
+		try:
 			terminal = Terminal.objects.get(pk=int(data.get('terminal')))
 			if terminal:
 				self.terminal = terminal
 				return value
 			else:
 				raise ValidationError('Terminal specified does not extist')
-		except:		
+		except:
 			raise ValidationError('Terminal specified does not extist')
 		return value
 
@@ -92,14 +92,14 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 
 	def validate_email(self, value):
 		data = self.get_initial()
-		username = data.get('email')		
+		username = data.get('email')
 		if '@' in username:
 			kwargs = {'email': username}
 		else:
 			kwargs = {'name': username}
 		try:
 			user = get_user_model().objects.get(**kwargs)
-			if not user:	
+			if not user:
 				raise PermissionDenied('Username/email error Authentication Failed!')
 			else:
 				return value
@@ -128,19 +128,19 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 
 	def validate_User(self,value):
 		data = self.get_initial()
-		try:		
+		try:
 			user = User.objects.get(pk=int(data.get('User')))
-			if not user:	
+			if not user:
 				raise PermissionDenied('Cashier Authentication Failed!')
 			else:
 				return value
 		except:
 			raise ValidationError('Cashier does not extist')
 		return value
-    
-	
 
-	def validate_trans_type(self,value):	
+
+
+	def validate_trans_type(self,value):
 		data = self.get_initial()
 		trans_type = str(data.get('trans_type'))
 		if trans_type != 'deposit' and self.type != 'withdraw':
@@ -160,25 +160,25 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 		if self.type == 'withdraw':
 			self.terminal = Terminal.objects.get(pk=terminal_id)
 			if self.terminal.amount < self.amount:
-				raise ValidationError('Insufficient cash in drawer!')				
+				raise ValidationError('Insufficient cash in drawer!')
 		return value
 
-		
+
 	def create(self, validated_data):
 		""" authenticate user and transact
 		"""
 		trans_type = str(validated_data['trans_type'])
 		amount = validated_data['amount']
-		manager = self.manager	
+		manager = self.manager
 		terminal = validated_data['terminal']
 		user = validated_data['User']
 		note = validated_data['note']
-		
+
 		trail = str(manager)+' '+trans_type+' '+str(amount)+\
 					' from TERMINAL:'+str(terminal)
 		print trail
-		if trans_type == 'deposit':			
-			self.terminal.amount += Decimal(amount)			
+		if trans_type == 'deposit':
+			self.terminal.amount += Decimal(amount)
 			self.terminal.save()
 			TerminalHistoryEntry.objects.create(
 							terminal=terminal,
@@ -187,24 +187,24 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 							user=manager
 						)
 		elif trans_type == 'withdraw':
-			self.terminal.amount -= Decimal(amount)	
+			self.terminal.amount -= Decimal(amount)
 			self.terminal.save()
 			TerminalHistoryEntry.objects.create(
 							terminal=terminal,
 							comment=trail,
 							crud=trans_type,
 							user=manager
-						)		
-			
+						)
 
-		drawer = DrawerCash.objects.create(manager=manager,										   
+
+		drawer = DrawerCash.objects.create(manager=manager,
 										   user = User.objects.get(pk=int(user)),
 										   terminal=terminal,
 										   amount=amount,
 										   trans_type=trans_type,
 										   note=note)
 		print drawer
-			
+
 		return validated_data
 
 

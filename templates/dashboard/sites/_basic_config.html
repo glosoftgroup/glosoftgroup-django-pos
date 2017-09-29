@@ -15,8 +15,7 @@
               <div class="col-md-12">
                   <div class="col-md-4">
                     <label for="image" class="text-center" style="padding-left:50px;">Business Logo</label>
-                      <div class="form-group">
-                        <!-- <label for="exampleInputEmail1">User Image</label> -->
+                      <div class="form-group">     
                         <div class="fileinput fileinput-new" data-provides="fileinput">
                           <div class="fileinput-new thumbnail" style="width: 150px; height: auto;">
                             <img data-src="holder.js/100%x100%" alt="..." src="{% if site.image %}{{ site.image.url }}{% else %}{% default_user_image %} {% endif %}">
@@ -30,11 +29,18 @@
                       </div>
                     </div>
                   <div class="col-md-8">
-                      <div class="form-group col-md-12">
+                      <div class="form-group col-md-6">
                         <label for="company_name">Business Name</label>
                         <input type="text" class="form-control" name="company_name" id="company_name" placeholder="Company Name"
                         value="{% if site.name %} {{site.name}} {% else %} {% endif %}">
                       </div>
+                      <!-- email -->
+                      <div class="form-group col-md-6">
+                        <label for="company_name">Business Email</label>
+                        <input type="text" class="form-control" name="company_email" id="company_email" placeholder="Company Email"
+                        value="{% if site.email %} {{site.email}} {% else %} {% endif %}">
+                      </div>
+
                       <div class="col-md-12"> <h6 style="font-weight:bold;">Sales Settings</h6></div>
                       <div class="row">
                       <div class="col-md-12">

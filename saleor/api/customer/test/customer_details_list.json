@@ -1,0 +1,72 @@
+
+Customer List Api
+
+GET /api/customer/
+
+HTTP 200 OK
+Allow: GET, HEAD, OPTIONS
+Content-Type: application/json
+Vary: Accept
+
+{
+    "count": 6,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "name": "denis",
+            "email": "",
+            "mobile": "+254909090909",
+            "loyalty_points": "0.00",
+            "redeemed_loyalty_points": "0.00",
+            "cash_equivalency": 0.0
+        },
+        {
+            "id": 2,
+            "name": "sdef",
+            "email": null,
+            "mobile": "12121212",
+            "loyalty_points": "0.00",
+            "redeemed_loyalty_points": "0.00",
+            "cash_equivalency": 0.0
+        },
+        {
+            "id": 3,
+            "name": "dfghj",
+            "email": null,
+            "mobile": "4215",
+            "loyalty_points": "110.00",
+            "redeemed_loyalty_points": "0.00",
+            "cash_equivalency": 1.1
+        },
+        {
+            "id": 4,
+            "name": "asdfghj",
+            "email": null,
+            "mobile": "1234567",
+            "loyalty_points": "0.00",
+            "redeemed_loyalty_points": "0.00",
+            "cash_equivalency": 0.0
+        },
+        {
+            "id": 5,
+            "name": "ujiui",
+            "email": null,
+            "mobile": "9090909",
+            "loyalty_points": "0.00",
+            "redeemed_loyalty_points": "0.00",
+            "cash_equivalency": 0.0
+        },
+        {
+            "id": 6,
+            "name": "Customer Name",
+            "email": null,
+            "mobile": "25499999000",
+            "loyalty_points": "0.00",
+            "redeemed_loyalty_points": "0.00",
+            "cash_equivalency": 0.0
+        }
+    ]
+}
+
