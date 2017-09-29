@@ -16,6 +16,7 @@ from django_prices.models import PriceField
 from payments import PaymentStatus, PurchasedItem
 from payments.models import BasePayment
 from prices import Price, FixedDiscount
+from jsonfield import JSONField
 from satchless.item import ItemLine, ItemSet
 from datetime import date
 from django.contrib.postgres.fields import HStoreField
@@ -166,6 +167,7 @@ class Sales(models.Model):
         'PaymentOption', related_name='payment_option', blank=True,
         verbose_name=pgettext_lazy('Sales field',
                                    'sales options'))
+    payment_data = JSONField(null=True,blank=True)
     class Meta:
         ordering = ('-last_status_change',)
         verbose_name = pgettext_lazy('Sales model', 'Sales')

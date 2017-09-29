@@ -1,0 +1,160 @@
+{% load i18n %}
+{% load prices_i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+{% load default_user_image %}
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-body">
+        <div class="table-responsives">
+
+          <table class="table  table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
+                <thead>
+                  <tr class="bg-primary">
+                    <th>Id</th>                    
+                    <th>Name</th>
+                    <th>Phone no.</th>             
+                    <th>Sales</th>                  
+                    <th>Loyalty Points</th>
+                    <th>Redeemed Points</th>
+                    <th>Total Discount</th>        
+                  </tr>
+                </thead>
+                <tbody id="p-tb">           
+                {% if users %}
+                      {% for user in users%}
+                      <tr class='clickable-row' id="{{user.pk }}">
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{ forloop.counter }}</td>
+                        
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.name}}</td>
+                        <!-- mobile -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">{{user.mobile}}</td>
+                        
+                        <!-- slaes -->
+                        <td>{{ user.get_sales }}
+                          <div class="text-size-small text-muted">{% if user.customers.first.created %}
+                    Last sale {{user.customers.first.created|timesince}} ago
+                     {% endif %}</div>
+                        </td>
+                        
+                        <!-- loyalty points -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
+                        {{ user.get_loyalty_points }}
+                        <div class="text-size-small text-muted">{{user.get_loy_perc}}% average</div>
+                        </td>
+                        <!-- redeemed loyalty points -->
+                        <!-- loyalty points -->
+                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
+                        {{ user.get_redeemed_loyalty_points }}
+                        <div class="text-size-small text-muted">{{user.get_rem_perc}}% average</div>
+                        </td>
+                        <td>
+                          {{user.get_total_discount}}
+                        </td>
+                        
+                      </tr>
+                      {% endfor %}
+                     {% else %}
+                      <tr><td colspan="8"><h2 class="text-center">No Customers available</h2></td></tr>
+                     {% endif %}
+                  </tbody>
+           </table>
+
+        </div>
+        </div>
+         <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
+      </div>
+
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/customer/customer-listing.js' %}"></script>
+ <script type="text/javascript">
+  var paginateUrl = "{% url 'dashboard:customer-report-paginate' %}";
+  var searchUrl = "{% url 'dashboard:customer-report-search' %}";
+   $(document).ready(function(){
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get(paginateUrl,{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                    });
+                }else{
+                    $.get(paginateUrl,{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
+                   $('#p-tb').html(data);
+                });
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+        $(".td").click(function() {
+             window.location = $(this).data("href");
+        });
+   });
+   //**@ display size select
+        $('.list-sz').selectpicker().on('change', function(){
+            var ts = $(this).val();
+            $.ajax({ url: paginateUrl,type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+            }});
+        });
+        
+   {% if sz %}
+   $.when( $.ready ).then(function() {     
+         $('.bootstrap-select').selectpicker();
+         $('.list-sz').selectpicker('val', ["{{sz}}"]);              
+      });
+  {% endif %}
+ </script>
+<script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>

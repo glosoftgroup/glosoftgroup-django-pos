@@ -28,7 +28,7 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
                               <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.name %}{{sale.user.name}}{% else %}{{sale.user.email}}{% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.payment_options.name %}{{sale.payment_options.name}}{% else %} Cash {% endif %}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
@@ -43,11 +43,7 @@
                  </table>
         </div>
           {% if sales %}
-             <div class="my-paginate">
-                
-  <style type="text/css">
-           .pagination{margin-bottom: 0px;}
-         </style> 
+             <div class="my-paginate" style="margin-top:20px;">
          <div class="row">   
          <div class="col-md-12">               
           <div class="col-md-4">

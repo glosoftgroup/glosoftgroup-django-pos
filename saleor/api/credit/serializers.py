@@ -99,6 +99,7 @@ class CreditListSerializer(serializers.ModelSerializer):
                  'status',
                  'total_tax',
                  'discount_amount',
+                 'due_date',
                  'debt',
                 )
 
@@ -142,13 +143,15 @@ class CreateCreditSerializer(serializers.ModelSerializer):
 
     def validate_customer(self,value):
         data = self.get_initial()
-        customer = Customer.objects.get(pk=data.get("customer"))
+        try:
+            customer = Customer.objects.get(pk=data.get("customer"))
+        except:
+            raise ValidationError('Incorrect customer details')
         if customer.creditable:
             print 'creditable'
         else:
             raise ValidationError('Customer is not creditable')
-            print 'not creditable'
-        print customer
+            print 'not creditable'        
         return value
         
     def validate_terminal(self,value):
@@ -207,6 +210,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                                      status='payment-pending',
                                      mobile=validated_data.get('mobile'),
                                      debt=validated_data.get('debt'),
+                                     due_date=validated_data.get('due_date'),
                                      customer_name=validated_data.get('customer_name'))
         for solditem_data in solditems_data:
             CreditedItem.objects.create(credit=credit,**solditem_data)           

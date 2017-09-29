@@ -31,6 +31,9 @@ def add_payment_options(sender, **kwargs):
         mpesa = PaymentOption.objects.filter(name='Mpesa')
         if not mpesa.exists():
             PaymentOption.objects.create(name="Mpesa")
+        points = PaymentOption.objects.filter(name='Loyalty Points')
+        if not points.exists():
+            PaymentOption.objects.create(name="Loyalty Points")
     except:
         print('Error creating payment options')
 
