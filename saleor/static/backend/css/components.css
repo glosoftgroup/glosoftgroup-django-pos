@@ -6853,7 +6853,7 @@ legend.alpaca-container-label {
     box-shadow: none
 }
 
-.daterangepicker .calendar,
+/*.daterangepicker .calendar,*/
 .ranges {
     border-radius: 3px;
     -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23)
@@ -6864,7 +6864,11 @@ legend.alpaca-container-label {
 }
 
 .daterangepicker.opensright .calendars {
-    float: right
+    float: right;
+    background-color:#fff;
+    padding-bottom:15px;
+    border-radius:5px;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, .16), -3px 3px 6px rgba(0, 0, 0, .23);
 }
 
 .daterangepicker.single .calendar {
@@ -6884,9 +6888,9 @@ legend.alpaca-container-label {
 .daterangepicker .calendar {
     display: none;
     background-color: #fff;
-    margin: 8px;
+    margin: 0px;
     padding: 16px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23)
+    /*box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23)*/
 }
 
 .daterangepicker td.available:focus,
@@ -21577,3 +21581,16 @@ label.display-block {
     float: right;
     display: block
 }
+/*  daterangepicker customization */
+.inp_row{
+    padding:10px 30px;
+    background:#fff;
+}
+.inp_row .range_inputs .applyBtn{
+    float:right;
+}
+.inp_row .range_inputs .cancelBtn{
+    float:left;
+}
+
+/*--  end --*/

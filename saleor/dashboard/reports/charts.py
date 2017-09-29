@@ -307,6 +307,11 @@ def sales_date_chart(request, image=None):
 				customer_diff = 0
 
 			date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
+			date_total_discount = Sales.objects.filter(created__contains=date).aggregate(Sum('discount_amount'))[
+				'discount_amount__sum']
+			date_total_tax = Sales.objects.filter(created__contains=date).aggregate(Sum('total_tax'))[
+				'total_tax__sum']
+
 			prevdate_total_sales = Sales.objects.filter(created__contains=prevdate).aggregate(Sum('total_net'))['total_net__sum']
 			try:
 				sales_diff = int(((Decimal(date_total_sales) - Decimal(prevdate_total_sales))/Decimal(prevdate_total_sales))*100)
@@ -343,9 +348,13 @@ def sales_date_chart(request, image=None):
 			sales_that_day = Sales.objects.filter(created__contains=date)
 			users_that_day = sales_that_day.values('user','user__email','total_net', 'created').annotate(c=Count('user__id', distinct=True))
 			users = Sales.objects.values('user__email','user__name','terminal').annotate(Count('user')).annotate(Sum('total_net')).order_by().filter(created__contains=date)
+			date_gross_sales = date_total_discount + date_total_tax + date_total_sales
 			data = {
 				"no_of_customers":no_of_customers,
 				"date_total_sales":date_total_sales,
+				"date_gross_sales":date_gross_sales,
+				"date_total_tax":date_total_tax,
+				"date_total_discount":date_total_discount,
 				"date":selected_sales_date,
 				"prevdate":previous_sales_date,
 				"default":default,
@@ -623,9 +632,9 @@ def sales_user_chart(request):
 
 	if date:
 		try:
-			users = Sales.objects.values('user__email', 'user__name', 'terminal').annotate(Count('user')).annotate(
+			users = Sales.objects.values('user__email', 'user__name', 'user').annotate(Count('user')).annotate(
 				Sum('total_net')).annotate(
-				Sum('solditems__quantity')).order_by('solditems__quantity__sum').filter(created__contains=date)
+				Sum('solditems__quantity')).order_by('-solditems__quantity__sum').filter(created__contains=date)
 			sales_by_category_totals = users.aggregate(Sum('solditems__quantity__sum'))['solditems__quantity__sum__sum']
 			new_sales = []
 			for sales in users:
@@ -833,7 +842,7 @@ def sales_terminal_chart(request):
 	if date:
 		try:
 			terminals = Sales.objects.values('terminal__terminal_name', 'terminal').annotate(Count('terminal')).annotate(
-				Sum('solditems__quantity')).annotate(Sum('total_net')).order_by('solditems__quantity__sum').filter(created__contains = date)
+				Sum('solditems__quantity')).annotate(Sum('total_net')).order_by('-solditems__quantity__sum').filter(created__contains = date)
 			sales_by_category_totals = terminals.aggregate(Sum('solditems__quantity__sum'))['solditems__quantity__sum__sum']
 			new_sales = []
 			for sales in terminals:

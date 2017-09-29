@@ -247,7 +247,7 @@ def create_discount(request):
         discount.save()
         for variant in variants:
             discount.variant.add(variant)
-        try:            
+        try:
             for customer in customers:
                 discount.customers.add(customer)
         except:

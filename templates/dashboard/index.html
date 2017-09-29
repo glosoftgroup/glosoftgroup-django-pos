@@ -374,6 +374,7 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/highcharts.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/exporting.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
 <script type="text/javascript">
         $('.p2-pag').bootpag({
             total: parseInt('{{pn}}'),
@@ -423,26 +424,33 @@ Highcharts.chart('itemChartContainer', {
     legend: {
         enabled: false
     },
+    credits: {
+			enabled: false
+    },
+    exporting: {
+        enabled: true
+    },
     plotOptions: {
         series: {
             borderWidth: 0,
             dataLabels: {
                 enabled: true,
-                format: '{point.p:.2f}%',
-                fontColor:'#8cc414'
+                format: '{point.p:.2f}%'
             }
         }
     },
 
     tooltip: {
         headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>KShs. {point.y:.2f}</b><br/>'
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>KShs. {point.yy:.2f}</b><br/>'
     },
 
     series: [{
         name: 'Items',
         colorByPoint: true,
-        data: [{% for d in sales_by_item %}{ name:'{% if d.product_name %}{{d.product_name }}{% else %}None{% endif %}', p:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} ,y:{% if d.total_cost__sum %}{{d.total_cost__sum}}{% else %}0{% endif %}, color:'{{d.color}}', drilldown:'{% if d.product_name %}{{d.product_name }}{% else %}None{% endif %}' }, {% endfor %}]
+        size: 250,
+        innerSize: 120,
+        data: [{% for d in sales_by_item %}{ name:'{% if d.product_name %}{{d.product_name }}{% else %}None{% endif %}', p:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} ,y:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %}, yy:{% if d.total_cost__sum %}{{d.total_cost__sum}}{% else %}0{% endif %}, color:'{{d.color}}', drilldown:'{% if d.product_name %}{{d.product_name }}{% else %}None{% endif %}' }, {% endfor %}]
     }],
     drilldown: {
         series: [{
@@ -532,6 +540,12 @@ Highcharts.chart('categoryChartContainer', {
     legend: {
         enabled: false
     },
+    credits: {
+			enabled: false
+    },
+    exporting: {
+        enabled: true
+    },
     plotOptions: {
         series: {
             borderWidth: 0,
@@ -545,13 +559,15 @@ Highcharts.chart('categoryChartContainer', {
 
     tooltip: {
         headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>KShs. {point.y:.2f}</b><br/>'
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>KShs. {point.yy:.2f}</b><br/>'
     },
 
     series: [{
         name: 'Items',
         colorByPoint: true,
-        data: [{% for d in sales_by_category %}{ name:'{% if d.product_category %}{{d.product_category }}{% else %}None{% endif %}', p:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} ,y:{% if d.total_cost__sum %}{{d.total_cost__sum}}{% else %}0{% endif %}, color:'{{d.color}}', drilldown:'{% if d.product_category %}{{d.product_category }}{% else %}None{% endif %}' }, {% endfor %}]
+        size: 250,
+        innerSize: 120,
+        data: [{% for d in sales_by_category %}{ name:'{% if d.product_category %}{{d.product_category }}{% else %}None{% endif %}', p:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} , y:{% if d.percentage %}{{d.percentage}}{% else %}0{% endif %} ,yy:{% if d.total_cost__sum %}{{d.total_cost__sum}}{% else %}0{% endif %}, color:'{{d.color}}', drilldown:'{% if d.product_category %}{{d.product_category }}{% else %}None{% endif %}' }, {% endfor %}]
     }],
     drilldown: {
         series: [{

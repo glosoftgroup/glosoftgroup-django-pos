@@ -118,9 +118,15 @@
                             '</div>' +
                         '</div>' +
                     '</div>' +
+                    '<div class="inp_row">'+
+                        '<div class="range_inputs">' +
+                            '<button class="applyBtn" disabled="disabled" type="button"></button> ' +
+                            '<button class="cancelBtn" type="button"></button>' +
+                        '</div>' +
+                    '</div'+
                 '</div>' +
 
-                '<div class="ranges">' +
+                '<div class="ranges" style="display:none;">' +
                     '<div class="daterangepicker-inputs">' +
                         '<div class="daterangepicker_input">' +
                             '<span class="start-date-label"></span>' +
@@ -349,7 +355,8 @@
             }
             list += '<li>' + this.locale.customRangeLabel + '</li>';
             list += '</ul>';
-            this.container.find('.ranges').prepend(list);
+//            this.container.find('.ranges').prepend(list);
+            this.container.find('.inp_row').prepend(list);
         }
 
         if (typeof cb === 'function') {
@@ -367,7 +374,8 @@
             this.autoApply = false;
 
         if (this.autoApply && typeof options.ranges !== 'object') {
-            this.container.find('.ranges').hide();
+//            this.container.find('.ranges').hide();
+            this.container.find('.inp_row').hide();
         } else if (this.autoApply) {
             this.container.find('.applyBtn, .cancelBtn').addClass('hide');
         }
@@ -379,7 +387,8 @@
             this.container.find('.calendar.right').hide();
             this.container.find('.daterangepicker_input input, .daterangepicker_input i').hide();
             if (!this.timePicker) {
-                this.container.find('.ranges').hide();
+//                this.container.find('.ranges').hide();
+                this.container.find('.inp_row').hide();
             }
         }
 
@@ -391,7 +400,8 @@
 
         //swap the position of the predefined ranges if opens right
         if (typeof options.ranges !== 'undefined' && this.opens == 'right') {
-            var ranges = this.container.find('.ranges');
+//            var ranges = this.container.find('.ranges');
+            var ranges = this.container.find('.inp_row');
             var html = ranges.clone();
             ranges.remove();
             this.container.find('.calendar.left').parent().parent().append(html);
@@ -432,7 +442,8 @@
             .on('keyup.daterangepicker', '.daterangepicker_input input', $.proxy(this.formInputsChanged, this))
             .on('change.daterangepicker', '.daterangepicker_input input', $.proxy(this.updateFormInputs, this));
 
-        this.container.find('.ranges')
+        //this.container.find('.ranges')
+        this.container.find('.inp_row')
             .on('click.daterangepicker', 'button.applyBtn', $.proxy(this.clickApply, this))
             .on('click.daterangepicker', 'button.cancelBtn', $.proxy(this.clickCancel, this))
             .on('click.daterangepicker', 'li', $.proxy(this.clickRange, this))

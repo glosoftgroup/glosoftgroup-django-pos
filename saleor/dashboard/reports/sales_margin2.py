@@ -68,13 +68,20 @@ def sales_list(request):
 					quantity = product.get_cost_price() * i.quantity
 				except:
 					quantity = 0
-				print quantity
+
+				try:
+					price = product.get_price_per_item().gross
+				except ValueError, e:
+					price = product.get_price_per_item()
+				except:
+					price = 0
+
 				costPrice.append(quantity)
 			totalCostPrice = sum(costPrice)
 			setattr(sale, 'totalCostPrice', quantity)
 			try:
 				grossProfit = sale.total_net - totalCostPrice
-				margin = sale.total_net - quantity
+				margin = round(sale.total_net - quantity - i.total_tax, 2)
 			except:
 				grossProfit = 0
 				margin = 0
