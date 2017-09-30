@@ -319,27 +319,10 @@ def sales_date_chart(request, image=None):
 				sales_diff = 0
 			items = SoldItem.objects.filter(sales__created__icontains=date)
 
-			# that date
-			seven_eight = get_hours_results(date, 7, 8)
-			eight_nine = get_hours_results(date, 8, 9)
-			nine_ten = get_hours_results(date, 9, 10)
-			ten_eleven = get_hours_results(date, 10, 11)
-			eleven_twelve = get_hours_results(date, 11, 12)
-			twelve_thirteen = get_hours_results(date, 12, 13)
-			thirteen_fourteen = get_hours_results(date, 13, 14)
-			fourteen_fifteen = get_hours_results(date, 14, 15)
-			fifteen_sixteen = get_hours_results(date, 15, 16)
-			sixteen_seventeen = get_hours_results(date, 16, 17)
-			seventeen_eighteen = get_hours_results(date, 17, 18)
-			eighteen_nineteen = get_hours_results(date, 18, 19)
-			nineteen_twenty = get_hours_results(date, 19, 20)
-			twenty_twentyone = get_hours_results(date, 20, 21)
-			twentyone_twentytwo = get_hours_results(date, 21, 22)
-
-			default = [seven_eight, eight_nine, nine_ten, ten_eleven,
-			eleven_twelve, twelve_thirteen, thirteen_fourteen, fourteen_fifteen,
-			fifteen_sixteen, sixteen_seventeen, seventeen_eighteen,
-			eighteen_nineteen, nineteen_twenty,twenty_twentyone]
+			default =[]
+			for i in range(7, 22):
+				p = get_hours_results(date, i)
+				default.append(p)
 
 			labels = ["7am","8am", "9am", "10am", "11am", "12pm", "1pm",
 			"2pm","3pm","4pm","5pm","6pm","7pm","8pm","9pm"]

@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-     <li><a href="{% url 'dashboard:sales_date_chart' %}">Sales Date Chart</a></li>
+     <li><a href="{% url 'dashboard:sales_date_chart' %}">Sales Summary</a></li>
  {% endblock %}
 
 {% block menu_report_summary_class %}active{% endblock %}
@@ -442,22 +442,11 @@ $(document).ready(function(){
     //**@ daterange to
     $('.daterange-to').daterangepicker({
             alwaysShowCalendars: true,
-            <!--showCustomRangeLabel: true,-->
             linkedCalendars:false,
             locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
             <!--opens: 'right',-->
             applyClass: 'btn-small bg-slate',
             cancelClass: 'btn-small btn-default'
-            <!--ranges: {-->
-               <!--'Today': [moment(), moment()],-->
-               <!--'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],-->
-               <!--'This week':[moment().startOf('week'), moment()],-->
-               <!--'Last Week': [moment().subtract(13, 'days'), moment().startOf('week').subtract(1, 'days')],-->
-               <!--'This Month': [moment().startOf('month'), moment()],-->
-               <!--'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],-->
-               <!--'This Year': [moment().startOf('year'), moment()],-->
-               <!--'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]-->
-            <!--}-->
     }, function(start, end){
         $('.daterangepicker ').addClass('show-calendar');
     });
@@ -539,7 +528,7 @@ $(document).ready(function(){
 
       var chartEl = document.getElementById("chart1").getContext('2d');
       var chart = new Chart(chartEl, {
-        type: "bar",
+        type: "line",
         data: lineChartData,
         options: {
           title:{
@@ -556,9 +545,9 @@ $(document).ready(function(){
             custom: customTooltips
           },
           elements: {
-            line: {
+            /*line: {
               tension: 0.000001
-            },
+            },*/
             point:{
                 pointStyle:'circle'
             }
@@ -572,8 +561,8 @@ $(document).ready(function(){
                         padding: 20
                     },
                     gridLines: {
-                        drawTicks: false,
-                        display: false
+                        drawTicks: true,
+                        display: true
                     }
 
                 }],

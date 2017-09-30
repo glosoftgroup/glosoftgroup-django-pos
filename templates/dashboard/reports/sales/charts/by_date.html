@@ -131,7 +131,7 @@
                           </td>
                           <td class="right-align">
                             <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
+                              {{ date_gross_sales }}
                             </div>
                           </td>
                           <td class="right-align">
@@ -139,21 +139,32 @@
                           </td>
                           <td>
                             <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
+                              {{ date_gross_sales }}
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>Discounts</td>
-                          <td class="right-align">0.00</td>
+                          <td class="right-align">
+                              <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_discount }}
+                            </div>
+                          </td>
                           <td>0.00</td>
-                          <td>0.00</td>
+                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_discount }}</div></td>
                         </tr>
                         <tr>
                           <td>Tax</td>
-                          <td class="right-align">0.00</td>
+                          <td class="right-align">
+                              <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_tax }}
+                            </div>
+                          </td>
                           <td>0.00</td>
-                          <td>0.00</td>
+                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_tax }}
+                            </div></td>
                         </tr>
                         <tr data-action-go="">
                           <td>
@@ -317,11 +328,6 @@ $(document).ready(function(){
             mode: 'index',
             intersect: false,
             custom: customTooltips
-          },
-          elements: {
-            line: {
-              tension: 0.000001
-            }
           }
         }
       });
