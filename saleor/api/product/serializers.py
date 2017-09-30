@@ -289,18 +289,22 @@ class SalesSerializer(serializers.ModelSerializer):
             total_tax = Decimal(0)
         terminal = validated_data.get('terminal')               
         terminal.amount += Decimal(total_net)  
-        terminal.save() 
+        terminal.save()
+
+        sales = Sales() 
 
         try:
             if validated_data.get('customer'):
                 customer = Customer.objects.get(name=validated_data.get('customer'))
             else:
                 customer = Customer.objects.get(name=validated_data.get('customer_name'))
+            sales.customer = customer
         except:
             name = validated_data.get('customer_name')
             if validated_data.get('mobile'):
                 mobile = validated_data.get('mobile')
                 customer = Customer.objects.create(name=name, mobile=mobile)
+                sales.customer = customer
             else:
                 pass
                 
@@ -311,21 +315,22 @@ class SalesSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Solditems field should not be empty')
         status = validated_data.get('status')
-        # make a sale       
-        sales = Sales.objects.create(user=validated_data.get('user'),
-                                     invoice_number=validated_data.get('invoice_number'),
-                                     total_net=validated_data.get('total_net'),
-                                     sub_total=validated_data.get('sub_total'),
-                                     balance=validated_data.get('balance'),
-                                     terminal=validated_data.get('terminal'),
-                                     amount_paid=validated_data.get('amount_paid'),
-                                     customer=customer,
-                                     status=status,
-                                     payment_data=validated_data.get('payment_data'),
-                                     total_tax=total_tax,
-                                     mobile=validated_data.get('mobile'),
-                                     discount_amount=validated_data.get('discount_amount'),
-                                     customer_name=validated_data.get('customer_name'))
+        # make a sale 
+        sales.user=validated_data.get('user')
+        sales.invoice_number=validated_data.get('invoice_number')      
+        sales.total_net=validated_data.get('total_net')
+        sales.sub_total=validated_data.get('sub_total')
+        sales.balance=validated_data.get('balance')
+        sales.terminal=validated_data.get('terminal')
+        sales.amount_paid=validated_data.get('amount_paid')        
+        sales.status=status
+        sales.payment_data=validated_data.get('payment_data')
+        sales.total_tax=total_tax
+        sales.mobile=validated_data.get('mobile')
+        sales.discount_amount=validated_data.get('discount_amount')
+        sales.customer_name=validated_data.get('customer_name')
+        sales.save()
+        # add payment options
         payment_data = validated_data.get('payment_data')        
         for option in payment_data:
             pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))

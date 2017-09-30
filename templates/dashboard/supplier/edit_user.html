@@ -108,8 +108,7 @@
           <div class="row">
             <div class="col-md-4">
             <label for="exampleInputEmail1">Supplier Logo</label>
-              <div class="form-group">
-                <!-- <label for="exampleInputEmail1">User Image</label> -->
+              <div class="form-group">              
                 <div class="fileinput fileinput-new" data-provides="fileinput">
                   <div class="fileinput-new thumbnail" style="width: 150px; height: auto;">
                     <img data-src="holder.js/100%x100%" alt="..." src="{% if user.image %}{{ user.image.url }}{% else %} {% default_user_image %} {% endif %}">
@@ -137,20 +136,20 @@
 
                            <div class="form-group">
                             <label for="exampleInputPassword1">Website:</label>
-                            <input type="url" class="form-control" name="website" value="{{ user.website }}"  id="website" placeholder="http://www.example.com">
+                            <input type="url" class="form-control" name="website" id="website" value="{{ user.website }}"  id="website" placeholder="http://www.example.com">
                            </div>
                            
                         </div>
                         <div class="col-md-6">
-                           <div class="form-group">
-                              <label for="email">Email address</label>
-                              <input type="email" class="form-control" name="email" value="{{ user.email }}"  id="email" placeholder="Email">
-                           </div>
-                          
-                           <div class="form-group">
+                          <div class="form-group">
                             <label for="mobile">Phone</label>
                             <input type="text" class="form-control" data-mask="(+254)-999-999-999" name="mobile" id="mobile" value="{{ user.mobile }}" placeholder="Mobile">
                            </div>
+                           <div class="form-group">
+                              <label for="email">Email address</label>
+                              <input type="email" class="form-control" name="email" {% if user.email %} value="{{ user.email }}" {% endif %}  id="email" placeholder="Email">
+                           </div>                  
+                           
                         </div>
                       </div>            
                      <div class="row">
@@ -185,7 +184,7 @@
 {% include "dashboard/includes/_modal_template.html"  %}
 {% endblock%}
 {% block custom_js %}
-<!-- <script type="text/javascript" src="{% static 'backend/js/backend.js' %}"></script> -->
+
 <script type="text/javascript">
 /* disable th permissions tab code */
 $('#next-tab').click(function(){
@@ -194,97 +193,14 @@ $('#next-tab').click(function(){
 function disable_profile_tab(){
   $('#rofile-tab').addClass('disabled').find('a').removeAttr('data-toggle').attr('href','javascript:;');
 }
-/* code to move to next tab */
-function next_tab(){
-  $('#profile').removeClass('active');
-  $('#profile-tab').removeClass('active');
-  $('#permissions').addClass('active');
-  $('#permissions-tab').addClass('active');
-}
-/* if not login permission */
-$("#can-login").click(function () {
-  var checked = $(this).is(':checked');
-  if(checked){
-      $('.check').each(function(){
-          $(this).prop("checked", true);          
-          $(this).parent().parent().removeClass('disabled');
-          $(this).parent().parent().parent().parent().removeClass('disabled');
-          $(this).parent().addClass('checked');
-          $(this).removeAttr('disabled');
-      });
-  }else{
-      $('.check').each(function(){
-          $(this).prop("checked", false);
-          $(this).parent().parent().parent().siblings('span').hide();
-          $(this).parent().parent().addClass('disabled');
-          $(this).parent().parent().parent().parent().addClass('disabled');
-          $(this).parent().removeClass('checked');
-          $(this).attr('disabled', 'disabled');
-      });
-  }
-});
-/* end login */
-/* check all */
-$("#checkAll").click(function () {
-  var checked = $(this).is(':checked');
-  if(checked){
-      $('.check').each(function(){
-          $(this).prop("checked", true);
-          $(this).parent().parent().parent().siblings('span').show();
-          $(this).parent().parent().parent().siblings('span').text('(granted)');
-          $(this).parent().addClass('checked');
-      });
-  }else{
-      $('.check').each(function(){
-          $(this).prop("checked", false);
-          $(this).parent().parent().parent().siblings('span').hide();
-          $(this).parent().removeClass('checked');
-      });
-  }
-});
-/* endcheck all */
-/* on each check */
-$( ".check" ).on( "click", function(){
-  var checked = $(this).is(':checked');
-  if(checked){
-    $(this).prop("checked", true);
-    $(this).parent().parent().parent().siblings('span').show();
-    $(this).parent().parent().parent().siblings('span').text('(granted)');      
-  }else{
-    $(this).prop("checked", false);
-    $(this).parent('span').removeClass('checked');
-    $(this).parent().parent().parent().siblings('span').hide();
-  }
-} );
-/* end each check*/
-/* update user details */
+
+/* update supplier details */
   $('#update-details').validate({
     rules:{
         name: {
           required:true,
           minlength:3
-        },
-        email:{
-          required: true,
-          email:true
-        },
-        password:{
-          required:true,
-          minlength: 6
-        },
-        confirm_password:{
-          required:true,
-          minlength:6,
-          equalTo: "#password"
-        },
-        nid:{
-          required:true,
-          digits: true,
-          minlength: 6
-        },
-        description:{
-            required:true
-        },
+        },                      
         mobile:{
           required:true,
           //digits: true,
@@ -297,18 +213,7 @@ $( ".check" ).on( "click", function(){
         required: "please provide a name",
         minlength: "name must be atleast 3 characters long"
       },
-      password:{
-        required: "please provide a password",
-        minlength: "password must be atleast 6 characters long"
-      },
-      description:{
-        required:"Please enter the description to describe the supplier"
-      },
-      confirm_password:{
-        required: "please provide a password",
-        minlength: "password must be atleast 6 characters long",
-        equalTo: "please enter the same password"
-      }
+      
     },
     submitHandler: function() { 
         var file = $('#image')[0].files[0];
@@ -334,8 +239,7 @@ $( ".check" ).on( "click", function(){
                             window.location = "{% url 'dashboard:supplier' %}";
                         }
                      }, 100);
-                     //});
-                     //window.location = "{% url 'dashboard:supplier' %}";
+                     
                   },
                   error:function(error){
                     $.jGrowl('Change a few things up and try submitting again', {
@@ -348,42 +252,7 @@ $( ".check" ).on( "click", function(){
     }
   });
 
-/* permission button */
-$("#permission-btn").click(function(event){
-    event.preventDefault();
-    var checkBoxesStringArray = $(".check:checked").map(function(){
-      return $(this).val();
-    }).get();
-    var checkBoxesStringNumber = checkBoxesStringArray.map(Number);
-    /* check can login status */
-    if($("#can-login").is(':checked')){
-      $("#can-login").val('active')
-    }else{
-      $("#can-login").val('inactive');
-    }
-    var can_login_value = $("#can-login").val();
-     console.log(checkBoxesStringNumber+' and '+ can_login_value);
-    $.ajax({
-      url: "{% url 'dashboard:user_assign_permission' %}",
-      type: 'POST',
-      data: {
-             'checklist[]': checkBoxesStringArray,
-             'user_id': '{{user.id}}',
-             'check_login':can_login_value,
-             'csrfmiddlewaretoken':"{% csrf_token %}"
-      },
-      success: function(data){
-         $.jGrowl('permissions updated successfully', {
-              header: 'Well done!',
-              theme: 'bg-success'
-         });
-         window.location = "{% url 'dashboard:users' %}";
-         localStorage.removeItem('user_id');
-      }
-      ,error:function(){}
-     });
 
-});
 </script>
 <script type="text/javascript">
     // update modal content from ajax results
@@ -416,6 +285,19 @@ $("#permission-btn").click(function(event){
       $("#contact-list" ).empty().append( data );
     });
   }
+
+  var web = $("#website");
+  web.on('focusin',function(){
+    if(!web.val()){
+      web.val('http://');
+    }
+  });
+  // remove mask if no input added
+  web.on('focusout',function(){
+    if(web.val()=='http://'){
+      web.val('');
+    }
+  });
 
 </script>
 

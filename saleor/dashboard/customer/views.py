@@ -74,7 +74,7 @@ def user_process(request):
 		if request.POST.get('email'):
 			new_user.email = request.POST.get('email')
 		if request.POST.get('mobile'):
-			new_user.mobile = request.POST.get('mobile')		
+			new_user.mobile = request.POST.get('mobile').replace(' ','').replace('(','').replace(')','').replace('-','') 		
 		if request.POST.get('creditable'):
 			new_user.creditable = True
 		try:
