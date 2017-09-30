@@ -32,12 +32,14 @@ debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
-def get_hours_results(date, l, h):
+def get_hours_results(date, h):
 	try:
 		sales_at_date = Sales.objects.filter(created__contains=date)
-		sales_at_h = sales_at_date.filter(created__hour__range=[l,h])
+		# sales_at_h = sales_at_date.filter(created__hour__range=[l,h])
+		sales_at_h = sales_at_date.extra(where=['extract(hour from created) in ('+ str(h) +')'])
 		try:
-			amount = Sales.objects.filter(pk__in=sales_at_h).aggregate(Sum('total_net'))['total_net__sum']
+			# amount = Sales.objects.filter(pk__in=sales_at_h).aggregate(Sum('total_net'))['total_net__sum']
+			amount = sales_at_h.aggregate(Sum('total_net'))['total_net__sum']
 			if amount is not None:
 				return amount
 			else:
