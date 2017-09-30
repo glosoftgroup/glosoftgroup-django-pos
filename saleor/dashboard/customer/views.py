@@ -66,37 +66,24 @@ def user_add(request):
 		return HttpResponse('error accessing add users page')
 
 @staff_member_required
-def user_process(request):
-	user = User.objects.all()
+def user_process(request):	
 	if request.method == 'POST':
-		name = request.POST.get('name')
-		email = request.POST.get('email')
-		# password = request.POST.get('password')
-		# encr_password = make_password(password)
-
-		mobile = request.POST.get('mobile').replace(' ','').replace('(','').replace(')','').replace('-','')
-		image= request.FILES.get('image')
-		groups = request.POST.getlist('groups[]')
-		new_user = Customer.objects.create(
-			name = name,
-			email = email,			
-
-			mobile = mobile,
-			image = image
-		)
+		new_user = Customer()
+		if request.POST.get('name'):
+			new_user.name = request.POST.get('name')
+		if request.POST.get('email'):
+			new_user.email = request.POST.get('email')
+		if request.POST.get('mobile'):
+			new_user.mobile = request.POST.get('mobile')		
+		if request.POST.get('creditable'):
+			new_user.creditable = True
 		try:
 			new_user.save()
 		except:
 			error_logger.info('Error when saving ')
-		last_id = Customer.objects.latest('id')
-		if groups:
-			permissions = Permission.objects.filter(group__name__in=groups)
-			last_id.user_permissions.add(*permissions)
-			gps = Group.objects.filter(name__in=groups)
-			last_id.groups.add(*gps)
-			last_id.save()
-		user_trail(request.user.name, 'created customer: '+str(name),'add')
-		info_logger.info('User: '+str(request.user.name)+' created customer:'+str(name))
+		last_id = Customer.objects.latest('id')		
+		user_trail(request.user.name, 'created customer: '+str(new_user.name),'add')
+		info_logger.info('User: '+str(request.user.name)+' created customer:'+str(new_user.name))
 		return HttpResponse(last_id.id)
 
 def user_detail(request, pk):
@@ -170,31 +157,23 @@ def user_edit(request, pk):
 def user_update(request, pk):
 	user = get_object_or_404(Customer, pk=pk)
 	if request.method == 'POST':
-		name = request.POST.get('name')
-		email = request.POST.get('email')		
-		nid = request.POST.get('nid')
-		mobile = request.POST.get('mobile').replace(' ','').replace('(','').replace(')','').replace('-','')
-		image= request.FILES.get('image')		
-		if image :
-			user.name = name
-			user.email = email			
-			user.nid = nid
-			user.mobile = mobile
-			user.image = image
-			user.save()
-			user_trail(request.user.name, 'updated customer: '+ str(user.name))
-			info_logger.info('User: '+str(request.user.name)+' updated customer: '+str(user.name))
-			return HttpResponse("success with image")
+		name = request.POST.get('name')		
+		email = request.POST.get('email')
+		if request.POST.get('creditable'):
+			user.creditable = True
 		else:
-			user.name = name
-			user.email = email			
-			user.nid = nid
-			user.mobile = mobile
-			user.save()
-			user_trail(request.user.name, 'updated customer: '+ str(user.name))
-			info_logger.info('User: '+str(request.user.name)+' updated customer: '+str(user.name))
-			return HttpResponse("success without image")
-
+			user.creditable = False
+		nid = request.POST.get('nid')
+		mobile = request.POST.get('mobile').replace(' ','').replace('(','').replace(')','').replace('-','')		
+		user.name = name
+		user.email = email			
+		user.nid = nid
+		user.mobile = mobile		
+		user.save()
+		user_trail(request.user.name, 'updated customer: '+ str(user.name))
+		info_logger.info('User: '+str(request.user.name)+' updated customer: '+str(user.name))
+		return HttpResponse("success")
+		
 @staff_member_required
 def customer_pagination(request):
 	page = int(request.GET.get('page', 1))

@@ -31,8 +31,8 @@ error_logger = logging.getLogger('error_logger')
 # @find_and_assign_anonymous_cart()
 @csrf_protect
 def login(request):
-	username = request.POST['email']
-	password = request.POST['password']
+	username = request.POST.get('email')
+	password = request.POST.get('password')
 
 	user = authenticate(username=username, password=password)
 	if user is not None:
