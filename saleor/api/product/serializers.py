@@ -222,8 +222,7 @@ class SalesSerializer(serializers.ModelSerializer):
                  'customer',
                  'mobile',
                  'customer_name',
-                 'status',
-                 'payment_options',
+                 'status',                
                  'payment_data',
                  'total_tax',
                  'discount_amount'
@@ -306,48 +305,11 @@ class SalesSerializer(serializers.ModelSerializer):
                 pass
                 
         invoice_number = validated_data.get('invoice_number')
-        # calculate loyalty_points
-        payment_data = validated_data.get('payment_data')
         
-        for option in payment_data:
-            print option['value']
-            print option['payment_id']
-            pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
-            print pay_opt
-            points_eq = pay_opt.loyalty_point_equiv
-            if points_eq == 0:
-                loyalty_points = 0
-            else:
-                loyalty_points = int(option['value'])/points_eq
-            try:
-                Customer.objects.gain_points(customer,loyalty_points)
-            except:
-                print 'customer details provided dont meet adding customer criteria'
-
-
-        # try:
-        #     total_net = validated_data.get('total_net')
-        #     points_eq = SiteSettings.objects.get(pk=1)      
-        #     points_eq = points_eq.loyalty_point_equiv #settings.LOYALTY_POINT_EQUIVALENCE
-        #     if points_eq == 0:
-        #         loyalty_points = 0
-        #     else:
-        #         loyalty_points = total_net/points_eq
-        #     customer.loyalty_points += loyalty_points
-        #     customer.save()
-        # except:
-        #     customer = None
-        #     print 'customer details provided dont meet adding customer criteria'
-
-        # get sold products 
         try:       
             solditems_data = validated_data.pop('solditems')
         except:
             raise ValidationError('Solditems field should not be empty')
-        try:
-            payment_options_data = validated_data.pop('payment_options')        
-        except:
-            raise ValidationError('Payment options field required')
         status = validated_data.get('status')
         # make a sale       
         sales = Sales.objects.create(user=validated_data.get('user'),
@@ -364,9 +326,20 @@ class SalesSerializer(serializers.ModelSerializer):
                                      mobile=validated_data.get('mobile'),
                                      discount_amount=validated_data.get('discount_amount'),
                                      customer_name=validated_data.get('customer_name'))
-        for payment_option_data in payment_options_data:
-            print payment_option_data.loyalty_point_equiv         
-            sales.payment_options.add(payment_option_data)
+        payment_data = validated_data.get('payment_data')        
+        for option in payment_data:
+            pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
+            sales.payment_options.add(pay_opt)
+            points_eq = pay_opt.loyalty_point_equiv
+            if points_eq == 0:
+                loyalty_points = 0
+            else:
+                loyalty_points = int(option['value'])/points_eq
+            try:
+                Customer.objects.gain_points(customer,loyalty_points)
+            except:
+                print 'customer details provided dont meet adding customer criteria'
+
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
             try:
@@ -434,15 +407,14 @@ class ProductStockListSerializer(serializers.ModelSerializer):
         today = date.today()
         price = obj.get_price_per_item().gross      
         discounts = Sale.objects.filter(start_date__lte=today).filter(end_date__gte=today)
-        discount = 0
+        discount  = 0
         discount_list = get_variant_discounts(obj, discounts)
         for discount in discount_list:
             try:
                 discount = discount.factor
                 discount = (Decimal(discount)*Decimal(price))
             except:
-                discount = discount.amount.gross
-                #discount = Decimal(discount)/Decimal(price)*Decimal(100)
+                discount = discount.amount.gross      
 
         return discount
 

@@ -34,6 +34,13 @@ urlpatterns = [
         url(r'^report/paginate/$', views.report_pagination, name='customer-report-paginate'),
         url(r'^report/search/$', views.report_search, name='customer-report-search'),
 
+        # credit urls        
+        url(r'^credit-list/$', permission_required('customer.view_customer', login_url='not_found')
+            (views.credit_report), name='customer_credit_list'),        
+        url(r'^credit/paginate/$', views.credit_pagination, name='customer-credit-paginate'),
+        url(r'^credit/search/$', views.credit_search, name='customer-credit-search'),
+
+
         
 ]
 

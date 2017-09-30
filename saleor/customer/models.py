@@ -120,7 +120,7 @@ class CustomerManager(BaseUserManager):
     
 
 class Customer(models.Model):
-    email = models.EmailField(pgettext_lazy('Customer field', 'email'), unique=True, null=True, blank=True)
+    email = models.EmailField(pgettext_lazy('Customer field', 'email'), null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     addresses = models.ManyToManyField(
         AddressBook, blank=True,
