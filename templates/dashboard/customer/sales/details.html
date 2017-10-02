@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col-md-12" style="margin-bottom:10px;">
         <a class="btn btn-primary pull-left" href="{% url 'dashboard:sales_list' %}"><i class="icon-arrow-left13 position-left"></i> Back To Sales List</a>
-        <a class="btn btn-primary pull-right" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
+        <a class="btn btn-primary pull-right printPdf" data-url="{% url 'dashboard:cust-pdf-sale-detail' pk=sale.pk%}" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
         </div>
     </div>
 </div>
@@ -102,4 +102,12 @@
 
 {% endblock%}
 {% block custom_js %}
+<script>
+    $('.printPdf').on('click', function(){
+       var url = $(this).data('url');
+        $.get(url, function(data){
+             window.open("data:application/pdf," + escape(data));
+        });
+    });
+</script>
 {% endblock %}
