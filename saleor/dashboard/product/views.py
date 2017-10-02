@@ -518,12 +518,17 @@ def fetch_variants32(request):
 def product_data(request):
     if request.method == 'POST':
         pk = request.POST.get('pk')
-        # try:
-        product = Product.objects.get(pk=pk)
+        try:
+            product = Product.objects.get(pk=pk)
+        except Exception as e:
+            return HttpResponse(e)
         if request.POST.get('tax'):
             try:
-                tax = ProductTax.objects.get(pk=int(request.POST.get('tax')))
-                product.product_tax = tax
+                if int(request.POST.get('tax')) == 0:
+                    product.product_tax = None
+                else:
+                    tax = ProductTax.objects.get(pk=int(request.POST.get('tax')))
+                    product.product_tax = tax
             except:
                 print('Error getting tax')
         if request.POST.get('supplier'):
@@ -533,14 +538,16 @@ def product_data(request):
             except:
                 print('Error add supplier')
         if request.POST.get('sku'):
-            #try:
-            variant = ProductVariant.objects.get(product=product)
-            variant.name = request.POST.get('sku')
-            if request.POST.get('threshold'):
-                 variant.low_stock_threshold = request.POST.get('threshold')
-            variant.save();
-            #except:
-            #   print('Error adding sku')
+            try:
+                variant = ProductVariant.objects.get(product=product)
+                variant.name = request.POST.get('sku')
+                if request.POST.get('threshold'):
+                     variant.low_stock_threshold = request.POST.get('threshold')
+                variant.save();
+            except Exception as e:
+                print(e)
+        if request.POST.get('name'):
+            product.name = request.POST.get('name')
         if request.POST.get('wholesale_price'):
             product.wholesale_price = request.POST.get('wholesale_price')
         if request.POST.get('price'):
@@ -548,9 +555,12 @@ def product_data(request):
         if request.POST.get('threshold'):
             product.low_stock_threshold = int(request.POST.get('threshold'))
         product.save()
+        print product.name
+        if request.POST.get('categories'):
+            category = request.POST.get('categories')
+            product.categories.clear()
+            product.categories.add(category)
         return HttpResponse({'message':str(product)+' Added'})
-        #except:
-        #return HttpResponse('Invalid product id')
     return HttpResponse('Invalid Method!')
 
 @staff_member_required
@@ -670,11 +680,12 @@ def product_edit(request, pk,name=None):
             'Dashboard message', 'Updated product %s') % product
         messages.success(request, msg)
         return redirect('dashboard:product-update', pk=product.pk,go='pricing')
-    ctx = {'stock_form':stock_form,'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
+    ctx = {'stock_form': stock_form, 'pc':pc,'attributes': attributes, 'images': images, 'product_form': form,
            'product': product, 'stock_delete_form': stock_delete_form,
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
            'variant_form': variant_form}
+    print form.errors
     if name:
         ctx['go'] = 'True'
     if request.is_ajax():
@@ -1888,8 +1899,8 @@ def have_variants(request):
             else:
                 data = {'has_variants':0,'name':has_variants.name}
             return HttpResponse(json.dumps(data),content_type='application/json')
-        except:
-            HttpResponse('Invalid class ID')
+        except Exception as e:
+            return HttpResponse(e)
 
 @staff_member_required
 def add_new_attribute(request,pk=None):
