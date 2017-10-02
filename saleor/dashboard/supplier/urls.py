@@ -35,8 +35,6 @@ urlpatterns = [
             (views.user_edit), name='supplier-edit'),
         url(r'^supplier_update(?P<pk>[0-9]+)/$', views.user_update, name='supplier-update'),
         url(r'^user_assign_permission/$', views.user_assign_permission, name='user_assign_permission'),
-        # url(r'^add/', permission_required('userprofile.add_user', login_url='account_login')(views.user_add)),
-
         
 ]
 

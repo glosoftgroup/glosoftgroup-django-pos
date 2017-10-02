@@ -11,7 +11,6 @@ urlpatterns = [
                 (views.users), name='users'),
         url(r'^add/$', permission_required('userprofile.add_user', login_url='not_found')
                 (views.user_add), name='user-add'),
-        # url(r'^users_pdf/$', views.users_pdf, name='users_pdf'),
         url(r'^users_export_csv/$', views.users_export_csv, name='users_export_csv'),
         url(r'^user_process/$',  permission_required('userprofile.add_user')
         (views.user_process), name='user_process'),

@@ -1,24 +1,12 @@
 from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
 from django.db.models import Q
 from django.db import IntegrityError
-from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
-from django.template import RequestContext, Context
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
-import os
-import base64
-
-from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...decorators import permission_decorator, user_trail
@@ -298,12 +286,6 @@ def user_delete(request, pk):
     user = get_object_or_404(User, pk=pk)
     if request.method == 'POST':
         user.delete()
-        # if user.image != '':
-        #     image_path = os.path.join(settings.MEDIA_ROOT, str(user.image))
-        #     try:
-        #         os.unlink(image_path)
-        #     except:
-        #         pass
         user_trail(request.user.name, 'deleted user: '+ str(user.name),'delete')
         return HttpResponse('success')
 

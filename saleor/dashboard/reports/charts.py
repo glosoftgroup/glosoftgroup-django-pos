@@ -1,44 +1,25 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect, render_to_response
-from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Q, Count, Min, Sum, Avg, Max
-from django.core import serializers
-from django.template.defaultfilters import date
-from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-import datetime
-from datetime import date, timedelta
-from django.utils.dateformat import DateFormat
 import logging
 import random
-import csv
-from django.utils.encoding import smart_str
 from decimal import Decimal
 from calendar import monthrange
 import calendar
-from django_xhtml2pdf.utils import generate_pdf
-
 import re
-import base64
+from django.template.response import TemplateResponse
+from django.http import HttpResponse, JsonResponse
+from django.db.models import Q, Count, Min, Sum, Avg, Max
+from django.core import serializers
+from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from  datetime import *
+from django.utils.dateformat import DateFormat
 
-from ...core.utils import get_paginator_items
 from ..views import staff_member_required
-from ...userprofile.models import User
+from ...credit.models import Credit
 from ...sale.models import Sales, SoldItem, Terminal
-from ...product.models import Product, ProductVariant, Category
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf
+from ...product.models import Category
+from ...decorators import permission_decorator
+from ...utils import render_to_pdf
 
 from .hours_chart import get_item_results, get_terminal_results, get_user_results, get_hours_results, get_hours_results_range, get_date_results_range, get_date_results, get_category_results
 
@@ -247,7 +228,6 @@ def get_category_sale_details(request):
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_category.html', data)
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/sales/charts/by_category.html',{})
-			# return HttpResponse(e)
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
@@ -268,14 +248,26 @@ def sales_date_chart(request, image=None):
 		ImageData = dataUrlPattern.match(ImageData).group(2)
 
 		date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
+		date_total_discount = Sales.objects.filter(created__contains=date).aggregate(Sum('discount_amount'))[
+			'discount_amount__sum']
+		date_total_tax = Sales.objects.filter(created__contains=date).aggregate(Sum('total_tax'))[
+			'total_tax__sum']
+		try:
+			date_gross_sales = date_total_discount + date_total_tax + date_total_sales
+		except:
+			date_gross_sales = 0
 		users = Sales.objects.values('user__email', 'user__name', 'terminal__terminal_name').annotate(Count('user')).annotate(
 			Sum('total_net')).order_by().filter(created__contains=date)
+
 		data = {
 			'today': last_sale.created,
 			'users': users,
 			'puller': request.user,
 			'image': ImageData,
 			"date_total_sales": date_total_sales,
+			"date_gross_sales": date_gross_sales,
+			"date_total_tax": date_total_tax,
+			"date_total_discount": date_total_discount,
 		}
 		pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
 		return HttpResponse(pdf, content_type='application/pdf')
@@ -331,7 +323,10 @@ def sales_date_chart(request, image=None):
 			sales_that_day = Sales.objects.filter(created__contains=date)
 			users_that_day = sales_that_day.values('user','user__email','total_net', 'created').annotate(c=Count('user__id', distinct=True))
 			users = Sales.objects.values('user__email','user__name','terminal').annotate(Count('user')).annotate(Sum('total_net')).order_by().filter(created__contains=date)
-			date_gross_sales = date_total_discount + date_total_tax + date_total_sales
+			try:
+				date_gross_sales = date_total_discount + date_total_tax + date_total_sales
+			except:
+				date_gross_sales = 0
 			data = {
 				"no_of_customers":no_of_customers,
 				"date_total_sales":date_total_sales,
@@ -383,122 +378,26 @@ def get_sales_charts(request):
 def get_sales_by_week(request):
 	date_from = request.GET.get('from')
 	d_to = request.GET.get('to')
-	date = d_to
 
+	date = d_to
 	d = d_to.split('-')[-1]
 	day_one = int(d)+1
-
 	m = d_to.split('-')[-2]
 	y = d_to.split('-')[-3]
 
 	lastday_of_month = monthrange(int(y),int(m))[1]
-	'''
-		** - subtract number of days
-	'''
-	firstday_of_thisweek = datetime.datetime.strptime(date_from, '%Y-%m-%d')
-	lastday_of_lastweek = firstday_of_thisweek - timedelta(days=(firstday_of_thisweek.weekday())+1)
-	firstday_of_lastweek = lastday_of_lastweek - timedelta(days=7)
-	# day differeces
-	first_range_date = datetime.datetime.strptime(date_from, '%Y-%m-%d')
-	second_range_date = datetime.datetime.strptime(d_to, '%Y-%m-%d')
-	onedd = first_range_date + timedelta(days=1)
-	'''
-		s = Sales.objects.filter(created__year='2017', created__month='06', created__month__lte='08')
-	'''
-	date_range_diff = (second_range_date - first_range_date).days
+	# date convert
+	first_range_date = datetime.strptime(date_from, '%Y-%m-%d')
+	second_range_date = datetime.strptime(d_to, '%Y-%m-%d')
+
 	default3 = []
 	labels3 = []
-	if date_range_diff <= 8:
-		for i in reversed(range(1, (date_range_diff)+1, 1)):
-			p = (second_range_date) - timedelta(days=i)
-			amount = get_date_results(DateFormat(p).format('Y-m-d'))
-			day = str(p.strftime("%A")[0:3])+ ' ('+str(DateFormat(p).format('jS F'))+')'
-			labels3.append(day)
-			default3.append(amount)
-
-	elif date_range_diff >= 9 and date_range_diff <= 20:
-		for i in reversed(range(1, (date_range_diff)+1, 2)):
-			p = (second_range_date) - timedelta(days=i)
-			amount = get_date_results(DateFormat(p).format('Y-m-d'))
-			day = str(p.strftime("%A")[0:3])+ ' (*'+str(DateFormat(p).format('jS'))+')'
-			labels3.append(day)
-			default3.append(amount)
-
-	elif date_range_diff > 20 and date_range_diff <= 30:
-		c = [first_range_date+timedelta(days=i) for i in range(0,(date_range_diff+1),4)]
-		r = (second_range_date-c[-1]).days
-		if r == 0:
-			for i in range(0, (date_range_diff) + 1, 4):
-				p = first_range_date + timedelta(days=i)
-				p_next = p + timedelta(days=4)
-				amount = get_date_results_range(DateFormat(p).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
-				r = str((DateFormat(p).format('d/m'))) + ' -0 ' + str(DateFormat(p_next).format('d/m'))
-				labels3.append(r)
-				default3.append(amount)
-		else:
-			last = c[-1]
-			c.remove(last)
-			for i in c:
-				p_next = i + timedelta(days=3)
-				amount = get_date_results_range(DateFormat(i).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
-				r = str((DateFormat(i).format('d/m'))) + ' -! ' + str(DateFormat(p_next).format('d/m'))
-				labels3.append(r)
-				default3.append(amount)
-
-			if last == second_range_date:
-				r = str((DateFormat(last).format('d/m'))) + ' -!! ' + str(DateFormat(second_range_date).format('d/m'))
-				amount_that_date = get_date_results(DateFormat(last).format('Y-m-d'))
-				default3.append(amount_that_date)
-				labels3.append(r)
-			else:
-				r = str((DateFormat(last).format('d/m'))) + ' -!!! ' + str(DateFormat(second_range_date).format('d/m'))
-				amount_that_date = get_date_results_range(DateFormat(last).format('Y-m-d'), DateFormat(second_range_date).format('Y-m-d'))
-				default3.append(amount_that_date)
-				labels3.append(r)
-
-	elif date_range_diff > 30 and date_range_diff <= 60:
-		c = [first_range_date+timedelta(days=i) for i in range(0,(date_range_diff+1),8)]
-		r = (second_range_date-c[-1]).days
-		if r == 0:
-			for i in range(0, (date_range_diff) + 1, 8):
-				p = first_range_date + timedelta(days=i)
-				p_next = p + timedelta(days=8)
-				amount = get_date_results_range(DateFormat(p).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
-				r = str((DateFormat(p).format('d/m'))) + ' -* ' + str(DateFormat(p_next).format('d/m'))
-				labels3.append(r)
-				default3.append(amount)
-		else:
-			last = c[-1]
-			c.remove(last)
-			for i in c:
-				p_next = i + timedelta(days=30)
-				amount = get_date_results_range(DateFormat(i).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
-				r = str((DateFormat(i).format('d/m'))) + ' -* ' + str(DateFormat(p_next).format('d/m'))
-				labels3.append(r)
-				default3.append(amount)
-
-			if last == second_range_date:
-				r = str((DateFormat(last).format('d/m'))) + ' -** ' + str(DateFormat(second_range_date).format('d/m'))
-				amount_that_date = get_date_results(DateFormat(last).format('Y-m-d'))
-				default3.append(amount_that_date)
-				labels3.append(r)
-			else:
-				r = str((DateFormat(last).format('d/m'))) + ' -*** ' + str(DateFormat(second_range_date).format('d/m'))
-				amount_that_date = get_date_results_range(DateFormat(last).format('Y-m-d'), DateFormat(second_range_date).format('Y-m-d'))
-				default3.append(amount_that_date)
-				labels3.append(r)
-
-	elif date_range_diff > 60 and date_range_diff <= 350:
-		for i in range(0, (date_range_diff)+1, 30):
-			p = (first_range_date) + timedelta(days=i)
-			p_next = p+timedelta(days=30)
-			amount = get_date_results_range(DateFormat(p).format('Y-m-d'), DateFormat(p_next).format('Y-m-d'))
-			r = str((DateFormat(p).format('d'))) +'.'+str(p.strftime("%b")[0:3])
-			labels3.append(r)
-			default3.append(amount)
-
-	elif 360 < date_range_diff <= 365:
-		date_range_diff
+	drf = (second_range_date - first_range_date) / 7
+	for i in range(7):
+		amount = get_date_results_range(DateFormat(i * drf + first_range_date).format('Y-m-d'), DateFormat((i+1)*drf+first_range_date).format('Y-m-d'))
+		r = str((DateFormat(i * drf + first_range_date).format('d/m'))) + ' - ' + str(DateFormat((i+1)*drf+first_range_date).format('d/m'))
+		labels3.append(r)
+		default3.append(amount)
 
 	if len(str(int(d))) == 1:
 		if len(str(int(d)+1)) == 1:
@@ -514,54 +413,35 @@ def get_sales_by_week(request):
 	try:
 
 
-		no_of_customers = Sales.objects.filter(created__range=[date_from, date_to]).count()
-
-		items = SoldItem.objects.filter(sales__created__range=[date_from, date_to])
-
-		# that date
-		seven_eight = get_hours_results_range(date_from, date_to, 7, 8)
-		eight_nine = get_hours_results_range(date_from, date_to, 8, 9)
-		nine_ten = get_hours_results_range(date_from, date_to, 9, 10)
-		ten_eleven = get_hours_results_range(date_from, date_to, 10, 11)
-		eleven_twelve = get_hours_results_range(date_from, date_to, 11, 12)
-		twelve_thirteen = get_hours_results_range(date_from, date_to, 12, 13)
-		thriteen_fourteen = get_hours_results_range(date_from, date_to, 13, 14)
-		fourteen_fifteen = get_hours_results_range(date_from, date_to, 14, 15)
-		fifteen_sixteen = get_hours_results_range(date_from, date_to, 15, 16)
-		sixteen_seventeen = get_hours_results_range(date_from, date_to, 16, 17)
-		seventeen_eighteen = get_hours_results_range(date_from, date_to, 17, 18)
-		eighteen_nineteen = get_hours_results_range(date_from, date_to, 18, 19)
-		nineteen_twenty = get_hours_results_range(date_from, date_to, 19, 20)
-		twenty_twentyone = get_hours_results_range(date_from, date_to, 20, 21)
-		twentyone_twentytwo = get_hours_results_range(date_from, date_to, 21, 22)
-
-		labels = ["7am","8am", "9am", "10am", "11am", "12am", "1pm",
-		"2pm","3pm","4pm","5pm","6pm","7pm","8pm","9pm"]
-
-		default = [seven_eight, eight_nine, nine_ten, ten_eleven, 
-		eleven_twelve, twelve_thirteen, thriteen_fourteen, fourteen_fifteen, 
-		fifteen_sixteen, sixteen_seventeen, seventeen_eighteen, 
-		eighteen_nineteen, nineteen_twenty,twenty_twentyone]
-
-		labels2 = ["7am","8am", "9am", "10am", "11am", "12pm", "1pm",
-		"2pm","3pm","4pm","5pm","6pm","7pm","8pm","9pm"]
+		sales_customers = Sales.objects.filter(created__range=[date_from, date_to]).count()
+		credit_customers = Credit.objects.filter(created__range=[date_from, date_to]).count()
+		no_of_customers = sales_customers + credit_customers
 
 		#get users in each teller and their total sales
 		sales_that_day = Sales.objects.filter(created__range=[date_from, date_to]).aggregate(Sum('total_net'))['total_net__sum']
 		users_that_day = Sales.objects.filter(created__range=[date_from, date_to]).values('user','user__email','total_net', 'created').annotate(c=Count('user__id', distinct=True))
 		users = Sales.objects.values('user__email','user__name','terminal').annotate(Count('user')).annotate(Sum('total_net')).order_by().filter(created__range=[date_from, date_to])
+		date_total_discount = Sales.objects.filter(created__range=[date_from, date_to]).aggregate(Sum('discount_amount'))[
+			'discount_amount__sum']
+		date_total_tax = Sales.objects.filter(created__range=[date_from, date_to]).aggregate(Sum('total_tax'))[
+			'total_tax__sum']
+		try:
+			date_gross_sales = date_total_discount + date_total_tax + sales_that_day
+		except:
+			date_gross_sales = 0
 
 		data = {
 			"no_of_customers":no_of_customers,
 			"date_total_sales":sales_that_day,
 			"date_from":date_from,
 			"date_to":date_to,
-			"default":default,
-			"labels2":labels2,
 			"labels3":labels3,
 			"default3":default3,
 			"cashiers":users_that_day,
-			"users":users
+			"users":users,
+			"date_gross_sales": date_gross_sales,
+			"date_total_tax": date_total_tax,
+			"date_total_discount": date_total_discount,
 		}
 		return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date_range.html',data)
 	except ObjectDoesNotExist as e:
@@ -755,7 +635,6 @@ def get_user_sale_details(request):
 				lm_percent = 0
 				lm_others = 0
 			last_sales = Sales.objects.filter(user__name__contains=get_categ).values('user__name', 'total_net','created').annotate(Sum('total_net', distinct=True)).order_by().latest('id')
-			print get_categ
 
 			data = {
 				"category":get_categ,
@@ -959,7 +838,6 @@ def get_terminal_sale_details(request):
 				lm_percent = 0
 				lm_others = 0
 			last_sales = Sales.objects.filter(terminal__terminal_name__contains=get_categ).values('terminal__terminal_name', 'total_net','created').annotate(Sum('total_net', distinct=True)).order_by().latest('id')
-			print get_categ
 
 			data = {
 				"category":get_categ,
