@@ -160,13 +160,32 @@
                 <div class="input-group">
                              
                       <div class=" input-group-btn" id='category_field' >
-                        {{ product_form.categories }}
+                        <!--{{ product_form.categories }}-->
+
+                          <select style="display:none" class="form-control" id="id_categories" name="categories" required>
+                              {% if product.pk %}
+                              {% with product.get_first_category as category %}
+                              {% if category %}
+                              <option value="{{category.id}}">{{ category }}</option>
+                              {% endif %}
+                              {% endwith %}
+                              {% else %}
+                              <option value="">---</option>
+                              {% endif %}
+
+                              {% for cat in categories %}
+                              <option value="{{cat.pk}}">{{cat}}</option>
+                              {% endfor %}
+                          </select>
+                          <br>
+                          <label class="error"></label>
+
                       </div>
                   
                   <div class="input-group-btn">
                      <button type="button" class="btn bg-primary btn-icon legitRipple edit_modal-trigger" data-popup="tooltip"
                     data-original-title="Add New category"
-                    href="#modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add32" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                    href="modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add32" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
                        <i class="icon-plus-circle2"></i>
                      </button>
                    </div>
@@ -260,7 +279,7 @@
               <a href="{% url 'dashboard:product-list' %}" class="btn btn-default pull-left">
                 {% trans "Cancel" context "Dashboard cancel action" %}
               </a>
-              <button type="submit" class="btn btn-primary waves-effect waves-light pull-right">
+              <button onclick="return false;" data-pk="{{product.pk}}" data-href="{% url 'dashboard:product-data' %}" id="update_product_btn" type="submit" class="btn btn-primary waves-effect waves-light pull-right">
                 {% trans "Update" context "Dashboard update action" %}
               </button>
             {% else %}
@@ -787,7 +806,7 @@
           </div>                
 
 </div>
-<input type="hidden" class="pageUrls" data-attributes="{% url 'dashboard:attr_list_f32b' %}" data-variantdetail="{% url 'dashboard:have-variants' %}" data-addattrurl="{% url 'dashboard:product-attr-add' %}" data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}" data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
+<input type="hidden" class="pageUrls" data-attributes="{% url 'dashboard:attr_list_f32b' %}" data-variantdetail="{% url 'dashboard:have-variants' %}" data-addattrurl="{% url 'dashboard:product-attr-add' %}" data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}" data-pk="{{product.pk}}" data-productdata="{% url 'dashboard:product-data' %}"  data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %} 

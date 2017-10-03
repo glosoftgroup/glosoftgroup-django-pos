@@ -72,7 +72,7 @@ PyInstaller==3.2.1
 PyJWT==1.4.2
 pyparsing==2.1.10
 PyPDF2==1.26.0
-#pypiwin32==219
+pypiwin32==219
 pytest==3.0.5
 pytest-django==3.1.2
 python-dateutil==2.6.0

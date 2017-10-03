@@ -208,15 +208,16 @@ class Product(models.Model, ItemRange, index.Indexed):
 
     def total_stock(self):
         return Sum(self.variant.stock.stock_available())
+
     def total_variants(self):
         return len(self.variants.all())
 
-
     def get_first_category(self):
-        for category in self.categories.all():
+        for category in self.categories.all().order_by('id'):
             if not category.hidden:
                 return category
         return None
+
     def get_variants_count(self):
         variants = self.variants.filter(product=self.pk)
         total = 0
