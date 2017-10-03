@@ -33,7 +33,7 @@ urlpatterns = [
             (views.customer_report), name='customer_report_list'),        
         url(r'^report/paginate/$', views.report_pagination, name='customer-report-paginate'),
         url(r'^report/search/$', views.report_search, name='customer-report-search'),
-
+        url(r'^reports/loyalty-points/pdf/$', views.costomer_loyalty_points_pdf, name='costomer_loyalty_points_pdf'),
         # credit urls        
         url(r'^credit-list/$', permission_required('customer.view_customer', login_url='not_found')
             (views.credit_report), name='customer_credit_list'),        
