@@ -67,7 +67,7 @@
   <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-heading">
-        <h6 class="panel-title">Sales Reports Charts by Date</h6>
+        <h6 class="panel-title">Sales Summary Reports by Date</h6>
         <div class="heading-elements">
           <ul class="icons-list">
             <li><a data-action="collapse"></a></li>
@@ -114,7 +114,6 @@
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
                     <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                    <option value="excel" data-icon="fa-file-excel-o" onclick="alert('hi')">export excel</option>
                   </select>
               </div>
             </div>
@@ -382,7 +381,8 @@ $(document).ready(function(){
     $('.daterange-single').daterangepicker({ 
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true
+        showDropdowns:true,
+        maxDate: new Date()
     }).on('change',function(){
       var date = $(this).val();
         $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:date },success: function(data){
@@ -414,34 +414,25 @@ $(document).ready(function(){
     }).on('change',function(){
          $('.setValue').val($(this).val());
          $('.setName').val('export');
-         // $('.set').value = $(this).val();
 
          if($(this).val() == 'pdf'){
-             /*html2canvas($("#st"), {
-                    onrendered: function(canvas) {
-                        var myImage = canvas.toDataURL("image/png");
-                        //window.open(myImage);
-                        var url = "/dashboard/reports/cpdf/"+myImage;
-                        window.open(url, '_blank');
-                    }
-                });*/
             var img = document.getElementById('chart1').toDataURL("image/png");
             var url = "/dashboard/reports/datechartimage/"+img;
             window.open(url, '_blank');
-         }else if($(this).val() == 'excel'){
-             var url ="/dashboard/reports/csv/"+img;
-             window.open(url, '_blank');
          }
     });
     //**@ daterange from
     $('.daterange-from').daterangepicker({ 
         singleDatePicker: true,
+        maxDate: new Date(),
         locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true
+        showDropdowns:true,
+        autoUpdateInput: false
     });
     //**@ daterange to
     $('.daterange-to').daterangepicker({
             alwaysShowCalendars: true,
+            maxDate: new Date(),
             linkedCalendars:false,
             locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
             <!--opens: 'right',-->
@@ -509,7 +500,6 @@ $(document).ready(function(){
       }
     };
     var color = Chart.helpers.color;
-  // alert(x.substring(0,3));
     var lineChartData = {
       labels: [{% for i in labels2 %} "{{ i }}", {% endfor %}],
       datasets: [{
@@ -545,9 +535,6 @@ $(document).ready(function(){
             custom: customTooltips
           },
           elements: {
-            /*line: {
-              tension: 0.000001
-            },*/
             point:{
                 pointStyle:'circle'
             }
@@ -584,7 +571,6 @@ $(document).ready(function(){
     // Define a plugin to provide data labels
     Chart.plugins.register({
         afterDatasetsDraw: function(chart, easing) {
-            // To only draw at the end of animation, check for easing === 1
             var ctx = chart.ctx;
 
             chart.data.datasets.forEach(function (dataset, i) {

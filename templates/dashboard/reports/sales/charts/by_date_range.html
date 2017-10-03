@@ -41,12 +41,7 @@
      </div>
       <div class="row">
           <div class="col-md-10">
-              <!--<div id="canvas-holder1">-->
-                <!--<canvas id="chart1" width="900" height="300"></canvas>-->
-                <!--<div class="chartjs-tooltip" id="tooltip-0"></div>-->
-                <!--<div class="text-center"><span style="color: #72726d;">Hours</span></div>-->
-              <!--</div>-->
-              <canvas id="dateChart" width="900" height="300"></canvas>
+              <canvas id="chart1" width="900" height="300"></canvas>
           </div>
           <div class="col-md-2">
 
@@ -112,7 +107,7 @@
                           </td>
                           <td class="right-align">
                             <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
+                              {{ date_gross_sales }}
                             </div>
                           </td>
                           <td class="right-align">
@@ -120,21 +115,32 @@
                           </td>
                           <td>
                             <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
+                              {{ date_gross_sales }}
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>Discounts</td>
-                          <td class="right-align">0.00</td>
+                          <td class="right-align">
+                              <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_discount }}
+                            </div>
+                          </td>
                           <td>0.00</td>
-                          <td>0.00</td>
+                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_discount }}</div></td>
                         </tr>
                         <tr>
                           <td>Tax</td>
-                          <td class="right-align">0.00</td>
+                          <td class="right-align">
+                              <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_tax }}
+                            </div>
+                          </td>
                           <td>0.00</td>
-                          <td>0.00</td>
+                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
+                              {{ date_total_tax }}
+                            </div></td>
                         </tr>
                         <tr data-action-go="">
                           <td>
@@ -234,62 +240,8 @@
    <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script> 
 <script type="text/javascript">
 $(document).ready(function(){
-    // setChart();
-    var defaultData = [{% for d in default3 %} {{ d }}, {% endfor %}];
-    var labels = [{% for i in labels3 %} "{{ i }}", {% endfor %}];
-    var ctx = document.getElementById("dateChart").getContext('2d');
-    var dateChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Sales in (Kshs)',
-                data: defaultData,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options:{
-         legend: {
-              display: false,
-              position:"bottom"
-          },
-          scales: {
-                yAxes: [{
-                    ticks: {
-                        fontColor: "rgba(0,0,0,0.5)",
-                        fontStyle: "bold",
-                        beginAtZero: true,
-                        maxTicksLimit: 5,
-                        padding: 20
-                    },
-                    gridLines: {
-                        drawTicks: true,
-                        display: true
-                    }
-
-                }]
-          }
-        }
-
-    });
-
-    //**@ chart
+//-----chart**/
+//**@ chart
  var customTooltips = function (tooltip) {
       $(this._chart.canvas).css("cursor", "pointer");
 
@@ -319,31 +271,33 @@ $(document).ready(function(){
       }
     };
     var color = Chart.helpers.color;
-  // alert(x.substring(0,3));
     var lineChartData = {
-      labels: [{% for i in labels2 %} "{{ i }}", {% endfor %}],
+      labels: [{% for i in labels3 %} "{{ i }}", {% endfor %}],
       datasets: [{
-        label: "Sales of {{date}}",
-        backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+        label: "Sales from {{date_from}} to {{date_to}}",
+        backgroundColor:"pink",
         borderColor: window.chartColors.red,
-        // pointBackgroundColor: window.chartColors.red,
-        fill: false,
-        data: [{% for d in default %} {{ d }}, {% endfor %}]
+        fill: true,
+        data: [{% for d in default3 %} {{ d }}, {% endfor %}],
+        pointRadius:4,
+        pointBorderColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointBackgroundColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointHoverBackgroundColor:  color(window.chartColors.red).alpha(0.2).rgbString(),
+        pointHoverBorderColor:  color(window.chartColors.red).alpha(0.2).rgbString()
       }]
     };
 
-      /*var chartEl = document.getElementById("chart1").getContext('2d');
+      var chartEl = document.getElementById("chart1").getContext('2d');
       var chart = new Chart(chartEl, {
         type: "line",
         data: lineChartData,
-        // pointLabelFontSize: 20,
         options: {
           title:{
             display: false,
             text: "Hourly Sales"
           },
           legend: {
-              display: false,
+              display: true,
           },
           tooltips: {
             enabled: false,
@@ -352,13 +306,75 @@ $(document).ready(function(){
             custom: customTooltips
           },
           elements: {
-            line: {
+            /*line: {
               tension: 0.000001
+            },*/
+            point:{
+                pointStyle:'circle'
             }
+          },
+          scales: {
+                yAxes: [{
+                    ticks: {
+                        fontColor: "rgba(0,0,0,1)",
+                        beginAtZero: true,
+                        maxTicksLimit: 5,
+                        padding: 20
+                    },
+                    gridLines: {
+                        drawTicks: true,
+                        display: true
+                    }
+
+                }],
+                xAxes: [{
+                    gridLines: {
+                        zeroLineColor: "transparent"
+                    },
+                    ticks: {
+                        padding: 20,
+                        fontColor: "rgba(0,0,0,1)",
+                        beginAtZero: true,
+                        maxTicksLimit: 10
+                    }
+                }]
           }
         }
-      });*/
+      });
 //-----chart**/
+    // Define a plugin to provide data labels
+    Chart.plugins.register({
+        afterDatasetsDraw: function(chart, easing) {
+            // To only draw at the end of animation, check for easing === 1
+            var ctx = chart.ctx;
+
+            chart.data.datasets.forEach(function (dataset, i) {
+                var meta = chart.getDatasetMeta(i);
+                if (!meta.hidden) {
+                    meta.data.forEach(function(element, index) {
+                        // Draw the text in black, with the specified font
+                        ctx.fillStyle = 'rgba(0, 0, 0,0.8)';
+
+                        var fontSize = 10;
+                        var fontStyle = 'normal';
+                        var fontFamily = 'Helvetica Neue';
+                        ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+                        // Just naively convert to string for now
+                        var dataString = dataset.data[index].toString();
+
+                        // Make sure alignment settings are correct
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        var padding = 5;
+                        var position = element.tooltipPosition();
+                        ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
+                    });
+                }
+            });
+        }
+    });
 
 });
 </script>

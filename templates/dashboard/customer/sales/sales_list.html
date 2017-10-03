@@ -64,7 +64,6 @@
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
                     <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
                   </select>
               </div>
             </div>
@@ -184,7 +183,7 @@ $(document).ready(function(){
     }});
 
      $('.bootpag-callback').bootpag({
-        total: parseInt(pagination_totalsize),
+        total: parseInt({{pn}}),
         maxVisible: 3,
         leaps: true,
         firstLastUse: true,
@@ -198,7 +197,7 @@ $(document).ready(function(){
         lastClass: 'last',
         firstClass: 'first',
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
+            $(".pages-nav").html("Page " + num +" of "+{{pn}});
             $.get("{% url 'dashboard:customer_sales_paginate' %}",{page:parseInt(num), cpk:'{{customer.pk}}'},function(data){
                $('#tb').html(data);
             });
@@ -207,29 +206,59 @@ $(document).ready(function(){
     $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true
-    }).on('change',function(){
-      var date = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:customer_sales_paginate' %}",type: 'GET',data: {page:1, date:date, cpk:'{{customer.pk}}' }, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
+        showDropdowns:true,
+        autoUpdateInput:false,
+        maxDate: new Date()
+    },function(chosen_date) {
+        $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
+        var group_id = $('.daterange-single').val();
+        var searchData = $('.search_user').val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var url_search = "{% url 'dashboard:customer_sales_search' %}";
+        var url_paginate = "{% url 'dashboard:customer_sales_paginate' %}";
+
+       if(searchData && listSizeVal && listSizeVal != '0'){
+            if(!group_id){
+               $.ajax({ url:url_search, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, cpk:'{{customer.pk}}'},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url_search, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:group_id, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(searchData){
+            if(!group_id){
+               $.ajax({ url:url_search, type: 'GET',data: {page:1, q:searchData, cpk:'{{customer.pk}}'},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url_search, type: 'GET',data: {page:1, q:searchData, size:10, gid:group_id, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(listSizeVal && listSizeVal != '0'){
+           if(!group_id){
+               $.ajax({ url: url_paginate,type: 'GET',data: {page:1, size:listSizeVal, cpk:'{{customer.pk}}'}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get(url_paginate,{page:1,gid:group_id, size:listSizeVal, cpk:'{{customer.pk}}'},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }else{
+           if(!group_id){
+               $.ajax({ url: url_paginate,type: 'GET',data: {page:1, size:10, cpk:'{{customer.pk}}'}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get(url_paginate,{page:1,gid:group_id, cpk:'{{customer.pk}}'},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }
     });
-  $('.sales-category').selectpicker().on('change', function(){
-        var sv = $(this).val();
-        if(sv == 'list'){
-            window.location = "{% url 'dashboard:sales_list' %}";
-        }else if(sv == 'summary'){
-            window.location = "{% url 'dashboard:sales_date_chart' %}";
-        }else if(sv == 'category'){
-            window.location = "{% url 'dashboard:sales_category_chart' %}";
-        }else if(sv == 'items'){
-            window.location = "{% url 'dashboard:sales_product_chart' %}";
-        }else if(sv == 'user'){
-            window.location = "{% url 'dashboard:sales_user_chart' %}";
-        }else if(sv == 'terminal'){
-            window.location = "{% url 'dashboard:sales_terminal_chart' %}";
-        }
-  });
 
    $('.export-sz').selectpicker({
           iconBase: 'fa',
@@ -240,11 +269,27 @@ $(document).ready(function(){
 
         var ts = $(this).val();
         if(ts == 'pdf'){
-          var url = "{% url 'dashboard:reports_sales_list_pdf' %}";
-          window.open(url, '_blank');
+            var searchData = $('.search_user').val();
+            var date = $('.daterange-single').val();
+            var url = "{% url 'dashboard:customers_sales_list_pdf' %}";
 
-        }else if(ts=='excel'){
-          window.location="{% url 'dashboard:reports_sales_list_export_csv' %}";
+            if (searchData && date ){
+                $.get(url, {q:searchData, gid:date, cpk:'{{customer.pk}}'}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (searchData){
+                $.get(url, {q:searchData, cpk:'{{customer.pk}}'}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (date){
+                $.get(url, {gid:date, cpk:'{{customer.pk}}'}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else{
+                $.get(url, {cpk:'{{customer.pk}}'},function(data){
+                          window.open("data:application/pdf," + escape(data));
+               });
+            }
 
         }else{
           $(this).val('')
@@ -262,10 +307,59 @@ $(document).ready(function(){
     });
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
-        var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:customer_sales_paginate' %}",type: 'GET',data: {page:1, size:ts, cpk:'{{customer.pk}}'}, async:false,success: function(data){
-              $('#pagination-div').html(data);
-        }});
+        <!--var ts = $(this).val();-->
+        <!--$.ajax({ url: "{% url 'dashboard:customer_sales_paginate' %}",type: 'GET',data: {page:1, size:ts, cpk:'{{customer.pk}}'}, async:false,success: function(data){-->
+              <!--$('#pagination-div').html(data);-->
+        <!--}});-->
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var date = $('.daterange-single').val();
+        var url_search = "{% url 'dashboard:customer_sales_search' %}";
+        var url_paginate = "{% url 'dashboard:customer_sales_paginate' %}";
+
+        if(searchData && date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url_search, type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url_search, type: 'GET',data: {page:1, size:10, q:searchData, gid:date, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else if(searchData){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url_search, type: 'GET',data: {page:1, size:listSizeVal, q:searchData, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url_search, type: 'GET',data: {page:1, size:10, q:searchData, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else if(date){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url_paginate, type: 'GET',data: {page:1, size:listSizeVal, gid:date, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url_paginate, type: 'GET',data: {page:1, size:10, gid:date, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+             }
+        }else{
+           if(listSizeVal != '0'){
+               $.ajax({ url: url_paginate,type: 'GET',data: {page:1, size:listSizeVal, cpk:'{{customer.pk}}'}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.ajax({ url: url_paginate,type: 'GET',data: {page:1, size:10, cpk:'{{customer.pk}}'}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+           }
+       }
+
+
      });
 
 
@@ -278,16 +372,44 @@ $(document).ready(function(){
       };
     })();
 
-    $('.search_user').keyup(function() {
-      var search_text = $(this).val();
-      delay(function(){
-         var url = "{% url 'dashboard:customer_sales_search' %}";
-         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, cpk:'{{customer.pk}}'},success: function(data){
-                $('#pagination-div').html(data);
-         }});
-      }, 500 );
+    <!--$('.search_user').keyup(function() {-->
+      <!--var search_text = $(this).val();-->
+      <!--delay(function(){-->
+         <!--var url = "{% url 'dashboard:customer_sales_search' %}";-->
+         <!--$.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, cpk:'{{customer.pk}}'},success: function(data){-->
+                <!--$('#pagination-div').html(data);-->
+         <!--}});-->
+      <!--}, 500 );-->
+    <!--});-->
 
-    });
+    $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        var date = $('.daterange-single').val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var url = "{% url 'dashboard:customer_sales_search' %}";
+        var scategory = $('.sales-category').find(":selected").val();
+
+        delay(function(){
+            if(listSizeVal && listSizeVal != '0' && date){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, gid:date, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(listSizeVal && listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(date){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10, gid:date, cpk:'{{customer.pk}}'},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, cpk:'{{customer.pk}}'},success: function(data){
+                        $('#pagination-div').html(data);
+               }});
+            }
+        }, 500 );
+
+      });
 
 
 });

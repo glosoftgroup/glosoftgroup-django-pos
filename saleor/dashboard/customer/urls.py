@@ -14,6 +14,7 @@ urlpatterns = [
         url(r'^customer_process/$', views.user_process, name='customer_process'),
         url(r'^d/(?P<pk>[0-9]+)/$', views.user_detail, name='customer-detail'),
         url(r'^sd/(?P<pk>[0-9]+)/$', views.sales_detail, name='customer-sales-detail'),
+        url(r'^cst/pdf/detail/(?P<pk>[0-9]+)/$', sales.sales_detail, name='cust-pdf-sale-detail'),
         url(r'^std/(?P<pk>[0-9]+)/(?P<ck>[0-9]+)/$', views.sales_items_detail, name='customer-sales-items-detail'),
         url(r'^delete/(?P<pk>[0-9]+)/$', permission_required('customer.delete_customer', login_url='account_login')
             (views.user_delete), name='customer-delete'),
@@ -23,8 +24,9 @@ urlpatterns = [
         url(r'^customer/paginate/$', views.customer_pagination, name='customer-paginate'),
         url(r'^customer/search/$', views.customer_search, name='customer-search'),
 
-        url( r'^customer/sales/paginate/$', sales.sales_paginate, name = 'customer_sales_paginate'),
+        url( r'^customer/sales/paginate/customer-sales-detail$', sales.sales_paginate, name = 'customer_sales_paginate'),
         url( r'^customer/sales/search/$', sales.sales_search, name = 'customer_sales_search'),
+        url(r'^customer/sales/list/pdf/$', sales.sales_list_pdf, name='customers_sales_list_pdf'),
 
         url( r'^customer/canbe/creditable/$', views.is_creditable, name = 'is_creditable'),
 
