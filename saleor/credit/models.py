@@ -106,7 +106,7 @@ class Credit(models.Model):
 
     due_date = models.DateTimeField(
         pgettext_lazy('Credit field', 'due date'),
-        null=False)
+        null=False,default=now)
     
     objects = CreditManager()
     class Meta:
