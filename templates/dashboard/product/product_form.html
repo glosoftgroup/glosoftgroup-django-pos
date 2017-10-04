@@ -329,7 +329,8 @@
          <th>{{v}}</th>       
         {% endfor %}
         <th>Retail Price</th>
-        <th>Wholesale Price</th>        
+        <th>Wholesale Price</th>
+            <th>Minimum price</th>
         <th></th>
         </tr>
         </thead>
@@ -338,9 +339,6 @@
           <td>
             <input type="text" id="new-sku-td" placeholder="Enter SKU" class="form-control" name='new-sku-td'>
           </td>
-         <!--  <td>
-            <input type="number" placeholder="(e.g 10)" class="form-control" value="10" id="reorder_level" name="reorder_level">
-          </td> -->
           {% for v in pc%}
           <td>
            <select placeholder="{{v}}" data-pk={{v.pk}} name="{{v}}" class="bootstrap-select form-control dynamicvxx">
@@ -357,7 +355,10 @@
             </td>
             <td>
               <input type="number" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
-            </td>     
+            </td>
+              <td>
+              <input type="number" placeholder="Mininum Price" class="form-control" id="mprice" name='mprice'>
+            </td>
             <td>
               <button class="btn btn-xs btn-primary" id="addvariantBtn" data-refreshvurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
             </td>
@@ -435,6 +436,9 @@
                     <th class="right-align">
                       Wholesale Price
                     </th>
+                      <th>
+                          Minimum Price
+                      </th>
                     <th class="text-center">Options</th>
                   </tr>
                 </thead>
@@ -462,6 +466,12 @@
                       <td class="right-align">
                       {% if variant.get_wholesale_price_per_item %}
                 {% gross variant.get_wholesale_price_per_item html=True %}
+                     {% endif %}
+                      </td>
+                   <!--minimum price-->
+                  <td class="right-align">
+                      {% if variant.minimum_price %}
+                {% gross variant.minimum_price html=True %}
                      {% endif %}
                       </td>
                       <!-- actions -->

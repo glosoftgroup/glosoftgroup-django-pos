@@ -259,6 +259,7 @@ class SalesSerializer(serializers.ModelSerializer):
         data = self.get_initial()
         dictionary_value = dict(data.get('payment_data'))
         return value
+
     def validate_status(self,value):
         data = self.get_initial()
         status = str(data.get('status'))        
@@ -266,7 +267,6 @@ class SalesSerializer(serializers.ModelSerializer):
             return value
         else:
             raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')
-        
         
     def validate_terminal(self,value):
         data = self.get_initial()
@@ -334,16 +334,24 @@ class SalesSerializer(serializers.ModelSerializer):
         payment_data = validated_data.get('payment_data')        
         for option in payment_data:
             pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
-            sales.payment_options.add(pay_opt)
-            points_eq = pay_opt.loyalty_point_equiv
-            if points_eq == 0:
-                loyalty_points = 0
+            if pay_opt.name == "Loyalty Points":
+                points_eq = pay_opt.loyalty_point_equiv
+                if points_eq == 0:
+                    loyalty_points = 0
+                else:
+                    loyalty_points = Decimal(option['value']) * Decimal(points_eq)
+                    Customer.objects.redeem_points(customer, loyalty_points)
             else:
-                loyalty_points = int(option['value'])/points_eq
-            try:
-                Customer.objects.gain_points(customer,loyalty_points)
-            except:
-                print 'customer details provided dont meet adding customer criteria'
+                sales.payment_options.add(pay_opt)
+                points_eq = pay_opt.loyalty_point_equiv
+                if points_eq == 0:
+                    loyalty_points = 0
+                else:
+                    loyalty_points = Decimal(option['value'])/Decimal(points_eq)
+                try:
+                    Customer.objects.gain_points(customer,loyalty_points)
+                except:
+                    print 'customer details provided dont meet adding customer criteria'
 
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)

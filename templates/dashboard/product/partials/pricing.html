@@ -44,7 +44,8 @@
     <th>SKU</th>  
     <th>Retail Price</th>
     <th>Wholesale Price</th>   
-    <th>&nbsp;</th>
+    <th>Minimum Price</th>
+       <th>&nbsp; </th>
    </tr>
   </thead>
   <tbody>
@@ -65,7 +66,9 @@
       <td>
         {{ product_form.wholesale_price }}
       </td>
-      
+      <td>
+        {{ product_form.minimum_price }}
+      </td>
       <td>
         <span>
          <a  class="btn hvr-glow btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing">Save</a>

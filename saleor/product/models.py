@@ -145,6 +145,10 @@ class Product(models.Model, ItemRange, index.Indexed):
         pgettext_lazy('Product field', 'price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12,
         validators=[MinValueValidator(0)], default=Decimal(0), decimal_places=2)
+    minimum_price = PriceField(
+        pgettext_lazy('Product variant field', 'minimum price'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
     wholesale_price = PriceField(
         pgettext_lazy('Product field', 'Wholesale price'),
         currency=settings.DEFAULT_CURRENCY, blank=True,null=True, max_digits=12, decimal_places=2)
@@ -268,6 +272,10 @@ class ProductVariant(models.Model, Item):
         blank=True)
     price_override = PriceField(
         pgettext_lazy('Product variant field', 'price override'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
+    minimum_price = PriceField(
+        pgettext_lazy('Product variant field', 'minimum price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     wholesale_override = PriceField(
