@@ -328,10 +328,8 @@ def sales_date_chart(request, image=None):
 			except:
 				date_gross_sales = 0
 
-			drawerdate =  datetime.strptime(date, '%Y-%m-%d')
-			drawerprevdate = drawerdate - timedelta(days=1)
 			try:
-				broughtdown = DrawerCash.objects.filter(created__contains=drawerprevdate).last().amount
+				broughtdown = DrawerCash.objects.filter(created__lte=date).last().amount
 				if broughtdown is None:
 					broughtdown = 0
 			except:
