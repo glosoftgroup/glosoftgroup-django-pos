@@ -16,6 +16,7 @@ $(function(){
   var url = '#';
   var id_sku = $('#id_sku');
   var rprice = $('#id_price_override');
+  var minimum_price = $('#id_minimum_price');
   var wprice = $('#id_wholesale_override');
   var dynamic_attrs = $('.dynamicxedit');
 
@@ -64,7 +65,14 @@ $(function(){
     }else{
       dynamicData['price'] = rprice.val();
     }
-    dynamicData['template'] = 'edit_variant';    
+    if(!minimum_price.val()){
+      alertUser('Minimum Price field required','bg-warning','Field Error!');
+      return false;
+    }else{
+      dynamicData['minimum_price'] = minimum_price.val();
+    }
+    dynamicData['template'] = 'edit_variant';
+    dynamicData['track'] = 'edit variant'
 
     addProductDetails(dynamicData,url,'post')
     .done(function(data){

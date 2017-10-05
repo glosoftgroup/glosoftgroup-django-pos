@@ -7,7 +7,7 @@
     {% if variants %}
       <thead>
      
-        <tr id="variant-row{{variant.pk}}" class="bg-primary">
+        <tr id="" class="bg-primary">
           
           <th>
             {% trans "SKU" context "Product variant table header" %}
@@ -25,6 +25,7 @@
           <th class="right-align">
             Wholesale Price
           </th>
+            <th>Minimum Price</th>
           <th class="text-center">Actions</th>
         </tr>
       </thead>
@@ -50,6 +51,12 @@
             <td class="right-align">
             {% if variant.get_wholesale_price_per_item %}
       {% gross variant.get_wholesale_price_per_item html=True %}
+           {% endif %}
+            </td>
+             <!-- minimum price -->
+            <td class="right-align">
+            {% if variant.minimum_price %}
+            {% gross variant.minimum_price html=True %}
            {% endif %}
             </td>
              <!-- actions -->

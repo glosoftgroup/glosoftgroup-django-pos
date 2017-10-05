@@ -32,6 +32,7 @@ $(function() {
  var tax_id = $('#id_product_tax');
  var updatePricing = $('#updatePricing');
  var newPrice = $('#tabprice');
+ var minimum_price = $('#id_minimum_price')
  var wholesaleId = $('#id_wholesale_price');
  var tax = 0;
  // stock variables
@@ -111,6 +112,7 @@ $(function() {
 
  });
  updatePricing.on('click',function(){
+    console.log('update priceing');
     tax = tax_id.val();
     price = newPrice.val();
     wholesalePrice = wholesaleId.val();
@@ -118,6 +120,9 @@ $(function() {
     var sku = skuId.val();
     url = $(this).data('priceurl');
     pk  = $(this).data('productpk');
+    if(minimum_price.val()){
+       dynamicData['minimum_price'] = minimum_price.val();
+    }
     dynamicData = {};
     dynamicData['pk'] = pk;
     dynamicData['price'] = price;
@@ -133,8 +138,8 @@ $(function() {
     if(wholesalePrice){
     dynamicData['wholesale_price'] =wholesalePrice;	
     }
-    
-    dynamicData['track'] = 'add pricing';
+    dynamicData['minimum_price'] = $('#id_minimum_price').val();
+    dynamicData['track'] = 'add pricing x';
     method = 'post';
     addProductDetails(dynamicData,url,method)
     .done(function(data){
@@ -163,6 +168,7 @@ $(function() {
   var addvariantBtn = $('#addvariantBtn');
   var retailPriceId = $('#rprice');
   var wholePriceId  = $('#wprice');
+  var minimumPrice  = $('#mprice');
   var dynamicVariants = $('.dynamicvxx');
   var newSkuId = $('#new-sku-td');
   var reorder_levelId = $('#reorder_level');
@@ -185,8 +191,9 @@ $(function() {
     retailPrice = retailPriceId.val();
     newSku      = newSkuId.val();
     reorder_level = reorder_levelId.val();
-    if(!retailPrice || !newSku){
-      alertUser('Retail Price & SKU required','bg-danger','Fill required fields!');
+
+    if(!retailPrice || !newSku || !minimumPrice.val()){
+      alertUser('Retail Price, Minimum price & SKU required','bg-danger','Fill required fields!');
       return false;
     }
     dynamicData = {};
@@ -203,9 +210,11 @@ $(function() {
     }  
     
     dynamicData['price'] = retailPrice;
+    dynamicData['minimum_price'] = minimumPrice.val();
+
     dynamicData['sku'] = newSku;
     dynamicData['attributes'] = JSON.stringify(json);
-    dynamicData['track'] = 'adding variants';
+    dynamicData['track'] = 'adding variants x';
     dynamicData['pk'] = $(this).data('productpk');
     var method = 'post';
     var url = $(this).data('attrurl');

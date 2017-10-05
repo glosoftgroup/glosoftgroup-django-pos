@@ -550,8 +550,11 @@ def product_data(request):
             product.name = request.POST.get('name')
         if request.POST.get('wholesale_price'):
             product.wholesale_price = request.POST.get('wholesale_price')
+        if request.POST.get('minimum_price'):
+            product.minimum_price = request.POST.get('minimum_price')
         if request.POST.get('price'):
             product.price = request.POST.get('price')
+
         if request.POST.get('threshold'):
             product.low_stock_threshold = int(request.POST.get('threshold'))
         product.save()
@@ -960,6 +963,8 @@ def add_attributes(request):
             product_variant.sku = request.POST.get('sku')
         if request.POST.get('price'):
             product_variant.price_override = request.POST.get('price')
+        if request.POST.get('minimum_price'):
+            product_variant.minimum_price = request.POST.get('minimum_price')
         if request.POST.get('wholesale'):
             product_variant.wholesale_override = request.POST.get('wholesale')
         if request.POST.get('low_stock_threshold'):
