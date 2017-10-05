@@ -88,7 +88,7 @@
               </div>
             </div>
             <div class="col-md-6">
-              <label>select a date range and click search button for results</label>
+              <label>select a date range</label>
               <div class="form-group">
                  <div class="col-md-8">
                     <div class="input-group">
@@ -295,7 +295,7 @@
                             <span style="font-weight: bold;">Sales</span>
                         </th>
                           <th class="right-align">
-                              <span class="pull-right">{{ date_gross_sales }}</span>
+                              <span class="pull-right">{{ drawerSales }}</span>
                         </th>
                       </tr>
                     </thead>
@@ -304,7 +304,7 @@
                             <td>Balance Brought Down</td>
                           <td class="right-align">
                               <div >
-                                  <span class="pull-right">{{ date_total_discount }}</span>
+                                  <span class="pull-right">{{ balanceBroughtDown }}</span>
                             </div>
                           </td>
                         </tr>
@@ -312,7 +312,7 @@
                             <td>Deposit</td>
                           <td class="right-align">
                               <div>
-                                  <span class="pull-right">{{ date_total_tax }}</span>
+                                  <span class="pull-right">{{ drawerDeposit }}</span>
                             </div>
                           </td>
                         </tr>
@@ -322,7 +322,7 @@
                           </td>
                           <td class="right-align">
                             <div>
-                              <span class="pull-right">{{ date_gross_sales }}</span>
+                              <span class="pull-right">{{ drawerWithdraw }}</span>
                             </div>
                           </td>
                         </tr>
@@ -332,7 +332,7 @@
                           </td>
                           <td class="right-align">
                             <div>
-                              <span class="pull-right">{{ date_gross_sales }}</span>
+                              <span class="pull-right">{{ balanceCarriedForward }}</span>
                             </div>
                           </td>
                         </tr>

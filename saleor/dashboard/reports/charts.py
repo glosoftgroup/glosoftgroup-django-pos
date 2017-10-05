@@ -16,7 +16,7 @@ from django.utils.dateformat import DateFormat
 
 from ..views import staff_member_required
 from ...credit.models import Credit
-from ...sale.models import Sales, SoldItem, Terminal
+from ...sale.models import *
 from ...product.models import Category
 from ...decorators import permission_decorator
 from ...utils import render_to_pdf
@@ -327,7 +327,50 @@ def sales_date_chart(request, image=None):
 				date_gross_sales = date_total_discount + date_total_tax + date_total_sales
 			except:
 				date_gross_sales = 0
+
+			drawerdate =  datetime.strptime(date, '%Y-%m-%d')
+			drawerprevdate = drawerdate - timedelta(days=1)
+			try:
+				broughtdown = DrawerCash.objects.filter(created__contains=drawerprevdate).last().amount
+				if broughtdown is None:
+					broughtdown = 0
+			except:
+				broughtdown = 0
+
+			try:
+				drawerdeposit = DrawerCash.objects.filter(created__contains=date, trans_type__icontains='deposit').aggregate(Sum('amount'))['amount__sum']
+				if drawerdeposit is None:
+					drawerdeposit = 0
+			except:
+				drawerdeposit = 0
+
+			try:
+				drawerwithdraw = DrawerCash.objects.filter(created__contains=date, trans_type__icontains='withdraw').aggregate(Sum('amount'))['amount__sum']
+				if drawerwithdraw is None:
+					drawerwithdraw = 0
+			except:
+				drawerwithdraw = 0
+
+			try:
+				drawersales = DrawerCash.objects.filter(created__contains=date, trans_type__icontains='sale').aggregate(Sum('amount'))['amount__sum']
+				if drawersales is None:
+					drawersales = 0
+			except:
+				drawersales = 0
+
+			try:
+				carriedforward = DrawerCash.objects.filter(created__contains=date).last().amount
+				if carriedforward is None:
+					carriedforward = 0
+			except:
+				carriedforward = 0
 			data = {
+				"balanceBroughtDown":broughtdown,
+				"drawerDeposit":drawerdeposit,
+				"drawerWithdraw":drawerwithdraw,
+				"drawerSales":drawersales,
+				"balanceCarriedForward":carriedforward,
+
 				"no_of_customers":no_of_customers,
 				"date_total_sales":date_total_sales,
 				"date_gross_sales":date_gross_sales,

@@ -71,7 +71,7 @@
 
  <div class="row">
   <div class="col-md-12">
-      <div class="col-md-6">
+      <div class="col-md-12">
       <div class="panel panel-flat" id="ss">
         <div class="panel-heading">
           <h6 class="panel-title">Sales Summary</h6>
@@ -152,7 +152,7 @@
         </div>
 
     </div>
-      <div class="col-md-6">
+      <div class="col-md-6" style="display:none">
       <div class="panel panel-flat" id="ss2">
         <div class="panel-heading">
           <h6 class="panel-title">Cash Drawer Summary</h6>
@@ -178,7 +178,7 @@
                             <span style="font-weight: bold;">Sales</span>
                         </th>
                           <th class="right-align">
-                              <span class="pull-right">{{ date_gross_sales }}</span>
+                              <span class="pull-right">{{ drawerSales }}</span>
                         </th>
                       </tr>
                     </thead>
@@ -187,7 +187,7 @@
                             <td>Balance Brought Down</td>
                           <td class="right-align">
                               <div >
-                                  <span class="pull-right">{{ date_total_discount }}</span>
+                                  <span class="pull-right">{{ balanceBroughtDown }}</span>
                             </div>
                           </td>
                         </tr>
@@ -195,7 +195,7 @@
                             <td>Deposit</td>
                           <td class="right-align">
                               <div>
-                                  <span class="pull-right">{{ date_total_tax }}</span>
+                                  <span class="pull-right">{{ drawerDeposit }}</span>
                             </div>
                           </td>
                         </tr>
@@ -205,7 +205,7 @@
                           </td>
                           <td class="right-align">
                             <div>
-                              <span class="pull-right">{{ date_gross_sales }}</span>
+                              <span class="pull-right">{{ drawerWithdraw }}</span>
                             </div>
                           </td>
                         </tr>
@@ -215,7 +215,7 @@
                           </td>
                           <td class="right-align">
                             <div>
-                              <span class="pull-right">{{ date_gross_sales }}</span>
+                              <span class="pull-right">{{ balanceCarriedForward }}</span>
                             </div>
                           </td>
                         </tr>
