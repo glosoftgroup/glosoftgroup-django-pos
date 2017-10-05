@@ -23,8 +23,6 @@ from .serializers import (
     ProductListSerializer,
     SalesSerializer, 
     SalesListSerializer,
-    SalesUpdateSerializer,
-    
      )
 from rest_framework import generics
 
@@ -77,36 +75,9 @@ class SalesCreateAPIView(generics.CreateAPIView):
         info_logger.info('User: '+str(self.request.user)+' made a sale:'+str(serializer.data['invoice_number']))
         
         
-
-class SalesUpdateAPIView(generics.RetrieveUpdateAPIView):    
-    queryset = Sales.objects.all()
-    serializer_class = SalesUpdateSerializer
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
-        user_trail(self.request.user.name,'made a sale:#'+str(serializer.data['invoice_number'])+' sale worth: '+str(serializer.data['total_net']),'add')
-        info_logger.info('User: '+str(self.request.user)+' made a sale:'+str(serializer.data['invoice_number']))
-        terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
-        trail = 'User: '+str(self.request.user)+\
-                ' updated a credited sale :'+str(serializer.data['invoice_number'])+\
-                ' Net#: '+str(serializer.data['total_net'])+\
-                ' Amount paid#:'+str(serializer.data['amount_paid'])
-
-        TerminalHistoryEntry.objects.create(
-                            terminal=terminal,
-                            comment=trail,
-                            crud='deposit',
-                            user=self.request.user
-                        )
-        drawer = DrawerCash.objects.create(manager=self.request.user,                                        
-                                           user = self.request.user,
-                                           terminal=terminal,
-                                           amount=serializer.data['amount_paid'],
-                                           trans_type='credit paid')
-        
-
-
-class SalesListAPIView(generics.ListAPIView):    
+class SalesListAPIView(generics.ListAPIView):
     serializer_class = SalesListSerializer
+
     def get_queryset(self, *args, **kwargs):        
         queryset_list = Sales.objects.all()
         query = self.request.GET.get('q')

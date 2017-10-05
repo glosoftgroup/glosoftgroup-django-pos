@@ -322,11 +322,15 @@ class ProductVariant(models.Model, Item):
             return 0
         return max([stock.quantity_available for stock in self.stock.all()])
 
+    def get_min_price_per_item(self):
+        return self.minimum_price or self.product.minimum_price
+
     def get_price_per_item(self, discounts=None, **kwargs):
         price = self.price_override or self.product.price
         price = calculate_discounted_price(self.product, price, discounts,
                                            **kwargs)
         return price
+
     def get_wholesale_price_per_item(self, discounts=None, **kwargs):
         price = self.wholesale_override or self.product.wholesale_price
         price = calculate_discounted_price(self.product, price, discounts,
