@@ -1,0 +1,32 @@
+/*
+ * Product List Api Product Stock List Api
+
+ * Product Stock List Api
+
+ * GET /api/products/stock?q=qwertyfg
+
+ * HTTP 200 OK
+ * Allow: GET, HEAD, OPTIONS
+ * Content-Type: application/json
+ * Vary: Accept
+ */
+
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 172,
+            "productName": "qwertyfg (_)",
+            "sku": "qwerty12-15-10x",
+            "price": 90.0,
+            "min_price": 56.0,
+            "tax": 16,
+            "discount": 0,
+            "quantity": 95809,
+            "product_category": "Accessories"
+        }
+    ]
+}
+

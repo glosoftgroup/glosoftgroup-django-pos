@@ -145,6 +145,10 @@ class Product(models.Model, ItemRange, index.Indexed):
         pgettext_lazy('Product field', 'price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12,
         validators=[MinValueValidator(0)], default=Decimal(0), decimal_places=2)
+    minimum_price = PriceField(
+        pgettext_lazy('Product variant field', 'minimum price'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
     wholesale_price = PriceField(
         pgettext_lazy('Product field', 'Wholesale price'),
         currency=settings.DEFAULT_CURRENCY, blank=True,null=True, max_digits=12, decimal_places=2)
@@ -270,6 +274,10 @@ class ProductVariant(models.Model, Item):
         pgettext_lazy('Product variant field', 'price override'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
+    minimum_price = PriceField(
+        pgettext_lazy('Product variant field', 'minimum price'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
     wholesale_override = PriceField(
         pgettext_lazy('Product variant field', 'wholesale override'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
@@ -314,11 +322,15 @@ class ProductVariant(models.Model, Item):
             return 0
         return max([stock.quantity_available for stock in self.stock.all()])
 
+    def get_min_price_per_item(self):
+        return self.minimum_price or self.product.minimum_price
+
     def get_price_per_item(self, discounts=None, **kwargs):
         price = self.price_override or self.product.price
         price = calculate_discounted_price(self.product, price, discounts,
                                            **kwargs)
         return price
+
     def get_wholesale_price_per_item(self, discounts=None, **kwargs):
         price = self.wholesale_override or self.product.wholesale_price
         price = calculate_discounted_price(self.product, price, discounts,

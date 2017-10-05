@@ -1,19 +1,14 @@
 from decimal import Decimal
-
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import (
 					SerializerMethodField,
 					ValidationError,					
 				 )
-
 from django.contrib.auth import get_user_model
-User = get_user_model()
 from ...customer.models import Customer
 from ...sale.models import PaymentOption
-#from ...site.models import SiteSettings
-from ...decorators import user_trail
+User = get_user_model()
+
 
 class CustomerListSerializer(serializers.ModelSerializer):    
     cash_equivalency = SerializerMethodField()
@@ -28,7 +23,6 @@ class CustomerListSerializer(serializers.ModelSerializer):
                  'cash_equivalency'
                  )
     def get_cash_equivalency(self, obj):
-        #points_eq = SiteSettings.objects.get(pk=1).loyalty_point_equiv    
         points_eq = PaymentOption.objects.filter(name='Loyalty Points')
         if not points_eq.exists():
             points_eq = 0

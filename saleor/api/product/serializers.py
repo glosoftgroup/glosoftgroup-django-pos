@@ -113,100 +113,11 @@ class SalesListSerializer(serializers.ModelSerializer):
         return name.name
 
 
-class SalesUpdateSerializer(serializers.ModelSerializer):    
-    #solditems = ItemsSerializer(required=False,many=True)    
-    class Meta:
-        model = Sales
-        fields = ('id',                 
-                 'invoice_number',
-                 'total_net',
-                 'sub_total',                
-                 'balance',
-                 'terminal',
-                 'amount_paid',                 
-                 'mobile',
-                 'customer_name',
-                 'status',
-                 #'solditems',
-                 )       
-    
-    def validate_status(self,value):        
-        data = self.get_initial()
-        status = str(data.get('status'))        
-        if status == 'fully-paid' or status == 'payment-pending':
-            status = status 
-            invoice_number = data.get('invoice_number')      
-            amount_paid = Decimal(data.get('amount_paid'))
-            total_net = Decimal(data.get('total_net'))
-            balance = Decimal(data.get('balance'))
-            sale = Sales.objects.get(invoice_number=invoice_number)
-            
-            if status == 'fully-paid' and sale.balance > amount_paid:                
-                raise ValidationError("Status error. Amount paid is less than balance.")        
-            else:
-                return value
-        else:
-            raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')        
-
-    def validate_total_net(self,value):
-        data = self.get_initial()        
-        try:
-            total_net = Decimal(data.get('total_net'))
-        except:
-            raise ValidationError('Total Net should be a decimal/integer')
-
-    def validate_balance(self,value):
-        data = self.get_initial()        
-        try:
-            balance = Decimal(data.get('balance'))
-        except:
-            raise ValidationError('Balance should be a decimal/integer')
-        return value
-
-    def validate_amout_paid(self,value):
-        data = self.get_initial()        
-        try:
-            amount_paid = Decimal(data.get('amount_paid'))
-        except:
-            raise ValidationError('Amount paid should be a decimal/integer')
-        return value
-
-    def validate_terminal(self,value):
-        data = self.get_initial()
-        self.terminal_id = int(data.get('terminal'))
-        #try:
-        terminal = Terminal.objects.filter(pk=self.terminal_id)
-        if terminal:
-            return value
-        else:
-            raise ValidationError('Terminal specified does not exist')
-        # except:
-        #     raise ValidationError('Terminal specified does not exist')
-        
-
-    def update(self, instance, validated_data):
-        terminal = Terminal.objects.get(pk=self.terminal_id)    
-
-        terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))       
-        terminal.save()        
-        instance.balance = instance.balance-validated_data.get('amount_paid', instance.amount_paid)
-        instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
-        if instance.amount_paid >= instance.total_net:
-            instance.status = 'fully-paid'
-        else:
-            instance.status = validated_data.get('status', instance.status)
-        instance.mobile = validated_data.get('mobile', instance.mobile)
-        
-        
-        instance.customer_name = validated_data.get('customer_name', instance.customer_name)
-        instance.save()        
-        return instance
-
-
 class SalesSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
     solditems = TrackSerializer(many=True)
     payment_data = JSONField()
+
     class Meta:
         model = Sales
         fields = ('id',
@@ -259,6 +170,7 @@ class SalesSerializer(serializers.ModelSerializer):
         data = self.get_initial()
         dictionary_value = dict(data.get('payment_data'))
         return value
+
     def validate_status(self,value):
         data = self.get_initial()
         status = str(data.get('status'))        
@@ -266,7 +178,6 @@ class SalesSerializer(serializers.ModelSerializer):
             return value
         else:
             raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')
-        
         
     def validate_terminal(self,value):
         data = self.get_initial()
@@ -334,16 +245,24 @@ class SalesSerializer(serializers.ModelSerializer):
         payment_data = validated_data.get('payment_data')        
         for option in payment_data:
             pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
-            sales.payment_options.add(pay_opt)
-            points_eq = pay_opt.loyalty_point_equiv
-            if points_eq == 0:
-                loyalty_points = 0
+            if pay_opt.name == "Loyalty Points":
+                points_eq = pay_opt.loyalty_point_equiv
+                if points_eq == 0:
+                    loyalty_points = 0
+                else:
+                    loyalty_points = Decimal(option['value']) * Decimal(points_eq)
+                    Customer.objects.redeem_points(customer, loyalty_points)
             else:
-                loyalty_points = int(option['value'])/points_eq
-            try:
-                Customer.objects.gain_points(customer,loyalty_points)
-            except:
-                print 'customer details provided dont meet adding customer criteria'
+                sales.payment_options.add(pay_opt)
+                points_eq = pay_opt.loyalty_point_equiv
+                if points_eq == 0:
+                    loyalty_points = 0
+                else:
+                    loyalty_points = Decimal(option['value'])/Decimal(points_eq)
+                try:
+                    Customer.objects.gain_points(customer,loyalty_points)
+                except:
+                    print 'customer details provided dont meet adding customer criteria'
 
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
@@ -394,7 +313,8 @@ class ProductStockListSerializer(serializers.ModelSerializer):
     tax = SerializerMethodField()
     discount = SerializerMethodField()
     product_category = SerializerMethodField()
-    #description = SerializerMethodField()
+    min_price = SerializerMethodField()
+
     class Meta:        
         model = ProductVariant
         fields = (
@@ -402,6 +322,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             'productName',
             'sku',
             'price',
+            'min_price',
             'tax',
             'discount',
             'quantity',
@@ -426,14 +347,21 @@ class ProductStockListSerializer(serializers.ModelSerializer):
     def get_quantity(self,obj):
         quantity = obj.get_stock_quantity()
         return quantity
-    def get_productName(self,obj):
-        productName = obj.display_product()
-        return productName
-    # def get_description(self,obj):
-    #     return self.products.description
+
+    def get_productName(self, obj):
+        product_name = obj.display_product()
+        return product_name
+
+    def get_min_price(self,obj):
+        try:
+            return obj.get_min_price_per_item().gross
+        except Exception as e:
+            return 0
+
     def get_price(self,obj):
         price = obj.get_price_per_item().gross
         return price
+
     def get_tax(self,obj):
         if obj.product.product_tax:
             tax = obj.product.product_tax.tax

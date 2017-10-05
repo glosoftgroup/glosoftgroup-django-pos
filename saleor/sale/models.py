@@ -196,7 +196,7 @@ class SoldItem(models.Model):
         pgettext_lazy('SoldItem field', 'product_category'), max_length=128, null=True)
     discount = models.DecimalField(
         pgettext_lazy('SoldItem field', 'discount'), default=Decimal(0), max_digits=100, decimal_places=2)
-    tax = models.IntegerField(default=Decimal(0))
+    tax = models.DecimalField(default=Decimal(0), max_digits=100, decimal_places=2)
     
 
     class Meta:

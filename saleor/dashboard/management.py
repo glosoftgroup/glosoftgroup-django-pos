@@ -4,6 +4,7 @@ from django.contrib.auth.models import Permission
 from ..sale.models import PaymentOption, Terminal
 from ..product.models import StockLocation
 
+
 def add_stock_location(sender,**kwargs):
     try:
         store = StockLocation.objects.filter(name='default')
@@ -12,6 +13,7 @@ def add_stock_location(sender,**kwargs):
     except Exception as e:
         print e
 
+
 def add_terminal(sender,**kwargs):
     try:
         terminal = Terminal.objects.all()
@@ -19,6 +21,7 @@ def add_terminal(sender,**kwargs):
             Terminal.objects.create(terminal_name="Till-001",terminal_number=1)
     except Exception as e:
         print e
+
 
 def add_payment_options(sender, **kwargs):
     try:
