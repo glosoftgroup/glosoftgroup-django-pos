@@ -81,8 +81,8 @@ def sales_list(request):
 			setattr(sale, 'totalCostPrice', quantity)
 			try:
 				grossProfit = sale.total_net - totalCostPrice
-				margin = round(sale.total_net - quantity - i.total_tax, 2)
-			except:
+				margin = round(sale.total_net - quantity - sale.total_tax, 2)
+			except Exception as e:
 				grossProfit = 0
 				margin = 0
 			setattr(sale, 'margin', margin)
@@ -194,9 +194,8 @@ def sales_paginate(request):
 				setattr(sale, 'totalCostPrice', quantity)
 				try:
 					grossProfit = sale.total_net - totalCostPrice
-					margin = sale.total_net - quantity
+					margin = round(sale.total_net - quantity - sale.total_tax, 2)
 					status = 'true'
-					# margin = round((grossProfit / sale.total_net) * 100, 2)
 				except:
 					grossProfit = 0
 					margin = 0

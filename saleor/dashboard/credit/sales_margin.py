@@ -134,21 +134,21 @@ def sales_margin(request):
 			'reportImage':image
 		}
 		if pdf:
-			pdf = render_to_pdf('dashboard/reports/sales_margin/pdf.html', data)
+			pdf = render_to_pdf('dashboard/reports/sales_profit/pdf.html', data)
 			return HttpResponse(pdf, content_type='application/pdf')
 		elif jax:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin/ajax.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales_profit/ajax.html', data)
 		else:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin/margin.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales_profit/profit.html', data)
 	except Exception, e:
 		data = {
 			'status': 'false',
 			'date':date2
 		}
 		if jax:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin/ajax.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales_profit/ajax.html', data)
 		else:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin/margin.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales_profit/profit.html', data)
 
 @staff_member_required
 def sales_tax(request):

@@ -10,7 +10,7 @@
         <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}">{{sale.quantity}}</td>
         <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.totalCostPrice|intcomma }}</span></td>
         <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
-        <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span>{{sale.margin|intcomma }}</span></td>
+        <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.margin|intcomma }}</span></td>
       </tr>
         <script type="text/javascript">
         $(document).ready(function(){

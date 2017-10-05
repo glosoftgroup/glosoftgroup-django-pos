@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 
-from . import views,charts, pdfs,  purchase, sales_margin, sales_tax, sales_margin2, product_sales
+from . import views,charts, pdfs,  purchase, sales_profit, sales_tax, sales_margin2, product_sales
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -91,9 +91,9 @@ urlpatterns = [
 		url(r'^cpdf/(?P<image>.+)/$', pdfs.chart_pdf, name='chart_pdf'),
 		url(r'^csv/(?P<image>.+)/$', pdfs.sales_export_csv, name='chart_csv'),
 
-		url( r'^datechart/$',  permission_required('reports.view_sale_reports', login_url='not_found')
+		url( r'^summary/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_date_chart), name = 'sales_date_chart' ),
-		url( r'^datechartimage/(?P<image>.+)/$', charts.sales_date_chart, name = 'sales_date_chart' ),
+		url( r'^summary/image/(?P<image>.+)/$', charts.sales_date_chart, name = 'sales_date_chart' ),
 		url( r'^productchart/$',  permission_required('reports.view_products_reports', login_url='not_found')
 			(charts.sales_product_chart), name = 'sales_product_chart' ),
 	    url( r'^productchart/pnt/$',  permission_required('reports.view_products_reports', login_url='not_found')
@@ -123,8 +123,8 @@ urlpatterns = [
 		url( r'^ttd/$', charts.get_terminal_sale_details, name = 'get_terminal_sale_details' ),
 		url( r'^weekfilter/$', charts.get_sales_by_week, name = 'get_sales_by_week' ),
 
-		url( r'^sales/margin/$', sales_margin.sales_margin, name = 'sales_margin' ),
-		url( r'^sales/tax/report/$', sales_margin.sales_tax, name = 'sales_tax' ),
+		url( r'^sales/profit/$', sales_profit.sales_profit, name ='sales_profit'),
+		url( r'^sales/tax/report/$', sales_profit.sales_tax, name ='sales_tax'),
 
 ]
 

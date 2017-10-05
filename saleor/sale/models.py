@@ -37,11 +37,11 @@ class PaymentOption(models.Model):
         pgettext_lazy('Payment option field', 'description'), blank=True)
     loyalty_point_equiv = models.IntegerField( pgettext_lazy('Site field', 'loyalty points equivalency'),
         validators=[MinValueValidator(0)], default=Decimal(0))
-    
+
     class Meta:     
         verbose_name = pgettext_lazy('Payment option model', 'Payment')
         verbose_name_plural = pgettext_lazy('Payment options model', 'Payments')
-    
+
     def __str__(self):
         return str(self.name)
 
@@ -55,12 +55,12 @@ class Terminal(models.Model):
         pgettext_lazy('Terminal field', 'created'),
         default=now, editable=False)
     amount = models.IntegerField(default=Decimal(0))
-    
+
 
     class Meta:     
         verbose_name = pgettext_lazy('Terminal model', 'Terminal')
         verbose_name_plural = pgettext_lazy('Terminals model', 'Terminals')
-        
+
     def __str__(self):
         return str(self.terminal_name)+' #'+str(self.terminal_number)
 
@@ -83,7 +83,7 @@ class TerminalHistoryEntry(models.Model):
     terminal = models.ForeignKey(
         Terminal, related_name='history',
         verbose_name=pgettext_lazy('Terminal history entry field', 'order'))
-    
+
     comment = models.CharField(
         pgettext_lazy('Terminal history entry field', 'comment'),
         max_length=100, default='', blank=True)
@@ -107,7 +107,7 @@ class TerminalHistoryEntry(models.Model):
             'TerminalHistoryEntry for terminal #%d') % self.terminal.pk
 
 
-        
+
 @python_2_unicode_compatible
 class Sales(models.Model):
     status = models.CharField(
@@ -141,25 +141,25 @@ class Sales(models.Model):
         verbose_name=pgettext_lazy('Sales field', 'order'))
     invoice_number = models.CharField(
         pgettext_lazy('Sales field', 'invoice_number'),unique=True, null=True, max_length=36,)
-    
+
     total_net = models.DecimalField(
         pgettext_lazy('Sales field', 'total net'), default=Decimal(0), max_digits=100, decimal_places=2)
     total_tax = models.DecimalField(
         pgettext_lazy('Sales field', 'total tax'), default=Decimal(0), max_digits=100, decimal_places=2)    
     sub_total = models.DecimalField(
         pgettext_lazy('Sales field', 'sub total'), default=Decimal(0), max_digits=100, decimal_places=2)
-    
+
     total_tax = models.DecimalField(
         pgettext_lazy('Sales field', 'total tax'), default=Decimal(0), max_digits=100, decimal_places=2)
     amount_paid = models.DecimalField(
         pgettext_lazy('Sales field', 'amount paid'), default=Decimal(0), max_digits=100, decimal_places=2)
-    
+
     balance = models.DecimalField(
         pgettext_lazy('Sales field', 'balance'), default=Decimal(0), max_digits=100, decimal_places=2)
-    
+
     discount_amount = models.DecimalField(
         pgettext_lazy('Sales field', 'total discount'), default=Decimal(0), max_digits=100, decimal_places=2)
-    
+
     discount_name = models.CharField(
         verbose_name=pgettext_lazy('Sales field', 'discount name'),
         max_length=255, default='', blank=True)
@@ -172,12 +172,12 @@ class Sales(models.Model):
         ordering = ('-last_status_change',)
         verbose_name = pgettext_lazy('Sales model', 'Sales')
         verbose_name_plural = pgettext_lazy('Sales model', 'Sales')
-        
+
     def __str__(self):
         return self.invoice_number
     def __unicode__(self):
         return unicode(self.invoice_number)
-                                
+
 class SoldItem(models.Model):
     sales = models.ForeignKey(Sales,related_name='solditems',on_delete=models.CASCADE)
     order = models.IntegerField(default=Decimal(1))
@@ -197,7 +197,7 @@ class SoldItem(models.Model):
     discount = models.DecimalField(
         pgettext_lazy('SoldItem field', 'discount'), default=Decimal(0), max_digits=100, decimal_places=2)
     tax = models.IntegerField(default=Decimal(0))
-    
+
 
     class Meta:
         #unique_together = ('sales')
@@ -230,7 +230,7 @@ class DrawerCash(models.Model):
     class Meta:     
         verbose_name = pgettext_lazy('DrawerCash model', 'DrawerCash')
         verbose_name_plural = pgettext_lazy('DrawerCash model', 'DrawerCash')
-        
+
     def __str__(self):
         return str(self.user)+' '+str(self.amount)
 

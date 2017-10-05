@@ -31,65 +31,30 @@ from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, convert_html_to_pdf, image64
 
 @staff_member_required
-def sales_margin(request):
-	get_date = request.GET.get('date')
+def sales_profit(request):
+	month = request.GET.get('month')
+	year = request.GET.get('year')
 	pdf = request.GET.get('pdf')
 	image = request.GET.get('image')
 	jax = request.GET.get('ajax')
 
-	dateFrom = request.GET.get('dateFrom')
-	dateTo = request.GET.get('dateTo')
-
-	today = datetime.datetime.now()
-	if get_date:
-		date = get_date
-		date2 = request.GET.get('date2')
-	elif dateFrom and dateTo:
-		x = []
-		a, b, c = dateFrom.split('-')
-		x.append(c)
-		x.append(b)
-		x.append(a)
-		dateFrom2 = '-'.join(x)
-		y = []
-		d, e, f = dateTo.split('-')
-		y.append(f)
-		y.append(e)
-		y.append(d)
-		dateTo2 = '-'.join(y)
-
-		z = []
-		g, h, i = dateTo.split('-')
-		z.append(g)
-		if i == '30':
-			z.append(h)
-			z.append(str(int(i) + 1))
-		elif i =='31':
-			z.append(str(int(h) + 1))
-			z.append('01')
-		else:
-			z.append(h)
-			z.append(str(int(i) + 1))
-		dateTo = '-'.join(z)
-		date2 = dateFrom2 + ' - ' + dateTo2
-	else:
-		try:
-			last_sale = Sales.objects.latest('id')
-			date = DateFormat(last_sale.created).format('Y-m-d')
-			date2 = DateFormat(last_sale.created).format('d/m/Y')
-		except:
-			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
-			date2 = DateFormat(datetime.datetime.today()).format('d/m/Y')
+	thisMonth = datetime.datetime.today().month
+	thisYear = datetime.datetime.today().year
 
 	try:
-		if dateFrom and dateTo:
-			sales = Sales.objects.filter(created__range=[str(dateFrom), str(dateTo)])
-			soldItems = SoldItem.objects.filter(sales__created__range=[str(dateFrom), str(dateTo)]).order_by('-id')
+		if year and month:
+			sales = Sales.objects.filter(created__year=year, created__month=month)
+			soldItems = SoldItem.objects.filter(sales__created__year=year, sales__created__month=month).order_by('-id')
+			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
+			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+		elif year:
+			sales = Sales.objects.filter(created__year=year)
+			soldItems = SoldItem.objects.filter(sales__created__year=year).order_by('-id')
 			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
 			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
 		else:
-			sales = Sales.objects.filter(created__icontains=date).order_by('-id')
-			soldItems = SoldItem.objects.filter(sales__created__icontains=date).order_by('-id')
+			sales = Sales.objects.filter(created__year=thisYear, created__month=thisMonth)
+			soldItems = SoldItem.objects.filter(sales__created__year=thisYear, sales__created__month=thisMonth).order_by('-id')
 			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
 			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
 
@@ -122,6 +87,8 @@ def sales_margin(request):
 			status = 'false'
 
 		img = image64()
+		startYear = Sales.objects.all().first().created.year
+		startMonth = Sales.objects.all().first().created.month
 		data = {
 			'totalCostPrice':totalCostPrice,
 			'totalSales':totalSales,
@@ -129,30 +96,32 @@ def sales_margin(request):
 			'grossProfit':grossProfit,
 			'markup':markup,
 			'margin':margin,
-			'date':date2,
+			'date':year,
 			'status':status,
 			'puller':request.user,
 			'image': img,
-			'reportImage':image
+			'reportImage':image,
+			'startYear':startYear,
+			'startMonth':startMonth
 		}
 		if pdf:
-			pdf = render_to_pdf('dashboard/reports/sales_margin/pdf.html', data)
+			pdf = render_to_pdf('dashboard/reports/sales_profit/pdf.html', data)
 			return HttpResponse(pdf, content_type='application/pdf')
 		elif jax:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin/ajax.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales_profit/ajax.html', data)
 		else:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin/margin.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales_profit/profit.html', data)
 	except Exception, e:
 		print (e)
 		# return HttpResponse(e)
 		data = {
 			'status': 'false',
-			'date':date2
+			'date':year
 		}
 		if jax:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin/ajax.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales_profit/ajax.html', data)
 		else:
-			return TemplateResponse(request, 'dashboard/reports/sales_margin/margin.html', data)
+			return TemplateResponse(request, 'dashboard/reports/sales_profit/profit.html', data)
 
 @staff_member_required
 def sales_tax(request):

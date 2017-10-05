@@ -9,11 +9,12 @@
   Sales Profit Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:sales_margin' %}">Sales Profit</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_profit' %}">Sales Profit</a></li>
  {% endblock %}
 
 {% block menu_report_margin_class %}active{% endblock %}
  {% block custom_css %}
+ <link href="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet" type="text/css">
    <style type="text/css">
     label.error{
       color: #FF5722;
@@ -42,16 +43,25 @@
 
         <div class="panel-body search-panel">
             <div class="col-md-12">
-            <div class="col-md-4">
-              <label>pick a date</label>
+            <div class="col-md-2">
+              <label>Year:</label>
               <div class="form-group">
                 <div class="input-group">
-                  <input class="form-control daterange-single" type="text" placeholder="yyyy-mm-dd">
+                  <input class="form-control date-year" type="text" placeholder="yyyy">
                   <span class="input-group-addon"><i class="icon-calendar22"></i></span>
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
+                <div class="col-md-2">
+              <label>Month:</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control date-month" type="text" placeholder="mm/yyyy">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
              <label>Export</label>
               <div class="form-group">
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
@@ -190,25 +200,40 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/js/bootstrap-datepicker.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript">
-$('.rangeBtn').on('click', function(){
-  $('.rangeDates').slideToggle();
-})
-    // Show calendars on left
-    $('.daterange-single').daterangepicker({
-        singleDatePicker: true,
-        locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true,
-        autoUpdateInput:false
-    }, function(chosen_date) {
-        $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
-        var date2 = chosen_date.format('DD-MM-YYYY')
-        var date = $('.daterange-single').val();
-        $.get("{% url 'dashboard:sales_margin' %}",{ajax:'ajax',date:date, date2:date2}, function(data){
+var grossUrl = "{% url 'dashboard:sales_profit' %}";
+    $('.date-year').datepicker({
+        format: "yyyy",
+        autoclose: true,
+        startDate: '{{startYear}}',
+        endDate: 'now',
+        minViewMode: "years"})
+    .on('changeDate', function(e) {
+        var year = e.date.getFullYear();
+       $.get(grossUrl,{ajax:'ajax', year:year}, function(data){
            $('#pagination-div').html(data);
         });
     });
+
+$('.date-month').datepicker({
+    format: "M/yyyy",
+    autoclose: true,
+    startDate: '{{startMonth}}/{{startYear}}',
+    endDate: 'now',
+    minViewMode: "months"})
+    .on('changeDate', function(e) {
+        var month = e.date.getMonth()+1;
+        var year = e.date.getFullYear();
+       $.get(grossUrl,{ajax:'ajax',month:month, year:year}, function(data){
+           $('#pagination-div').html(data);
+        });
+    });
+
+$('.rangeBtn').on('click', function(){
+  $('.rangeDates').slideToggle();
+})
 
     $('.dateFrom').daterangepicker({
         singleDatePicker: true,
@@ -245,7 +270,7 @@ $('.rangeBtn').on('click', function(){
           $('.rangeDates').slideUp();
           $('.dateFrom').val('');
           $('.dateTo').val('');
-          $.get("{% url 'dashboard:sales_margin' %}",{ajax:'ajax',dateFrom:from, dateTo:to}, function(data){
+          $.get("{% url 'dashboard:sales_profit' %}",{ajax:'ajax',dateFrom:from, dateTo:to}, function(data){
              $('#pagination-div').html(data);
           });
       }
@@ -261,14 +286,13 @@ $('.rangeBtn').on('click', function(){
     }).on('change', function(){
 
         var ts = $(this).val();
-        var date = $('.daterange-single');
         if(ts == 'pdf'){
             var node = document.getElementById('reportBody')
                     domtoimage.toPng(node)
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                       $.get("{% url 'dashboard:sales_margin' %}",{pdf:'pdf',image:dataUrl}, function(data){
+                       $.get("{% url 'dashboard:sales_profit' %}",{pdf:'pdf',image:dataUrl}, function(data){
                             window.open("data:application/pdf," + escape(data));
                         });
                     }).catch(function (error) {

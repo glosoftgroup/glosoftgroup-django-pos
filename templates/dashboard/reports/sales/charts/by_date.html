@@ -93,8 +93,10 @@
   </div>
 </div>
 
+  <div class="row">
   <div class="col-md-12">
-      <div class="panel panel-flat">
+      <div class="col-md-6">
+      <div class="panel panel-flat" id="ss">
         <div class="panel-heading">
           <h6 class="panel-title">Sales Summary</h6>
           <div class="heading-elements">
@@ -118,10 +120,8 @@
                         <th>
                         </th>
                         <th class="right-align">
-                          Sales
+                            <span class="pull-right">Sales</span>
                         </th>
-                        <th> Refund </th>
-                        <th> Net </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -130,57 +130,34 @@
                             <span style="font-weight: bold;">Gross Sales</span>
                           </td>
                           <td class="right-align">
-                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_gross_sales }}
-                            </div>
-                          </td>
-                          <td class="right-align">
-                            <span style="font-weight: bold;">0.00</span>
-                          </td>
-                          <td>
-                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_gross_sales }}
+                            <div style="font-weight: bold;">
+                                <span class="pull-right">{{ date_gross_sales }}</span>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>Discounts</td>
                           <td class="right-align">
-                              <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_discount }}
+                              <div style="font-weight: bold;">
+                                  <span class="pull-right">{{ date_total_discount }}</span>
                             </div>
                           </td>
-                          <td>0.00</td>
-                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_discount }}</div></td>
                         </tr>
                         <tr>
                           <td>Tax</td>
                           <td class="right-align">
-                              <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_tax }}
+                              <div style="font-weight: bold;">
+                                  <span class="pull-right">{{ date_total_tax }}</span>
                             </div>
                           </td>
-                          <td>0.00</td>
-                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_tax }}
-                            </div></td>
                         </tr>
                         <tr data-action-go="">
                           <td>
                             <span style="font-weight: bold;">Net Sales</span>
                           </td>
                           <td class="right-align">
-                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
-                            </div>
-                          </td>
-                          <td class="right-align">
-                            <span style="font-weight: bold;">0.00</span>
-                          </td>
-                          <td>
-                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
+                            <div style="font-weight: bold;">
+                                <span class="pull-right">{{ date_total_sales }}</span>
                             </div>
                           </td>
                         </tr>
@@ -190,7 +167,7 @@
               {% else %}
                 <div class="card-content card-content--no-data not-found">
                   <p class="grey-text">
-                    {% trans "No products are low in stock." context "Empty low stock table message" %}
+                    No Sales Summary Available
                   </p>
                 </div>
               {% endif %}
@@ -199,6 +176,90 @@
         </div>
 
     </div>
+      <div class="col-md-6">
+      <div class="panel panel-flat" id="ss2">
+        <div class="panel-heading">
+          <h6 class="panel-title">Cash Drawer Summary</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+
+        <div class="panel-body">
+
+            <div class="card">
+
+              {% if cashiers %}
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead style="border-top:1px solid #ddd;">
+                      <tr class="bg-primary">
+                        <th class="right-align">
+                            <span style="font-weight: bold;">Sales</span>
+                        </th>
+                          <th class="right-align">
+                              <span class="pull-right">{{ date_gross_sales }}</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Balance Brought Down</td>
+                          <td class="right-align">
+                              <div >
+                                  <span class="pull-right">{{ date_total_discount }}</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                            <td>Deposit</td>
+                          <td class="right-align">
+                              <div>
+                                  <span class="pull-right">{{ date_total_tax }}</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr data-action-go="">
+                          <td>
+                            <span>Withdrawals</span>
+                          </td>
+                          <td class="right-align">
+                            <div>
+                              <span class="pull-right">{{ date_gross_sales }}</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr data-action-go="">
+                          <td>
+                            <span>Balance Carried Forward</span>
+                          </td>
+                          <td class="right-align">
+                            <div>
+                              <span class="pull-right">{{ date_gross_sales }}</span>
+                            </div>
+                          </td>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="card-content card-content--no-data not-found">
+                  <p class="grey-text">
+                    No Cash Drawer Summary Available
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+    </div>
+  </div>
+</div>
 
   <div class="col-md-12">
       <div class="panel panel-flat">

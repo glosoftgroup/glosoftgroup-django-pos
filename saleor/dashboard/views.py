@@ -211,7 +211,7 @@ def top_items():
             highest_item = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
                 c=Count('product_name', distinct=False)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')[:1]
             lowest_item = SoldItem.objects.filter(sales__created__contains=date).values('product_name').annotate(
-                c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('quantity__sum')[:1]
+                c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('quantity__sum', 'total_cost__sum')[:1]
             sales_by_category_totals = sales_by_category.aggregate(Sum('quantity__sum'))['quantity__sum__sum']
             new_sales = []
             for sales in sales_by_category:

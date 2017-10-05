@@ -232,7 +232,8 @@ $(document).ready(function(){
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true,
-        autoUpdateInput:false
+        autoUpdateInput:false,
+        maxDate:new Date()
     }, function(chosen_date) {
         $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
         var group_id = $('.daterange-single').val();
