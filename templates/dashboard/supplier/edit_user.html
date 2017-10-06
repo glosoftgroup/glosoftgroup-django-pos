@@ -299,6 +299,18 @@ function disable_profile_tab(){
     }
   });
 
+  {% if request.GET.contacts %}
+    $.when( $.ready ).then(function() {     
+       $('#profile-tab').removeClass('active');
+       $('#profile').removeClass('active');
+       //activate pricing tab
+       $('#contacts-tab').addClass('active');
+       $('#contacts').addClass('active');
+
+                     
+    });
+  {% endif %}
+
 </script>
 
 {% endblock %}

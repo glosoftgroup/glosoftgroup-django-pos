@@ -127,10 +127,10 @@ class Customer(models.Model):
         pgettext_lazy('Customer field', 'active'),
         default=True)
     creditable = models.BooleanField(default=False)
-    loyalty_points = models.DecimalField(
-        pgettext_lazy('Customer field', 'loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
-    redeemed_loyalty_points = models.DecimalField(
-        pgettext_lazy('Customer field', 'Redeemed loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)    
+    loyalty_points = models.IntegerField(
+        pgettext_lazy('Customer field', 'loyalty points'), default=0)    
+    redeemed_loyalty_points = models.IntegerField(
+        pgettext_lazy('Customer field', 'Redeemed loyalty points'), default=0)    
     
     nid = models.CharField(max_length=100, null=True,blank=True)
     mobile = models.CharField(max_length=100, null=True, blank=True)
@@ -145,14 +145,9 @@ class Customer(models.Model):
     default_billing_address = models.ForeignKey(
         AddressBook, related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL,
-        verbose_name=pgettext_lazy('Customer field', 'default billing address'))
-
-    # USERNAME_FIELD = 'email'
+        verbose_name=pgettext_lazy('Customer field', 'default billing address'))    
 
     objects = CustomerManager()
-
-    # search_fields = [
-    #     index.SearchField('email')]
 
     class Meta:
         verbose_name = pgettext_lazy('Customer model', 'customer')
@@ -198,12 +193,12 @@ class Customer(models.Model):
 
     def get_loyalty_points(self):
         if self.loyalty_points != 0.00:
-            return cool_format(self.loyalty_points)
+            return cool_int_format(self.loyalty_points)
         return 0
 
     def get_redeemed_loyalty_points(self):
-        if self.redeemed_loyalty_points != 0.00:
-            return cool_format(self.redeemed_loyalty_points)
+        if self.redeemed_loyalty_points != 0:
+            return cool_int_format(self.redeemed_loyalty_points)
         return 0
 
     def get_loy_perc(self):        
@@ -211,7 +206,7 @@ class Customer(models.Model):
         loyalty  = self.loyalty_points
         total = redeemed + loyalty       
         if not total:
-            return 0.00
+            return 0
         return (100*loyalty)/total
 
     def get_rem_perc(self):        
@@ -223,12 +218,13 @@ class Customer(models.Model):
         return (100*redeemed)/total
 
 
-def cool_format(value):
-     value = Decimal(value)
-     if value < 1000.00:
-        return str("%.2f" % value)
-     elif value < Decimal(1000000.0):
-        value = value/Decimal(1000.0)
-        return str("%.2f" % value) + 'K'
+
+def cool_int_format(value):
+     value = int(value)
+     if value < 1000:
+        return str(value)
+     elif value < 1000000:
+        value = value/1000
+        return str(value) + 'K'
      else:
-        return str("%.2f" % value/Decimal(1000000.0)) + 'M'
+        return str(value/1000000) + 'M'

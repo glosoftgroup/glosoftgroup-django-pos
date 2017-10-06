@@ -251,7 +251,7 @@ class SalesSerializer(serializers.ModelSerializer):
                     loyalty_points = 0
                 else:
                     loyalty_points = Decimal(option['value']) * Decimal(points_eq)
-                    Customer.objects.redeem_points(customer, loyalty_points)
+                    Customer.objects.redeem_points(customer, int(loyalty_points))
             else:
                 sales.payment_options.add(pay_opt)
                 points_eq = pay_opt.loyalty_point_equiv
@@ -259,8 +259,9 @@ class SalesSerializer(serializers.ModelSerializer):
                     loyalty_points = 0
                 else:
                     loyalty_points = Decimal(option['value'])/Decimal(points_eq)
-                try:
-                    Customer.objects.gain_points(customer,loyalty_points)
+                try:                    
+                    if int(loyalty_points) != 0:
+                        Customer.objects.gain_points(customer,loyalty_points)
                 except:
                     print 'customer details provided dont meet adding customer criteria'
 

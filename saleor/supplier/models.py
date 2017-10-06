@@ -124,7 +124,7 @@ class SupplierManager(BaseUserManager):
     
 
 class Supplier(models.Model):
-    email = models.EmailField(pgettext_lazy('Supplier field', 'email'), unique=True)
+    email = models.EmailField(pgettext_lazy('Supplier field', 'email'))
     name = models.CharField(max_length=100, null=True, blank=True)
     street1 = models.CharField(max_length=128, null=True, blank=True)    
     street2 = models.CharField(max_length=128, null=True, blank=True)    
@@ -155,12 +155,9 @@ class Supplier(models.Model):
         on_delete=models.SET_NULL,
         verbose_name=pgettext_lazy('Supplier field', 'default billing address'))
 
-    USERNAME_FIELD = 'email'
-
+    
     objects = SupplierManager()
 
-    search_fields = [
-        index.SearchField('email')]
     
     class Meta:
         verbose_name = pgettext_lazy('Supplier model', 'supplier')

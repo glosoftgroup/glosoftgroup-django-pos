@@ -13,10 +13,12 @@ from ...supplier.models import Supplier, AddressBook
 
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf
+from django.core.urlresolvers import reverse
 import csv
 import random
 from django.utils.encoding import smart_str
 import logging
+import json
 from datetime import date
 
 debug_logger = logging.getLogger('debug_logger')
@@ -193,15 +195,13 @@ def user_process(request):
 		except:
 			error_logger.info('Error when saving ')
 		last_id = Supplier.objects.latest('id')
-		if groups:
-			permissions = Permission.objects.filter(group__name__in=groups)
-			last_id.user_permissions.add(*permissions)
-			gps = Group.objects.filter(name__in=groups)
-			last_id.groups.add(*gps)
-			last_id.save()
-		user_trail(request.user.name, 'created user: '+str(name),'add')
-		info_logger.info('User: '+str(request.user.name)+' created user:'+str(name))
-		return HttpResponse(last_id.id)
+		
+		user_trail(request.user.name, 'created supplier: '+str(name),'add')
+		info_logger.info('User: '+str(request.user.name)+' created supplier:'+str(name))
+		success_url = reverse(
+            'dashboard:supplier-edit', kwargs={'pk': last_id.pk})
+        
+		return HttpResponse(json.dumps({'success_url':success_url}),content_type='application/json')
 
 def user_detail(request, pk):
 	user = get_object_or_404(Supplier, pk=pk)
