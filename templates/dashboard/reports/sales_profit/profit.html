@@ -43,25 +43,27 @@
 
         <div class="panel-body search-panel">
             <div class="col-md-12">
-            <div class="col-md-2">
-              <label>Year:</label>
+                <div class="col-md-2">
+             <label>Period:</label>
               <div class="form-group">
-                <div class="input-group">
-                  <input class="form-control date-year" type="text" placeholder="yyyy">
-                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                </div>
+                 <select class="bootstrap-select period-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="quarter">Quarterly</option>
+                    <option value="year">Yearly</option>
+                  </select>
               </div>
             </div>
-                <div class="col-md-2">
-              <label>Month:</label>
+            <div class="col-md-3">
+              <label>Ending Month:</label>
               <div class="form-group">
                 <div class="input-group">
                   <input class="form-control date-month" type="text" placeholder="mm/yyyy">
+                    <input type="hidden" class="hidden-year">
+                    <input type="hidden" class="hidden-month">
                   <span class="input-group-addon"><i class="icon-calendar22"></i></span>
                 </div>
               </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 pull-right">
              <label>Export</label>
               <div class="form-group">
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
@@ -70,35 +72,11 @@
                   </select>
               </div>
             </div>
-            <div class="col-md-4">
-             <label style="visibility:hidden;">Export</label>
-              <button class="btn btn-primary btn-block rangeBtn">DATE RANGE SEARCH</button>
-            </div>
-        </div>
-            <div class="col-md-12 rangeDates">
-                <div class="col-md-3">
-              <label>From</label>
-              <div class="form-group">
-                <div class="input-group">
-                  <input class="form-control dateFrom" type="text" placeholder="From:">
-                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-             <label>To</label>
-              <div class="form-group">
-                <div class="input-group">
-                  <input class="form-control dateTo" type="text" placeholder="To:">
-                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                </div>
-              </div>
-            </div>
             <div class="col-md-2">
              <label style="visibility:hidden;">Export</label>
-              <button class="btn btn-primary btn-block btnRangeSearch">SEARCH</button>
+              <button class="btn btn-primary btn-block rangeBtn">SEARCH</button>
             </div>
-            </div>
+        </div>
       </div>
    </div>
    </div>
@@ -107,6 +85,47 @@
 
 {% if status == 'true' %}
 <div id="pagination-div">
+    <div class="col-md-12">
+      <div class="panel panel-flat" id="ss2">
+
+        <div class="panel-body">
+
+            <div class="card">
+
+                <div class="data-table-container">
+                  <table class="table bordered highlight responsive data-table">
+                    <thead style="border-top:1px solid #ddd;">
+                      <tr class="bg-primary">
+                        <th class="right-align">
+                            <span style="font-weight: bold;">Gross Sales</span>
+                        </th>
+
+                          {% for i in dateperiod %}
+                              <th class="right-align">
+                                  <span class="pull-right">{{ i }}</span>
+                              </th>
+                          {% endfor %}
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Balance Brought Down</td>
+                            {% for i in dateperiod %}
+                              <td class="right-align">
+                                  <div >
+                                      <span class="pull-right">{{ i.totalSales }}</span>
+                                </div>
+                              </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+          </div>
+        </div>
+
+    </div>
 <div class="col-md-12">
     <div class="panel panel-flat">
       <div class="panel-body" id="reportBody">
@@ -204,21 +223,9 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript">
 var grossUrl = "{% url 'dashboard:sales_profit' %}";
-    $('.date-year').datepicker({
-        format: "yyyy",
-        autoclose: true,
-        startDate: '{{startYear}}',
-        endDate: 'now',
-        minViewMode: "years"})
-    .on('changeDate', function(e) {
-        var year = e.date.getFullYear();
-       $.get(grossUrl,{ajax:'ajax', year:year}, function(data){
-           $('#pagination-div').html(data);
-        });
-    });
 
 $('.date-month').datepicker({
-    format: "M/yyyy",
+    format: "MM/yyyy",
     autoclose: true,
     startDate: '{{startMonth}}/{{startYear}}',
     endDate: 'now',
@@ -226,58 +233,20 @@ $('.date-month').datepicker({
     .on('changeDate', function(e) {
         var month = e.date.getMonth()+1;
         var year = e.date.getFullYear();
-       $.get(grossUrl,{ajax:'ajax',month:month, year:year}, function(data){
-           $('#pagination-div').html(data);
-        });
+        $('.hidden-year').val(year);
+        $('.hidden-month').val(month);
     });
 
 $('.rangeBtn').on('click', function(){
-  $('.rangeDates').slideToggle();
-})
+    var period = $('.period-sz').find(":selected").val();
+    var m = $('.hidden-month').val();
+    var y = $('.hidden-year').val();
+    $.get(grossUrl,{ajax:'ajax',month:m, year:y, period:period}, function(data){
+           $('#pagination-div').html(data);
+        });
+});
 
-    $('.dateFrom').daterangepicker({
-        singleDatePicker: true,
-        locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true,
-        autoUpdateInput:false
-    }, function(chosen_date) {
-        $('.dateFrom').val(chosen_date.format('YYYY-MM-DD'));
-    });
-    $('.dateTo').daterangepicker({
-        singleDatePicker: true,
-        locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true,
-        autoUpdateInput:false
-    }, function(chosen_date) {
-        $('.dateTo').val(chosen_date.format('YYYY-MM-DD'));
-    });
-
-    $('.btnRangeSearch').on('click', function(){
-      var from =  $('.dateFrom').val();
-      var to = $('.dateTo').val();
-
-      if(from == ''){
-            $.jGrowl('please fill in the Start Date', {
-                          header: 'Oh snap!',
-                          theme: 'bg-danger'
-                      });
-      }else if(to == ''){
-          $.jGrowl('please fill in the End Date', {
-                              header: 'Oh snap!',
-                              theme: 'bg-danger'
-                          });
-      }else{
-          $('.rangeDates').slideUp();
-          $('.dateFrom').val('');
-          $('.dateTo').val('');
-          $.get("{% url 'dashboard:sales_profit' %}",{ajax:'ajax',dateFrom:from, dateTo:to}, function(data){
-             $('#pagination-div').html(data);
-          });
-      }
-
-    });
-
-
+    $('.period-sz').selectpicker({});
     $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
@@ -292,7 +261,7 @@ $('.rangeBtn').on('click', function(){
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                       $.get("{% url 'dashboard:sales_profit' %}",{pdf:'pdf',image:dataUrl}, function(data){
+                       $.get(grossUrl,{pdf:'pdf',image:dataUrl}, function(data){
                             window.open("data:application/pdf," + escape(data));
                         });
                     }).catch(function (error) {

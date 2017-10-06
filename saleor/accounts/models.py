@@ -29,6 +29,12 @@ class Expenses(models.Model):
 	phone = models.CharField(max_length=100, null=True, blank=True)
 	amount = models.DecimalField(max_digits=100, decimal_places=2, null=True, blank=True)
 
+	def __str__(self):
+		return self.expense_type
+
+	def __unicode__(self):
+		return unicode(self.expense_type)
+
 class PersonalExpenses(models.Model):
 	added_on = models.DateTimeField(default=now, editable=False)
 	expense_date = models.CharField(max_length=100, null=True, blank=True)
@@ -42,11 +48,29 @@ class PersonalExpenses(models.Model):
 	phone = models.CharField(max_length=100, null=True, blank=True)
 	amount = models.DecimalField(max_digits=100, decimal_places=2, null=True, blank=True)
 
+	def __str__(self):
+		return self.expense_type
+
+	def __unicode__(self):
+		return unicode(self.expense_type)
+
 class ExpenseType(models.Model):
 	name = models.CharField(max_length=100, null=True, blank=True)
+
+	def __str__(self):
+		return self.name
+
+	def __unicode__(self):
+		return unicode(self.name)
 
 class PettyCash(models.Model):
 	created = models.DateTimeField(default=now, editable=False)
 	opening = models.DecimalField(max_digits=100, decimal_places=2, null=True)
 	added = models.DecimalField(max_digits=100, decimal_places=2, null=True)
 	closing = models.DecimalField(max_digits=100, decimal_places=2, null=True)
+
+	def __str__(self):
+		return self.created
+
+	def __unicode__(self):
+		return unicode(self.created)

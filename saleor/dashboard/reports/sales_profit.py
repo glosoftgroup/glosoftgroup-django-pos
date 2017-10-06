@@ -1,103 +1,167 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max
-from django.core import serializers
-from django.template.defaultfilters import date
-from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-import datetime
-from datetime import date, timedelta
+from django.http import HttpResponse
+from django.db.models import Sum, Count
 from django.utils.dateformat import DateFormat
-import logging
+import datetime
+import dateutil.relativedelta
 
 from ..views import staff_member_required
-from ...core.utils import get_paginator_items
-from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem
-from ...product.models import Product, ProductVariant
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf, image64
+from ...product.models import ProductVariant
+from ...utils import render_to_pdf, image64
+from ...accounts.models import *
+
+
+def sales_period_results(year, month):
+	if year and month:
+		sales = Sales.objects.filter(created__year=year, created__month=month)
+		soldItems = SoldItem.objects.filter(sales__created__year=year, sales__created__month=month).order_by('-id')
+		totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
+		totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+		expenses = PersonalExpenses.objects.filter(added_on__year=year, added_on__month=month)
+	elif year:
+		sales = Sales.objects.filter(created__year=year)
+		soldItems = SoldItem.objects.filter(sales__created__year=year).order_by('-id')
+		totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
+		totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+		expenses = PersonalExpenses.objects.filter(added_on__year=year).aggregate(Sum('amount'))['amount__sum']
+
+	costPrice = []
+	for i in soldItems:
+		product = ProductVariant.objects.get(sku=i.sku)
+		try:
+			quantity = product.get_cost_price().gross
+		except ValueError, e:
+			quantity = product.get_cost_price()
+		except:
+			quantity = 0
+		costPrice.append(quantity)
+
+	totalCostPrice = sum(costPrice)
+	try:
+		grossProfit = totalSales - totalCostPrice
+	except:
+		grossProfit = 0
+
+	print expenses
+	print ('-=-==-=')
+	print sales
+
+	return {
+		"sales":sales,
+		"soldItems":soldItems,
+		"totalSales":totalSales,
+		"totalTax":totalTax,
+		'grossProfit': grossProfit,
+		'totalCostPrice': totalCostPrice,
+		'expenses':expenses
+	}
 
 @staff_member_required
 def sales_profit(request):
 	month = request.GET.get('month')
 	year = request.GET.get('year')
+	period = request.GET.get('period')
 	pdf = request.GET.get('pdf')
 	image = request.GET.get('image')
 	jax = request.GET.get('ajax')
+
 
 	thisMonth = datetime.datetime.today().month
 	thisYear = datetime.datetime.today().year
 
 	try:
+		dateperiod = []
+		dateresults = []
 		if year and month:
-			sales = Sales.objects.filter(created__year=year, created__month=month)
-			soldItems = SoldItem.objects.filter(sales__created__year=year, sales__created__month=month).order_by('-id')
-			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
-			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+			if len(str(month)) == 1:
+				m = '0' + str(month)
+				fdate = str(year) + '-' + m
+			else:
+				fdate = str(year) + '-' + str(month)
+			d = datetime.datetime.strptime(fdate, "%Y-%m")
+			if period == 'quarter':
+				for i in range(0, 3):
+					p = d - dateutil.relativedelta.relativedelta(months=i)
+					tt = sales_period_results(year, str(p.strftime("%m")))
+					a = {}
+					a['totalSales'] = tt['totalSales']
+					a['totalTax'] = tt['totalTax']
+					a['grossProfit'] = tt['grossProfit']
+					a['totalCostPrice'] = tt['totalCostPrice']
+					# a['expenses'] = tt['expenses']
+					a['sales'] = tt['sales']
+					dateperiod.append(p.strftime("%B"))
+					dateresults.append(a)
+			elif period == 'year':
+				p = d - dateutil.relativedelta.relativedelta(years=1)
+				tt = sales_period_results(year, str(p.strftime("%m")))
+				a = {}
+				a['totalSales'] = tt['totalSales']
+				a['totalTax'] = tt['totalTax']
+				a['grossProfit'] = tt['grossProfit']
+				a['totalCostPrice'] = tt['totalCostPrice']
+				dateperiod.append(str(p.strftime("%Y")))
+				dateresults.append(a)
+
+			tt = sales_period_results(year, month)
+			soldItems = tt['soldItems']
+			totalSales = tt['totalSales']
+			totalTax = tt['totalTax']
 		elif year:
-			sales = Sales.objects.filter(created__year=year)
-			soldItems = SoldItem.objects.filter(sales__created__year=year).order_by('-id')
-			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
-			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+			tt = sales_period_results(year)
+			soldItems = tt['soldItems']
+			totalSales = tt['totalSales']
+			totalTax = tt['totalTax']
 		else:
-			sales = Sales.objects.filter(created__year=thisYear, created__month=thisMonth)
-			soldItems = SoldItem.objects.filter(sales__created__year=thisYear, sales__created__month=thisMonth).order_by('-id')
-			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
-			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+			tt = sales_period_results(thisYear, thisMonth)
+			soldItems = tt['soldItems']
+			totalSales = tt['totalSales']
+			totalTax = tt['totalTax']
 
+		# dateperiod = dateperiod.sort(reverse=True)
+		# dateresults = dateresults.sort(reverse=True)
 
-
-		costPrice = []
-		for i in soldItems:
-			product = ProductVariant.objects.get(sku=i.sku)
-			try:
-				quantity = product.get_cost_price().gross
-			except ValueError, e:
-				quantity = product.get_cost_price()
-			except:
-				quantity =0
-			costPrice.append(quantity)
-
-		totalCostPrice = sum(costPrice)
-		try:
-			grossProfit = totalSales - totalCostPrice
-			status = 'true'
-			margin = round((grossProfit / totalSales) * 100, 2)
-			try:
-				markup = round((grossProfit / totalCostPrice) * 100, 2)
-			except:
-				markup = round(0, 2)
-		except:
-			grossProfit = 0
-			margin = 0
-			markup = 0
-			status = 'false'
+		# costPrice = []
+		# for i in soldItems:
+		# 	product = ProductVariant.objects.get(sku=i.sku)
+		# 	try:
+		# 		quantity = product.get_cost_price().gross
+		# 	except ValueError, e:
+		# 		quantity = product.get_cost_price()
+		# 	except:
+		# 		quantity =0
+		# 	costPrice.append(quantity)
+		#
+		# totalCostPrice = sum(costPrice)
+		# try:
+		# 	grossProfit = totalSales - totalCostPrice
+		# 	status = 'true'
+		# 	margin = round((grossProfit / totalSales) * 100, 2)
+		# 	try:
+		# 		markup = round((grossProfit / totalCostPrice) * 100, 2)
+		# 	except:
+		# 		markup = round(0, 2)
+		# except:
+		# 	grossProfit = 0
+		# 	margin = 0
+		# 	markup = 0
+		# 	status = 'false'
 
 		img = image64()
 		startYear = Sales.objects.all().first().created.year
 		startMonth = Sales.objects.all().first().created.month
 		data = {
-			'totalCostPrice':totalCostPrice,
+			'dateperiod':dateperiod,
+			'dateresults':dateresults,
+			# 'totalCostPrice':totalCostPrice,
 			'totalSales':totalSales,
 			'totalTax':totalTax,
-			'grossProfit':grossProfit,
-			'markup':markup,
-			'margin':margin,
+			# 'grossProfit':grossProfit,
+			# 'markup':markup,
+			# 'margin':margin,
 			'date':year,
-			'status':status,
+			'status':'true',
 			'puller':request.user,
 			'image': img,
 			'reportImage':image,
