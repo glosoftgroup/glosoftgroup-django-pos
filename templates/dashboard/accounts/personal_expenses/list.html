@@ -85,7 +85,6 @@
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
                     <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
                   </select>
               </div>
             </div>
@@ -495,11 +494,28 @@
 
         var ts = $(this).val();
         if(ts == 'pdf'){
-          var url = "{% url 'dashboard:users_pdf' %}";
-          window.open(url, '_blank');
+            var searchData = $('.search_user').val();
+            var listSizeVal = $('.list-sz').find(":selected").val();
+            var groupSizeVal = $('.group-sz').find(":selected").val();
+            var url = "{% url 'accounts:bexpenses_pdf' %}";
 
-        }else if(ts=='excel'){
-          window.location="{% url 'dashboard:users_export_csv' %}";
+            if (searchData && (groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')) ){
+                $.get(url, {q:searchData, gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if ((groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none'))){
+                $.get(url, {gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (searchData){
+                $.get(url, {q:searchData}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else{
+                $.get(url, function(data){
+                          window.open("data:application/pdf," + escape(data));
+               });
+            }
 
         }else{
           $(this).val('')

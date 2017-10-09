@@ -85,7 +85,6 @@
                  <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
                     <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
-                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
                   </select>
               </div>
             </div>
@@ -460,9 +459,6 @@
                           window.open("data:application/pdf," + escape(data));
                });
             }
-
-        }else if(ts=='excel'){
-          window.location="{% url 'dashboard:users_export_csv' %}";
 
         }else{
           $(this).val('')

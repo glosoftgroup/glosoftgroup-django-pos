@@ -96,6 +96,8 @@
                         <i class="icon-calendar22"></i>
                       </span>
                       <input class="form-control daterange-to to" type="text" placeholder="to">
+                        <input class="frm" type="hidden" val="">
+                        <input class="trm" type="hidden" val="">
                     </div>
                  </div>
               </div>
@@ -436,6 +438,7 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/html2canvas.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 
@@ -476,10 +479,28 @@ $(document).ready(function(){
          $('.setValue').val($(this).val());
          $('.setName').val('export');
 
+         var singledate = $('.daterange-single').val()
+         var frmdate = $('.frm').val();
+         var trmdate = $('.trm').val();
+         var img = document.getElementById('chart1').toDataURL("image/png");
+         var url2 = "{% url 'dashboard:sales_date_chart' %}";
+
          if($(this).val() == 'pdf'){
-            var img = document.getElementById('chart1').toDataURL("image/png");
-            var url = "/dashboard/reports/datechartimage/"+img;
-            window.open(url, '_blank');
+            if(singledate){
+                $.ajax({ url: url2,type: 'GET',data: {date:singledate },success: function(data){
+                      window.open("data:application/pdf," + escape(data));
+                }});
+
+            }else if(frmdate && trmdate){
+                $.ajax({ url: "{% url 'dashboard:get_sales_by_week' %}",type: 'GET',data: {from:frmdate, to:trmdate },success: function(data){
+                    window.open("data:application/pdf," + escape(data));
+                }});
+            }else{
+                $.get(url2,{image:img}, function(data){
+                      window.open("data:application/pdf," + escape(data));
+                });
+            }
+
          }
     });
     //**@ daterange from
@@ -504,6 +525,8 @@ $(document).ready(function(){
     });
     $('.daterange-to').on('apply.daterangepicker', function(ev, picker) {
       var from = picker.startDate.format('YYYY-MM-DD'), to = picker.endDate.format('YYYY-MM-DD');
+      $('.frm').val(from);
+      $('.trm').val(to);
         if(from == to ){
             $(this).val(from);
             $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:from },success: function(data){
