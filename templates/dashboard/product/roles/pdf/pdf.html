@@ -8,65 +8,41 @@
      <head>
          <title>Products Report</title>
          <style type="text/css">
-             body {
-                   font-family: 'Nunito', sans-serif;
-                   color: #384047;
-             }
-             .header {
-                 font-size: 15px;
-                 font-weight: 100;
-                 text-align: center;
-                 color: #007cae;
-             }
-             .title {
-                 font-size: 16px;
-                 font-weight: 100;
-                /* text-align: right;*/
-                padding: 10px 20px 0px 20px;
-             }
-             .title span {
-                 color: #007cae;
-             }
-             .detailss {
-                 padding: 10px 20px 0px 20px;
-                 text-align: left !important;
-                 /*margin-left: 40%;*/
-             }
-             .hrItem {
-                 border: none;
-                 height: 1px;
-                 /* Set the hr color */
-                 color: #333; /* old IE */
-                 background-color: #fff; /* Modern Browsers */
-             }
-             .img-circle{
-              border-radius: 50%;
-             }
-             table {
-              max-width: 960px;
-              margin: 10px auto;
+             body {sans-serif; color: #384047;}
+             .header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}
+             .title {font-size: 16px;font-weight: 100;}
+             .header p{color:#384047;}
+
+             .img-circle{border-radius: 50%;}
+             table {ax-width: 960px; margin: 10px auto;}
+            tr{border-bottom:0.5px solid #ddd;border-right:0.5px solid #ddd;
+                border-left:0.5px solid #ddd;
             }
+            td{border:none;}
             th {
-                  font-weight: 400;
-                  background: #1779c6;
+                  font-weight: bold;
+                  background:#2196F3;
                   color: #FFF;
+                  border:none;
+                  font-size:11px;
+                  vertical-align:middle;
                 }
-             .td{text-align: center;}
+             .td{text-align: center;font-size:11px;}
              tr{padding:5px;}
-            .foot{padding-top:30px;}
-            .foot p{ color: #007cae;font-size: 12px;}
+             .img{width:50px;height:50px;}
          </style>
      </head>
      <body>
          <div class='wrapper'>
              <div class='header'>
-                 <p class='title'>Products List Report <br>
+                 <p style="margin-bottom:0px;"><img class="img" src="{{image}}" alt="Red dot" /></p>
+                 <p class='title'>PRODUCT LIST REPORT <br>
                    <span style="font-size: 0.8em;">{{today | date:'d-m-Y'}}</span>
                  </p>
              </div>
          <div>
          <div class='details'>
-            <table class="table  table-hover datatable-header-footer" style="border:0.5px solid #ddd;">
+            <table repeat="1" class="table  table-hover datatable-header-footer" style="border:0.5px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
                      <th>Id</th>
@@ -103,8 +79,16 @@
                   </tbody>
            </table>
          </div>
-         <div class="foot">
-             <p style="text-align: center;">Report Pulled by: {% if puller.email %}{{ puller.email }} {% else %} {{ puller.name }}{% endif %}</p>
-         </div>
+         <div class="foot" id="footerContent">
+                 <p style="text-align: center;font-size:11px;">Report Pulled by:
+                     <span style="font-weight:bold">
+                         {% if puller.name %}
+                            {{ puller.name | upper }}
+                         {% else %}
+                            {{ puller.email | upper }}
+                         {% endif %}
+                     </span></p>
+
+             </div>
      </body>
  </html>

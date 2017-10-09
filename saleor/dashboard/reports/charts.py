@@ -231,7 +231,8 @@ def get_category_sale_details(request):
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
-def sales_date_chart(request, image=None):
+def sales_date_chart(request):
+	image = request.GET.get('image')
 	get_date = request.GET.get('date')
 	if get_date:
 		date = get_date
@@ -242,35 +243,35 @@ def sales_date_chart(request, image=None):
 		except:
 			date = DateFormat(datetime.today()).format('Y-m-d')
 
-	if image:
-		dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
-		ImageData = image
-		ImageData = dataUrlPattern.match(ImageData).group(2)
-
-		date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
-		date_total_discount = Sales.objects.filter(created__contains=date).aggregate(Sum('discount_amount'))[
-			'discount_amount__sum']
-		date_total_tax = Sales.objects.filter(created__contains=date).aggregate(Sum('total_tax'))[
-			'total_tax__sum']
-		try:
-			date_gross_sales = date_total_discount + date_total_tax + date_total_sales
-		except:
-			date_gross_sales = 0
-		users = Sales.objects.values('user__email', 'user__name', 'terminal__terminal_name').annotate(Count('user')).annotate(
-			Sum('total_net')).order_by().filter(created__contains=date)
-
-		data = {
-			'today': last_sale.created,
-			'users': users,
-			'puller': request.user,
-			'image': ImageData,
-			"date_total_sales": date_total_sales,
-			"date_gross_sales": date_gross_sales,
-			"date_total_tax": date_total_tax,
-			"date_total_discount": date_total_discount,
-		}
-		pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
-		return HttpResponse(pdf, content_type='application/pdf')
+	# if image:
+	# 	dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+	# 	ImageData = image
+	# 	ImageData = dataUrlPattern.match(ImageData).group(2)
+	#
+	# 	date_total_sales = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))['total_net__sum']
+	# 	date_total_discount = Sales.objects.filter(created__contains=date).aggregate(Sum('discount_amount'))[
+	# 		'discount_amount__sum']
+	# 	date_total_tax = Sales.objects.filter(created__contains=date).aggregate(Sum('total_tax'))[
+	# 		'total_tax__sum']
+	# 	try:
+	# 		date_gross_sales = date_total_discount + date_total_tax + date_total_sales
+	# 	except:
+	# 		date_gross_sales = 0
+	# 	users = Sales.objects.values('user__email', 'user__name', 'terminal__terminal_name').annotate(Count('user')).annotate(
+	# 		Sum('total_net')).order_by().filter(created__contains=date)
+	#
+	# 	data = {
+	# 		'today': last_sale.created,
+	# 		'users': users,
+	# 		'puller': request.user,
+	# 		'image': ImageData,
+	# 		"date_total_sales": date_total_sales,
+	# 		"date_gross_sales": date_gross_sales,
+	# 		"date_total_tax": date_total_tax,
+	# 		"date_total_discount": date_total_discount,
+	# 	}
+	# 	pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
+	# 	return HttpResponse(pdf, content_type='application/pdf')
 
 	if date:
 		try:
@@ -385,6 +386,46 @@ def sales_date_chart(request, image=None):
 				"prevdate_total_sales":prev_sales,
 				"previous_sales":prevdate_total_sales,
 			}
+			if image:
+				dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+				ImageData = image
+				ImageData = dataUrlPattern.match(ImageData).group(2)
+
+				data = {
+					"balanceBroughtDown": broughtdown,
+					"drawerDeposit": drawerdeposit,
+					"drawerWithdraw": drawerwithdraw,
+					"drawerSales": drawersales,
+					"balanceCarriedForward": carriedforward,
+
+					"no_of_customers": no_of_customers,
+					"date_total_sales": date_total_sales,
+					"date_gross_sales": date_gross_sales,
+					"date_total_tax": date_total_tax,
+					"date_total_discount": date_total_discount,
+					"date": selected_sales_date,
+					"prevdate": previous_sales_date,
+					"default": default,
+					"labels2": labels,
+					"cashiers": users_that_day,
+					"users": users,
+					"sales_percent": sales_diff,
+					"customer_percent": customer_diff,
+					"prevdate_total_sales": prev_sales,
+					"previous_sales": prevdate_total_sales,
+
+					'today': last_sale.created,
+					'users': users,
+					'puller': request.user,
+					'image': ImageData,
+					"date_total_sales": date_total_sales,
+					"date_gross_sales": date_gross_sales,
+					"date_total_tax": date_total_tax,
+					"date_total_discount": date_total_discount,
+				}
+				pdf = render_to_pdf('dashboard/reports/sales/charts/pdf/pdf.html', data)
+				return HttpResponse(pdf, content_type='application/pdf')
+
 			if get_date:
 				return TemplateResponse(request, 'dashboard/reports/sales/charts/by_date.html', data)
 			else:

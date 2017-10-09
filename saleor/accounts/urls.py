@@ -20,6 +20,7 @@ urlpatterns = [
 	url( r'^pexpenses/search/$', personal_expenses.expenses_search, name = 'personal_expenses_search' ),
 	url(r'^detail/b/(?P<pk>[0-9]+)/$', personal_expenses.detail, name='bexpense-detail'),
 	url( r'^expenses/pdf/$', expenses_pdf.pdf, name ='expenses_pdf'),
+	url( r'^b/expenses/pdf/$', expenses_pdf.bpdf, name ='bexpenses_pdf'),
 
 	url(r'^add/expense/type/$', expense_type.add, name='add_expense_type'),
 	url(r'^pty/cash/$', petty_cash.view, name='petty_cash'),

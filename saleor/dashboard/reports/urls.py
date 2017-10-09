@@ -93,7 +93,7 @@ urlpatterns = [
 
 		url( r'^summary/$',  permission_required('reports.view_sale_reports', login_url='not_found')
 			(charts.sales_date_chart), name = 'sales_date_chart' ),
-		url( r'^summary/image/(?P<image>.+)/$', charts.sales_date_chart, name = 'sales_date_chart' ),
+		# url( r'^summary/image/(?P<image>.+)/$', charts.sales_date_chart, name = 'sales_date_chart' ),
 		url( r'^productchart/$',  permission_required('reports.view_products_reports', login_url='not_found')
 			(charts.sales_product_chart), name = 'sales_product_chart' ),
 	    url( r'^productchart/pnt/$',  permission_required('reports.view_products_reports', login_url='not_found')
