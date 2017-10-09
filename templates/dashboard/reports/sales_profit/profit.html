@@ -85,7 +85,7 @@
 
 {% if status == 'true' %}
 <div id="pagination-div">
-    <div class="col-md-12">
+    <div class="col-md-12 animated fadeIn">
       <div class="panel panel-flat" id="ss2">
 
         <div class="panel-body">
@@ -97,10 +97,9 @@
                     <thead style="border-top:1px solid #ddd;">
                       <tr class="bg-primary">
                         <th class="right-align">
-                            <span style="font-weight: bold;">Gross Sales</span>
+                            <span style="font-weight: bold;">Period</span>
                         </th>
-
-                          {% for i in dateperiod %}
+                          {% for i in dateperiod reversed %}
                               <th class="right-align">
                                   <span class="pull-right">{{ i }}</span>
                               </th>
@@ -108,12 +107,81 @@
                       </tr>
                     </thead>
                     <tbody>
+                    <tr><td><span style="font-weight:bold">Income *</span></td><td colspan="2"></td></tr>
+                            <tr>
+                                <td><span class="" style="padding-left:15px;">Gross Sales</span></td>
+                                {% for i in dateresults reversed %}
+                                  <td class="right-align">
+                                      <div >
+                                          <span class="pull-right">{% if i.totalSales %}{{ i.totalSales }}{% else %}0.00{% endif %}</span>
+                                    </div>
+                                  </td>
+                                {% endfor %}
+                            </tr>
                         <tr>
-                            <td>Balance Brought Down</td>
-                            {% for i in dateperiod %}
+                            <td><span class="" style="padding-left:15px;">Total Items Costs</span></td>
+                            {% for i in dateresults reversed %}
                               <td class="right-align">
                                   <div >
-                                      <span class="pull-right">{{ i.totalSales }}</span>
+                                      <span class="pull-right">{% if i.totalCostPrice %}{{ i.totalCostPrice }}{% else %}0.00{% endif %}</span>
+                                </div>
+                              </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><span class="" style="padding-left:15px;font-weight:bold">Gross Profit</span></td>
+                            {% for i in dateresults reversed %}
+                              <td class="right-align">
+                                  <div >
+                                      <span class="pull-right" style="font-weight:bold">{% if i.grossProfit %}{{ i.grossProfit }}{% else %}0.00{% endif %}</span>
+                                </div>
+                              </td>
+                            {% endfor %}
+                        </tr>
+                        <tr><td><span style="font-weight:bold">Expenses *</span></td><td colspan="3"></td></tr>
+                        {% for i in epp %}
+                         <tr>
+                             <td>
+                                 <span class="" style="padding-left:15px;">{{i.name}}</span>
+                             </td>
+                             {% for p in i.amounts reversed %}
+                              <td>
+                                  <div >
+                                      <span class="pull-right">
+                                          {% if p.amount %}{{p.amount}}{% else %}0.00{% endif %}</span>
+                                </div>
+                              </td>
+                             {% endfor %}
+                         </tr>
+                     {% endfor %}
+                     {% if expensesstatus != 0 %}
+                        <tr>
+                            <td><span class="" style="padding-left:15px;">PettyCash Expenses</span></td>
+                            {% for i in pettycashexpenses reversed %}
+                              <td class="right-align">
+                                  <div >
+                                      <span class="pull-right">{% if i.expenses %}{{ i.expenses }}{% else %}0.00{% endif %}</span>
+                                </div>
+                              </td>
+                            {% endfor %}
+                        </tr>
+                     {% endif %}
+                         <tr>
+                            <td><span class="" style="padding-left:15px;font-weight:bold">Total Expenses</span></td>
+                            {% for i in totalexpenses reversed %}
+                              <td class="right-align">
+                                  <div >
+                                      <span class="pull-right" style="font-weight:bold">{% if i.expenses %}{{ i.expenses }}{% else %}0.00{% endif %}</span>
+                                </div>
+                              </td>
+                            {% endfor %}
+                        </tr>
+                        <tr style="border:2px solid #DDDDDD;background-color:#fafafa">
+                            <td><span class="" style="padding-left:15px;font-weight:bold">Net Gain</span></td>
+                            {% for i in netprofit reversed %}
+                              <td class="right-align">
+                                  <div >
+                                      <span class="pull-right" style="font-weight:bold">{% if i.net %}{{ i.net }}{% else %}0.00{% endif %} - ({% if i.net > 0 %}Profit{% elif i.net < 0 %}Loss {% else %}Null{% endif %})</span>
                                 </div>
                               </td>
                             {% endfor %}
@@ -126,78 +194,6 @@
         </div>
 
     </div>
-<div class="col-md-12">
-    <div class="panel panel-flat">
-      <div class="panel-body" id="reportBody">
-        <div class="row" style="margin-top:0px; padding-top: 0px;">
-            <div class="col-md-4 col-md-offset-4" style="margin-top:0px; padding-top: 0px;">
-              <img src="{% static 'backend/images/cp-logo2.jpg' %}" class="img-responsive center-block" style="height: 100px;width: auto; ">
-               <p class="text-center address-block">
-                Company Name.<br />
-                P.O Box 23333-00100, Nairobi, Kenya<br />
-                Sales Profit<br/>
-                As at: {{date}}
-               </p>
-            </div>
-        </div>
-            <div class="row">
-             <div class="col-md-10 col-md-offset-1">
-              <div class="col-md-6 col-md-offset-3">
-                 <h3 class="text-center hs">Gross Profit</h3>
-                 <div class="b-details">
-                   <h5>Profit</h5>
-                   <p>
-                     <ul class="blist">
-                       <li>Total Sales<span class="pull-right"> {{totalSales|intcomma }}</span></li>
-                       <li>Total Costs(purchases) <span class="pull-right"> {{totalCostPrice|intcomma }}</span></li>
-                     </ul>
-                     <p><span class="total-text">Gross Profit</span> <span class="pull-right total-amount">Kshs {{grossProfit}}</span></p>
-                   </p>
-                 </div>
-              </div>
-              <!--<div class="col-md-6">-->
-                 <!--<h3 class="text-centers hs">Markup</h3>-->
-                 <!--<div class="b-details">-->
-                   <!--<h5>Net Profit</h5>-->
-                   <!--<p>-->
-                     <!--<ul class="blist">-->
-                       <!--<li>Total Sales <span class="pull-right"> {{totalSales|intcomma }}</span></li>-->
-                       <!--<li>Total Costs(Purchases) <span class="pull-right"> {{totalCostPrice|intcomma }}</span></li>-->
-                     <!--</ul>-->
-                     <!--<p><span class="total-text">Gross Profit</span> <span class="pull-right total-amount">Kshs {{grossProfit|intcomma }}</span></p>-->
-                   <!--</p>-->
-                 <!--</div>-->
-              <!--</div>-->
-              <!--<div class="col-md-12 totals">-->
-                <!--<div class="col-md-6">-->
-                  <!--<div class="b-details">-->
-                  <!--<p><span class="total-b-texts">Profit Margin</span> <span class="pull-right total-b-amount">{{margin|intcomma }}%</span></p>-->
-                  <!--</div>-->
-                <!--</div>-->
-                <!--<div class="col-md-6">-->
-                  <!--<div class="b-details">-->
-                  <!--<p><span class="total-b-texts">Percentage Markup</span> <span class="total-b-amount pull-right">{{markup|intcomma }}%</span></p>-->
-                  <!--</div>-->
-                <!--</div>-->
-              <!--</div>-->
-             </div>
-            </div>
-            <div class="row">
-              <div class="col-md-10 col-md-offset-1">
-                  <p class="text-center" style="margin: 20px 0px;"> Thank you for partnering with us.<br />
-                  <span>Report Pulled By: {% if puller.name %}
-                        {{ puller.name | upper }}
-                     {% else %}
-                        {{ puller.email | upper }}
-                     {% endif %}</span></p>
-
-              </div>
-             </div>
-            </div>
-
-
-    </div>
-  </div>
 </div>
      {% else %}
   <div class="col-md-12 animated fadeIn ">
@@ -227,8 +223,8 @@ var grossUrl = "{% url 'dashboard:sales_profit' %}";
 $('.date-month').datepicker({
     format: "MM/yyyy",
     autoclose: true,
-    startDate: '{{startMonth}}/{{startYear}}',
-    endDate: 'now',
+    //startDate: '{{startMonth}}/{{startYear}}',
+    //endDate: 'now',
     minViewMode: "months"})
     .on('changeDate', function(e) {
         var month = e.date.getMonth()+1;
@@ -256,14 +252,25 @@ $('.rangeBtn').on('click', function(){
 
         var ts = $(this).val();
         if(ts == 'pdf'){
-            var node = document.getElementById('reportBody')
+            var node = document.getElementById('ss2')
                     domtoimage.toPng(node)
                     .then(function (dataUrl) {
                         var img = new Image();
                         img.src = dataUrl;
-                       $.get(grossUrl,{pdf:'pdf',image:dataUrl}, function(data){
-                            window.open("data:application/pdf," + escape(data));
-                        });
+                        var period = $('.period-sz').find(":selected").val();
+                        var m = $('.hidden-month').val();
+                        var y = $('.hidden-year').val();
+                        if(m && y){
+                            $.get(grossUrl,{ajax:'ajax',month:m, year:y, period:period, pdf:'pdf'}, function(data){
+                               window.open("data:application/pdf," + escape(data));
+                            });
+                        }else{
+                            $.get(grossUrl,{pdf:'pdf'}, function(data){
+                                window.open("data:application/pdf," + escape(data));
+                            });
+                        }
+
+
                     }).catch(function (error) {
                         console.error('oops, something went wrong!', error);
                     });
