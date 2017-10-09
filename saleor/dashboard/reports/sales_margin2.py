@@ -81,7 +81,8 @@ def sales_list(request):
 			setattr(sale, 'totalCostPrice', quantity)
 			try:
 				grossProfit = sale.total_net - totalCostPrice
-				margin = round(sale.total_net - quantity - sale.total_tax, 2)
+				# margin = round(grossProfit - sale.total_tax, 2)
+				margin = round(grossProfit, 2)
 			except Exception as e:
 				grossProfit = 0
 				margin = 0
