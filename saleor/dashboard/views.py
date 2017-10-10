@@ -1,55 +1,23 @@
-from django.conf import settings
 from django.contrib.admin.views.decorators import \
     staff_member_required as _staff_member_required
 from django.template.response import TemplateResponse
 from payments import PaymentStatus
-
 from ..order.models import Order, Payment
 from ..order import OrderStatus
-from ..product.models import Product
-
-from ..core.utils import get_paginator_items
-from ..userprofile.models import User
-from ..sale.models import Sales, SoldItem, Terminal
-from ..product.models import Product, ProductVariant, Category, Stock
-from ..decorators import permission_decorator, user_trail
-from ..utils import render_to_pdf, convert_html_to_pdf
-from ..credit.models import Credit, CreditedItem
-
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect, render_to_response
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max, F
-from django.core import serializers
-from django.template.defaultfilters import date
+from ..sale.models import Sales, SoldItem
+from ..product.models import Category, Stock
+from ..credit.models import Credit
+from django.db.models import Count, Sum
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.core.exceptions import ObjectDoesNotExist
-# from lockdown.decorators import lockdown
-import datetime
-from datetime import date, timedelta
+from .reports.hours_chart import get_item_results, get_category_results
 from django.utils.dateformat import DateFormat
+from decimal import Decimal
+import datetime
 import logging
 import random
-import csv
-from django.utils.encoding import smart_str
-from decimal import Decimal
-from calendar import monthrange
 import calendar
-from django_xhtml2pdf.utils import generate_pdf
 
-import re
-import base64
-
-from .reports.hours_chart import get_item_results, get_terminal_results, get_user_results, get_hours_results, get_hours_results_range, get_date_results_range, get_date_results, get_category_results
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -61,7 +29,6 @@ def staff_member_required(f):
 
 @staff_member_required
 def index(request):
-    today = datetime.datetime.now()
     try:
         last_sale = Sales.objects.latest('id')
         date = DateFormat(last_sale.created).format('Y-m-d')

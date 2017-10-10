@@ -446,13 +446,17 @@ $(document).ready(function(){
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true,
-        maxDate: new Date()
-    }).on('change',function(){
-      var date = $(this).val();
+        maxDate: new Date(),
+        autoUpdateInput: false
+    }, function(dt){
+     $('.daterange-single').val(dt.format('YYYY-MM-DD'));
+      var date = $('.daterange-single').val();
         $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:date },success: function(data){
               $('.p-sales').html(data);
         }});
+
     });
+
   $('.sales-category').selectpicker().on('change', function(){
         var sv = $(this).val();
         if(sv == 'list'){
@@ -487,14 +491,14 @@ $(document).ready(function(){
 
          if($(this).val() == 'pdf'){
             if(singledate){
-                $.ajax({ url: url2,type: 'GET',data: {date:singledate },success: function(data){
+                $.get(url2,{image:img, date:singledate}, function(data){
                       window.open("data:application/pdf," + escape(data));
-                }});
+                });
 
             }else if(frmdate && trmdate){
-                $.ajax({ url: "{% url 'dashboard:get_sales_by_week' %}",type: 'GET',data: {from:frmdate, to:trmdate },success: function(data){
-                    window.open("data:application/pdf," + escape(data));
-                }});
+                $.get("{% url 'dashboard:get_sales_by_week' %}",{image:img, from:frmdate, to:trmdate }, function(data){
+                      window.open("data:application/pdf," + escape(data));
+                });
             }else{
                 $.get(url2,{image:img}, function(data){
                       window.open("data:application/pdf," + escape(data));
