@@ -1,47 +1,4 @@
- <!--{% load staticfiles %}-->
- <!--<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">-->
- <!--<html>-->
-     <!--<head>-->
-         <!--<title>Sales Report</title>-->
-         <!--<style type="text/css">-->
-             <!--body {sans-serif; color: #384047;}-->
-             <!--.header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}-->
-             <!--.title {font-size: 16px;font-weight: 100;}-->
-             <!--.header p{color:#384047;}-->
-
-             <!--.img-circle{border-radius: 50%;}-->
-             <!--table {ax-width: 960px; margin: 10px auto;}-->
-            <!--tr{border-bottom:0.5px solid #ddd;border-right:0.5px solid #ddd;-->
-                <!--border-left:0.5px solid #ddd;-->
-            <!--}-->
-            <!--td{border:none;}-->
-            <!--th {-->
-                  <!--font-weight: bold;-->
-                  <!--background:#2196F3;-->
-                  <!--color: #FFF;-->
-                  <!--border:none;-->
-                  <!--font-size:11px;-->
-                  <!--vertical-align:middle;-->
-                <!--}-->
-             <!--.td{text-align: center;font-size:11px;}-->
-             <!--tr{padding:5px;}-->
-             <!--.img{width:50px;height:50px;}-->
-         <!--</style>-->
-     <!--</head>-->
-     <!--<body>-->
-         <!--<div class='wrapper'>-->
-             <!--<div class='header'>-->
-                 <!--<p style="margin-bottom:0px;"><img class="img" src="{{image}}" alt="Red dot" /></p>-->
-             <!--</div>-->
-         <!--</div>-->
-         <!--<div class='details' style="margin-top:0px;">-->
-            <!--<img class="img" src="{{reportImage}}" alt="Red dot" style="width:auto;height:auto;"/>-->
-         <!--</div>-->
-     <!--</body>-->
- <!--</html>-->
-
-
-  {% load staticfiles %}
+{% load staticfiles %}
  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
  <html>
      <head>
@@ -53,7 +10,7 @@
              .header p{color:#384047;}
 
              .img-circle{border-radius: 50%;}
-             table {ax-width: 960px; margin: 10px auto;}
+             .table {max-width: 960px; margin: 10px auto;}
             tr{border-bottom:0.5px solid #ddd;border-right:0.5px solid #ddd;
                 border-left:0.5px solid #ddd;
             }
@@ -83,22 +40,34 @@
             <table class="table bordered highlight responsive data-table">
                     <thead style="border-top:1px solid #ddd;">
                       <tr class="bg-primary">
-                        <th class="right-align">
-                            <span style="font-weight: bold;">Period</span>
-                        </th>
-                          {% for i in dateperiod reversed %}
-                              <th class="right-align">
+
+                          {% if  dateperiod|length < 2 %}
+                             <th class="right-align" colspan="3">
+                                <span style="font-weight: bold;">Period</span>
+                            </th>
+                          {% else %}
+                            <th class="right-align">
+                                <span style="font-weight: bold;">Period</span>
+                            </th>
+                          {% endif %}
+
+                             {% for i in dateperiod reversed %}
+                              <th class="right-align" style="text-align:center;">
                                   <span class="pull-right">{{ i }}</span>
                               </th>
-                          {% endfor %}
+                             {% endfor %}
                       </tr>
                     </thead>
                     <tbody>
                     <tr><td><span style="font-weight:bold">Income *</span></td><td colspan="2"></td></tr>
                             <tr>
+                                {% if   dateresults|length < 2 %}
+                                <td colspan="3"><span class="" style="padding-left:15px;">Gross Sales</span></td>
+                                {% else %}
                                 <td><span class="" style="padding-left:15px;">Gross Sales</span></td>
+                                {% endif %}
                                 {% for i in dateresults reversed %}
-                                  <td class="right-align">
+                                  <td class="right-align" style="text-align:center;">
                                       <div >
                                           <span class="pull-right">{% if i.totalSales %}{{ i.totalSales }}{% else %}0.00{% endif %}</span>
                                     </div>
@@ -106,9 +75,13 @@
                                 {% endfor %}
                             </tr>
                         <tr>
-                            <td><span class="" style="padding-left:15px;">Total Items Costs</span></td>
+                            {% if   dateresults|length < 2 %}
+                                <td colspan="3"><span class="" style="padding-left:15px;">Total Items Costs</span></td>
+                                {% else %}
+                                <td><span class="" style="padding-left:15px;">Total Items Costs</span></td>
+                                {% endif %}
                             {% for i in dateresults reversed %}
-                              <td class="right-align">
+                              <td class="right-align" style="text-align:center;">
                                   <div >
                                       <span class="pull-right">{% if i.totalCostPrice %}{{ i.totalCostPrice }}{% else %}0.00{% endif %}</span>
                                 </div>
@@ -116,9 +89,14 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td><span class="" style="padding-left:15px;font-weight:bold">Gross Profit</span></td>
+                                {% if   dateresults|length < 2 %}
+                                <td colspan="3"><span class="" style="padding-left:15px;font-weight:bold">Gross Profit</span></td>
+                                {% else %}
+                                <td><span class="" style="padding-left:15px;font-weight:bold">Gross Profit</span></td>
+                                {% endif %}
+
                             {% for i in dateresults reversed %}
-                              <td class="right-align">
+                              <td class="right-align" style="text-align:center;">
                                   <div >
                                       <span class="pull-right" style="font-weight:bold">{% if i.grossProfit %}{{ i.grossProfit }}{% else %}0.00{% endif %}</span>
                                 </div>
@@ -132,7 +110,7 @@
                                  <span class="" style="padding-left:15px;">{{i.name}}</span>
                              </td>
                              {% for p in i.amounts reversed %}
-                              <td>
+                              <td style="text-align:center;">
                                   <div >
                                       <span class="pull-right">
                                           {% if p.amount %}{{p.amount}}{% else %}0.00{% endif %}</span>
@@ -143,9 +121,13 @@
                      {% endfor %}
                      {% if expensesstatus != 0 %}
                         <tr>
-                            <td><span class="" style="padding-left:15px;">PettyCash Expenses</span></td>
+                            {% if  pettycashexpenses|length < 2 %}
+                                 <td colspan="3"><span class="" style="padding-left:15px;">PettyCash Expenses</span></td>
+                                {% else %}
+                                 <td><span class="" style="padding-left:15px;">PettyCash Expenses</span></td>
+                                {% endif %}
                             {% for i in pettycashexpenses reversed %}
-                              <td class="right-align">
+                              <td class="right-align" style="text-align:center;">
                                   <div >
                                       <span class="pull-right">{% if i.expenses %}{{ i.expenses }}{% else %}0.00{% endif %}</span>
                                 </div>
@@ -154,9 +136,14 @@
                         </tr>
                      {% endif %}
                          <tr>
-                            <td><span class="" style="padding-left:15px;font-weight:bold">Total Expenses</span></td>
+                             {% if  totalexpenses|length < 2 %}
+                                  <td colspan="3"><span class="" style="padding-left:15px;font-weight:bold">Total Expenses</span></td>
+                                {% else %}
+                                  <td><span class="" style="padding-left:15px;font-weight:bold">Total Expenses</span></td>
+                                {% endif %}
+
                             {% for i in totalexpenses reversed %}
-                              <td class="right-align">
+                              <td class="right-align" style="text-align:center;">
                                   <div >
                                       <span class="pull-right" style="font-weight:bold">{% if i.expenses %}{{ i.expenses }}{% else %}0.00{% endif %}</span>
                                 </div>
@@ -164,9 +151,14 @@
                             {% endfor %}
                         </tr>
                         <tr style="border:2px solid #DDDDDD;background-color:#fafafa">
-                            <td><span class="" style="padding-left:15px;font-weight:bold">Net Gain</span></td>
+                            {% if  netprofit|length < 2 %}
+                                  <td colspan="3"><span class="" style="padding-left:15px;font-weight:bold">Net Gain</span></td>
+                                {% else %}
+                                  <td><span class="" style="padding-left:15px;font-weight:bold">Net Gain</span></td>
+                                {% endif %}
+
                             {% for i in netprofit reversed %}
-                              <td class="right-align">
+                              <td class="right-align" style="text-align:center;">
                                   <div >
                                       <span class="pull-right" style="font-weight:bold">{% if i.net %}{{ i.net }}{% else %}0.00{% endif %} - ({% if i.net > 0 %}Profit{% elif i.net < 0 %}Loss {% else %}Null{% endif %})</span>
                                 </div>

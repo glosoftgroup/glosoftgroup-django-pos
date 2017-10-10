@@ -1,19 +1,21 @@
 from django.template.response import TemplateResponse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.shortcuts import redirect
-from django.contrib.auth import authenticate, views as django_views
-from django.contrib.auth.decorators import login_required
-import json
-
+from django.contrib.auth import authenticate
 from ..dashboard.views import staff_member_required
 from ..product.utils import products_with_availability, products_for_homepage
 
 
 def home(request):
-	products = products_for_homepage()[:8]
-	products = products_with_availability(
-		products, discounts=request.discounts, local_currency=request.currency)
-	return TemplateResponse(request, 'dashboard/login.html')
+	if request.user.is_authenticated():
+		referer = request.META.get('HTTP_REFERER')
+		print referer
+		return redirect('dashboard:landing-page')
+	else:
+		products = products_for_homepage()[:8]
+		products = products_with_availability(
+			products, discounts=request.discounts, local_currency=request.currency)
+		return TemplateResponse(request, 'dashboard/login.html')
 
 def lock(request):
 	return TemplateResponse(request, 'dashboard/lock.html')

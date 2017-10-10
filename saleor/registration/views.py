@@ -3,32 +3,21 @@ from django.contrib import messages, auth
 from django.contrib.auth import views as django_views
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from django.shortcuts import redirect
-import json
 import logging
 import datetime
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
-
-from saleor.cart.utils import find_and_assign_anonymous_cart
-from .forms import LoginForm, SignupForm, SetPasswordForm
-from saleor.decorators import permission_decorator, user_trail
-from saleor.userprofile.models import User
+from .forms import SignupForm, SetPasswordForm
+from saleor.decorators import user_trail
 from django.views.decorators.csrf import csrf_protect
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
-# @find_and_assign_anonymous_cart()
-# def login(request):
-#     kwargs = {
-#         'template_name': 'account/login.html', 'authentication_form': LoginForm}
-#     return django_views.login(request, **kwargs)
-# @find_and_assign_anonymous_cart()
+
 @csrf_protect
 def login(request):
 	username = request.POST.get('email')
@@ -41,9 +30,9 @@ def login(request):
 			user_trail(request.user,"logged in ", "login")
 			info_logger.info(str(request.user)+' logged in at '+str(datetime.datetime.now()))
 			return HttpResponse('success')
-		else: 
+		else:
 			return HttpResponse('cannot login')
-	else: 
+	else:
 		return HttpResponse('wrong credentials')
 
 
