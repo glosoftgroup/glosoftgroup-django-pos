@@ -1,43 +1,18 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, F, Q
-from django.core import serializers
-from ...utils import render_to_pdf, convert_html_to_pdf, image64
-
+from django.http import HttpResponse
+from django.db.models import Count, Sum, Q
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-import datetime
-from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
-import logging
-
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf
-import csv
-import random
-from django.utils.encoding import smart_str
 from datetime import date
-
-from ...core.utils import get_paginator_items
+from ...utils import render_to_pdf
+from ...utils import image64
 from ..views import staff_member_required
-from ...userprofile.models import User
-from ...sale.models import Sales, SoldItem, DrawerCash
-from ...product.models import Product, ProductVariant
-from ...purchase.models import PurchaseProduct
+from ...sale.models import Sales, SoldItem
+from ...product.models import ProductVariant
 from ...decorators import permission_decorator, user_trail
-from ...dashboard.views import get_low_stock_products
-
+import logging
+import datetime
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
@@ -56,8 +31,10 @@ def sales_list(request):
 		total_sales_amount = all_sales.aggregate(Sum('total_net'))
 		total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 		total_sales = []
-		costPrice = []
+		total_margin = []
 		for sale in all_sales:
+			costPrice = []
+			discounts = []
 			quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 			setattr(sale, 'quantity', quantity['c'])
 			for i in SoldItem.objects.filter(sales=sale):
@@ -69,31 +46,24 @@ def sales_list(request):
 				except:
 					quantity = 0
 
-				try:
-					price = product.get_price_per_item().gross
-				except ValueError, e:
-					price = product.get_price_per_item()
-				except:
-					price = 0
-
 				costPrice.append(quantity)
+				discounts.append(i.discount)
 			totalCostPrice = sum(costPrice)
-			setattr(sale, 'totalCostPrice', quantity)
+			totalDiscounts = sum(discounts)
+			setattr(sale, 'totalCostPrice', totalCostPrice)
+			setattr(sale, 'totalDiscounts', totalDiscounts)
 			try:
 				grossProfit = sale.total_net - totalCostPrice
-				# margin = round(grossProfit - sale.total_tax, 2)
-				margin = round(grossProfit, 2)
+				margin = round(grossProfit -totalDiscounts, 2)
 			except Exception as e:
-				grossProfit = 0
 				margin = 0
 			setattr(sale, 'margin', margin)
 			total_sales.append(sale)
+			total_margin.append(margin)
 
 		try:
-			grossProfit = total_sales_amount['total_net__sum'] - totalCostPrice
-			totalMargin = total_sales_amount['total_net__sum'] - totalCostPrice
+			totalMargin = sum(total_margin)
 		except:
-			grossProfit = 0
 			totalMargin = 0
 
 		page = request.GET.get('page', 1)
@@ -144,13 +114,16 @@ def sales_detail(request, pk=None):
 				itemPrice = 0
 			unitSalesCost = t.unit_cost
 			totalSalesCost = t.total_cost
+			discount = t.discount
 			try:
 				unitMargin = totalSalesCost - (itemPrice)
+				unitMargin = unitMargin - t.discount
 				totalMargin += unitMargin
 			except:
 				unitMargin = 0
 				totalMargin = 0
 			setattr(t, 'unitMargin', unitMargin)
+			setattr(t, 'discount', discount)
 			total_items.append(t)
 		data = {'items': total_items, "sale":sale, "totalMargin": totalMargin}
 		return TemplateResponse(request, 'dashboard/reports/sales_margin2/details.html',data)
@@ -178,8 +151,10 @@ def sales_paginate(request):
 			all_salesd = Sales.objects.filter(created__icontains=date).order_by('-id')
 			that_date_sum = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))
 			sales = []
-			costPrice = []
+			total_margin = []
 			for sale in all_salesd:
+				costPrice = []
+				discounts = []
 				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				for i in SoldItem.objects.filter(sales=sale):
@@ -191,17 +166,21 @@ def sales_paginate(request):
 					except:
 						quantity = 0
 					costPrice.append(quantity)
+					discounts.append(i.discount)
+
 				totalCostPrice = sum(costPrice)
-				setattr(sale, 'totalCostPrice', quantity)
+				totalDiscounts = sum(discounts)
+				setattr(sale, 'totalCostPrice', totalCostPrice)
+				setattr(sale, 'totalDiscounts', totalDiscounts)
 				try:
 					grossProfit = sale.total_net - totalCostPrice
-					margin = round(sale.total_net - quantity - sale.total_tax, 2)
-					status = 'true'
-				except:
+					margin = round(grossProfit - totalDiscounts, 2)
+				except Exception as e:
 					grossProfit = 0
 					margin = 0
 				setattr(sale, 'margin', margin)
 				sales.append(sale)
+				total_margin.append(margin)
 
 			if p2_sz and date:
 				paginator = Paginator(sales, int(p2_sz))
@@ -226,8 +205,10 @@ def sales_paginate(request):
 			total_sales_amount = all_sales.aggregate(Sum('total_net'))
 			total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 			sales = []
-			costPrice = []
+			total_margin = []
 			for sale in all_sales:
+				costPrice = []
+				discounts = []
 				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				for i in SoldItem.objects.filter(sales=sale):
@@ -239,18 +220,20 @@ def sales_paginate(request):
 					except:
 						quantity = 0
 					costPrice.append(quantity)
+					discounts.append(i.discount)
 				totalCostPrice = sum(costPrice)
-				setattr(sale, 'totalCostPrice', quantity)
+				totalDiscounts = sum(discounts)
+				setattr(sale, 'totalCostPrice', totalCostPrice)
+				setattr(sale, 'totalDiscounts', totalDiscounts)
 				try:
-					grossProfit = sale.total_net - quantity
-					margin = sale.total_net - quantity
-					status = 'true'
-					# margin = round((grossProfit / sale.total_net) * 100, 2)
-				except:
+					grossProfit = sale.total_net - totalCostPrice
+					margin = round(grossProfit - totalDiscounts, 2)
+				except Exception as e:
 					grossProfit = 0
 					margin = 0
 				setattr(sale, 'margin', margin)
 				sales.append(sale)
+				total_margin.append(margin)
 
 			if list_sz:
 				paginator = Paginator(sales, int(list_sz))
@@ -297,11 +280,13 @@ def sales_search(request):
 				Q(user__email__icontains=q) |
 				Q(user__name__icontains=q)).order_by( 'id' ).distinct()
 			sales = []
-			costPrice = []
 
 			if request.GET.get('gid'):
 				csales = all_sales.filter(created__icontains=request.GET.get('gid'))
+				total_margin = []
 				for sale in csales:
+					costPrice = []
+					discounts = []
 					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					for i in SoldItem.objects.filter(sales=sale):
@@ -313,18 +298,20 @@ def sales_search(request):
 						except:
 							quantity = 0
 						costPrice.append(quantity)
+						discounts.append(i.discount)
 					totalCostPrice = sum(costPrice)
-					setattr(sale, 'totalCostPrice', quantity)
+					totalDiscounts = sum(discounts)
+					setattr(sale, 'totalCostPrice', totalCostPrice)
+					setattr(sale, 'totalDiscounts', totalDiscounts)
 					try:
-						grossProfit = sale.total_net - quantity
-						margin = sale.total_net - quantity
-						status = 'true'
-						# margin = round((grossProfit / sale.total_net) * 100, 2)
-					except:
+						grossProfit = sale.total_net - totalCostPrice
+						margin = round(grossProfit - totalDiscounts, 2)
+					except Exception as e:
 						grossProfit = 0
 						margin = 0
 					setattr(sale, 'margin', margin)
 					sales.append(sale)
+					total_margin.append(margin)
 
 				if p2_sz:
 					paginator = Paginator(sales, int(p2_sz))
@@ -345,7 +332,10 @@ def sales_search(request):
 										 'gid': request.GET.get('gid')})
 
 			else:
+				total_margin = []
 				for sale in all_sales:
+					costPrice = []
+					discounts = []
 					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					for i in SoldItem.objects.filter(sales=sale):
@@ -357,18 +347,20 @@ def sales_search(request):
 						except:
 							quantity = 0
 						costPrice.append(quantity)
+						discounts.append(i.discount)
 					totalCostPrice = sum(costPrice)
-					setattr(sale, 'totalCostPrice', quantity)
+					totalDiscounts = sum(discounts)
+					setattr(sale, 'totalCostPrice', totalCostPrice)
+					setattr(sale, 'totalDiscounts', totalDiscounts)
 					try:
 						grossProfit = sale.total_net - totalCostPrice
-						margin = sale.total_net - quantity
-						status = 'true'
-						# margin = round((grossProfit / sale.total_net) * 100, 2)
-					except:
+						margin = round(grossProfit - totalDiscounts, 2)
+					except Exception as e:
 						grossProfit = 0
 						margin = 0
 					setattr(sale, 'margin', margin)
 					sales.append(sale)
+					total_margin.append(margin)
 
 				if list_sz:
 					paginator = Paginator(sales, int(list_sz))
@@ -435,6 +427,7 @@ def pdf_sale_tax_detail(request, pk=None):
 		sale = Sales.objects.get(pk=pk)
 		items = SoldItem.objects.filter(sales=sale)
 		total_items = []
+		totalMargin = 0
 		for t in items:
 			product = ProductVariant.objects.get(sku=t.sku)
 			try:
@@ -445,14 +438,16 @@ def pdf_sale_tax_detail(request, pk=None):
 				itemPrice = 0
 			unitSalesCost = t.unit_cost
 			totalSalesCost = t.total_cost
-			print totalSalesCost
+			discount = t.discount
 			try:
-				grossProfit = unitSalesCost - itemPrice
-				unitMargin = totalSalesCost - itemPrice
+				unitMargin = totalSalesCost - (itemPrice)
+				unitMargin = unitMargin - t.discount
+				totalMargin += unitMargin
 			except:
-				grossProfit = 0
 				unitMargin = 0
+				totalMargin = 0
 			setattr(t, 'unitMargin', unitMargin)
+			setattr(t, 'discount', discount)
 			total_items.append(t)
 		img = image64()
 		data = {
@@ -480,7 +475,6 @@ def sales_list_tax_pdf( request ):
 			gid = None
 
 		sales = []
-		costPrice = []
 		if q is not None:
 			all_sales = Sales.objects.filter(
 				Q(invoice_number__icontains=q) |
@@ -493,7 +487,10 @@ def sales_list_tax_pdf( request ):
 
 			if gid:
 				csales = all_sales.filter(created__icontains=gid)
+				total_margin = []
 				for sale in csales:
+					costPrice = []
+					discounts = []
 					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					for i in SoldItem.objects.filter(sales=sale):
@@ -505,20 +502,25 @@ def sales_list_tax_pdf( request ):
 						except:
 							quantity = 0
 						costPrice.append(quantity)
+						discounts.append(i.discount)
 					totalCostPrice = sum(costPrice)
-					setattr(sale, 'totalCostPrice', quantity)
+					totalDiscounts = sum(discounts)
+					setattr(sale, 'totalCostPrice', totalCostPrice)
+					setattr(sale, 'totalDiscounts', totalDiscounts)
 					try:
 						grossProfit = sale.total_net - totalCostPrice
-						margin = sale.total_net - quantity
-						status = 'true'
-						# margin = round((grossProfit / sale.total_net) * 100, 2)
-					except:
+						margin = round(grossProfit - totalDiscounts, 2)
+					except Exception as e:
 						grossProfit = 0
 						margin = 0
 					setattr(sale, 'margin', margin)
 					sales.append(sale)
+					total_margin.append(margin)
 			else:
+				total_margin = []
 				for sale in all_sales:
+					costPrice = []
+					discounts = []
 					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					for i in SoldItem.objects.filter(sales=sale):
@@ -530,22 +532,27 @@ def sales_list_tax_pdf( request ):
 						except:
 							quantity = 0
 						costPrice.append(quantity)
+						discounts.append(i.discount)
 					totalCostPrice = sum(costPrice)
-					setattr(sale, 'totalCostPrice', quantity)
+					totalDiscounts = sum(discounts)
+					setattr(sale, 'totalCostPrice', totalCostPrice)
+					setattr(sale, 'totalDiscounts', totalDiscounts)
 					try:
-						grossProfit = sale.total_net - quantity
-						margin = sale.total_net - quantity
-						status = 'true'
-						# margin = round((grossProfit / sale.total_net) * 100, 2)
-					except:
+						grossProfit = sale.total_net - totalCostPrice
+						margin = round(grossProfit - totalDiscounts, 2)
+					except Exception as e:
 						grossProfit = 0
 						margin = 0
 					setattr(sale, 'margin', margin)
 					sales.append(sale)
+					total_margin.append(margin)
 
 		elif gid:
 			csales = Sales.objects.filter(created__icontains=gid)
+			total_margin = []
 			for sale in csales:
+				costPrice = []
+				discounts = []
 				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				for i in SoldItem.objects.filter(sales=sale):
@@ -557,18 +564,20 @@ def sales_list_tax_pdf( request ):
 					except:
 						quantity = 0
 					costPrice.append(quantity)
+					discounts.append(i.discount)
 				totalCostPrice = sum(costPrice)
-				setattr(sale, 'totalCostPrice', quantity)
+				totalDiscounts = sum(discounts)
+				setattr(sale, 'totalCostPrice', totalCostPrice)
+				setattr(sale, 'totalDiscounts', totalDiscounts)
 				try:
-					grossProfit = sale.total_net - quantity
-					margin = sale.total_net - quantity
-					status = 'true'
-					# margin = round((grossProfit / sale.total_net) * 100, 2)
-				except:
+					grossProfit = sale.total_net - totalCostPrice
+					margin = round(grossProfit - totalDiscounts, 2)
+				except Exception as e:
 					grossProfit = 0
 					margin = 0
 				setattr(sale, 'margin', margin)
 				sales.append(sale)
+				total_margin.append(margin)
 		else:
 			try:
 				last_sale = Sales.objects.latest('id')
@@ -577,7 +586,10 @@ def sales_list_tax_pdf( request ):
 				gid = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
 			csales = Sales.objects.filter(created__icontains=gid)
+			total_margin = []
 			for sale in csales:
+				costPrice = []
+				discounts = []
 				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				for i in SoldItem.objects.filter(sales=sale):
@@ -589,18 +601,20 @@ def sales_list_tax_pdf( request ):
 					except:
 						quantity = 0
 					costPrice.append(quantity)
+					discounts.append(i.discount)
 				totalCostPrice = sum(costPrice)
-				setattr(sale, 'totalCostPrice', quantity)
+				totalDiscounts = sum(discounts)
+				setattr(sale, 'totalCostPrice', totalCostPrice)
+				setattr(sale, 'totalDiscounts', totalDiscounts)
 				try:
-					grossProfit = sale.total_net - quantity
-					margin = sale.total_net - quantity
-					status = 'true'
-					# margin = round((grossProfit / sale.total_net) * 100, 2)
-				except:
+					grossProfit = sale.total_net - totalCostPrice
+					margin = round(grossProfit - totalDiscounts, 2)
+				except Exception as e:
 					grossProfit = 0
 					margin = 0
 				setattr(sale, 'margin', margin)
 				sales.append(sale)
+				total_margin.append(margin)
 
 		img = image64()
 		data = {
