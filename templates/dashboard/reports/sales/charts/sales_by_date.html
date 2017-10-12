@@ -433,7 +433,7 @@
 
 {% endblock%}
 {% block custom_js %}
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
@@ -442,7 +442,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
 
-    $('.daterange-single').daterangepicker({ 
+    $('.daterange-single').daterangepicker({
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true,
@@ -454,6 +454,7 @@ $(document).ready(function(){
         $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:date },success: function(data){
               $('.p-sales').html(data);
         }});
+        $('.daterange-to').val('');
 
     });
 
@@ -507,14 +508,7 @@ $(document).ready(function(){
 
          }
     });
-    //**@ daterange from
-    $('.daterange-from').daterangepicker({ 
-        singleDatePicker: true,
-        maxDate: new Date(),
-        locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true,
-        autoUpdateInput: false
-    });
+
     //**@ daterange to
     $('.daterange-to').daterangepicker({
             alwaysShowCalendars: true,
@@ -541,7 +535,8 @@ $(document).ready(function(){
             $.ajax({ url: "{% url 'dashboard:get_sales_by_week' %}",type: 'GET',data: {from:from, to:to },success: function(data){
                     $('.p-sales').html(data);
             }});
-         }   
+         }
+           $('.daterange-single').val('');
     });
     $('.daterange-to').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
