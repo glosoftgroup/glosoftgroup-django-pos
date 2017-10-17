@@ -55,19 +55,7 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% if product.pk %}
-  <li>              
-    <a href="{{ product.get_absolute_url }}"><i class="icon-eye position-left"></i>  {% trans "View on site" context "Dashboard preview action" %}
-    </a>
-  </li>
-  <li>
-    <a href="#modal_instance" data-href="{% url 'dashboard:product-delete' pk=product.pk %}"
-        class="modal-trigger"><i class="icon-trash position-left"></i> 
-          {% trans "Remove product" context "Product form action" %}
-        </a>
-  </li>   
-   
-  {% endif %}
+
 {% endblock %}
 
 {% block menu_catalogue_class %} active{% endblock %}
@@ -177,19 +165,20 @@
                               <option value="{{cat.pk}}">{{cat}}</option>
                               {% endfor %}
                           </select>
-                          <br>
-                          <label class="error"></label>
 
                       </div>
                   
                   <div class="input-group-btn">
                      <button type="button" class="btn bg-primary btn-icon legitRipple edit_modal-trigger" data-popup="tooltip"
                     data-original-title="Add New category"
-                    href="modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add32" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
+                    href="#modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add32" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
                        <i class="icon-plus-circle2"></i>
                      </button>
                    </div>
                  </div>
+                  <br>
+                          <label class="error"></label>
+
               </div>
             </div>
             <div class="col-md-4">
