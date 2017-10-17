@@ -596,7 +596,7 @@ $(function(){
 * ---------------------------------------------------------------------------- */
 
 $(function(){
-  var addNewStockBtn = $('#addNewStockBtn');
+  var addNewStockBtn = $('#addNewStockBtnjj');
   var modalIds = $('#modal_stocks');  
   var addStockForm = $('.addstockresults');
 
