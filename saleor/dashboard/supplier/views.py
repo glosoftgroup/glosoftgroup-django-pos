@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Group, Permission
 from django.contrib import messages
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.translation import pgettext_lazy
 from django.http import HttpResponse
@@ -12,18 +12,17 @@ from ...userprofile.models import User, UserTrail
 from ...supplier.models import Supplier, AddressBook
 
 from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf
-from django.core.urlresolvers import reverse
+from ...utils import render_to_pdf, default_logo
 import csv
 import random
 from django.utils.encoding import smart_str
 import logging
-import json
 from datetime import date
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
+
 
 @permission_decorator('supplier.view_supplier')
 def users(request):
@@ -49,6 +48,7 @@ def users(request):
 	except TypeError as e:
 		error_logger.error(e)
 		return HttpResponse('error accessing users')
+
 
 @staff_member_required
 def user_paginate(request):
@@ -85,7 +85,7 @@ def user_paginate(request):
 		except PageNotAnInteger:
 			users = paginator.page(1)
 		except InvalidPage:
-			groups = paginator.page(1)
+			users = paginator.page(1)
 		except EmptyPage:
 			users = paginator.page(paginator.num_pages)
 		return TemplateResponse(request,'dashboard/supplier/pagination/paginate.html',{'users':users})
@@ -195,13 +195,16 @@ def user_process(request):
 		except:
 			error_logger.info('Error when saving ')
 		last_id = Supplier.objects.latest('id')
-		
-		user_trail(request.user.name, 'created supplier: '+str(name),'add')
-		info_logger.info('User: '+str(request.user.name)+' created supplier:'+str(name))
-		success_url = reverse(
-            'dashboard:supplier-edit', kwargs={'pk': last_id.pk})
-        
-		return HttpResponse(json.dumps({'success_url':success_url}),content_type='application/json')
+		if groups:
+			permissions = Permission.objects.filter(group__name__in=groups)
+			last_id.user_permissions.add(*permissions)
+			gps = Group.objects.filter(name__in=groups)
+			last_id.groups.add(*gps)
+			last_id.save()
+		user_trail(request.user.name, 'created user: '+str(name),'add')
+		info_logger.info('User: '+str(request.user.name)+' created user:'+str(name))
+		return HttpResponse(last_id.id)
+
 
 def user_detail(request, pk):
 	user = get_object_or_404(Supplier, pk=pk)
@@ -216,14 +219,15 @@ def user_delete(request, pk):
 		user_trail(request.user.name, 'deleted supplier: '+ str(user.name))
 		return HttpResponse('success')
 
+
 @permission_decorator('supplier.change_supplier')
 def user_edit(request, pk):
 	user = get_object_or_404(Supplier, pk=pk)
-	#addresses = user.get_address()		
 	ctx = {'user': user}
 	user_trail(request.user.name, 'accessed edit page for supplier '+ str(user.name),'update')
 	info_logger.info('User: '+str(request.user.name)+' accessed edit page for supplier: '+str(user.name))
 	return TemplateResponse(request, 'dashboard/supplier/edit_user.html', ctx)
+
 
 def user_update(request, pk):
 	user = get_object_or_404(Supplier, pk=pk)
@@ -271,6 +275,7 @@ def user_update(request, pk):
 			info_logger.info('User: '+str(request.user.name)+' updated supplier: '+str(user.name))
 			return HttpResponse("success without image")
 
+
 @csrf_exempt
 def user_assign_permission(request):
 	if request.method == 'POST':
@@ -307,6 +312,7 @@ def user_assign_permission(request):
 				user_trail(request.user.name, 'assigned permissions for user: '+ str(user.name))
 				info_logger.info('User: '+str(request.user.name)+' assigned permissions for user: '+str(user.name))
 				return HttpResponse('permissions updated')
+
 
 @staff_member_required
 def address_add(request,pk):
@@ -378,13 +384,16 @@ def user_trails(request):
 @staff_member_required
 def supplier_pdf(request):
 	users = Supplier.objects.all().order_by('-id')
+	img = default_logo()
 	data = {
         'today': date.today(),
         'users': users,
-        'puller': request.user
+        'puller': request.user,
+		'image': img
         }
 	pdf = render_to_pdf('dashboard/supplier/pagination/pdf/pdf.html', data)
 	return HttpResponse(pdf, content_type='application/pdf')
+
 
 @staff_member_required
 def supplier_export_csv(request):

@@ -1,43 +1,17 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, F, Q
-from django.core import serializers
-# from django.template.defaultfilters import date
+from django.http import HttpResponse
+from django.db.models import Count, Sum, Q
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 import datetime
-from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
-
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf
-import csv
-import random
-from django.utils.encoding import smart_str
-from datetime import date
 from operator import itemgetter
-
-from ...core.utils import get_paginator_items
 from ..views import staff_member_required
-from ...userprofile.models import User
-from ...sale.models import Sales, SoldItem, DrawerCash
-from ...product.models import Product, ProductVariant
-from ...purchase.models import PurchaseProduct
+from ...sale.models import Sales, SoldItem
+from ...product.models import ProductVariant
 from ...decorators import permission_decorator, user_trail
-from ...dashboard.views import get_low_stock_products
-from ...utils import render_to_pdf, convert_html_to_pdf, image64, default_logo
+from ...utils import render_to_pdf, default_logo
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -54,7 +28,7 @@ def sales_list(request):
 		except:
 			last_date_of_sales = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
-		total_sales = SoldItem.objects.filter(sales__created__contains=last_date_of_sales).values('product_name','product_category','sales__customer_name', 'sales__user__name','sales__user__email','sales__terminal__terminal_name').annotate(
+		total_sales = SoldItem.objects.filter(sales__created__contains=last_date_of_sales).values('product_name','product_category').annotate(
 				c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by('-quantity__sum')
 
 		page = request.GET.get('page', 1)
@@ -93,15 +67,13 @@ def sales_paginate(request):
 		try:
 			if order == 'qlh':
 				sales = SoldItem.objects.filter(sales__created__contains=date). \
-					values('product_category', 'product_name', 'sales__customer_name', 'sales__terminal__terminal_name',
-						   'sales__user__name', 'sales__user__email').annotate(
+					values('product_category', 'product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 					Sum('quantity')).order_by(
 					'quantity__sum')
 			elif order == 'mlh':
 				items = SoldItem.objects.filter(sales__created__contains=date). \
-					values('sku', 'product_category', 'product_name', 'sales__customer_name', 'sales__terminal__terminal_name',
-						   'sales__user__name', 'sales__user__email').annotate(
+					values('sku', 'product_category', 'product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 					Sum('quantity'))
 				total_items = []
@@ -124,8 +96,7 @@ def sales_paginate(request):
 				margin = True
 			elif order == 'mhl':
 				items = SoldItem.objects.filter(sales__created__contains=date). \
-					values('sku', 'product_category', 'product_name', 'sales__customer_name', 'sales__terminal__terminal_name',
-						   'sales__user__name', 'sales__user__email').annotate(
+					values('sku', 'product_category', 'product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 					Sum('quantity'))
 				total_items = []
@@ -148,7 +119,7 @@ def sales_paginate(request):
 				margin = True
 			else:
 				sales = SoldItem.objects.filter(sales__created__contains=date).\
-					values('product_category','product_name','sales__customer_name','sales__terminal__terminal_name','sales__user__name','sales__user__email').annotate(
+					values('product_category','product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by(
 					'-quantity__sum')
 
@@ -185,15 +156,13 @@ def sales_paginate(request):
 			last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
 			if order == 'qlh':
 				sales = SoldItem.objects.filter(sales__created__contains=last_date_of_sales). \
-					values('product_category', 'product_name', 'sales__customer_name', 'sales__terminal__terminal_name',
-						   'sales__user__name', 'sales__user__email').annotate(
+					values('product_category', 'product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 					Sum('quantity')).order_by(
 					'quantity__sum')
 			elif order == 'mlh':
 				items = SoldItem.objects.filter(sales__created__contains=last_date_of_sales). \
-					values('sku', 'product_category', 'product_name', 'sales__customer_name', 'sales__terminal__terminal_name',
-						   'sales__user__name', 'sales__user__email').annotate(
+					values('sku', 'product_category', 'product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 					Sum('quantity'))
 				total_items = []
@@ -216,8 +185,7 @@ def sales_paginate(request):
 				margin = True
 			elif order == 'mhl':
 				items = SoldItem.objects.filter(sales__created__contains=last_date_of_sales). \
-					values('sku', 'product_category', 'product_name', 'sales__customer_name', 'sales__terminal__terminal_name',
-						   'sales__user__name', 'sales__user__email').annotate(
+					values('sku', 'product_category', 'product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 					Sum('quantity'))
 				total_items = []
@@ -240,7 +208,7 @@ def sales_paginate(request):
 				margin = True
 			else:
 				sales = SoldItem.objects.filter(sales__created__contains=last_date_of_sales). \
-					values('product_category','product_name', 'sales__customer_name', 'sales__terminal__terminal_name','sales__user__name', 'sales__user__email').annotate(
+					values('product_category','product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by(
 					'-quantity__sum')
 
@@ -306,21 +274,16 @@ def sales_search(request):
 		if q is not None:
 			all_sales = SoldItem.objects.filter(
 				Q(product_name__icontains=q) |
-				Q(product_category__icontains=q) |
-				Q(sales__customer__name__icontains=q) |
-				Q(sales__user__email__icontains=q) |
-				Q(sales__terminal__terminal_name__icontains=q) |
-				Q(sales__user__name__icontains=q))
+				Q(product_category__icontains=q))
 
 			if order == 'qlh':
 				sales = all_sales.filter(sales__created__contains=date). \
-					values('product_category','sales__terminal__terminal_name','product_name', 'sales__customer_name', 'sales__user__email','sales__user__name'). \
+					values('product_category','product_name'). \
 					annotate(c=Count('product_name', distinct=True)).annotate(Sum('total_cost')). \
 					annotate(Sum('quantity')).order_by('quantity__sum')
 			elif order == 'mlh':
 				items = all_sales.filter(sales__created__contains=date). \
-					values('sku', 'product_category', 'product_name', 'sales__customer_name', 'sales__terminal__terminal_name',
-						   'sales__user__name', 'sales__user__email').annotate(
+					values('sku', 'product_category', 'product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 					Sum('quantity'))
 				total_items = []
@@ -343,8 +306,7 @@ def sales_search(request):
 				margin = True
 			elif order == 'mhl':
 				items = all_sales.filter(sales__created__contains=date). \
-					values('sku', 'product_category', 'product_name', 'sales__customer_name', 'sales__terminal__terminal_name',
-						   'sales__user__name', 'sales__user__email').annotate(
+					values('sku', 'product_category', 'product_name').annotate(
 					c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 					Sum('quantity'))
 				total_items = []
@@ -367,8 +329,7 @@ def sales_search(request):
 				margin = True
 			else:
 				sales = all_sales.filter(sales__created__contains=date). \
-					values('product_category', 'sales__terminal__terminal_name', 'product_name', 'sales__customer_name',
-						   'sales__user__email', 'sales__user__name'). \
+					values('product_category', 'product_name'). \
 					annotate(c=Count('product_name', distinct=True)).annotate(Sum('total_cost')). \
 					annotate(Sum('quantity')).order_by('-quantity__sum')
 
@@ -436,25 +397,18 @@ def sales_list_pdf( request ):
 		if q is not None:
 			all_sales = SoldItem.objects.filter(
 				Q(product_name__icontains=q) |
-				Q(product_category__icontains=q) |
-				Q(sales__customer__name__icontains=q) |
-				Q(sales__user__email__icontains=q) |
-				Q(sales__terminal__terminal_name__icontains=q) |
-				Q(sales__user__name__icontains=q))
+				Q(product_category__icontains=q))
 		else:
 			all_sales = SoldItem.objects.all()
 
 		if order == 'qlh':
 			sales = all_sales.filter(sales__created__contains=date). \
-				values('product_category', 'sales__terminal__terminal_name', 'product_name', 'sales__customer_name',
-					   'sales__user__email', 'sales__user__name'). \
+				values('product_category', 'product_name'). \
 				annotate(c=Count('product_name', distinct=True)).annotate(Sum('total_cost')). \
 				annotate(Sum('quantity')).order_by('quantity__sum')
 		elif order == 'mlh':
 			items = all_sales.filter(sales__created__contains=date). \
-				values('sku', 'product_category', 'product_name', 'sales__customer_name',
-					   'sales__terminal__terminal_name',
-					   'sales__user__name', 'sales__user__email').annotate(
+				values('sku', 'product_category', 'product_name').annotate(
 				c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 				Sum('quantity'))
 			total_items = []
@@ -477,9 +431,7 @@ def sales_list_pdf( request ):
 			margin = True
 		elif order == 'mhl':
 			items = all_sales.filter(sales__created__contains=date). \
-				values('sku', 'product_category', 'product_name', 'sales__customer_name',
-					   'sales__terminal__terminal_name',
-					   'sales__user__name', 'sales__user__email').annotate(
+				values('sku', 'product_category', 'product_name').annotate(
 				c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(
 				Sum('quantity'))
 			total_items = []
@@ -502,8 +454,7 @@ def sales_list_pdf( request ):
 			margin = True
 		else:
 			sales = all_sales.filter(sales__created__contains=date). \
-				values('product_category', 'sales__terminal__terminal_name', 'product_name', 'sales__customer_name',
-					   'sales__user__email', 'sales__user__name'). \
+				values('product_category','product_name'). \
 				annotate(c=Count('product_name', distinct=True)).annotate(Sum('total_cost')). \
 				annotate(Sum('quantity')).order_by('-quantity__sum')
 

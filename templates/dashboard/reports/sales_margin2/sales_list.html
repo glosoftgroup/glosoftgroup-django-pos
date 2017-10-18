@@ -100,6 +100,7 @@
                           <th>Quantity</th>
                           <th class="text-center">Total Cost Price (KShs)</th>
                           <th class="text-center">Total Sales (KShs)</th>
+                          <th class="text-center">Total Discounts (KShs)</th>
                           <th class="text-center">Margin (Kshs)</th>
                         </tr>
                       </thead>
@@ -113,6 +114,7 @@
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.totalCostPrice|intcomma }}</span></td>
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                            <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.totalDiscounts|intcomma }}</span></td>
                             <td class="td" data-href="{% url 'dashboard:sale_margin_detail' pk=sale.pk %}"><span class="pull-right">{{sale.margin|intcomma }}</span></td>
                           </tr>
                         {% endfor %}

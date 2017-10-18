@@ -57,6 +57,7 @@
                           <th>Retail Price</th>
                           <th>Quantity</th>
                           <th>Total Sales (KShs)</th>
+                          <th>Total Discount (KShs)</th>
                           <th>Margin (KShs)</th>
                         </tr>
                       </thead>
@@ -69,6 +70,7 @@
                             <td>{{item.unit_cost}}</td>
                             <td>{{item.quantity}}</td>
                             <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
+                            <td><span class="pull-right">{{item.discount|intcomma}}</span></td>
                             <td><span>{{item.unitMargin|intcomma}}</span></td>
                           </tr>
                         {% endfor %}

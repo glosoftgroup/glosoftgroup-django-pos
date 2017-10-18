@@ -5,61 +5,34 @@
      <head>
          <title>Sales Report</title>
          <style type="text/css">
-             body {
-                   font-family: 'Nunito', sans-serif;
-                   color: #384047;
-             }
-             .header {
-                 font-size: 15px;
-                 font-weight: 100;
-                 text-align: center;
-                 color: #007cae;
-             }
-             .title {
-                 font-size: 16px;
-                 font-weight: 100;
-                /* text-align: right;*/
-                padding: 10px 20px 0px 20px;  
-             }
-             .title span {
-                 color: #007cae;
-             }
-             .detailss {
-                 padding: 10px 20px 0px 20px;
-                 text-align: left !important;
-                 /*margin-left: 40%;*/
-             }
-             .hrItem {
-                 border: none;
-                 height: 1px;
-                 /* Set the hr color */
-                 color: #333; /* old IE */
-                 background-color: #fff; /* Modern Browsers */
-             }
-             .img-circle{
-              border-radius: 50%;
-             }
-             table {
-              max-width: 960px;
-              margin: 10px auto;
+                          body {sans-serif; color: #384047;}
+             .header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}
+             .title {font-size: 16px;font-weight: 100;}
+             .header p{color:#384047;}
+
+             .img-circle{border-radius: 50%;}
+             table {ax-width: 960px; margin: 10px auto;}
+            tr{border-bottom:0.5px solid #ddd;border-right:0.5px solid #ddd;
+                border-left:0.5px solid #ddd;
             }
+            td{border:none;}
             th {
-                  font-weight: 400;
-                  background: #1779c6;
+                  font-weight: bold;
+                  background:#2196F3;
                   color: #FFF;
+                  border:none;
+                  font-size:11px;
+                  vertical-align:middle;
                 }
-             .td{text-align: center;}
+             .td{text-align: center;font-size:11px;}
              tr{padding:5px;}
-            .foot{padding-top:30px;}
-            .foot p{ color: #333;font-size: 12px;}
-            .chart{width:500px;height: 400px;}
-            .data-table-container{padding-top:20px;}
+             .img{width:50px;height:50px;}
          </style>
      </head>
      <body>
          <div class='wrapper'>
              <div class='header'>
-                 <p class='title'>Sales Summary Report <br>
+                 <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;">SALES SUMMARY REPORT <br>
                    <span style="font-size: 0.8em;">{{today| date:'jS F Y'}}</span>
                  </p>
              </div>
@@ -75,8 +48,6 @@
                         <th class="right-align">
                           Sales
                         </th>
-                        <th> Refund </th>
-                        <th> Net </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -84,15 +55,7 @@
                           <td>
                             <span style="font-weight: bold;">Gross Sales</span>
                           </td>
-                          <td class="right-align">
-                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_gross_sales }}
-                            </div>
-                          </td>
-                          <td class="right-align">
-                            <span style="font-weight: bold;">0.00</span>
-                          </td>
-                          <td>
+                          <td class="right-align" style="text-align:center;">
                             <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
                               {{ date_gross_sales }}
                             </div>
@@ -100,40 +63,25 @@
                         </tr>
                         <tr>
                           <td>Discounts</td>
-                          <td class="right-align">
+                          <td class="right-align" style="text-align:center;">
                               <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
                               {{ date_total_discount }}
                             </div>
                           </td>
-                          <td>0.00</td>
-                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_discount }}</div></td>
                         </tr>
                         <tr>
                           <td>Tax</td>
-                          <td class="right-align">
+                          <td class="right-align" style="text-align:center;">
                               <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
                               {{ date_total_tax }}
                             </div>
                           </td>
-                          <td>0.00</td>
-                          <td><div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_tax }}
-                            </div></td>
                         </tr>
                         <tr data-action-go="">
                           <td>
                             <span style="font-weight: bold;">Net Sales</span>
                           </td>
-                          <td class="right-align">
-                            <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
-                              {{ date_total_sales }}
-                            </div>
-                          </td>
-                          <td class="right-align">
-                            <span style="font-weight: bold;">0.00</span>
-                          </td>
-                          <td>
+                          <td class="right-align" style="text-align:center;">
                             <div style="font-weight: bold;"><span style="font-size: 0.7em;">Ksh.</span>
                               {{ date_total_sales }}
                             </div>
@@ -164,7 +112,7 @@
                             {{ user.user__name }} - {{user.user__email}}
                           </td>
                           <td class="td">
-                            {{ user.terminal__terminal_name }}
+                            {{ user.terminal }}
                           </td>
                           <td class="td">
                             <div><span style="font-size: 0.7em;">Ksh. </span>{{ user.total_net__sum }}</div>

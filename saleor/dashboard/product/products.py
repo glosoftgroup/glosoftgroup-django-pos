@@ -1,35 +1,13 @@
 from __future__ import unicode_literals
-
-import emailit.api
-from django.conf import settings
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.contrib.postgres.search import SearchVector
-
 from . import forms
-from ...core.utils import get_paginator_items
-from ...purchase.models import (
-								PurchaseOrder,
-								PurchaseItems,
-								PurchaseProduct
-								)
-from ...supplier.models import Supplier
-from ...product.models import (Product, ProductAttribute, Category,
-							   ProductClass, AttributeChoiceValue,
-							   ProductImage, ProductVariant, Stock,
-							   StockLocation, ProductTax, StockHistoryEntry)
+from ...product.models import (Product, ProductClass)
 from ..views import staff_member_required
-from ..views import get_low_stock_products
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf
+from ...decorators import user_trail
+from ...utils import render_to_pdf, default_logo
 import csv
 import random
 from django.utils.encoding import smart_str
@@ -192,10 +170,12 @@ def search(request):
 @staff_member_required
 def products_pdf(request):
 	product_results = Product.objects.all()
+	img = default_logo()
 	data = {
 		'today': date.today(),
 		'product_results': product_results,
-		'puller': request.user
+		'puller': request.user,
+		'image': img,
 	}
 	pdf = render_to_pdf('dashboard/product/roles/pdf/pdf.html', data)
 	return HttpResponse(pdf, content_type='application/pdf')

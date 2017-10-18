@@ -1,108 +1,365 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max
-from django.core import serializers
-from django.template.defaultfilters import date
-from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-import datetime
-from datetime import date, timedelta
+from django.http import HttpResponse
+from django.db.models import Sum
 from django.utils.dateformat import DateFormat
-import logging
+import datetime
+import dateutil.relativedelta
 
 from ..views import staff_member_required
-from ...core.utils import get_paginator_items
-from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem
-from ...product.models import Product, ProductVariant
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf, image64
+from ...product.models import ProductVariant
+from ...utils import render_to_pdf, image64
+from ...accounts.models import *
+
+
+def get_pettycash_expenses(year, month=None):
+	if year and month:
+		expenses = Expenses.objects.filter(added_on__year=year, added_on__month=month).aggregate(Sum('amount'))['amount__sum']
+		if expenses is None:
+			expenses = 0
+
+	return {
+		'expenses':expenses
+	}
+
+
+def get_year_pettycash_expenses(lastyear, thisyear, month=None):
+	expenses = Expenses.objects.filter(added_on__year__range=[lastyear, thisyear], added_on__month__lte=month).aggregate(Sum('amount'))['amount__sum']
+	if expenses is None:
+		expenses = 0
+
+	return {
+		'expenses':expenses
+	}
+
+
+def get_year_total_expenses(lastyear, thisyear, month=None):
+	try:
+		expenses = PersonalExpenses.objects.filter(added_on__year__range=[lastyear, thisyear], added_on__month__lte=month).aggregate(Sum('amount'))['amount__sum']
+		if expenses is None:
+			expenses = 0
+	except:
+		expenses = 0
+
+	try:
+		petty = Expenses.objects.filter(added_on__year__range=[lastyear, thisyear], added_on__month__lte=month).aggregate(Sum('amount'))['amount__sum']
+		if petty is None:
+			petty = 0
+	except:
+		petty = 0
+
+	total = expenses + petty
+
+	return {
+		'expenses': total
+	}
+
+def get_total_expenses(year, month=None):
+	if year and month:
+		try:
+			expenses = PersonalExpenses.objects.filter(added_on__year=year, added_on__month=month).aggregate(Sum('amount'))['amount__sum']
+			if expenses is None:
+				expenses = 0
+		except:
+			expenses = 0
+
+		try:
+			petty = Expenses.objects.filter(added_on__year=year, added_on__month=month).aggregate(Sum('amount'))['amount__sum']
+			if petty is None:
+				petty = 0
+		except:
+			petty = 0
+
+		total = expenses + petty
+
+	return {
+		'expenses': total
+	}
+
+
+def sales_period_results(year, month=None):
+	sales = Sales.objects.filter(created__year=year, created__month=month)
+	soldItems = SoldItem.objects.filter(sales__created__year=year, sales__created__month=month).order_by('-id')
+	totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
+	if totalSales is None:
+		totalSales = 0
+	totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+	if totalTax is None:
+		totalTax = 0
+	expenses = PersonalExpenses.objects.filter(added_on__year=year, added_on__month=month)
+
+	costPrice = []
+	for i in soldItems:
+		product = ProductVariant.objects.get(sku=i.sku)
+		try:
+			quantity = product.get_cost_price().gross
+		except ValueError, e:
+			quantity = product.get_cost_price()
+		except:
+			quantity = 0
+		costPrice.append(quantity)
+
+	totalCostPrice = sum(costPrice)
+	try:
+		grossProfit = totalSales - totalCostPrice
+	except:
+		grossProfit = 0
+
+	return {
+		"sales":sales,
+		"soldItems":soldItems,
+		"totalSales":totalSales,
+		"totalTax":totalTax,
+		'grossProfit': grossProfit,
+		'totalCostPrice': totalCostPrice,
+		'expenses':expenses
+	}
+
+
+def sales_year_results(lastyear, thisyear, month=None):
+
+	sales = Sales.objects.filter(created__year__range=[lastyear, thisyear], created__month__lte=month)
+	soldItems = SoldItem.objects.filter(sales__created__year__range=[lastyear, thisyear], sales__created__month__lte=month).order_by('-id')
+	totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
+	if totalSales is None:
+		totalSales = 0
+	totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+	if totalTax is None:
+		totalTax = 0
+	expenses = PersonalExpenses.objects.filter(added_on__year__range=[lastyear, thisyear], added_on__month__lte=month)
+
+
+	costPrice = []
+	for i in soldItems:
+		product = ProductVariant.objects.get(sku=i.sku)
+		try:
+			quantity = product.get_cost_price().gross
+		except ValueError, e:
+			quantity = product.get_cost_price()
+		except:
+			quantity = 0
+		costPrice.append(quantity)
+
+	totalCostPrice = sum(costPrice)
+	try:
+		grossProfit = totalSales - totalCostPrice
+	except:
+		grossProfit = 0
+
+	return {
+		"sales":sales,
+		"soldItems":soldItems,
+		"totalSales":totalSales,
+		"totalTax":totalTax,
+		'grossProfit': grossProfit,
+		'totalCostPrice': totalCostPrice,
+		'expenses':expenses
+	}
+
+
+def get_net_profit(year, month=None):
+	if year and month:
+		sales = sales_period_results(year, month)
+		expenses = get_total_expenses(year, month)
+	else:
+		sales = sales_period_results(year)
+		expenses = get_total_expenses(year)
+
+	net = sales['grossProfit'] - expenses['expenses']
+	return {
+		'net':net
+	}
+
+def get_year_net_profit(lastyear, thisyear, month):
+	sales = sales_year_results(lastyear, thisyear, month)
+	expenses = get_year_total_expenses(lastyear, thisyear, month)
+
+	net = sales['grossProfit'] - expenses['expenses']
+	return {
+		'net':net
+	}
+
 
 @staff_member_required
 def sales_profit(request):
 	month = request.GET.get('month')
 	year = request.GET.get('year')
+	period = request.GET.get('period')
 	pdf = request.GET.get('pdf')
 	image = request.GET.get('image')
 	jax = request.GET.get('ajax')
 
-	thisMonth = datetime.datetime.today().month
-	thisYear = datetime.datetime.today().year
+	if not year:
+		year = datetime.datetime.today().year
+
+	if not month:
+		month = datetime.datetime.today().month
 
 	try:
+		dateperiod = []
+		dateresults = []
+		epp = None
+		totalexpenses = []
+		pettycashexpenses = []
+		expensesstatus = 0
+		netprofit = []
 		if year and month:
-			sales = Sales.objects.filter(created__year=year, created__month=month)
-			soldItems = SoldItem.objects.filter(sales__created__year=year, sales__created__month=month).order_by('-id')
-			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
-			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
-		elif year:
-			sales = Sales.objects.filter(created__year=year)
-			soldItems = SoldItem.objects.filter(sales__created__year=year).order_by('-id')
-			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
-			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
-		else:
-			sales = Sales.objects.filter(created__year=thisYear, created__month=thisMonth)
-			soldItems = SoldItem.objects.filter(sales__created__year=thisYear, sales__created__month=thisMonth).order_by('-id')
-			totalSales = sales.aggregate(Sum('total_net'))['total_net__sum']
-			totalTax = sales.aggregate(Sum('total_tax'))['total_tax__sum']
+			if len(str(month)) == 1:
+				m = '0' + str(month)
+				fdate = str(year) + '-' + m
+			else:
+				fdate = str(year) + '-' + str(month)
+			d = datetime.datetime.strptime(fdate, "%Y-%m")
+			ep = []
+			epp = []
+			if period == 'year':
+				p = d - dateutil.relativedelta.relativedelta(years=1)
+				tt = sales_year_results(str(p.strftime("%Y")), year, month)
+				a = {}
+				a['totalSales'] = tt['totalSales']
+				a['totalTax'] = tt['totalTax']
+				a['grossProfit'] = tt['grossProfit']
+				a['totalCostPrice'] = tt['totalCostPrice']
+				dateperiod.append(str(p.strftime("%B"))+'/'+str(p.strftime("%Y"))+' - '+str(datetime.datetime.strptime(month, "%m").strftime("%B"))+'/'+ str(year))
+				dateresults.append(a)
+
+				tt2 = get_year_total_expenses(str(p.strftime("%Y")), year, month)
+				pp = get_year_pettycash_expenses(str(p.strftime("%Y")), year, month)
+				net = get_year_net_profit(str(p.strftime("%Y")), year, month)
+				aa = {}
+				bb = {}
+				cc = {}
+				expensesstatus += pp['expenses']
+				aa['expenses'] = tt2['expenses']
+				bb['expenses'] = pp['expenses']
+				cc['net'] = net['net']
+				totalexpenses.append(aa)
+				pettycashexpenses.append(bb)
+				netprofit.append(cc)
+
+				for n in PersonalExpenses.objects.filter(added_on__year__range=[str(p.strftime("%Y")), year], added_on__month=month):
+					ep.append(n.expense_type)
+
+				ep = list(set(ep))
+
+				for i in ep:
+					a2 = []
+					b2 = {}
+					b2['amount'] = \
+						PersonalExpenses.objects.filter(added_on__year__range=[str(p.strftime("%Y")), year], added_on__month=month,
+														expense_type__icontains=str(i)).aggregate(Sum('amount'))['amount__sum']
+					a2.append(b2)
+					epp.append({'name': i, 'amounts': a2})
+
+			elif period == 'month':
+				p = d
+				tt = sales_period_results(str(p.strftime("%Y")), str(p.strftime("%m")))
+				a = {}
+				a['totalSales'] = tt['totalSales']
+				a['totalTax'] = tt['totalTax']
+				a['grossProfit'] = tt['grossProfit']
+				a['totalCostPrice'] = tt['totalCostPrice']
+				dateperiod.append(str(p.strftime("%B")) + '/' + str(p.strftime("%Y")))
+				dateresults.append(a)
+
+				tt2 = get_total_expenses(str(p.strftime("%Y")),str(p.strftime("%m")))
+				pp = get_pettycash_expenses(str(p.strftime("%Y")), str(p.strftime("%m")))
+				net = get_net_profit(str(p.strftime("%Y")), str(p.strftime("%m")))
+				aa = {}
+				bb = {}
+				cc = {}
+				expensesstatus += pp['expenses']
+				aa['expenses'] = tt2['expenses']
+				bb['expenses'] = pp['expenses']
+				cc['net'] = net['net']
+				totalexpenses.append(aa)
+				pettycashexpenses.append(bb)
+				netprofit.append(cc)
+
+				for n in PersonalExpenses.objects.filter(added_on__year=str(p.strftime("%Y")),
+														 added_on__month=str(p.strftime("%m"))):
+					ep.append(n.expense_type)
+
+				ep = list(set(ep))
+
+				for i in ep:
+					a2 = []
+					b2 = {}
+					b2['amount'] = \
+						PersonalExpenses.objects.filter(added_on__year=str(p.strftime("%Y")),
+														added_on__month=str(p.strftime("%m")),
+														expense_type__icontains=str(i)).aggregate(Sum('amount'))[
+							'amount__sum']
+					a2.append(b2)
+					epp.append({'name': i, 'amounts': a2})
 
 
+			else:
+				for i in range(0, 3):
+					p = d - dateutil.relativedelta.relativedelta(months=i)
+					tt = sales_period_results(year, str(p.strftime("%m")))
+					a = {}
+					a['totalSales'] = tt['totalSales']
+					a['totalTax'] = tt['totalTax']
+					a['grossProfit'] = tt['grossProfit']
+					a['totalCostPrice'] = tt['totalCostPrice']
+					a['sales'] = tt['sales']
+					dateperiod.append(str(p.strftime("%B")) + '/' + str(p.strftime("%Y")))
+					dateresults.append(a)
 
-		costPrice = []
-		for i in soldItems:
-			product = ProductVariant.objects.get(sku=i.sku)
-			try:
-				quantity = product.get_cost_price().gross
-			except ValueError, e:
-				quantity = product.get_cost_price()
-			except:
-				quantity =0
-			costPrice.append(quantity)
+					tt2 = get_total_expenses(str(p.strftime("%Y")), str(p.strftime("%m")))
+					pp = get_pettycash_expenses(str(p.strftime("%Y")), str(p.strftime("%m")))
+					net = get_net_profit(str(p.strftime("%Y")), str(p.strftime("%m")))
+					aa = {}
+					bb = {}
+					cc = {}
+					expensesstatus += pp['expenses']
+					aa['expenses'] = tt2['expenses']
+					bb['expenses'] = pp['expenses']
+					cc['net'] = net['net']
+					totalexpenses.append(aa)
+					pettycashexpenses.append(bb)
+					netprofit.append(cc)
 
-		totalCostPrice = sum(costPrice)
-		try:
-			grossProfit = totalSales - totalCostPrice
-			status = 'true'
-			margin = round((grossProfit / totalSales) * 100, 2)
-			try:
-				markup = round((grossProfit / totalCostPrice) * 100, 2)
-			except:
-				markup = round(0, 2)
-		except:
-			grossProfit = 0
-			margin = 0
-			markup = 0
-			status = 'false'
+					for n in PersonalExpenses.objects.filter(added_on__year=str(p.strftime("%Y")),added_on__month=str(p.strftime("%m"))):
+						ep.append(n.expense_type)
+
+				ep = list(set(ep))
+
+				for i in ep:
+					a2= []
+					for pp in range(0, 3):
+						p2 = d - dateutil.relativedelta.relativedelta(months=pp)
+						b2 = {}
+						b2['amount'] = PersonalExpenses.objects.filter(added_on__year=str(p.strftime("%Y")), added_on__month=str(p2.strftime("%m")),expense_type__icontains = str(i)).aggregate(Sum('amount'))['amount__sum']
+						a2.append(b2)
+					epp.append({'name': i, 'amounts': a2})
 
 		img = image64()
-		startYear = Sales.objects.all().first().created.year
-		startMonth = Sales.objects.all().first().created.month
+		try:
+			startYear = Sales.objects.all().first().created.year
+			startMonth = Sales.objects.all().first().created.month
+		except:
+			startYear = datetime.datetime.today().year
+			startMonth = datetime.datetime.today().month
+
+
 		data = {
-			'totalCostPrice':totalCostPrice,
-			'totalSales':totalSales,
-			'totalTax':totalTax,
-			'grossProfit':grossProfit,
-			'markup':markup,
-			'margin':margin,
+			'dateperiod':dateperiod,
+			'dateresults':dateresults,
+			'epp':epp,
+			'netprofit':netprofit,
+			'totalexpenses':totalexpenses,
+			'pettycashexpenses':pettycashexpenses,
+			'expensesstatus':expensesstatus,
 			'date':year,
-			'status':status,
+			'status':'true',
 			'puller':request.user,
 			'image': img,
 			'reportImage':image,
 			'startYear':startYear,
-			'startMonth':startMonth
+			'startMonth':startMonth,
+			'today':datetime.datetime.now()
 		}
 		if pdf:
 			pdf = render_to_pdf('dashboard/reports/sales_profit/pdf.html', data)

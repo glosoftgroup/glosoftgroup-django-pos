@@ -13,10 +13,7 @@
                           <th>Transaction Date</th>
                           <th>Product Name</th>
                           <th>Category</th>
-                          <th>Customer</th>
-                          <th>Cashier</th>
-                          <th>Till</th>
-                          <th>Quantity</th>
+                          <<th>Quantity</th>
                           <th class="text-center">Total Sales (KShs)</th>
                             {% if margin %}
                             <th class="text-center">Margin (Kshs)</th>
@@ -30,10 +27,7 @@
                             <td class="td">{{date}}</td>
                             <td class="td">{{sale.product_name }}</td>
                               <td class="td">{{sale.product_category }}</td>
-                            <td class="td">{% if sale.sales__customer_name %}{{sale.sales__customer_name}}{% else %} Customer {% endif %}</td>
-                            <td class="td">{% if sale.sales__user__name %}{{sale.sales__user__name}}{% else %}{{sale.sales__user__email}}{% endif %}</td>
-                            <td class="td">{{sale.sales__terminal__terminal_name}}</td>
-                              <td class="td">{{sale.quantity__sum}}</td>
+                            <td class="td">{{sale.quantity__sum}}</td>
                             <td class="td"><span class="pull-right">{{sale.total_cost__sum|intcomma }}</span></td>
                               {% if margin %}
                               <td class="td"><span class="pull-right">{{sale.unitMargin|intcomma }}</span></td>
@@ -41,7 +35,7 @@
                           </tr>
                         {% endfor %}
                          {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">No Products Sales Summary Available</h2></td></tr>
+                         <tr><td colspan="5"><h2 class="text-center">No Products Sales Summary Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 

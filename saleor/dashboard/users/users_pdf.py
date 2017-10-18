@@ -1,14 +1,14 @@
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
 from django.db.models import Q
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from ..views import staff_member_required
 from ...userprofile.models import User
-from ...utils import render_to_pdf, image64
 from datetime import date
+from ...utils import render_to_pdf, default_logo
 
 
 @staff_member_required
-def pdf( request ):
+def pdf(request):
 
 	if request.is_ajax():
 		q = request.GET.get( 'q' )
@@ -30,7 +30,7 @@ def pdf( request ):
 			print (group.name)
 		else:
 			users = User.objects.all()
-		img = image64()
+		img = default_logo()
 		data = {
 			'today': date.today(),
 			'users': users,

@@ -2,7 +2,9 @@
 {% load staticfiles i18n %}
 {% load render_bundle from webpack_loader %}
 {% load version %}
-
+{% load default_user_image %}
+{% load business_name %}
+{% load business_logo %}
 <html lang="{{ LANGUAGE_CODE }}" class="no-js">
   <head>
     <title>
@@ -60,9 +62,36 @@
           <span style="font-size: 2.3em;font-family: monospace;font-weight: bolder;">G-POS</span>
         <svg data-src="{% static "dashboard/images/saleor_logo.svg" %}" height="38px" width="176px" />
       </a>
-
     </div>
 
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+           {% if request.user.image %}
+              <img src="{{request.user.image.url }}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;" />
+           {% else %}
+              <img src="{% default_user_image %}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;">
+           {% endif %}
+        </li>
+          <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+
+          {% if request.user.name %}{{ request.user.name|title }} {% else %} {{ request.user.email }}{% endif %}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+             <li>
+                <a href="{% url 'dashboard:user-detail' pk=user.id %}">
+                 <i class="icon-user-plus"></i> My profile
+                </a>
+             </li>
+            <li role="separator" class="divider"></li>
+            <li>
+                <a href="{% url 'account_logout' %}" class="waves-effect waves-teal">
+                <i class="icon-switch"></i>
+                  {% trans "Log out" context "Dashboard top navigation action" %}
+                </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
 
   </div>
   <!-- /main navbar -->
