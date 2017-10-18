@@ -299,9 +299,27 @@ def sales_date_chart(request):
 				date_gross_sales = 0
 
 			try:
-				broughtdown = DrawerCash.objects.filter(created__lte=date).last().amount
-				if broughtdown is None:
-					broughtdown = 0
+
+				drdeposit = DrawerCash.objects.filter(created__lte=date, trans_type__icontains='deposit').aggregate(
+					Sum('amount'))['amount__sum']
+				if drdeposit is None:
+					drdeposit = 0
+
+				drwithdraw = DrawerCash.objects.filter(created__lte=date, trans_type__icontains='withdraw').aggregate(
+					Sum('amount'))['amount__sum']
+				if drwithdraw is None:
+					drwithdraw = 0
+
+				drsales = DrawerCash.objects.filter(created__lte=date, trans_type__icontains='sale').aggregate(
+					Sum('amount'))['amount__sum']
+				if drsales is None:
+					drsales = 0
+
+				broughtdown = (drdeposit + drsales) - drwithdraw
+
+				# broughtdown = DrawerCash.objects.filter(created__lte=date).last().amount
+				# if broughtdown is None:
+				# 	broughtdown = 0
 			except:
 				broughtdown = 0
 
@@ -327,9 +345,7 @@ def sales_date_chart(request):
 				drawersales = 0
 
 			try:
-				carriedforward = DrawerCash.objects.filter(created__contains=date).last().amount
-				if carriedforward is None:
-					carriedforward = 0
+				carriedforward = (drawerdeposit + drawersales) - drawerwithdraw
 			except:
 				carriedforward = 0
 			data = {
