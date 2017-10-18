@@ -15,7 +15,6 @@
                     <th>Name</th>
                     <th>Phone no.</th>             
                     <th>Sales</th>                  
-                    <th>Loyalty Points</th>
                     <th>Redeemed Points</th>
                     <th>Total Discount</th>        
                   </tr>
@@ -42,19 +41,7 @@
                      {% endif %}</div>
                         </td>
                         
-                        <!-- loyalty points -->
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">
-                        {% if user.get_loyalty_points %}
-                        {{ user.get_loyalty_points }}
-                        {% else %}
-                        --
-                        {% endif %}
-                        <div class="text-size-small text-muted">
-                        {% if user.get_loy_perc %}
-                        {{user.get_loy_perc}}% average
-                        {% endif %}
-                      </div>
-                        </td>
+                        
                         <!-- redeemed loyalty points -->
                         <!-- loyalty points -->
                         <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.pk %}">

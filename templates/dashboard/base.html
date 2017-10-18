@@ -278,12 +278,7 @@
                     <a href="{% url 'dashboard:customers' %}">
                     <i class="icon-users2"></i> Customers
                     </a>
-                    </li>
-                    <li class="{% block menu_reportCustomer_class %}{% endblock %}">
-                    <a href="{% url 'dashboard:customer_report_list' %}">
-                    <i class="icon-gift"></i> Loyalty Points
-                    </a>
-                    </li>
+                    </li>                    
                     <!-- credit -->
                     <li class="{% block menu_creditCustomer_class %}{% endblock %}">
                     <a href="{% url 'dashboard:customer_credit_list' %}">
@@ -329,7 +324,11 @@
                     <i class="icon-price-tags"></i>Discounts
                     </a>
                     </li>
-                    
+                    <li class="{% block menu_reportCustomer_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:customer_report_list' %}">
+                    <i class="icon-gift"></i> Loyalty Points
+                    </a>
+                    </li>
                     </ul>
                 </li>
                   {% endif %}
@@ -337,7 +336,7 @@
                  <li>
                   <a href="javascript:;">
                     <i class="icon-wallet"></i> 
-                    <span>Drawer Cash</span>
+                    <span>Cash Drawer</span>
                   </a>
                   <ul>
                       {% if perms.sale.view_terminal %}

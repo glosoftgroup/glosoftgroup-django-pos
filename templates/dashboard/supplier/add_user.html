@@ -37,7 +37,7 @@
         <div class="tabbable">
           <ul class="nav nav-tabs nav-tabs-highlight">
             <li class="active" id="profile-tab"><a href="#profile" data-toggle="tab" class="legitRipple" aria-expanded="false">add supplier profile</a></li>
-            <li class="" id="contacts-tab"><a href="#contacts-disabled" data-toggle="tab" class="legitRipple contacts-tab" aria-expanded="false">Contacts</a></li>
+            <li  id="contacts-tab"><a href="#contacts-disabled" class="legitRipple disabled contacts-tab" aria-expanded="false">Contacts</a></li>
           </ul>
 
           <div class="tab-content">
@@ -239,10 +239,10 @@ function disable_profile_tab(){
                           header: 'Well done!',
                           theme: 'bg-success'
                        });
-                       window.location = "{% url 'dashboard:supplier' %}";
-                      
+                                             
                       localStorage.setItem('user_id', data);
                       $('.user_id').val(localStorage.getItem("user_id"));
+                      window.location = data.success_url+'?contacts=edit';
                     },
                     error:function(error){
                       console.log(error);
@@ -273,6 +273,13 @@ function disable_profile_tab(){
     if(web.val()=='http://'){
       web.val('');
     }
+  });
+
+  $('#contacts-tab').on('click',function(){
+    $.jGrowl('Add supplier first', {
+            header: 'Oh snap!',
+            theme: 'bg-danger'
+        });
   });
   
 </script>
