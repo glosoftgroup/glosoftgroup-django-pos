@@ -245,9 +245,18 @@ $('.rangeBtn').on('click', function(){
     var period = $('.period-sz').find(":selected").val();
     var m = $('.hidden-month').val();
     var y = $('.hidden-year').val();
-    $.get(grossUrl,{ajax:'ajax',month:m, year:y, period:period}, function(data){
+
+    if($('.date-month').val()){
+        $.get(grossUrl,{ajax:'ajax',month:m, year:y, period:period}, function(data){
            $('#pagination-div').html(data);
         });
+    }else{
+        $.jGrowl('Please select the end month', {
+          header: 'Well done!',
+          theme: 'bg-danger'
+        });
+    }
+
 });
 
     $('.period-sz').selectpicker({});

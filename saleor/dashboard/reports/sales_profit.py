@@ -336,8 +336,12 @@ def sales_profit(request):
 					epp.append({'name': i, 'amounts': a2})
 
 		img = image64()
-		startYear = Sales.objects.all().first().created.year
-		startMonth = Sales.objects.all().first().created.month
+		try:
+			startYear = Sales.objects.all().first().created.year
+			startMonth = Sales.objects.all().first().created.month
+		except:
+			startYear = datetime.datetime.today().year
+			startMonth = datetime.datetime.today().month
 
 
 		data = {
