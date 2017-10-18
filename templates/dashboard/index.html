@@ -9,12 +9,59 @@
 {% block breadcrumbs %}
     <li class="active"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
 {% endblock %}
+{% block custom_css %}
+<link href="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet" type="text/css">
 <style>
   table tr .ctd{padding: 8px 10px !important;}
-  .table{border:1px solid #ccc}
+  .table{border-bottom:1px solid #ccc}
+  .datepicker table tr td span {
+      padding:1px !important;
+    }
+    .datepicker table tr td span.active.active{
+       background-color:#1E88E5 !important;
+    }
 </style>
+{% endblock %}
 {% block content %}
           <!-- Quick stats boxes -->
+            <div class="row animated fadeIn" style="position:relative;z-index:993">
+                <div class="col-md-12">
+                  <div class="panel panel-flat">
+
+                    <div class="panel-body search-panel">
+                        <div class="col-md-12">
+                            <div class="col-md-2">
+                         <label>Period:</label>
+                          <div class="form-group">
+                             <select class="bootstrap-select period-sz" style="display: none;" data-width="100%" tabindex="-98">
+                                 <option value="month">Monthly</option>
+                                <option value="quarter">Quarterly</option>
+                                <option value="year">Yearly</option>
+                              </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <label>Ending Month:</label>
+                          <div class="form-group">
+                            <div class="input-group">
+                              <input class="form-control date-month" type="text" placeholder="mm/yyyy">
+                                <input type="hidden" class="hidden-year">
+                                <input type="hidden" class="hidden-month">
+                                <input type="hidden" class="hidden-date">
+                              <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-2">
+                         <label style="visibility:hidden;">Export</label>
+                          <button class="btn btn-primary btn-block rangeBtn">SEARCH</button>
+                        </div>
+                    </div>
+                  </div>
+               </div>
+               </div>
+            </div>
+<div id="pagination-div">
           <div class="row animated fadeIn">
             <div class="col-lg-3">
               <div class="panel bg-indigo-300">
@@ -29,7 +76,7 @@
 
                 </div>
               </div>
-           </div>
+            </div>
 
             <div class="col-lg-3">
              <div class="panel bg-pink-400">
@@ -249,7 +296,7 @@
       </div>
       <!-- end of category chart-->
 
-
+</div><!-- paginatio div-->
 {% if low_stock %}
   <div class="row">
     <div class="col-md-12">
@@ -371,11 +418,47 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/highcharts.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/exporting.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
 <script type="text/javascript">
+var url = '{% url 'dashboard:index' %}';
+    $('.period-sz').selectpicker({});
+
+$('.date-month').datepicker({
+    format: "MM/yyyy",
+    autoclose: true,
+    startDate: '{{startMonth}}/{{startYear}}',
+    endDate: 'now',
+    minViewMode: "months"})
+    .on('changeDate', function(e) {
+        var month = e.date.getMonth()+1;
+        var year = e.date.getFullYear();
+        $('.hidden-year').val(year);
+        $('.hidden-month').val(month);
+    });
+
+$('.rangeBtn').on('click', function(){
+    var period = $('.period-sz').find(":selected").val();
+    var m = $('.hidden-month').val();
+    var y = $('.hidden-year').val();
+    if($('.date-month').val()){
+        $.get(url,{month:m, year:y, period:period}, function(data){
+               $('#pagination-div').html(data);
+        });
+    }else{
+        $.jGrowl('Please select the end month', {
+          header: 'Well done!',
+          theme: 'bg-danger'
+        });
+    }
+
+});
+
+
         $('.p2-pag').bootpag({
             total: parseInt('{{pn}}'),
             maxVisible: 3,
