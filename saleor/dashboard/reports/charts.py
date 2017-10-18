@@ -317,9 +317,6 @@ def sales_date_chart(request):
 
 				broughtdown = (drdeposit + drsales) - drwithdraw
 
-				# broughtdown = DrawerCash.objects.filter(created__lte=date).last().amount
-				# if broughtdown is None:
-				# 	broughtdown = 0
 			except:
 				broughtdown = 0
 
@@ -345,7 +342,7 @@ def sales_date_chart(request):
 				drawersales = 0
 
 			try:
-				carriedforward = (drawerdeposit + drawersales) - drawerwithdraw
+				carriedforward = (broughtdown + drawerdeposit + drawersales) - drawerwithdraw
 			except:
 				carriedforward = 0
 			data = {
