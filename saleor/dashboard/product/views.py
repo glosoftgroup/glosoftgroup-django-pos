@@ -558,7 +558,6 @@ def product_data(request):
         if request.POST.get('threshold'):
             product.low_stock_threshold = int(request.POST.get('threshold'))
         product.save()
-        print product.name
         if request.POST.get('categories'):
             category = request.POST.get('categories')
             product.categories.clear()
