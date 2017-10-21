@@ -313,13 +313,13 @@
       <table class="table table-hover">
         <thead>
         <tr class="bg-primary">  
-        <th>SKU</th>          
+        <th>SKU <span class="text-danger">*</span></th>
         {% for v in pc %} 
          <th>{{v}}</th>       
         {% endfor %}
-        <th>Retail Price</th>
+        <th>Retail Price <span class="text-danger">*</span></th>
         <th>Wholesale Price</th>
-            <th>Minimum price</th>
+            <th>Minimum price <span class="text-danger">*</span></th>
         <th></th>
         </tr>
         </thead>
@@ -327,6 +327,7 @@
           <tr>
           <td>
             <input type="text" id="new-sku-td" placeholder="Enter SKU" class="form-control" name='new-sku-td'>
+              <span class="help-block text-danger"></span>
           </td>
           {% for v in pc%}
           <td>
@@ -341,12 +342,15 @@
           {% endfor %}
            <td>
             <input type="number" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
+               <span class="help-block text-danger"></span>
             </td>
             <td>
               <input type="number" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
+                <span class="help-block text-danger"></span>
             </td>
               <td>
               <input type="number" placeholder="Mininum Price" class="form-control" id="mprice" name='mprice'>
+                  <span class="help-block text-danger"></span>
             </td>
             <td>
               <button class="btn btn-xs btn-primary" id="addvariantBtn" data-refreshvurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>

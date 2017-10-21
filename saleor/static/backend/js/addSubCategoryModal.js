@@ -43,7 +43,7 @@ $(function() {
    var selector = $('#id_product_class');
    selector.append('<option value="'+newitemnum+'">'+newitemdesc+'</option>');
    selector.selectpicker('refresh'); 
-   selector.selectpicker('val', newitemdesc); 
+   selector.selectpicker('val', newitemnum);
   }
 
   addClassBtn.on('click',function(){

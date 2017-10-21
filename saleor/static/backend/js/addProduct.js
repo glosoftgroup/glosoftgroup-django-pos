@@ -192,6 +192,29 @@ $(function() {
     newSku      = newSkuId.val();
     reorder_level = reorder_levelId.val();
 
+    newSkuId.on('focusin',function(){
+      $(this).nextAll('.help-block:first').addClass('text-danger').html('');
+    });
+    if(!newSku){
+        newSkuId.nextAll('.help-block:first').addClass('text-danger').html('Sku required');
+        return false;
+    }
+    //validate retail price
+    retailPriceId.on('focusin',function(){
+      $(this).nextAll('.help-block:first').addClass('text-danger').html('');
+    });
+    if(!retailPriceId.val()){
+        retailPriceId.nextAll('.help-block:first').addClass('text-danger').html('Retail price');
+        return false;
+    }
+    //validate minimum price
+    minimumPrice.on('focusin',function(){
+      $(this).nextAll('.help-block:first').addClass('text-danger').html('');
+    });
+    if(!minimumPrice.val()){
+        minimumPrice.nextAll('.help-block:first').addClass('text-danger').html('Fill minimum price');
+        return false;
+    }
     if(!retailPrice || !newSku || !minimumPrice.val()){
       alertUser('Retail Price, Minimum price & SKU required','bg-danger','Fill required fields!');
       return false;
@@ -481,13 +504,13 @@ $(function(){
    reorder_levelId.on('change',function(){
     $(this).nextAll('.help-block:first').addClass('text-danger').html('');
    });
-   stockQuantityId.on('focusout',function(){
+   stockQuantityId.on('focusin',function(){
     $(this).nextAll('.help-block:first').addClass('text-danger').html('');
    });
    stockLocationId.on('change',function(){
     $(this).nextAll('.help-block:first').addClass('text-danger').html('');
    });
-   stockInvoiceId.on('focusout',function(){
+   stockInvoiceId.on('focusin',function(){
     $(this).nextAll('.help-block:first').addClass('text-danger').html('');
    });
    costPriceId.on('keyup',function(){
@@ -616,9 +639,13 @@ $(function(){
   var EditRefreshDiv = $('#div-edit-variant');
   var editButton = $('.editVariantBtn');
   var editvariantBtn = $('#editvariantBtn');
+  var toggleVariant = $('#toggleVariant');
   var url = '#';  
 
   editButton.on('click',function(){
+    if(toggleVariant.is(':visible')){
+        toggleVariant.toggle('slow');
+    }
     EditRefreshDiv.html('Processing form ...');
     var pk = $(this).data('pk');
     var url = $(this).data('href');
@@ -643,11 +670,15 @@ $(function(){
 /* edit variant script */
 $(function(){
   var editStockRefreshDiv = $('#div-edit-stock');
-  var editSelectOption = $('.edit-stock-Btn');  
+  var editSelectOption = $('.edit-stock-Btn');
+  var toggleStock = $('#toggleStock');
   var url = '#';  
 
   editSelectOption.on('click',function(){
     editStockRefreshDiv.html('Processing form ...');
+    if(toggleStock.is(':visible')){
+        toggleStock.toggle('slow');
+    }
     var pk = $(this).data('pk');
     url = $(this).data('href');
     dynamicData = {};

@@ -218,7 +218,6 @@ class Customer(models.Model):
         return (100*redeemed)/total
 
 
-
 def cool_int_format(value):
      value = int(value)
      if value < 1000:
@@ -228,3 +227,14 @@ def cool_int_format(value):
         return str(value) + 'K'
      else:
         return str(value/1000000) + 'M'
+
+
+def cool_format(value):
+    value = Decimal(value)
+    if value < 1000.00:
+        return str("%.2f" % value)
+    elif value < Decimal(1000000.0):
+        value = value / Decimal(1000.0)
+        return str("%.2f" % value) + 'K'
+    else:
+        return str("%.2f" % value / Decimal(1000000.0)) + 'M'
