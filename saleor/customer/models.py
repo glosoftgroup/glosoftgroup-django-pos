@@ -218,7 +218,6 @@ class Customer(models.Model):
         return (100*redeemed)/total
 
 
-
 def cool_int_format(value):
      value = int(value)
      if value >= 1000:
