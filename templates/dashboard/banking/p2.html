@@ -1,0 +1,241 @@
+{% load staticfiles %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+     tr.nb td{border:0px;}
+     .nb{border:0px;}
+     .table{border:1px solid #ccc}
+   </style>
+
+      <div class="panel panel-flat">
+        <div class="bank-responsive">
+         
+            <div class="panel-body">
+              <table class="table bank-striped bank-hover databank-header-footer" style="border-bottom:1px solid #ddd;">
+                     <thead>
+                      <tr class="bg-primary">             
+                        <th>Name</th>
+
+                        {% if perms.sale.delete_bank %}
+                        <th class="text-center">Options</th>
+                        {% endif %}
+                      </tr>
+                    </thead>
+                    <tbody id="p-tb">
+                    {% if options %}
+                        {% for option in options %}
+                          <tr class='clickable-row' id="{{user.pk }}">
+                            
+                            <td class="td" data-href="{% url 'dashboard:bank-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.name}}</td>
+
+                            
+                            {% if perms.sale.delete_table %}
+                            <!-- actions -->
+                    <td class="text-center">
+                        <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle legitRipple" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu edit-dropdown">
+                              <li class="td" data-href="{% url 'dashboard:bank-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail"><a><i class="icon-pencil7"></i> EDIT</a>
+                              </li>
+                            <li>
+                                <a data-ta="#modal_instance" data-title="Delete  table {{ option.name }} ?" data-href="{% url 'dashboard:bank2-delete' pk=option.pk %}" data-name="{{ option.name}}" data-id="{{ option.pk }}"
+                         class="modal-trigger del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                            </a>
+                            </li>
+
+                        </ul>
+                      </div>
+                    </td>
+                            {% endif %}
+                          </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                          <td colspan="6">
+                            <h2 class="text-center">
+                              No data Available
+                            </h2>
+                          </td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+               </table>
+            </div>
+        </div>
+          {% if options %}
+             <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" name="list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
+          {% endif %}
+      </div>
+
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+ <script type="text/javascript">
+   $(document).ready(function(){
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            leaps: false
+            }).on("page", function(event, num){
+                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
+                var gid = '{{gid}}';
+                if(gid == 0){
+                    $.get("{% url 'dashboard:bank2_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                      $('#p-tb').html(data);
+                    });
+                }else{
+                    $.get("{% url 'dashboard:bank2_paginate' %}",{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
+                   $('#p-tb').html(data);
+                });
+                }
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+
+      $('.modal-trigger').on('click', function (e) {
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+        /* clicked the submit button */
+        $('.del').on('click', function (e) {
+                var f = document.getElementById('delform');
+                var formData = new FormData(f);
+                var id = $(this).data('id');
+                var url = $(this).data('href');
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){        
+                      $('#modal_instance').modal('hide');
+                      $('#tb #'+id).remove();            
+                      $.jGrowl('User deleted successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                      });
+                      window.location.reload();
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Error deleting Staff', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            });
+
+   });
+    // Basic select
+    $('.bootstrap-select').selectpicker();
+     //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var groupSizeVal = $('.group-sz').find(":selected").val();
+        var url = "{% url 'dashboard:bank-search' %}";
+
+        if(searchData && groupSizeVal && groupSizeVal != 'all' && groupSizeVal !='none'){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+       }else if(searchData){
+           if(listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+
+       }else if(groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+           if(listSizeVal != '0'){
+                $.get("{% url 'dashboard:bank2_paginate' %}",{page:1,gid:groupSizeVal, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }else{
+                $.get("{% url 'dashboard:bank2_paginate' %}",{page:1,gid:groupSizeVal, size:10},function(data){
+                 $('#pagination-div').html(data);
+               });
+
+           }
+       }else{
+           if(listSizeVal != '0'){
+               $.ajax({ url: "{% url 'dashboard:bank2_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.ajax({ url: "{% url 'dashboard:bank2_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+           }
+       }
+
+     });
+    
+    {% if sz %}
+    $.when( $.ready ).then(function() {     
+       $('.bootstrap-select').selectpicker();
+       $('.list-sz').selectpicker('val', ["{{sz}}"]);              
+    });
+    {% endif %}    
+ </script>

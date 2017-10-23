@@ -1,0 +1,668 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Bank
+{% endblock %}
+
+ {% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:bank-list' %}">Bank </a></li>
+ {% endblock %}
+
+
+{% block menu_bank_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+     tr.nb td{border:0px;}
+     .nb{border:0px;}
+     .table{border:1px solid #ccc}
+     #addExpenseTable{display:none;}
+     .detail-column p{font-size:14px;}
+     #addoptionsform label.error{color:#ff7043}
+   </style>
+ {% endblock %}
+
+{% block content %}
+ <div class="row animated fadeIn">
+   <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-body">
+            <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.sale.add_paymentoption %}
+                   
+                  <a href="javascript:;" id="addExpenseBtn" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add</a>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-4">
+             <label>Search Bank</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search ..." type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            
+
+    <div class="col-md-12" id="addExpenseTable">
+        <form class="form" enctype="multipart/form-data" id="addoptionsform" name="addoptionsform">
+            {% csrf_token %}
+     <table class="table bank-hover">
+        <thead>
+            <tr class="bg-primary">            
+            <th>Name</th>
+
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>        
+
+          <td>
+            <input placeholder="name" class="form-control" id="name" required="" name="name" type="text" >           
+            </td>
+
+
+            <td>
+              <button class="btn btn-xs btn-primary legitRipple" id="submitExpenseBtn" data-token="{% csrf_token %}" data-url="{% url 'dashboard:bank-add' %}" type="submit">Submit <i class="icon-arrow-right14 position-right"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table> </form></div>
+        </div>
+      </div>
+   </div>
+
+
+  <div class="col-md-12">
+   <div id="pagination-div">
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-body">
+        <div class="bank-responsive">
+
+
+          <table class="table bank-striped bank-hover databank-header-footer" style="border-bottom:1px solid #ddd;">
+                <thead>
+                  <tr class="bg-primary">                  
+                    <th>Name</th>
+
+                    {% if perms.sale.delete_bank %}
+                    <th class="text-center">Options</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody id="tb">
+                {% if options %}
+                  {% for option in options %}
+                  <tr class='clickable-row' id="{{option.pk }}">
+                    <!-- name -->
+                    <td class="td" data-href="{% url 'dashboard:bank-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.name}}</td>
+
+                    
+                    {% if perms.sale.delete_paymentoption %}
+                    <!-- actions -->
+                    <td class="text-center">
+                        <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle legitRipple" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu edit-dropdown">
+                              <li class="td" data-href="{% url 'dashboard:bank-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail"><a><i class="icon-pencil7"></i> EDIT</a>
+                              </li>
+                            <li>
+                                <a data-ta="#modal_instance" data-title="Delete  bank {{ option.name }} ?" data-href="{% url 'dashboard:bank2-delete' pk=option.pk %}" data-name="{{ option.name}}" data-id="{{ option.pk }}"
+                         class="modal-trigger del-btn"><i class="icon-trash" href="#modal_instance" data-toggle="modal"></i> DELETE
+                            </a>
+                            </li>
+
+                        </ul>
+                      </div>
+                    </td>
+                    {% endif %}
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                    <tr>
+                      <td colspan="6">
+                        <h2 class="text-center">
+                          No Data Available
+                        </h2>
+                      </td>
+                    </tr>
+                {% endif %}
+                  </tbody>
+           </table>
+
+        </div>
+        </div>
+          {% if options %}                          
+         <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
+              
+          {% endif %}
+      </div>
+    </div><!-- pagination -->
+  </div>
+
+</div>
+
+<!-- Blue modal -->
+ <div id="modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+         <div class="">
+         <form action="" class="delete_form" method="post" id="delform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm delete bank!
+           </h5>
+           <input type="hidden" class="item-id" />
+           </div>
+
+         </div>
+       </div>
+
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" onclick="return false" data-id="" data-href="">Delete</button>
+         </form>
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <div class="info"></div>
+ <!-- /blue modal -->
+<!-- expense detail modal -->
+ <div id="pdetail" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center">Table Details</h6>
+       </div>
+       <div class="modal-body">
+
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default btn-link btn-xs" data-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-primary btn-xs" id="updateOption" onclick="return false;">Update</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /expense detail modal-->
+<!-- edit modal -->
+ <div id="edit_modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <form action="" class="edit_form" method="post" id="editform" novalidate>
+           <div class="modal-body">
+            {% csrf_token %}
+                 <div class="form-group">
+                     <label class="cat_label"> </label>
+                     <input class="form-control edit_class" name=""/>
+                 </div>
+                  <input type="hidden" class="eitem-url"/>
+                  <input type="hidden" class="eitem-select"/>
+                 <input type="hidden" name="option" value="option"/>
+
+           </div>
+           <div class="modal-footer">
+               <button class="btn btn-primary waves-effect waves-light pull-right data_update"
+                       id='modal_edit' type="submit">
+                   Create
+                   <i class="icon-arrow-right14 position-right"></i>
+               </button>
+
+             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+           </div>
+       </form>
+     </div>
+   </div>
+ </div>
+ <!-- /edit modal -->
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+  var paginationSearchUrl = "{% url 'dashboard:bank-search' %}";
+  var paginationUrl = "{% url 'dashboard:bank2_paginate' %}";
+  $(document).ready(function() {
+
+    $('#addExpenseBtn').on('click', function(){
+        $('#addExpenseTable').slideToggle( "slow");
+    });
+    $('#id_sale_point').selectpicker();
+    $('.spoint').selectpicker();
+
+    $('.expense_type').selectpicker({
+        iconBase: 'fa',
+        addIcon:'fa-plus-circle'
+    });
+    $('.input-group').on('change', '.sel', function(){
+       var v = $(this).val();
+
+       if(v == 'add'){
+             var selected = $(this).find('option:selected');
+
+             var url = selected.data('href')
+             var prompt_text = selected.data('title');
+             var modal = selected.data('ta');
+             var select = selected.data('select');
+             var cat = selected.data('cat');
+             var label = selected.data('label');
+             $('.cat_label').html(label);
+             $('.eitem-url').val(url);
+             $('.eitem-select').val(select);
+             $('.modal-title').html(prompt_text);
+             $('.edit_class').attr('name', cat)
+             $(modal).modal();
+             $('.delete_form').attr('action',url);
+
+             var form = $("#editform"), validator = form.validate();
+             validator.resetForm();
+             form.find(".error").removeClass("error");
+
+             $("#editform input[name='" + cat + "']").rules("add", {required:true});
+       }
+    });
+
+
+
+    $('#editform').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+           name: {
+              required:true
+            }
+        },
+        messages:{
+          name:{
+            required: "please fill in the required field"
+          }
+        },
+        submitHandler: function() {
+              var name = $('.edit_class').data('name');
+              var inputValue = $('.edit_class').val();
+              var f = document.getElementById('editform');
+              var formData = new FormData(f);
+              //formData.append(name, inputValue);
+              var url = $('.eitem-url').val();
+              var selectClass = $('.eitem-select').val();
+              $.ajax({
+                  url: url,
+                  type: "POST",
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success:function(data){
+                    $('#edit_modal_instance').modal('hide');
+                    $('.edit_class').val('');
+                    var replaceDiv = $('.eitem-select').val()
+                    $(replaceDiv).replaceWith(data);
+                    $.jGrowl('Created successfully', {
+                      header: 'Well done!',
+                      theme: 'bg-success'
+                    });
+                    //window.location.reload();
+                  },
+                  error:function(error){
+                    console.log(error);
+                    $.jGrowl('Error Updating', {
+                        header: 'Oh snap!',
+                        theme: 'bg-danger'
+                    });
+                  }
+              });
+        }
+    });
+
+    $('.bootpag-callback').bootpag({
+        total: parseInt({{pn}}),
+        maxVisible: 3,
+        leaps: false
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
+            $.get(paginationUrl,{page:num},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+      $('body').on('click', '.td', function(){
+          <!--window.location = $(this).data("href");-->
+          var url = $(this).data('href');
+          var modal = $(this).data('m');
+          var modalTitle = $(this).data('mtitle');
+           $(modal+' .modal-title').html(modalTitle);
+
+          $.ajax({
+              url: url,
+              type: "GET",
+              data: {csrfmiddlewaretoken:'{{csrf_token}}'},
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $(modal+' .modal-body').html(data);
+                $(modal).modal();
+              },
+              error:function(error){}
+          });
+      });
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+      /* clicked the submit button */
+      $('.del').on('click', function (e) {
+          var f = document.getElementById('delform');
+          var formData = new FormData(f);
+          var id = $(this).data('id');
+          var url = $(this).data('href');
+          console.log(this);
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $('#modal_instance').modal('hide');
+                if(!data.error){
+                $.jGrowl('Bank deleted successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                $('#tb #'+id).remove();
+                window.location.reload();
+               }else{
+                $.jGrowl(data.error, {
+                  header: 'Error!',
+                  theme: 'bg-danger'
+                });
+               
+               }            
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error deleting Staff', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });
+      });
+
+
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+
+
+
+    var petty_cash_balance = 0;
+    
+
+    jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+        return this.optional(element) || (parseFloat(value) <= petty_cash_balance);
+    }, "* more than petty cash amount (KShs."+ petty_cash_balance +" )");
+
+      //** validate form & submit
+      $('#addoptionsform').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{           
+          name:{
+            required: "please provide the name"
+          },
+          
+        },
+        submitHandler: function() {
+          var f = document.getElementById('addoptionsform');
+          var formData = new FormData(f);
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:bank-add' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                         $('#addoptionsform')[0].reset();
+                         $('#addExpenseTable').slideUp();
+
+                         $.ajax({ url: paginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                            $('#pagination-div').html(data);
+                         }});
+                         $.jGrowl('message sent successfully.', {
+                            header: 'Well done!',
+                            theme: 'bg-success'
+                         });
+
+
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try sending again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            }
+        }
+      });
+
+
+     //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var groupSizeVal = $('.group-sz').find(":selected").val();
+        var url = paginationSearchUrl;
+
+        if(searchData && groupSizeVal && groupSizeVal != 'all' && groupSizeVal !='none'){
+            if(listSizeVal != '0'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+       }else if(searchData){
+           if(listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }
+
+       }else if(groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+           if(listSizeVal != '0'){
+                $.get(paginationUrl,{page:1,gid:groupSizeVal, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }else{
+                $.get(paginationUrl,{page:1,gid:groupSizeVal, size:10},function(data){
+                 $('#pagination-div').html(data);
+               });
+
+           }
+       }else{
+           if(listSizeVal != '0'){
+               $.ajax({ url: paginationUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.ajax({ url: paginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                      $('#pagination-div').html(data);
+                }});
+           }
+       }
+
+     });
+
+     //**@ group name select
+    $('.group-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o'
+    }).on('change', function(){
+
+       var group_id = $(this).val();
+       var searchData = $('.search_user').val();
+       var listSizeVal = $('.list-sz').find(":selected").val();
+       var url = paginationSearchUrl;
+
+       if(searchData && listSizeVal && listSizeVal != '0'){
+            if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:group_id},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(searchData){
+            if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:group_id},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+           }
+       }else if(listSizeVal && listSizeVal != '0'){
+           if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url: paginationUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get(paginationUrl,{page:1,gid:group_id, size:listSizeVal},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }else{
+           if(group_id == 'all' || group_id=='none'){
+               $.ajax({ url: paginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                  $('#pagination-div').html(data);
+              }});
+           }else{
+                $.get(paginationUrl,{page:1,gid:group_id},function(data){
+                 $('#pagination-div').html(data);
+               });
+           }
+       }
+
+    });
+
+    $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var groupSizeVal = $('.group-sz').find(":selected").val();
+        var url = paginationSearchUrl;
+
+        delay(function(){
+            if((listSizeVal && listSizeVal != '0') && groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(listSizeVal && listSizeVal != '0'){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:listSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else if(groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')){
+                $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text, size:10, gid:groupSizeVal},success: function(data){
+                          $('#pagination-div').html(data);
+                }});
+            }else{
+               $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                      $('#pagination-div').html(data);
+               }});
+            }
+        }, 500 );
+
+      });
+
+
+
+  });
+
+</script>
+{% endblock %}
