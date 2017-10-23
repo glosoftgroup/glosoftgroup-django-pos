@@ -19,12 +19,9 @@ import logging
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')     
-from rest_framework.decorators import api_view
-from rest_framework import status
-from rest_framework.views import APIView
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
-
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 class TerminalListAPIView(generics.ListAPIView):
     serializer_class = TerminalListSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Terminal.objects.all()
