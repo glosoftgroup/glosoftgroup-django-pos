@@ -5,7 +5,7 @@
 {% load humanize %}
 {% for product in product_results %}
     <tr data-title=" {{ product.name }} " class="clickable-row">
-      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">#{{ product.id }}</td>
+      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"></td>
       <!-- image -->
       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}"
        srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"

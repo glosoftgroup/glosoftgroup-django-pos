@@ -90,7 +90,6 @@
             <table class="table table-striped table-hover fixed_headers datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
-                     <th>Id</th>
                       <th>Image</th>
                       <th>Product Name</th>
                       <th>Category</th>
@@ -105,7 +104,6 @@
                 {% if product_results %}
                 {% for product in product_results %}
                     <tr data-title=" {{ product.name }} " class="clickable-row">
-                      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">{{ product.id }}</td>
                       <!-- image -->
                       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}"
                        srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"

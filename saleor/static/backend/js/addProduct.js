@@ -598,7 +598,7 @@ $(function(){
       }
       
       /* toggle form */
-      $('#toggleStock').slideUp();
+      $('#toggleStock').toggle();
       refreshStockDiv(refreshStockUrl)
       .done(function(data){
         refreshDiv.html(data);

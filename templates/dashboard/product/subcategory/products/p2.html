@@ -19,7 +19,7 @@
               <table class="table table-striped table-hover fixed_headers datatable-header-footer" style="border-bottom:1px solid #ddd;">
                      <thead>
                       <tr class="bg-primary">
-                         <th>Id</th>
+                         <th></th>
                           <th>Image</th>
                           <th>Product Name</th>
                           <th>Category</th>
@@ -31,7 +31,7 @@
                     <tbody id="p-tb">
                        {% for product in product_results %}
                     <tr data-title=" {{ product.name }} " class="clickable-row">
-                      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}">#{{ product.id }}</td>
+                      <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"></td>
                       <!-- image -->
                       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-href="{% url 'dashboard:product-update' pk=product.pk %}"><img src="{% product_first_image product size="60x60" method="crop" %}"
                        srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"
@@ -86,10 +86,41 @@
             </div>
         </div>
          <div class="my-paginate">
-            <div id="bootpag-callback" class="text-center bootpag-callback p2-pag" style="padding:20px;">
-              <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
-              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+           <div class="row">
+         <div class="col-md-12">
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
             </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate">
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>
+         <input type="hidden" id="page_size" val="">
+
           </div>
       </div>
      {% else %}
@@ -140,6 +171,18 @@
         }).children('.pagination').addClass('pagination-flat pagination-sm')
 
    });
+
+  //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        if(ts != '0'){
+            $.ajax({ url: "{% url 'dashboard:subcategory-products-paginate' %}",type: 'GET',data: {page:1, size:ts, product_pk:'{{product_pk}}' },
+            async:false,success: function(data){
+                  $('#pagination-div').html(data);
+            }});
+        }
+
+     });
  </script>
  <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
     
