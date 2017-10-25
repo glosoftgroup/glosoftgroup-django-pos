@@ -34,11 +34,11 @@ def get_template(request,pk=None):
         if request.is_ajax():
             if request.GET.get('pk'):
                 stemplate = get_object_or_404(SmsTemplate,pk=(int(request.GET.get('pk'))))
-                ctx = {'template':stemplate}
+                ctx = {'template': stemplate}
                 if request.GET.get('template'):                
                     template = request.GET.get('template')
-                    return TemplateResponse(request, 'dashboard/messages/includes/'+template+'.html', ctx)
-                
+                    return HttpResponse(request, 'dashboard/messages/includes/'+template+'.html', ctx)
+
                 return TemplateResponse(request, 'dashboard/messages/includes/single-template.html', ctx)
         sms_templates = SmsTemplate.objects.all().order_by('-id')
         ctx = {'sms_templates':sms_templates}

@@ -130,8 +130,8 @@
                       <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">{{ name }}</td>
                       <!-- product attributes -->
                       <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">
-                        {% if product_attributes %}
-                       {{ product_attributes|join:", " }}
+                        {% if variant_attributes %}
+                       {{ variant_attributes|join:", " }}
                       {% endif %}
                       </td>
                       <!-- actions -->
@@ -313,7 +313,7 @@ var toggleBtn = $('#toggle-add-form');
 var toggleDiv = $('#toggle-div');
 
 toggleBtn.on('click',function(){
-  toggleDiv.slideDown('slow');
+  toggleDiv.toggle('slow');
 });
 function refreshList(){
   var url = "{% url 'dashboard:terminal-search' %}";
