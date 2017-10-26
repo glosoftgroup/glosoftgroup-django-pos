@@ -366,7 +366,7 @@
                 </li>
                   {% endif %}
                   {% if perms.accounts.view_expenses %}
-                <li><a href="#"><i class="icon-coins"></i> <span>Banking</span></a>
+                <li style="display:none;"><a href="#"><i class="icon-coins"></i> <span>Banking</span></a>
                   <ul>
                     <li class="{% block menu_bank_class %}{% endblock %}">
                         <a href="{% url 'dashboard:bank-list' %}">
