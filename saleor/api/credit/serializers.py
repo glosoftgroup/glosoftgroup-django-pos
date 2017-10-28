@@ -50,6 +50,7 @@ class TrackSerializer(serializers.ModelSerializer):
 class ItemsSerializer(serializers.ModelSerializer):
     available_stock = SerializerMethodField()
     item_pk = SerializerMethodField()
+
     class Meta:
         model = CreditedItem
         fields = (
@@ -111,6 +112,7 @@ class CreditListSerializer(serializers.ModelSerializer):
 class CreateCreditSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
     credititems = TrackSerializer(many=True)
+
     class Meta:
         model =  Credit
         fields = ('id',

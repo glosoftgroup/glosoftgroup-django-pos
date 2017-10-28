@@ -33,6 +33,7 @@ def add_template(request):
         return HttpResponse(temp.pk)
     return HttpResponse('Post request expected')
 
+
 @staff_member_required
 def get_template(request, pk=None):
     if request.method == 'GET':
@@ -48,6 +49,7 @@ def get_template(request, pk=None):
         sms_templates = EmailTemplate.objects.all().order_by('-id')
         ctx = {'sms_templates':sms_templates}
         return TemplateResponse(request, 'dashboard/notification/includes/templates.html', ctx)
+
 
 @staff_member_required
 def delete_template(request,pk=None):

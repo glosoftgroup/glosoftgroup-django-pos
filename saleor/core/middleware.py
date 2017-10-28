@@ -66,6 +66,7 @@ class CurrencyMiddleware(object):
 class SettingsMiddleware(object):
 
     def process_request(self, request):
+        return None
         excluded_path = reverse('dashboard:addsitekeys')
 
         en = Encryptor()
@@ -82,7 +83,7 @@ class SettingsMiddleware(object):
         except IndexError:
             return TemplateResponse(request, 'lockdown/form.html', {'days': "unknown", 'machine': number})
 
-        filecontent  = ufile.file
+        filecontent = ufile.file
         filename = ufile.check
 
         #  check hashlib

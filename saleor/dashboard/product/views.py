@@ -1917,16 +1917,12 @@ def add_new_attribute(request,pk=None):
         else:
             return HttpResponse(json.dumps({'error':'Name or pk expected'}))
         if request.POST.get('attributes'):
-            try:
-                del(choices)
-                del(choice)
-            except:
-                pass
             choices = json.loads(request.POST.get('attributes'))
             for choice in choices:
                 slug = choice.replace(' ','_')
-                AttributeChoiceValue.objects.create(attribute=attribute,slug=slug,name=choice);        
-        return HttpResponse(attribute)
+                AttributeChoiceValue.objects.create(attribute=attribute,slug=slug,name=choice);
+        return HttpResponse(json.dumps({"value":attribute.id,"text":attribute.name}),content_type='application/json')
+
 
 @permission_decorator('product.delete_productvariant')
 @staff_member_required

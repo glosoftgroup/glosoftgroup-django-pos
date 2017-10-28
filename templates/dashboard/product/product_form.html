@@ -892,6 +892,13 @@
       addAttributePlusChoice(dynamicData,myUrl)
       .done(function(data){
         alertUser('Success');
+        console.log(data.value);
+        //$('.xgetAttributesD').append($('<option selected />').val(data.value).html(data.text));
+        //$('#xProductClass').find('tokens-container').append('<li class="token" data-value=data.value><a class="dismiss"></a><span>data.text</span></li>');
+        //$('.xgetAttributesD').tokenize2().dropdownAddItem(data.value,data.text);
+        //$('.xgetAttributesD').tokenize2().trigger('tokenize:tokens:add', [data.value, data.text, true]);
+
+
         getAttributesChoice.val('');
         choices = '';
         newattrName = '';
