@@ -1,9 +1,13 @@
-FROM python:3.5
+FROM python:2.7-slim
 ENV PYTHONUNBUFFERED 1
+COPY hstore.sql /docker-entrypoint-initdb.d
 
 RUN \
   apt-get -y update && \
   apt-get install -y gettext && \
+  apt-get install -y python-dev && \
+  apt-get install -y libpq-dev && \
+  apt-get install -y gcc && \
   apt-get clean
 
 ADD requirements.txt /app/

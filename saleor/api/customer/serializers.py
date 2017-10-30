@@ -55,7 +55,7 @@ class CustomerUpdateSerializer(serializers.ModelSerializer):
         data = self.get_initial()
         self.points = data.get('loyalty_points')
         try:
-        	print Decimal(self.points)
+        	pass
         except:
         	raise ValidationError('Invalid loyalty points')
     
