@@ -135,8 +135,7 @@ class Credit(models.Model):
 
     def is_expired(self):       
         difference = datetime.now() - self.created.replace(tzinfo=None)        
-        max_credit_date = SiteSettings.objects.get(pk=1).max_credit_date
-        print max_credit_date
+        max_credit_date = SiteSettings.objects.get(pk=1).max_credit_date        
         if difference.days > max_credit_date:
             return True
         return False

@@ -263,7 +263,7 @@ class SalesSerializer(serializers.ModelSerializer):
                     if int(loyalty_points) != 0:
                         Customer.objects.gain_points(customer,loyalty_points)
                 except:
-                    print 'customer details provided dont meet adding customer criteria'
+                    pass
 
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
@@ -272,9 +272,9 @@ class SalesSerializer(serializers.ModelSerializer):
                 if stock:                
                     Stock.objects.decrease_stock(stock,solditem_data['quantity'])                                    
                 else: 
-                    print 'stock not found'
+                    print('stock not found')
             except:
-                print 'Error reducing stock!'
+                print('Error reducing stock!')
                 
         return sales
         
