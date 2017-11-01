@@ -27,7 +27,7 @@ def cart(db):  # pylint: disable=W0613
 
 @pytest.fixture
 def customer_user(db):  # pylint: disable=W0613
-    return User.objects.create_user('test@example.com', 'password')
+    return User.objects.create_user('payload@example.com', 'password')
 
 
 @pytest.fixture
@@ -62,7 +62,7 @@ def admin_user(db):  # pylint: disable=W0613
 
 @pytest.fixture()
 def admin_client(admin_user):
-    """A Django test client logged in as an admin user."""
+    """A Django payload client logged in as an admin user."""
     from django.test.client import Client
     client = Client()
     client.login(username=admin_user.email, password='password')

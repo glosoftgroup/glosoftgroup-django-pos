@@ -19,14 +19,14 @@ def base_backend():
 
 
 def test_login_form_valid(customer_user):
-    data = {'username': 'test@example.com', 'password': 'password'}
+    data = {'username': 'payload@example.com', 'password': 'password'}
     form = LoginForm(data=data)
     assert form.is_valid()
     assert form.get_user() == customer_user
 
 
 def test_login_form_not_valid(customer_user):
-    data = {'user': 'test@example.com', 'password': 'wrongpassword'}
+    data = {'user': 'payload@example.com', 'password': 'wrongpassword'}
     form = LoginForm(data=data)
     assert not form.is_valid()
     assert form.get_user_id() is None
@@ -35,7 +35,7 @@ def test_login_form_not_valid(customer_user):
 def test_login_view_valid(client, customer_user):
     url = reverse('account_login')
     response = client.post(
-        url, {'username': 'test@example.com', 'password': 'password'},
+        url, {'username': 'payload@example.com', 'password': 'password'},
         follow=True)
     assert response.context['user'] == customer_user
 
@@ -43,7 +43,7 @@ def test_login_view_valid(client, customer_user):
 def test_login_view_not_valid(client, customer_user):
     url = reverse('account_login')
     response = client.post(
-        url, {'username': 'test@example.com', 'password': 'wrong'},
+        url, {'username': 'payload@example.com', 'password': 'wrong'},
         follow=True)
     assert isinstance(response.context['user'], AnonymousUser)
 
@@ -51,7 +51,7 @@ def test_login_view_not_valid(client, customer_user):
 def test_login_view_next(client, customer_user):
     url = reverse('account_login') + '?next=/cart/'
     response = client.post(
-        url, {'username': 'test@example.com', 'password': 'password'})
+        url, {'username': 'payload@example.com', 'password': 'password'})
     redirect_location = get_redirect_location(response)
     assert redirect_location == '/cart/'
 
@@ -109,7 +109,7 @@ def test_signup_view_fail(client, db, customer_user):
 
 def test_password_reset_view_post(client, db):
     url = reverse('account_reset_password')
-    data = {'email': 'test@examle.com'}
+    data = {'email': 'payload@examle.com'}
     response = client.post(url, data)
     redirect_location = get_redirect_location(response)
     assert redirect_location == reverse('account_reset_password_done')

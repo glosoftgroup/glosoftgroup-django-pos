@@ -12,7 +12,7 @@ from ...utils import create_superuser
 
 
 class Command(BaseCommand):
-    help = 'Populate database with test objects'
+    help = 'Populate database with payload objects'
     placeholders_dir = r'saleor/static/placeholders/'
 
     def add_arguments(self, parser):

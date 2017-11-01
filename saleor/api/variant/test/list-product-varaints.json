@@ -1,0 +1,26 @@
+//  List product varaints given a category id
+//
+//  Variant Category List Api
+//
+//  Variant Category List Api
+//
+//  GET /api/variant/category/1
+//
+//  HTTP 200 OK
+//  Allow: GET, HEAD, OPTIONS
+//  Content-Type: application/json
+//  Vary: Accept
+
+[
+    {
+        "id": 1,
+        "productName": "Soup (soup-600)",
+        "sku": "soup-600",
+        "price": 120.0,
+        "tax": 0,
+        "discount": 0,
+        "quantity": 100,
+        "product_category": "BreakFase"
+    }
+]
+

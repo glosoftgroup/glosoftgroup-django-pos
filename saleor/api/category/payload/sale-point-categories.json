@@ -1,0 +1,28 @@
+//     Category List Api Sale Point Category List Api
+//
+//Sale Point Category List Api
+//
+//GET /api/category/sale-point/1
+//
+//HTTP 200 OK
+//Allow: GET, HEAD, OPTIONS
+//Content-Type: application/json
+//Vary: Accept
+
+[
+    {
+        "id": 8,
+        "name": "sdferes",
+        "description": "",
+        "product_variants_url": "http://192.168.0.16:8000/api/variant/category/8",
+        "total_products": 0
+    },
+    {
+        "id": 9,
+        "name": "sdferesii",
+        "description": "jh",
+        "product_variants_url": "http://192.168.0.16:8000/api/variant/category/9",
+        "total_products": 0
+    }
+]
+
