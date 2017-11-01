@@ -386,6 +386,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id','email','name','permissions']
+
     def get_permissions(self,obj):
         info_logger.info('User: '+str(obj.name)+' '+str(obj.email)+' logged in via api')
         user_trail(obj.name, 'logged in via api','view')
@@ -394,5 +395,10 @@ class UserSerializer(serializers.ModelSerializer):
         if obj.has_perm('sales.make_sale'):
             permissions.append('make_sale') 
         if obj.has_perm('sales.make_invoice'):
-            permissions.append('make_invoice')           
+            permissions.append('make_invoice')
+        if obj.has_perm('sales.credit_sale'):
+            permissions.append('credit_sale')
+        if obj.has_perm('sales.credit_receive'):
+            permissions.append('credit_receive')
+
         return permissions
