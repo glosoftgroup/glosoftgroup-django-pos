@@ -7,10 +7,10 @@ from django.contrib.auth.models import User
 
 
 class ModelTestCase(TestCase):
-    """This class defines the test suite for the bucketlist model."""
+    """This class defines the payload suite for the bucketlist model."""
 
     def setUp(self):
-        """Define the test client and other test variables."""
+        """Define the payload client and other payload variables."""
         user = User.objects.create(username="nerd")
         self.name = "Write world class code"
         # specify owner of a bucketlist
@@ -32,7 +32,7 @@ class ViewsTestCase(TestCase):
     """Test suite for the api views."""
 
     def setUp(self):
-        """Define the test client and other test variables."""
+        """Define the payload client and other payload variables."""
         user = User.objects.create(username="nerd")
 
         # Initialize client and force it to use authentication

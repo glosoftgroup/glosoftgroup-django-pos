@@ -75,7 +75,7 @@ def test_get_or_create_anonymous_cart_from_token(
     assert Cart.objects.all().count() == 4
     assert cart == opened_anonymous_cart
 
-    # test against getting closed carts
+    # payload against getting closed carts
     cart = utils.get_or_create_anonymous_cart_from_token(
         cancelled_anonymous_cart.token)
     assert Cart.objects.all().count() == 5
@@ -84,7 +84,7 @@ def test_get_or_create_anonymous_cart_from_token(
     assert cart.status == CartStatus.OPEN
     cart.delete()
 
-    # test against new token
+    # payload against new token
     cart = utils.get_or_create_anonymous_cart_from_token(uuid4())
     assert Cart.objects.all().count() == 5
     assert cart not in carts
@@ -92,7 +92,7 @@ def test_get_or_create_anonymous_cart_from_token(
     assert cart.status == CartStatus.OPEN
     cart.delete()
 
-    # test against getting cart assigned to user
+    # payload against getting cart assigned to user
     cart = utils.get_or_create_anonymous_cart_from_token(opened_user_cart.token)
     assert Cart.objects.all().count() == 5
     assert cart not in carts
@@ -108,7 +108,7 @@ def test_get_or_create_user_cart(
     assert Cart.objects.all().count() == 4
     assert cart == opened_user_cart
 
-    # test against getting closed carts
+    # payload against getting closed carts
     Cart.objects.create(user=admin_user, status=CartStatus.CANCELED)
     queryset = Cart.objects.all()
     carts = list(queryset)
@@ -127,17 +127,17 @@ def test_get_anonymous_cart_from_token(
     assert Cart.objects.all().count() == 4
     assert cart == opened_anonymous_cart
 
-    # test against getting closed carts
+    # payload against getting closed carts
     cart = utils.get_anonymous_cart_from_token(cancelled_anonymous_cart.token)
     assert Cart.objects.all().count() == 4
     assert cart is None
 
-    # test against new token
+    # payload against new token
     cart = utils.get_anonymous_cart_from_token(uuid4())
     assert Cart.objects.all().count() == 4
     assert cart is None
 
-    # test against getting cart assigned to user
+    # payload against getting cart assigned to user
     cart = utils.get_anonymous_cart_from_token(opened_user_cart.token)
     assert Cart.objects.all().count() == 4
     assert cart is None
@@ -150,7 +150,7 @@ def test_get_user_cart(
     assert Cart.objects.all().count() == 4
     assert cart == opened_user_cart
 
-    # test against getting closed carts
+    # payload against getting closed carts
     Cart.objects.create(user=admin_user, status=CartStatus.CANCELED)
     queryset = Cart.objects.all()
     carts = list(queryset)

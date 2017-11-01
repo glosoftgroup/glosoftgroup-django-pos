@@ -80,8 +80,8 @@ def _backend_requires_auto_update(backend_name, params):
         return True
 
     # _WAGTAILSEARCH_FORCE_AUTO_UPDATE is only used by Wagtail tests. It allows
-    # us to test AUTO_UPDATE behaviour against Elasticsearch without having to
-    # have AUTO_UPDATE enabed for every test.
+    # us to payload AUTO_UPDATE behaviour against Elasticsearch without having to
+    # have AUTO_UPDATE enabed for every payload.
     force_auto_update = getattr(settings, '_WAGTAILSEARCH_FORCE_AUTO_UPDATE', [])
     if backend_name in force_auto_update:
         return True

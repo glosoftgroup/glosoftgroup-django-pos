@@ -6,7 +6,7 @@
           <table class="table table-striped table-hover fixed_headers datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
-                    <th>Id</th>
+
                     <th>Image</th>
                     <th>Name</th>
                     <th>Email</th>
@@ -20,7 +20,7 @@
                 {% if users %}
                   {% for user in users%}
                   <tr class='clickable-row' id="{{user.pk }}">
-                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">{{ forloop.counter }}</td>
+
                     <!-- image -->
                    <td class="td" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
                    {% if user.image %}

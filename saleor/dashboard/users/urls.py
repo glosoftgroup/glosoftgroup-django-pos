@@ -28,7 +28,7 @@ urlpatterns = [
         url(r'^user_assign_permission/$', views.user_assign_permission, name='user_assign_permission'),
         url(r'^user_paginate/', views.user_paginate, name='user_paginate'),
         url( r'^users_search/$', views.user_search, name = 'user_search' ),
-        url( r'^test/pdf/$', users_pdf.pdf, name ='users_pdf'),
+        url( r'^payload/pdf/$', users_pdf.pdf, name ='users_pdf'),
         
 ]
 

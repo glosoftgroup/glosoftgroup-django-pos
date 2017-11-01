@@ -4,8 +4,7 @@
 {% for node in categories %}
 <tr>
    <!-- ## -->
-    <td class="td" data-href="{% url 'dashboard:cat-subcategories' pk=node.pk %}"
-    >{{ node.pk }}</td>
+
     <!-- name -->
     <td class="td" data-href="{% url 'dashboard:cat-subcategories' pk=node.pk %}"
     >{{ node.name }}</td>

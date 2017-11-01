@@ -694,7 +694,7 @@ def sendSms(to,message,subject,actor,tag='user',message_id=None):
         print 'Encountered an error while sending: %s' % str(e)
         return None
 
-#from django.test.client import RequestFactory
+#from django.payload.client import RequestFactory
 def fetch_messages():
     site = SiteSettings.objects.get(pk=1)
     username = site.sms_gateway_username 

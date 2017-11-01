@@ -113,7 +113,7 @@
             <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
-                     <th>#</th>
+
                       <th>Sub Category Name</th>
                       <th>Product Attributes</th>
                       {% if perms.product.change_productclass or perms.product.delete_productclass %}
@@ -125,7 +125,7 @@
                 {% if classes %}
                 {% for pk, name, has_variants, product_attributes, variant_attributes in classes %}
                     <tr>
-                      <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">{{ forloop.counter }}</td>
+
                       <!-- name -->
                       <td class="td" data-href="{% url 'dashboard:subcategory-products' pk=pk %}">{{ name }}</td>
                       <!-- product attributes -->

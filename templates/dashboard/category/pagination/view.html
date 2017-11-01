@@ -111,7 +111,7 @@
             <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
-                    <th>#</th>
+
                     <th>Name</th>
                     <th>Description</th>
                     <th>Products</th>
@@ -125,8 +125,7 @@
                 {% for node in categories %}
                    <tr>
                    <!-- ## -->
-                    <td class="td" data-href="{% url 'dashboard:cat-subcategories' pk=node.pk %}"
-                    >{{ node.pk }}</td>
+
                     <!-- name -->
                     <td class="td" data-href="{% url 'dashboard:cat-subcategories' pk=node.pk %}"
                     >{{ node.name }}</td>

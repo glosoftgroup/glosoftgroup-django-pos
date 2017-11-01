@@ -10,7 +10,7 @@ User = get_user_model()
 
 def test_checkout_flow(request_cart_with_item, client, shipping_method):  # pylint: disable=W0613,R0914
     """
-    Basic test case that confirms if core checkout flow works
+    Basic payload case that confirms if core checkout flow works
     """
 
     # Enter checkout
@@ -20,7 +20,7 @@ def test_checkout_flow(request_cart_with_item, client, shipping_method):  # pyli
 
     # Enter shipping address data
     shipping_data = {
-        'email': 'test@example.com',
+        'email': 'payload@example.com',
         'first_name': 'John',
         'last_name': 'Doe',
         'street_address_1': 'Aleje Jerozolimskie 2',
@@ -175,7 +175,7 @@ def test_summary_without_shipping_method(request_cart_with_item, client, monkeyp
     user tries to get summary step without saved shipping method -
      if is redirected to shipping method step
     """
-    # address test return true
+    # address payload return true
     monkeypatch.setattr('saleor.checkout.core.Checkout.email',
                         True)
 
@@ -231,7 +231,7 @@ def test_voucher_invalid(client, request_cart_with_item, shipping_method, vouche
 
     # Enter shipping address data
     shipping_data = {
-        'email': 'test@example.com',
+        'email': 'payload@example.com',
         'first_name': 'John',
         'last_name': 'Doe',
         'street_address_1': 'Aleje Jerozolimskie 2',
@@ -277,7 +277,7 @@ def test_remove_voucher(client, request_cart_with_item, shipping_method, voucher
 
     # Enter shipping address data
     shipping_data = {
-        'email': 'test@example.com',
+        'email': 'payload@example.com',
         'first_name': 'John',
         'last_name': 'Doe',
         'street_address_1': 'Aleje Jerozolimskie 2',
