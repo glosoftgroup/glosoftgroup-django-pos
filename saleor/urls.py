@@ -8,6 +8,7 @@ from django.views.i18n import javascript_catalog
 from graphene_django.views import GraphQLView
 
 from .accounts.urls import urlpatterns as accounts_urls
+from .api.allocate.urls import urlpatterns as api_allocate_urls
 from .api.cash.urls import urlpatterns as api_cash_urls
 from .api.category.urls import urlpatterns as api_category_urls
 from .api.customer.urls import urlpatterns as api_customer_urls
@@ -43,6 +44,7 @@ urlpatterns = [
     url(r'^', include(core_urls)),
     url(r'^account/', include(registration_urls)),
     url(r'^accounts/', include(accounts_urls, namespace='accounts')),
+    url(r'^api/allocate/', include(api_allocate_urls, namespace='allocate-api')),
     url(r'^api/category/', include(api_category_urls, namespace='category-api')),
     url(r'^api/cash/', include(api_cash_urls, namespace='cash-api')),
     url(r'^api/customer/', include(api_customer_urls, namespace='customer-api')),
