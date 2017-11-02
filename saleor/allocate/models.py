@@ -90,7 +90,7 @@ class Allocate(models.Model):
         pgettext_lazy('Allocate field', 'balance'), default=Decimal(0), max_digits=100, decimal_places=2)
     debt = models.DecimalField(
         pgettext_lazy('Allocate field', 'debt'), default=Decimal(0), max_digits=100, decimal_places=2)
-    
+
     discount_amount = PriceField(
         verbose_name=pgettext_lazy('Allocate field', 'discount amount'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
@@ -116,12 +116,19 @@ class Allocate(models.Model):
         
     def __str__(self):
         return self.invoice_number
+
     def __unicode__(self):
         return unicode(self.invoice_number)
+
     def total_items(self):
-        return len(self.credititems.all());
+        return len(self.allocated_items.all())
+
     def items(self):
-        return self.credititems.all()
+        return self.allocated_items.all()
+
+    def item_detail(self,sku):
+        return self.allocated_items.get(sku=sku)
+
     def is_fully_paid(self):
         if self.status == 'fully-paid':
             return True
@@ -139,8 +146,8 @@ class Allocate(models.Model):
         if difference.days > max_credit_date:
             return True
         return False
-  
-                                
+
+
 class AllocatedItem(models.Model):
     allocate = models.ForeignKey(Allocate,related_name='allocated_items',on_delete=models.CASCADE)
     order = models.IntegerField(default=Decimal(1))
@@ -148,7 +155,10 @@ class AllocatedItem(models.Model):
         pgettext_lazy('AllocatedItem field', 'SKU'), max_length=32)    
     quantity = models.IntegerField(
         pgettext_lazy('AllocatedItem field', 'quantity'),
-        validators=[MinValueValidator(0)], default=Decimal(1))
+        validators=[MinValueValidator(0)], default=Decimal(0))
+    allocated_quantity = models.DecimalField(
+        pgettext_lazy('AllocatedItem field', 'debt'), default=Decimal(0), max_digits=100, decimal_places=2)
+
     product_name = models.CharField(
         pgettext_lazy('AllocatedItem field', 'product name'), max_length=128)
     total_cost = models.DecimalField(

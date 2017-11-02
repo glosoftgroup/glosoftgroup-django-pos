@@ -83,13 +83,12 @@ class AllocateUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = AllocateUpdateSerializer
     def perform_update(self, serializer):
         instance = serializer.save(user=self.request.user)
-        if instance.status == 'fully-paid':
-            send_to_sale(instance)
-        user_trail(self.request.user.name,'made a credit sale:#'+str(serializer.data['invoice_number'])+' credit sale worth: '+str(serializer.data['total_net']),'add')
-        info_logger.info('User: '+str(self.request.user)+' made a credit sale:'+str(serializer.data['invoice_number']))
+        send_to_sale(instance)
+        user_trail(self.request.user.name,'made a allocated sale:#'+str(serializer.data['invoice_number'])+' credit sale worth: '+str(serializer.data['total_net']),'add')
+        info_logger.info('User: '+str(self.request.user)+' made a allocated sale:'+str(serializer.data['invoice_number']))
         terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
         trail = 'User: '+str(self.request.user)+\
-                ' updated a credited sale :'+str(serializer.data['invoice_number'])+\
+                ' updated a allocated sale :'+str(serializer.data['invoice_number'])+\
                 ' Net#: '+str(serializer.data['total_net'])+\
                 ' Amount paid#:'+str(serializer.data['amount_paid'])
 
@@ -103,7 +102,7 @@ class AllocateUpdateAPIView(generics.RetrieveUpdateAPIView):
                                            user = self.request.user,
                                            terminal=terminal,
                                            amount=serializer.data['amount_paid'],
-                                           trans_type='credit paid')
+                                           trans_type='allocated sale paid')
         
 
 def send_to_sale(credit):
@@ -116,7 +115,6 @@ def send_to_sale(credit):
                          balance=credit.balance,
                          terminal=credit.terminal,
                          amount_paid=credit.amount_paid,
-                         customer=credit.customer,
                          status=credit.status,
                          total_tax=credit.total_tax,
                          mobile=credit.mobile,

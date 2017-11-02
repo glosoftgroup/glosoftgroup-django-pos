@@ -6,7 +6,6 @@ from rest_framework.generics import (ListAPIView,
                                      DestroyAPIView,
                                     )
 from django.contrib.auth import get_user_model
-User = get_user_model()
 from ...product.models import (
     Product,
     ProductVariant,
@@ -29,6 +28,7 @@ from rest_framework import generics
 
 from ...decorators import user_trail
 import logging
+User = get_user_model()
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
