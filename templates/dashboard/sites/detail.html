@@ -39,7 +39,9 @@
                     <ul class="nav nav-tabs nav-tabs-highlight"  style="margin-bottom:0px;">
                       <li class="active"><a href="#basic" data-toggle="tab">Basic Settings</a></li>
                       <li><a href="#sms" data-toggle="tab" disabled>Communications</a></li>
-                      <li><a href="#db" data-toggle="tab">Databases</a></li>                    
+                        {% if perms.sales.import_database or perms.sales.export_database %}
+                            <li><a href="#db" data-toggle="tab">Databases</a></li>
+                        {% endif %}
                     </ul>
 
                     <div class="tab-content" style="margin-bottom:0px;">
