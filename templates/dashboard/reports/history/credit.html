@@ -1,0 +1,271 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load humanize %}
+
+{% block title %}
+  Credit Report
+{% endblock %}
+{% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:credit_reports' %}">Credit</a></li>
+ {% endblock %}
+
+{% block menu_creditreport_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+    <div class="col-md-12">
+      <div class="panel panel-flat">
+      <div class="panel-heading">
+        <h6 class="panel-title">Credit Reports</h6>
+        <div class="heading-elements">
+          <ul class="icons-list">
+            <li><a data-action="collapse"></a></li>
+            <li><a data-action="reload"></a></li>
+            <li><a data-action="close"></a></li>
+          </ul>
+        </div>
+      <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+        <div class="panel-body">
+            <div class="col-md-6">
+             <label>Search Credit Sale</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search details" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>pick a date</label>
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control daterange-single" type="text">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                    <option value="excel" data-icon="fa-file-excel-o">export excel</option>
+                  </select>
+              </div>
+            </div>
+      </div>
+   </div>
+   </div>
+
+<div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsives">     
+                <table class="table  datatable-header-footer">
+                  <caption style="margin-bottom: 10px;">
+                   </caption> 
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr>
+                          <th>Transaction Date</th>
+                          <th>Receipt No</th>
+                          <th>Customer Name</th>
+                          <th>Item Name</th>
+                          <th>Unit Cost</th>
+                          <th>Quantity</th>
+                          <th>Total Sales (KShs)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tb">
+                        {% if items %}
+                        {% for item in items %}
+                          <tr>
+                            <td>{{item.credit.created|date:"d-m-Y H:i a"}}</td>
+                            <td>{{item.credit.invoice_number }}</td>
+                            <td>{% if item.credit.user.email %}{{item.credit.user.email}}{% else %}{{item.credit.user.name}}{% endif %}</td>
+                            <td>{{item.product_name}}</td>
+                            <td>{{item.unit_cost}}</td>
+                            <td>{{item.quantity}}</td>
+                              <td><span class="pull-right">{{item.total_cost|intcomma }}</span></td>
+                          </tr>
+                        {% endfor %}
+                        {% else %}
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Reports Available</h2></td></tr>
+                        {% endif %}
+                        </tbody>
+
+                 </table>
+              </div>
+              {% if items %}
+              <div class="my-paginate">
+                <div class="text-center bootpag-callback" style="padding:20px;">
+                  <ul class="pagination bootpag pagination-flat pagination-sm"></ul>
+                  <div class="pull-right pages-nav">Page 1</div>
+                </div>
+                <input type="hidden" id="page_size" val="">
+              </div>
+              {% endif %}
+             </div>
+            </div>
+          {% if items %}
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                 <p class="text-center" style="margin: 20px 0px;">
+                   Todays Sales: Kshs 
+                    {% if tsum.total_net__sum %}
+                       {{tsum.total_net__sum}} 
+                    {% else %}
+                       0.00<br />
+                    {% endif %}<br />
+                   Total Sales: Kshs {{total_sales.total_net__sum}}<br />
+                   Total Tax: Kshs {{ total_tax.total_tax__sum}}
+                 </p>
+                  <p class="text-center"> Thank you for partnering with us.<br />
+                  <span>Report pullled by {{request.user.name}}</span></p>
+                  <input type="hidden" class="setValue">
+                  <input type="hidden" class="setName">
+                  <!--<button class="btn btn-primary ck">Click</button> -->
+                  
+              </div>
+             </div>
+          {% endif %}
+            </div>
+<!--       <div class="panel-footer">
+      <button class="btn btn-primary disabled">checki this</button>
+      </div> -->
+    </div>
+   </div><!--pagination div-->
+  </div>
+</div>
+
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+<script type="text/javascript">
+ var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
+    var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
+$(document).ready(function(){
+
+    var pagination_totalsize;
+    var status;
+    var reportUrl = "{% url 'dashboard:credit_reports' %}";
+   
+    //**@ get
+    $.ajax({ url: reportUrl,type: 'GET',data: {initial:'initial'},
+        async:false,success: function(data){
+         pagination_totalsize = data;
+    }}); 
+
+     $('.bootpag-callback').bootpag({
+        total: parseInt(pagination_totalsize),
+        maxVisible: 3,
+        leaps: false
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
+            $.get(creditPaginateUrl,{page:parseInt(num)},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm'); 
+
+    $('.daterange-single').daterangepicker({ 
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+        $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, date:date }, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+    });
+
+   $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change', function(){
+
+        var ts = $(this).val();
+        if(ts == 'pdf'){
+          var url = "{% url 'dashboard:reports_sales_list_pdf' %}";
+          window.open(url, '_blank');
+
+        }else if(ts=='excel'){
+          window.location="{% url 'dashboard:reports_sales_list_export_csv' %}";
+
+        }else{
+          $(this).val('')
+        }
+    });
+
+    $('.ck').click(function(){
+      var name = $('.setName').val();
+      var vl = $('.setValue').val();
+        if( !name || !vl || vl == 'none'){
+           alert('nothing');
+        }else{
+         alert(name +' and '+ vl);
+        }
+    });
+    //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
+
+
+
+      var delay = (function(){
+    var timer = 0;
+    return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+    $('.search_user').keyup(function() {
+      var search_text = $(this).val();
+      delay(function(){ 
+         var url = creditSearchUrl;
+         $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                $('#pagination-div').html(data);
+         }});
+      }, 500 );
+
+    });
+
+
+});
+
+</script>
+{% endblock %}

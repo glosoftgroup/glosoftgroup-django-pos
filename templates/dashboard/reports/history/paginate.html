@@ -1,0 +1,39 @@
+{% load staticfiles %}
+{% load prices_i18n %}
+{% load humanize %}
+ {% if sales %}
+    {% for sale in sales %}
+      <tr class='clickable-row' id="{{sale.pk }}">
+        <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|timesince}}</td>
+        <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
+        <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
+        {% if sale.is_fully_paid %}
+        <span class="text-success  icon-checkmark-circle"><i></i></span>
+        {% else %}
+        <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+        {% endif %}
+        </td>
+          <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
+        <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+        
+        <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+        <td>
+          {% if sale.discount_amount %}
+          {{sale.discount_amount}}
+          {% else %}
+          --
+          {% endif %}</td>
+        <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+      </tr>
+        <script type="text/javascript">
+        $(document).ready(function(){
+
+            $(".td").click(function(){
+                  window.location = $(this).data("href");
+              });
+        });
+        </script>
+    {% endfor %}
+    {% else %}
+     <tr><td colspan="7"><h2 class="text-center">no sales available</h2></td></tr>
+    {% endif %}

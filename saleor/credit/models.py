@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Sum
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
@@ -139,7 +140,13 @@ class Credit(models.Model):
         if difference.days > max_credit_date:
             return True
         return False
-  
+
+    def total_amount(self):
+        return len(self.credit_history.all())
+
+    def total_balance(self):
+        return self.credit_history.aggregate(Sum('balance'))['balance__sum']
+
                                 
 class CreditedItem(models.Model):
     credit = models.ForeignKey(Credit,related_name='credititems',on_delete=models.CASCADE)
@@ -176,11 +183,17 @@ class CreditHistoryEntry(models.Model):
     date = models.DateTimeField(
         pgettext_lazy('Credit history entry field', 'last history change'),
         default=now, editable=False)
+    created = models.DateTimeField(
+        pgettext_lazy('Credit history entry field', 'created'),
+        default=now, editable=False)
     credit = models.ForeignKey(
         Credit, related_name='credit_history',
         verbose_name=pgettext_lazy('Credit history entry field', 'order'))
     amount = models.DecimalField(
         pgettext_lazy('Credit history entry field', 'amount cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+    balance = models.DecimalField(
+        pgettext_lazy('Credit history entry field', 'balance'), default=Decimal(0), max_digits=100,
+        decimal_places=2)
 
     comment = models.CharField(
         pgettext_lazy('Credit history entry field', 'comment'),
@@ -202,6 +215,9 @@ class CreditHistoryEntry(models.Model):
     def __str__(self):
         return pgettext_lazy(
             'Credit history entry str',
-            'CreditHistoryEntry for terminal #%d') % self.terminal.pk
+            'CreditHistoryEntry for terminal #%s') % self.credit.invoice_number
+
+
+
 
 

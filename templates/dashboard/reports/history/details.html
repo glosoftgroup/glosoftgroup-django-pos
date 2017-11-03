@@ -1,0 +1,123 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load prices_i18n %}
+{% load humanize %}
+{% load default_user_image %}
+{% block title %}
+ Credit Sales Report
+{% endblock %}
+{% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:credit_list' %}">Credit Sales</a></li>
+     <li>Receipt</li>
+ {% endblock %}
+
+{% block menu_report_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+    label.error{
+      color: #FF5722;
+    }
+    .table{border:1px solid #ccc}
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12" style="margin-bottom:10px;">
+        <a class="btn btn-primary pull-left" href="{% url 'dashboard:credit_list' %}"><i class="icon-arrow-left13 position-left"></i> Back To Credit Sales List</a>
+        <a class="btn btn-primary pull-right printPdf" data-url="{% url 'dashboard:pdf-sale-detail' pk=sale.pk%}" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
+        </div>
+    </div>
+</div>
+<div class="col-md-12">
+   <div id="pagination-div">
+    <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+               <div>
+                      <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
+
+                        <h6><span class="text-bold">Customer:</span> {% if sale.customer.name %} {{sale.customer.name}} {% else %} <span class="text-bold">-</span>{% endif %}</h6>
+                          <h6 class=""><span class="text-bold">Receipt Number:</span> {{sale.invoice_number}}</h6>
+                          <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
+
+                      </div>
+                    </div>
+            <div class="table-responsives">
+                <table class="table  datatable-header-footer">
+
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr class="bg-primary">
+                          <th>Transaction Date</th>
+                          <th>Item Name</th>         
+                          <th>Unit Cost</th>
+                          <th>Quantity</th>
+                          <th>Discount</th>
+                          <th>Total Sales (KShs)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tb">
+                        {% if items %}
+                        {% for item in items %}
+                          <tr>
+                            <td>{{item.credit.created|date:"d-m-Y H:i a"}}</td>
+                            <td>{{item.product_name}}</td>
+
+                            <td>{{item.unit_cost}}</td>
+                            <td>{{item.quantity}}</td>
+                            <td>
+                            {% if sale.discount %}
+                            {{sale.discount}}
+                            {% else %}
+                            --
+                            {% endif %}</td>
+                              <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
+                          </tr>
+                        {% endfor %}
+                         {% else %}
+                         <tr><td colspan="5"><h2 class="text-center">No Items Available</h2></td></tr>
+                        {% endif %}
+                        </tbody>
+
+                 </table>
+              </div>
+             </div>
+            </div>
+          {% if items %}
+            <div class="row">
+              <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
+                  <span>
+                   Total Credit Sales: Kshs {{sale.total_net}}<br />
+                   Total Tax: Kshs {{sale.total_tax}}
+                 </span><br>
+                  <span> Thank you for partnering with us.<br />
+                  <span>Report pullled by {{request.user.name}}</span></span>
+                  <input type="hidden" class="setValue">
+                  <input type="hidden" class="setName">
+
+              </div>
+             </div>
+          {% endif %}
+            </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+</div>
+
+
+{% endblock%}
+{% block custom_js %}
+<script>
+    $('.printPdf').on('click', function(){
+       var url = $(this).data('url');
+        $.get(url, function(data){
+             window.open("data:application/pdf," + escape(data));
+        });
+    });
+</script>
+{% endblock %}

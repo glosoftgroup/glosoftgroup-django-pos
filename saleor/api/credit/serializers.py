@@ -82,7 +82,7 @@ class ItemsSerializer(serializers.ModelSerializer):
 
 
 class CreditListSerializer(serializers.ModelSerializer):
-    url = HyperlinkedIdentityField(view_name='product-api:sales-details')
+    update_url = HyperlinkedIdentityField(view_name='credit-api:update-credit')
     credititems = ItemsSerializer(many=True)
     cashier = SerializerMethodField()
     class Meta:
@@ -92,7 +92,7 @@ class CreditListSerializer(serializers.ModelSerializer):
                  'invoice_number',
                  'total_net',
                  'sub_total',                 
-                 'url',
+                 'update_url',
                  'balance',
                  'terminal',
                  'amount_paid',
@@ -114,7 +114,7 @@ class CreditListSerializer(serializers.ModelSerializer):
 
 
 class CreateCreditSerializer(serializers.ModelSerializer):
-    url = HyperlinkedIdentityField(view_name='product-api:sales-details')
+    update_url = HyperlinkedIdentityField(view_name='credit-api:update-credit')
     credititems = TrackSerializer(many=True)
 
     class Meta:
@@ -124,7 +124,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                  'invoice_number',
                  'total_net',
                  'sub_total',                 
-                 'url',
+                 'update_url',
                  'balance',
                  'terminal',
                  'amount_paid',
@@ -222,7 +222,8 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         try:
             history = CreditHistoryEntry()
             history.credit = credit
-            history.amount = validated_data.get('total_net')
+            history.balance = validated_data.get('total_net')
+            history.amount = validated_data.get('amount_paid')
             history.save()
         except Exception as e:
             print(e)
@@ -338,6 +339,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             history = CreditHistoryEntry()
             history.credit = instance
             history.amount = Decimal(validated_data.get('amount_paid'))
+            history.balance = instance.total_net - instance.amount_paid
             history.save()
         except Exception as e:
             print(e)

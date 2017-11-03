@@ -23,7 +23,8 @@ from django.utils.dateformat import DateFormat
 import logging
 
 from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf
+from ...utils import render_to_pdf, convert_html_to_pdf, image64, default_logo
+
 import csv
 import random
 from django.utils.encoding import smart_str
@@ -34,7 +35,7 @@ from ..views import staff_member_required
 from ..notification.views import custom_notification
 from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, DrawerCash
-from ...credit.models import Credit, CreditedItem
+from ...credit.models import Credit, CreditedItem, CreditHistoryEntry
 from ...product.models import Product, ProductVariant
 from ...purchase.models import PurchaseProduct
 from ...decorators import permission_decorator, user_trail
@@ -43,6 +44,76 @@ from ...dashboard.views import get_low_stock_products
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
+
+
+@staff_member_required
+@permission_decorator('reports.view_sale_reports')
+def credit_history(request, credit_pk=None):
+	if credit_pk:
+		credit = Credit.objects.get(pk=credit_pk)
+		total_amount = CreditHistoryEntry.objects.aggregate(Sum('amount'))['amount__sum']
+		total_balance = CreditHistoryEntry.objects.aggregate(Sum('balance'))['balance__sum']
+	else:
+		credit = Credit()
+	try:
+		try:
+			last_sale = CreditHistoryEntry.objects.latest('id')
+			last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
+		except:
+			last_date_of_sales = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+		all_sales = CreditHistoryEntry.objects.filter(credit=credit)
+		total_sales_amount = 0 #all_sales.aggregate(Sum('total_net'))
+		total_tax_amount = 0 #all_sales.aggregate(Sum('total_tax'))
+		total_sales = []
+
+
+		page = request.GET.get('page', 1)
+		paginator = Paginator(total_sales, 10)
+		try:
+			total_sales = paginator.page(page)
+		except PageNotAnInteger:
+			total_sales = paginator.page(1)
+		except InvalidPage:
+			total_sales = paginator.page(1)
+		except EmptyPage:
+			total_sales = paginator.page(paginator.num_pages)
+		user_trail(request.user.name, 'accessed credit sales reports', 'view')
+		info_logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
+		ctx = {
+			   'pn': paginator.num_pages,
+			   'sales': all_sales,
+			   "credit":credit,
+			   'total_amount':total_amount,
+			   'total_balance':total_balance,
+			   "total_sales_amount":total_sales_amount,
+			   "total_tax_amount":total_tax_amount,
+			   "date":last_date_of_sales
+			   }
+		return TemplateResponse(request, 'dashboard/reports/history/sales_list.html',ctx)
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
+
+
+@staff_member_required
+@permission_decorator('reports.view_sales_reports')
+def credit_detail_pdf(request, pk=None):
+	try:
+		credit = Credit.objects.get(pk=pk)
+		all_sales = CreditHistoryEntry.objects.filter(credit=credit)
+		img = default_logo()
+		data = {
+			'today': date.today(),
+			'sales': all_sales,
+			'credit': credit,
+			'puller': request.user,
+			'image': img
+		}
+		pdf = render_to_pdf('dashboard/reports/history/pdf/pdf.html',data)
+		return HttpResponse(pdf, content_type='application/pdf')
+	except ObjectDoesNotExist as e:
+		error_logger.error(e)
+
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
@@ -78,6 +149,7 @@ def credit_list(request):
 		return TemplateResponse(request, 'dashboard/reports/credit/sales_list.html',{'pn': paginator.num_pages, 'sales': total_sales, "total_sales_amount":total_sales_amount, "total_tax_amount":total_tax_amount,"date":last_date_of_sales})
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
+
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
