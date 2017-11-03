@@ -28,6 +28,7 @@ from decimal import Decimal
 from calendar import monthrange
 import calendar
 from django_xhtml2pdf.utils import generate_pdf
+import dateutil.relativedelta
 
 import re
 import base64
@@ -102,13 +103,50 @@ def sales_list_pdf( request ):
 		gid = request.GET.get('gid')
 
 		if gid:
-			gid = gid
+			date = gid
 		else:
-			gid = None
+			date = None
+
+		month = request.GET.get('month')
+		year = request.GET.get('year')
+		period = request.GET.get('period')
+
+		if year and month:
+			if len(str(month)) == 1:
+				m = '0' + str(month)
+				fdate = str(year) + '-' + m
+			else:
+				fdate = str(year) + '-' + str(month)
+
+			d = datetime.datetime.strptime(fdate, "%Y-%m")
+		elif year:
+			fdate = str(year)
+			d = datetime.datetime.strptime(fdate, "%Y")
+
+		if period == 'year':
+			lastyear = d - dateutil.relativedelta.relativedelta(years=1)
+			y = str(lastyear.strftime("%Y"))
+			credits = Credit.objects.filter(created__year__range=[y, year])
+			date_period = str(lastyear.strftime("%Y"))+' - '+str(datetime.datetime.now().strftime("%m"))+'/'+ str(year)
+		elif period == 'month':
+			credits = Credit.objects.filter(created__year=str(d.strftime("%Y")), created__month=str(d.strftime("%m")))
+			date_period = str(datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(datetime.datetime.strptime(year, "%Y").strftime("%Y"))
+		elif period == 'quarter':
+			p = d - dateutil.relativedelta.relativedelta(months=3)
+			month = str(datetime.datetime.strptime(month, "%m").strftime("%m"))
+			credits = Credit.objects.filter(created__year=str(p.strftime("%Y")),
+			                                            created__month__range=[str(p.strftime("%m")), month])
+			date_period = str(p.strftime("%B")) + '/' + str(p.strftime("%Y")) + ' - ' + str(
+            datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(year)
+		else:
+			credits = Credit.objects.all()
+			if not date:
+				date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+			date_period = date
 
 		sales = []
 		if q is not None:
-			all_sales = Credit.objects.filter(
+			all_sales = credits.filter(
 				Q(invoice_number__icontains=q) |
 				Q(terminal__terminal_name__icontains=q) |
 				Q(created__icontains=q) |
@@ -117,8 +155,8 @@ def sales_list_pdf( request ):
 				Q(user__email__icontains=q) |
 				Q(user__name__icontains=q)).order_by('id').distinct()
 
-			if gid:
-				csales = all_sales.filter(created__icontains=gid)
+			if date:
+				csales = all_sales.filter(created__icontains=date)
 				for sale in csales:
 					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 					setattr(sale, 'quantity', quantity['c'])
@@ -129,8 +167,8 @@ def sales_list_pdf( request ):
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 
-		elif gid:
-			csales = Credit.objects.filter(created__icontains=gid)
+		elif date:
+			csales = credits.filter(created__icontains=date)
 			for sale in csales:
 				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
@@ -142,7 +180,7 @@ def sales_list_pdf( request ):
 			except:
 				gid = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
-			csales = Credit.objects.filter(created__icontains=gid)
+			csales = credits.filter(created__icontains=date)
 			for sale in csales:
 				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
@@ -150,11 +188,12 @@ def sales_list_pdf( request ):
 
 		img = image64()
 		data = {
-			'today': date.today(),
+			'today': datetime.datetime.today(),
 			'sales': sales,
 			'puller': request.user,
 			'image': img,
-			'gid':gid
+			'gid':date,
+			'date_period':date_period
 		}
 		pdf = render_to_pdf('dashboard/reports/credit/pdf/saleslist_pdf.html', data)
 		return HttpResponse(pdf, content_type='application/pdf')

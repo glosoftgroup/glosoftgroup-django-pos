@@ -37,7 +37,6 @@
                      <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
                         SALES DATE: {{sales_date}}
                  </p>{% endif %}
-                   <p style="margin-top:2px;font-size:11px;">{{today | date:'jS F Y'}}</p>
                  </p>
              </div>
          <div>
@@ -54,7 +53,7 @@
                          {% else %}
                             {{ puller.email | upper }}
                          {% endif %}
-                     </span></p>
+                     </span>, On: {{today | date:'d-m-Y'}}</p>
 
              </div>
      </body>

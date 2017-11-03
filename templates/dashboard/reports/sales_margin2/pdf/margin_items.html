@@ -33,7 +33,6 @@
              <div class='header'>
                  <p style="margin-bottom:0px;"><img class="img" src="{{image}}" alt="Red dot" /></p>
                  <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;"> SALES ITEMS MARGIN REPORT</p>
-                   <p style="margin-top:2px;font-size:11px;">{{today | date:'jS F Y'}}</p>
              </div>
          <div>
          <div class='details'>
@@ -78,7 +77,7 @@
                          {% else %}
                             {{ puller.email | upper }}
                          {% endif %}
-                     </span></p>
+                     </span>, On: {{today | date:'d-m-Y'}}</p>
 
          </div>
      </body>
