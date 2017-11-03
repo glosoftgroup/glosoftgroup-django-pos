@@ -9,12 +9,22 @@
   Credit Sales Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:sales_list' %}">Credit Sales Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:credit_list' %}">Credit Sales Reports</a></li>
  {% endblock %}
 
 {% block menu_creditreport_class %}active{% endblock %}
  {% block custom_css %}
-   <style type="text/css">
+ <link href="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet" type="text/css">
+<style type="text/css">
+    table tr .ctd{padding: 8px 10px !important;}
+    .table{border-bottom:1px solid #ccc}
+    .datepicker table tr td span {
+      padding:1px !important;
+    }
+    .datepicker table tr td span.active.active{
+       background-color:#1E88E5 !important;
+    }
+
    .highcharts-credits{display:none;}
     label.error{
       color: #FF5722;
@@ -39,6 +49,32 @@
                 </div>
               </div>
             </div>
+             <div class="col-md-2">
+               <label>Period:</label>
+                <div class="form-group">
+                   <select class="bootstrap-select period-sz" style="display: none;" data-width="100%" tabindex="-98">
+                       <option value="day" selected>Daily</option>
+                       <option value="month">Monthly</option>
+                       <option value="quarter">Quarterly</option>
+                       <option value="year">Yearly</option>
+                    </select>
+                </div>
+              </div>
+              <div id="replaceDate">
+                <div class="col-md-2" id="monthDiv">
+                  <label>Ending Month:</label>
+                  <div class="form-group">
+                    <div class="input-group">
+                      <input class="form-control date-month" type="text" placeholder="dd-mm-yyyy">
+                        <input type="hidden" class="hidden-year">
+                        <input type="hidden" class="hidden-month">
+                        <input type="hidden" class="hidden-date">
+                        <input type="hidden" class="hidden-format">
+                      <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             <div class="col-md-2 hidden">
                 <label>Expired/All</label>
               <div class="form-group">
@@ -57,15 +93,6 @@
                     <option value="10">10</option>
                     <option value="20">20</option>
                   </select>
-              </div>
-            </div>
-            <div class="col-md-2">
-              <label>pick a date</label>
-              <div class="form-group">
-                <div class="input-group">
-                  <input class="form-control daterange-single" type="text" placeholder="yyyy-mm-dd">
-                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                </div>
               </div>
             </div>
             <div class="col-md-2">
@@ -217,6 +244,7 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/exporting.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/js/bootstrap-datepicker.min.js' %}"></script>
 <script type="text/javascript">
 var creditPaginationUrl = "{% url 'dashboard:credit_paginate' %}";
 var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
@@ -242,7 +270,7 @@ $(document).ready(function(){
       });
 
      $('.bootpag-callback').bootpag({
-        total: parseInt({{pn}}),
+        total: parseInt('{{pn}}'),
         maxVisible: 3,
         leaps: true,
         firstLastUse: true,
@@ -256,186 +284,11 @@ $(document).ready(function(){
         lastClass: 'last',
         firstClass: 'first',
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
+            $(".pages-nav").html("Page " + num +" of "+'{{pn}}');
             $.get(creditPaginationUrl,{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm');
-
-    $('.daterange-single').daterangepicker({
-        singleDatePicker: true,
-        locale:{format: 'YYYY-MM-DD'},
-        showDropdowns:true,
-        autoUpdateInput:false
-    }, function(chosen_date) {
-        $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
-        var group_id = $('.daterange-single').val();
-        var searchData = $('.search_user').val();
-        var listSizeVal = $('.list-sz').find(":selected").val();
-        var url = creditSearchUrl;
-       var categs = $('.sales-category').find(":selected").val();
-
-       if((categs == 'category') || (categs == 'category' && listSizeVal) || (categs == 'category' && searchData) || (categs == 'category' && listSizeVal && searchData) ){
-               $.get(categoryChartUrl, {date:group_id},function(data){
-                      $('#pagination-div').html(data)
-                });
-       }else if((categs == 'items') || (categs == 'items' && listSizeVal) || (categs == 'items' && searchData) || (categs == 'items' && listSizeVal && searchData) ){
-               $.get(productChartUrl, {date:group_id},function(data){
-                      $('#pagination-div').html(data)
-                });
-       }else if((categs == 'user') || (categs == 'user' && listSizeVal) || (categs == 'user' && searchData) || (categs == 'user' && listSizeVal && searchData) ){
-               $.get(userChartUrl, {date:group_id},function(data){
-                      $('#pagination-div').html(data)
-                });
-       }else if((categs == 'terminal') || (categs == 'terminal' && listSizeVal) || (categs == 'terminal' && searchData) || (categs == 'terminal' && listSizeVal && searchData) ){
-               $.get(terminalChartUrl, {date:group_id},function(data){
-                      $('#pagination-div').html(data)
-                });
-       }else if(searchData && listSizeVal && listSizeVal != '0'){
-            if(!group_id){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
-                      $('#pagination-div').html(data);
-               }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:group_id},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-           }
-       }else if(searchData){
-            if(!group_id){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData},success: function(data){
-                      $('#pagination-div').html(data);
-               }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:group_id},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-           }
-       }else if(listSizeVal && listSizeVal != '0'){
-           if(!group_id){
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
-                  $('#pagination-div').html(data);
-              }});
-           }else{
-                $.get(creditPaginationUrl,{page:1,gid:group_id, size:listSizeVal},function(data){
-                 $('#pagination-div').html(data);
-               });
-           }
-       }else{
-           if(!group_id){
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
-                  $('#pagination-div').html(data);
-              }});
-           }else{
-                $.get(creditPaginationUrl,{page:1,gid:group_id},function(data){
-                 $('#pagination-div').html(data);
-               });
-           }
-       }
-
-    });
-
-  $('.sales-category').selectpicker().on('change', function(){
-        var sv = $(this).val();
-        var date = $('.daterange-single').val();
-        var listSizeVal = $('.list-sz').find(":selected").val();
-        var searchData = $('.search_user').val();
-
-         if(sv == 'list' && date && listSizeVal && searchData){
-            if(listSizeVal != '0'){
-               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:listSizeVal, gid:date, q:searchData}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
-            }
-        }else if(sv == 'list' && listSizeVal && searchData){
-            if(listSizeVal != '0'){
-               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:listSizeVal, q:searchData}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
-            }
-        }else if(sv == 'list' && listSizeVal && date){
-            if(listSizeVal != '0'){
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
-            }
-        }else if(sv == 'list' && date){
-         $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
-                  $('#pagination-div').html(data);
-            }});
-        }else if(sv == 'list' && searchData){
-         $.ajax({ url: creditSearchUrl,type: 'GET',data: {page:1, size:10, gid:date,q:searchData}, async:false,success: function(data){
-                  $('#pagination-div').html(data);
-            }});
-        }else if(sv == 'list' && listSizeVal){
-            if(listSizeVal != '0'){
-                 $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
-                          $('#pagination-div').html(data);
-                    }});
-            }else{
-            $.ajax({ url: creditPaginationUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
-                          $('#pagination-div').html(data);
-                    }});
-            }
-        }else if(sv == 'summary'){
-            window.location = "{% url 'dashboard:sales_date_chart' %}";
-
-        }else if(sv == 'category' && date){
-            $.get("{% url 'dashboard:sales_category_chart' %}", {date:date},function(data){
-                      $('#pagination-div').html(data)
-                      updateSelectListnSearch();
-                });
-        }else if(sv == 'category'){
-            url = "{% url 'dashboard:sales_category_chart' %}";
-            $.get(url, function(data){
-                      $('#pagination-div').html(data)
-                      updateSelectListnSearch();
-
-                });
-        }else if(sv == 'items' && date){
-            $.get("{% url 'dashboard:sales_product_chart' %}", {date:date}, function(data){
-                      $('#pagination-div').html(data)
-                      updateSelectListnSearch();
-                });
-        }else if(sv == 'items'){
-            $.get("{% url 'dashboard:sales_product_chart' %}", function(data){
-                      $('#pagination-div').html(data)
-                      updateSelectListnSearch();
-                });
-        }else if(sv == 'user' && date){
-            $.get("{% url 'dashboard:sales_user_chart' %}",{date:date}, function(data){
-                      $('#pagination-div').html(data)
-                      updateSelectListnSearch();
-                });
-        }else if(sv == 'user'){
-            $.get("{% url 'dashboard:sales_user_chart' %}", function(data){
-                      $('#pagination-div').html(data)
-                      updateSelectListnSearch();
-                });
-        }else if(sv == 'terminal' && date){
-             $.get("{% url 'dashboard:sales_terminal_chart' %}", {date:date}, function(data){
-                      $('#pagination-div').html(data)
-                      updateSelectListnSearch();
-                });
-        }else if(sv == 'terminal'){
-             $.get("{% url 'dashboard:sales_terminal_chart' %}", function(data){
-                      $('#pagination-div').html(data)
-                      updateSelectListnSearch();
-                });
-        }
-  });
 
    $('.export-sz').selectpicker({
           iconBase: 'fa',
@@ -449,132 +302,40 @@ $(document).ready(function(){
         if(ts == 'pdf'){
             var searchData = $('.search_user').val();
             var listSizeVal = $('.list-sz').find(":selected").val();
-            var groupSizeVal = $('.group-sz').find(":selected").val();
-            var date = $('.daterange-single').val();
+            var date = $('.date-month').val();
             var url = "{% url 'dashboard:reports_credit_list_pdf' %}";
-            var scategory = $('.sales-category').find(":selected").val();
 
-            if(date && (scategory == 'category')){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_credit_category_pdf' %}",{image:dataUrl, date:date}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
-            }else if(scategory == 'category'){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_credit_category_pdf' %}",{image:dataUrl}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
-            }else if(date && (scategory == 'items')){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_credit_items_pdf' %}",{image:dataUrl, date:date}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
-            }else if(scategory == 'items'){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_credit_items_pdf' %}",{image:dataUrl}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
-            }else if(date && (scategory == 'user')){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_credit_user_pdf' %}",{image:dataUrl, date:date}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
-            }else if(scategory == 'user'){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_credit_user_pdf' %}",{image:dataUrl}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
-            }else if(date && (scategory == 'terminal')){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_credit_tills_pdf' %}",{image:dataUrl, date:date}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
-            }else if(scategory == 'terminal'){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_credit_tills_pdf' %}",{image:dataUrl}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
-            }else if (searchData && date ){
-                $.get(url, {q:searchData, gid:date}, function(data){
-                          window.open("data:application/pdf," + escape(data));
-                });
-            }else if (searchData){
-                $.get(url, {q:searchData}, function(data){
-                          window.open("data:application/pdf," + escape(data));
-                });
-            }else if (date){
-                $.get(url, {gid:date}, function(data){
-                          window.open("data:application/pdf," + escape(data));
-                });
-            }else{
-                $.get(url, function(data){
-                          window.open("data:application/pdf," + escape(data));
-               });
+            var period = $('.period-sz').find(":selected").val();
+            var month = $('.hidden-month').val();
+            var year = $('.hidden-year').val();
+
+            if(!$('.hidden-format').val()){
+              $('.hidden-format').val('yyyy-mm-dd');
             }
+
+            if($('.hidden-format').val() == 'yyyy-mm-dd'){
+               if(!date){
+                  date = null;
+               }
+            }else if($('.hidden-format').val() == 'yyyy'){
+                var date = null;
+                month = null;
+            }else{
+               var date = null;
+            }
+
+            dynamicData = {}
+            dynamicData['q'] = searchData;
+            dynamicData['gid'] = date;
+            dynamicData['period'] = period;
+            dynamicData['month'] = month;
+            dynamicData['year'] = year; 
+        
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+                window.open("data:application/pdf," + escape(data));
+             })
+            .fail();
 
         }else if(ts=='excel'){
           <!--window.location="{% url 'dashboard:users_export_csv' %}";-->
@@ -589,24 +350,57 @@ $(document).ready(function(){
      $('.list-sz').selectpicker().on('change', function(){
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
-        var date = $('.daterange-single').val();
+        var date = $('.date-month').val();
         var url = creditPaginationUrl;
         var paginationUrl = creditPaginationUrl;
-        var scategory = $('.sales-category').find(":selected").val();
+
+        var period = $('.period-sz').find(":selected").val();
+        var month = $('.hidden-month').val();
+        var year = $('.hidden-year').val();
+
+        if(!$('.hidden-format').val()){
+          $('.hidden-format').val('yyyy-mm-dd');
+        }
+
+        if($('.hidden-format').val() == 'yyyy-mm-dd'){
+           if(!date){
+              date = null;
+           }
+        }else if($('.hidden-format').val() == 'yyyy'){
+            var date = null;
+            month = null;
+        }else{
+           var date = null;
+        }
+
         dynamicData = {}
         dynamicData['page'] = 1;
         dynamicData['q'] = searchData;
         dynamicData['gid'] = date;
+        dynamicData['period'] = period;
+        dynamicData['month'] = month;
+        dynamicData['year'] = year; 
         if(listSizeVal == '0'){
           dynamicData['size'] = '10';
         }else{
           dynamicData['size'] = listSizeVal;
         } 
-        paginationData(dynamicData,url,'GET').
-         done(function(data){
-          $('#pagination-div').html(data);
-         })
-         .fail();        
+        if(searchData){
+            paginationData(dynamicData,creditSearchUrl,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+             .fail(); 
+
+        }else{
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+            .fail(); 
+
+        }
+               
 
      });
 
@@ -633,10 +427,27 @@ $(document).ready(function(){
     $('.search_user').keyup(function() {
       var url = creditSearchUrl;
       var search_text = $(this).val();     
-      var date = $('.daterange-single').val();
+      var date = $('.date-month').val();
       var listSizeVal = $('.list-sz').find(":selected").val();
-      var scategory = $('.sales-category').find(":selected").val();
+      var period = $('.period-sz').find(":selected").val();
+      var month = $('.hidden-month').val();
+      var year = $('.hidden-year').val();
       dynamicData = {};
+
+      if(!$('.hidden-format').val()){
+        $('.hidden-format').val('yyyy-mm-dd');
+      }
+
+      if($('.hidden-format').val() == 'yyyy-mm-dd'){
+         if(!date){
+            date = null;
+         }
+      }else if($('.hidden-format').val() == 'yyyy'){
+          var date = null;
+          month = null;
+      }else{
+         var date = null;
+      }
 
       delay(function(){         
          dynamicData['']
@@ -647,7 +458,10 @@ $(document).ready(function(){
          }else{
           dynamicData['size'] = listSizeVal;
          }         
-         dynamicData['gid'] = date;         
+         dynamicData['gid'] = date;
+         dynamicData['period'] = period;
+         dynamicData['month'] = month;
+         dynamicData['year'] = year;        
          paginationData(dynamicData,url,'GET').
          done(function(data){
           $('#pagination-div').html(data);
@@ -659,7 +473,113 @@ $(document).ready(function(){
     });
 
     
+$('.period-sz').selectpicker().on('change', function(){
+    var period = $(this).val();
+    var DateOptions = {
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            endDate: 'now'
+    }
+    var MonthOptions = {
+        format: "MM/yyyy",
+        autoclose: true,
+        //startDate: '{{startMonth}}/{{startYear}}',
+        endDate: 'now',
+        minViewMode: 'months'
+    }
+    var YearOptions = {
+        format: "yyyy",
+        autoclose: true,
+        //startDate: '{{startMonth}}/{{startYear}}',
+        endDate: 'now',
+        minViewMode: 'years'
+    }
+    if(period == 'day'){
+      $(".date-month").val("");
+      $(".date-month").datepicker("destroy");
+      $(".date-month").datepicker(DateOptions);
+      $(".date-month").attr("placeholder", "yyyy-mm-dd");
+      $('.hidden-format').val('yyyy-mm-dd');
+    }else if(period == 'year'){
+      $(".date-month").val("");
+      $(".date-month").datepicker("destroy");
+      $(".date-month").datepicker(YearOptions);
+      $(".date-month").attr("placeholder", "yyyy");
+      $('.hidden-format').val('yyyy');
+    }else{
+      $(".date-month").val("");
+      $(".date-month").datepicker("destroy");
+      $(".date-month").datepicker(MonthOptions);
+      $(".date-month").attr("placeholder", "mm/yyyy");
+      $('.hidden-format').val('mm/yyyy');
+    }
+});
 
+
+$('.date-month').datepicker({
+    format: "yyyy-mm-dd",
+    autoclose: true,
+    endDate: 'now'})
+  .on('changeDate', function(e) {
+      var period = $('.period-sz').find(":selected").val();
+      var month = e.date.getMonth()+1;
+      var year = e.date.getFullYear();
+
+      $('.hidden-year').val(year);
+      $('.hidden-month').val(month);
+      
+
+      if(!$('.hidden-format').val()){
+        $('.hidden-format').val('yyyy-mm-dd');
+      }
+
+      if($('.hidden-format').val() == 'yyyy-mm-dd'){
+         var group_id = $(this).val();
+         if(!group_id){
+            group_id = null;
+         }
+      }else if($('.hidden-format').val() == 'yyyy'){
+          var group_id = null;
+          month = null;
+      }else{
+         var group_id = null;
+      }
+
+
+        
+        var dd = e.date.getFullYear() + '-'+e.date.getMonth()+'-'+e.date.getDate()
+        var searchData = $('.search_user').val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var url = creditPaginationUrl;
+
+        dynamicData = {}
+        dynamicData['page'] = 1;
+        dynamicData['q'] = searchData;
+        dynamicData['gid'] = group_id;
+        dynamicData['period'] = period;
+        dynamicData['month'] = month;
+        dynamicData['year'] = year; 
+        if(listSizeVal == '0'){
+          dynamicData['size'] = '10';
+        }else{
+          dynamicData['size'] = listSizeVal;
+        } 
+        if(searchData){
+            paginationData(dynamicData,creditSearchUrl,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+             .fail(); 
+
+        }else{
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+            .fail(); 
+
+        }
+  });
 
 });
 

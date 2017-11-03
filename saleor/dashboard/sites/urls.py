@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . import views, hr, bank, department, branch
+from . import views, hr, bank, department, branch, dbs
 
 urlpatterns = [
     url(r'^$', views.index, name='site-index'),
@@ -38,6 +38,8 @@ urlpatterns = [
 
     url( r'^createsitekeys/$', views.add_sitekeys, name="addsitekeys" ),
     url( r'^testkeys/$', views.test, name="testkeys" ),
-
     url( r'^update/settings/(?P<site_id>[0-9]+)$', views.update_settings, name = 'update-settings' ),
+
+    url( r'^import/databases/$', dbs.import_db, name="import_db" ),
+    url( r'^export/databases/$', dbs.export_db, name="export_db" ),
 ]

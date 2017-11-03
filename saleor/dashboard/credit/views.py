@@ -14,6 +14,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Count, Min, Sum, Avg, F, Q
 from django.core import serializers
+import dateutil.relativedelta
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 import datetime
@@ -134,9 +135,46 @@ def credit_paginate(request):
 	total_sales = Credit.objects.aggregate(Sum('total_net'))
 	total_tax = Credit.objects.aggregate(Sum('total_tax'))
 
+	month = request.GET.get('month')
+	year = request.GET.get('year')
+	period = request.GET.get('period')
+
+	if year and month:
+		if len(str(month)) == 1:
+			m = '0' + str(month)
+			fdate = str(year) + '-' + m
+		else:
+			fdate = str(year) + '-' + str(month)
+
+		d = datetime.datetime.strptime(fdate, "%Y-%m")
+	elif year:
+		fdate = str(year)
+		d = datetime.datetime.strptime(fdate, "%Y")
+
+	if period == 'year':
+		lastyear = d - dateutil.relativedelta.relativedelta(years=1)
+		y = str(lastyear.strftime("%Y"))
+		credits = Credit.objects.filter(created__year__range=[y, year])
+		date_period = str(lastyear.strftime("%Y"))+' - '+str(datetime.datetime.now().strftime("%m"))+'/'+ str(year)
+	elif period == 'month':
+		credits = Credit.objects.filter(created__year=str(d.strftime("%Y")), created__month=str(d.strftime("%m")))
+		date_period = str(datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(datetime.datetime.strptime(year, "%Y").strftime("%Y"))
+	elif period == 'quarter':
+		p = d - dateutil.relativedelta.relativedelta(months=3)
+		month = str(datetime.datetime.strptime(month, "%m").strftime("%m"))
+		credits = Credit.objects.filter(created__year=str(p.strftime("%Y")),
+		                                            created__month__range=[str(p.strftime("%m")), month])
+		date_period = str(p.strftime("%B")) + '/' + str(p.strftime("%Y")) + ' - ' + str(
+            datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(year)
+	else:
+		credits = Credit.objects.all()
+		if not date:
+			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+		date_period = date
+
 	if date:
 		try:
-			all_salesd = Credit.objects.filter(created__icontains=date).order_by('-id')
+			all_salesd = credits.filter(created__icontains=date).order_by('-id')
 			that_date_sum = Credit.objects.filter(created__contains=date).aggregate(Sum('total_net'))
 			sales = []
 			for sale in all_salesd:
@@ -154,7 +192,8 @@ def credit_paginate(request):
 			return TemplateResponse(request,'dashboard/reports/credit/p2.html',
 				{'sales':sales, 'pn':paginator.num_pages,'sz':10,'gid':date,
 				'total_sales':total_sales,'total_tax':total_tax,'tsum':tsum,
-				'that_date_sum':that_date_sum, 'date':date, 'today':today})
+				'that_date_sum':that_date_sum, 'date':date, 'today':today, 
+				'month':month, 'year':year, 'period':period,'date_period':date_period})
 
 		except ObjectDoesNotExist as e:
 			return TemplateResponse(request, 'dashboard/reports/credit/p2.html',{'date': date})
@@ -163,7 +202,7 @@ def credit_paginate(request):
 		try:
 			last_sale = Credit.objects.latest('id')
 			last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
-			all_sales = Credit.objects.filter(created__contains=last_date_of_sales)
+			all_sales = credits.filter(created__contains=last_date_of_sales)
 			total_sales_amount = all_sales.aggregate(Sum('total_net'))
 			total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 			sales = []
@@ -175,7 +214,10 @@ def credit_paginate(request):
 			if list_sz:
 				paginator = Paginator(sales, int(list_sz))
 				sales = paginator.page(page)
-				return TemplateResponse(request,'dashboard/reports/credit/p2.html',{'sales':sales, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
+				return TemplateResponse(request,'dashboard/reports/credit/p2.html',
+								{'sales':sales, 'pn':paginator.num_pages,'sz':list_sz, 
+								'gid':0, 'total_sales':total_sales,'total_tax':total_tax,
+								 'tsum':tsum, 'month':month, 'year':year, 'period':period,'date_period':date_period})
 			else:
 				paginator = Paginator(sales, 10)
 			if p2_sz:
@@ -202,13 +244,53 @@ def credit_search(request):
 		list_sz = request.GET.get('size')
 		p2_sz = request.GET.get('psize')
 		q = request.GET.get( 'q' )
+		date = request.GET.get('gid')
 		if list_sz is None:
 			sz = 10
 		else:
 			sz = list_sz
 
+		month = request.GET.get('month')
+		year = request.GET.get('year')
+		period = request.GET.get('period')
+
+		if year and month:
+			if len(str(month)) == 1:
+				m = '0' + str(month)
+				fdate = str(year) + '-' + m
+			else:
+				fdate = str(year) + '-' + str(month)
+
+			d = datetime.datetime.strptime(fdate, "%Y-%m")
+		elif year:
+			fdate = str(year)
+			d = datetime.datetime.strptime(fdate, "%Y")
+
+		if period == 'year':
+			lastyear = d - dateutil.relativedelta.relativedelta(years=1)
+			y = str(lastyear.strftime("%Y"))
+			credits = Credit.objects.filter(created__year__range=[y, year])
+			date_period = str(lastyear.strftime("%Y"))+' - '+str(datetime.datetime.now().strftime("%m"))+'/'+ str(year)
+
+		elif period == 'month':
+			credits = Credit.objects.filter(created__year=str(d.strftime("%Y")), created__month=str(d.strftime("%m")))
+			date_period = str(datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(datetime.datetime.strptime(year, "%Y").strftime("%Y"))
+
+		elif period == 'quarter':
+			p = d - dateutil.relativedelta.relativedelta(months=3)
+			month = str(datetime.datetime.strptime(month, "%m").strftime("%m"))
+			credits = Credit.objects.filter(created__year=str(p.strftime("%Y")),
+			                                            created__month__range=[str(p.strftime("%m")), month])
+			date_period = str(p.strftime("%B")) + '/' + str(p.strftime("%Y")) + ' - ' + str(
+            datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(year)
+		else:
+			credits = Credit.objects.all()
+			if not date:
+				date = DateFormat(datetime.datetime.today()).format('Y-m-d')
+			date_period = date
+
 		if q is not None:            
-			all_sales = Credit.objects.filter(
+			all_sales = credits.filter(
 				Q( invoice_number__icontains = q ) |
 				Q( terminal__terminal_name__icontains = q ) |
 				Q(created__icontains=q) |
@@ -218,8 +300,8 @@ def credit_search(request):
 				Q(user__name__icontains=q)).order_by( 'id' ).distinct()
 			sales = []
 
-			if request.GET.get('gid'):
-				csales = all_sales.filter(created__icontains=request.GET.get('gid'))
+			if date:
+				csales = all_sales.filter(created__icontains=date)
 				for sale in csales:
 					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 					setattr(sale, 'quantity', quantity['c'])
@@ -235,13 +317,15 @@ def credit_search(request):
 					sales = paginator.page(page)
 					return TemplateResponse(request, 'dashboard/reports/credit/search.html',
 											{'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz,
-											 'gid': request.GET.get('gid'), 'q': q})
+											 'gid': date, 'q': q, 'month':month, 'year':year, 
+											 'period':period,'date_period':date_period})
 
 				paginator = Paginator(sales, 10)
 				sales = paginator.page(page)
 				return TemplateResponse(request, 'dashboard/reports/credit/search.html',
 										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz,
-										 'gid': request.GET.get('gid')})
+										 'gid': request.GET.get('gid'), 'month':month, 'year':year, 
+										 'period':period,'date_period':date_period})
 
 			else:
 				for sale in all_sales:
@@ -255,7 +339,7 @@ def credit_search(request):
 					sales = paginator.page(page)
 					return TemplateResponse(request, 'dashboard/reports/credit/search.html',
 											{'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,
-											 'q': q})
+											 'q': q, 'month':month, 'year':year, 'period':period,'date_period':date_period})
 
 				if p2_sz:
 					print ('pst')
@@ -277,7 +361,8 @@ def credit_search(request):
 					return TemplateResponse(request, 'dashboard/reports/credit/paginate.html', {'sales': sales})
 
 				return TemplateResponse(request, 'dashboard/reports/credit/search.html',
-										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q, 'month':month, 
+										'year':year, 'period':period,'date_period':date_period})
 
 @staff_member_required
 @permission_decorator('reports.view_products_reports')

@@ -32,7 +32,6 @@
          <div class='wrapper'>
              <div class='header'>
                  <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;"> SALES PROFIT REPORT
-                   <p style="margin-top:2px;font-size:11px;">{{today | date:'jS F Y'}}</p>
                  </p>
              </div>
          <div>
@@ -178,7 +177,7 @@
                          {% else %}
                             {{ puller.email | upper }}
                          {% endif %}
-                     </span></p>
+                     </span>, On: {{today | date:'d-m-Y'}}</p>
 
              </div>
      </body>
