@@ -39,7 +39,7 @@
                     <ul class="nav nav-tabs nav-tabs-highlight"  style="margin-bottom:0px;">
                       <li class="active"><a href="#basic" data-toggle="tab">Basic Settings</a></li>
                       <li><a href="#sms" data-toggle="tab" disabled>Communications</a></li>
-                     <!--  <li><a href="#sales" data-toggle="tab">Sales</a></li>  -->                   
+                      <li><a href="#db" data-toggle="tab">Databases</a></li>                    
                     </ul>
 
                     <div class="tab-content" style="margin-bottom:0px;">
@@ -52,6 +52,12 @@
                       <div class="tab-pane fade" id="sms">
                        <!--  products -->
                        {% include "dashboard/sites/_sms_config.html" with form=form %}
+                        <!-- ./products -->
+                      </div>
+
+                      <div class="tab-pane fade" id="db">
+                       <!--  products -->
+                       {% include "dashboard/sites/_db.html" with form=form %}
                         <!-- ./products -->
                       </div>
 
@@ -76,7 +82,9 @@ $( document ).ready(function() {
   $( "label" ).addClass( "text-bold" );
 });
 </script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/pages/form_inputs.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/anytime.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/picker_date.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/site-settings.js' %}"></script>
@@ -88,5 +96,41 @@ $( document ).ready(function() {
         format:'HH:i A',
         formatSubmit:'HH:i A'
     });
+
+    $(document).ready(function(){
+        $('.import_btn').on('click', function(){
+          var f = document.getElementById('database-form');
+          var formData = new FormData(f);
+
+          var file = $('.db')[0].files[0];
+          var filename = $('.db').val();
+
+          if(file){
+            formData.append("db", file);
+
+            var fileExtension = ['json'];
+            if ($.inArray(filename.split('.').pop().toLowerCase(), fileExtension) == -1) {
+                alert("Only formats are allowed : "+fileExtension.join(', '));
+            }
+            
+            var extension = $('.db').val().replace(/^.*\./, '');
+            $.ajax({
+                url: "{% url 'dashboard:import_db' %}",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                success: function(data){
+                    alert(data);
+                }
+            });
+          }else{
+            alert('please choose a file')
+          }
+        });
+});
+
 </script>
 {% endblock %}

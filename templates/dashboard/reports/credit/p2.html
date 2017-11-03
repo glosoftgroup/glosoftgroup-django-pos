@@ -4,6 +4,9 @@
       <div class="panel panel-flat">
       <div class="panel-body">
         <div class="row">
+          {% if date_period %}
+            <h5 class=" text-center">{{date_period}}</h5>
+          {% endif %}
           <div class="col-md-12">
             <div class="table-responsive">
                 <table class="table  datatable-header-footer table-hover">
@@ -129,18 +132,24 @@
             lastClass: 'last',
             firstClass: 'first',
             }).on("page", function(event, num){
-                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}'); 
-                var gid = '{{gid}}';
-                if(gid == 0){
-                    $.get(creditPaginateUrl,{page:num, psize:'{{sz}}'},function(data){
-                      $('#p-tb').html(data);
-                      console.log('without gid '+data);
-                    });
-                }else{
-                    $.get(creditPaginateUrl,{page:num, psize:'{{sz}}',gid:'{{gid}}'},function(data){
-                       $('#p-tb').html(data);
-                    });
+              $(".pages-nav2").html("Page " + num +" of "+'{{pn}}');
+                dynamicData = {};
+                dynamicData['page'] = num;
+                dynamicData['q'] = '{{q}}';
+                dynamicData['psize'] = '{{sz}}';
+                dynamicData['period'] = '{{period}}';
+                dynamicData['month'] = '{{month}}';
+                dynamicData['year'] = '{{year}}';
+                
+                if('{{gid}}' != 0){
+                    dynamicData['gid'] = '{{gid}}';
                 }
+
+                paginationData(dynamicData,creditPaginateUrl,'GET')
+                    .done(function(data){
+                        $('#p-tb').html(data);
+                    })
+                    .fail();
 
         }).children('.pagination').addClass('pagination-flat pagination-sm')
 
@@ -193,36 +202,69 @@
    });
 
     //**@ display size select
-     $('.list-sz').selectpicker().on('change', function(){
+     $('.list-sz').selectpicker().on('change', function(){   
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
-        var date = $('.daterange-single').val();
+        var date = $('.date-month').val();
         var url = creditPaginationUrl;
         var paginationUrl = creditPaginationUrl;
         var scategory = $('.sales-category').find(":selected").val();
         dynamicData = {}
+
+        var period = $('.period-sz').find(":selected").val();
+        var month = $('.hidden-month').val();
+        var year = $('.hidden-year').val();
+
+        if(!$('.hidden-format').val()){
+          $('.hidden-format').val('yyyy-mm-dd');
+        }
+
+        if($('.hidden-format').val() == 'yyyy-mm-dd'){
+           if(!date){
+              date = null;
+           }
+        }else if($('.hidden-format').val() == 'yyyy'){
+            var date = null;
+            month = null;
+        }else{
+           var date = null;
+        }
+
         dynamicData['page'] = 1;
         dynamicData['q'] = searchData;
         dynamicData['gid'] = date;
+        dynamicData['period'] = period;
+        dynamicData['month'] = month;
+        dynamicData['year'] = year;
         if(listSizeVal == '0'){
           dynamicData['size'] = '10';
         }else{
           dynamicData['size'] = listSizeVal;
         } 
-        paginationData(dynamicData,url,'GET').
-         done(function(data){
-          $('#pagination-div').html(data);
-         })
-         .fail();        
+        if(searchData){
+            paginationData(dynamicData,creditSearchUrl,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+             .fail(); 
+
+        }else{
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+            .fail(); 
+
+        }     
 
      });
    
-   <!--{% if sz %}-->
-   <!--$.when( $.ready ).then(function() {     -->
-         <!--$('.bootstrap-select').selectpicker();-->
-         <!--$('.list-sz').selectpicker('val', ["{{sz}}"]);              -->
-      <!--});-->
-  <!--{% endif %}-->
+   {% if sz %}
+   $.when( $.ready ).then(function() {
+         $('.bootstrap-select').selectpicker();
+         $('.list-sz').selectpicker('val', ["{{sz}}"]);
+      });
+   {% endif %}
 
 
  </script>

@@ -3,6 +3,9 @@
 {% load humanize %}
       <div class="panel panel-flat">
           <div class="panel-body">
+          {% if date_period %}
+            <h5 class=" text-center">{{date_period}}</h5>
+          {% endif %}
         <div class="table-responsive">
          
                 <table class="table  datatable-header-footer table-hover">
@@ -129,17 +132,23 @@
             firstClass: 'first',
             }).on("page", function(event, num){
                 $(".pages-nav2").html("Page " + num +" of "+'{{pn}}');
-
-                var gid = '{{gid}}';
-                if(gid == 0){
-                    $.get(creditSearchUrl,{page:num, psize:'{{sz}}', q:'{{q}}'},function(data){
-                      $('#p-tb').html(data);
-                    });
-                }else{
-                    $.get(creditSearchUrl,{page:num, psize:'{{sz}}', q:'{{q}}', gid:'{{gid}}'},function(data){
-                       $('#p-tb').html(data);
-                    });
+                dynamicData = {};
+                dynamicData['page'] = num;
+                dynamicData['q'] = '{{q}}';
+                dynamicData['psize'] = '{{sz}}';
+                dynamicData['period'] = '{{period}}';
+                dynamicData['month'] = '{{month}}';
+                dynamicData['year'] = '{{year}}';
+                
+                if('{{gid}}' != 0){
+                    dynamicData['gid'] = '{{gid}}';
                 }
+
+                paginationData(dynamicData,creditSearchUrl,'GET')
+                    .done(function(data){
+                        $('#p-tb').html(data);
+                    })
+                    .fail();
 
         }).children('.pagination').addClass('pagination-flat pagination-sm')
 
@@ -198,89 +207,62 @@
      $('.list-sz').selectpicker().on('change', function(){
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
-        var date = $('.daterange-single').val();
+        var date = $('.date-month').val();
         var url = creditPaginationUrl;
+        var paginationUrl = creditPaginationUrl;
         var scategory = $('.sales-category').find(":selected").val();
+        dynamicData = {}
 
-        if((scategory == 'list' && date && searchData)){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(scategory == 'list' && searchData){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:listSizeVal},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, q:searchData, size:10},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(scategory == 'list' && date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }
-        }else if(((scategory && scategory != 'list' && scategory != 'none') && (!searchData && !date)) || (scategory && scategory != 'list' && scategory != 'none' && date)){
-           console.log('nothinh')
-        }else if(searchData && date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
-        }else if(searchData){
-            if(listSizeVal != '0'){
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:listSizeVal, q:searchData},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:url, type: 'GET',data: {page:1, size:10, q:searchData},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
-        }else if(date){
-            if(listSizeVal != '0'){
-               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-            }else{
-               $.ajax({ url:creditPaginateUrl, type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
-                          $('#pagination-div').html(data);
-                }});
-             }
-        }else{
-           if(listSizeVal != '0'){
-               $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
-                  $('#pagination-div').html(data);
-              }});
-           }else{
-                $.ajax({ url: creditPaginateUrl,type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
-                      $('#pagination-div').html(data);
-                }});
+        var period = $('.period-sz').find(":selected").val();
+        var month = $('.hidden-month').val();
+        var year = $('.hidden-year').val();
+
+        if(!$('.hidden-format').val()){
+          $('.hidden-format').val('yyyy-mm-dd');
+        }
+
+        if($('.hidden-format').val() == 'yyyy-mm-dd'){
+           if(!date){
+              date = null;
            }
-       }
+        }else if($('.hidden-format').val() == 'yyyy'){
+            var date = null;
+            month = null;
+        }else{
+           var date = null;
+        }
 
+        dynamicData['page'] = 1;
+        dynamicData['q'] = searchData;
+        dynamicData['gid'] = date;
+        dynamicData['period'] = period;
+        dynamicData['month'] = month;
+        dynamicData['year'] = year;
+        if(listSizeVal == '0'){
+          dynamicData['size'] = '10';
+        }else{
+          dynamicData['size'] = listSizeVal;
+        } 
+        if(searchData){
+            paginationData(dynamicData,creditSearchUrl,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+             .fail(); 
+
+        }else{
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+            .fail(); 
+
+        }
      });
-   <!--{% if sz %}-->
-   <!--$.when( $.ready ).then(function() {     -->
-         <!--$('.bootstrap-select').selectpicker();-->
-         <!--$('.list-sz').selectpicker('val', ["{{sz}}"]);              -->
-      <!--});-->
-  <!--{% endif %}-->
+   {% if sz %}
+   $.when( $.ready ).then(function() {
+         $('.bootstrap-select').selectpicker();
+         $('.list-sz').selectpicker('val', ["{{sz}}"]);
+    });
+  {% endif %}
  </script>
