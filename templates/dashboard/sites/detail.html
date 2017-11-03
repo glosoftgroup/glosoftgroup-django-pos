@@ -24,6 +24,7 @@
 {% endblock %}
 
 {% block custom_css %}
+<link href="{% static 'backend/js/plugins/ladda/ladda-themeless.min.css' %}" rel="stylesheet" type="text/css">
 <style type="text/css">
   .error {
         color: #ff5722;
@@ -86,6 +87,8 @@ $( document ).ready(function() {
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/form_inputs.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/anytime.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ladda/spin.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ladda/ladda.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/picker_date.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/site-settings.js' %}"></script>
 <script type="text/javascript">
@@ -98,38 +101,70 @@ $( document ).ready(function() {
     });
 
     $(document).ready(function(){
-        $('.import_btn').on('click', function(){
-          var f = document.getElementById('database-form');
-          var formData = new FormData(f);
+        $('.import_btn').on('click', function(e){
+            e.preventDefault();
+            var l = Ladda.create(this);
+            l.start();
+            var f = document.getElementById('database-form');
+            var formData = new FormData(f);
 
-          var file = $('.db')[0].files[0];
-          var filename = $('.db').val();
+            var file = $('.db')[0].files[0];
+            var filename = $('.db').val();
 
-          if(file){
-            formData.append("db", file);
+            if(file){
+                formData.append("db", file);
 
-            var fileExtension = ['json'];
-            if ($.inArray(filename.split('.').pop().toLowerCase(), fileExtension) == -1) {
-                alert("Only formats are allowed : "+fileExtension.join(', '));
-            }
-            
-            var extension = $('.db').val().replace(/^.*\./, '');
-            $.ajax({
-                url: "{% url 'dashboard:import_db' %}",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                method: 'POST',
-                type: 'POST',
-                success: function(data){
-                    alert(data);
+                var fileExtension = ['json'];
+                if ($.inArray(filename.split('.').pop().toLowerCase(), fileExtension) == -1) {
+                  l.stop();
+                  alertNotificatio("Only formats are allowed : "+fileExtension.join(', '), 'Note!', 'info');
+                  return false
                 }
-            });
-          }else{
-            alert('please choose a file')
-          }
+                
+                var extension = $('.db').val().replace(/^.*\./, '');
+                $.ajax({
+                    url: "{% url 'dashboard:import_db' %}",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'POST',
+                    type: 'POST',
+                    success: function(data){
+                        l.stop();
+                        data == 'success' ? alertNotificatio(data, 'Success!', 'success') : alertNotificatio('Error Backing Up', 'Error!', 'danger');
+                    },error: function(){
+                        l.stop();
+                        alertNotificatio('Error Backing Up', 'Error!', 'danger');
+                    }
+                });
+              }else{
+                l.stop();
+                alertNotificatio('Please Choose a File', 'Error!', 'danger');
+              }
+              return false;
         });
+
+        $('.export_btn').on('click', function(e){
+            e.preventDefault();
+            var l = Ladda.create(this);
+            l.start();
+            $.get("{% url 'dashboard:export_db' %}", function(data){
+                l.stop();
+                alertNotificatio(data, 'Success!', 'success')
+            }).fail(function(response) {
+                l.stop();
+                alertNotificatio('Error Backing Up', 'Error!', 'danger')
+            });
+            return false;
+        });
+
+        function alertNotificatio(message, header, theme){
+            $.jGrowl(message, {
+                header: header,
+                theme: 'bg-'+theme
+            });
+        }
 });
 
 </script>

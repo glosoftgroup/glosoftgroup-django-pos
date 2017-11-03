@@ -2,22 +2,29 @@
 <div class="row">
       <div class="panel-body">
         <form method="post" id="database-form" enctype="multipart/form-data" novalidate>
-          <div class=" col-md-6 col-md-offset-3 ard-content-form">
+          <div class=" col-md-6">
+            <div class=" col-md-12">
             {% csrf_token %}
-            <label>Choose your dabase file to import</label>
+            <label style="margin-bottom:15px;">IMPORT DATABASE</label>
             <div class="form-group">
                   <input type="file" class="file-styled db" accept=".json" name="file">
                   <input type="hidden" class="import_url" val="{% url 'dashboard:import_db' %}">
               </div>
-              <label>click below to export your database</label>
+              
               <div class="form-group">
-                <button type="button" class="btn bg-pink-400 btn-block import_btn">Import Database <i class="icon-circle-right2 position-right"></i></button>
-              </div>
+                <button type="button" class="btn bg-pink-400 btn-block import_btn ladda-button" data-style="expand-right">Import Database <i class="icon-circle-right2 position-right"></i></button>
+              </div> 
+              </div>    
+          </div> 
+          <div class=" col-md-6 ard-content-form">
+            <div class=" col-md-8 col-md-offset-2">
+              <label style="margin-bottom:15px;">DATABASE BACKUP</label>
+              <div class="form-group">
+                <button type="button" class="btn bg-primary btn-block export_btn ladda-button" data-style="expand-right">Export Database <i class="icon-circle-right2 position-right"></i></button>
+              </div> 
+            </div>
+          </div>
 
-              <div class="form-group">
-                <button type="button" class="btn bg-primary-400 btn-block export_btn">Export Database <i class="icon-circle-right2 position-right"></i></button>
-              </div>      
-          </div>          
         </form>
       </div>
     </div>
