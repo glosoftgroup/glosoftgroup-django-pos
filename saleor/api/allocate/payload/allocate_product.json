@@ -1,7 +1,7 @@
 {
   "id": 4,
   "user": 1,
-  "invoice_number": "sdfei",
+  "invoice_number": "TestInvoice",
   "total_net": "1000.00",
   "sub_total": "1234.00",
   "balance": "12345.00",
@@ -10,11 +10,11 @@
   "allocated_items": [
     {
       "order": 1,
-      "sku": "Engine8-24-2x",
-      "quantity": 1,
+      "sku": "60-1337",
+      "allocated_quantity": 10,
       "unit_cost": "90.00",
       "total_cost": "90.00",
-      "product_name": "unga (Weight: 1Kg)",
+      "product_name": "Martin PLC (60-1337) ",
       "product_category": "Flour",
       "tax": 16,
       "discount": 200

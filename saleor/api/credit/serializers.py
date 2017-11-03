@@ -16,7 +16,11 @@ from ...sale.models import (
             SoldItem,
             Terminal,
             )
-from ...credit.models import Credit, CreditedItem
+from ...credit.models import (
+            Credit,
+            CreditedItem,
+            CreditHistoryEntry
+            )
 from ...site.models import SiteSettings
 from ...product.models import (
             Product,
@@ -179,7 +183,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                     raise ValidationError('customer is not creditable')
             else:
                 customer = Customer.objects.get(name=validated_data.get('customer_name'))
-        except:
+        except Exception as e:
             name = validated_data.get('customer_name')
             if validated_data.get('mobile') and validated_data.get('customer_name'):
                 mobile = validated_data.get('mobile')
@@ -213,6 +217,16 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                                      debt=validated_data.get('debt'),
                                      due_date=validated_data.get('due_date'),
                                      customer_name=validated_data.get('customer_name'))
+
+        # add credit history
+        try:
+            history = CreditHistoryEntry()
+            history.credit = credit
+            history.amount = validated_data.get('total_net')
+            history.save()
+        except Exception as e:
+            print(e)
+
         for solditem_data in solditems_data:
             CreditedItem.objects.create(credit=credit,**solditem_data)           
             try:
@@ -222,7 +236,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                     print stock.quantity
                 else: 
                     print 'stock not found'
-            except:
+            except Exception as e:
                 print 'Error reducing stock!'
             
                 
@@ -317,7 +331,16 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         instance.mobile = validated_data.get('mobile', instance.mobile)   
         
         instance.customer_name = validated_data.get('customer_name', instance.customer_name)
-        instance.save()        
+        instance.save()
+
+        # add credit history
+        try:
+            history = CreditHistoryEntry()
+            history.credit = instance
+            history.amount = Decimal(validated_data.get('amount_paid'))
+            history.save()
+        except Exception as e:
+            print(e)
         return instance
 
 

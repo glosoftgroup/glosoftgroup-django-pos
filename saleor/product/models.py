@@ -431,7 +431,10 @@ class StockManager(models.Manager):
 
     def decrease_stock(self, stock, quantity):
         stock.quantity = F('quantity') - quantity
-        #stock.quantity_allocated = F('quantity_allocated') - quantity
+        stock.save(update_fields=['quantity', 'quantity_allocated'])
+
+    def increase_stock(self, stock, quantity):
+        stock.quantity = F('quantity') + quantity
         stock.save(update_fields=['quantity', 'quantity_allocated'])
 
     def get_low_stock(self):

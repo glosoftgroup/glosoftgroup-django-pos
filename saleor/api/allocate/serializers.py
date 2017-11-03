@@ -37,6 +37,7 @@ class TrackSerializer(serializers.ModelSerializer):
                 'id',
                 'order',
                 'sku',
+                'allocated_quantity',
                 'quantity',
                 'unit_cost',
                 'total_cost',
@@ -79,7 +80,7 @@ class ItemsSerializer(serializers.ModelSerializer):
 
 
 class AllocateListSerializer(serializers.ModelSerializer):
-    url = HyperlinkedIdentityField(view_name='product-api:sales-details')
+    update_url = HyperlinkedIdentityField(view_name='allocate-api:update-allocate')
     allocated_items = ItemsSerializer(many=True)
     cashier = SerializerMethodField()
     class Meta:
@@ -89,12 +90,11 @@ class AllocateListSerializer(serializers.ModelSerializer):
                  'invoice_number',
                  'total_net',
                  'sub_total',                 
-                 'url',
+                 'update_url',
                  'balance',
                  'terminal',
                  'amount_paid',
-                 'allocated_items',
-                 'customer',
+                 'agent',
                  'mobile',
                  'customer_name',
                  'cashier',
@@ -103,6 +103,7 @@ class AllocateListSerializer(serializers.ModelSerializer):
                  'discount_amount',
                  'due_date',
                  'debt',
+                 'allocated_items',
                 )
 
     def get_cashier(self,obj):
@@ -111,7 +112,7 @@ class AllocateListSerializer(serializers.ModelSerializer):
 
 
 class CreateAllocateSerializer(serializers.ModelSerializer):
-    url = HyperlinkedIdentityField(view_name='product-api:sales-details')
+    update_url = HyperlinkedIdentityField(view_name='allocate-api:update-allocate')
     allocated_items = TrackSerializer(many=True)
 
     class Meta:
@@ -121,11 +122,10 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                  'invoice_number',
                  'total_net',
                  'sub_total',                 
-                 'url',
+                 'update_url',
                  'balance',
                  'terminal',
                  'amount_paid',
-                 'allocated_items',
                  'agent',
                  'mobile',
                  'customer_name',
@@ -134,6 +134,7 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                  'discount_amount',
                  'due_date',
                  'debt',
+                 'allocated_items',
                 )
 
     def validate_total_net(self,value):
@@ -182,13 +183,12 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
             try:
                 stock = Stock.objects.get(variant__sku=solditem_data['sku'])
                 if stock:                
-                    Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
+                    Stock.objects.decrease_stock(stock,solditem_data['allocated_quantity'])
                     print stock.quantity
                 else: 
                     print 'stock not found'
             except:
                 print 'Error reducing stock!'
-            
                 
         return credit
 
@@ -212,24 +212,6 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
                  'allocated_items',
                  )       
     
-    def validate_status(self,value):        
-        data = self.get_initial()
-        status = str(data.get('status'))        
-        if status == 'fully-paid' or status == 'payment-pending':
-            status = status 
-            invoice_number = data.get('invoice_number')      
-            amount_paid = Decimal(data.get('amount_paid'))
-            total_net = Decimal(data.get('total_net'))
-            balance = Decimal(data.get('balance'))            
-            sale = Allocate.objects.get(invoice_number=str(invoice_number))
-            if status == 'fully-paid' and sale.balance > amount_paid:
-                print 'balance '+str(sale.balance)
-                print 'amount '+str(amount_paid)
-                raise ValidationError("Status error. Amount paid is less than balance.")        
-            else:
-                return value
-        else:
-            raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')        
 
     def validate_total_net(self,value):
         data = self.get_initial()        
@@ -268,7 +250,18 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
         
 
     def update(self, instance, validated_data):
-        terminal = Terminal.objects.get(pk=self.terminal_id)    
+        terminal = Terminal.objects.get(pk=self.terminal_id)
+        for x in validated_data.get('allocated_items'):
+            old = instance.item_detail(x['sku'])
+            unsold = old.allocated_quantity - x['quantity']
+            old.quantity = x['quantity']
+            old.save()
+            stock = Stock.objects.get(variant__sku=x['sku'])
+            if stock:
+                Stock.objects.increase_stock(stock, unsold)
+                print stock.quantity
+            else:
+                print 'stock not found'
 
         terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))       
         terminal.save()        

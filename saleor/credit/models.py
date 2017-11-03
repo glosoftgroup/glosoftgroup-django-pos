@@ -170,3 +170,38 @@ class CreditedItem(models.Model):
     def __str__(self):
         return self.product_name
 
+
+@python_2_unicode_compatible
+class CreditHistoryEntry(models.Model):
+    date = models.DateTimeField(
+        pgettext_lazy('Credit history entry field', 'last history change'),
+        default=now, editable=False)
+    credit = models.ForeignKey(
+        Credit, related_name='credit_history',
+        verbose_name=pgettext_lazy('Credit history entry field', 'order'))
+    amount = models.DecimalField(
+        pgettext_lazy('Credit history entry field', 'amount cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+
+    comment = models.CharField(
+        pgettext_lazy('Credit history entry field', 'comment'),
+        max_length=100, default='', blank=True)
+    crud = models.CharField(
+        pgettext_lazy('Credit history entry field', 'crud'),
+        max_length=30, default='', blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        verbose_name=pgettext_lazy('Credit history entry field', 'user'))
+
+    class Meta:
+        ordering = ('date',)
+        verbose_name = pgettext_lazy(
+            'Credit history entry model', 'Credit history entry')
+        verbose_name_plural = pgettext_lazy(
+            'Credit history entry model', 'Credit history entries')
+
+    def __str__(self):
+        return pgettext_lazy(
+            'Credit history entry str',
+            'CreditHistoryEntry for terminal #%d') % self.terminal.pk
+
+
