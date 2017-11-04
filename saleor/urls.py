@@ -21,6 +21,7 @@ from .api.product.urls import urlpatterns as api_urls
 from .api.settings.urls import urlpatterns as api_settings_urls
 from .api.sms.urls import urlpatterns as api_sms_urls
 from .api.terminal.urls import urlpatterns as api_terminal_urls
+from .api.user.urls import urlpatterns as api_user_urls
 from .api.variant.urls import urlpatterns as api_variant_urls
 from .cart.urls import urlpatterns as cart_urls
 from .checkout.urls import urlpatterns as checkout_urls
@@ -57,6 +58,7 @@ urlpatterns = [
     url(r'^api/settings/', include(api_settings_urls, namespace='settings-api')),
     url(r'^api/sms/', include(api_sms_urls, namespace='terminal-api')),
     url(r'^api/terminal/', include(api_terminal_urls, namespace='terminal-api')),
+    url(r'^api/user/', include(api_user_urls, namespace='user-api')),
     url(r'^api/variant/', include(api_variant_urls, namespace='variant-api')),
     url(r'^cart/', include(cart_urls, namespace='cart')),
     url(r'^checkout/', include(checkout_urls, namespace='checkout')),

@@ -131,9 +131,6 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                  'customer_name',
                  'status',
                  'total_tax',
-                 'discount_amount',
-                 'due_date',
-                 'debt',
                  'allocated_items',
                 )
 
@@ -175,8 +172,7 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                                      agent=validated_data.get('agent'),
                                      status='payment-pending',
                                      mobile=validated_data.get('mobile'),
-                                     debt=validated_data.get('debt'),
-                                     due_date=validated_data.get('due_date'),
+                                     debt=validated_data.get('total_net'),
                                      customer_name=validated_data.get('customer_name'))
         for solditem_data in solditems_data:
             AllocatedItem.objects.create(allocate=credit,**solditem_data)

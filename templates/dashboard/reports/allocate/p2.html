@@ -17,10 +17,10 @@
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
                           <th>Status</th>
-                          <th>Customer</th>
-                          <th>Cashier</th>           
-                          <th>Quantity</th>
-                          <th>Discount</th>
+                          <th>Agent</th>
+                          <th>Cashier</th>
+                          <th>Allocated</th>
+                          <th>Sold</th>
                           <th>Total Sales (KShs)</th>
                         </tr>
                       </thead>
@@ -28,26 +28,29 @@
                         {% if sales %}
                         {% for sale in sales %}
                           <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|timesince}}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                            <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
+                              <!--date-->
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{{sale.created}}</td>
+                              <!--receipt-->
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{{sale.invoice_number }}</td >
+                              <!--status-->
+                            <td class="td text-center" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">
                             {% if sale.is_fully_paid %}
                             <span class="text-success  icon-checkmark-circle"><i></i></span>
                             {% else %}
                             <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
                             {% endif %}
                             </td>
-                              <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+                              <!--agent-->
+                              <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{% if sale.agent %}{{sale.agent}}{% else %} -- {% endif %}</td>
+                              <!--cashier-->
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                              <!--allocated-->
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{{sale.allocated_quantity}}</td>
+                              <!--sold-->
                             <td>
-                            {% if sale.discount_amount %}
-                            {{sale.discount_amount}}
-                            {% else %}
-                            --
-                            {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                                {{sale.quantity}}
+                            </td>
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
@@ -129,8 +132,8 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
  <script type="text/javascript">
-  var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
-  var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
+  var creditSearchUrl = "{% url 'dashboard:allocate_search' %}";
+  var creditPaginateUrl = "{% url 'dashboard:allocate_paginate' %}";
    $(document).ready(function(){
 
        $(".td").click(function(){

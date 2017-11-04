@@ -6,13 +6,13 @@
 {% load humanize %}
 
 {% block title %}
-  Credit Sales Report
+  Products Transfer Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:credit_list' %}">Credit Sales Reports</a></li>
+     <li class="active"><a href="{% url 'dashboard:allocate_list' %}">Product Transfer Report</a></li>
  {% endblock %}
 
-{% block menu_creditreport_class %}active{% endblock %}
+{% block menu_allocatereport_class %}active{% endblock %}
  {% block custom_css %}
  <link href="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet" type="text/css">
 <style type="text/css">
@@ -41,7 +41,7 @@
      
         <div class="panel-body search-panel">
             <div class="col-md-4">
-             <label>Search Credit Sales (for date format: yyyy-mm-dd)</label>
+             <label>Search (for date format: yyyy-mm-dd)</label>
               <div class="form-group form-group-material has-feedback">
                 <input class="form-control search_user" placeholder="Search details" type="text">
                 <div class="form-control-feedback">
@@ -123,10 +123,10 @@
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
                           <th>Status</th>
-                          <th>Customer Name</th>
+                          <th>Agent</th>
                           <th>Cashier</th>        
-                          <th>Quantity</th>
-                          <th>Discount</th>
+                          <th>Allocated</th>
+                          <th>Sold</th>
                           <th>Total Sales (KShs)</th>
                         </tr>
                       </thead>
@@ -134,26 +134,29 @@
                         {% if sales %}
                         {% for sale in sales %}
                           <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|timesince}}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td >
-                            <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
+                              <!--date-->
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{{sale.created}}</td>
+                              <!--receipt-->
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{{sale.invoice_number }}</td >
+                              <!--status-->
+                            <td class="td text-center" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">
                             {% if sale.is_fully_paid %}
                             <span class="text-success  icon-checkmark-circle"><i></i></span>
                             {% else %}
                             <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
                             {% endif %}
                             </td>
-                              <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
-                            
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+                              <!--agent-->
+                              <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{% if sale.agent %}{{sale.agent}}{% else %} -- {% endif %}</td>
+                              <!--cashier-->
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                              <!--allocated-->
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{{sale.allocated_quantity}}</td>
+                              <!--sold-->
                             <td>
-                            {% if sale.discount_amount %}
-                            {{sale.discount_amount}}
-                            {% else %}
-                            --
-                            {% endif %}</td>
-                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                                {{sale.quantity}}
+                            </td>
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
@@ -209,13 +212,9 @@
           {% if sales %}
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
-                 <p class="text-center" style="margin: 20px 0px;">
-                  
-                   Total Credit Sales: Kshs {{total_sales_amount.total_net__sum}}<br />
-                   
-                 </p>
+
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by  {% if request.user.name %}
+                  <span>Report pulled by  {% if request.user.name %}
                         {{request.user.name}}
                       {% else %}
                       {{ request.user.email}}
@@ -246,8 +245,8 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/js/bootstrap-datepicker.min.js' %}"></script>
 <script type="text/javascript">
-var creditPaginationUrl = "{% url 'dashboard:credit_paginate' %}";
-var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
+var creditPaginationUrl = "{% url 'dashboard:allocate_paginate' %}";
+var creditSearchUrl = "{% url 'dashboard:allocate_search' %}";
 var categoryChartUrl = "{% url 'dashboard:sales_category_chart' %}";
 var productChartUrl = "{% url 'dashboard:sales_product_chart' %}";
 var userChartUrl = "{% url 'dashboard:sales_user_chart' %}";
@@ -303,7 +302,7 @@ $(document).ready(function(){
             var searchData = $('.search_user').val();
             var listSizeVal = $('.list-sz').find(":selected").val();
             var date = $('.date-month').val();
-            var url = "{% url 'dashboard:reports_credit_list_pdf' %}";
+            var url = "{% url 'dashboard:reports_allocate_list_pdf' %}";
 
             var period = $('.period-sz').find(":selected").val();
             var month = $('.hidden-month').val();

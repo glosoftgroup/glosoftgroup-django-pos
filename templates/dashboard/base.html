@@ -430,6 +430,11 @@
                           <a href="{% url 'dashboard:credit_list' %}"><i class='icon-width'></i>Credit Sales</a>
                         </li>
                       {% endif %}
+                       {% if perms.reports.view_sale_reports %}
+                        <li class="{% block menu_allocatereport_class %}{% endblock %}">
+                          <a href="{% url 'dashboard:allocate_list' %}"><i class='icon-width'></i>Product Transfer</a>
+                        </li>
+                      {% endif %}
                       {% if perms.reports.view_sale_reports %}
                         <li class="{% block menu_report_summary_class %}{% endblock %}">
                           <a href="{% url 'dashboard:sales_date_chart' %}"><i class='icon-list-unordered'></i>Sales Summary</a>
