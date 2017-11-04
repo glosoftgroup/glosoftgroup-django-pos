@@ -64,7 +64,6 @@ oauthlib==2.0.1
 packaging==16.8
 pbr==1.10.0
 Pillow==3.4.2
-pkg-resources==0.0.0
 premailer==3.0.1
 prices==0.5.8
 promise==1.0.0

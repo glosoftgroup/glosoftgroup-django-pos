@@ -5,7 +5,7 @@
 {% load default_user_image %}
 
 {% block title %}
-  {% trans "Customers Reports" context "Dashboard customer list" %} - {{ block.super }}
+  {% trans "Customer Reports" context "Dashboard customer list" %} - {{ block.super }}
 {% endblock %}
 
 {% block menu_creditCustomer_class %}active{% endblock %}
@@ -65,7 +65,7 @@
               <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                     <thead>
                       <tr class="bg-primary">
-                        <th>Id</th>                 
+
                         <th>Customer</th>          
                         <th>Status</th>           
                         <th>Last Credit Sale</th>   
@@ -79,29 +79,29 @@
                      {% if users %}
                       {% for user in users%}
                       <tr class='clickable-row' id="{{user.customer.pk }}">
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">{{ forloop.counter }}</td>
+
                         <!-- name -->
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">{{user.customer.name}}
+                        <td class="td" data-href="{% url 'dashboard:credit_history' credit_pk=user.pk %}">{{user.customer.name}}
                         <div class="text-size-small text-muted">
                           <i class="icon-mobile3"></i>{{user.customer.mobile}}
                         </div>
-                        </td>                       
+                        </td>
                         <td>
                           {% if sale.is_fully_paid %}
                             <span class="text-success  icon-checkmark-circle"><i></i></span>
                             {% else %}
                             <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
                             {% endif %}
-                        </td>                      
+                        </td>
                         <!-- created -->
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">
-                        
+                        <td class="td" data-href="{% url 'dashboard:credit_history' credit_pk=user.pk %}">
+
                          {% if user.created %}
                     {{user.created|timesince}} ago
                      {% endif %}
                         </td>
                        <!-- due date -->
-                        <td class="td" data-href="{% url 'dashboard:customer-detail' pk=user.customer.pk %}">
+                        <td class="td" data-href="{% url 'dashboard:credit_history' credit_pk=user.pk %}">
                        {{user.due_date}}
                         </td>
                         <!-- is due -->
