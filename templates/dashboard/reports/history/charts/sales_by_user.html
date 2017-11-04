@@ -1,0 +1,431 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  Sales Report
+{% endblock %}
+
+{% block breadcrumbs %}
+     <li><a href="{% url 'dashboard:sales_user_chart' %}">Sales User Chart</a></li>
+ {% endblock %}
+
+{% block menu_report_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+   .td:hover{cursor:pointer}
+    label.error{
+      color: #FF5722;
+    }
+    .daterangepicker-inputs{display: none;}
+
+    /* chart */
+          canvas{
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+    .chartjs-tooltip {
+      opacity: 1;
+      position: absolute;
+      background: rgba(0, 0, 0, .7);
+      color: white;
+      border-radius: 3px;
+      -webkit-transition: all .1s ease;
+      transition: all .1s ease;
+      pointer-events: none;
+      -webkit-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+      padding: 4px;
+    }
+
+    .chartjs-tooltip-key {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+    }
+    /* chart*/
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+    <div class="col-md-12">
+      <div class="panel panel-flat">
+          <div class="panel-heading">
+              <h6 class="panel-title">Filter Users</h6>
+              <div class="heading-elements">
+                <ul class="icons-list">
+                  <li><a data-action="collapse"></a></li>
+                  <li><a data-action="reload"></a></li>
+                  <li><a data-action="close"></a></li>
+                </ul>
+              </div>
+            <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+          </div>
+          <div class="panel-body">
+              <div class="row">
+                  <div class="col-md-6">
+                      <label>Select User for details</label>
+                      <div class="form-group">
+                       <select class="bootstrap-select cat" data-live-search="true" data-width="100%" tabindex="-98">
+                            {% for cat in categs %}
+                            <option value="{{cat.user__name}}">{{cat.user__name}}</option>
+                            {% endfor %}
+                        </select>
+                       </div>
+                  </div>
+                  <div class="col-md-3">
+                    <label>categories</label>
+                  <div class="form-group">
+                     <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
+                         <option value="user">by user</option>
+                         <option value="list">sales list</option>
+                         <option value="summary">sales summary</option>
+                        <option value="category">by category</option>
+                        <option value="items">by items</option>
+                         <option value="terminal">by terminal</option>
+                      </select>
+                  </div>
+                </div>
+                  <div class="col-md-3">
+                      <label>Export</label>
+                      <div class="form-group">
+                         <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                            <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                            <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+    </div>
+{% if sales_by_category %}
+<div class="p-sales">
+    <div class="col-md-12">
+    <div class="panel panel-flat" id="catdiv">
+      <div class="panel-heading">
+          <h6 class="panel-title" style="text-align:center;">Top User sales</h6>
+          <div class="heading-elements">
+            <ul class="icons-list">
+              <li><a data-action="collapse"></a></li>
+              <li><a data-action="reload"></a></li>
+              <li><a data-action="close"></a></li>
+            </ul>
+          </div>
+        <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-6">
+           <canvas id="catChart" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="canvas-holder1" style="width:100%;">
+                        <canvas id="chart1"></canvas>
+                        <div class="chartjs-tooltip" id="tooltip-0"></div>
+                        <div class="chartjs-tooltip" id="tooltip-1"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h6 class="text-center">Top 5 Users in last sales</h6>
+                     <div class="data-table-container">
+                        <table class="table bordered highlight responsive data-table">
+                          <tbody>
+                          {% if sales_by_category %}
+                           {% for sales in sales_by_category %}
+                              <tr data-action-go="">
+                                <td class="td" data-href="{{sales.user__name}}">
+                                  <div class="sqaure" style="width: 15px;height: 15px;border-radius: 50%;background-color: {{sales.color}};">
+                                  </div>
+                                </td>
+                                <td class="td" data-href="{{sales.user__name}}">
+                                    {{forloop.counter }}.
+                                   {{sales.user__name}}
+                                </td>
+                                <td class="td" data-href="{{sales.user__name}}">
+                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_net__sum}}</div>
+                                </td>
+                                <td class="td" data-href="{{sales.user__name}}">
+                                  {{ sales.percentage }}%
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            {% endif %}
+
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+ </div>
+     {% else %}
+  <div class="col-md-12 animated fadeIn ">
+   <div class="panel bg-info">
+     <div class="panel-body">
+       <div style="text-align: center;font-size:16px;">
+          No report for Sales by User
+       </div>
+      </div>
+    </div>
+  </div>
+ {% endif %}
+</div>
+
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/utils.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/html2canvas.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  var endpoint = "{% url 'dashboard:chart' %}";
+  var defaultData = [];
+  var labels = [];
+
+  $.ajax({
+    method:"GET",
+    url:endpoint,
+    success:function(data){
+      labels = data.label;
+      defaultData = data.default;
+    },
+    error:function(error_data){
+
+    }
+  });
+
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    }).on('change',function(){
+      var date = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:date },success: function(data){
+              $('.p-sales').html(data);
+        }});
+    });
+
+    $('.cat').selectpicker().on('change',function(){
+      var user = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:get_user_sale_details' %}",type: 'GET',data: {user:user },success: function(data){
+              $('.p-sales').html(data);
+        }});
+    });
+
+    $(".td").click(function(){
+         var user = $(this).data("href");
+         $.ajax({ url: "{% url 'dashboard:get_user_sale_details' %}",type: 'GET',data: {user:user },success: function(data){
+             $('.p-sales').html(data);
+          }});
+      });
+
+  $('.sales-category').selectpicker().on('change', function(){
+        var sv = $(this).val();
+        if(sv == 'list'){
+            window.location = "{% url 'dashboard:sales_list' %}";
+        }else if(sv == 'summary'){
+            window.location = "{% url 'dashboard:sales_date_chart' %}";
+        }else if(sv == 'category'){
+            window.location = "{% url 'dashboard:sales_category_chart' %}";
+        }else if(sv == 'items'){
+            window.location = "{% url 'dashboard:sales_product_chart' %}";
+        }else if(sv == 'user'){
+            window.location = "{% url 'dashboard:sales_user_chart' %}";
+        }else if(sv == 'terminal'){
+            window.location = "{% url 'dashboard:sales_terminal_chart' %}";
+        }
+  });
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change',function(){
+
+         if($(this).val() == 'pdf'){
+            html2canvas($("#catdiv"), {
+                allowTaint: true,
+                onrendered: function(canvas) {
+                    var img = canvas.toDataURL("image/png");
+                    $.ajax({ url: "/dashboard/reports/userchart/",
+                         type: 'POST',
+                         data: {img:img,  csrfmiddlewaretoken: '{{ csrf_token }}' },
+                         success: function(data){
+                             var nw = window.open("data:application/pdf," + escape(data), "width=900, height=900")
+                          },
+                          async:false
+                      });
+                }
+            });
+         }
+    });
+    //**@ daterange from
+    $('.daterange-from').daterangepicker({
+        singleDatePicker: true,
+        locale:{format: 'YYYY-MM-DD'},
+        showDropdowns:true
+    });
+    //**@ daterange to
+    $('.daterange-to').daterangepicker({
+            alwaysShowCalendars: true,
+            showCustomRangeLabel: true,
+            linkedCalendars:false,
+            locale: {applyLabel:'Search',cancelLabel: 'Clear',format: 'YYYY-MM-DD'},
+            opens: 'right',
+            applyClass: 'btn-small bg-slate',
+            cancelClass: 'btn-small btn-default',
+            ranges: {
+               'Today': [moment(), moment()],
+               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+               'This week':[moment().startOf('week'), moment()],
+               'Last Week': [moment().subtract(13, 'days'), moment().startOf('week').subtract(1, 'days')],
+               'This Month': [moment().startOf('month'), moment()],
+               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+               'This Year': [moment().startOf('year'), moment()],
+               'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+            }
+    }, function(start, end){
+        $('.daterangepicker ').addClass('show-calendar');
+    });
+    $('.daterange-to').on('apply.daterangepicker', function(ev, picker) {
+      var from = picker.startDate.format('YYYY-MM-DD'), to = picker.endDate.format('YYYY-MM-DD');
+        if(from == to ){
+            $(this).val(from);
+            $.ajax({ url: "{% url 'dashboard:sales_date_chart' %}",type: 'GET',data: {date:from },success: function(data){
+                    $('.p-sales').html(data);
+            }});
+         }else{
+            $(this).val(from + ' - ' + to);
+            $.ajax({ url: "{% url 'dashboard:get_sales_by_week' %}",type: 'GET',data: {from:from, to:to },success: function(data){
+                    $('.p-sales').html(data);
+            }});
+         }
+    });
+    $('.daterange-to').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+
+    //**@ put placeholders
+    $('.to').val('');
+    $('.to').attr("placeholder","To");
+    //**@ date search button
+    $('.search_daterange').click(function(){
+      var from = $('.daterange-from').val();
+      var to = $('.daterange-to').val();
+       alert('from: '+from+' to: '+to);
+    });
+
+
+//**@ chart
+ var customTooltips = function (tooltip) {
+      $(this._chart.canvas).css("cursor", "pointer");
+
+      var positionY = this._chart.canvas.offsetTop;
+      var positionX = this._chart.canvas.offsetLeft;
+
+      $(".chartjs-tooltip").css({
+        opacity: 0,
+      });
+
+      if (!tooltip || !tooltip.opacity) {
+        return;
+      }
+
+      if (tooltip.dataPoints.length > 0) {
+        tooltip.dataPoints.forEach(function (dataPoint) {
+          var content = [dataPoint.xLabel, dataPoint.yLabel].join(": ");
+          var $tooltip = $("#tooltip-" + dataPoint.datasetIndex);
+
+          $tooltip.html(content);
+          $tooltip.css({
+            opacity: 1,
+            top: positionY + dataPoint.y + "px",
+            left: positionX + dataPoint.x + "px",
+          });
+        });
+      }
+    };
+    var color = Chart.helpers.color;
+  // alert(x.substring(0,3));
+    var lineChartData = {
+     labels:[{% for d in labels %} "{{ d }}", {% endfor %}],
+      datasets: [{
+        label: "Average current month sales",
+        backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
+        borderColor: window.chartColors.blue,
+        // pointBackgroundColor: window.chartColors.blue,
+        fill:false,
+        data: [{% for df in default %} {{ df }}, {% endfor %}]
+      }]
+    };
+
+    window.onload = function() {
+      var chartEl = document.getElementById("chart1");
+      var chart = new Chart(chartEl, {
+        type: "line",
+        data: lineChartData,
+        options: {
+          title:{
+            display: true,
+            text: "Average User Sales for {{hcateg}}"
+          },
+          tooltips: {
+            enabled: false,
+            mode: 'index',
+            intersect: false,
+            custom: customTooltips
+          },
+          legend:{
+          display:false
+          },
+          elements: {
+            line: {
+              //tension: 0.000001
+            },
+            bezierCurve : true
+          }
+        }
+      });
+    };
+//-----chart**/
+//**@ doughnut chart
+    var defaultData2 = [{% for d in sales_by_category %} {{ d.total_net__sum }}, {% endfor %}];
+    var labels2 = [{% for d in sales_by_category %} "{{ d.user__name }}", {% endfor %}];
+    var backColor = [{% for d in sales_by_category %} "{{ d.color }}", {% endfor %}];
+    // console.log({% for d in sales_by_category %} "{{ d.color }}", {% endfor %});
+      var ctx = document.getElementById("catChart").getContext('2d');
+      var catChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: labels2,
+              datasets: [{
+                  label: 'Amount of sale',
+                  data: defaultData2,
+                  backgroundColor:backColor,
+                  borderWidth: 1
+              }]
+          }
+      });
+//---------------doghnut chart**/
+});
+
+</script>
+{% endblock %}

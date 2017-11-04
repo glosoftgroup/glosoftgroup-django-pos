@@ -1,0 +1,270 @@
+{% load staticfiles %}
+{% load prices_i18n %}
+{% load humanize %}
+      <div class="panel panel-flat">
+      <div class="panel-body">
+        <div class="row">
+          {% if date_period %}
+            <h5 class=" text-center">{{date_period}}</h5>
+          {% endif %}
+          <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table  datatable-header-footer table-hover">
+                  <caption style="margin-bottom: 10px;">
+                   </caption> 
+                      <thead style="border-top:1px solid #ddd;">
+                        <tr class="bg-primary">
+                          <th>Transaction Date</th>
+                          <th>Receipt No</th>
+                          <th>Status</th>
+                          <th>Customer</th>
+                          <th>Cashier</th>           
+                          <th>Quantity</th>
+                          <th>Discount</th>
+                          <th>Total Sales (KShs)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="p-tb">
+                        {% if sales %}
+                        {% for sale in sales %}
+                          <tr class='clickable-row' id="{{sale.pk }}">
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.created|timesince}}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
+                            <td class="td text-center" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">
+                            {% if sale.is_fully_paid %}
+                            <span class="text-success  icon-checkmark-circle"><i></i></span>
+                            {% else %}
+                            <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+                            {% endif %}
+                            </td>
+                              <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
+                            
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}">{{sale.quantity}}</td>
+                            <td>
+                            {% if sale.discount_amount %}
+                            {{sale.discount_amount}}
+                            {% else %}
+                            --
+                            {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:credit-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                          </tr>
+                        {% endfor %}
+                         {% else %}
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Reports Available</h2></td></tr>
+                        {% endif %}
+                        </tbody>
+
+                 </table>
+        </div>
+          {% if sales %}
+             <div class="my-paginate">
+                
+  <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style> 
+         <div class="row">   
+         <div class="col-md-12 mt-10">               
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback p2-pag" style="">
+             <div class="my-paginate"> 
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav2">Page 1 of {{pn}}</div>
+             </div>
+            </div>
+          </div>
+         </div>                 
+         <input type="hidden" id="page_size" val="">
+              </div>
+          {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Core Scripts - Include with every page -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+ <script type="text/javascript">
+  var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
+  var creditPaginateUrl = "{% url 'dashboard:credit_paginate' %}";
+   $(document).ready(function(){
+
+       $(".td").click(function(){
+          window.location = $(this).data("href");
+      });
+
+        $('.p2-pag').bootpag({
+            total: parseInt('{{pn}}'),
+            maxVisible: 3,
+            leaps: true,
+            firstLastUse: true,
+            first: 'First',
+            last: 'Last',       
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first',
+            }).on("page", function(event, num){
+              $(".pages-nav2").html("Page " + num +" of "+'{{pn}}');
+                dynamicData = {};
+                dynamicData['page'] = num;
+                dynamicData['q'] = '{{q}}';
+                dynamicData['psize'] = '{{sz}}';
+                dynamicData['period'] = '{{period}}';
+                dynamicData['month'] = '{{month}}';
+                dynamicData['year'] = '{{year}}';
+                
+                if('{{gid}}' != 0){
+                    dynamicData['gid'] = '{{gid}}';
+                }
+
+                paginationData(dynamicData,creditPaginateUrl,'GET')
+                    .done(function(data){
+                        $('#p-tb').html(data);
+                    })
+                    .fail();
+
+        }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+        /* clicked the submit button */
+        $('.del').on('click', function (e) {
+                var f = document.getElementById('delform');
+                var formData = new FormData(f);
+                var id = $(this).data('id');
+                var url = $(this).data('href');
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){        
+                      $('#modal_instance').modal('hide');
+                      $('#tb #'+id).remove();            
+                      $.jGrowl('User deleted successfully', {
+                        header: 'Well done!',
+                        theme: 'bg-success'
+                      });
+                      window.location.reload();
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Error deleting Staff', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            });
+
+   });
+
+    //**@ display size select
+     $('.list-sz').selectpicker().on('change', function(){   
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var date = $('.date-month').val();
+        var url = creditPaginationUrl;
+        var paginationUrl = creditPaginationUrl;
+        var scategory = $('.sales-category').find(":selected").val();
+        dynamicData = {}
+
+        var period = $('.period-sz').find(":selected").val();
+        var month = $('.hidden-month').val();
+        var year = $('.hidden-year').val();
+
+        if(!$('.hidden-format').val()){
+          $('.hidden-format').val('yyyy-mm-dd');
+        }
+
+        if($('.hidden-format').val() == 'yyyy-mm-dd'){
+           if(!date){
+              date = null;
+           }
+        }else if($('.hidden-format').val() == 'yyyy'){
+            var date = null;
+            month = null;
+        }else{
+           var date = null;
+        }
+
+        dynamicData['page'] = 1;
+        dynamicData['q'] = searchData;
+        dynamicData['gid'] = date;
+        dynamicData['period'] = period;
+        dynamicData['month'] = month;
+        dynamicData['year'] = year;
+        if(listSizeVal == '0'){
+          dynamicData['size'] = '10';
+        }else{
+          dynamicData['size'] = listSizeVal;
+        } 
+        if(searchData){
+            paginationData(dynamicData,creditSearchUrl,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+             .fail(); 
+
+        }else{
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+            .fail(); 
+
+        }     
+
+     });
+   
+   {% if sz %}
+   $.when( $.ready ).then(function() {
+         $('.bootstrap-select').selectpicker();
+         $('.list-sz').selectpicker('val', ["{{sz}}"]);
+      });
+   {% endif %}
+
+
+ </script>

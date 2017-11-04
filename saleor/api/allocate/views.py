@@ -40,7 +40,7 @@ class AllocateDetailAPIView(generics.RetrieveAPIView):
 
 
 class AllocateCreateAPIView(generics.CreateAPIView):
-    """ allocate products to a user """
+    """ allocate products to a agent """
     queryset = Allocate.objects.all()
     serializer_class = CreateAllocateSerializer
 
@@ -79,6 +79,14 @@ class AllocateListAPIView2(generics.ListAPIView):
         return queryset_list
 
 class AllocateUpdateAPIView(generics.RetrieveUpdateAPIView):
+    """
+        update allocated products
+        :param quantity: amount sold by agent
+        :return updated allocate instance
+        :operation subtracts allocated_quantity quantity result added back to stock
+        sold quantities are sent to sale model.
+        :payload - /payload/update-allocate.json
+    """
     queryset = Allocate.objects.all()
     serializer_class = AllocateUpdateSerializer
     def perform_update(self, serializer):
