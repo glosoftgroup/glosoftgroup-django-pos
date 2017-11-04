@@ -138,7 +138,7 @@ def sales_paginate(request):
 			that_date_sum = Sales.objects.filter(created__contains=date).aggregate(Sum('total_net'))
 			sales = []
 			for sale in all_salesd:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 
@@ -166,7 +166,7 @@ def sales_paginate(request):
 			total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 			sales = []
 			for sale in all_sales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 
@@ -219,7 +219,7 @@ def sales_search(request):
 			if request.GET.get('gid'):
 				csales = all_sales.filter(created__icontains=request.GET.get('gid'))
 				for sale in csales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 
@@ -243,7 +243,7 @@ def sales_search(request):
 
 			else:
 				for sale in all_sales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 
@@ -457,7 +457,7 @@ def sales_list_export_csv(request):
 	total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 	total_sales = []
 	for sale in all_sales:
-		quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+		quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 		if not sale['customer']:
 			sale['customer'] = 'Customer'
 		setattr(sale, 'quantity', quantity['c'])

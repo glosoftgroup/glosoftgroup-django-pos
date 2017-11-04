@@ -158,12 +158,12 @@ def sales_list_pdf( request ):
 			if date:
 				csales = all_sales.filter(created__icontains=date)
 				for sale in csales:
-					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 			else:
 				for sale in all_sales:
-					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 			total_sales_amount = all_sales.aggregate(Sum('total_net'))
@@ -171,7 +171,7 @@ def sales_list_pdf( request ):
 		elif date:
 			csales = credits.filter(created__icontains=date)
 			for sale in csales:
-				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 			total_sales_amount = csales.aggregate(Sum('total_net'))
@@ -184,7 +184,7 @@ def sales_list_pdf( request ):
 
 			csales = credits.filter(created__icontains=date)
 			for sale in csales:
-				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 			total_sales_amount = csales.aggregate(Sum('total_net'))
