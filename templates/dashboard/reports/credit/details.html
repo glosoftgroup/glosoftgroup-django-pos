@@ -14,7 +14,7 @@
      <li>Receipt</li>
  {% endblock %}
 
-{% block menu_report_class %}active{% endblock %}
+{% block menu_creditreport_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col-md-12" style="margin-bottom:10px;">
         <a class="btn btn-primary pull-left" href="{% url 'dashboard:credit_list' %}"><i class="icon-arrow-left13 position-left"></i> Back To Credit Sales List</a>
-        <a class="btn btn-primary pull-right printPdf" data-url="{% url 'dashboard:pdf-sale-detail' pk=sale.pk%}" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
+        <a class="btn btn-primary pull-right printPdf" data-url="{% url 'dashboard:pdf-credit-detail' pk=sale.pk%}" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
         </div>
     </div>
 </div>

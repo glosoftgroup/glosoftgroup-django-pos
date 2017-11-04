@@ -1,18 +1,7 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, F, Q
+from django.db.models import Count, Sum, F, Q
 from django.core import serializers
 import dateutil.relativedelta
 
@@ -21,23 +10,17 @@ import datetime
 from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
-
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf, image64, default_logo
+from ...utils import render_to_pdf, default_logo
 
 import csv
 import random
 from django.utils.encoding import smart_str
 from datetime import date
-
-from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ..notification.views import custom_notification
-from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, DrawerCash
 from ...credit.models import Credit, CreditedItem, CreditHistoryEntry
 from ...product.models import Product, ProductVariant
-from ...purchase.models import PurchaseProduct
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
 
@@ -130,7 +113,7 @@ def credit_list(request):
 		total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 		total_sales = []
 		for sale in all_sales:
-			quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+			quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 			setattr(sale, 'quantity', quantity['c'])
 			total_sales.append(sale)
 
@@ -241,8 +224,10 @@ def credit_paginate(request):
 	else:
 		credits = Credit.objects.all()
 		if not date:
-			date = DateFormat(datetime.datetime.today()).format('Y-m-d')
-		date_period = date
+			date1 = DateFormat(datetime.datetime.today()).format('Y-m-d')
+		else:
+			date1 = date
+		date_period = date1
 
 	if date:
 		try:
@@ -250,7 +235,7 @@ def credit_paginate(request):
 			total_sales_amount = Credit.objects.filter(created__contains=date).aggregate(Sum('total_net'))
 			sales = []
 			for sale in all_salesd:
-				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 
@@ -279,7 +264,7 @@ def credit_paginate(request):
 			total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 			sales = []
 			for sale in all_sales:
-				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 
@@ -375,7 +360,7 @@ def credit_search(request):
 			if date:
 				csales = all_sales.filter(created__icontains=date)
 				for sale in csales:
-					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 				total_sales_amount = all_sales.aggregate(Sum('total_net'))
@@ -404,7 +389,7 @@ def credit_search(request):
 
 			else:
 				for sale in all_sales:
-					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 				total_sales_amount = all_sales.aggregate(Sum('total_net'))
@@ -616,7 +601,7 @@ def sales_list_export_csv(request):
 	total_tax_amount = all_sales.aggregate(Sum('total_tax'))
 	total_sales = []
 	for sale in all_sales:
-		quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+		quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 		if not sale['customer']:
 			sale['customer'] = 'Customer'
 		setattr(sale, 'quantity', quantity['c'])

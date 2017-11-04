@@ -637,7 +637,7 @@
         $.get("{% url 'dashboard:export_db' %}",{daily:'daily'}, function(data){
         }).fail(function(response) {
         })
-    }, 36000000);
+    }, 60000);
 
   });
 
