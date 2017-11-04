@@ -166,6 +166,7 @@ def sales_list_pdf( request ):
 					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
+			total_sales_amount = all_sales.aggregate(Sum('total_net'))
 
 		elif date:
 			csales = credits.filter(created__icontains=date)
@@ -173,6 +174,7 @@ def sales_list_pdf( request ):
 				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
+			total_sales_amount = csales.aggregate(Sum('total_net'))
 		else:
 			try:
 				last_sale = Credit.objects.latest('id')
@@ -185,6 +187,7 @@ def sales_list_pdf( request ):
 				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
+			total_sales_amount = csales.aggregate(Sum('total_net'))
 
 		img = image64()
 		data = {
@@ -193,7 +196,8 @@ def sales_list_pdf( request ):
 			'puller': request.user,
 			'image': img,
 			'gid':date,
-			'date_period':date_period
+			'date_period':date_period,
+			"total_sales_amount": total_sales_amount
 		}
 		pdf = render_to_pdf('dashboard/reports/credit/pdf/saleslist_pdf.html', data)
 		return HttpResponse(pdf, content_type='application/pdf')

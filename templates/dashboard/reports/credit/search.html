@@ -99,7 +99,28 @@
          <input type="hidden" id="page_size" val="">
           </div>
           {% endif %}
+          {% if sales %}
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                 <p class="text-center" style="margin: 20px 0px;">
+
+                   Total Credit Sales: Kshs {{total_sales_amount.total_net__sum}}<br />
+
+                 </p>
+                  <p class="text-center"> Thank you for partnering with us.<br />
+                  <span>Report pullled by  {% if request.user.name %}
+                        {{request.user.name}}
+                      {% else %}
+                      {{ request.user.email}}
+                      {% endif %}</span></p>
+                  <input type="hidden" class="setValue">
+                  <input type="hidden" class="setName">
+
+              </div>
+             </div>
+          {% endif %}
       </div>
+
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
