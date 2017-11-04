@@ -36,11 +36,16 @@
                      <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
                         SALES DATE: {{gid}}
                  </p>{% endif %}
-                 {% if date_period and not gid%}
+                 {% if date_period and not gid %}
                     <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
                       PERIOD: {{date_period}}
                     </p>
                   {% endif %}
+                 {% if total_sales_amount %}
+                 <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
+                   Total Credit Sales: Kshs {{total_sales_amount.total_net__sum}}
+                 </p>
+                 {% endif %}
                    
                  </p>
              </div>

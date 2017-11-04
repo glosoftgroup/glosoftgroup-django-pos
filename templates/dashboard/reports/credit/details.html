@@ -92,11 +92,10 @@
             <div class="row">
               <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
                   <span>
-                   Total Credit Sales: Kshs {{sale.total_net}}<br />
-                   Total Tax: Kshs {{sale.total_tax}}
+                   Total Credit Sales: Kshs {{sale.total_net}}
                  </span><br>
                   <span> Thank you for partnering with us.<br />
-                  <span>Report pullled by {{request.user.name}}</span></span>
+                  <span>Report pulled by {% if request.user.name %}{{request.user.name}}{% else %}{{request.user.email}}{% endif %}</span></span>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
 

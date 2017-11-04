@@ -247,7 +247,7 @@ def credit_paginate(request):
 	if date:
 		try:
 			all_salesd = credits.filter(created__icontains=date).order_by('-id')
-			that_date_sum = Credit.objects.filter(created__contains=date).aggregate(Sum('total_net'))
+			total_sales_amount = Credit.objects.filter(created__contains=date).aggregate(Sum('total_net'))
 			sales = []
 			for sale in all_salesd:
 				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
@@ -264,7 +264,7 @@ def credit_paginate(request):
 			return TemplateResponse(request,'dashboard/reports/credit/p2.html',
 				{'sales':sales, 'pn':paginator.num_pages,'sz':10,'gid':date,
 				'total_sales':total_sales,'total_tax':total_tax,'tsum':tsum,
-				'that_date_sum':that_date_sum, 'date':date, 'today':today, 
+				"total_sales_amount":total_sales_amount, 'date':date, 'today':today,
 				'month':month, 'year':year, 'period':period,'date_period':date_period})
 
 		except ObjectDoesNotExist as e:
@@ -288,7 +288,7 @@ def credit_paginate(request):
 				sales = paginator.page(page)
 				return TemplateResponse(request,'dashboard/reports/credit/p2.html',
 								{'sales':sales, 'pn':paginator.num_pages,'sz':list_sz, 
-								'gid':0, 'total_sales':total_sales,'total_tax':total_tax,
+								'gid':0, 'total_sales':total_sales, "total_sales_amount":total_sales_amount,
 								 'tsum':tsum, 'month':month, 'year':year, 'period':period,'date_period':date_period})
 			else:
 				paginator = Paginator(sales, 10)
@@ -378,6 +378,7 @@ def credit_search(request):
 					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
+				total_sales_amount = all_sales.aggregate(Sum('total_net'))
 
 				if p2_sz:
 					paginator = Paginator(sales, int(p2_sz))
@@ -390,31 +391,33 @@ def credit_search(request):
 					return TemplateResponse(request, 'dashboard/reports/credit/search.html',
 											{'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz,
 											 'gid': date, 'q': q, 'month':month, 'year':year, 
-											 'period':period,'date_period':date_period})
+											 'period':period,'date_period':date_period,
+											 "total_sales_amount":total_sales_amount})
 
 				paginator = Paginator(sales, 10)
 				sales = paginator.page(page)
 				return TemplateResponse(request, 'dashboard/reports/credit/search.html',
 										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz,
 										 'gid': request.GET.get('gid'), 'month':month, 'year':year, 
-										 'period':period,'date_period':date_period})
+										 'period':period,'date_period':date_period,
+										 "total_sales_amount":total_sales_amount})
 
 			else:
 				for sale in all_sales:
 					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
+				total_sales_amount = all_sales.aggregate(Sum('total_net'))
 
 				if list_sz:
-					print ('lst')
 					paginator = Paginator(sales, int(list_sz))
 					sales = paginator.page(page)
 					return TemplateResponse(request, 'dashboard/reports/credit/search.html',
 											{'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,
-											 'q': q, 'month':month, 'year':year, 'period':period,'date_period':date_period})
+											 'q': q, 'month':month, 'year':year, 'period':period,'date_period':date_period,
+											 "total_sales_amount": total_sales_amount})
 
 				if p2_sz:
-					print ('pst')
 					paginator = Paginator(sales, int(p2_sz))
 					sales = paginator.page(page)
 					return TemplateResponse(request, 'dashboard/reports/credit/paginate.html', {'sales': sales})
@@ -434,7 +437,8 @@ def credit_search(request):
 
 				return TemplateResponse(request, 'dashboard/reports/credit/search.html',
 										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q, 'month':month, 
-										'year':year, 'period':period,'date_period':date_period})
+										'year':year, 'period':period,'date_period':date_period,
+										 "total_sales_amount": total_sales_amount})
 
 @staff_member_required
 @permission_decorator('reports.view_products_reports')
