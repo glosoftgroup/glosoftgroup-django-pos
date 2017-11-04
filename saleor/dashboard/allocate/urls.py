@@ -11,26 +11,26 @@ urlpatterns = [
 		url(r'^$', permission_required('reports.view_sale_reports', login_url='not_found')
 			(views.allocate_list), name='allocate_list'),
         url(r'^history/(?P<credit_pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
-			(views.credit_history), name='credit_history'),
+			(views.allocate_history), name='credit_history'),
 		url(r'^history/pdf/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
-			(views.credit_detail_pdf), name='credit_history_pdf'),
-		url(r'^credit/$', permission_required('reports.view_sale_reports', login_url='not_found')
-			(views.credit_reports), name='credit_reports'),
+			(views.allocate_detail_pdf), name='allocate_history_pdf'),
+		url(r'^allocate/$', permission_required('reports.view_sale_reports', login_url='not_found')
+			(views.allocate_reports), name='allocate_reports'),
 		url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
-			(views.credit_detail), name='credit-detail'),
+			(views.allocate_detail), name='allocate-detail'),
 
-		url( r'^credit_search/$', views.credit_search, name = 'credit_search' ),
-		url( r'^credit_paginate/$', views.credit_paginate, name = 'credit_paginate'),
+		url( r'^allocate_search/$', views.allocate_search, name = 'allocate_search' ),
+		url( r'^allocate_paginate/$', views.allocate_paginate, name = 'allocate_paginate'),
 		
 
-		url(r'^reports/credit/list/pdf/$', pdfs.sales_list_pdf, name='reports_credit_list_pdf'),
+		url(r'^reports/credit/list/pdf/$', pdfs.sales_list_pdf, name='reports_allocate_list_pdf'),
 		
 		url(r'^reports/credit/category/pdf/$', pdfs.sales_category, name='reports_credit_category_pdf'),
 		url(r'^reports/credit/items/pdf/$', pdfs.sales_items, name='reports_credit_items_pdf'),
 		url(r'^reports/credit/user/pdf/$', pdfs.sales_user, name='reports_credit_user_pdf'),
 		url(r'^reports/credit/till/pdf/$', pdfs.sales_tills, name='reports_credit_tills_pdf'),
 		url(r'^pdf/credit/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_credit_reports', login_url='not_found')
-			(pdfs.sales_detail), name='pdf-credit-detail'),
+			(pdfs.sales_detail), name='pdf-allocate-detail'),
     	url(r'^reports/sales/list/export_csv/$', views.sales_list_export_csv, name='reports_credit_list_export_csv'),
 
 		

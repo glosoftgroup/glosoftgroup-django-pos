@@ -1,0 +1,39 @@
+/*
+      User List Api
+
+      User List Api
+
+      GET /api/user/
+
+      HTTP 200 OK
+      Allow: GET, HEAD, OPTIONS
+      Content-Type: application/json
+      Vary: Accept
+*/
+
+{
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 2,
+            "name": null,
+            "email": "taylor.simmons@example.com",
+            "mobile": null
+        },
+        {
+            "id": 3,
+            "name": "john",
+            "email": "moses@moses.com",
+            "mobile": "+254123232445"
+        },
+        {
+            "id": 1,
+            "name": "sky",
+            "email": "sky@sky.com",
+            "mobile": "******"
+        }
+    ]
+}
+

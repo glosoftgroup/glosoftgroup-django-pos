@@ -38,6 +38,7 @@ from ..views import staff_member_required
 from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, Terminal
 from ...credit.models import Credit, CreditedItem
+from ...allocate.models import Allocate, AllocatedItem
 from ...product.models import Product, ProductVariant, Category
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, convert_html_to_pdf, image64
@@ -126,20 +127,20 @@ def sales_list_pdf( request ):
 		if period == 'year':
 			lastyear = d - dateutil.relativedelta.relativedelta(years=1)
 			y = str(lastyear.strftime("%Y"))
-			credits = Credit.objects.filter(created__year__range=[y, year])
+			credits = Allocate.objects.filter(created__year__range=[y, year])
 			date_period = str(lastyear.strftime("%Y"))+' - '+str(datetime.datetime.now().strftime("%m"))+'/'+ str(year)
 		elif period == 'month':
-			credits = Credit.objects.filter(created__year=str(d.strftime("%Y")), created__month=str(d.strftime("%m")))
+			credits = Allocate.objects.filter(created__year=str(d.strftime("%Y")), created__month=str(d.strftime("%m")))
 			date_period = str(datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(datetime.datetime.strptime(year, "%Y").strftime("%Y"))
 		elif period == 'quarter':
 			p = d - dateutil.relativedelta.relativedelta(months=3)
 			month = str(datetime.datetime.strptime(month, "%m").strftime("%m"))
-			credits = Credit.objects.filter(created__year=str(p.strftime("%Y")),
+			credits = Allocate.objects.filter(created__year=str(p.strftime("%Y")),
 			                                            created__month__range=[str(p.strftime("%m")), month])
 			date_period = str(p.strftime("%B")) + '/' + str(p.strftime("%Y")) + ' - ' + str(
             datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(year)
 		else:
-			credits = Credit.objects.all()
+			credits = Allocate.objects.all()
 			if not date:
 				date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 			date_period = date
@@ -150,20 +151,22 @@ def sales_list_pdf( request ):
 				Q(invoice_number__icontains=q) |
 				Q(terminal__terminal_name__icontains=q) |
 				Q(created__icontains=q) |
-				Q(customer__name__icontains=q) | Q(customer__mobile__icontains=q) |
-				Q(credititems__product_name__icontains=q) |
+				Q(agent__name__icontains=q) | Q(agent__mobile__icontains=q) |
+				Q(allocated_items__product_name__icontains=q) |
 				Q(user__email__icontains=q) |
 				Q(user__name__icontains=q)).order_by('id').distinct()
 
 			if date:
 				csales = all_sales.filter(created__icontains=date)
 				for sale in csales:
-					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+					quantity = AllocatedItem.objects.filter(allocate=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
+					allocated_quantity = AllocatedItem.objects.filter(allocate=sale).aggregate(ac=Sum('allocated_quantity'))
+					setattr(sale, 'allocated_quantity', allocated_quantity['ac'])
 					sales.append(sale)
 			else:
 				for sale in all_sales:
-					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+					quantity = AllocatedItem.objects.filter(allocate=sale).aggregate(c=Count('sku'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 			total_sales_amount = all_sales.aggregate(Sum('total_net'))
@@ -171,21 +174,25 @@ def sales_list_pdf( request ):
 		elif date:
 			csales = credits.filter(created__icontains=date)
 			for sale in csales:
-				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+				quantity = AllocatedItem.objects.filter(allocate=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
+				allocated_quantity = AllocatedItem.objects.filter(allocate=sale).aggregate(ac=Sum('allocated_quantity'))
+				setattr(sale, 'allocated_quantity', allocated_quantity['ac'])
 				sales.append(sale)
 			total_sales_amount = csales.aggregate(Sum('total_net'))
 		else:
 			try:
-				last_sale = Credit.objects.latest('id')
+				last_sale = Allocate.objects.latest('id')
 				gid = DateFormat(last_sale.created).format('Y-m-d')
 			except:
 				gid = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
 			csales = credits.filter(created__icontains=date)
 			for sale in csales:
-				quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Count('sku'))
+				quantity = AllocateItem.objects.filter(allocate=sale).aggregate(c=Count('sku'))
 				setattr(sale, 'quantity', quantity['c'])
+				allocated_quantity = AllocatedItem.objects.filter(allocate=sale).aggregate(ac=Sum('allocated_quantity'))
+				setattr(sale, 'allocated_quantity', allocated_quantity['ac'])
 				sales.append(sale)
 			total_sales_amount = csales.aggregate(Sum('total_net'))
 
@@ -199,15 +206,16 @@ def sales_list_pdf( request ):
 			'date_period':date_period,
 			"total_sales_amount": total_sales_amount
 		}
-		pdf = render_to_pdf('dashboard/reports/credit/pdf/saleslist_pdf.html', data)
+		pdf = render_to_pdf('dashboard/reports/allocate/pdf/saleslist_pdf.html', data)
 		return HttpResponse(pdf, content_type='application/pdf')
+
 
 @staff_member_required
 @permission_decorator('reports.view_sales_reports')
 def sales_detail(request, pk=None):
 	try:
-		sale = Credit.objects.get(pk=pk)
-		items = CreditedItem.objects.filter(credit=sale)
+		sale = Allocate.objects.get(pk=pk)
+		items = AllocatedItem.objects.filter(allocate=sale)
 		img = image64()
 		data = {
 			'today': date.today(),
@@ -216,7 +224,7 @@ def sales_detail(request, pk=None):
 			'puller': request.user,
 			'image': img
 		}
-		pdf = render_to_pdf('dashboard/reports/credit/pdf/pdf.html',data)
+		pdf = render_to_pdf('dashboard/reports/allocate/pdf/pdf.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)

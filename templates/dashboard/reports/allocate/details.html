@@ -7,14 +7,14 @@
 {% load humanize %}
 {% load default_user_image %}
 {% block title %}
- Credit Sales Report
+ Product Tranfer Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:credit_list' %}">Credit Sales</a></li>
+     <li class="active"><a href="{% url 'dashboard:allocate_list' %}">Product Transfer Report</a></li>
      <li>Receipt</li>
  {% endblock %}
 
-{% block menu_report_class %}active{% endblock %}
+{% block menu_allocatereport_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
     label.error{
@@ -28,8 +28,8 @@
 <div class="col-md-12">
     <div class="row">
         <div class="col-md-12" style="margin-bottom:10px;">
-        <a class="btn btn-primary pull-left" href="{% url 'dashboard:credit_list' %}"><i class="icon-arrow-left13 position-left"></i> Back To Credit Sales List</a>
-        <a class="btn btn-primary pull-right printPdf" data-url="{% url 'dashboard:pdf-sale-detail' pk=sale.pk%}" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
+        <a class="btn btn-primary pull-left" href="{% url 'dashboard:allocate_list' %}"><i class="icon-arrow-left13 position-left"></i> Back To Product Transfer List</a>
+        <a class="btn btn-primary pull-right printPdf" data-url="{% url 'dashboard:pdf-allocate-detail' pk=sale.pk%}" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
         </div>
     </div>
 </div>
@@ -42,7 +42,7 @@
                <div>
                       <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
 
-                        <h6><span class="text-bold">Customer:</span> {% if sale.customer.name %} {{sale.customer.name}} {% else %} <span class="text-bold">-</span>{% endif %}</h6>
+                        <h6><span class="text-bold">Customer:</span> {% if sale.agent.name %} {{sale.agent.name}} {% else %} <span class="text-bold">--</span>{% endif %}</h6>
                           <h6 class=""><span class="text-bold">Receipt Number:</span> {{sale.invoice_number}}</h6>
                           <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
 
@@ -56,26 +56,23 @@
                           <th>Transaction Date</th>
                           <th>Item Name</th>         
                           <th>Unit Cost</th>
-                          <th>Quantity</th>
-                          <th>Discount</th>
-                          <th>Total Sales (KShs)</th>
+                          <th>Quantity Allocated</th>
+                            <th>Quantity Sold</th>
+
+                          <th>Amount worth (KShs)</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
                         {% if items %}
                         {% for item in items %}
                           <tr>
-                            <td>{{item.credit.created|date:"d-m-Y H:i a"}}</td>
+                            <td>{{item.allocate.created|date:"d-m-Y H:i a"}}</td>
                             <td>{{item.product_name}}</td>
 
                             <td>{{item.unit_cost}}</td>
+                              <td>{{item.allocated_quantity}}</td>
                             <td>{{item.quantity}}</td>
-                            <td>
-                            {% if sale.discount %}
-                            {{sale.discount}}
-                            {% else %}
-                            --
-                            {% endif %}</td>
+
                               <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
                           </tr>
                         {% endfor %}
@@ -92,7 +89,7 @@
             <div class="row">
               <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
                   <span>
-                   Total Credit Sales: Kshs {{sale.total_net}}
+                   Total Product Worth: Kshs {{sale.total_net}}
                  </span><br>
                   <span> Thank you for partnering with us.<br />
                   <span>Report pulled by {% if request.user.name %}{{request.user.name}}{% else %}{{request.user.email}}{% endif %}</span></span>

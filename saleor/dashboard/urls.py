@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 
 from . import views as core_views
+from .allocate.urls import urlpatterns as allocate_urls
 from .banking.urls import urlpatterns as banking_urls
 from .category.urls import urlpatterns as category_urls
 from .customer.urls import urlpatterns as customer_urls
@@ -24,6 +25,7 @@ from .users.urls import urlpatterns as users_urls
 
 urlpatterns = [
     url(r'^$', core_views.index, name='index'),
+    url(r'^allocate/', include(allocate_urls)),
     url(r'^banking/', include(banking_urls)),
     url(r'^categories/', include(category_urls)),
     url(r'^customers/', include(customer_urls)),
