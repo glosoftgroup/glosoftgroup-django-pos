@@ -104,6 +104,22 @@
   </div>
   <!-- ./supplier -->
   {% endif %}
+  {% if perms.supplier.view_supplier %}
+  <!-- supplier management -->
+  <div class="col-md-3 hvr-float-shadow">
+  <a href="{% url 'dashboard:car-list' %}">
+  <div class="thumbnail no-padding">
+        <div class="thumb bg-blue">
+          <img src="{% static 'backend/images/landingpage/fleet.png' %}" alt="">
+        </div>
+        <div class="caption text-center no-padding">
+          <h6 class="text-semibold no-margin">Fleet Management </h6>
+        </div>
+     </div>
+    </a>
+  </div>
+  <!-- ./supplier -->
+  {% endif %}
   <!-- communication management -->
   <div class="col-md-3 hvr-float-shadow">
   <a href="{% url 'dashboard:notification_list' %}">

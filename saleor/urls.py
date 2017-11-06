@@ -9,6 +9,7 @@ from graphene_django.views import GraphQLView
 
 from .accounts.urls import urlpatterns as accounts_urls
 from .api.allocate.urls import urlpatterns as api_allocate_urls
+from .api.car.urls import urlpatterns as api_car_urls
 from .api.cash.urls import urlpatterns as api_cash_urls
 from .api.category.urls import urlpatterns as api_category_urls
 from .api.customer.urls import urlpatterns as api_customer_urls
@@ -46,12 +47,13 @@ urlpatterns = [
     url(r'^account/', include(registration_urls)),
     url(r'^accounts/', include(accounts_urls, namespace='accounts')),
     url(r'^api/allocate/', include(api_allocate_urls, namespace='allocate-api')),
+    url(r'^api/car/', include(api_car_urls, namespace='car-api')),
     url(r'^api/category/', include(api_category_urls, namespace='category-api')),
     url(r'^api/cash/', include(api_cash_urls, namespace='cash-api')),
+    url(r'^api/credit/', include(api_credit_urls, namespace='credit-api')),
     url(r'^api/customer/', include(api_customer_urls, namespace='customer-api')),
     url(r'^api/discount/', include(api_discount_urls, namespace='discount-api')),
     url(r'^api/invoice/', include(api_invoice_urls, namespace='invoice-api')),
-    url(r'^api/credit/', include(api_credit_urls, namespace='credit-api')),
     url(r'^api/order_number/', include(api_order_number_urls, namespace='order_number-api')),
     url(r'^api/products/', include(api_urls, namespace='product-api')),
     url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),

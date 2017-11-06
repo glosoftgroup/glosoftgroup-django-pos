@@ -1,0 +1,19 @@
+/*
+    HTTP 200 OK
+    Allow: GET, HEAD, OPTIONS
+    Content-Type: application/json
+    Vary: Accept
+*/
+
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "name": "KBK-909G",
+            "number": ""
+        }
+    ]
+}

@@ -28,6 +28,7 @@ from ..userprofile.models import Address
 from ..customer.models import Customer
 from ..site.models import SiteSettings
 from ..sale.models import Terminal, PaymentOption
+from ..car.models import Car
 
 from . import OrderStatus
 from . import TransactionStatus
@@ -58,7 +59,8 @@ class Allocate(models.Model):
 
     mobile = models.CharField(max_length=20, blank=True, null=True)
     customer_name = models.CharField(max_length=100, null=True, blank=True)
-
+    car = models.ForeignKey(Car, blank=True, null=True, related_name='transfer_car',
+        verbose_name=pgettext_lazy('Allocate field', 'Transfer Car'))
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, related_name='allocator',
         verbose_name=pgettext_lazy('Allocate field', 'user'))

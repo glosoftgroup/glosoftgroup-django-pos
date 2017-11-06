@@ -180,6 +180,7 @@ INSTALLED_APPS = [
     # Local apps
     'saleor.accounts',
     'saleor.banking',
+    'saleor.car',
     'saleor.userprofile',
     'saleor.discount',
     'saleor.product',    

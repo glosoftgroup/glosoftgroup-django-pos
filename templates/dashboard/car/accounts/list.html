@@ -1,0 +1,654 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load humanize %}
+
+{% block title %}
+  Account
+{% endblock %}
+
+ {% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:accounts-list' %}">Accounts</a></li>
+ {% endblock %}
+
+
+{% block menu_bank_accounts_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+     .clickable-row td.td{
+      cursor: pointer;
+     }
+     tr.nb td{border:0px;}
+     .nb{border:0px;}
+     .table{border:1px solid #ccc}
+      #addExpenseTable{display:none;}
+     .detail-column p{font-size:14px;}
+     #expenses label.error{color:#ff7043}
+   </style>
+ {% endblock %}
+
+{% block content %}
+ <div class="row animated fadeIn">
+   <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-body">
+            <div class="col-md-2">
+              <label style="visibility: hidden;"> add</label>
+              <div class="form-group">
+                {% if perms.accounts.add_expenses %}
+                   <a href="javascript:;" id="addExpenseBtn" class="btn-block btn-primary btn-lg"><i class="icon-plus2"></i> Add Account</a>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-4">
+             <label>Search Accounts</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control search_user" placeholder="Search Accounts" type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 hidden">
+              <label>display list size</label>
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>Select Bank</label>
+              <div class="form-group">
+                  <select class="bootstrap-select group-sz" style="display: none;" placeholder="select a group..." data-width="100%" tabindex="-98">
+                      <option value="all">Select All</option>
+                  {% if banks %}
+                  {% for bank in banks %}
+                       <option value="{{bank.pk}}">
+                            {{bank.name}}
+                       </option>
+                  {% endfor %}
+                  {% else %}
+                   <option value="none" data-icon="fa-dot-circle-o">No Banks</option>
+                  {% endif %}
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select class="bootstrap-select export-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" data-icon="fa fa-dot-circle-o">Option</option>
+                    <option value="pdf" data-icon="fa-file-pdf-o">export pdf</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-12" id="addExpenseTable">
+        <form class="form" enctype="multipart/form-data" id="expenses" name="expenses">
+            {% csrf_token %}
+     <table class="table table-hover">
+        <thead>
+            <tr class="bg-primary">
+            <th>Bank Name</th>
+            <th>Account Name</th>
+            <th>Account Number</th>
+            <th>Amount (KShs)</th>
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>
+          <td>
+            <div class="input-group">
+                <div class="btn-group bootstrap-select input-group-btn" id="expense_types" style="width: 100%;">
+                    <select class="bootstrap-select sel required expense_type" id="expense_type" name="bank" data-width="100%" tabindex="-98" style="display: none;">
+                        <option value="">Choose...</option>
+                          {% if banks %}
+                            {% for bank in banks %}
+                              <option value="{{bank.name}}">{{bank.name}}</option>
+                            {% endfor %}
+                          {% else %}
+                            <option value="none">No Banks</option>
+                          {% endif %}
+                          <option value="add" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Expense Type" data-select="#expense_types"
+                            data-href="{% url 'accounts:add_expense_type' %}" data-cat="expense_type" data-label="Expense Type:"> add new expense type</option>
+                    </select>
+                </div>
+            </div>
+          </td>
+
+          <td>
+            <input placeholder="name" class="form-control" id="name" name="name" type="text">
+            </td>
+            <td>
+              <input placeholder="number" class="form-control" id="number" name="number" type="text">
+            </td>
+              <td>
+              <input placeholder="amount" class="form-control" id="amount" name="amount" type="text">
+            </td>
+            <td>
+              <button class="btn btn-xs btn-primary legitRipple" id="submitExpenseBtn" data-token="{% csrf_token %}" data-url="{% url 'accounts:add_expense_process' %}" type="submit">Submit <i class="icon-arrow-right14 position-right"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table> </form></div>
+        </div>
+      </div>
+   </div>
+
+  <div class="col-md-12">
+   <div id="pagination-div">
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat">
+        <div class="panel-body">
+        <div class="table-responsive">
+
+
+          <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
+                <thead>
+                  <tr class="bg-primary">
+                    <th>Account Name</th>
+                    <th>Account Number</th>
+                    <th>Bank</th>
+                    <th>Amount (KShs)</th>
+                    {% if perms.accounts.delete_expenses %}
+                    <th class="text-center">Actions</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody id="tb">
+                {% if accounts %}
+                  {% for account in accounts %}
+                  <tr class='clickable-row' id="{{account.pk }}">
+                    <td class="td" data-href="{% url 'dashboard:accounts-detail' pk=account.pk %}" data-m="#pdetail">{{ account.name }}</td>
+                    <td class="td" data-href="{% url 'dashboard:accounts-detail' pk=account.pk %}" data-m="#pdetail">{{account.number}}</td>
+                    <td class="td" data-href="{% url 'dashboard:accounts-detail' pk=account.pk %}" data-m="#pdetail">{{account.bank.name}}</td>
+                    <td class="td" data-href="{% url 'dashboard:accounts-detail' pk=account.pk %}" data-m="#pdetail">
+                        <span class="pull-right">{{ account.balance|intcomma }}</span></td>
+                    {% if perms.accounts.delete_expenses %}
+                    <!-- actions -->
+                    <td class="text-center">
+                      <ul class="icons-list">
+                        <li>
+                          <a data-ta="#modal_instance" data-title="Delete Account {{ account.name }} ?" data-href="{% url 'dashboard:accounts-delete' pk=account.pk %}" data-name="{{ account.name}}" data-id="{{ account.pk }}"
+                         class="modal-trigger btn btn-default btn-sm del-btn"><i class="icon-trash" style="font-size: 11px;" href="#modal_instance" data-toggle="modal"></i> remove
+                         </a>
+                        </li>
+                      </ul>
+                    </td>
+                    {% endif %}
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                    <tr>
+                      <td colspan="6">
+                        <h2 class="text-center">
+                          No Bank Accounts Available
+                        </h2>
+                      </td>
+                    </tr>
+                {% endif %}
+                  </tbody>
+           </table>
+
+        </div>
+        </div>
+          {% if accounts %}
+             <div class="my-paginate">
+                 <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style>
+         <div class="row">
+         <div class="col-md-12">
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                 <select class="bootstrap-select list-sz" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="0" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4">
+           <div class="text-center bootpag-callback" style="">
+             <div class="my-paginate">
+             <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
+             </div>
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12">
+              <div class="pull-right pages-nav">Page 1 </div>
+             </div>
+            </div>
+          </div>
+         </div>
+         <input type="hidden" id="page_size" val="">
+              </div>
+          {% endif %}
+      </div>
+    </div><!-- pagination -->
+  </div>
+
+</div>
+
+<!-- Blue modal -->
+ <div id="modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+         <div class="">
+         <form action="" class="delete_form" method="post" id="delform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm Account delete!
+           </h5>
+           <input type="hidden" class="item-id" />
+         </div>
+
+         </div>
+       </div>
+
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" onclick="return false" data-id="" data-href="">Delete</button>
+         </form>
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <div class="info"></div>
+ <!-- /blue modal -->
+
+<!-- expense detail modal -->
+ <div id="pdetail" class="modal fade">
+   <div class="modal-dialog modal-md">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center">Account Details</h6>
+       </div>
+       <div class="modal-body">
+
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default btn-block" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /expense detail modal-->
+<!-- edit modal -->
+ <div id="edit_modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <form action="" class="edit_form" method="post" id="editform" novalidate>
+           <div class="modal-body">
+            {% csrf_token %}
+                 <div class="form-group">
+                     <label class="cat_label"> </label>
+                     <input class="form-control edit_class" name=""/>
+                 </div>
+                  <input type="hidden" class="eitem-url"/>
+                  <input type="hidden" class="eitem-select"/>
+                 <input type="hidden" name="option" value="option"/>
+
+           </div>
+           <div class="modal-footer">
+               <button class="btn btn-primary waves-effect waves-light pull-right data_update"
+                       id='modal_edit' type="submit">
+                   Create
+                   <i class="icon-arrow-right14 position-right"></i>
+               </button>
+
+             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+           </div>
+       </form>
+     </div>
+   </div>
+ </div>
+ <!-- /edit modal -->
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+
+  function updateSelectListnSearch(){
+      $('.expense_type').find(":selected").removeAttr('selected')
+      $(".expense_type option[value='none']").attr('selected', 'selected');
+      $(".expense_type").val(0);
+      $(".expense_type .filter-option").text('Choose...');
+      $(".expense_type ul.dropdown-menu li.active").removeClass('active');
+      $(".expense_type ul.dropdown-menu li[data-original-index='0']").addClass('active');
+  }
+
+  $('.input-group').on('change', '.sel', function(){
+       var v = $(this).val();
+
+       if(v == 'add'){
+             var selected = $(this).find('option:selected');
+
+             var url = selected.data('href')
+             var prompt_text = selected.data('title');
+             var modal = selected.data('ta');
+             var select = selected.data('select');
+             var cat = selected.data('cat');
+             var label = selected.data('label');
+             $('.cat_label').html(label);
+             $('.eitem-url').val(url);
+             $('.eitem-select').val(select);
+             $('.modal-title').html(prompt_text);
+             $('.edit_class').attr('name', cat)
+             $(modal).modal();
+             $('.delete_form').attr('action',url);
+
+             var form = $("#editform"), validator = form.validate();
+             validator.resetForm();
+             form.find(".error").removeClass("error");
+
+             $("#editform input[name='" + cat + "']").rules("add", {required:true});
+       }
+    });
+  $('#addExpenseBtn').on('click', function(){
+        $('#addExpenseTable').slideToggle();
+    });
+        $('.expense_type').selectpicker({
+        iconBase: 'fa',
+        addIcon:'fa-plus-circle'
+    });
+
+    $('#editform').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+           category: {
+              required:true
+            }
+        },
+        messages:{
+          category:{
+            required: "please fill in the required field"
+          }
+        },
+        submitHandler: function() {
+              var name = $('.edit_class').data('name');
+              var inputValue = $('.edit_class').val();
+              var f = document.getElementById('editform');
+              var formData = new FormData(f);
+              //formData.append(name, inputValue);
+              var url = $('.eitem-url').val();
+              var selectClass = $('.eitem-select').val();
+              $.ajax({
+                  url: url,
+                  type: "POST",
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success:function(data){
+                    $('#edit_modal_instance').modal('hide');
+                    $('.edit_class').val('');
+                    var replaceDiv = $('.eitem-select').val()
+                    $(replaceDiv).replaceWith(data);
+                    $.jGrowl('Created successfully', {
+                      header: 'Well done!',
+                      theme: 'bg-success'
+                    });
+                    //window.location.reload();
+                  },
+                  error:function(error){
+                    console.log(error);
+                    $.jGrowl('Error Updating', {
+                        header: 'Oh snap!',
+                        theme: 'bg-danger'
+                    });
+                  }
+              });
+        }
+      });
+
+    //** validate form & submit
+      $('#expenses').validate({
+        onkeyup: function(element) {$(element).valid()},
+        rules:{
+            name: { required:true},
+            amount:{required:true},
+            number:{required:true}
+        },
+        messages:{
+          name:{
+            required: "please provide the name"
+          },
+          number:{
+            required: "please provide the number"
+          },
+          amount:{
+            required: "please provide the amount"
+          },
+        },
+        submitHandler: function() {
+          var f = document.getElementById('expenses');
+          var formData = new FormData(f);
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:accounts-add' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                         $('#expenses')[0].reset();
+                         updateSelectListnSearch();
+                         $('#addExpenseTable').slideUp();
+                         $.ajax({ url: "{% url 'dashboard:accounts_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                            $('#pagination-div').html(data);
+                         }});
+                         $.jGrowl('message sent successfully', {
+                            header: 'Well done!',
+                            theme: 'bg-success'
+                         });
+
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Change a few things up and try sending again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            }
+        }
+      });
+
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change', function(){
+
+        var ts = $(this).val();
+        if(ts == 'pdf'){
+            var searchData = $('.search_user').val();
+            var listSizeVal = $('.list-sz').find(":selected").val();
+            var groupSizeVal = $('.group-sz').find(":selected").val();
+            var url = "{% url 'accounts:bexpenses_pdf' %}";
+
+            if (searchData && (groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none')) ){
+                $.get(url, {q:searchData, gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if ((groupSizeVal && (groupSizeVal != 'all' && groupSizeVal !='none'))){
+                $.get(url, {gid:groupSizeVal}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else if (searchData){
+                $.get(url, {q:searchData}, function(data){
+                          window.open("data:application/pdf," + escape(data));
+                });
+            }else{
+                $.get(url, function(data){
+                          window.open("data:application/pdf," + escape(data));
+               });
+            }
+
+        }else{
+          $(this).val('')
+        }
+    });
+
+    //**@ display size select
+    $('.list-sz').selectpicker().on('change', function(){
+        var ts = $(this).val();
+        $.ajax({ url: "{% url 'dashboard:accounts_paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+        }});
+     });
+
+    $('.bootpag-callback').bootpag({
+        total: parseInt('{{pn}}'),
+        maxVisible: 3,
+        leaps: false
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+'{{pn}}'); // or some ajax content loading...
+            $.get("{% url 'dashboard:accounts_paginate' %}",{page:num},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm')
+
+     //**@ group name select
+    $('.group-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o'
+    }).on('change', function(){
+       var group_id = $(this).val();
+       if(group_id == 'all'){
+           $.ajax({ url: "{% url 'dashboard:accounts_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+              $('#pagination-div').html(data);
+          }});
+       }else{
+            $.get("{% url 'dashboard:accounts_paginate' %}",{page:1,gid:group_id},function(data){
+             $('#pagination-div').html(data);
+           });
+       }
+
+    });
+
+      $(".td").click(function(){
+          <!--window.location = $(this).data("href");-->
+          var url = $(this).data('href');
+          var modal = $(this).data('m');
+
+          $.ajax({
+              url: url,
+              type: "GET",
+              data: {csrfmiddlewaretoken:'{{csrf_token}}'},
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $(modal+' .modal-body').html(data);
+                $(modal).modal();
+              },
+              error:function(error){}
+          });
+      });
+
+      $('.modal-trigger').on('click', function (e) {
+
+         var url = $(this).data('href')
+         var prompt_text = $(this).data('title');
+         var username = $(this).data('name');
+         var modal = $(this).data('ta');
+         var id = $(this).data('id');
+         $('.del').attr('data-id', id);
+         $('.del').attr('data-href', url);
+         $('.modal-title').html(prompt_text);
+         $(modal).modal();
+         $('.delete_form').attr('action',url);
+      });
+
+      /* clicked the submit button */
+      $('.del').on('click', function (e) {
+          var f = document.getElementById('delform');
+          var formData = new FormData(f);
+          var id = $(this).data('id');
+          var url = $(this).data('href');
+
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success:function(data){
+                $('#modal_instance').modal('hide');
+                $('#tb #'+id).remove();
+                $.jGrowl('User deleted successfully', {
+                  header: 'Well done!',
+                  theme: 'bg-success'
+                });
+                window.location.reload();
+             // $("#mydiv").load(location.href + " #mydiv");
+              },
+              error:function(error){
+                console.log(error);
+                $.jGrowl('Error deleting Staff', {
+                    header: 'Oh snap!',
+                    theme: 'bg-danger'
+                });
+              }
+          });
+      });
+
+
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+
+      $('.search_user').keyup(function() {
+        var search_text = $(this).val();
+        delay(function(){
+           var url = "{% url 'dashboard:accounts-search' %}";
+           $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
+                  $('#pagination-div').html(data);
+           }});
+        }, 500 );
+
+      });
+
+
+
+  });
+
+
+</script>
+{% endblock %}

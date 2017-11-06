@@ -302,6 +302,21 @@
                     </li>
                   </ul>
                 </li>
+                   {% if perms.customer.view_car %}
+                <li >
+                  <a href="{% url 'dashboard:car-list' %}"><i class="icon-truck"></i> <span>
+                    Fleet Management
+                  </span></a>
+                  <ul>
+                    <li class="{% block menu_addcars_class %}{% endblock %}">
+                    <a href="{% url 'dashboard:car-list' %}">
+                    <i class="icon-car2"></i> Cars
+                    </a>
+                    </li>
+
+                  </ul>
+                </li>
+                  {% endif %}
                 <!-- communications -->
                 <li>
                   <a href="#"><i class=" icon-bubbles4"></i> <span>Communications</span></a>

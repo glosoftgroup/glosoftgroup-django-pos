@@ -124,6 +124,7 @@
                           <th>Receipt No</th>
                           <th>Status</th>
                           <th>Agent</th>
+                          <th>Car</th>
                           <th>Cashier</th>        
                           <th>Allocated</th>
                           <th>Sold</th>
@@ -148,6 +149,9 @@
                             </td>
                               <!--agent-->
                               <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{% if sale.agent %}{{sale.agent}}{% else %} -- {% endif %}</td>
+                              <!--car-->
+                              <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{% if sale.car %}{{sale.car}}{% else %} -- {% endif %}</td>
+
                               <!--cashier-->
                             <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
                               <!--allocated-->
