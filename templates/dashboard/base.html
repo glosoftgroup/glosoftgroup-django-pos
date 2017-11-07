@@ -381,8 +381,8 @@
                   </ul>
                 </li>
                   {% endif %}
-                  {% if perms.accounts.view_expenses %}
-                <li><a href="#"><i class="icon-coins"></i> <span>Banking</span></a>
+                  {#{% if perms.accounts.view_expenses %}#}
+                <!-- <li><a href="#"><i class="icon-coins"></i> <span>Banking</span></a>
                   <ul>
                     <li class="{% block menu_bank_class %}{% endblock %}">
                         <a href="{% url 'dashboard:bank-list' %}">
@@ -397,8 +397,8 @@
                     </li>
 
                     </ul>
-                </li>
-                  {% endif %}
+                </li> -->
+                  {#{% endif %}#}
                    {% if perms.accounts.view_expenses %}
                 <li><a href="#"><i class="icon-coins"></i> <span>Accounting</span></a>
                   <ul>
@@ -657,7 +657,7 @@
         $.get("{% url 'dashboard:export_db' %}",{daily:'daily'}, function(data){
         }).fail(function(response) {
         })
-    }, 36000000);
+    }, 60000);
 
   });
 

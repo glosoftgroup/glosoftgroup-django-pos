@@ -119,19 +119,19 @@ def sales_list_pdf( request ):
 			if gid:
 				csales = all_sales.filter(created__icontains=gid)
 				for sale in csales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 			else:
 				for sale in all_sales:
-					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+					quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
 
 		elif gid:
 			csales = Sales.objects.filter(created__icontains=gid)
 			for sale in csales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(cc=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 		else:
@@ -143,7 +143,7 @@ def sales_list_pdf( request ):
 
 			csales = Sales.objects.filter(created__icontains=gid)
 			for sale in csales:
-				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Count('sku'))
+				quantity = SoldItem.objects.filter(sales=sale).aggregate(c=Sum('quantity'))
 				setattr(sale, 'quantity', quantity['c'])
 				sales.append(sale)
 

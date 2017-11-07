@@ -51,5 +51,4 @@ urlpatterns = [
     url(r'^style-guide/', core_views.styleguide, name='styleguide'),
     url(r'^supplier/', include(supplier_urls)),
     url(r'^users/', include(users_urls)),
-    
 ]
