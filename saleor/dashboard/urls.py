@@ -3,7 +3,9 @@ from django.conf.urls import url, include
 from . import views as core_views
 from .allocate.urls import urlpatterns as allocate_urls
 from .banking.urls import urlpatterns as banking_urls
+from .car.urls import urlpatterns as car_urls
 from .category.urls import urlpatterns as category_urls
+from .credit.urls import urlpatterns as credit_urls
 from .customer.urls import urlpatterns as customer_urls
 from .drawercash.urls import urlpatterns as drawercash_urls
 from .discount.urls import urlpatterns as discount_urls
@@ -16,7 +18,7 @@ from .permgroups.urls import urlpatterns as group_urls
 from .product.urls import urlpatterns as product_urls
 from .variants.urls import urlpatterns as variants_urls
 from .reports.urls import urlpatterns as reports_urls
-from .credit.urls import urlpatterns as credit_urls
+
 from .search.urls import urlpatterns as search_urls
 from .sites.urls import urlpatterns as site_urls
 from .shipping.urls import urlpatterns as shipping_urls
@@ -27,6 +29,7 @@ urlpatterns = [
     url(r'^$', core_views.index, name='index'),
     url(r'^allocate/', include(allocate_urls)),
     url(r'^banking/', include(banking_urls)),
+    url(r'^car/', include(car_urls)),
     url(r'^categories/', include(category_urls)),
     url(r'^customers/', include(customer_urls)),
     url(r'^credit/', include(credit_urls)),

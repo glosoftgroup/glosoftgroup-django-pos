@@ -1,0 +1,68 @@
+{% load static %}
+{% if option %}
+    <div class=" detail-column">
+        
+
+          <div class="form-group">            
+              <label class="text-left" style="font-weight:500">Table name:</label>
+            
+              <input type="text" value="{{option.name}}" {{disabled}} name="optname" id="optname" class="form-control">
+            </div>
+
+
+    </div>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+    $('#id_sale_point').selectpicker();
+    var updateOptionBtn = $('#updateOption');
+    var number = $('#number');
+    var optname = $('#optname');
+    var sale_point = $('.spoint');
+    var updateUrl = "{% url 'dashboard:update-bank' pk=option.pk %}"
+
+    function updatePaymentOption(dynamicData,url,method){
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      return $.ajax({
+          url: url,
+          type: method,
+          data: dynamicData
+        });
+
+    }
+    // alertUser
+    function alertUser(msg,status='bg-success',header='Well done!')
+    { $.jGrowl(msg,{header: header,theme: status}); }
+    updateOptionBtn.on('click',function(){
+       var name = optname.val();
+       var dynamicData = {};     
+
+       if(!name){
+        alertUser('Name required','bg-danger','Missing Field Error!');
+        return false;
+       }
+       if(number.val){
+        dynamicData['number'] = number.val();
+       }
+
+       dynamicData['name'] = name;
+       dynamicData['sale_point'] = $('.spoint').val();
+       dynamicData['track'] = 'updating bank';
+
+
+       updatePaymentOption(dynamicData,updateUrl,'post')
+       .done(function(data){
+        alertUser('Updated successfully');
+        window.location.reload();
+       })
+       .fail(function(){
+        alertUser('Error occurred. Try another name','bg-danger','Error!')
+       });
+    });
+
+
+</script>
+{% else %}
+<div class="alert bg-info col-md-12">
+    <h4 class="text-center">No details for this option</h4>
+</div>
+{% endif %}

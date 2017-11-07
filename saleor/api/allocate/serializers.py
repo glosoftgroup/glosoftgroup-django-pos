@@ -95,6 +95,7 @@ class AllocateListSerializer(serializers.ModelSerializer):
                  'terminal',
                  'amount_paid',
                  'agent',
+                 'car',
                  'mobile',
                  'customer_name',
                  'cashier',
@@ -127,6 +128,7 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                  'terminal',
                  'amount_paid',
                  'agent',
+                 'car',
                  'mobile',
                  'customer_name',
                  'status',
@@ -159,8 +161,6 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
            total_net = Decimal(validated_data.get('total_net'))
         except:
            total_net = Decimal(0)
-
-                  
         solditems_data = validated_data.pop('allocated_items')
         credit = Allocate.objects.create(user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),
@@ -170,6 +170,7 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                                      terminal=validated_data.get('terminal'),
                                      amount_paid=validated_data.get('amount_paid'),
                                      agent=validated_data.get('agent'),
+                                     car=validated_data.get('car'),
                                      status='payment-pending',
                                      mobile=validated_data.get('mobile'),
                                      debt=validated_data.get('total_net'),
@@ -263,10 +264,11 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
         terminal.save()        
         instance.debt = instance.debt-validated_data.get('amount_paid', instance.amount_paid)
         instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
-        if instance.amount_paid >= instance.total_net:
-            instance.status = 'fully-paid'            
-        else:
-            instance.status = validated_data.get('status', instance.status)
+
+        instance.total_net = instance.amount_paid
+
+        instance.status = 'fully-paid'
+
         instance.mobile = validated_data.get('mobile', instance.mobile)   
         
         instance.customer_name = validated_data.get('customer_name', instance.customer_name)
