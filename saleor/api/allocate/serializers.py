@@ -9,22 +9,15 @@ from rest_framework.serializers import (
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from ...discount.models import Sale
-from ...discount.models import get_product_discounts
 from ...sale.models import (
-            Sales, 
-            SoldItem,
             Terminal,
             )
 from ...allocate.models import Allocate, AllocatedItem
-from ...site.models import SiteSettings
 from ...product.models import (
-            Product,
             ProductVariant,
             Stock,
             )
 from decimal import Decimal
-from ...customer.models import Customer
 
 
 User = get_user_model()
@@ -39,6 +32,8 @@ class TrackSerializer(serializers.ModelSerializer):
                 'sku',
                 'allocated_quantity',
                 'quantity',
+                'sold',
+                'unsold',
                 'unit_cost',
                 'total_cost',
                 'product_name',
@@ -59,6 +54,8 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'order',
                 'sku',
                 'quantity',
+                'sold',
+                'unsold',
                 'unit_cost',
                 'total_cost',
                 'product_name',
@@ -68,6 +65,7 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'tax',
                 'discount',
                  )
+
     def get_item_pk(self,obj):
         return obj.pk
 
@@ -83,9 +81,11 @@ class AllocateListSerializer(serializers.ModelSerializer):
     update_url = HyperlinkedIdentityField(view_name='allocate-api:update-allocate')
     allocated_items = ItemsSerializer(many=True)
     cashier = SerializerMethodField()
+
     class Meta:
         model = Allocate
-        fields = ('id',
+        fields = (
+                 'id',
                  'user',
                  'invoice_number',
                  'total_net',
@@ -107,7 +107,7 @@ class AllocateListSerializer(serializers.ModelSerializer):
                  'allocated_items',
                 )
 
-    def get_cashier(self,obj):
+    def get_cashier(self, obj):
         name = User.objects.get(pk=obj.user.id)
         return name.name
 
@@ -117,8 +117,9 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
     allocated_items = TrackSerializer(many=True)
 
     class Meta:
-        model =  Allocate
-        fields = ('id',
+        model = Allocate
+        fields = (
+                 'id',
                  'user',
                  'invoice_number',
                  'total_net',
@@ -156,13 +157,14 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
             raise ValidationError('Terminal specified does not exist')
         return value    
 
-    def create(self,validated_data):        
+    def create(self, validated_data):
         try:
            total_net = Decimal(validated_data.get('total_net'))
         except:
            total_net = Decimal(0)
         solditems_data = validated_data.pop('allocated_items')
-        credit = Allocate.objects.create(user=validated_data.get('user'),
+        credit = Allocate.objects.create(
+                                     user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),
                                      total_net=validated_data.get('total_net'),
                                      sub_total=validated_data.get('sub_total'),
@@ -189,11 +191,14 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                 
         return credit
 
+
 class AllocateUpdateSerializer(serializers.ModelSerializer):
     allocated_items = TrackSerializer(many=True)
+
     class Meta:
         model = Allocate
-        fields = ('id',                 
+        fields = (
+                 'id',
                  'invoice_number',
                  'total_net',
                  'sub_total',                
@@ -207,8 +212,7 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
                  'discount_amount',
                  'debt',
                  'allocated_items',
-                 )       
-    
+                 )
 
     def validate_total_net(self,value):
         data = self.get_initial()        
@@ -244,7 +248,6 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
             raise ValidationError('Terminal specified does not exist')
         # except:
         #     raise ValidationError('Terminal specified does not exist')
-        
 
     def update(self, instance, validated_data):
         terminal = Terminal.objects.get(pk=self.terminal_id)
@@ -252,22 +255,29 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
             old = instance.item_detail(x['sku'])
             unsold = old.allocated_quantity - x['quantity']
             old.quantity = x['quantity']
-            old.save()
+            old.sold += x['quantity']
+            old.unsold = unsold
             stock = Stock.objects.get(variant__sku=x['sku'])
-            if stock:
-                Stock.objects.increase_stock(stock, unsold)
-                print stock.quantity
+
+            # handle return unsold product to stock
+            if validated_data.get('status', instance.status) == 'fully-paid':
+                if stock:
+                    Stock.objects.increase_stock(stock, unsold)
+                    print stock.quantity
+                else:
+                    print 'stock not found'
             else:
-                print 'stock not found'
+                old.allocated_quantity = unsold
+            old.save()
 
         terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))       
         terminal.save()        
         instance.debt = instance.debt-validated_data.get('amount_paid', instance.amount_paid)
-        instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
+        instance.total_sale += validated_data.get('amount_paid', instance.amount_paid)
 
         instance.total_net = instance.amount_paid
 
-        instance.status = 'fully-paid'
+        instance.status = validated_data.get('status', instance.status)
 
         instance.mobile = validated_data.get('mobile', instance.mobile)   
         

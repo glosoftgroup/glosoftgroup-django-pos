@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
-from .views import (    
+from .views import (
+    AllocateAgentListAPIView,
     AllocateCreateAPIView,
     AllocateListAPIView,
     AllocateUpdateAPIView,
@@ -8,10 +9,10 @@ from .views import (
 
 
 urlpatterns = [
-    url(r'^$', AllocateListAPIView.as_view(),
-     name='list-allocate'),
-    url(r'^search/$', AllocateListAPIView.as_view(),
-     name='search-allocate'),
+    url(r'^$', AllocateListAPIView.as_view(), name='list-allocate'),
+    url(r'^search/$', AllocateListAPIView.as_view(), name='search-allocate'),
+    url(r'^agent/(?P<pk>[0-9]+)/$', AllocateAgentListAPIView.as_view(),
+        name='search-agent-allocate'),
     url(r'^update/(?P<pk>[0-9]+)/$', AllocateUpdateAPIView.as_view(),
      name='update-allocate'),
     url(r'^create/$',

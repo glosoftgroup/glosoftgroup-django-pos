@@ -13,3 +13,9 @@ class UserListAPIView(generics.ListAPIView):
     serializer_class = UserListSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = User.objects.all()
+
+
+class AgentListAPIView(generics.ListAPIView):
+    serializer_class = UserListSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = User.objects.all()

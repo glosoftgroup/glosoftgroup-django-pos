@@ -33,6 +33,7 @@ from ..car.models import Car
 from . import OrderStatus
 from . import TransactionStatus
 
+
 class AllocateManager(models.Manager):
     def due_credits(self):        
         return self.get_queryset().filter(due_date__lte=timezone.now())
@@ -87,7 +88,9 @@ class Allocate(models.Model):
         pgettext_lazy('Allocate field', 'total tax'), default=Decimal(0), max_digits=100, decimal_places=2)
     amount_paid = models.DecimalField(
         pgettext_lazy('Allocate field', 'amount paid'), default=Decimal(0), max_digits=100, decimal_places=2)
-    
+    total_sale = models.DecimalField(
+        pgettext_lazy('Allocate field', 'total paid'), default=Decimal(0), max_digits=100, decimal_places=2)
+
     balance = models.DecimalField(
         pgettext_lazy('Allocate field', 'balance'), default=Decimal(0), max_digits=100, decimal_places=2)
     debt = models.DecimalField(
@@ -158,8 +161,12 @@ class AllocatedItem(models.Model):
     quantity = models.IntegerField(
         pgettext_lazy('AllocatedItem field', 'quantity'),
         validators=[MinValueValidator(0)], default=Decimal(0))
-    allocated_quantity = models.DecimalField(
-        pgettext_lazy('AllocatedItem field', 'debt'), default=Decimal(0), max_digits=100, decimal_places=2)
+    allocated_quantity = models.IntegerField(
+        pgettext_lazy('AllocatedItem field', 'allocated quantity'), validators=[MinValueValidator(0)], default=Decimal(0))
+    sold = models.IntegerField(
+        pgettext_lazy('AllocatedItem field', 'sold quantity'), validators=[MinValueValidator(0)], default=Decimal(0))
+    unsold = models.IntegerField(
+        pgettext_lazy('AllocatedItem field', 'unsold quantity'), validators=[MinValueValidator(0)], default=Decimal(0))
 
     product_name = models.CharField(
         pgettext_lazy('AllocatedItem field', 'product name'), max_length=128)
