@@ -10,11 +10,11 @@
   "allocated_items": [
     {
       "order": 1,
-      "sku": "60-1337",
+      "sku": "57-1337",
       "allocated_quantity": 10,
       "unit_cost": "90.00",
       "total_cost": "90.00",
-      "product_name": "Martin PLC (60-1337) ",
+      "product_name": "Gray, Martinez and Perry (57-1337)",
       "product_category": "Flour",
       "tax": 16,
       "discount": 200

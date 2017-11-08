@@ -275,7 +275,7 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
         instance.debt = instance.debt-validated_data.get('amount_paid', instance.amount_paid)
         instance.total_sale += validated_data.get('amount_paid', instance.amount_paid)
 
-        instance.total_net = instance.amount_paid
+        instance.amount_paid = validated_data.get('amount_paid', instance.amount_paid)
 
         instance.status = validated_data.get('status', instance.status)
 
