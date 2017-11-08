@@ -128,6 +128,7 @@
                           <th>Cashier</th>        
                           <th>Allocated</th>
                           <th>Sold</th>
+
                           <th>Total Sales (KShs)</th>
                         </tr>
                       </thead>
@@ -155,11 +156,12 @@
                               <!--cashier-->
                             <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{% if sale.user.email %}{{sale.user.email}}{% else %}{{sale.user.name}}{% endif %}</td>
                               <!--allocated-->
-                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{{sale.allocated_quantity}}</td>
+                            <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}">{{sale.total_allocated}}</td>
                               <!--sold-->
                             <td>
-                                {{sale.quantity}}
+                                {{ sale.sold_items }}
                             </td>
+
                             <td class="td" data-href="{% url 'dashboard:allocate-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                           </tr>
                         {% endfor %}

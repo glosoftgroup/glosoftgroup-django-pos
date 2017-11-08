@@ -131,6 +131,18 @@ class Allocate(models.Model):
     def items(self):
         return self.allocated_items.all()
 
+    def sold_items(self):
+        total = self.allocated_items.aggregate(sum=models.Sum('sold'))
+        return total['sum']
+
+    def unsold_items(self):
+        total = self.allocated_items.aggregate(sum=models.Sum('unsold'))
+        return total['sum']
+
+    def total_allocated(self):
+        total = self.allocated_items.aggregate(sum=models.Sum('allocated_quantity'))
+        return total['sum']
+
     def item_detail(self,sku):
         return self.allocated_items.get(sku=sku)
 

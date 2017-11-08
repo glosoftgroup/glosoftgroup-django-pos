@@ -56,6 +56,7 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'quantity',
                 'sold',
                 'unsold',
+                'allocated_quantity',
                 'unit_cost',
                 'total_cost',
                 'product_name',
@@ -178,7 +179,7 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                                      debt=validated_data.get('total_net'),
                                      customer_name=validated_data.get('customer_name'))
         for solditem_data in solditems_data:
-            AllocatedItem.objects.create(allocate=credit,**solditem_data)
+            AllocatedItem.objects.create(allocate=credit, **solditem_data)
             try:
                 stock = Stock.objects.get(variant__sku=solditem_data['sku'])
                 if stock:                
@@ -214,7 +215,7 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
                  'allocated_items',
                  )
 
-    def validate_total_net(self,value):
+    def validate_total_net(self, value):
         data = self.get_initial()        
         try:
             total_net = Decimal(data.get('total_net'))
@@ -253,9 +254,10 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
         terminal = Terminal.objects.get(pk=self.terminal_id)
         for x in validated_data.get('allocated_items'):
             old = instance.item_detail(x['sku'])
-            unsold = old.allocated_quantity - x['quantity']
-            old.quantity = x['quantity']
             old.sold += x['quantity']
+            old.quantity = x['quantity']
+            old.total_cost = x['total_cost']
+            unsold = old.allocated_quantity - old.sold
             old.unsold = unsold
             stock = Stock.objects.get(variant__sku=x['sku'])
 
@@ -266,8 +268,6 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
                     print stock.quantity
                 else:
                     print 'stock not found'
-            else:
-                old.allocated_quantity = unsold
             old.save()
 
         terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))       

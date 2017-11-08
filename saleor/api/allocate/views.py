@@ -1,17 +1,8 @@
 from django.db.models import Q
-from .pagination import PostLimitOffsetPagination
-from rest_framework.generics import (ListAPIView,
-                                     CreateAPIView,
-                                     RetrieveAPIView,
-                                     DestroyAPIView,
-                                    )
+
 from rest_framework.response import Response
 from rest_framework.request import Request
-from ...product.models import (
-    Product,
-    ProductVariant,
-    Stock,
-    )
+
 from ...allocate.models import Allocate
 from ...sale.models import (
                             Sales, SoldItem,
@@ -19,7 +10,7 @@ from ...sale.models import (
                             TerminalHistoryEntry,
                             DrawerCash
                             )
-from ...customer.models import Customer
+
 from .serializers import (
     AllocateListSerializer,
     CreateAllocateSerializer,
@@ -66,13 +57,10 @@ class AllocateListAPIView(generics.ListAPIView):
 
 class AllocateAgentListAPIView(generics.ListAPIView):
     """
-        list agents allocated products items
-        @:param q is order status
-        @:param pk sale point id
-        @:param order_pk order start query
-
-        GET /api/order/sale-point/2/47?q=pending-payment
-        payload Json: /payload/getnewerorders.json
+        list agents pending allocated products items
+        @:param pk agent id
+        GET api/allocate/agent/6/
+        payload Json: /payload/agents_allocations.json
     """
     serializer_class = AllocateListSerializer
     queryset = Allocate.objects.all()
@@ -82,7 +70,8 @@ class AllocateAgentListAPIView(generics.ListAPIView):
             'request': Request(request),
         }
         queryset = self.get_queryset().filter(
-            Q(agent__pk=pk)
+            Q(agent__pk=pk) and
+            Q(status='payment-pending')
         )
         serializer = AllocateListSerializer(queryset, many=True, context=serializer_context)
         return Response(serializer.data)
@@ -127,7 +116,10 @@ class AllocateUpdateAPIView(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         instance = serializer.save(user=self.request.user)
-        send_to_sale(instance)
+        if instance.amount_paid != 0.00:
+            send_to_sale(instance)
+        else:
+            print('amount paid cannot be zero')
         user_trail(self.request.user.name,'made a allocated sale:#'+str(serializer.data['invoice_number'])+' credit sale worth: '+str(serializer.data['total_net']),'add')
         info_logger.info('User: '+str(self.request.user)+' made a allocated sale:'+str(serializer.data['invoice_number']))
         terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
@@ -172,13 +164,13 @@ def send_to_sale(credit):
         print(e)
 
     for item in credit.items():
-        item = SoldItem.objects.create(
-                        sales=sale,
-                        sku=item.sku,
-                        quantity=item.quantity,
-                        product_name=item.product_name,
-                        total_cost=item.total_cost,
-                        unit_cost=item.unit_cost,
-                        product_category=item.product_category
-                        )
-        print item
+        if item.quantity:
+            new = SoldItem()
+            new.sales = sale
+            new.sku = item.sku
+            new.quantity = item.quantity
+            new.product_name = item.product_name
+            new.total_cost = item.total_cost
+            new.unit_cost = item.unit_cost
+            new.product_category=item.product_category
+            new.save()
