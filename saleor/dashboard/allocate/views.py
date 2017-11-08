@@ -302,7 +302,7 @@ def allocate_paginate(request):
 				paginator = Paginator(sales, int(list_sz))
 				sales = paginator.page(page)
 				return TemplateResponse(request,'dashboard/reports/allocate/p2.html',
-								{'sales':sales, 'pn':paginator.num_pages,'sz':list_sz, 
+								{'sales':sales, 'pn':paginator.num_pages,'sz':list_sz,
 								'gid':0, 'total_sales':total_sales, "total_sales_amount":total_sales_amount,
 								 'tsum':tsum, 'month':month, 'year':year, 'period':period,'date_period':date_period})
 			else:
@@ -377,7 +377,7 @@ def allocate_search(request):
 				date = DateFormat(datetime.datetime.today()).format('Y-m-d')
 			date_period = date
 
-		if q is not None:            
+		if q is not None:
 			all_sales = credits.filter(
 				Q( invoice_number__icontains = q ) |
 				Q( terminal__terminal_name__icontains = q ) |
@@ -409,7 +409,7 @@ def allocate_search(request):
 					sales = paginator.page(page)
 					return TemplateResponse(request, 'dashboard/reports/allocate/search.html',
 											{'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz,
-											 'gid': date, 'q': q, 'month':month, 'year':year, 
+											 'gid': date, 'q': q, 'month':month, 'year':year,
 											 'period':period,'date_period':date_period,
 											 "total_sales_amount":total_sales_amount})
 
@@ -417,7 +417,7 @@ def allocate_search(request):
 				sales = paginator.page(page)
 				return TemplateResponse(request, 'dashboard/reports/credit/search.html',
 										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz,
-										 'gid': request.GET.get('gid'), 'month':month, 'year':year, 
+										 'gid': request.GET.get('gid'), 'month':month, 'year':year,
 										 'period':period,'date_period':date_period,
 										 "total_sales_amount":total_sales_amount})
 
@@ -455,7 +455,7 @@ def allocate_search(request):
 					return TemplateResponse(request, 'dashboard/reports/credit/paginate.html', {'sales': sales})
 
 				return TemplateResponse(request, 'dashboard/reports/credit/search.html',
-										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q, 'month':month, 
+										{'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q, 'month':month,
 										'year':year, 'period':period,'date_period':date_period,
 										 "total_sales_amount": total_sales_amount})
 
@@ -546,8 +546,8 @@ def products_search(request):
 		else:
 			sz = list_sz
 
-		if q is not None:            
-			items = ProductVariant.objects.filter( 
+		if q is not None:
+			items = ProductVariant.objects.filter(
 				Q( sku__icontains = q ) |
 				Q( product__name__icontains = q ) |
 				Q(product__product_class__name__icontains = q) ).order_by( '-id' )
@@ -820,7 +820,7 @@ def get_dashboard_data(request):
 	todays_sales = Sales.objects.filter(created=today).annotate(Sum('total_net'))
 
 	''' get highest product '''
-	
+
 	''' get lowest product '''
 	data = {
 		 "label":label,
