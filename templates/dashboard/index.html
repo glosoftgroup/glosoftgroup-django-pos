@@ -451,38 +451,37 @@ $('.rangeBtn').on('click', function(){
         });
     }else{
         $.jGrowl('Please select the end month', {
-          header: 'Well done!',
+          header: 'Oops! Empty fields',
           theme: 'bg-danger'
         });
     }
-
 });
 
 
-        $('.p2-pag').bootpag({
-            total: parseInt('{{pn}}'),
-            maxVisible: 3,
-            leaps: true,
-        firstLastUse: true,
-        first: 'First',
-        last: 'Last',
-        wrapClass: 'pagination',
-        activeClass: 'active',
-        disabledClass: 'disabled',
-        nextClass: 'next',
-        prevClass: 'prev',
-        lastClass: 'last',
-        firstClass: 'first',
-            }).on("page", function(event, num){
-                $(".pages-nav2").html("Page " + num +" of "+'{{pn}}');
-                var gid = '{{gid}}';
-                if(gid == 0){
-                    $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
-                      $('#p-tb').html(data);
-                      console.log('without gid '+data);
-                    });
-                }
-        }).children('.pagination').addClass('pagination-flat pagination-sm')
+$('.p2-pag').bootpag({
+    total: parseInt('{{pn}}'),
+    maxVisible: 3,
+    leaps: true,
+    firstLastUse: true,
+    first: 'First',
+    last: 'Last',
+    wrapClass: 'pagination',
+    activeClass: 'active',
+    disabledClass: 'disabled',
+    nextClass: 'next',
+    prevClass: 'prev',
+    lastClass: 'last',
+    firstClass: 'first',
+        }).on("page", function(event, num){
+            $(".pages-nav2").html("Page " + num +" of "+'{{pn}}');
+            var gid = '{{gid}}';
+            if(gid == 0){
+                $.get("{% url 'dashboard:products_reorder_paginate' %}",{page:num, psize:'{{sz}}'},function(data){
+                  $('#p-tb').html(data);
+                  console.log('without gid '+data);
+                });
+            }
+    }).children('.pagination').addClass('pagination-flat pagination-sm')
 
 // Create the chart
 Highcharts.chart('itemChartContainer', {
