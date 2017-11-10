@@ -36,6 +36,7 @@
    <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
   <!--image preview -->
   <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">
+   <link href="{% static 'backend/js/plugins/ladda/ladda-themeless.min.css' %}" rel="stylesheet" type="text/css">
   <!-- bootstrap select -->
   <!-- <link href="{% static 'backend/js/plugins/ui/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" type="text/css"> -->
   
@@ -87,7 +88,7 @@
               <input type="hidden" name="next" value="{{ request.GET.next }}">
 
               <div class="form-group">
-                <button type="submit" class="btn bg-pink-400 btn-block login_btn">Sign in <i class="icon-circle-right2 position-right"></i><br><i class="fa fa-spinner fa-spin fa-2x fa-fw position-right spinner" style="display: none;"></i></button>
+                <button type="submit" class="btn bg-pink-400 btn-block login_btn ladda-button" data-style="expand-right" id="login_btn">Sign in <i class="icon-circle-right2 position-right"></i><br><i class="fa fa-spinner fa-spin fa-2x fa-fw position-right spinner" style="display: none;"></i></button>
               </div>
               <div class="text-center">
                 <a class="link--styled" href="{% url 'account_reset_password' %}">
@@ -145,6 +146,9 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/pnotify.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/noty.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/notifications/jgrowl.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/ladda/spin.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ladda/ladda.min.js' %}"></script>
+  
 
   <script type="text/javascript" src="{% static 'backend/js/pages/components_notifications_other.js' %}"></script>
 
@@ -161,7 +165,11 @@
     <script type="text/javascript">
          $("#loginForm").submit(function(e)
           {
-              $('.spinner').show();
+             e.preventDefault();
+
+              var l = Ladda.create(document.querySelector('#login_btn'));
+              l.start();
+              // $('.spinner').show();
               var postData = $(this).serializeArray();
               var formURL = "{% url 'lock_process' %}";
 
@@ -173,27 +181,33 @@
                   data : postData,
                   success:function(data, textStatus, jqXHR) 
                   {
-                      if(data == 'error login' || data == 'wrong credentials')
-                      {
-                          $('#status').show();
-                          $('.spinner').hide();
-                      }else{ 
-                         window.location = data;
-                         $('.email').val('');
-                         $('.password').val('');
-                         $('.spinner').hide();
+                       if(data == 'error login' || data == 'wrong credentials'){
+                          l.stop();
+                          alertNotificatio('Wrond Credentials!', 'Authentication Error', 'danger') 
+                       }
+                       else{
+                          l.stop();
+                          alertNotificatio('Authenticated', 'Success!', 'success')
+                          window.location = data;
+                          $('.email').val('');
+                          $('.password').val('');
                        }
 
                   },
                   error: function(data) 
                   {
-                    console.log(data);
-                      $('#status').show();
-                      $('.spinner').hide();  
+                    alertNotificatio('Wrond Credentials!', 'Authenticatin Error', 'danger') 
                   }
               });
+               return false;
               e.preventDefault(); //STOP default action
           });
+         function alertNotificatio(message, header, theme){
+            $.jGrowl(message, {
+                header: header,
+                theme: 'bg-'+theme
+            });
+        }
 
         
        // });
