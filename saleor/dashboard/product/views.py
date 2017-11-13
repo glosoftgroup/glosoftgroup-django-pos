@@ -543,7 +543,7 @@ def product_data(request):
                 variant.name = request.POST.get('sku')
                 if request.POST.get('threshold'):
                      variant.low_stock_threshold = request.POST.get('threshold')
-                variant.save();
+                variant.save()
             except Exception as e:
                 print(e)
         if request.POST.get('name'):
@@ -562,7 +562,7 @@ def product_data(request):
             category = request.POST.get('categories')
             product.categories.clear()
             product.categories.add(category)
-        return HttpResponse({'message':str(product)+' Added'})
+        return HttpResponse({'message': str(product)+' Added'})
     return HttpResponse('Invalid Method!')
 
 @staff_member_required
@@ -687,7 +687,7 @@ def product_edit(request, pk,name=None):
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
            'variant_form': variant_form}
-    print form.errors
+    #print form.errors
     if name:
         ctx['go'] = 'True'
     if request.is_ajax():
@@ -1876,7 +1876,7 @@ def attr_list_f32d(request):
         variants = json.loads(request.POST.get('variants'))        
         if request.POST.get('name'):
             pk = request.POST.get('name')
-            product_class = get_object_or_404(ProductClass,pk=int(pk))
+            product_class = get_object_or_404(ProductClass, pk=int(pk))
         if request.POST.get('newclass'):            
             product_class = ProductClass.objects.create(name=request.POST.get('newclass'))
         if product_class:

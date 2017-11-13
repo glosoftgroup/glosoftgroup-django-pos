@@ -1,0 +1,179 @@
+{% load i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+
+ <div class="panel panel-flat">         
+     
+    <div class="modal-body">
+     {% if errors %}
+       
+       <div class="col-md-12">
+         <div class="alert alert-danger alert-styled-left">
+          <button type="button" class="close" data-dismiss="alert"><span>&times;</span><span class="sr-only">Close</span></button>         
+            <span class="text-semib">{{ errors.as_text }}</span>
+         
+            
+          </div>
+        </div>
+     
+       {% endif %}
+    <form method="post" id="new-stock-settings" enctype="multipart/form-data">
+      <div class="card-content">
+        {% csrf_token %}
+        <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=stock">
+      <div class="row">
+         <div class="col-md-6">
+            <div class="form-group">
+              {{ form.variant|materializecss }}
+            </div>
+            <div class="form-group">
+              {{ form.location|materializecss }}
+            </div>
+            <div class="form-group">
+              {{ form.invoice_number|materializecss }}
+            </div>
+         </div>
+         <div class="col-md-6">
+            <div class="form-group">
+                {{ form.quantity|materializecss }}
+            </div>
+            <div class="form-group">
+                {{ form.cost_price|materializecss }}
+            </div>
+            <div class="form-group">
+              <div class="col-md-6">
+                <label class="text-bold">Total Cost</label>
+                <input type="number"  name="total_cost" id='total_cost' class="form-control" />
+              </div>
+            </div>
+         </div>
+        </div>
+        </div>
+         <!-- action buttons -->
+         <div class="modal-footer">
+           {% if stock.pk %}
+              <a href="{% url 'dashboard:product-update' pk=product.pk %}?tab=stock" class="btn btn-flat">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+              <button type="submit" class="btn waves-effect waves-light">
+                {% trans "Update" context "Dashboard update action" %}
+              </button>
+            {% else %}
+              <a href="" data-dismiss="modal" class="btn btn-link">
+                {% trans "Cancel" context "Dashboard cancel action" %}
+              </a>
+              <button type="submit" class="btn btn-primary waves-effect waves-light">
+                {% trans "Create" context "Dashboard create action" %}
+              </button>
+            {% endif %}
+         </div>        
+      </div> 
+      </form>      
+    </div>
+  </div>
+  <script type="text/javascript">
+    $( document ).ready(function() {
+    // validate
+    $('#new-stock-settings').validate({
+    rules:{
+        cost_price: {
+          required:true,
+          minlength:1
+        },   
+        
+    },
+    submitHandler: function() { 
+      
+      if(1 != ''){
+          var f = document.getElementById('new-stock-settings');
+          var formData = new FormData(f);
+          
+          for (var pair of formData.entries()) {
+              console.log(pair[0]+ ', ' + pair[1]); 
+          }
+          if (formData) {
+                $.ajax({
+                    url: "{% url 'dashboard:product-stock-add' product_pk=product.pk %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success:function(data){
+                       console.log(data);
+                       $("#name").val('');               
+                       $("#nid").val('');               
+
+                       // if(data['message'] == 1){
+                       // 	alertUser('successfully');
+                       // }else{
+                       // 	alertUser('error');
+                       // }
+                       $.jGrowl('Stock added successfully,', {
+                          header: 'Well done!',
+                          theme: 'bg-success'
+                       });
+                       
+                      localStorage.setItem('user_id', data);
+                      $('.user_id').val(localStorage.getItem("user_id"));
+                      {% if product.pk %}
+                      //window.location = "{% url 'dashboard:product-update' pk=product.pk %}?tab=stock";      
+                      {% endif %}
+                    },
+                    error:function(error){
+                      console.log(error);
+                      $.jGrowl('Variant already exist. Try adding another variant, then submitting again', {
+                          header: 'Oh snap!',
+                          theme: 'bg-danger'
+                      });
+                    }
+                });
+            } 
+      }else{
+        $.jGrowl('Image is empty fill and try submitting again', {
+            header: 'Oh snap!',
+            theme: 'bg-danger'
+        });
+      }
+    }
+  });
+    // end validate
+  });
+   
+  </script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+  // Basic select
+  $('.select').selectpicker();
+
+  
+  $("#total_cost").on("change keyup paste keydown", function(event) { 
+    var total_cost = $('#total_cost').val();
+    var unit_cost = $('#id_cost_price').val();
+    var quantity = $('#id_quantity').val();
+    
+    unit_cost = parseInt(total_cost)/parseInt(quantity);
+    $('#id_cost_price').val(unit_cost);    
+
+  });
+  $("#id_cost_price").on("change keyup paste keydown", function(event) { 
+    var total_cost = $('#total_cost').val();
+    var unit_cost = $('#id_cost_price').val();
+    var quantity = $('#id_quantity').val();
+    
+    total_cost = parseInt(unit_cost)*parseInt(quantity);
+    $('#total_cost').val(total_cost);    
+
+  });
+  $("#id_quantity").on("change keyup paste keydown", function(event) { 
+    var total_cost = $('#total_cost').val();
+    var unit_cost = $('#id_cost_price').val();
+    var quantity = $('#id_quantity').val();
+    
+    total_cost = parseInt(unit_cost)*parseInt(quantity);
+    $('#total_cost').val(total_cost);
+    unit_cost = parseInt(total_cost)/parseInt(quantity);
+    $('#id_cost_price').val(unit_cost);
+
+
+  });
+</script>
