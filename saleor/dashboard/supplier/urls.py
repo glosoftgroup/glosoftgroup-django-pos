@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 
-from . import views
+from . import views, credit
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -35,6 +35,13 @@ urlpatterns = [
             (views.user_edit), name='supplier-edit'),
         url(r'^supplier_update(?P<pk>[0-9]+)/$', views.user_update, name='supplier-update'),
         url(r'^user_assign_permission/$', views.user_assign_permission, name='user_assign_permission'),
+
+        url(r'^credit-list/$', permission_required('customer.view_customer', login_url='not_found')
+            (credit.credit_report), name='supplier_credit_list'),
+        url(r'^credit/paginate/$', credit.credit_pagination, name='supplier-credit-paginate'),
+        url(r'^credit/search/$', credit.credit_search, name='supplier-credit-search'),
+        url(r'^history/(?P<credit_pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (credit.credit_history), name='supplier_credit_history'),
         
 ]
 

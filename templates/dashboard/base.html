@@ -296,9 +296,14 @@
                   </span></a>
                   <ul>
                     <li class="{% block menu_supplier_class %}{% endblock %}">
-                    <a href="{% url 'dashboard:supplier' %}">
-                    <i class="icon-users2"></i>Supplier
-                    </a>
+                        <a href="{% url 'dashboard:supplier' %}">
+                        <i class="icon-users2"></i>Supplier
+                        </a>
+                    </li>
+                      <li class="{% block menu_creditSupplier_class %}{% endblock %}">
+                        <a href="{% url 'dashboard:supplier_credit_list' %}">
+                        <i class="icon-width"></i> Credit
+                        </a>
                     </li>
                   </ul>
                 </li>

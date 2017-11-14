@@ -126,6 +126,7 @@ def sales_detail(request, pk):
                 "total_sales_amount":total_sales_amount,
                 "total_tax_amount":total_tax_amount,
                 "customer":customer,
+                "pn":paginator.num_pages
             }
             return TemplateResponse(request, 'dashboard/customer/sales/sales_list.html',data)
     except ObjectDoesNotExist as e:
