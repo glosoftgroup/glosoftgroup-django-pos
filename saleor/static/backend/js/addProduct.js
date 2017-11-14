@@ -494,6 +494,9 @@ $(function(){
    var stockInvoiceId  = $('#stockInvoiceNumber');
    var stockLocationId = $('#id_location');
    var stockQuantityId = $('#stock_quantity');
+   var stockAmountPaid = $('#amount_paid');
+   var stockTotalCost  = $('#total_cost');
+   var stockPaymentOption = $('#payment_option');
    var reorder_levelId = $('#id_low_stock_threshold');
    var addnewStockBtn  = $('#addnewStockBtn');
 
@@ -530,7 +533,7 @@ $(function(){
     var refreshStockUrl = $(this).data('refreshstockurl');
     // validation
     if(!invoice_number){
-      //alertUser('Invoice number required','bg-danger','Field Required!');
+
       stockInvoiceId.focus();
       stockInvoiceId.prop('autofocus');      
       stockInvoiceId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
@@ -539,7 +542,7 @@ $(function(){
       stockInvoiceId.nextAll('.help-block:first').addClass('text-danger').html('');
     }
     if(!variant){
-      //alertUser('Please select a variant','bg-danger','Field Required!');
+
       stockVariantId.focus();
       stockVariantId.prop('autofocus');      
       stockVariantId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
@@ -551,7 +554,7 @@ $(function(){
        
     }
     if(!cost_price){
-      //alertUser('Enter cost price','bg-danger','Field Required!');
+
       costPriceId.focus();
       costPriceId.prop('autofocus');      
       costPriceId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
@@ -561,7 +564,6 @@ $(function(){
       costPriceId.nextAll('.help-block:first').addClass('text-danger').html('');
     }
     if(!quantity){
-      //alertUser('Stock Quantity required','bg-danger','Field Required!');
       stockQuantityId.focus();
       stockQuantityId.prop('autofocus');      
       stockQuantityId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
@@ -573,6 +575,15 @@ $(function(){
     
     if(reorder_level){
       dynamicData['low_stock_threshold'] = reorder_level;
+    }
+    if(stockAmountPaid.val()){
+      dynamicData['amount_paid'] = stockAmountPaid.val();
+    }
+    if(stockPaymentOption.val()){
+      dynamicData['payment_option'] = stockPaymentOption.val();
+    }
+    if(stockTotalCost.val()){
+      dynamicData['total_cost'] = stockTotalCost.val();
     }
     
     // ./validation    

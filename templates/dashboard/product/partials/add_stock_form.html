@@ -9,9 +9,9 @@
  <style type="text/css">
         #toggleStock{display:none;}
 </style>
-<div id="toggleStock" class="card-3">
+<div id="toggleStock" class="card-3 mb-10">
 <!--form-->
-<div class="add-new-stock-form">
+<div class="add-new-stock-form mt-10">
     <div class="sidebar-category bg-primary">
         <div class="category-title text-center text-semibold">
             <span id="selected-number">Add Stock</span>
@@ -20,54 +20,100 @@
 
     <div class="col-md-12 bg-white ">
      <div class="tab-pane fade has-padding active in">
+        <div class="panelpanel-flat">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <fieldset>
 
+                            <div class="form-group">
+                                <label>Invoice Number:<span class="text-danger">*</span></label>
+                                <input type="text" placeholder="Invoice Number" class="form-control has-warning" id="stockInvoiceNumber" name="stockInvoiceNumber">
+                                <span class="help-block"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Variant:<span class="text-danger">*</span></label>
+                                {{ stock_form.variant }}
+                                <span class="help-block"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Payment option:<span class="text-danger">*</span></label>
+                                <select name="payment_option" id="payment_option" class="bootstrap-select form-control" id="payment_option">
+                                    {% for option in payment_options %}
+                                        <option value="{{option.id}}">{{option}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="hidden">
+                                {{ stock_form.location }}
+                            </div>
+
+
+                        </fieldset>
+                    </div>
+
+                    <div class="col-md-6">
+                        <fieldset>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Quantity:</label>
+                                        <input type="number" placeholder="Quantity" class="form-control" id="stock_quantity" name="stock_quantity">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Reorder Threshold:</label>
+                                        {{ stock_form.low_stock_threshold }}
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Unit cost price:</label>
+                                        <input style="" type="number" placeholder="Unit price" class="form-control" id="stockcostprice" name="stockcostprice">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Total cost #:</label>
+                                        <input placeholder="Total cost" name="total_cost" id="total_cost" class="form-control" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Amount paid:</label>
+                                        <input placeholder="Total amount" name="amount_paid" id="amount_paid" class="form-control" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </fieldset>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-add' product_pk=product.pk %}" id='addnewStockBtn' class="btn btn-xs btn-primary">Add</button>
+                </div>
+            </div>
+        </div>
      </div>
     </div>
 </div>
     <!--/form-->
-<table class="table  datatable-header-footer responsive data-table">
-    <thead>
-      <tr class='bg-primary'>
-        <th> Invoiceyy</th>
-        <th> Variant</th>
-        <th> Cost Price</th>
-        <th class="right-align">Quantity</th>
-        <th>Reorder Threshold</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-     <tr>
-    	<td width="15%">
-    		<input type="text" placeholder="Invoice Number" class="form-control has-warning" id="stockInvoiceNumber" name="stockInvoiceNumber">
-            <span class="help-block"></span>
-    	</td>
-    	<td width="25%">
-        <div id="refreshStockVariants">
-    		{{ stock_form.variant }}
-            <span class="help-block"></span>
-        </div>
-    	</td>
-    	<td width="15%">
-    		<input style="" type="number" placeholder="Cost price" class="form-control" id="stockcostprice" name="stockcostprice">
-            <span class="help-block"></span>
-    	</td>
-    	<td  class="hidden">
-    		{{ stock_form.location }}
-    	</td>
-    	<td width="15%">
-    		<input type="number" placeholder="Quantity" class="form-control" id="stock_quantity" name="stock_quantity">
-            <span class="help-block"></span>
-    	</td>
-        <td>
-            {{ stock_form.low_stock_threshold }}
-            <span class="help-block"></span>
-        </td>
-    	<td>
-    		<button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-add' product_pk=product.pk %}" id='addnewStockBtn' class="btn btn-xs btn-primary">Add</button>
-    	</td>
-      </tr>
-    </tbody>
-   </table>
+
 
 </div>

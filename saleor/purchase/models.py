@@ -40,8 +40,8 @@ class PurchaseProduct(models.Model):
         pgettext_lazy('PurchaseProduct item field', 'cost price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
-    total_price = PriceField(
-        pgettext_lazy('PurchaseProduct item field', 'cost price'),
+    total_cost = PriceField(
+        pgettext_lazy('PurchaseProduct item field', 'total cost price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     supplier = models.ForeignKey(
