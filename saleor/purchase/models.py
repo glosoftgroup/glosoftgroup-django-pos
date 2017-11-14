@@ -41,7 +41,7 @@ class PurchaseProduct(models.Model):
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     total_cost = PriceField(
-        pgettext_lazy('PurchaseProduct item field', 'total cost price'),
+        pgettext_lazy('PurchaseProduct item field', 'cost price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     supplier = models.ForeignKey(
@@ -51,8 +51,8 @@ class PurchaseProduct(models.Model):
         pgettext_lazy('PurchaseProduct', 'invoice_number'), null=True, max_length=36,)
     payment_options = models.ManyToManyField(
         PaymentOption, related_name='purchase_payment_option', blank=True,
-        verbose_name=pgettext_lazy('Sales field',
-                                   'sales options'))
+        verbose_name=pgettext_lazy('PurchaseProduct item field',
+                                   'payment options'))
     created = models.DateTimeField(
         pgettext_lazy('PurchaseProduct field', 'created'),
         default=now, editable=False)

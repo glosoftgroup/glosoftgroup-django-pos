@@ -813,7 +813,8 @@ def stock_fresh(request, product_pk):
 def stock_edit(request, product_pk, stock_pk=None):
     product = get_object_or_404(Product, pk=product_pk)
     if stock_pk:
-        stock = get_object_or_404(Stock, pk=stock_pk)
+        stock = Stock.objects.get(pk=stock_pk)
+        print stock.purchase_stock
     else:
         stock = Stock()
     form = forms.StockForm(request.POST or None, instance=stock,
