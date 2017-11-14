@@ -1,0 +1,538 @@
+
+{% extends "dashboard/base.html" %}
+{% load staticfiles i18n %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load humanize %}
+{% load mathfilters %}
+
+{% block title %}
+  Credit Sales History Report
+{% endblock %}
+{% block breadcrumbs %}
+     <li class="active"><a href="{% url 'dashboard:supplier_credit_list' %}">Credit Purchase History Reports</a></li>
+ {% endblock %}
+
+{% block menu_creditCustomer_class %}active{% endblock %}
+ {% block custom_css %}
+ <link href="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet" type="text/css">
+<style type="text/css">
+    table tr .ctd{padding: 8px 10px !important;}
+    .table{border-bottom:1px solid #ccc}
+    .datepicker table tr td span {
+      padding:1px !important;
+    }
+    .datepicker table tr td span.active.active{
+       background-color:#1E88E5 !important;
+    }
+
+   .highcharts-credits{display:none;}
+    label.error{
+      color: #FF5722;
+    }
+    .td{cursor:pointer}
+    .table{border:1px solid #ccc}
+  </style>
+ {% endblock %}
+
+{% block content %}
+<div class="row animated fadeIn">
+
+
+<div class="col-md-12">
+   <div id="paginationdiv">
+    <div class="panelpanel-flat">
+      <div class="panelbody">
+          <!--statement template-->
+          <div class="panel panel-white">
+						<div class="panel-heading">
+							<h6 class="panel-title">Credit Statement<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+							<div class="heading-elements">
+
+								<button type="button" data-url="{% url 'dashboard:credit_history_pdf' pk=credit.pk %}" class="printPdf btn btn-default btn-xs heading-btn legitRipple c"><i class="icon-printer position-left"></i> Print</button>
+		                	</div>
+						</div>
+
+						<div class="panel-body no-padding-bottom">
+							<div class="row">
+								<div class="col-sm-6 content-group text-left">
+                                    <div class="invoice-detail">
+										<h5 class="text-uppercas text-semibold">Invoice {{credit.invoice_number}}</h5>
+										<ul class="list-condensed list-unstyled">
+											<li>Date: <span class="text-semibold">{{ credit.created }}</span></li>
+											<li>Due date: <span class="text-semibold">{{ credit.due_date }}</span></li>
+                                            <li>Status:
+                                                {% if sale.is_fully_paid %}
+                                                <span class="text-success  icon-checkmark-circle"><i></i></span>
+                                                {% else %}
+                                                <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+                                                {% endif %}
+                                            </li>
+										</ul>
+									</div>
+								</div>
+
+								<div class="col-sm-6 content-group">
+                                    <div class="invoice-details">
+									<span class="text-muted">Served by:</span>
+		 							<ul class="list-condensed list-unstyled">
+										<li><h5>{{ credit.user }}</h5></li>
+
+										<li><a href="#">{{ credit.user.email }}</a></li>
+									</ul>
+                                        </div>
+								</div>
+							</div>
+
+
+						</div>
+
+						<div class="table-responsive" style="padding:12px">
+						    <table class="table table-lg">
+						        <thead>
+						            <tr class="bg-primary">
+						                <th>Comment</th>
+                                        <th>Date</th>
+						                <th class="col-sm-1">Amount</th>
+                                        <th class="col-sm-1">Balance</th>
+						            </tr>
+						        </thead>
+						        <tbody>
+                                {% if sales %}
+                                {% for sale in sales %}
+						            <tr>
+						                <td>
+						                	<h6 class="no-margin">{{ sale.crud }}</h6>
+						                	<span class="text-muted">
+                                                {{ sale.comment }}
+                                            </span>
+					                	</td>
+                                        <td>{{ sale.created }}</td>
+						                <td><span class="text-semibold">{{ sale.amount }}</span></td>
+                                        <td><span class="text-semibold">{{ sale.balance }}</span></td>
+
+						            </tr>
+                                {% endfor %}
+                                {% endif %}
+						        </tbody>
+
+						    </table>
+						</div>
+<div class="panel-body">
+						<div class="row invoice-payment">
+							<div class="col-sm-7">
+
+							</div>
+
+							<div class="col-sm-5 panel-primary panel-bordered">
+								<div class="content-group">
+									<div class="table-responsive no-border">
+										<table class="table">
+											<tbody>
+												<tr>
+													<td>
+                                                      <h4 class="text-semibold">Amount Paid </h4>
+                                                    </td>
+													<td class="text-right">{{ credit.amount_paid }}</td>
+												</tr>
+
+												<tr>
+													<td>
+                                                      <h4 class="text-semibold">Balance </h4>
+                                                    </td>
+													<td class="text-right text-primary">
+                                                        <h5 class="text-semibold">
+                                                            {{ credit.total_net|sub:credit.amount_paid }}
+                                                        </h5>
+                                                    </td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+						<div class="panel-body text-center">
+							<p class="text-muted"> Thank you for partnering with us.<br />
+                              <span>Report pullled by  {% if request.user.name %}
+                                    {{request.user.name}}
+                                  {% else %}
+                                  {{ request.user.email}}
+                                  {% endif %}
+                              </span>
+                            </p>
+						</div>
+					</div>
+          <!--./statement templzte-->
+
+
+            </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+
+
+</div>
+
+{% endblock%}
+{% block custom_js %}
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/highcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/exporting.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+<script type="text/javascript">
+var creditPaginationUrl = "{% url 'dashboard:credit_paginate' %}";
+var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
+var categoryChartUrl = "{% url 'dashboard:sales_category_chart' %}";
+var productChartUrl = "{% url 'dashboard:sales_product_chart' %}";
+var userChartUrl = "{% url 'dashboard:sales_user_chart' %}";
+var terminalChartUrl  ="{% url 'dashboard:sales_terminal_chart' %}";
+var dynamicData = {}
+
+function paginationData(dynamicData,url,method){
+  dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+  return $.ajax({
+      url: url,
+      type: method,
+      data: dynamicData
+    });
+}
+
+$(document).ready(function(){
+
+    $(".td").click(function(){
+          window.location = $(this).data("href");
+      });
+
+     $('.bootpag-callback').bootpag({
+        total: parseInt('{{pn}}'),
+        maxVisible: 3,
+        leaps: true,
+        firstLastUse: true,
+        first: 'First',
+        last: 'Last',
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
+        }).on("page", function(event, num){
+            $(".pages-nav").html("Page " + num +" of "+'{{pn}}');
+            $.get(creditPaginationUrl,{page:parseInt(num)},function(data){
+               $('#tb').html(data);
+            });
+    }).children('.pagination').addClass('pagination-flat pagination-sm');
+
+   $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change', function(){
+
+        var ts = $(this).val();
+
+        if(ts == 'pdf'){
+            var searchData = $('.search_user').val();
+            var listSizeVal = $('.list-sz').find(":selected").val();
+            var date = $('.date-month').val();
+            var url = "{% url 'dashboard:reports_credit_list_pdf' %}";
+
+            var period = $('.period-sz').find(":selected").val();
+            var month = $('.hidden-month').val();
+            var year = $('.hidden-year').val();
+
+            if(!$('.hidden-format').val()){
+              $('.hidden-format').val('yyyy-mm-dd');
+            }
+
+            if($('.hidden-format').val() == 'yyyy-mm-dd'){
+               if(!date){
+                  date = null;
+               }
+            }else if($('.hidden-format').val() == 'yyyy'){
+                var date = null;
+                month = null;
+            }else{
+               var date = null;
+            }
+
+            dynamicData = {}
+            dynamicData['q'] = searchData;
+            dynamicData['gid'] = date;
+            dynamicData['period'] = period;
+            dynamicData['month'] = month;
+            dynamicData['year'] = year;
+
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+                window.open("data:application/pdf," + escape(data));
+             })
+            .fail();
+
+        }else if(ts=='excel'){
+          <!--window.location="{% url 'dashboard:users_export_csv' %}";-->
+
+        }else{
+          $(this).val('')
+        }
+    });
+
+
+    //**@ display size select
+     $('.list-sz').selectpicker().on('change', function(){
+        var listSizeVal = $(this).val();
+        var searchData = $('.search_user').val();
+        var date = $('.date-month').val();
+        var url = creditPaginationUrl;
+        var paginationUrl = creditPaginationUrl;
+
+        var period = $('.period-sz').find(":selected").val();
+        var month = $('.hidden-month').val();
+        var year = $('.hidden-year').val();
+
+        if(!$('.hidden-format').val()){
+          $('.hidden-format').val('yyyy-mm-dd');
+        }
+
+        if($('.hidden-format').val() == 'yyyy-mm-dd'){
+           if(!date){
+              date = null;
+           }
+        }else if($('.hidden-format').val() == 'yyyy'){
+            var date = null;
+            month = null;
+        }else{
+           var date = null;
+        }
+
+        dynamicData = {}
+        dynamicData['page'] = 1;
+        dynamicData['q'] = searchData;
+        dynamicData['gid'] = date;
+        dynamicData['period'] = period;
+        dynamicData['month'] = month;
+        dynamicData['year'] = year;
+        if(listSizeVal == '0'){
+          dynamicData['size'] = '10';
+        }else{
+          dynamicData['size'] = listSizeVal;
+        }
+        if(searchData){
+            paginationData(dynamicData,creditSearchUrl,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+             .fail();
+
+        }else{
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+            .fail();
+
+        }
+
+
+     });
+
+  function updateSelectListnSearch(){
+      $('.search_user').val('');
+      $('.list-sz').find(":selected").removeAttr('selected')
+      $(".list-sz option[value=0]").attr('selected', 'selected');
+      $(".list-sz").val(0);
+      $(".list-sz .filter-option").text('No:');
+      $(".list-sz ul.dropdown-menu li.active").removeClass('active');
+      $(".list-sz ul.dropdown-menu li[data-original-index='0']").addClass('active');
+  }
+
+    var delay = (function(){
+    var timer = 0;
+    return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+
+    //** search
+    $('.search_user').keyup(function() {
+      var url = creditSearchUrl;
+      var search_text = $(this).val();
+      var date = $('.date-month').val();
+      var listSizeVal = $('.list-sz').find(":selected").val();
+      var period = $('.period-sz').find(":selected").val();
+      var month = $('.hidden-month').val();
+      var year = $('.hidden-year').val();
+      dynamicData = {};
+
+      if(!$('.hidden-format').val()){
+        $('.hidden-format').val('yyyy-mm-dd');
+      }
+
+      if($('.hidden-format').val() == 'yyyy-mm-dd'){
+         if(!date){
+            date = null;
+         }
+      }else if($('.hidden-format').val() == 'yyyy'){
+          var date = null;
+          month = null;
+      }else{
+         var date = null;
+      }
+
+      delay(function(){
+         dynamicData['']
+         dynamicData['page'] = 1;
+         dynamicData['q'] = search_text;
+         if(listSizeVal == '0'){
+          dynamicData['size'] = 10;
+         }else{
+          dynamicData['size'] = listSizeVal;
+         }
+         dynamicData['gid'] = date;
+         dynamicData['period'] = period;
+         dynamicData['month'] = month;
+         dynamicData['year'] = year;
+         paginationData(dynamicData,url,'GET').
+         done(function(data){
+          $('#pagination-div').html(data);
+         })
+         .fail();
+
+      }, 500 );
+
+    });
+
+
+$('.period-sz').selectpicker().on('change', function(){
+    var period = $(this).val();
+    var DateOptions = {
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            endDate: 'now'
+    }
+    var MonthOptions = {
+        format: "MM/yyyy",
+        autoclose: true,
+        //startDate: '{{startMonth}}/{{startYear}}',
+        endDate: 'now',
+        minViewMode: 'months'
+    }
+    var YearOptions = {
+        format: "yyyy",
+        autoclose: true,
+        //startDate: '{{startMonth}}/{{startYear}}',
+        endDate: 'now',
+        minViewMode: 'years'
+    }
+    if(period == 'day'){
+      $(".date-month").val("");
+      $(".date-month").datepicker("destroy");
+      $(".date-month").datepicker(DateOptions);
+      $(".date-month").attr("placeholder", "yyyy-mm-dd");
+      $('.hidden-format').val('yyyy-mm-dd');
+    }else if(period == 'year'){
+      $(".date-month").val("");
+      $(".date-month").datepicker("destroy");
+      $(".date-month").datepicker(YearOptions);
+      $(".date-month").attr("placeholder", "yyyy");
+      $('.hidden-format').val('yyyy');
+    }else{
+      $(".date-month").val("");
+      $(".date-month").datepicker("destroy");
+      $(".date-month").datepicker(MonthOptions);
+      $(".date-month").attr("placeholder", "mm/yyyy");
+      $('.hidden-format').val('mm/yyyy');
+    }
+});
+
+
+$('.date-month').datepicker({
+    format: "yyyy-mm-dd",
+    autoclose: true,
+    endDate: 'now'})
+  .on('changeDate', function(e) {
+      var period = $('.period-sz').find(":selected").val();
+      var month = e.date.getMonth()+1;
+      var year = e.date.getFullYear();
+
+      $('.hidden-year').val(year);
+      $('.hidden-month').val(month);
+
+
+      if(!$('.hidden-format').val()){
+        $('.hidden-format').val('yyyy-mm-dd');
+      }
+
+      if($('.hidden-format').val() == 'yyyy-mm-dd'){
+         var group_id = $(this).val();
+         if(!group_id){
+            group_id = null;
+         }
+      }else if($('.hidden-format').val() == 'yyyy'){
+          var group_id = null;
+          month = null;
+      }else{
+         var group_id = null;
+      }
+
+
+
+        var dd = e.date.getFullYear() + '-'+e.date.getMonth()+'-'+e.date.getDate()
+        var searchData = $('.search_user').val();
+        var listSizeVal = $('.list-sz').find(":selected").val();
+        var url = creditPaginationUrl;
+
+        dynamicData = {}
+        dynamicData['page'] = 1;
+        dynamicData['q'] = searchData;
+        dynamicData['gid'] = group_id;
+        dynamicData['period'] = period;
+        dynamicData['month'] = month;
+        dynamicData['year'] = year;
+        if(listSizeVal == '0'){
+          dynamicData['size'] = '10';
+        }else{
+          dynamicData['size'] = listSizeVal;
+        }
+        if(searchData){
+            paginationData(dynamicData,creditSearchUrl,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+             .fail();
+
+        }else{
+            paginationData(dynamicData,url,'GET').
+             done(function(data){
+              $('#pagination-div').html(data);
+             })
+            .fail();
+
+        }
+  });
+
+});
+
+</script>
+<script>
+    $('.printPdf').on('click', function(){
+       var url = $(this).data('url');
+        $.get(url, function(data){
+             window.open("data:application/pdf," + escape(data));
+        });
+    });
+</script>
+{% endblock %}

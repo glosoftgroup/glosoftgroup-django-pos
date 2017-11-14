@@ -42,6 +42,8 @@ urlpatterns = [
         url(r'^credit/search/$', credit.credit_search, name='supplier-credit-search'),
         url(r'^history/(?P<credit_pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (credit.credit_history), name='supplier_credit_history'),
+        url(r'^history/pdf/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (credit.credit_detail_pdf), name='supplier_credit_history_pdf'),
         
 ]
 
