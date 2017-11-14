@@ -24,7 +24,7 @@ from ...product.models import (Product, ProductAttribute, Category,
                                ProductImage, ProductVariant, Stock,
                                StockLocation, ProductTax, StockHistoryEntry)
 from ..views import staff_member_required
-from ..views import get_low_stock_products
+from saleor.sale.models import PaymentOption
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.db.models import Q
@@ -543,7 +543,7 @@ def product_data(request):
                 variant.name = request.POST.get('sku')
                 if request.POST.get('threshold'):
                      variant.low_stock_threshold = request.POST.get('threshold')
-                variant.save();
+                variant.save()
             except Exception as e:
                 print(e)
         if request.POST.get('name'):
@@ -562,8 +562,9 @@ def product_data(request):
             category = request.POST.get('categories')
             product.categories.clear()
             product.categories.add(category)
-        return HttpResponse({'message':str(product)+' Added'})
+        return HttpResponse({'message': str(product)+' Added'})
     return HttpResponse('Invalid Method!')
+
 
 @staff_member_required
 @permission_decorator('product.add_product')
@@ -652,6 +653,7 @@ def product_edit(request, pk,name=None):
         Product.objects.prefetch_related(
             'images', 'variants'), pk=pk)
     product = Product.objects.get(pk=product.pk)
+    payment_options = PaymentOption.objects.all()
     stock = Stock()
     stock_form = forms.StockForm(request.POST or None, instance=stock,
                            product=product)
@@ -686,8 +688,9 @@ def product_edit(request, pk,name=None):
            'product': product, 'stock_delete_form': stock_delete_form,
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
+           'payment_options': payment_options,
            'variant_form': variant_form}
-    print form.errors
+    print payment_options
     if name:
         ctx['go'] = 'True'
     if request.is_ajax():
@@ -817,21 +820,22 @@ def stock_edit(request, product_pk, stock_pk=None):
                            product=product)
     if form.is_valid():
         form.save()
-        
-        quantity = request.POST.get('quantity')     
-        cost_price = request.POST.get('cost_price')     
-        invoice_number = request.POST.get('invoice_number')
-        #try:
-        p = PurchaseProduct.objects.create(
-                            variant=stock.variant,
-                            stock=stock,
-                            invoice_number=invoice_number,
-                            cost_price=cost_price,
-                            quantity=quantity,
-                            supplier=product.product_supplier,
-                            )
-        print p
-        print '*'*21
+
+        purchase = PurchaseProduct()
+        purchase.variant = stock.variant
+        purchase.stock = stock
+        purchase.invoice_number = request.POST.get('invoice_number')
+        if request.POST.get('cost_price'):
+            purchase.cost_price = request.POST.get('cost_price')
+        if request.POST.get('quantity'):
+            purchase.quantity = request.POST.get('quantity')
+        if request.POST.get('amount_paid'):
+            purchase.amount_paid = request.POST.get('amount_paid')
+        if request.POST.get('total_cost'):
+            purchase.total_cost = request.POST.get('total_cost')
+        purchase.supplier = product.product_supplier
+        purchase.save()
+
         messages.success(
             request, pgettext_lazy('Dashboard message', 'Saved stock'))
         product_url = reverse(
@@ -1876,7 +1880,7 @@ def attr_list_f32d(request):
         variants = json.loads(request.POST.get('variants'))        
         if request.POST.get('name'):
             pk = request.POST.get('name')
-            product_class = get_object_or_404(ProductClass,pk=int(pk))
+            product_class = get_object_or_404(ProductClass, pk=int(pk))
         if request.POST.get('newclass'):            
             product_class = ProductClass.objects.create(name=request.POST.get('newclass'))
         if product_class:

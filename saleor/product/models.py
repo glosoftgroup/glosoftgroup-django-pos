@@ -118,6 +118,7 @@ class ProductTax(models.Model):
     def get_tax(self):
         return self.tax
 
+
 class ProductManager(models.Manager):
 
     def get_available_products(self):
@@ -442,7 +443,6 @@ class StockManager(models.Manager):
         return self.get_queryset().filter(quantity__lte=F('low_stock_threshold'))
 
 
-
 @python_2_unicode_compatible
 class Stock(models.Model):
     variant = models.ForeignKey(
@@ -494,7 +494,7 @@ class StockHistoryEntry(models.Model):
     stock = models.ForeignKey(
         Stock, related_name='history',
         verbose_name=pgettext_lazy('Stock history entry field', 'order'))
-    
+
     comment = models.CharField(
         pgettext_lazy('Stock history entry field', 'comment'),
         max_length=100, default='', blank=True)

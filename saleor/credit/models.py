@@ -1,12 +1,8 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal
-from uuid import uuid4
 
-import emailit.api
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Sum
@@ -16,26 +12,20 @@ from django.utils.translation import pgettext_lazy
 from django_prices.models import PriceField
 
 from django.utils import timezone
-from payments import PaymentStatus, PurchasedItem
-from payments.models import BasePayment
-from prices import Price, FixedDiscount
-from django.db.models import F
-from satchless.item import ItemLine, ItemSet
-from datetime import date, datetime, timedelta
-
-from ..discount.models import Voucher
-from ..product.models import Product
+from datetime import datetime, timedelta
 from ..userprofile.models import Address
 from ..customer.models import Customer
 from ..site.models import SiteSettings
 from ..sale.models import Terminal, PaymentOption
-
 from . import OrderStatus
-from . import TransactionStatus
+
 
 class CreditManager(models.Manager):
     def due_credits(self):        
         return self.get_queryset().filter(due_date__lte=timezone.now())
+
+    def customer_credits(self, customer):
+        return self.get_queryset().filter(customer=customer).aggregate(Sum('total_net'))['total_net__sum']
 
     def expired_credit(self):        
         max_credit_date = SiteSettings.objects.get(pk=1).max_credit_date 
@@ -110,6 +100,7 @@ class Credit(models.Model):
         null=False,default=now)
     
     objects = CreditManager()
+
     class Meta:
         ordering = ('-last_status_change',)
         verbose_name = pgettext_lazy('Credit model', 'Credit')
@@ -117,12 +108,16 @@ class Credit(models.Model):
         
     def __str__(self):
         return self.invoice_number
+
     def __unicode__(self):
         return unicode(self.invoice_number)
+
     def total_items(self):
-        return len(self.credititems.all());
+        return len(self.credititems.all())
+
     def items(self):
         return self.credititems.all()
+
     def is_fully_paid(self):
         if self.status == 'fully-paid':
             return True

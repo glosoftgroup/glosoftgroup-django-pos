@@ -157,7 +157,7 @@ urlpatterns = [
         (views.view_attr), name='product-attributes'),
     url(r'attributes/paginate/$', permission_required('product.view_productattribute', login_url='not_found')
         (views.paginate_attr), name='attr_paginate'),
-    url(r'new-attribute/$',views.new_attribute,name='new-attribute'),
+    url(r'new-attribute/$', views.new_attribute,name='new-attribute'),
     url(r'attributes/search$',
         views.search_attribute, name='search-attribute'),
     url(r'attributes/add/new/$',

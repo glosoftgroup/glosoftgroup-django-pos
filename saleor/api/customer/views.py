@@ -1,19 +1,15 @@
 from django.db.models import Q
-
-from .pagination import PostLimitOffsetPagination, PostPageNumberPagination
-
-from django.contrib.auth import get_user_model
-User = get_user_model()
-
 from .serializers import (
      CustomerListSerializer,
      CreditWorthyCustomerSerializer,
      CustomerUpdateSerializer   
      )
-from rest_framework import generics 
-from ...decorators import user_trail
+from rest_framework import generics
 from ...customer.models import Customer
 import logging
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')     
@@ -33,6 +29,7 @@ class CreditWorthyCustomerListAPIView(generics.ListAPIView):
 
 class CustomerListAPIView(generics.ListAPIView):   
     serializer_class = CustomerListSerializer
+
     def get_queryset(self, *args, **kwargs):        
         queryset_list = Customer.objects.all()
         query = self.request.GET.get('q')

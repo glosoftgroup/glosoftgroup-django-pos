@@ -527,8 +527,9 @@
       <!-- STOCK DETAILS -->
       <div id="div-edit-stock" class="mb-20"></div>
       {% include "dashboard/product/partials/stock_details.html" with product=product %}
-      {% include 'dashboard/product/partials/stock_table_form.html' with product=product %}
-                      <div id="stock" class="">
+       <!--include 'dashboard/product/partials/stock_table_form.html' with product=product %}-->
+        {% include "dashboard/product/partials/add_stock_form.html" with product=product %}
+     <div id="stock" class="">
       <form method="post" action="{% url 'dashboard:stock-bulk-delete' product_pk=product.pk %}" novalidate>
         {% csrf_token %}
         <div class="data-table-header-action" style="padding: 8px;">
@@ -939,7 +940,7 @@
         getAttributesChoice.val('');
          
          $(".selectAttributesChoice").parents('div').find('li.token').remove();
-        $('#newattrName').val('');
+         $('#newattrName').val('');
       })
       .fail(function(){
         alertUser('Attribute already exist','bg-danger','Add unique attribute name');
