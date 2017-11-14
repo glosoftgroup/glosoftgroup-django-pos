@@ -24,7 +24,7 @@
                           <tr class='clickable-row' id="{{user.supplier.pk }}">
 
                             <!-- name -->
-                            <td class="td" data-href="{% url 'dashboard:credit_history' credit_pk=user.pk %}">{% if user.supplier.name %}{{user.supplier.name}}{% else %}-{% endif %}
+                            <td class="td" data-href="{% url 'dashboard:supplier_credit_history' credit_pk=user.pk %}">{% if user.supplier.name %}{{user.supplier.name}}{% else %}-{% endif %}
                                 <div class="text-size-small text-muted">
                                   <i class="icon-mobile3"></i>{% if user.supplier.mobile %}{{user.supplier.mobile}}{% else %}-{% endif %}
                                 </div>
@@ -37,7 +37,7 @@
                                 {% endif %}
                             </td>
                             <!-- created -->
-                            <td class="td" data-href="{% url 'dashboard:credit_history' credit_pk=user.pk %}">
+                            <td class="td" data-href="{% url 'dashboard:supplier_credit_history' credit_pk=user.pk %}">
 
                              {% if user.created %}
                         {{user.created|timesince}} ago

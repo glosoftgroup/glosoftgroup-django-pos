@@ -160,9 +160,10 @@ def credit_history(request, credit_pk=None):
 			   "total_tax_amount":total_tax_amount,
 			   "date":last_date_of_sales
 			   }
-		return TemplateResponse(request, 'dashboard/reports/history/sales_list.html',ctx)
+		return TemplateResponse(request, 'dashboard/supplier/credit/history.html',ctx)
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
+		return HttpResponse('Error matching query')
 
 
 @staff_member_required
@@ -179,7 +180,8 @@ def credit_detail_pdf(request, pk=None):
 			'puller': request.user,
 			'image': img
 		}
-		pdf = render_to_pdf('dashboard/reports/history/pdf/pdf.html',data)
+		pdf = render_to_pdf('dashboard/supplier/credit/pdf/pdf.html',data)
 		return HttpResponse(pdf, content_type='application/pdf')
 	except ObjectDoesNotExist as e:
 		error_logger.error(e)
+		return HttpResponse(e)
