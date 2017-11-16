@@ -1,0 +1,44 @@
+{% load product_first_image from product_images %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load static %}
+{% load default_user_image %}
+
+{% if users %}
+  {% for user in users%}
+  <tr class='clickable-row' id="{{user.supplier.pk }}">
+
+    <!-- name -->
+    <td class="td" data-href="{% url 'dashboard:supplier_credit_history' credit_pk=user.pk %}">{% if user.supplier.name %}{{user.supplier.name}}{% else %}-{% endif %}
+        <div class="text-size-small text-muted">
+          <i class="icon-mobile3"></i>{% if user.supplier.mobile %}{{user.supplier.mobile}}{% else %}-{% endif %}
+        </div>
+    </td>
+    <td>
+      {% if sale.is_fully_paid %}
+        <span class="text-success  icon-checkmark-circle"><i></i></span>
+        {% else %}
+        <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+        {% endif %}
+    </td>
+    <!-- created -->
+    <td class="td" data-href="{% url 'dashboard:supplier_credit_history' credit_pk=user.pk %}">
+
+     {% if user.created %}
+{{user.created|timesince}} ago
+ {% endif %}
+    </td>
+    <!-- amount -->
+    <td>
+      {{user.total_cost.gross}}
+    </td>
+      <td>
+      {{user.amount_paid.gross}}
+    </td>
+
+  </tr>
+  {% endfor %}
+ {% else %}
+  <tr><td colspan="5"><h2 class="text-center">No suppliers available</h2></td></tr>
+ {% endif %}
+ <script type="text/javascript" src="{% static 'backend/js/customer/customer-listing.js' %}"></script>

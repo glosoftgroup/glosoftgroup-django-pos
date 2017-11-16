@@ -7,6 +7,11 @@ from StringIO import StringIO
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from saleor.site.models import SiteSettings
+import logging
+
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 def import_db(request):
 	db = request.FILES['db']
@@ -19,16 +24,17 @@ def import_db(request):
 		call_command('flush', interactive=False, load_initial_data=False)
 		call_command('loaddata', 'media/'+str(filename), stdout=out)
 		d = out.getvalue()
-		print d
 		if 'Installed' in d:
 			print uploaded_file_url
 			file_path = os.path.join(settings.MEDIA_ROOT, str(filename))
 			os.unlink(file_path)
+			info_logger.info('success installing the database')
 			return HttpResponse('success')
 		else:
+			info_logger.info('error installing the database')
 			return HttpResponse('error')
 	except Exception as e:
-		print e
+		error_logger.error(e)
 		return HttpResponse('error')
 
 
@@ -71,6 +77,8 @@ def export_db(request):
 			sys.stdout = open(backfolder+"/"+d+"_db%s.json" % i, "w")
 		call_command('dumpdata', '--exclude', 'auth.permission', '--exclude', 'contenttypes')
 		sys.stdout = sysout
+		info_logger.info('backup '+ d +' successful')
 		return HttpResponse('Database Backup Successful')
 	except Exception as e:
+		error_logger.error(e)
 		return HttpResponse(e)

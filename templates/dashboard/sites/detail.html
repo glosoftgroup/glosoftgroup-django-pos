@@ -6,9 +6,9 @@
   {% if site.pk %}
     {{ site.name }}
   {% else %}
-    {% trans "Add new site settings" context "Site settings page title" %}
+    {% trans "Add new system settings" context "System settings page title" %}
   {% endif %}
-   - {% trans "Site settings" context "Dashboard site settings" %} - {{ block.super }}
+   - {% trans "System settings" context "Dashboard sytem settings" %} - {{ block.super }}
 {% endblock %}
 
 {% block body_class %}body-settings{% endblock %}
@@ -18,7 +18,7 @@
 {% block breadcrumbs %}
   <li class="active">
         <a href="{% url 'dashboard:site-index' %}">
-             {% trans "Site settings" context "Dashboard site settings" %}
+             {% trans "System settings" context "Dashboard system settings" %}
         </a>
     </li>
 {% endblock %}

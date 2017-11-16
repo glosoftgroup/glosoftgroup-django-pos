@@ -397,10 +397,8 @@ $(document).ready(function(){
              done(function(data){
               $('#pagination-div').html(data);
              })
-            .fail(); 
-
+            .fail();
         }
-               
 
      });
 
@@ -544,13 +542,11 @@ $('.date-month').datepicker({
       }else{
          var group_id = null;
       }
-
-
         
-        var dd = e.date.getFullYear() + '-'+e.date.getMonth()+'-'+e.date.getDate()
-        var searchData = $('.search_user').val();
-        var listSizeVal = $('.list-sz').find(":selected").val();
-        var url = creditPaginationUrl;
+      var dd = e.date.getFullYear() + '-'+e.date.getMonth()+'-'+e.date.getDate();
+      var searchData = $('.search_user').val();
+      var listSizeVal = $('.list-sz').find(":selected").val();
+      var url = creditPaginationUrl;
 
         dynamicData = {}
         dynamicData['page'] = 1;

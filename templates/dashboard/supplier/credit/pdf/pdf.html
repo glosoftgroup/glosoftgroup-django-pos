@@ -1,0 +1,177 @@
+{% load staticfiles %}
+{% load mathfilters %}
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+ <html>
+     <head>
+         <title>Credit Purchase IReport</title>
+         <style type="text/css">
+             body {sans-serif; color: #384047;}
+             .header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}
+             .title {font-size: 16px;font-weight: 100;}
+             .header p{color:#384047;}
+
+             .img-circle{border-radius: 50%;}
+             table {ax-width: 960px; margin: 10px auto;}
+            tr{border-bottom:0.5px solid #ddd;border-right:0.5px solid #ddd;
+                border-left:0.5px solid #ddd;
+            }
+            td{border:none;}
+            th {
+                  font-weight: bold;
+                  background:#2196F3;
+                  color: #FFF;
+                  border:none;
+                  font-size:11px;
+                  vertical-align:middle;
+                }
+             .td{text-align: center;font-size:11px;}
+             tr{padding:5px;}
+             .img{width:50px;height:50px;}
+         </style>
+     </head>
+     <body>
+         <div class='wrapper'>
+
+         <div>
+         <div class='details'>
+             <div class="col-md-12">
+   <div id="paginationdiv">
+    <div class="panelpanel-flat">
+      <div class="panelbody">
+          <!--statement template-->
+          <div class="panel panel-white">
+              <div class='wrapper'>
+             <div class='header'>
+                 <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;"> PURCHASE REPORT
+                 <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
+                        SUPPLIER: {% if credit.customer.name %} {{credit.customer.name|upper}} {% else %} -{% endif %}
+                 </p>
+                     <p style="margin-bottom:0px;margin-top:2px;font-size:11px;" class="text-semibold">
+                        RECEIPT: {{credit.invoice_number}}
+                 </p>
+                 <p style="margin-bottom:0px;margin-top:2px;font-size:10px;">
+                        SERVED BY: {{ credit.user | upper}}
+                 </p>
+                 </p>
+             </div>
+         <div>
+
+
+						<div class="panel-body no-padding-bottom">
+							<div class="row">
+								<div class="col-sm-6 content-group text-left">
+                                    <div class="invoice-detail">
+
+										<div class="list-condensed list-unstyled">
+											Date: <span class="text-semibold">{{ credit.created }}</span><br>
+											Due date: <span class="text-semibold">{{ credit.due_date }}</span><br>
+                                            Status:
+                                                {% if sale.is_fully_paid %}
+                                                <span class="text-success  icon-checkmark-circle"><i></i></span>
+                                                {% else %}
+                                                <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+                                                {% endif %}
+
+										</div>
+									</div>
+								</div>
+
+
+							</div>
+
+
+						</div>
+
+						<div class="table-responsive" style="padding:12px">
+						    <table class="table table-lg">
+						        <thead>
+						            <tr class="bg-primary">
+						                <th>Comment</th>
+                                        <th>Date</th>
+						                <th class="col-sm-1">Amount</th>
+                                        <th class="col-sm-1">Balance</th>
+						            </tr>
+						        </thead>
+						        <tbody>
+                                {% if sales %}
+                                {% for sale in sales %}
+						            <tr>
+						                <td>
+						                	<h6 class="no-margin">{{ sale.crud }}</h6>
+						                	<span class="text-muted">
+                                                {{ sale.comment }}
+                                            </span>
+					                	</td>
+                                        <td>{{ sale.created }}</td>
+						                <td><span class="text-semibold">{{ sale.amount }}</span></td>
+                                        <td><span class="text-semibold">{{ sale.balance }}</span></td>
+
+						            </tr>
+                                {% endfor %}
+                                {% endif %}
+						        </tbody>
+
+						    </table>
+						</div>
+<div class="panel-body">
+						<div class="row invoice-payment">
+							<div class="col-sm-7">
+
+							</div>
+
+							<div class="col-sm-5 panel-primary panel-bordered">
+								<div class="content-group">
+									<div class="table-responsive no-border">
+										<table class="table" border="1">
+											<tbody>
+												<tr>
+													<td>
+                                                      <h4 class="text-semibold">Amount Paid </h4>
+                                                    </td>
+													<td class="text-right">{{ credit.amount_paid }}</td>
+												</tr>
+
+												<tr>
+													<td>
+                                                      <h4 class="text-semibold">Balance </h4>
+                                                    </td>
+													<td class="text-right text-primary">
+                                                        <h5 class="text-semibold">
+                                                            {{ credit.total_net|sub:credit.amount_paid }}
+                                                        </h5>
+                                                    </td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+						<div class="panel-body text-center">
+							<p class="text-muted"> Thank you for partnering with us.<br />
+                              <span>Report pulled by  {% if request.user.name %}
+                                    {{credit.user.name}}
+                                  {% else %}
+                                  {{ credit.user.email}}
+                                  {% endif %}
+                              </span>
+                            </p>
+						</div>
+					</div>
+          <!--./statement templzte-->
+
+
+            </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+
+
+</div>
+
+         </div>
+     </body>
+ </html>
