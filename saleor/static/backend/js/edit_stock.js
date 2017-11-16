@@ -11,7 +11,7 @@
 
 $(function(){
   var editStockRefreshDiv = $('#div-edit-stock');  
-  var editStockBtn = $('#editStockBtn');
+
   var url = '#';
   var editArea = $('#edit-area');
   var editForm  = editArea.find('form');
@@ -24,8 +24,10 @@ $(function(){
   var editStockTotalCost  = editForm.find('#id_total_cost');
   var editStockPaymentOption = editForm.find('#id_payment_options');
   var low_stock_threshold = editForm.find('#reorder-threshold');
+  var editStockBtn = editForm.find('#editStockBtn');
 
-  editStockBtn.on('click',function(){   
+  editStockBtn.on('click',function(){
+    console.log('you clicked edit stock');
     var url = $(this).data('contenturl');
     var refreshUrl = $(this).data('refreshstockurl')+"?tab=stock";
     

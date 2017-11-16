@@ -529,7 +529,7 @@
       {% include "dashboard/product/partials/stock_details.html" with product=product %}
        <!--include 'dashboard/product/partials/stock_table_form.html' with product=product %}-->
         {% include "dashboard/product/partials/add_stock_form.html" with product=product %}
-     <div id="stock" class="">
+                     <div id="stock" class="">
       <form method="post" action="{% url 'dashboard:stock-bulk-delete' product_pk=product.pk %}" novalidate>
         {% csrf_token %}
         <div class="data-table-header-action" style="padding: 8px;">
@@ -825,6 +825,7 @@
 {% endblock %}
 
  {% block custom_js %}
+ <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
 
  {% if not product.pk %}
  <script type="text/javascript" src="{% static 'backend/js/tabs_toggle.js' %}"></script>
@@ -862,8 +863,8 @@ $(document).ready(function(){
 <script type="text/javascript" src="{% static 'backend/js/productattribute.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/deleteModal.js' %}"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
-<script type="text/javascript" src="{% static 'backend/js/vue/product.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'backend/js/product/vue/product.js' %}"></script>
 <script type="text/javascript">
  
   $( document ).ready(function() {
@@ -1030,6 +1031,7 @@ $(document).ready(function(){
     $('#toggleVariant').slideToggle();
   });
   $('#btntoggles').on('click',function(){
+    console.log('button clidekdsdee');
     $('#toggleStock').slideToggle();
   });
     
