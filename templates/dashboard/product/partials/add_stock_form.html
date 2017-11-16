@@ -34,16 +34,20 @@
 
                             <div class="form-group">
                                 <label>Variant:<span class="text-danger">*</span></label>
+                                <div id="feditv">
                                 {{ stock_form.variant }}
+                                </div>
                                 <span class="help-block"></span>
                             </div>
                             <div class="form-group">
                                 <label>Payment option:<span class="text-danger">*</span></label>
-                                <select name="payment_option" id="payment_option" class="bootstrap-select form-control" id="payment_option">
+
+                                <select name="payment_options" id="payment_option" multiple="multiple" class="multiselect-select2">
                                     {% for option in payment_options %}
                                         <option value="{{option.id}}">{{option}}</option>
                                     {% endfor %}
                                 </select>
+
                             </div>
                             <div class="hidden">
                                 {{ stock_form.location }}
@@ -85,7 +89,8 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Total cost #:</label>
-                                        <input placeholder="Total cost" name="total_cost" id="total_cost" class="form-control" type="text">
+                                        {{ stock_form.total_cost }}
+
                                     </div>
                                 </div>
                             </div>
@@ -117,3 +122,4 @@
 
 
 </div>
+

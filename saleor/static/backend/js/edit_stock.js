@@ -13,18 +13,32 @@ $(function(){
   var editStockRefreshDiv = $('#div-edit-stock');  
   var editStockBtn = $('#editStockBtn');
   var url = '#';
-  var invoice_number = $("#id_invoice_number");
-  var variant = $('#id_variant');
-  var cost_price = $('#id_cost_price');
-  var location = $('#id_location');
-  var quantity = $('#id_quantity');
-  var low_stock_threshold = $('#reorder-threshold');  
+  var editArea = $('#edit-area');
+  var editForm  = editArea.find('form');
+  var invoice_number = editForm.find("#id_invoice_number");
+  var variant = editForm.find('#id_variant');
+  var cost_price = editForm.find('#id_cost_price');
+  var location = editForm.find('#id_location');
+  var quantity = editForm.find('#id_quantity');
+  var editStockAmountPaid = editForm.find('#id_amount_paid');
+  var editStockTotalCost  = editForm.find('#id_total_cost');
+  var editStockPaymentOption = editForm.find('#id_payment_options');
+  var low_stock_threshold = editForm.find('#reorder-threshold');
 
   editStockBtn.on('click',function(){   
     var url = $(this).data('contenturl');
     var refreshUrl = $(this).data('refreshstockurl')+"?tab=stock";
     
     dynamicData = {};
+    if(editStockAmountPaid.val()){
+      dynamicData['amount_paid'] = editStockAmountPaid.val();
+    }
+    if(editStockPaymentOption.val()){
+      dynamicData['payment_options'] = editStockPaymentOption.val();
+    }
+    if(editStockTotalCost.val()){
+      dynamicData['total_cost'] = editStockTotalCost.val();
+    }
     dynamicData['location'] = location.val();
     if(cost_price.val()){
       dynamicData['cost_price'] = cost_price.val();

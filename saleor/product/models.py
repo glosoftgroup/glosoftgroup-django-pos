@@ -25,6 +25,7 @@ from versatileimagefield.fields import VersatileImageField, PPOIField
 from ..discount.models import calculate_discounted_price
 from ..supplier.models import Supplier
 from ..search import index
+from saleor.payment.models import PaymentOption
 from .utils import get_attributes_display_map
 
 
@@ -465,6 +466,18 @@ class Stock(models.Model):
         pgettext_lazy('Stock item field', 'cost price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
+    amount_paid = PriceField(
+        pgettext_lazy('Stock item field', 'cost price'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
+    total_cost = PriceField(
+        pgettext_lazy('Stock item field', 'total cost price'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
+    payment_options = models.ManyToManyField(
+        PaymentOption, related_name='stock_payment_option', blank=True,
+        verbose_name=pgettext_lazy('Stock item field',
+                                   'payment options'))
 
     objects = StockManager()
 
@@ -478,12 +491,50 @@ class Stock(models.Model):
     @property
     def quantity_available(self):
         return max(self.quantity - self.quantity_allocated, 0)
+
+    @property
     def cost_priceAsData(self):
         return self.cost_price
-    def varaintName(self):        
+
+    @property
+    def varaintName(self):
         return self.variant.price_override;
+
+    @property
     def Access_pk(self):
         return self.pk
+
+
+@python_2_unicode_compatible
+class StockCreditHistory(models.Model):
+    date = models.DateTimeField(
+        pgettext_lazy('Stock credit history entry field', 'last history change'),
+        default=now, editable=False)
+    stock = models.ForeignKey(
+        Stock, related_name='credit_history',
+        verbose_name=pgettext_lazy('Stock credit history entry field', 'order'))
+
+    comment = models.CharField(
+        pgettext_lazy('Stock history credit entry field', 'comment'),
+        max_length=100, default='', blank=True)
+    crud = models.CharField(
+        pgettext_lazy('Stock history credit entry field', 'crud'),
+        max_length=30, default='', blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        verbose_name=pgettext_lazy('Stock history credit entry field', 'user'))
+
+    class Meta:
+        ordering = ('date', )
+        verbose_name = pgettext_lazy(
+            'Stock history credit entry model', 'Stock credit history entry')
+        verbose_name_plural = pgettext_lazy(
+            'Stock history credit entry model', 'Stock credit history entries')
+
+    def __str__(self):
+        return pgettext_lazy(
+            'Stock credit history entry str',
+            'Stock credit HistoryEntry  for Stock #%d') % self.stock.pk
 
 
 @python_2_unicode_compatible

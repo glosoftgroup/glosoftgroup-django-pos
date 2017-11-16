@@ -1,7 +1,6 @@
 {% load materializecss %}
 {% load prices_i18n %}
 {% load static %}
-
 <style type="text/css">
 .hvr-pulsew {
     -webkit-animation-name: hvr-pulse;
@@ -15,57 +14,133 @@
 }
 
 </style>
-<div id="" class="card-2">
-<table class="table  datatable-header-footer responsive data-table">            
-    <thead>
-      <tr class='bg-primary'>        
-        <th> Invoice</th>
-        <th> Variant</th>
-        <th> Cost Price</th>        
-        <th class="right-align">Quantity</th>
-        <th>Reorder Threshold</th>         
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-     <tr>
-    	<td width="15%">
-    		{{ form.invoice_number }}
-            <span class="help-block"></span>
-    	</td>
-    	<td width="25%">
-        <div id="feditv">
-    		{{ form.variant }}
-            <span class="help-block"></span>
+
+<div id="edit-area" class="card-3 mb-10">
+<!--form-->
+<div class="add-new-stock-form mt-10">
+    <div class="sidebar-category bg-primary">
+        <div class="category-title text-center text-semibold">
+            <span id="selected-number">Add Stock</span>
         </div>
-    	</td>
-    	<td width="15%">
-    		{{ form.cost_price }}
-            <span class="help-block"></span>
-    	</td>    	
-    	
-    	<td width="15%">
-    		{{form.quantity}}
-            <span class="help-block"></span>
-    	</td>
-        <td>
-         <div class="hidden">
-             {{ form.location}}
-         </div>
-         <input type="number" class="form-control" id="reorder-threshold" placeholder="Reorder Threshold" value="{{ form.low_stock_threshold.value|default_if_none:''}}" name="reorder-threshold">         
-           
-        <span class="help-block"></span>
-        </td>
-    	<td>
-    		<button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:product-update' pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=stock.pk %}" id='editStockBtn' class="btn btn-xs btn-primary hvr-pulsew">Edit</button>
-    	</td>
-      </tr>
-    </tbody>
-   </table>
-  
+    </div>
+
+    <div class="col-md-12 bg-white ">
+     <div class="tab-pane fade has-padding active in">
+        <div class="panelpanel-flat">
+            <div class="panel-body">
+                <div class="row">
+                    <form>
+                    <div class="col-md-6">
+                        <fieldset>
+
+                            <div class="form-group">
+                                <label>Invoice Number:<span class="text-danger">*</span></label>
+                                {{ form.invoice_number }}
+                                <span class="help-block"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Variant:<span class="text-danger">*</span></label>
+                                <div id="feditv">
+                                    {{ form.variant }}
+                                    <span class="help-block"></span>
+                                </div>
+                                <span class="help-block"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Payment option:<span class="text-danger">*</span></label>
+                                <div class="multi-select-full">
+                                {{ form.payment_options }}
+                                </div>
+                                <span class="help-block"></span>
+                            </div>
+                            <div class="hidden">
+                                 {{ form.location}}
+                             </div>
+
+
+                        </fieldset>
+                    </div>
+
+                    <div class="col-md-6">
+                        <fieldset>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Quantity:</label>
+                                        {{form.quantity}}
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Reorder Threshold:</label>
+                                        <input type="number" class="form-control" id="reorder-threshold" placeholder="Reorder Threshold" value="{{ form.low_stock_threshold.value|default_if_none:''}}" name="reorder-threshold">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Unit cost price:</label>
+                                        {{ form.cost_price }}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Total cost #:</label>
+                                        {{ form.total_cost }}
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Amount paid:</label>
+                                        {{ form.amount_paid }}
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </fieldset>
+                    </div>
+                    </form>
+                </div>
+
+                <div class="text-right">
+                    <button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:product-update' pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=stock.pk %}" id='editStockBtn' class="btn btn-xs btn-primary hvr-pulsew">Edit</button>
+                </div>
+            </div>
+        </div>
+     </div>
+    </div>
 </div>
-<script type="text/javascript">
-  // Basic select
-    $('.bootstrap-select').selectpicker();
+    <!--/form-->
+
+
+</div>
+
+<script>
+    console.log('edit form loaded');
+    $('.select').selectpicker();
+     // Basic initialization
+    $('.multiselect').multiselect({
+        onChange: function() {
+            $.uniform.update();
+        }
+    });
+     // Default initialization
+    $(".styled, .multiselect-container input").uniform({
+        radioClass: 'choice'
+    });
 </script>
 <script type="text/javascript" src="{% static 'backend/js/edit_stock.js' %}"></script>

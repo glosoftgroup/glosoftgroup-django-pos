@@ -803,7 +803,7 @@ def stock_fresh(request, product_pk):
     variants = product.variants.all()
     stock_items = Stock.objects.filter(
         variant__in=variants).select_related('variant', 'location')
-    ctx = {'product':product,'stock_items':stock_items}
+    ctx = {'product': product, 'stock_items': stock_items}
     return TemplateResponse(request, 'dashboard/product/partials/stock_refresh.html', ctx)
 
 
@@ -813,14 +813,18 @@ def stock_fresh(request, product_pk):
 def stock_edit(request, product_pk, stock_pk=None):
     product = get_object_or_404(Product, pk=product_pk)
     if stock_pk:
-        stock = get_object_or_404(Stock, pk=stock_pk)
+        stock = Stock.objects.get(pk=stock_pk)
     else:
         stock = Stock()
     form = forms.StockForm(request.POST or None, instance=stock,
                            product=product)
     if form.is_valid():
-        form.save()
-
+        obj = form.save(commit=False)  # get just the object but don't commit it yet.
+        obj.save()  # finally save it.
+        form.save_m2m()
+        if request.POST.getlist('payment_options[]'):
+            for option in request.POST.getlist('payment_options[]'):
+                stock.payment_options.add(option)
         purchase = PurchaseProduct()
         purchase.variant = stock.variant
         purchase.stock = stock
@@ -835,6 +839,9 @@ def stock_edit(request, product_pk, stock_pk=None):
             purchase.total_cost = request.POST.get('total_cost')
         purchase.supplier = product.product_supplier
         purchase.save()
+        if request.POST.getlist('payment_options[]'):
+            for option in request.POST.getlist('payment_options[]'):
+                purchase.payment_options.add(option)
 
         messages.success(
             request, pgettext_lazy('Dashboard message', 'Saved stock'))

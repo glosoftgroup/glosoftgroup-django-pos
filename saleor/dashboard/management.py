@@ -1,7 +1,8 @@
 from django.db.models.signals import post_migrate
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
-from ..sale.models import PaymentOption, Terminal
+from ..sale.models import Terminal
+from saleor.payment.models import PaymentOption
 from ..product.models import StockLocation
 
 

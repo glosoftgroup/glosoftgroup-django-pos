@@ -14,20 +14,24 @@ from ...product.models import (AttributeChoiceValue, Product, ProductAttribute,
 from .widgets import ImagePreviewWidget
 from ...search import index as search_index
 
+
 # purchase forms
 class StockPurchaseForm(forms.ModelForm):
     class Meta:
         model = Stock
         exclude = ['quantity_allocated']
 
+
 class ProductTaxForm(forms.ModelForm):
     class Meta:
         model = ProductTax
         exclude = []
+
     def __init__(self, *args, **kwargs):        
         super(ProductTaxForm, self).__init__(*args, **kwargs)     
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
 
 class ProductClassSelectorForm(forms.Form):
     MAX_RADIO_SELECT_ITEMS = 5
@@ -72,6 +76,10 @@ class StockForm(forms.ModelForm):
         field = self.fields['location'] 
         field.widget.attrs['class'] = 'form-control select'
 
+        field = self.fields['payment_options']
+        field.widget.attrs['class'] = 'form-control multiselect'
+
+
 class ProductClassForm(forms.ModelForm):
     class Meta:
         model = ProductClass
@@ -83,6 +91,7 @@ class ProductClassForm(forms.ModelForm):
             'product_attributes': pgettext_lazy(
                 'Product class form label',
                 'Attributes')}
+
     def __init__(self, *args, **kwargs):       
         super(ProductClassForm, self).__init__(*args, **kwargs)
         field = self.fields['product_attributes'] 
