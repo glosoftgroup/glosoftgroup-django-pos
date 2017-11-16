@@ -27,6 +27,7 @@ from ..supplier.models import Supplier
 from ..search import index
 from saleor.payment.models import PaymentOption
 from .utils import get_attributes_display_map
+from . import Status
 
 
 @python_2_unicode_compatible
@@ -446,6 +447,9 @@ class StockManager(models.Manager):
 
 @python_2_unicode_compatible
 class Stock(models.Model):
+    status = models.CharField(
+        pgettext_lazy('Stock field', 'Credit status'),
+        max_length=32, choices=Status.CHOICES, default=Status.PAYMENT_PENDING)
     variant = models.ForeignKey(
         ProductVariant, related_name='stock',
         verbose_name=pgettext_lazy('Stock item field', 'variant'))

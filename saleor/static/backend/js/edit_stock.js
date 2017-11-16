@@ -17,6 +17,7 @@ $(function(){
   var editForm  = editArea.find('form');
   var invoice_number = editForm.find("#id_invoice_number");
   var variant = editForm.find('#id_variant');
+  var status = editForm.find('#status');
   var cost_price = editForm.find('#id_cost_price');
   var location = editForm.find('#id_location');
   var quantity = editForm.find('#id_quantity');
@@ -25,14 +26,17 @@ $(function(){
   var editStockPaymentOption = editForm.find('#id_payment_options');
   var low_stock_threshold = editForm.find('#reorder-threshold');
 
+  console.log(status.val());
   editStockBtn.on('click',function(){   
     var url = $(this).data('contenturl');
     var refreshUrl = $(this).data('refreshstockurl')+"?tab=stock";
     
     dynamicData = {};
+    dynamicData['status'] = status.val();
     if(editStockAmountPaid.val()){
       dynamicData['amount_paid'] = editStockAmountPaid.val();
     }
+
     if(editStockPaymentOption.val()){
       dynamicData['payment_options'] = editStockPaymentOption.val();
     }

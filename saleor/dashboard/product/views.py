@@ -820,7 +820,11 @@ def stock_edit(request, product_pk, stock_pk=None):
                            product=product)
     if form.is_valid():
         obj = form.save(commit=False)  # get just the object but don't commit it yet.
+
+        if obj.amount_paid >= obj.total_cost:
+            obj.status = 'fully-paid'
         obj.save()  # finally save it.
+        print obj.status
         form.save_m2m()
         if request.POST.getlist('payment_options[]'):
             for option in request.POST.getlist('payment_options[]'):
