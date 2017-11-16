@@ -11,7 +11,7 @@
 </style>
 <div id="toggleStock" class="card-3 mb-10">
 <!--form-->
-<div class="add-new-stock-form mt-10">
+<div class="add-new-stock-form mt-10" id="product-app">
     <div class="sidebar-category bg-primary">
         <div class="category-title text-center text-semibold">
             <span id="selected-number">Add Stock</span>
@@ -51,6 +51,7 @@
                             </div>
                             <div class="hidden">
                                 {{ stock_form.location }}
+                                <input type="hidden" id="status" name="status" value="payment-pending">
                             </div>
 
 
@@ -64,7 +65,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Quantity:</label>
-                                        <input type="number" placeholder="Quantity" class="form-control" id="stock_quantity" name="stock_quantity">
+                                        <input v-on:keyup="getTotal()"  v-model="quantity" type="number" placeholder="Quantity" class="form-control" id="stock_quantity" name="stock_quantity">
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
@@ -82,30 +83,33 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Unit cost price:</label>
-                                        <input style="" type="number" placeholder="Unit price" class="form-control" id="stockcostprice" name="stockcostprice">
+                                        <input v-model="amount" v-on:keyup="getTotal()" style="" type="number" placeholder="Unit price" class="form-control" id="stockcostprice" name="stockcostprice">
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Total cost #:</label>
-                                        {{ stock_form.total_cost }}
+                                        <input id="id_total_cost" name="total_cost" v-on:keyup="getAmount" v-model="total" step="any" value="{{stock.total_cost.gross}}" class="form-control" type="number">
 
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Amount paid:</label>
-                                        <input placeholder="Total amount" name="amount_paid" id="amount_paid" class="form-control" type="text">
+                                        <input placeholder="Total amount" v-on:keyup="getBalance()" v-model="paid" name="amount_paid" id="amount_paid" class="form-control" type="number">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Balance:</label>
+                                        <input disabled="disabled" placeholder="Balance amount" v-model="balance" name="balance" id="balance" class="form-control" type="number">
                                     </div>
                                 </div>
                             </div>
-
-
-
                         </fieldset>
                     </div>
                 </div>

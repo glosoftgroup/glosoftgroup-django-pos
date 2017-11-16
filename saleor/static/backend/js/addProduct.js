@@ -498,6 +498,7 @@ $(function(){
    var stockTotalCost  = $('#id_total_cost');
    var stockPaymentOption = $('#payment_option');
    var reorder_levelId = $('#id_low_stock_threshold');
+   var stockStatus = $('#status');
    var addnewStockBtn  = $('#addnewStockBtn');
 
    // remove helper
@@ -587,7 +588,8 @@ $(function(){
       dynamicData['total_cost'] = stockTotalCost.val();
     }
     
-    // ./validation    
+    // ./validation
+    dynamicData['status']  = stockStatus.val();
     dynamicData['variant'] = variant;
     dynamicData['quantity'] = quantity;
     dynamicData['cost_price'] = cost_price;
