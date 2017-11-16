@@ -1,5 +1,3 @@
-from django.conf import settings
-from datetime import date
 from rest_framework.serializers import (
                 ModelSerializer,
                 HyperlinkedIdentityField,
@@ -9,8 +7,7 @@ from rest_framework.serializers import (
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from ...discount.models import Sale
-from ...discount.models import get_product_discounts
+
 from ...sale.models import (
             Sales, 
             SoldItem,
@@ -71,8 +68,10 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'tax',
                 'discount',
                  )
+
     def get_item_pk(self,obj):
         return obj.pk
+
     def get_available_stock(self,obj):
         try:
             stock = ProductVariant.objects.get(sku=obj.sku)
@@ -247,7 +246,8 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
     credititems = TrackSerializer(many=True)
     class Meta:
         model = Credit
-        fields = ('id',                 
+        fields = (
+                 'id',
                  'invoice_number',
                  'total_net',
                  'sub_total',                

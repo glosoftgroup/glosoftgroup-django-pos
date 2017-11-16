@@ -495,7 +495,7 @@ $(function(){
    var stockLocationId = $('#id_location');
    var stockQuantityId = $('#stock_quantity');
    var stockAmountPaid = $('#amount_paid');
-   var stockTotalCost  = $('#total_cost');
+   var stockTotalCost  = $('#id_total_cost');
    var stockPaymentOption = $('#payment_option');
    var reorder_levelId = $('#id_low_stock_threshold');
    var addnewStockBtn  = $('#addnewStockBtn');
@@ -503,7 +503,7 @@ $(function(){
    // remove helper
    stockVariantId.on('change',function(){
     $(this).nextAll('.help-block:first').addClass('text-danger').html('');
-   });   
+   });
    reorder_levelId.on('change',function(){
     $(this).nextAll('.help-block:first').addClass('text-danger').html('');
    });
@@ -522,6 +522,7 @@ $(function(){
    // success
    var refreshDiv = $('#refreshStockitems');   
    addnewStockBtn.on('click',function(){
+   console.log('you clicked thi button');
     var dynamicData = {};
     var variant = stockVariantId.val();
     var cost_price = costPriceId.val();
@@ -580,7 +581,7 @@ $(function(){
       dynamicData['amount_paid'] = stockAmountPaid.val();
     }
     if(stockPaymentOption.val()){
-      dynamicData['payment_option'] = stockPaymentOption.val();
+      dynamicData['payment_options'] = stockPaymentOption.val();
     }
     if(stockTotalCost.val()){
       dynamicData['total_cost'] = stockTotalCost.val();
