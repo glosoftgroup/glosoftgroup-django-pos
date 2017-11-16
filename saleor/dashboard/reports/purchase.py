@@ -44,7 +44,7 @@ error_logger = logging.getLogger('error_logger')
 @permission_decorator('reports.view_purchase_reports')
 def purchase_reports(request):
 	try:
-		queryset_list = PurchaseProduct.objects.all().order_by('id')
+		queryset_list = PurchaseProduct.objects.all().order_by('-id')
 		page = request.GET.get('page', 1)
 		paginator = Paginator(queryset_list, 10)
 		try:
@@ -119,7 +119,7 @@ def purchase_paginate(request):
 			return TemplateResponse(request, 'dashboard/reports/purchase/p2.html', {'date': date})
 	else:
 		try:
-			purchases = PurchaseProduct.objects.all().order_by('id')
+			purchases = PurchaseProduct.objects.all().order_by('-id')
 			total_purchases = 0
 			for purchase in purchases:
 				total_purchases += purchase.get_total_cost()
@@ -177,7 +177,7 @@ def purchase_search(request):
 				Q(invoice_number__icontains=q) |
 				Q(stock__variant__product__name__icontains=q) |
 				Q(created__icontains=q) |
-				Q(supplier__name__icontains=q)).order_by('id')
+				Q(supplier__name__icontains=q)).order_by('-id')
 			all_purchases = 0
 			for purchase in purchases:
 				all_purchases += purchase.get_total_cost()
@@ -250,7 +250,7 @@ def purchase_pdf(request):
 				Q(invoice_number__icontains=q) |
 				Q(stock__variant__product__name__icontains=q) |
 				Q(created__icontains=q) |
-				Q(supplier__name__icontains=q)).order_by('id')
+				Q(supplier__name__icontains=q)).order_by('-id')
 			all_purchases = 0
 			for purchase in purchases:
 				all_purchases += purchase.get_total_cost()
@@ -267,7 +267,7 @@ def purchase_pdf(request):
 			pdf = render_to_pdf('dashboard/reports/purchase/pdf/pdf.html', data)
 			return HttpResponse(pdf, content_type='application/pdf')
 		else:
-			purchases = PurchaseProduct.objects.all().order_by('id')
+			purchases = PurchaseProduct.objects.all().order_by('-id')
 			all_purchases = 0
 			for purchase in purchases:
 				all_purchases += purchase.get_total_cost()
@@ -300,11 +300,11 @@ def purchase_export_csv(request):
 				Q(invoice_number__icontains=q) |
 				Q(stock__variant__product__name__icontains=q) |
 				Q(created__icontains=q) |
-				Q(supplier__name__icontains=q)).order_by('id')
+				Q(supplier__name__icontains=q)).order_by('-id')
 			if gid:
 				purchases = purchases.filter(created__icontains=gid)
 		else:
-			purchases = PurchaseProduct.objects.all().order_by('id')
+			purchases = PurchaseProduct.objects.all().order_by(-'id')
 			if gid:
 				purchases = purchases.filter(created__icontains=gid)
 

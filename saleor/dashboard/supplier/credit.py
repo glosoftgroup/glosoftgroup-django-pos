@@ -120,19 +120,19 @@ def credit_pagination(request):
 @permission_decorator('reports.view_sale_reports')
 def credit_history(request, credit_pk=None):
 	if credit_pk:
-		credit = Credit.objects.get(pk=credit_pk)
-		total_amount = CreditHistoryEntry.objects.aggregate(Sum('amount'))['amount__sum']
-		total_balance = CreditHistoryEntry.objects.aggregate(Sum('balance'))['balance__sum']
+		credit = PurchaseProduct.objects.get(pk=credit_pk)
+		total_amount = credit.total_cost
+		total_balance = credit.total_cost - credit.amount_paid
 	else:
-		credit = Credit()
+		credit = PurchaseProduct()
 	try:
 		try:
-			last_sale = CreditHistoryEntry.objects.latest('id')
+			last_sale = PurchaseProduct.objects.latest('id')
 			last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
 		except:
 			last_date_of_sales = DateFormat(datetime.today()).format('Y-m-d')
 
-		all_sales = CreditHistoryEntry.objects.filter(credit=credit)
+		all_sales = credit.total_cost
 		total_sales_amount = 0 #all_sales.aggregate(Sum('total_net'))
 		total_tax_amount = 0 #all_sales.aggregate(Sum('total_tax'))
 		total_sales = []
