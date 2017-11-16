@@ -13,7 +13,7 @@
      <li class="active"><a href="{% url 'dashboard:supplier_credit_list' %}">Credit Purchase History Reports</a></li>
  {% endblock %}
 
-{% block menu_creditCustomer_class %}active{% endblock %}
+{% block menu_creditSupplier_class %}active{% endblock %}
  {% block custom_css %}
  <link href="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet" type="text/css">
 <style type="text/css">
@@ -60,7 +60,7 @@
 										<h5 class="text-uppercas text-semibold">Invoice {{credit.invoice_number}}</h5>
 										<ul class="list-condensed list-unstyled">
 											<li>Date: <span class="text-semibold">{{ credit.created }}</span></li>
-											<li>Due date: <span class="text-semibold">{{ credit.due_date }}</span></li>
+											<li class="hidden">Due date: <span class="text-semibold">{{ credit.due_date }}</span></li>
                                             <li>Status:
                                                 {% if sale.is_fully_paid %}
                                                 <span class="text-success  icon-checkmark-circle"><i></i></span>
@@ -76,9 +76,9 @@
                                     <div class="invoice-details">
 									<span class="text-muted">Served by:</span>
 		 							<ul class="list-condensed list-unstyled">
-										<li><h5>{{ credit.user }}</h5></li>
+										<li><h5>{% if request.user.name %}{{ request.user.name }}{% else %}{{request.user.email}}{% endif%}</h5></li>
 
-										<li><a href="#">{{ credit.user.email }}</a></li>
+										<li><a href="#">{% if request.user.email %}{{ request.user.email }}{% else %}-{% endif%}</a></li>
 									</ul>
                                         </div>
 								</div>
@@ -93,26 +93,26 @@
 						            <tr class="bg-primary">
 						                <th>Comment</th>
                                         <th>Date</th>
-						                <th class="col-sm-1">Amount</th>
-                                        <th class="col-sm-1">Balance</th>
+						                <th class="col-sm-1">Total Credit</th>
+                                        <th class="col-sm-1">Amount Paid</th>
 						            </tr>
 						        </thead>
 						        <tbody>
-                                {% if sales %}
-                                {% for sale in sales %}
+                                {% if credit %}
+                                {#{% for sale in credit %}#}
 						            <tr>
 						                <td>
-						                	<h6 class="no-margin">{{ sale.crud }}</h6>
+						                	<h6 class="no-margin">{% if credit.stock.variant.name %}{{credit.stock.variant.name}}{% else %}{{ credit.stock.variant.product.name }}{% endif %}</h6>
 						                	<span class="text-muted">
-                                                {{ sale.comment }}
+                                                {% if credit.stock.variant.sku %}{{ credit.stock.variant.sku }}{% else %}-{% endif %}
                                             </span>
 					                	</td>
-                                        <td>{{ sale.created }}</td>
-						                <td><span class="text-semibold">{{ sale.amount }}</span></td>
-                                        <td><span class="text-semibold">{{ sale.balance }}</span></td>
+                                        <td>{{ credit.created }}</td>
+						                <td><span class="text-semibold">{{ credit.total_cost.gross }}</span></td>
+                                        <td><span class="text-semibold">{{ credit.amount_paid.gross }}</span></td>
 
 						            </tr>
-                                {% endfor %}
+                                {#{% endfor %}#}
                                 {% endif %}
 						        </tbody>
 
@@ -133,7 +133,7 @@
 													<td>
                                                       <h4 class="text-semibold">Amount Paid </h4>
                                                     </td>
-													<td class="text-right">{{ credit.amount_paid }}</td>
+													<td class="text-right">{{ credit.amount_paid.gross }}</td>
 												</tr>
 
 												<tr>
@@ -142,7 +142,7 @@
                                                     </td>
 													<td class="text-right text-primary">
                                                         <h5 class="text-semibold">
-                                                            {{ credit.total_net|sub:credit.amount_paid }}
+                                                            {{ total_balance.gross }}
                                                         </h5>
                                                     </td>
 												</tr>
