@@ -86,7 +86,8 @@ class CreditListSerializer(serializers.ModelSerializer):
     cashier = SerializerMethodField()
     class Meta:
         model = Credit
-        fields = ('id',
+        fields = (
+                 'id',
                  'user',
                  'invoice_number',
                  'total_net',
@@ -117,7 +118,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
     credititems = TrackSerializer(many=True)
 
     class Meta:
-        model =  Credit
+        model = Credit
         fields = ('id',
                  'user',
                  'invoice_number',
@@ -203,7 +204,8 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                 loyalty_points = total_net/points_eq
                   
         solditems_data = validated_data.pop('credititems')        
-        credit = Credit.objects.create(user=validated_data.get('user'),
+        credit = Credit.objects.create(
+                                     user=validated_data.get('user'),
                                      invoice_number=validated_data.get('invoice_number'),
                                      total_net=validated_data.get('total_net'),
                                      sub_total=validated_data.get('sub_total'),
@@ -238,12 +240,12 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                     print 'stock not found'
             except Exception as e:
                 print 'Error reducing stock!'
-            
-                
         return credit
+
 
 class CreditUpdateSerializer(serializers.ModelSerializer):      
     credititems = TrackSerializer(many=True)
+
     class Meta:
         model = Credit
         fields = (

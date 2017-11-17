@@ -1009,6 +1009,7 @@ $(document).ready(function(){
  $.when( $.ready ).then(function() {
   $('#id_categories').removeAttr('multiple');
   $('#id_categories').selectpicker();
+  $('.select-variant').selectpicker();
  });
 
  {% if product.pk %}

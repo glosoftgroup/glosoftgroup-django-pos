@@ -42,6 +42,7 @@ def credit_report(request):
 		error_logger.error(e)
 		return TemplateResponse(request, 'dashboard/supplier/credit/list.html', {})
 
+
 @staff_member_required
 def credit_search(request):
     if request.is_ajax():
@@ -85,6 +86,7 @@ def credit_search(request):
 
 			return TemplateResponse(request, 'dashboard/supplier/credit/pagination/credit_search.html',
 			{"users":users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
 def credit_pagination(request):

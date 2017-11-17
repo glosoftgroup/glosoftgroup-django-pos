@@ -2,7 +2,8 @@ from django.db.models.signals import post_migrate
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from ..sale.models import Terminal
-from saleor.payment.models import PaymentOption
+from saleor.payment.models import PaymentOption as Payment
+from saleor.sale.models import PaymentOption
 from ..product.models import StockLocation
 
 
@@ -38,6 +39,24 @@ def add_payment_options(sender, **kwargs):
         points = PaymentOption.objects.filter(name='Loyalty Points')
         if not points.exists():
             PaymentOption.objects.create(name="Loyalty Points")
+    except:
+        print('Error creating payment options')
+
+
+def add_stock_payment_options(sender, **kwargs):
+    try:
+        cash = Payment.objects.filter(name='Cash')
+        if not cash.exists():
+            Payment.objects.create(name="Cash")
+        visa = PaymentOption.objects.filter(name='Visa')
+        if not visa.exists():
+            Payment.objects.create(name="Visa")
+        mpesa = Payment.objects.filter(name='Mpesa')
+        if not mpesa.exists():
+            Payment.objects.create(name="Mpesa")
+        points = PaymentOption.objects.filter(name='Credit')
+        if not points.exists():
+            Payment.objects.create(name="Credit")
     except:
         print('Error creating payment options')
 

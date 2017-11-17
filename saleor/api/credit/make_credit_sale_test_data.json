@@ -4,7 +4,7 @@
   "invoice_number": "new0fionvoice",
   "total_net": "1000.00",
   "sub_total": "1234.00",
-  "balance": "12345.00",
+  "balance": "1000.00",
   "terminal": 1,
   "amount_paid": "0.00",
   "credititems": [

@@ -10,8 +10,13 @@ from django.utils.http import is_safe_url
 from django.utils.translation import pgettext_lazy
 from django.views.decorators.http import require_http_methods
 from django.contrib.postgres.search import SearchVector
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from . import forms
+from .forms import ProductTaxForm
 from ...core.utils import get_paginator_items
 from ...purchase.models import (
                                 PurchaseOrder,
@@ -24,11 +29,7 @@ from ...product.models import (Product, ProductAttribute, Category,
                                ProductImage, ProductVariant, Stock,
                                StockLocation, ProductTax, StockHistoryEntry)
 from ..views import staff_member_required
-from saleor.sale.models import PaymentOption
-from django.http import HttpResponse
-from django.http import JsonResponse
-from django.db.models import Q
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from saleor.payment.models import PaymentOption
 from ...decorators import permission_decorator, user_trail
 import logging
 
@@ -799,7 +800,10 @@ def stock_fresh(request, product_pk):
             form = forms.StockForm(request.POST or None, instance=stock,
                            product=product)
             ctx = {'product':product,'stock_form':form}
-            return TemplateResponse(request, 'dashboard/product/partials/'+template+'.html', ctx)
+            latest = ProductVariant.objects.latest('id')
+            print(latest)
+            return HttpResponse(json.dumps({'id': latest.id, 'value': latest.sku}), content_type='application/json')
+            #return TemplateResponse(request, 'dashboard/product/partials/'+template+'.html', ctx)
     variants = product.variants.all()
     stock_items = Stock.objects.filter(
         variant__in=variants).select_related('variant', 'location')
@@ -998,11 +1002,10 @@ def add_attributes(request):
             attributes = product.product_class.variant_attributes.prefetch_related('values')    
             variants = product.variants.all()
             product_variant.save()
-            ctx = {'product':product,
-                   'attributes':attributes,
+            ctx = {'product': product,
+                   'attributes': attributes,
                    'variants':variants}
-            return TemplateResponse(request,
-                'dashboard/product/partials/variant_table.html', ctx)
+            return TemplateResponse(request,'dashboard/product/partials/variant_table.html', ctx)
     return HttpResponse('Error!');
 
 
@@ -1394,7 +1397,7 @@ def stock_location_delete(request, location_pk):
     return TemplateResponse(
         request, 'dashboard/product/stock_locations/modal_confirm_delete.html',
         ctx)
-from .forms import ProductTaxForm
+
 
 @staff_member_required
 @permission_decorator('product.view_producttax')

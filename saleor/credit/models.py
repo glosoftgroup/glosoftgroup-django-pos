@@ -25,7 +25,7 @@ class CreditManager(models.Manager):
         return self.get_queryset().filter(due_date__lte=timezone.now())
 
     def customer_credits(self, customer):
-        return self.get_queryset().filter(customer=customer).aggregate(Sum('total_net'))['total_net__sum']
+        return self.get_queryset().filter(customer=customer).aggregate(Sum('debt'))['debt__sum']
 
     def expired_credit(self):        
         max_credit_date = SiteSettings.objects.get(pk=1).max_credit_date 
