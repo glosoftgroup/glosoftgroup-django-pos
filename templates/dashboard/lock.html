@@ -183,11 +183,11 @@
                   {
                        if(data == 'error login' || data == 'wrong credentials'){
                           l.stop();
-                          alertNotificatio('Wrond Credentials!', 'Authentication Error', 'danger') 
+                          alertNotification('Wrong Credentials!', 'Authentication Error', 'danger')
                        }
                        else{
                           l.stop();
-                          alertNotificatio('Authenticated', 'Success!', 'success')
+                          alertNotification('Authenticated', 'Success!', 'success')
                           window.location = data;
                           $('.email').val('');
                           $('.password').val('');
@@ -196,13 +196,13 @@
                   },
                   error: function(data) 
                   {
-                    alertNotificatio('Wrond Credentials!', 'Authenticatin Error', 'danger') 
+                    alertNotification('Wrong Credentials!', 'Authenticatin Error', 'danger')
                   }
               });
                return false;
               e.preventDefault(); //STOP default action
           });
-         function alertNotificatio(message, header, theme){
+         function alertNotification(message, header, theme){
             $.jGrowl(message, {
                 header: header,
                 theme: 'bg-'+theme

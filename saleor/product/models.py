@@ -500,6 +500,12 @@ class Stock(models.Model):
     def cost_priceAsData(self):
         return self.cost_price
 
+    def get_balance(self):
+        try:
+            return self.total_cost.gross - self.amount_paid.gross
+        except:
+            return 0
+
     @property
     def varaintName(self):
         return self.variant.price_override;

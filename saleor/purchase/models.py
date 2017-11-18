@@ -16,7 +16,7 @@ from ..product.models import (
 from ..userprofile.models import Address
 from ..customer.models import Customer
 from ..supplier.models import Supplier
-from saleor.sale.models import PaymentOption
+from saleor.payment.models import PaymentOption
 
 from . import OrderStatus
 
@@ -63,6 +63,12 @@ class PurchaseProduct(models.Model):
 
     def __str__(self):
         return str(self.variant)+' '+str(self.stock)
+
+    def get_balance(self):
+        try:
+            return self.total_cost.gross - self.amount_paid.gross
+        except:
+            return 0
 
     def get_total_cost(self):
         if not self.cost_price:
