@@ -114,7 +114,14 @@
                                         <input id="balance_e" name="balance_e" v-model="balance" step="any" class="form-control" type="number">
                                     </div>
                                 </div>
-
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Settle payment:</label>
+                                        <input id="settle_payment" v-on:keyup="settleBalance()" v-model="settle" name="settle_payment" step="any" class="form-control" type="number">
+                                    </div>
+                                </div>
                             </div>
 
 
@@ -138,7 +145,7 @@
 </div>
 
 <script>
-    console.log('edit form loaded');
+
     $('.select').selectpicker();
      // Basic initialization
     $('.multiselect').multiselect({

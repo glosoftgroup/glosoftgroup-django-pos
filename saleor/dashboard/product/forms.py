@@ -71,7 +71,7 @@ class StockForm(forms.ModelForm):
         self.fields['variant'] = forms.ModelChoiceField(
             queryset=product.variants, initial=initial)
         field = self.fields['variant'] 
-        field.widget.attrs['class'] = 'form-control select'
+        field.widget.attrs['class'] = 'form-control select-variant'
 
         field = self.fields['location'] 
         field.widget.attrs['class'] = 'form-control select'

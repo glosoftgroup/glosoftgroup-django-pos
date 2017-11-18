@@ -7,16 +7,17 @@ from django.utils.translation import pgettext_lazy
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
+from django.utils.encoding import smart_str
+from django.core.urlresolvers import reverse
 from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...supplier.models import Supplier, AddressBook
+from ...purchase.models import PurchaseProduct
 
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf
-from django.core.urlresolvers import reverse
 import csv
 import random
-from django.utils.encoding import smart_str
 import logging
 import json
 from datetime import date
@@ -435,4 +436,163 @@ def supplier_export_csv(request):
     return response
 
 
+# credit
+@permission_decorator('supplier.view_supplier')
+def credit(request):
+    try:
+        users = PurchaseProduct.objects.filter(
+            Q(payment_options__name='Credit')
+        ).exclude(supplier=None).order_by('supplier').distinct('supplier')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(users, 10)
+        try:
+            users = paginator.page(page)
+        except PageNotAnInteger:
+            users = paginator.page(1)
+        except InvalidPage:
+            users = paginator.page(1)
+        except EmptyPage:
+            users = paginator.page(paginator.num_pages)
+        user_trail(request.user.name, 'accessed suppliers list page', 'view')
+        info_logger.info('User: ' + str(request.user.name) + ' accessed the view users page')
+        if request.GET.get('initial'):
+            return HttpResponse(paginator.num_pages)
+        else:
+            ctx = {'users': users, 'pn': paginator.num_pages}
+            return TemplateResponse(request, 'dashboard/supplier/credit/users2.html', ctx)
+    except TypeError as e:
+        error_logger.error(e)
+        return HttpResponse('error accessing users')
+
+
+@staff_member_required
+def credit_paginate(request):
+    page = int(request.GET.get('page', 1))
+    list_sz = request.GET.get('size')
+    p2_sz = request.GET.get('psize')
+    select_sz = request.GET.get('select_size')
+    users = PurchaseProduct.objects.filter(
+        Q(payment_options__name='Credit')
+    ).exclude(supplier=None).order_by('supplier').distinct('supplier')
+
+    if list_sz:
+        paginator = Paginator(users, int(list_sz))
+        users = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/supplier/credit/p2.html',
+                                {'users': users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+    else:
+        paginator = Paginator(users, 10)
+    if p2_sz:
+        paginator = Paginator(users, int(p2_sz))
+        users = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/supplier/credit/paginate.html', {'users': users})
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except InvalidPage:
+        groups = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
+    return TemplateResponse(request, 'dashboard/supplier/credit/paginate.html', {'users': users})
+
+
+@staff_member_required
+def credit_search(request):
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
+            users = PurchaseProduct.objects.filter(
+                Q(payment_options__name='Credit') and
+                (
+                    Q(supplier__name__icontains=q) |
+                    Q(supplier__email__icontains=q) |
+                    Q(supplier__mobile__icontains=q))
+            ).exclude(supplier=None).order_by('supplier').distinct('supplier')
+            paginator = Paginator(users, 10)
+            try:
+                users = paginator.page(page)
+            except PageNotAnInteger:
+                users = paginator.page(1)
+            except InvalidPage:
+                users = paginator.page(1)
+            except EmptyPage:
+                users = paginator.page(paginator.num_pages)
+            if p2_sz:
+                users = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/supplier/credit/paginate.html', {'users': users})
+
+            return TemplateResponse(request, 'dashboard/supplier/credit/search.html',
+                                    {'users': users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+
+# stock listing
+@permission_decorator('supplier.view_supplier')
+def credit_stock(request, pk=None):
+    try:
+        users = PurchaseProduct.objects.filter(
+            Q(payment_options__name='Credit') and
+            Q(supplier__pk=pk)
+        ).exclude(supplier=None).order_by('invoice_number').distinct('invoice_number')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(users, 10)
+        try:
+            users = paginator.page(page)
+        except PageNotAnInteger:
+            users = paginator.page(1)
+        except InvalidPage:
+            users = paginator.page(1)
+        except EmptyPage:
+            users = paginator.page(paginator.num_pages)
+        user_trail(request.user.name, 'accessed suppliers credited list page', 'view')
+        info_logger.info('User: ' + str(request.user.name) + ' accessed the view supplier credit stock page')
+        if request.GET.get('initial'):
+            return HttpResponse(paginator.num_pages)
+        else:
+            ctx = {'users': users, 'pn': paginator.num_pages}
+            return TemplateResponse(request, 'dashboard/supplier/stock/users2.html', ctx)
+    except TypeError as e:
+        error_logger.error(e)
+        return HttpResponse('error accessing users')
+
+
+@staff_member_required
+def credit_stock_paginate(request, pk=None):
+    page = int(request.GET.get('page', 1))
+    list_sz = request.GET.get('size')
+    p2_sz = request.GET.get('psize')
+    select_sz = request.GET.get('select_size')
+    users = PurchaseProduct.objects.filter(
+        Q(payment_options__name='Credit') and
+        Q(supplier__pk=pk)
+    ).exclude(supplier=None).order_by('invoice_number').distinct('invoice_number')
+
+    if list_sz:
+        paginator = Paginator(users, int(list_sz))
+        users = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/supplier/stock/p2.html',
+                                {'users': users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+    else:
+        paginator = Paginator(users, 10)
+    if p2_sz:
+        paginator = Paginator(users, int(p2_sz))
+        users = paginator.page(page)
+        return TemplateResponse(request, 'dashboard/supplier/stock/paginate.html', {'users': users})
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except InvalidPage:
+        groups = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
+    return TemplateResponse(request, 'dashboard/supplier/stock/paginate.html', {'users': users})
 

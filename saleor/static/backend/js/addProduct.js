@@ -175,6 +175,14 @@ $(function() {
   var refreshVaraintsContent = $('#refreshvaraintscontent');
   var refreshStockVariants = $('#refreshStockVariants');
   var json = [];
+
+  function addItem(newitemnum, newitemdesc) {
+   var selector = $('#id_variant');
+   console.log('we reresh soth**');
+   selector.append('<option value="'+newitemnum+'">'+newitemdesc+'</option>');
+   selector.selectpicker('refresh');
+   selector.selectpicker('val', newitemnum);
+ }
   addvariantBtn.on('click',function(){    
     // map each varaint
     dynamicVariants.map(function() {       
@@ -250,10 +258,11 @@ $(function() {
       refreshVaraintsContent.html(data);
       var dynamic = {}
       dynamic['template'] = 'select_variant';
-      dynamic['get'] = 'variants';      
+      dynamic['get'] = 'variants';
+      dynamic['track'] = 'refresh stock variant field';
       refreshStockVar(dynamic,refreshvurl)
       .done(function(data){
-        refreshStockVariants.html(data);
+        addItem(data['id'],data['value']);
       });
     })
     .fail(function(){

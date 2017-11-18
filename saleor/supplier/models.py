@@ -110,7 +110,6 @@ class SupplierManager(BaseUserManager):
         return supplier
 
 
-
 class SupplierManager(BaseUserManager):
 
     def create_supplier(self, email, password=None,

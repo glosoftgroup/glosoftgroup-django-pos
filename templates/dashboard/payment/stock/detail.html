@@ -1,0 +1,78 @@
+{% if option %}
+    <div class=" detail-column">
+        
+
+          <div class="form-group">            
+              <label class="text-left" style="font-weight:500">option name:</label>
+            
+              <input type="text" value="{{option.name}}" {{disabled}} name="optname" id="optname" class="form-control">
+            </div>
+       
+          <div class="form-group hidden">
+              <label class="text-left" style="font-weight:500">Loyalty points equiv:</label>            
+              <input type="number" value="{{option.loyalty_point_equiv}}" name="loyalty_point_equiv" id="loyalty_point_equiv" class="form-control">
+            
+          </div>           
+      
+        
+        <div class="col-md-12">
+          <div class="form-group">
+            <label style="font-weight:500">Description</label>
+            <textarea name='optdescription' id="optdescription" class="form-control">{{option.description}}</textarea>
+         </div>
+        </div>
+    </div>
+<script type="text/javascript">
+    var updateOptionBtn = $('#updateOption');
+    var optdescription = $('#optdescription');
+    var optname = $('#optname');
+    var loyalty_point_equiv = $('#loyalty_point_equiv');
+    var updateUrl = "{% url 'dashboard:update-payment-stock-option' pk=option.pk %}"
+
+    function updatePaymentOption(dynamicData,url,method){
+      dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+      return $.ajax({
+          url: url,
+          type: method,
+          data: dynamicData
+        });
+
+    }
+    // alertUser
+    function alertUser(msg,status='bg-success',header='Well done!')
+    { $.jGrowl(msg,{header: header,theme: status}); }
+    updateOptionBtn.on('click',function(){
+       var name = optname.val();
+       var description = optdescription.val();
+       var dynamicData = {};     
+
+       if(!name){
+        alertUser('Name required','bg-danger','Missing Field Error!');
+        return false;
+       }
+       if(description){
+        dynamicData['description'] = description;
+       }
+       if(loyalty_point_equiv.val()){
+        dynamicData['loyalty_point_equiv'] = loyalty_point_equiv.val();
+       }
+       dynamicData['name'] = name;
+       dynamicData['track'] = 'updating payment option';
+
+
+       updatePaymentOption(dynamicData,updateUrl,'post')
+       .done(function(data){
+        alertUser('Updated successfully');
+        window.location.reload();
+       })
+       .fail(function(){
+        alertUser('Error occured. Try another name','bg-danger','Error!')
+       });
+    });
+
+</script>
+{% else %}
+<div class="alert bg-info col-md-12">
+    <h4 class="text-center">No details for this option</h4>
+</div>
+{% endif %}
