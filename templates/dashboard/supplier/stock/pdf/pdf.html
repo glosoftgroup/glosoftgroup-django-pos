@@ -1,11 +1,9 @@
 {% load staticfiles %}
-{% load i18n %}
-{% load prices_i18n %}
+{% load mathfilters %}
  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
  <html>
-    <link href='https://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
      <head>
-         <title>Supplier Report</title>
+         <title>Credit Purchase Items Report</title>
          <style type="text/css">
              body {sans-serif; color: #384047;}
              .header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}
@@ -33,56 +31,154 @@
      </head>
      <body>
          <div class='wrapper'>
+
+         <div>
+         <div class='details'>
+             <div class="col-md-12">
+   <div id="paginationdiv">
+    <div class="panelpanel-flat">
+      <div class="panelbody">
+          <!--statement template-->
+          <div class="panel panel-white">
+              <div class='wrapper'>
              <div class='header'>
-                 <p style="margin-bottom:0px;"><img class="img" src="{{image}}" alt="Red dot" /></p>
-                 <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;">SUPPLIERS REPORT <br>
-                   <span style="font-size: 0.8em;">{{today | date:'d-m-Y'}}</span>
+                 <p class='title' style="margin-top:2px;margin-bottom:0px;font-size:13px;"> CREDIT PURCHASE REPORT
+                 <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
+                        SUPPLIER: {% if credit.variant.product.product_supplier.name %} {{credit.variant.product.product_supplier.name|upper}} {% else %} -{% endif %}
+                 </p>
+                     <p style="margin-bottom:0px;margin-top:2px;font-size:11px;" class="text-semibold">
+                        RECEIPT: {{credit.invoice_number}}
+                 </p>
+                 <p style="margin-bottom:0px;margin-top:2px;font-size:10px;">
+                        SERVED BY: {{ credit.user | upper}}
+                 </p>
                  </p>
              </div>
          <div>
-         <div class='details'>
-            <table repeat="1" class="table  table-hover datatable-header-footer" style="border:0.5px solid #ddd;">
-                <thead>
-                  <tr class="bg-primary">
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone no.</th>
-                  </tr>
-                </thead>
-                <tbody id="tb">
-                    {% if users %}
-                        {% for user in users%}
-                  <tr class='clickable-row' id="{{user.pk }}">
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{ forloop.counter }}</td>
-                    <!-- image -->
-                     <!-- product name -->
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{user.name}}</td>
-                    <!-- product category -->
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">{{user.email}}
-                    </td>
-                    <!-- role -->
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">
-                    {{ user.mobile }}
-                    </td>
-                  </tr>
-                  {% endfor %}
-                        {% else %}
-                         <tr><td colspan="4"><h2 class="text-center">No Suppliers available</h2></td></tr>
-                        {% endif %}
-                  </tbody>
-           </table>
-         </div>
-         <div class="foot" id="footerContent">
-                 <p style="text-align: center;font-size:11px;">Report Pulled by:
-                     <span style="font-weight:bold">
-                         {% if puller.name %}
-                            {{ puller.name | upper }}
-                         {% else %}
-                            {{ puller.email | upper }}
-                         {% endif %}
-                     </span></p>
 
-             </div>
+
+						<div class="panel-body no-padding-bottom">
+							<div class="row">
+								<div class="col-sm-6 content-group text-left">
+                                    <div class="invoice-detail">
+
+										<div class="list-condensed list-unstyled">
+											Date: <span class="text-semibold">{{ credit.created }}</span><br>
+                                            Status:
+                                                {% if sale.is_fully_paid %}
+                                                <span class="text-success  icon-checkmark-circle"><i></i></span>
+                                                {% else %}
+                                                <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
+                                                {% endif %}
+
+										</div>
+									</div>
+								</div>
+
+
+							</div>
+
+
+						</div>
+
+						<div class="table-responsive" style="padding:12px">
+						    <table class="table table-lg">
+						        <thead>
+						            <tr class="bg-primary">
+						                <th>Comment</th>
+                                        <th>Date</th>
+						                <th class="col-sm-1">Amount</th>
+                                        <th class="col-sm-1">Balance</th>
+						            </tr>
+						        </thead>
+						        <tbody>
+                                {% if sales %}
+                                {% for sale in sales %}
+						            <tr>
+						                <td>
+						                	<h6 class="no-margin"></h6>
+						                	<span class="text-muted">
+                                                {{ sale.comment }}
+                                                <br>
+                                                {{ sale.user }}
+                                            </span>
+					                	</td>
+                                        <td>{{ sale.created }}</td>
+						                <td><span class="text-semibold">{{ sale.amount_paid.gross }}</span></td>
+                                        <td>
+                                            <span class="text-semibold">
+                                             {% if sale.balance.gross %}
+                                              {{ sale.balance.gross }}
+                                             {% endif %}
+                                            </span>
+                                        </td>
+
+						            </tr>
+                                {% endfor %}
+                                {% endif %}
+						        </tbody>
+
+						    </table>
+						</div>
+<div class="panel-body">
+						<div class="row invoice-payment">
+							<div class="col-sm-7">
+
+							</div>
+
+							<div class="col-sm-5 panel-primary panel-bordered">
+								<div class="content-group">
+									<div class="table-responsive no-border">
+										<table class="table" border="1">
+											<tbody>
+												<tr>
+													<td>
+                                                      <h4 class="text-semibold">Amount Paid </h4>
+                                                    </td>
+													<td class="text-right">{{ credit.amount_paid.gross }}</td>
+												</tr>
+
+												<tr>
+													<td>
+                                                      <h4 class="text-semibold">Balance </h4>
+                                                    </td>
+													<td class="text-right text-primary">
+                                                        <h5 class="text-semibold">
+                                                            {{ credit.get_balance }}
+                                                        </h5>
+                                                    </td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+						<div class="panel-body text-center">
+							<p class="text-muted"> Thank you for partnering with us.<br />
+                              <span>Report pulled by  {% if request.user.name %}
+                                    {{credit.user.name}}
+                                  {% else %}
+                                  {{ credit.user.email}}
+                                  {% endif %}
+                              </span>
+                            </p>
+						</div>
+					</div>
+          <!--./statement templzte-->
+
+
+            </div>
+    </div>
+   </div><!--pagination div-->
+  </div>
+
+
+</div>
+
+         </div>
      </body>
  </html>

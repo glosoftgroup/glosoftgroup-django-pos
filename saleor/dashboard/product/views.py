@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import emailit.api
+from decimal import Decimal
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -9,7 +10,6 @@ from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
 from django.utils.translation import pgettext_lazy
 from django.views.decorators.http import require_http_methods
-from django.contrib.postgres.search import SearchVector
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.db.models import Q
@@ -32,10 +32,12 @@ from ..views import staff_member_required
 from saleor.payment.models import PaymentOption
 from ...decorators import permission_decorator, user_trail
 import logging
+import json
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
+
 
 @staff_member_required
 def re_order(request):
@@ -57,8 +59,8 @@ def re_order(request):
         info_logger.info('User: ' + str(request.user.name) + ' accessed reorder page')
 
         data ={
-            "low_stock":low_stock,
-            "totalp":paginator.num_pages,
+            "low_stock": low_stock,
+            "totalp": paginator.num_pages,
             'pn': paginator.num_pages
                }
         if request.GET.get('initial'):
@@ -69,6 +71,8 @@ def re_order(request):
         error_logger.error(e)
         return TemplateResponse(request, 'dashboard/re_order/re_order.html', data)
 
+
+@staff_member_required
 def reorder_pagination(request):
     page = int(request.GET.get('page', 1))
     list_sz = request.GET.get('size')
@@ -97,6 +101,7 @@ def reorder_pagination(request):
     except EmptyPage:
         low_stock = paginator.page(paginator.num_pages)
     return TemplateResponse(request, 'dashboard/re_order/pagination/paginate.html', {"low_stock":low_stock,'pn': paginator.num_pages})
+
 
 @staff_member_required
 def reorder_search(request):
@@ -136,7 +141,6 @@ def reorder_search(request):
                                     {"low_stock":low_stock, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 
-import json
 @staff_member_required
 @permission_decorator('product.add_stock')
 def add_reorder_stock(request,pk=None): 
@@ -146,7 +150,7 @@ def add_reorder_stock(request,pk=None):
             supplier = get_object_or_404(Supplier,name=str(request.POST.get('supplier')))       
             product = get_object_or_404(Product,pk=(request.POST.get('pid')))       
 
-            ref_no   = request.POST.get('ref_no')
+            ref_no = request.POST.get('ref_no')
             if supplier:
                 purchase_order = PurchaseOrder.objects.create(
                                                         product=product,                    
@@ -779,6 +783,7 @@ def add_stock_ajax(request):
         info_logger.error(message)
         return HttpResponse(message)
 
+
 @staff_member_required
 @permission_decorator('product.change_stock')
 def stock_form(request,product_pk):
@@ -824,27 +829,36 @@ def stock_edit(request, product_pk, stock_pk=None):
                            product=product)
     if form.is_valid():
         obj = form.save(commit=False)  # get just the object but don't commit it yet.
-
+        obj.user = request.user
         if obj.amount_paid >= obj.total_cost:
             obj.status = 'fully-paid'
         obj.save()  # finally save it.
-        print obj.status
         form.save_m2m()
+
+        if request.POST.get('settle_payment'):
+            amount_paid = request.POST.get('settle_payment')
+        else:
+            amount_paid = request.POST.get('amount_paid')
         if request.POST.getlist('payment_options[]'):
             for option in request.POST.getlist('payment_options[]'):
                 stock.payment_options.add(option)
         purchase = PurchaseProduct()
         purchase.variant = stock.variant
         purchase.stock = stock
+        purchase.user = request.user
         purchase.invoice_number = request.POST.get('invoice_number')
         if request.POST.get('cost_price'):
             purchase.cost_price = request.POST.get('cost_price')
         if request.POST.get('quantity'):
             purchase.quantity = request.POST.get('quantity')
         if request.POST.get('amount_paid'):
-            purchase.amount_paid = request.POST.get('amount_paid')
+            purchase.amount_paid = amount_paid
         if request.POST.get('total_cost'):
             purchase.total_cost = request.POST.get('total_cost')
+        if request.POST.get('balance'):
+            purchase.balance = request.POST.get('balance')
+        else:
+            purchase.balance = request.POST.get('total_cost') - request.POST.get('amount_paid')
         purchase.supplier = product.product_supplier
         purchase.save()
         if request.POST.getlist('payment_options[]'):
@@ -864,8 +878,7 @@ def stock_edit(request, product_pk, stock_pk=None):
         if form.errors:
             response = JsonResponse({'status':'false','message':form.errors.items()})
             response.status_code = 500
-            return response            
-            #return HttpResponse(json.dumps({'errors': form.errors.items()}),content_type='application/json')
+            return response
         else:
             return TemplateResponse(request, 'dashboard/product/partials/edit_stock.html', ctx)
         # except Exception as e:

@@ -482,6 +482,15 @@ class Stock(models.Model):
         PaymentOption, related_name='stock_payment_option', blank=True,
         verbose_name=pgettext_lazy('Stock item field',
                                    'payment options'))
+    created = models.DateTimeField(
+        pgettext_lazy('Stock field', 'created'),
+        default=now, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        verbose_name=pgettext_lazy('Stock history entry field', 'user'))
+    comment = models.CharField(
+        pgettext_lazy('Stock entry field', 'comment'),
+        max_length=100, default='', blank=True)
 
     objects = StockManager()
 
