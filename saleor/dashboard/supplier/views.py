@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Group, Permission
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
@@ -13,9 +14,10 @@ from ..views import staff_member_required
 from ...userprofile.models import User, UserTrail
 from ...supplier.models import Supplier, AddressBook
 from ...purchase.models import PurchaseProduct
+from ...product.models import Stock
 
 from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf
+from ...utils import render_to_pdf, default_logo
 import csv
 import random
 import logging
@@ -538,6 +540,7 @@ def credit_search(request):
 @permission_decorator('supplier.view_supplier')
 def credit_stock(request, pk=None):
     try:
+        context_instance = Supplier.objects.get(pk=pk)
         users = PurchaseProduct.objects.filter(
             Q(payment_options__name='Credit') and
             Q(supplier__pk=pk)
@@ -557,7 +560,7 @@ def credit_stock(request, pk=None):
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
-            ctx = {'users': users, 'pn': paginator.num_pages}
+            ctx = {"context_instance": context_instance, 'users': users, 'pn': paginator.num_pages}
             return TemplateResponse(request, 'dashboard/supplier/stock/users2.html', ctx)
     except TypeError as e:
         error_logger.error(e)
@@ -566,6 +569,7 @@ def credit_stock(request, pk=None):
 
 @staff_member_required
 def credit_stock_paginate(request, pk=None):
+    context_instance = Supplier.objects.get(pk=pk)
     page = int(request.GET.get('page', 1))
     list_sz = request.GET.get('size')
     p2_sz = request.GET.get('psize')
@@ -579,13 +583,14 @@ def credit_stock_paginate(request, pk=None):
         paginator = Paginator(users, int(list_sz))
         users = paginator.page(page)
         return TemplateResponse(request, 'dashboard/supplier/stock/p2.html',
-                                {'users': users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
+                                {'context_instance': context_instance, 'users': users, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
     else:
         paginator = Paginator(users, 10)
     if p2_sz:
         paginator = Paginator(users, int(p2_sz))
         users = paginator.page(page)
-        return TemplateResponse(request, 'dashboard/supplier/stock/paginate.html', {'users': users})
+        return TemplateResponse(request, 'dashboard/supplier/stock/paginate.html',
+                                {'context_instance': context_instance, 'users': users})
     try:
         users = paginator.page(page)
     except PageNotAnInteger:
@@ -594,5 +599,75 @@ def credit_stock_paginate(request, pk=None):
         groups = paginator.page(1)
     except EmptyPage:
         users = paginator.page(paginator.num_pages)
-    return TemplateResponse(request, 'dashboard/supplier/stock/paginate.html', {'users': users})
+    return TemplateResponse(request, 'dashboard/supplier/stock/paginate.html',
+                            {'context_instance': context_instance, 'users': users})
 
+
+@staff_member_required
+def credit_stock_search(request,pk=None):
+    context_instance = Supplier.objects.get(pk=pk)
+    if request.is_ajax():
+        page = request.GET.get('page', 1)
+        list_sz = request.GET.get('size', 10)
+        p2_sz = request.GET.get('psize')
+        q = request.GET.get('q')
+        if list_sz is None:
+            sz = 10
+        else:
+            sz = list_sz
+
+        if q is not None:
+            users = PurchaseProduct.objects.filter(supplier__pk=pk).filter(
+                Q(payment_options__name='Credit') and
+                (
+                    Q(stock__invoice_number__icontains=q) |
+                    Q(stock__variant__sku__icontains=q) |
+                    Q(stock__variant__product__name__icontains=q)
+                )
+            ).exclude(supplier=None).order_by('invoice_number').distinct('invoice_number')
+            paginator = Paginator(users, 10)
+            try:
+                users = paginator.page(page)
+            except PageNotAnInteger:
+                users = paginator.page(1)
+            except InvalidPage:
+                users = paginator.page(1)
+            except EmptyPage:
+                users = paginator.page(paginator.num_pages)
+            if p2_sz:
+                users = paginator.page(page)
+                return TemplateResponse(request, 'dashboard/supplier/stock/paginate.html',
+                                        {'context_instance': context_instance, 'users': users})
+
+            return TemplateResponse(request, 'dashboard/supplier/stock/search.html',
+                                    {'context_instance': context_instance, 'users': users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
+
+#statement
+@staff_member_required
+def credit_statement(request, pk=None, stock_pk=None):
+    credit  = Stock.objects.get(pk=stock_pk)
+    context_instance = Supplier.objects.get(pk=pk)
+    sales = PurchaseProduct.objects.filter(stock=stock_pk).order_by('-id')
+    return TemplateResponse(request, 'dashboard/supplier/stock/statement.html',
+                            {'sales': sales, 'context_instance': context_instance, 'credit': credit})
+
+
+@staff_member_required
+@permission_decorator('reports.view_sales_reports')
+def credit_detail_pdf(request, pk=None):
+    try:
+        credit = Stock.objects.get(pk=pk)
+        all_sales = PurchaseProduct.objects.filter(stock__pk=pk)
+        img = default_logo()
+        data = {
+            'today': date.today(),
+            'sales': all_sales,
+            'credit': credit,
+            'puller': request.user,
+            'image': img
+        }
+        pdf = render_to_pdf('dashboard/supplier/stock/pdf/pdf.html', data)
+        return HttpResponse(pdf, content_type='application/pdf')
+    except ObjectDoesNotExist as e:
+        error_logger.error(e)

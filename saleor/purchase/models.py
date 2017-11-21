@@ -37,7 +37,11 @@ class PurchaseProduct(models.Model):
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     amount_paid = PriceField(
-        pgettext_lazy('PurchaseProduct item field', 'cost price'),
+        pgettext_lazy('PurchaseProduct item field', 'amount paid'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
+    balance = PriceField(
+        pgettext_lazy('PurchaseProduct item field', 'balance price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     total_cost = PriceField(
@@ -56,6 +60,12 @@ class PurchaseProduct(models.Model):
     created = models.DateTimeField(
         pgettext_lazy('PurchaseProduct field', 'created'),
         default=now, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        verbose_name=pgettext_lazy('PurchaseProduct history entry field', 'user'))
+    comment = models.CharField(
+        pgettext_lazy('PurchaseProduct field', 'comment'),
+        max_length=100, default='', blank=True)
 
     class Meta:
         verbose_name = pgettext_lazy('PurchaseProduct model', 'PurchaseProduct')

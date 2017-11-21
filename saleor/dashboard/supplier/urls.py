@@ -46,10 +46,14 @@ urlpatterns = [
         url(r'^credit/(?P<pk>[0-9]+)$', permission_required('customer.view_customer', login_url='not_found')
             (views.credit_stock), name='supplier_credit_stock_list'),
         url(r'^credit/paginate/(?P<pk>[0-9]+)$', views.credit_stock_paginate, name='supplier-credit-stock-paginate'),
-        url(r'^credit/search/(?P<pk>[0-9]+)$', views.credit_search, name='supplier-credit-stock-search'),
+        url(r'^credit/search/(?P<pk>[0-9]+)/stock/$', views.credit_stock_search, name='supplier-credit-stock-search'),
+        url(r'^credit/statement/(?P<pk>[0-9]+)/stock/(?P<stock_pk>[0-9]+)$',
+            views.credit_statement, name='supplier-credit-statement'),
+        url(r'^history/pdf/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (views.credit_detail_pdf), name='supplier_credit_history_pdf'),
 
 
-    url(r'^history/(?P<credit_pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
+        url(r'^history/(?P<credit_pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (credit.credit_history), name='supplier_credit_history'),
         url(r'^history/pdf/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (credit.credit_detail_pdf), name='supplier_credit_history_pdf'),

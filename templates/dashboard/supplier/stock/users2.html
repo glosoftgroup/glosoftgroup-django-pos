@@ -10,11 +10,11 @@
 
  {% block breadcrumbs %}
      <li class=""><a href="{% url 'dashboard:supplier_credit_list' %}">Supplier Credit</a></li>
-     <li class="active">Credit Purchases</li>
+     <li class="active">{{context_instance}} Credit Purchases</li>
  {% endblock %}
 
 
-{% block menu_supplier_class %}active{% endblock %}
+{% block menu_creditSupplier_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
      .clickable-row td.td{
@@ -33,10 +33,10 @@
       
         <div class="panel-body  search-panel">
 
-            <div class="col-md-4 hidden">
-             <label>Search Supplier</label>
+            <div class="col-md-4">
+             <label>Search</label>
               <div class="form-group form-group-material has-feedback">
-                <input class="form-control search_user" placeholder="Search Suppliers" type="text">
+                <input class="form-control search_user" placeholder="Search " type="text">
                 <div class="form-control-feedback">
                   <i class="icon-search4 text-size-base"></i>
                 </div>
@@ -85,7 +85,6 @@
                     <th>Amount Paid</th>
                     <th>Balance</th>
                     <th>Total</th>
-
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -94,33 +93,31 @@
                   <tr class='clickable-row' id="{{user.pk }}">
 
                     <!-- invoice -->
-                   <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">
+                   <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                        {{user.invoice_number}}
                    </td>
                      <!-- stock -->
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">
-                        {{user.stock}}
+                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
+                        {{user.stock.variant.display_product}}
                     </td>
                     <!-- quantity -->
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">
+                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                         {{user.quantity}}
                     </td>
                     <!-- amount_paid -->
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">
+                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                     {{ user.stock.amount_paid.gross }}
                     </td>
-                    <td>
+                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                         {{user.stock.get_balance}}
                     </td>
-                    <td class="td" data-href="{% url 'dashboard:supplier-detail' pk=user.pk %}">
+                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                     {{ user.stock.total_cost.gross }}
                     </td>
-
-
                   </tr>
                   {% endfor %}
                 {% else %}
-                     <tr><td colspan="6"><h2 class="text-center">No Suppliers Available</h2></td></tr>
+                     <tr><td colspan="6"><h2 class="text-center">No Data Available</h2></td></tr>
                     {% endif %}
                   </tbody>
            </table>
@@ -208,8 +205,9 @@
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
-<script type="text/javascript">
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+  <script type="text/javascript">
+  var searchUrl = "{% url 'dashboard:supplier-credit-stock-search' pk=context_instance.pk %}";
   $(document).ready(function() {
 
     $('.export-sz').selectpicker({
@@ -241,7 +239,7 @@
     //**@ display size select
     $('.list-sz').selectpicker().on('change', function(){
         var ts = $(this).val();
-        $.ajax({ url: "{% url 'dashboard:supplier-credit-paginate' %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
+        $.ajax({ url: "{% url 'dashboard:supplier-credit-stock-paginate' pk=context_instance.pk %}",type: 'GET',data: {page:1, size:ts}, async:false,success: function(data){
               $('#pagination-div').html(data);
         }});
      });
@@ -262,13 +260,13 @@
         firstClass: 'first',
         }).on("page", function(event, num){
             $(".pages-nav").html("Page " + num +" of "+pagination_totalsize); // or some ajax content loading...
-            $.get("{% url 'dashboard:supplier-credit-paginate' %}",{page:num},function(data){
+            $.get("{% url 'dashboard:supplier-credit-stock-paginate' pk=context_instance.pk %}",{page:num},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm')
 
       $(".td").click(function(){
-          //window.location = $(this).data("href");
+          window.location = $(this).data("href");
       });
 
       $('.modal-trigger').on('click', function (e) {
@@ -330,7 +328,7 @@
       $('.search_user').keyup(function() {
         var search_text = $(this).val();
         delay(function(){
-           var url = "{% url 'dashboard:supplier-credit-search' %}";
+           var url = searchUrl;
            $.ajax({ url:url, type: 'GET',data: {page:1, q:search_text},success: function(data){
                   $('#pagination-div').html(data);
            }});

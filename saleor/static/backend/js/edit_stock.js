@@ -25,6 +25,8 @@ $(function(){
   var editStockTotalCost  = editForm.find('#id_total_cost');
   var editStockPaymentOption = editForm.find('#id_payment_options');
   var low_stock_threshold = editForm.find('#reorder-threshold');
+  var settlePayment = editForm.find('#settle_payment');
+  var balance = editForm.find('#balance_e');
 
   console.log(status.val());
   editStockBtn.on('click',function(){   
@@ -35,6 +37,12 @@ $(function(){
     dynamicData['status'] = status.val();
     if(editStockAmountPaid.val()){
       dynamicData['amount_paid'] = editStockAmountPaid.val();
+    }
+    if(settlePayment.val()){
+      dynamicData['settle_payment'] = settlePayment.val();
+    }
+    if(balance.val()){
+      dynamicData['balance'] = balance.val();
     }
 
     if(editStockPaymentOption.val()){
