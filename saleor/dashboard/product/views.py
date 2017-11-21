@@ -816,6 +816,40 @@ def stock_fresh(request, product_pk):
     return TemplateResponse(request, 'dashboard/product/partials/stock_refresh.html', ctx)
 
 
+@staff_member_required
+@permission_decorator('product.change_stock')
+def purchase_data(request):
+    if request.POST.get('pk'):
+        obj = Stock.objects.get(pk=request.POST.get('pk'))
+        if request.POST.get('value'):
+            if Decimal(request.POST.get('name')) < obj.amount_paid.gross:
+                obj.amount_paid = Decimal(request.POST.get('name')) + Decimal(request.POST.get('value'))
+                # delete last inserted data
+                PurchaseProduct.objects.latest('id').delete()
+            else:
+                obj.amount_paid = obj.amount_paid.gross + Decimal(request.POST.get('value'))
+            amount_paid = request.POST.get('value')
+        if obj.amount_paid >= obj.total_cost:
+            obj.status = 'fully-paid'
+        obj.save()
+
+        purchase = PurchaseProduct()
+        purchase.variant = obj.variant
+        purchase.stock = obj
+        purchase.user = request.user
+        purchase.invoice_number = obj.invoice_number
+        purchase.cost_price = obj.cost_price
+        purchase.quantity = obj.quantity
+        purchase.amount_paid = amount_paid
+        purchase.total_cost = obj.total_cost
+        purchase.balance = obj.total_cost.gross - obj.amount_paid.gross
+        purchase.supplier = obj.variant.product.product_supplier
+        purchase.save()
+
+        return HttpResponse(json.dumps({'message': obj.pk}), content_type='application/json')
+    else:
+        return HttpResponse(json.dumps({'error': 'Stock pk required'}),content_type='application/json')
+
 
 @staff_member_required
 @permission_decorator('product.change_stock')

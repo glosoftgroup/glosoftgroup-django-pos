@@ -2,7 +2,7 @@
              {% load default_user_image %}
                {% if users %}
                   {% for user in users%}
-                    <tr class='clickable-row' id="{{user.pk }}">
+                    <tr class='clickable-row' id="{{user.stock.pk }}">
 
                     <!-- invoice -->
                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
@@ -13,18 +13,19 @@
                         {{user.stock.variant.display_product}}
                     </td>
                     <!-- quantity -->
-                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                        {{user.quantity}}
+                    <td class="tdx" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
+                        <!-- kebab-case in HTML -->
+                        <child balance="{{user.stock.amount_paid.gross}}" pk="{{user.stock.id}}"></child>
                     </td>
                     <!-- amount_paid -->
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                    {{ user.stock.amount_paid.gross }}
+                        <span class="stock-paid" data-paid="{{ user.stock.amount_paid.gross }}">{{ user.stock.amount_paid.gross }}</span>
                     </td>
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                        {{user.stock.get_balance}}
+                        <span class="stock-balance" data-balance="{{user.stock.get_balance}}">{{user.stock.get_balance}}</span>
                     </td>
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                    {{ user.stock.total_cost.gross }}
+                       {{ user.stock.total_cost.gross }}
                     </td>
                   </tr>
                   {% endfor %}

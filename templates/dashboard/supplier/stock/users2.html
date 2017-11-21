@@ -73,15 +73,13 @@
       <!-- Header and footer fixed -->
       <div class="panel panel-flat">
         <div class="panel-body">
-        <div class="table-responsives">
-
-
-          <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
+        <div class="table-responsives" >
+          <table id="purchase-app" class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
                     <th>Invoice</th>
                     <th>Stock</th>
-                    <th>Quantity</th>
+                    <th>Settle Credit</th>
                     <th>Amount Paid</th>
                     <th>Balance</th>
                     <th>Total</th>
@@ -90,7 +88,7 @@
                 <tbody id="tb">
                 {% if users %}
                   {% for user in users%}
-                  <tr class='clickable-row' id="{{user.pk }}">
+                  <tr class='clickable-row' id="{{user.stock.pk }}">
 
                     <!-- invoice -->
                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
@@ -101,18 +99,19 @@
                         {{user.stock.variant.display_product}}
                     </td>
                     <!-- quantity -->
-                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                        {{user.quantity}}
+                    <td class="tdx" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
+                        <!-- kebab-case in HTML -->
+                        <child balance="{{user.stock.amount_paid.gross}}" pk="{{user.stock.id}}"></child>
                     </td>
                     <!-- amount_paid -->
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                    {{ user.stock.amount_paid.gross }}
+                        <span class="stock-paid" data-paid="{{ user.stock.amount_paid.gross }}">{{ user.stock.amount_paid.gross }}</span>
                     </td>
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                        {{user.stock.get_balance}}
+                        <span class="stock-balance" data-balance="{{user.stock.get_balance}}">{{user.stock.get_balance}}</span>
                     </td>
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                    {{ user.stock.total_cost.gross }}
+                       {{ user.stock.total_cost.gross }}
                     </td>
                   </tr>
                   {% endfor %}
@@ -206,6 +205,32 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/editable/editable.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'backend/js/stock/vue/purchase.js' %}"></script>
+  {% csrf_token %}
+  <script>
+    var purchaseUrl = "{% url 'dashboard:update-stock-purchase-data' %}";
+    var csrf = $("[name=csrfmiddlewaretoken]").val();
+    var oldBalance = 0;
+    var amountPaid = 0;
+    // purchase stock update
+    $('.type-number').editable({
+        url: purchaseUrl,
+        title: 'Amount settled',
+        params: {
+            csrfmiddlewaretoken: csrf
+        },
+        success: function(response, newValue) {
+            selector = '#'+response.message;
+            oldBalance = $(selector).find('.stock-balance').data('balance');
+            amountPaid = $(selector).find('.stock-paid').data('paid');
+            $(selector).find('.stock-paid').html(parseInt(amountPaid)+parseInt(newValue));
+            $(selector).find('.stock-balance').html(parseInt(oldBalance)-parseInt(newValue));
+
+        }
+    });
+  </script>
   <script type="text/javascript">
   var searchUrl = "{% url 'dashboard:supplier-credit-stock-search' pk=context_instance.pk %}";
   $(document).ready(function() {
