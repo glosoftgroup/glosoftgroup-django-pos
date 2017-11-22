@@ -2,7 +2,7 @@
              {% load default_user_image %}
                {% if users %}
                   {% for user in users%}
-                                    <tr class='clickable-row' id="{{user.pk }}">
+                      <tr class='clickable-row' id="{{user.pk }}">
 
                     <!-- image -->
                    <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
@@ -13,15 +13,16 @@
                    {% endif %}
                      <!-- product name -->
                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">{{user.supplier}}</td>
-                    <!-- product category -->
-                    <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">{{user.supplier.email}}
-                    </td>
+
                     <!-- role -->
                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
-                    {{ user.supplier.mobile }}
+                        {{ user.supplier.mobile }}
                     </td>
-
-                  </tr>{% endfor %}
+                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
+                        {{user.get_total_supplier_credit.gross}}
+                    </td>
+                  </tr>
+                  {% endfor %}
                 {% else %}
                    <tr><td colspan="6"><h2 class="text-center">no supplier available</h2></td></tr>
                {% endif %}

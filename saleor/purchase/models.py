@@ -12,7 +12,9 @@ from django_prices.models import PriceField
 from ..product.models import (
                             Product,
                             ProductVariant,
-                            Stock)
+                            Stock,
+                            get_total_supplier_credit
+                            )
 from ..userprofile.models import Address
 from ..customer.models import Customer
 from ..supplier.models import Supplier
@@ -92,6 +94,10 @@ class PurchaseProduct(models.Model):
             # return self.stock.cost_price
             return self.stock.variant.get_price_per_item().gross
         return self.cost_price
+
+    def get_total_supplier_credit(self):
+        return get_total_supplier_credit(self.supplier)
+
 
 @python_2_unicode_compatible
 class PurchaseOrder(models.Model):

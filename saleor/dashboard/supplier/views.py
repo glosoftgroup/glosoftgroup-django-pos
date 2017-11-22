@@ -517,7 +517,8 @@ def credit_search(request):
                 (
                     Q(supplier__name__icontains=q) |
                     Q(supplier__email__icontains=q) |
-                    Q(supplier__mobile__icontains=q))
+                    Q(supplier__mobile__icontains=q)
+                )
             ).exclude(supplier=None).order_by('supplier').distinct('supplier')
             paginator = Paginator(users, 10)
             try:

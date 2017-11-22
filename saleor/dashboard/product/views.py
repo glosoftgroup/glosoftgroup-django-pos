@@ -892,7 +892,7 @@ def stock_edit(request, product_pk, stock_pk=None):
         if request.POST.get('balance'):
             purchase.balance = request.POST.get('balance')
         else:
-            purchase.balance = request.POST.get('total_cost') - request.POST.get('amount_paid')
+            purchase.balance = Decimal(request.POST.get('total_cost')) - Decimal(request.POST.get('amount_paid'))
         purchase.supplier = product.product_supplier
         purchase.save()
         if request.POST.getlist('payment_options[]'):
