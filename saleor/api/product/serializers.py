@@ -1,5 +1,6 @@
-from django.conf import settings
 from datetime import date
+from decimal import Decimal
+import logging
 from rest_framework.serializers import (
                 ModelSerializer,
                 HyperlinkedIdentityField,
@@ -7,11 +8,9 @@ from rest_framework.serializers import (
                 ValidationError,
                 JSONField
                 )
-
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from ...decorators import user_trail
-import logging
 from ...discount.models import Sale
 from ...discount.models import get_variant_discounts
 from ...sale.models import (
@@ -19,14 +18,11 @@ from ...sale.models import (
             SoldItem,
             Terminal,
             PaymentOption)
-from ...site.models import SiteSettings
 from ...product.models import (
             Product,
             ProductVariant,
             Stock,
             )
-from decimal import Decimal
-import json
 from ...customer.models import Customer
 
 
@@ -74,7 +70,8 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'tax',
                 'discount',
                  )
-    def get_available_stock(self,obj):
+
+    def get_available_stock(self, obj):
         try:
             stock = ProductVariant.objects.get(sku=obj.sku)
             return stock.get_stock_quantity()
@@ -86,6 +83,7 @@ class SalesListSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
     solditems = ItemsSerializer(many=True)
     cashier = SerializerMethodField()
+
     class Meta:
         model = Sales
         fields = ('id',
@@ -120,7 +118,8 @@ class SalesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sales
-        fields = ('id',
+        fields = (
+                 'id',
                  'user',
                  'invoice_number',
                  'total_net',
@@ -139,7 +138,7 @@ class SalesSerializer(serializers.ModelSerializer):
                  'discount_amount'
                 )
 
-    def validate_total_net(self,value):
+    def validate_total_net(self, value):
         data = self.get_initial()        
         try:
             self.total_net = Decimal(data.get('total_net'))
@@ -147,7 +146,7 @@ class SalesSerializer(serializers.ModelSerializer):
             raise ValidationError('Total Net should be a decimal/integer')
         return value
 
-    def validate_total_tax(self,value):
+    def validate_total_tax(self, value):
         data = self.get_initial()        
         try:
             total_net = Decimal(data.get('total_net'))
@@ -158,7 +157,7 @@ class SalesSerializer(serializers.ModelSerializer):
             raise ValidationError('Total Net should be a decimal/integer')
         return value
 
-    def validate_discount_amount(self,value):
+    def validate_discount_amount(self, value):
         data = self.get_initial()        
         try:
             discount = Decimal(data.get('discount_amount'))            
@@ -188,7 +187,7 @@ class SalesSerializer(serializers.ModelSerializer):
             raise ValidationError('Terminal specified does not exist')
         return value    
 
-    def create(self,validated_data):
+    def create(self, validated_data):
         # add sold amount to drawer 
         try:
            total_net = Decimal(validated_data.get('total_net'))
@@ -227,19 +226,19 @@ class SalesSerializer(serializers.ModelSerializer):
             raise ValidationError('Solditems field should not be empty')
         status = validated_data.get('status')
         # make a sale 
-        sales.user=validated_data.get('user')
-        sales.invoice_number=validated_data.get('invoice_number')      
-        sales.total_net=validated_data.get('total_net')
-        sales.sub_total=validated_data.get('sub_total')
-        sales.balance=validated_data.get('balance')
-        sales.terminal=validated_data.get('terminal')
-        sales.amount_paid=validated_data.get('amount_paid')        
-        sales.status=status
-        sales.payment_data=validated_data.get('payment_data')
-        sales.total_tax=total_tax
-        sales.mobile=validated_data.get('mobile')
-        sales.discount_amount=validated_data.get('discount_amount')
-        sales.customer_name=validated_data.get('customer_name')
+        sales.user = validated_data.get('user')
+        sales.invoice_number = validated_data.get('invoice_number')
+        sales.total_net = validated_data.get('total_net')
+        sales.sub_total = validated_data.get('sub_total')
+        sales.balance = validated_data.get('balance')
+        sales.terminal = validated_data.get('terminal')
+        sales.amount_paid = validated_data.get('amount_paid')
+        sales.status = status
+        sales.payment_data = validated_data.get('payment_data')
+        sales.total_tax = total_tax
+        sales.mobile = validated_data.get('mobile')
+        sales.discount_amount = validated_data.get('discount_amount')
+        sales.customer_name = validated_data.get('customer_name')
         sales.save()
         # add payment options
         payment_data = validated_data.get('payment_data')        
@@ -262,8 +261,8 @@ class SalesSerializer(serializers.ModelSerializer):
                 try:                    
                     if int(loyalty_points) != 0:
                         Customer.objects.gain_points(customer,loyalty_points)
-                except:
-                    pass
+                except Exception as e:
+                    error_logger.error(e)
 
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
@@ -273,9 +272,9 @@ class SalesSerializer(serializers.ModelSerializer):
                     Stock.objects.decrease_stock(stock,solditem_data['quantity'])                                    
                 else: 
                     print('stock not found')
-            except:
+            except Exception as e:
                 print('Error reducing stock!')
-                
+                error_logger.error(e)
         return sales
         
 
@@ -286,7 +285,8 @@ class OrderedItemSerializer(serializers.Serializer):
 
 class ProductListSerializer(serializers.ModelSerializer):    
     vat_tax = SerializerMethodField()
-    item_price = SerializerMethodField()    
+    item_price = SerializerMethodField()
+
     class Meta:
         model = Product
         fields = (
@@ -296,13 +296,15 @@ class ProductListSerializer(serializers.ModelSerializer):
             'item_price',
             'description',
            )
+
     def get_vat_tax(self, obj):
         if obj.product_tax:
             tax = obj.product_tax.tax
         else:
             tax = 0
         return tax
-    def get_item_price(self,obj):
+
+    def get_item_price(self, obj):
         item_price = obj.price.gross
         return item_price
 
@@ -330,7 +332,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             'product_category',            
             )
 
-    def get_discount(self,obj):
+    def get_discount(self, obj):
         today = date.today()
         price = obj.get_price_per_item().gross      
         discounts = Sale.objects.filter(start_date__lte=today).filter(end_date__gte=today)
@@ -345,7 +347,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 
         return discount
 
-    def get_quantity(self,obj):
+    def get_quantity(self, obj):
         quantity = obj.get_stock_quantity()
         return quantity
 
@@ -353,24 +355,24 @@ class ProductStockListSerializer(serializers.ModelSerializer):
         product_name = obj.display_product()
         return product_name
 
-    def get_min_price(self,obj):
+    def get_min_price(self, obj):
         try:
             return obj.get_min_price_per_item().gross
         except Exception as e:
             return 0
 
-    def get_price(self,obj):
+    def get_price(self, obj):
         price = obj.get_price_per_item().gross
         return price
 
-    def get_tax(self,obj):
+    def get_tax(self, obj):
         if obj.product.product_tax:
             tax = obj.product.product_tax.tax
         else:
             tax = 0        
         return tax
 
-    def get_product_category(self,obj):
+    def get_product_category(self, obj):
         product_category = obj.product_category()
         return product_category
 
@@ -383,11 +385,12 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     # used during jwt authentication
     permissions = SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['id','email','name','permissions']
 
-    def get_permissions(self,obj):
+    def get_permissions(self, obj):
         info_logger.info('User: '+str(obj.name)+' '+str(obj.email)+' logged in via api')
         user_trail(obj.name, 'logged in via api','view')
         
@@ -400,5 +403,4 @@ class UserSerializer(serializers.ModelSerializer):
             permissions.append('credit_sale')
         if obj.has_perm('sales.credit_receive'):
             permissions.append('credit_receive')
-
         return permissions

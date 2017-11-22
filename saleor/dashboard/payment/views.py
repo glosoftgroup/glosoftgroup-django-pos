@@ -83,7 +83,6 @@ def payment_stock_add(request):
         return HttpResponse(json.dumps({'message':'Invalid method'}))
 
 
-
 @staff_member_required
 def delete(request, pk=None):
     option = get_object_or_404(PaymentOption, pk=pk)
@@ -107,10 +106,15 @@ def stock_delete(request, pk=None):
     option = get_object_or_404(Table, pk=pk)
     if request.method == 'POST':
         try:
-            option.delete()
-            user_trail(request.user.name, 'deleted stock payment option : '+ str(option.name),'delete')
-            info_logger.info('deleted stock payment option: '+ str(option.name))
-            return HttpResponse('success')
+            if option.name == "Credit":
+                pass
+            else:
+                option.delete()
+                user_trail(request.user.name, 'deleted stock payment option : '+ str(option.name),'delete')
+                info_logger.info('deleted stock payment option: '+ str(option.name))
+                return HttpResponse('success')
+            return HttpResponse(json.dumps({'error': "You cannot delete Credit"}),
+                                content_type='application/json')
         except Exception, e:
             error_logger.error(e)
             return HttpResponse(e)
@@ -137,7 +141,6 @@ def edit(request, pk=None):
         except Exception, e:
             error_logger.error(e)
             return HttpResponse(e)
-
 
 
 @staff_member_required
@@ -177,6 +180,7 @@ def transactions(request):
     except TypeError as e:
         error_logger.error(e)
         return TemplateResponse(request, 'dashboard/cashmovement/transactions.html', {'transactions':transactions, 'pn': paginator.num_pages})
+
 
 def transaction_pagination(request):
     page = int(request.GET.get('page', 1))
@@ -239,6 +243,7 @@ def option_searchs(request):
 
             return TemplateResponse(request, 'dashboard/payment/options/search.html',
 {'options': options, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
 def options_paginate(request):
@@ -334,7 +339,7 @@ def stock_edit(request, pk=None):
     if request.method == 'POST':
         try:
             if request.POST.get('name'):
-                if request.POST.get('name') != 'Loyalty Points':
+                if request.POST.get('name') != 'Credit':
                     option.name = request.POST.get('name')
                 if request.POST.get('description'):
                     option.description = request.POST.get('description')
@@ -357,7 +362,7 @@ def stock_detail(request, pk=None):
         try:
             option = get_object_or_404(Table, pk=pk)
             ctx = {'option': option}
-            if option.name == "Loyalty Points":
+            if option.name == "Credit":
                 ctx['disabled'] = "disabled"
             else:
                 ctx['disabled'] = ''

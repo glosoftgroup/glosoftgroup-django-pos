@@ -69,12 +69,15 @@ class UserAuthorizationAPIView(generics.CreateAPIView):
     """docstring for UserAuthorizationAPIView"""
     serializer_class = UserAuthorizationSerializer
 
+
 class UserTransactionAPIView(generics.CreateAPIView,):    
     serializer_class = UserTransactionSerializer
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        user_trail(self.request.user,'Drawer Cash:#'+str(serializer.data['amount'])+' added ','add')
+        user_trail(self.request.user, 'Drawer Cash:#'+str(serializer.data['amount'])+' added ','add')
         info_logger.info('User: '+str(self.request.user)+' Drawer Cash:'+str(serializer.data['amount']))
+
 
 class TerminalListAPIView(generics.ListAPIView):
     pagination_class = PostLimitOffsetPagination

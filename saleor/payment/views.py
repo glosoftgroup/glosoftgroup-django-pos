@@ -6,10 +6,10 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from .models import MpesaPayment
 from ..sale.models import PaymentOption
 
+
 def payments_list(request):	
     try:
         options = PaymentOption.objects.all().order_by('-id')
-        #expense_types = ExpenseType.objects.all()
         page = request.GET.get('page', 1)
         paginator = Paginator(options, 10)
         try:
@@ -24,8 +24,8 @@ def payments_list(request):
             "expenses": options,            
             "pn": paginator.num_pages
         }
-        user_trail(request.user.name, 'accessed expenses', 'views')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed expenses page')
+        user_trail(request.user.name, 'accessed payment options', 'views')
+        info_logger.info('User: ' + str(request.user.name) + 'accessed payment option page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
@@ -33,6 +33,7 @@ def payments_list(request):
     except TypeError as e:
         error_logger.error(e)
         return HttpResponse('error accessing expenses')
+
 
 @csrf_exempt
 def index(request): 
