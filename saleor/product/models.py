@@ -106,6 +106,7 @@ class ProductClass(models.Model):
         return '<%s.%s(pk=%r, name=%r)>' % (
             class_.__module__, class_.__name__, self.pk, self.name)
 
+
 class ProductTax(models.Model):    
     tax_name = models.CharField(
         pgettext_lazy('Tax name', 'Tax name (optional)'),
@@ -113,10 +114,12 @@ class ProductTax(models.Model):
     tax_label = models.CharField(
         pgettext_lazy('Label on invoices', 'Short text printed on invoices'),
         max_length=128, blank=True)
-    tax = models.IntegerField( pgettext_lazy('Product Tax', 'tax %'),
-        validators=[MinValueValidator(0)], unique=True, default=Decimal(0)) 
+    tax = models.IntegerField(pgettext_lazy('Product Tax', 'tax %'),
+        validators=[MinValueValidator(0)], unique=True, default=Decimal(0))
+
     def __str__(self):
-        return self.tax_name +' '+str(self.tax)+' %'
+        return self.tax_name + ' ' + str(self.tax)+' %'
+
     def get_tax(self):
         return self.tax
 
@@ -156,7 +159,7 @@ class Product(models.Model, ItemRange, index.Indexed):
         pgettext_lazy('Product field', 'Wholesale price'),
         currency=settings.DEFAULT_CURRENCY, blank=True,null=True, max_digits=12, decimal_places=2)
     product_supplier = models.ForeignKey(
-        Supplier, related_name='suppliers',blank=True, null=True,
+        Supplier, related_name='suppliers', blank=True, null=True,
         verbose_name=pgettext_lazy('Product field', 'product supplier'))
     
     available_on = models.DateField(
@@ -441,8 +444,10 @@ class StockManager(models.Manager):
         stock.save(update_fields=['quantity', 'quantity_allocated'])
 
     def get_low_stock(self):
-        today = datetime.date.today()
         return self.get_queryset().filter(quantity__lte=F('low_stock_threshold'))
+
+    def get_total_credit(self, supplier):
+        return self.get_queryset().filter(variant__product__product_supplier=supplier).aggregate(total=Sum(F('total_cost') - F('amount_paid')))['total']
 
 
 @python_2_unicode_compatible
@@ -522,6 +527,9 @@ class Stock(models.Model):
     @property
     def Access_pk(self):
         return self.pk
+
+    def get_total_credit(self):
+        return Stock.objects.get_total_credit()
 
 
 @python_2_unicode_compatible
@@ -718,5 +726,8 @@ class VariantImage(models.Model):
     class Meta:
         verbose_name = pgettext_lazy(
             'Variant image model', 'variant image')
-        verbose_name_plural = pgettext_lazy(
-'Variant image model', 'variant images')
+        verbose_name_plural = pgettext_lazy('Variant image model', 'variant images')
+
+
+def get_total_supplier_credit(supplier=None):
+    return Stock.objects.get_total_credit(supplier)

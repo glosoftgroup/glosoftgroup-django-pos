@@ -230,16 +230,14 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             print(e)
 
         for solditem_data in solditems_data:
-            CreditedItem.objects.create(credit=credit,**solditem_data)           
-            try:
-                stock = Stock.objects.get(variant__sku=solditem_data['sku'])
-                if stock:                
-                    Stock.objects.decrease_stock(stock,solditem_data['quantity'])                
-                    print stock.quantity
-                else: 
-                    print 'stock not found'
-            except Exception as e:
-                print 'Error reducing stock!'
+            CreditedItem.objects.create(credit=credit, **solditem_data)
+
+            stock = Stock.objects.get(variant__sku=solditem_data['sku'])
+            if stock:
+                Stock.objects.decrease_stock(stock, solditem_data['quantity'])
+            else:
+                print 'stock not found'
+
         return credit
 
 
@@ -318,7 +316,6 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             raise ValidationError('Terminal specified does not exist')
         # except:
         #     raise ValidationError('Terminal specified does not exist')
-        
 
     def update(self, instance, validated_data):
         terminal = Terminal.objects.get(pk=self.terminal_id)    

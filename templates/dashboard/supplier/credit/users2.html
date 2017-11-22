@@ -80,8 +80,8 @@
                   <tr class="bg-primary">
                     <th>Image</th>
                     <th>Name</th>
-                    <th>Email</th>
                     <th>Phone no.</th>
+                    <th>Total Credit</th>
 
                   </tr>
                 </thead>
@@ -99,14 +99,14 @@
                    {% endif %}
                      <!-- product name -->
                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">{{user.supplier}}</td>
-                    <!-- product category -->
-                    <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">{{user.supplier.email}}
-                    </td>
+
                     <!-- role -->
                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
-                    {{ user.supplier.mobile }}
+                        {{ user.supplier.mobile }}
                     </td>
-
+                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
+                        {{user.get_total_supplier_credit.gross}}
+                    </td>
                   </tr>
                   {% endfor %}
                 {% else %}

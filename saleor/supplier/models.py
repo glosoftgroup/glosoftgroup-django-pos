@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import pgettext_lazy
 from django_countries.fields import Country, CountryField
-from ..search import index
 
 
 class AddressBookManager(models.Manager):
@@ -153,10 +152,7 @@ class Supplier(models.Model):
         AddressBook, related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL,
         verbose_name=pgettext_lazy('Supplier field', 'default billing address'))
-
-    
     objects = SupplierManager()
-
     
     class Meta:
         verbose_name = pgettext_lazy('Supplier model', 'supplier')
@@ -173,5 +169,7 @@ class Supplier(models.Model):
         
     def get_addresses(self):
         return self.addresses.all()
+
+
     
 
