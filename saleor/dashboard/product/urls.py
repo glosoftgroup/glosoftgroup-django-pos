@@ -194,4 +194,6 @@ urlpatterns = [
     (views.stock_location_edit), name='product-stock-location-edit'),
     url(r'stocklocations/(?P<location_pk>[0-9]+)/delete/$', permission_required('product.delete_stocklocation', login_url='not_found')
         (views.stock_location_delete), name='product-stock-location-delete'),
+    url(r'update/stock/data/$', permission_required('product.view_stock', login_url='not_found')
+        (views.purchase_data), name='update-stock-purchase-data'),
 ]
