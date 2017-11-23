@@ -225,13 +225,7 @@
                     Add Stock</a>
                     </li>
                     {% endif %}
-                      {% if perms.product.view_stock %}
-                    <li class="{% block menu_purchase_payment_option_list %}{% endblock %}">
-                    <a href="{% url 'dashboard:payments-stock-list' %}">
-                        <i class='icon-paypal2'></i>
-                    Stock Payment option</a>
-                    </li>
-                    {% endif %}
+
                       {% if perms.product.view_category %}
                     <!-- categories -->
                      <li class="{% block menu_categories_class %}{% endblock %}">
@@ -272,6 +266,13 @@
                     </a>
                     </li>
                       {% endif %}
+                       {% if perms.product.view_stock %}
+                    <li class="{% block menu_purchase_payment_option_list %}{% endblock %}">
+                    <a href="{% url 'dashboard:payments-stock-list' %}">
+                        <i class='icon-paypal2'></i>
+                    Stock Payment option</a>
+                    </li>
+                    {% endif %}
                     
                   </ul>
                 </li>

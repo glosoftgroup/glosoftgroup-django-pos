@@ -18,8 +18,11 @@ from ...product.models import (
             Stock,
             )
 from decimal import Decimal
+import logging
 
-
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 User = get_user_model()
 
 
@@ -145,7 +148,6 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Total Net should be a decimal/integer')
         return value
-
         
     def validate_terminal(self,value):
         data = self.get_initial()
@@ -186,9 +188,9 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                     Stock.objects.decrease_stock(stock,solditem_data['allocated_quantity'])
                     print stock.quantity
                 else: 
-                    print 'stock not found'
-            except:
-                print 'Error reducing stock!'
+                    print('stock not found')
+            except Exception as e:
+                error_logger.error(e)
                 
         return credit
 
@@ -237,18 +239,6 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Amount paid should be a decimal/integer')
         return value
-
-    def validate_terminal(self,value):
-        data = self.get_initial()
-        self.terminal_id = int(data.get('terminal'))
-        #try:
-        terminal = Terminal.objects.filter(pk=self.terminal_id)
-        if terminal:
-            return value
-        else:
-            raise ValidationError('Terminal specified does not exist')
-        # except:
-        #     raise ValidationError('Terminal specified does not exist')
 
     def update(self, instance, validated_data):
         terminal = Terminal.objects.get(pk=self.terminal_id)

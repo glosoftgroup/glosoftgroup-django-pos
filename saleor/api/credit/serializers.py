@@ -8,11 +8,7 @@ from rest_framework.serializers import (
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from ...sale.models import (
-            Sales, 
-            SoldItem,
-            Terminal,
-            )
+from ...sale.models import Terminal
 from ...credit.models import (
             Credit,
             CreditedItem,
@@ -26,8 +22,10 @@ from ...product.models import (
             )
 from decimal import Decimal
 from ...customer.models import Customer
-
-
+import logging
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 User = get_user_model()
 
 
@@ -119,7 +117,8 @@ class CreateCreditSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Credit
-        fields = ('id',
+        fields = (
+                 'id',
                  'user',
                  'invoice_number',
                  'total_net',
@@ -227,16 +226,18 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             history.amount = validated_data.get('amount_paid')
             history.save()
         except Exception as e:
-            print(e)
+            error_logger.error(e)
 
         for solditem_data in solditems_data:
-            CreditedItem.objects.create(credit=credit, **solditem_data)
-
-            stock = Stock.objects.get(variant__sku=solditem_data['sku'])
-            if stock:
-                Stock.objects.decrease_stock(stock, solditem_data['quantity'])
-            else:
-                print 'stock not found'
+            try:
+                CreditedItem.objects.create(credit=credit, **solditem_data)
+                stock = Stock.objects.get(variant__sku=solditem_data['sku'])
+                if stock:
+                    Stock.objects.decrease_stock(stock, solditem_data['quantity'])
+                else:
+                    print 'stock not found'
+            except Exception as e:
+                error_logger.error(e)
 
         return credit
 
@@ -274,15 +275,13 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             balance = Decimal(data.get('balance'))            
             sale = Credit.objects.get(invoice_number=str(invoice_number))
             if status == 'fully-paid' and sale.balance > amount_paid:
-                print 'balance '+str(sale.balance)
-                print 'amount '+str(amount_paid)
-                raise ValidationError("Status error. Amount paid is less than balance.")        
+                raise ValidationError("Status error. Amount paid is less than balance.")
             else:
                 return value
         else:
             raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')        
 
-    def validate_total_net(self,value):
+    def validate_total_net(self, value):
         data = self.get_initial()        
         try:
             total_net = Decimal(data.get('total_net'))
@@ -305,7 +304,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             raise ValidationError('Amount paid should be a decimal/integer')
         return value
 
-    def validate_terminal(self,value):
+    def validate_terminal(self, value):
         data = self.get_initial()
         self.terminal_id = int(data.get('terminal'))
         #try:
@@ -341,7 +340,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             history.balance = instance.total_net - instance.amount_paid
             history.save()
         except Exception as e:
-            print(e)
+            error_logger.error(e)
         return instance
 
 
