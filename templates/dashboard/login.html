@@ -195,6 +195,7 @@
                   },
                   error: function(jqXHR, textStatus, errorThrown) 
                   {
+                      l.stop();
                       alertNotificatio('Wrond Credentials!', 'Authenticatin Error', 'danger')  
                   }
               });

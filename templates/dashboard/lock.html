@@ -196,6 +196,7 @@
                   },
                   error: function(data) 
                   {
+                    l.stop();
                     alertNotification('Wrong Credentials!', 'Authenticatin Error', 'danger')
                   }
               });
