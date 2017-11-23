@@ -1,5 +1,7 @@
 {% load staticfiles %}
+{% load payment_status %}
 {% load mathfilters %}
+{% load humanize %}
  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
  <html>
      <head>
@@ -50,7 +52,7 @@
                         RECEIPT: {{credit.invoice_number}}
                  </p>
                  <p style="margin-bottom:0px;margin-top:2px;font-size:10px;">
-                        SERVED BY: {{ credit.user | upper}}
+                        RECEIVED BY: {{ credit.user | upper}}
                  </p>
                  </p>
              </div>
@@ -61,15 +63,31 @@
 							<div class="row">
 								<div class="col-sm-6 content-group text-left">
                                     <div class="invoice-detail">
+                                        <table class="table table-columned">
+											<tbody>
+												<tr>
+
+													<td class="text-right"><span class="text-right text-semibold">Name:</span></td>
+													<td class="text-left" align="left">
+														{{ credit.variant.display_product}}
+													</td>
+												</tr>
+												<tr class="border-top-success">
+													<td class="text-right"><span class="text-right text-semibold">Unit Cost:</span></td>
+													<td class="text-left" align="left">
+														{{ credit.cost_price.gross|intcomma }}
+													</td>
+													<td class="text-right"><span class="text-semibold">Total Cost:</span></td>
+													<td class="text-left" align="left">
+														{{ credit.total_cost.gross|intcomma }}
+													</td>
+												</tr>
+											</tbody>
+										</table>
 
 										<div class="list-condensed list-unstyled">
 											Date: <span class="text-semibold">{{ credit.created }}</span><br>
-                                            Status:
-                                                {% if sale.is_fully_paid %}
-                                                <span class="text-success  icon-checkmark-circle"><i></i></span>
-                                                {% else %}
-                                                <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
-                                                {% endif %}
+                                            Status:&nbsp{{ credit.status}}
 
 										</div>
 									</div>
@@ -104,11 +122,11 @@
                                             </span>
 					                	</td>
                                         <td>{{ sale.created }}</td>
-						                <td><span class="text-semibold">{{ sale.amount_paid.gross }}</span></td>
+						                <td><span class="text-semibold">{{ sale.amount_paid.gross|intcomma }}</span></td>
                                         <td>
                                             <span class="text-semibold">
                                              {% if sale.balance.gross %}
-                                              {{ sale.balance.gross }}
+                                              {{ sale.balance.gross|intcomma }}
                                              {% endif %}
                                             </span>
                                         </td>
@@ -135,7 +153,7 @@
 													<td>
                                                       <h4 class="text-semibold">Amount Paid </h4>
                                                     </td>
-													<td class="text-right">{{ credit.amount_paid.gross }}</td>
+													<td class="text-right">{{ credit.amount_paid.gross|intcomma }}</td>
 												</tr>
 
 												<tr>
@@ -144,7 +162,7 @@
                                                     </td>
 													<td class="text-right text-primary">
                                                         <h5 class="text-semibold">
-                                                            {{ credit.get_balance }}
+                                                            {{ credit.get_balance|intcomma }}
                                                         </h5>
                                                     </td>
 												</tr>

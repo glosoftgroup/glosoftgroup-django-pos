@@ -446,8 +446,11 @@ class StockManager(models.Manager):
     def get_low_stock(self):
         return self.get_queryset().filter(quantity__lte=F('low_stock_threshold'))
 
-    def get_total_credit(self, supplier):
+    def get_credit_balance(self, supplier):
         return self.get_queryset().filter(variant__product__product_supplier=supplier).aggregate(total=Sum(F('total_cost') - F('amount_paid')))['total']
+
+    def get_credit_total(self, supplier):
+        return self.get_queryset().filter(variant__product__product_supplier=supplier).aggregate(total=Sum(F('total_cost')))['total']
 
 
 @python_2_unicode_compatible
@@ -614,9 +617,11 @@ class ProductAttribute(models.Model):
         return self.name
 
     def get_formfield_name(self):
-        return slugify('attribute-%s' % self.slug)    
+        return slugify('attribute-%s' % self.slug)
+
     def has_values(self):
         return self.values.exists()
+
 
 @python_2_unicode_compatible
 class VariantAttribute(models.Model):
@@ -636,7 +641,8 @@ class VariantAttribute(models.Model):
         return self.name
 
     def get_formfield_name(self):
-        return slugify('variant-attribute-%s' % self.slug)    
+        return slugify('variant-attribute-%s' % self.slug)
+
     def has_values(self):
         return self.values.exists()
 
@@ -729,5 +735,9 @@ class VariantImage(models.Model):
         verbose_name_plural = pgettext_lazy('Variant image model', 'variant images')
 
 
-def get_total_supplier_credit(supplier=None):
-    return Stock.objects.get_total_credit(supplier)
+def get_supplier_credit_balance(supplier=None):
+    return Stock.objects.get_credit_balance(supplier)
+
+
+def get_supplier_credit_total(supplier=None):
+    return Stock.objects.get_credit_total(supplier)

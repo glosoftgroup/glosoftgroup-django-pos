@@ -20,3 +20,11 @@ def cool_number(value, num_decimals=2):
         return formatted_number.format(int_value/1000.0).rstrip('0.') + 'K'
     else:
         return formatted_number.format(int_value/1000000.0).rstrip('0.') + 'M'
+
+
+@register.filter
+def payment_status(value, num_decimals=2):
+    if value == 'fully-paid':
+        return '<span>Paid</span>'
+    else:
+        return '<span>Pending</span>'

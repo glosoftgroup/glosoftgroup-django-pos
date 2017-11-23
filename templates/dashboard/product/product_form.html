@@ -870,7 +870,8 @@ $(document).ready(function(){
 
    // Custom results color
     $('.multiselect-select2').select2({
-
+        dropdownCssClass: 'border-primary',
+        containerCssClass: 'border-primary text-primary-700'
     });
 
     $(".styled, .multiselect-container input").uniform({
@@ -1304,6 +1305,9 @@ $(document).ready(function(){
     $btnChecked.hide();
   }
 });
+
+  $('#add-product-stock-form').validate({});
+
 
 $('#form-product').validate({
     rules:{

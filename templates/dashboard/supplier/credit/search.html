@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load humanize %}
 {% load default_user_image %}
       <div class="panel panel-flat">
         <div class="table-responsives">
@@ -7,11 +8,11 @@
           <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
-
                     <th>Image</th>
                     <th>Name</th>
                     <th>Phone no.</th>
-                    <th>Total Credit</th>
+                    <th>Total</th>
+                    <th>To pay</th>
 
                   </tr>
                 </thead>
@@ -34,9 +35,14 @@
                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
                         {{ user.supplier.mobile }}
                     </td>
-                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
-                        {{user.get_total_supplier_credit.gross}}
+                       <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
+                        {{user.get_supplier_credit_total.gross|intcomma}}
                     </td>
+                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
+                        {{user.get_supplier_credit_balance.gross|intcomma}}
+                    </td>
+
+
                   </tr>
                   {% endfor %}
                 {% else %}

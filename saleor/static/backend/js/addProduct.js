@@ -513,6 +513,7 @@ $(function(){
    // remove helper
    stockVariantId.on('change',function(){
     $(this).nextAll('.help-block:first').addClass('text-danger').html('');
+    $('#variant-help').addClass('text-danger').html('');
    });
    reorder_levelId.on('change',function(){
     $(this).nextAll('.help-block:first').addClass('text-danger').html('');
@@ -553,10 +554,9 @@ $(function(){
       stockInvoiceId.nextAll('.help-block:first').addClass('text-danger').html('');
     }
     if(!variant){
-
       stockVariantId.focus();
       stockVariantId.prop('autofocus');      
-      stockVariantId.nextAll('.help-block:first').addClass('text-danger').html('Field required');
+      $('#variant-help').addClass('text-danger').html('Field required');
       stockVariantId.css("border-color","transparent transparent #D84315;");
       
       return false;
