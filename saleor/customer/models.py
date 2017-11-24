@@ -183,7 +183,7 @@ class Customer(models.Model):
         return '--'
 
     def get_total_credit_amount(self):
-        total = self.credit_customers.aggregate(models.Sum('total_net'))['total_net__sum']
+        total = self.credit_customers.aggregate(models.Sum('debt'))['debt__sum']
         if total:
             return cool_format(total)+' '+settings.DEFAULT_CURRENCY
         return '--'
