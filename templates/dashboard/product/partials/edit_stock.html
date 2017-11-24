@@ -29,7 +29,7 @@
         <div class="panelpanel-flat">
             <div class="panel-body">
                 <div class="row">
-                    <form>
+                    <form id="edit-product-stock">
                     <div class="col-md-6">
                         <fieldset>
 
@@ -157,5 +157,6 @@
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
     });
+    $('#edit-product-stock').validate({});
 </script>
 <script type="text/javascript" src="{% static 'backend/js/edit_stock.js' %}"></script>

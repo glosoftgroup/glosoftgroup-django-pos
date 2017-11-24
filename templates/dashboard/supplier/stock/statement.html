@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load prices_i18n %}
 {% load humanize %}
+{% load payment_status %}
 {% load mathfilters %}
 
 {% block title %}
@@ -59,16 +60,34 @@
 							<div class="row">
 								<div class="col-sm-6 content-group text-left">
                                     <div class="invoice-detail">
-										<h5 class="text-uppercas text-semibold">Invoice {{credit.invoice_number}}</h5>
+										<table class="table table-columned">
+											<tbody>
+												<tr>
+													<td class="text-right"><span class="text-right text-semibold">Invoice:</span></td>
+													<td class="text-left">
+														<span class="text-left" style="margin-left:0px;">{{credit.invoice_number}}</span>
+													</td>
+													<td class="text-right"><span class="text-right text-semibold">Name:</span></td>
+													<td class="text-left">
+														{{ credit.variant.display_product}}
+													</td>
+												</tr>
+												<tr class="border-top-success">
+													<td class="text-right"><span class="text-right text-semibold">Unit Cost:</span></td>
+													<td class="text-left">
+														{{ credit.cost_price.gross|intcomma }}
+													</td>
+													<td class="text-right"><span class="text-semibold">Total Cost:</span></td>
+													<td class="text-left">
+														{{ credit.total_cost.gross|intcomma }}
+													</td>
+												</tr>
+											</tbody>
+										</table>
 										<ul class="list-condensed list-unstyled">
 											<li>Date: <span class="text-semibold">{{ credit.created }}</span></li>
-											<li>Total Cost:<span class="text-semibold"> {{ credit.total_cost.gross }}</span> </li>
                                             <li>Status:
-                                                {% if sale.is_fully_paid %}
-                                                <span class="text-success  icon-checkmark-circle"><i></i></span>
-                                                {% else %}
-                                                <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
-                                                {% endif %}
+                                                {{ credit.status|payment_status|safe }}
                                             </li>
 										</ul>
 									</div>
@@ -110,11 +129,11 @@
 											</span>
 					                	</td>
                                         <td>{{ sale.created }}</td>
-						                <td><span class="text-semibold">{{ sale.amount_paid.gross }}</span></td>
+						                <td><span class="text-semibold">{{ sale.amount_paid.gross|intcomma }}</span></td>
                                         <td>
 										 <span class="text-semibold">
 											{% if sale.balance.gross %}
-											  {{ sale.balance.gross }}
+											  {{ sale.balance.gross|intcomma }}
 											{% endif %}
 										 </span>
 										</td>
@@ -139,18 +158,18 @@
 											<tbody>
 												<tr>
 													<td>
-                                                      <h4 class="text-semibold">Amount Paid </h4>
+                                                      <h6 class="text-semibold">Amount Paid </h6>
                                                     </td>
-													<td class="text-right">{{ credit.amount_paid.gross }}</td>
+													<td class="text-right">{{ credit.amount_paid.gross|intcomma }}</td>
 												</tr>
 
 												<tr>
 													<td>
-                                                      <h4 class="text-semibold">Balance </h4>
+                                                      <h6 class="text-semibold">Balance </h6>
                                                     </td>
 													<td class="text-right text-primary">
                                                         <h5 class="text-semibold">
-                                                            {{ credit.get_balance }}
+                                                            {{ credit.get_balance|intcomma }}
                                                         </h5>
                                                     </td>
 												</tr>

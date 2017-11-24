@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load prices_i18n %}
 {% load default_user_image %}
+{% load humanize %}
 
 {% block title %}
  Supplier Credit List
@@ -81,8 +82,8 @@
                     <th>Image</th>
                     <th>Name</th>
                     <th>Phone no.</th>
-                    <th>Total Credit</th>
-
+                    <th>Total</th>
+                    <th>To pay</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -104,8 +105,11 @@
                     <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
                         {{ user.supplier.mobile }}
                     </td>
+                       <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
+                        {{user.get_supplier_credit_total.gross|intcomma}}
+                    </td>
                      <td class="td" data-href="{% url 'dashboard:supplier_credit_stock_list' pk=user.supplier.pk %}">
-                        {{user.get_total_supplier_credit.gross}}
+                        {{user.get_supplier_credit_balance.gross|intcomma}}
                     </td>
                   </tr>
                   {% endfor %}

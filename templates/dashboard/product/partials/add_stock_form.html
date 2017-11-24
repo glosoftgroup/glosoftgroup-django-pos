@@ -10,6 +10,7 @@
         #toggleStock{display:none;}
 </style>
 <div id="toggleStock" class="card-3 mb-10">
+    <form id="add-product-stock-form">
 <!--form-->
 <div class="add-new-stock-form mt-10" id="product-app">
     <div class="sidebar-category bg-primary">
@@ -36,13 +37,14 @@
                                 <label>Variant:<span class="text-danger">*</span></label>
                                 <div id="feditv">
                                 {{ stock_form.variant }}
+                                <span id="variant-help" class="help-block">required</span>
                                 </div>
-                                <span class="help-block"></span>
+
                             </div>
                             <div class="form-group">
                                 <label>Payment option:<span class="text-danger">*</span></label>
 
-                                <select name="payment_options" id="payment_option" multiple="multiple" class="multiselect-select2">
+                                <select data-placeholder="Select options..." name="payment_options" id="payment_option" multiple="multiple" class="multiselect-select2">
                                     {% for option in payment_options %}
                                         <option value="{{option.id}}">{{option}}</option>
                                     {% endfor %}
@@ -124,6 +126,6 @@
 </div>
     <!--/form-->
 
-
+    </form>
 </div>
 

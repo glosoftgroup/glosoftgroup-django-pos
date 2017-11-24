@@ -1,5 +1,6 @@
 {% load staticfiles %}
 {% load default_user_image %}
+{% load payment_status %}
       <div class="panel panel-flat">
         <div class="table-responsives">
          
@@ -9,10 +10,11 @@
                   <tr class="bg-primary">
                     <th>Invoice</th>
                     <th>Stock</th>
-                    <th>Quantity</th>
                     <th>Settle Credit</th>
-                    <th>Balance</th>
+                    <th>Amount Paid</th>
                     <th>Total</th>
+                    <th>To pay</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody id="p-tb">           
@@ -28,7 +30,7 @@
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                         {{user.stock.variant.display_product}}
                     </td>
-                    <!-- quantity -->
+                    <!-- pay -->
                     <td class="tdx" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                         <!-- kebab-case in HTML -->
                         <child balance="{{user.stock.amount_paid.gross}}" pk="{{user.stock.id}}"></child>
@@ -37,11 +39,16 @@
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                         <span class="stock-paid" data-paid="{{ user.stock.amount_paid.gross }}">{{ user.stock.amount_paid.gross }}</span>
                     </td>
+                       <!--total-->
+                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
+                       {{ user.stock.total_cost.gross }}
+                    </td>
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                         <span class="stock-balance" data-balance="{{user.stock.get_balance}}">{{user.stock.get_balance}}</span>
                     </td>
-                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                       {{ user.stock.total_cost.gross }}
+
+                      <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
+                       {{ user.stock.status|payment_status|safe }}
                     </td>
                   </tr>
                   {% endfor %}
