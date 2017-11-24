@@ -3,6 +3,7 @@
 {% load materializecss %}
 {% load staticfiles %}
 {% load default_user_image %}
+{% load payment_status %}
       <!-- Header and footer fixed -->
       <div class="panel panel-flat">
         <div class="panel-body">
@@ -32,11 +33,7 @@
                         </div>
                         </td>
                         <td class="td" data-href="{% url 'dashboard:credit_history' credit_pk=user.pk %}">
-                          {% if sale.is_fully_paid %}
-                            <span class="text-success  icon-checkmark-circle"><i></i></span>
-                            {% else %}
-                            <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
-                            {% endif %}
+                          {{ user.status|payment_status|safe }}
                         </td>
                         <!-- created -->
                         <td class="td" data-href="{% url 'dashboard:credit_history' credit_pk=user.pk %}">

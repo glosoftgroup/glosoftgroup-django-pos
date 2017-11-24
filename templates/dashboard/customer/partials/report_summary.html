@@ -1,48 +1,49 @@
+{% load humanize %}
 <div class="row">
-<div class="col-md-6">
-<style type="text/css">
-	.fixh {
-		height: 153px;
-	}
-</style>
-	<!-- Available hours -->
-	<div class="panel text-center fixh">
-		<div class="panel-body">
-			
+<!--sales-->
+<div class="col-sm-6 col-md-6">
+		<div class="panel panel-body bg-primary-400 has-bg-image">
+			<div class="media no-margin">
+				<div class="media-body">
+					<h3 class="no-margin">{{customer.get_total_sales_amount|intcomma}}</h3>
+					<span class="text-uppercase text-size-mini">{{ customer.get_sales|intcomma }} Sales</span>
+					{% if customer.customers.first.created %}
+					<span class="text-size-small text-muted">
+						<br>Last sale {{customer.customers.first.created|timesince}} ago
+					</span>
+				   {% endif %}
+				</div>
 
-        	<!-- Progress counter -->
-			<div class="content-group-sm svg-center position-relative" id="hours-available-progress">
-				<h2 class="mt-15 mb-5">{{customer.get_total_sales_amount}} </h2>
-				<i class="icon-cart text-pink-400 counter-icon" style="top: -28px"></i><div>{{customer.get_sales}} Sales</div><div class="text-size-small text-muted">{% if customer.customers.first.created %}
-				Last sale {{customer.customers.first.created|timesince}} ago
-			   {% endif %}</div></div>
-			<!-- /progress counter -->			
-
-		<a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+				<div class="media-right media-middle">
+					<i class="icon-cart icon-3x opacity-75"></i>
+				</div>
+			</div>
+		</div>
 	</div>
-	<!-- /available hours -->
-</div>
-<div class="col-md-6">
 
-	<!-- credit sale -->
-	<div class="panel text-center fixh">
-		<div class="panel-body">
-			
+	<!--credit-->
 
-        	<!-- Progress counter -->
-			<div class="content-group-sm svg-center position-relative" id="hours-available-progress">
-				<h2 class="mt-15 mb-5">{{customer.get_total_credit_amount}} </h2>
-				<i class="icon-cash3 text-pink-400 counter-icon" style="top: -28px"></i><div>{{customer.get_credits}} Credit</div><div class="text-size-small text-muted">
-				{% if customer.credit_customers.first.created %}
-					Last credit			
+<div class="col-sm-6 col-md-6">
+		<div class="panel panel-body bg-danger-400 has-bg-image">
+			<div class="media no-margin">
+				<div class="media-body">
+					<h3 class="no-margin">{{customer.get_total_credit_amount|intcomma}}</h3>
+					<span class="text-uppercase text-size-mini">{{customer.get_credits}} Credit(s)</span>
+					{% if customer.customers.first.created %}
+					<span class="text-size-small text-muted">
+						<br>Last credit
 				{{customer.credit_customers.first.created|timesince}} ago
-			  {% endif %}</div></div>
-			<!-- /progress counter -->			
+					</span>
+				   {% endif %}
+				</div>
 
-		<a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+				<div class="media-right media-middle">
+					<i class="icon-cash3 icon-3x opacity-75"></i>
+				</div>
+			</div>
+		</div>
 	</div>
-	<!-- /available hours -->
-</div>
+ <!--./credit-->
 
 <div class="col-md-6">
 	<!-- Productivity goal -->
