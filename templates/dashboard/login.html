@@ -190,12 +190,13 @@
                        }
                        else{
                           l.stop();
-                          alertNotificatio('Wrond Credentials!', 'Authentication Error', 'danger')
+                          alertNotificatio('Wrong Credentials!', 'Authentication Error', 'danger')
                        }
                   },
                   error: function(jqXHR, textStatus, errorThrown) 
                   {
-                      alertNotificatio('Wrond Credentials!', 'Authenticatin Error', 'danger')  
+                      l.stop();
+                      alertNotificatio('Wrong Credentials!', 'Authenticatin Error', 'danger')
                   }
               });
               return false;
