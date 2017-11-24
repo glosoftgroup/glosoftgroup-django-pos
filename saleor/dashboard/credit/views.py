@@ -46,8 +46,8 @@ def credit_history(request, credit_pk=None):
             last_date_of_sales = DateFormat(datetime.datetime.today()).format('Y-m-d')
 
         all_sales = CreditHistoryEntry.objects.filter(credit=credit)
-        total_sales_amount = 0 #all_sales.aggregate(Sum('total_net'))
-        total_tax_amount = 0 #all_sales.aggregate(Sum('total_tax'))
+        total_sales_amount = 0
+        total_tax_amount = 0
         total_sales = []
 
         page = request.GET.get('page', 1)

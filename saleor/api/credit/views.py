@@ -1,16 +1,8 @@
 from django.db.models import Q
-from .pagination import PostLimitOffsetPagination
-from rest_framework.generics import (ListAPIView,
-                                     CreateAPIView,
-                                     RetrieveAPIView,
-                                     DestroyAPIView,
-                                    )
 from django.contrib.auth import get_user_model
-from ...product.models import (
-    Product,
-    ProductVariant,
-    Stock,
-    )
+from rest_framework import generics
+
+from ...decorators import user_trail
 from ...credit.models import Credit
 from ...sale.models import (
                             Sales, SoldItem,
@@ -18,15 +10,12 @@ from ...sale.models import (
                             TerminalHistoryEntry,
                             DrawerCash
                             )
-from ...customer.models import Customer
 from .serializers import (
     CreditListSerializer,
     CreateCreditSerializer,
     CreditUpdateSerializer,    
      )
-from rest_framework import generics
 
-from ...decorators import user_trail
 import logging
 User = get_user_model()
 debug_logger = logging.getLogger('debug_logger')
@@ -61,8 +50,10 @@ class CreditListAPIView(generics.ListAPIView):
                 ).distinct()
         return queryset_list
 
+
 class CreditorsListAPIView(generics.ListAPIView):    
     serializer_class = CreditListSerializer
+
     def get_queryset(self, *args, **kwargs):        
         queryset_list = Credit.objects.filter(status='payment-pending')
         query = self.request.GET.get('q')
@@ -77,9 +68,11 @@ class CreditorsListAPIView(generics.ListAPIView):
             print('nothing found')
         return queryset_list
 
+
 class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):    
     queryset = Credit.objects.all()
     serializer_class = CreditUpdateSerializer
+
     def perform_update(self, serializer):
         instance = serializer.save(user=self.request.user)
         if instance.status == 'fully-paid':
@@ -99,14 +92,13 @@ class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):
                             user=self.request.user
                         )
         drawer = DrawerCash.objects.create(manager=self.request.user,                                        
-                                           user = self.request.user,
+                                           user=self.request.user,
                                            terminal=terminal,
                                            amount=serializer.data['amount_paid'],
                                            trans_type='credit paid')
         
 
 def send_to_sale(credit):
-    #credit = Credit.objects.get(invoice_number=invoice_number)
     sale = Sales.objects.create(
                          user=credit.user,
                          invoice_number=credit.invoice_number,

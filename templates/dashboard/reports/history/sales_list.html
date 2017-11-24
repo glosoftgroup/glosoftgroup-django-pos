@@ -5,7 +5,7 @@
 {% load prices_i18n %}
 {% load humanize %}
 {% load mathfilters %}
-
+{% load payment_status %}
 {% block title %}
   Credit Sales History Report
 {% endblock %}
@@ -46,7 +46,7 @@
           <!--statement template-->
           <div class="panel panel-white">
 						<div class="panel-heading">
-							<h6 class="panel-title">Credit Statement<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+							<h6 class="panel-title">{{credit.customer}} Credit Statement<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
 							<div class="heading-elements">
 
 								<button type="button" data-url="{% url 'dashboard:credit_history_pdf' pk=credit.pk %}" class="printPdf btn btn-default btn-xs heading-btn legitRipple c"><i class="icon-printer position-left"></i> Print</button>
@@ -57,16 +57,13 @@
 							<div class="row">
 								<div class="col-sm-6 content-group text-left">
                                     <div class="invoice-detail">
-										<h5 class="text-uppercas text-semibold">Invoice {{credit.invoice_number}}</h5>
+										<h5 class="text-uppercas text-semibold">Invoice: {{credit.invoice_number}}</h5>
+										<h5 class="text-uppercas text-semibold">Customer: {{credit.customer}}</h5>
 										<ul class="list-condensed list-unstyled">
 											<li>Date: <span class="text-semibold">{{ credit.created }}</span></li>
 											<li>Due date: <span class="text-semibold">{{ credit.due_date }}</span></li>
-                                            <li>Status:
-                                                {% if sale.is_fully_paid %}
-                                                <span class="text-success  icon-checkmark-circle"><i></i></span>
-                                                {% else %}
-                                                <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
-                                                {% endif %}
+                                            <li>Status: {{credit.status|payment_status|safe }}
+
                                             </li>
 										</ul>
 									</div>
@@ -77,8 +74,6 @@
 									<span class="text-muted">Served by:</span>
 		 							<ul class="list-condensed list-unstyled">
 										<li><h5>{{ credit.user }}</h5></li>
-
-										<li><a href="#">{{ credit.user.email }}</a></li>
 									</ul>
                                         </div>
 								</div>
@@ -88,10 +83,50 @@
 						</div>
 
 						<div class="table-responsive" style="padding:12px">
+							<table class="table table-columned">
+								<thead>
+								<tr class="active border-double">
+									<td colspan="3" class="text-bold">Credit Details</td>
+									<td class="text-right">
+										&nbsp;
+									</td>
+								</tr>
+								<tr class="bg-primary">
+								  <th>Name</th>
+								  <th>Quantity</th>
+								  <th class="text-right">Unit Price</th>
+								  <th class="text-right">Total Cost</th>
+								</tr>
+								</thead>
+								<tbody>
+								{% for item in credit.items %}
+								  <tr>
+								   <td>{{ item.product_name }}</td>
+								   <td>{{ item.quantity }}</td>
+								   <td class="text-right">{{ item.unit_cost }}</td>
+								   <td class="text-right">{{ item.total_cost }}</td>
+								  </tr>
+								{% endfor %}
+								</tbody>
+								<tfoot>
+								<tr class=" border-double">
+									<td colspan="3" class="text-right text-bold">Total</td>
+									<td class="text-right text-bold">
+										{{ credit.total_net|intcomma }}
+									</td>
+								</tr>
+								</tfoot>
+							</table>
 						    <table class="table table-lg">
 						        <thead>
+								    <tr class="active border-double">
+										<td colspan="3" class="text-bold">Payment History</td>
+										<td class="text-right">
+											&nbsp;
+										</td>
+									</tr>
 						            <tr class="bg-primary">
-						                <th>Comment</th>
+						                <th>&nbsp;</th>
                                         <th>Date</th>
 						                <th class="col-sm-1">Amount</th>
                                         <th class="col-sm-1">Balance</th>

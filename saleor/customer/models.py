@@ -71,7 +71,6 @@ class AddressBook(models.Model):
     @property
     def full_name(self):
         return '%s %s' % (self.first_name, self.last_name)
-    
 
     class Meta:
         verbose_name = pgettext_lazy('AddressBook model', 'address book')
@@ -95,8 +94,7 @@ class AddressBook(models.Model):
 
 class CustomerManager(BaseUserManager):
 
-    def create_customer(self, email, password=None,
-                    is_active=True, username='', **extra_fields):
+    def create_customer(self, email, password=None, is_active=True, username='', **extra_fields):
         'Creates a User with the given username, email and password'
         email = CustomerManager.normalize_email(email)
         customer = self.model(email=email, is_active=is_active,
@@ -114,7 +112,6 @@ class CustomerManager(BaseUserManager):
     def gain_points(self, customer, points):
         customer.loyalty_points = F('loyalty_points') + points        
         customer.save(update_fields=['loyalty_points'])
-
     
 
 class Customer(models.Model):
@@ -132,8 +129,8 @@ class Customer(models.Model):
     redeemed_loyalty_points = models.IntegerField(
         pgettext_lazy('Customer field', 'Redeemed loyalty points'), default=0)    
     
-    nid = models.CharField(max_length=100, null=True,blank=True)
-    mobile = models.CharField(max_length=100, null=True, blank=True)
+    nid = models.CharField(max_length=100, null=True, blank=True)
+    mobile = models.CharField(max_length=100, null=True, blank=True, unique=True)
     image = models.FileField(upload_to='employee', blank=True, null=True)
     date_joined = models.DateTimeField(
         pgettext_lazy('Customer field', 'date joined'),

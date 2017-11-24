@@ -1,9 +1,11 @@
 {% load staticfiles %}
+{% load humanize %}
+{% load payment_status %}
 {% load mathfilters %}
  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
  <html>
      <head>
-         <title>Credit Sales Items IReport</title>
+         <title>Credit Sales Items Report</title>
          <style type="text/css">
              body {sans-serif; color: #384047;}
              .header {font-family: 'Verdana';font-size: 15px;font-weight: 100;text-align: center;color: #007cae;}
@@ -65,12 +67,7 @@
 										<div class="list-condensed list-unstyled">
 											Date: <span class="text-semibold">{{ credit.created }}</span><br>
 											Due date: <span class="text-semibold">{{ credit.due_date }}</span><br>
-                                            Status:
-                                                {% if sale.is_fully_paid %}
-                                                <span class="text-success  icon-checkmark-circle"><i></i></span>
-                                                {% else %}
-                                                <span class="badge badge-flat border-warning text-warning-600">Pending..</span>
-                                                {% endif %}
+                                            Status: {{ credit.status }}
 
 										</div>
 									</div>
@@ -83,8 +80,49 @@
 						</div>
 
 						<div class="table-responsive" style="padding:12px">
+                            <table class="table table-columned">
+								<thead>
+								<tr class="active border-double">
+									<td colspan="3">Credit Details</td>
+									<td class="text-right">
+										&nbsp;
+									</td>
+								</tr>
+								<tr class="bg-primary">
+								  <th>Name</th>
+								  <th>Quantity</th>
+								  <th class="text-right">Unit Price</th>
+								  <th class="text-right">Total Cost</th>
+								</tr>
+								</thead>
+								<tbody>
+								{% for item in credit.items %}
+								  <tr>
+								   <td>{{ item.product_name }}</td>
+								   <td>{{ item.quantity }}</td>
+								   <td class="text-right">{{ item.unit_cost }}</td>
+								   <td class="text-right">{{ item.total_cost }}</td>
+								  </tr>
+								{% endfor %}
+								</tbody>
+								<tfoot>
+								<tr class=" border-double">
+									<td colspan="3" class="text-right text-bold">Total</td>
+									<td class="text-right text-bold">
+										{{ credit.total_net|intcomma }}
+									</td>
+								</tr>
+								</tfoot>
+							</table>
+
 						    <table class="table table-lg">
 						        <thead>
+                                   <tr class="active border-double">
+										<td colspan="3">Payment History</td>
+										<td class="text-right">
+											&nbsp;
+										</td>
+									</tr>
 						            <tr class="bg-primary">
 						                <th>Comment</th>
                                         <th>Date</th>
