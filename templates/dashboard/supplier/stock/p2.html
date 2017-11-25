@@ -48,7 +48,9 @@
                     </td>
 
                       <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                       {{ user.stock.status|payment_status|safe }}
+                       <span class="stock-status">
+                           {{ user.stock.status|payment_status|safe }}
+                       </span>
                     </td>
                   </tr>
                   {% endfor %}
@@ -209,6 +211,15 @@
     var csrf = $("[name=csrfmiddlewaretoken]").val();
     var oldBalance = 0;
     var amountPaid = 0;
+    //return formated status
+    function getStatus(pay_status){
+     if(pay_status == 'fully-paid'){
+            return '<span class="text-success  icon-checkmark-circle"><i></i></span>';
+        }else{
+            return '<span class="badge badge-flat border-warning text-warning-600">Pending..</span>';
+        }
+    }
+
     // purchase stock update
     $('.type-number').editable({
         url: purchaseUrl,
@@ -216,12 +227,20 @@
         params: {
             csrfmiddlewaretoken: csrf
         },
+        validate: function(value) {
+            if($.trim(value) == '') {
+                return 'This field is required';
+            }
+        },
         success: function(response, newValue) {
             selector = '#'+response.message;
             oldBalance = $(selector).find('.stock-balance').data('balance');
             amountPaid = $(selector).find('.stock-paid').data('paid');
             $(selector).find('.stock-paid').html(parseInt(amountPaid)+parseInt(newValue));
             $(selector).find('.stock-balance').html(parseInt(oldBalance)-parseInt(newValue));
+
+
+            $(selector).find('.stock-status').html(getStatus(response.status));
 
         }
     });

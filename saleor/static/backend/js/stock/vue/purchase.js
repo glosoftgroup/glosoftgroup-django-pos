@@ -21,6 +21,47 @@ new Vue({
     el:'#purchase-app2',
     delimiters: ['${', '}'],
     data:{ name:'POS'},
+    created: function () {
+
+        var purchaseUrl = "{% url 'dashboard:update-stock-purchase-data' %}";
+    var csrf = $("[name=csrfmiddlewaretoken]").val();
+    var oldBalance = 0;
+    var amountPaid = 0;
+
+    //return formated status
+    function getStatus(pay_status){
+         if(pay_status == 'fully-paid'){
+                return '<span class="text-success  icon-checkmark-circle"><i></i></span>';
+            }else{
+                return '<span class="badge badge-flat border-warning text-warning-600">Pending..</span>';
+            }
+    }
+
+    // purchase stock update
+    $('.type-number').editable({
+        url: purchaseUrl,
+        title: 'Amount settled',
+        params: {
+            csrfmiddlewaretoken: csrf
+        },
+        validate: function(value) {
+            if($.trim(value) == '') {
+                return 'This field is required';
+            }
+        },
+        success: function(response, newValue) {
+            selector = '#'+response.message;
+            oldBalance = $(selector).find('.stock-balance').data('balance');
+            amountPaid = $(selector).find('.stock-paid').data('paid');
+            $(selector).find('.stock-paid').html(parseInt(amountPaid)+parseInt(newValue));
+            $(selector).find('.stock-balance').html(parseInt(oldBalance)-parseInt(newValue));
+
+
+            $(selector).find('.stock-status').html(getStatus(response.status));
+
+        }
+    });
+    }
 });
 
 new Vue({

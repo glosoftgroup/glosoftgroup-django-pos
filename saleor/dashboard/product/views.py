@@ -831,6 +831,8 @@ def purchase_data(request):
             amount_paid = request.POST.get('value')
         if obj.amount_paid >= obj.total_cost:
             obj.status = 'fully-paid'
+        else:
+            obj.status = 'payment-pending'
         obj.save()
 
         purchase = PurchaseProduct()
@@ -846,7 +848,7 @@ def purchase_data(request):
         purchase.supplier = obj.variant.product.product_supplier
         purchase.save()
 
-        return HttpResponse(json.dumps({'message': obj.pk}), content_type='application/json')
+        return HttpResponse(json.dumps({'message': obj.pk, 'status':obj.status}), content_type='application/json')
     else:
         return HttpResponse(json.dumps({'error': 'Stock pk required'}),content_type='application/json')
 
