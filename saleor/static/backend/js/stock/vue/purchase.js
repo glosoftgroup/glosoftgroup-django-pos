@@ -9,6 +9,7 @@ Vue.component('child', {
   data: {
     paid:0
   },
+  template: '<a v-bind:data-name="balance" class="type-number" id="type-number" data-type="number" data-inputclass="form-control" v-bind:data-pk="pk" data-title="Enter Amount">Pay</a>'
 });
 
 new Vue({
