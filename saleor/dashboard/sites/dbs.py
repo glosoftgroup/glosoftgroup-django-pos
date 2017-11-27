@@ -43,12 +43,12 @@ def export_db(request):
 	try:
 
 		if sys.platform == 'win32':
-			v = "C:\\Users\\Public\\PosServer\\"
+			v = "C:\\Users\\Public\\PosServer\\Backup\\"
 		else:
-			v = os.path.expanduser('~/PosServer')
+			v = os.path.expanduser('~/PosServer/Backup')
 
 		if daily:
-			backfolder = str(v)+'/Backup/'
+			backfolder = str(v)
 			try:
 				ct = SiteSettings.objects.all().first().closing_time
 			except:
@@ -62,7 +62,11 @@ def export_db(request):
 			d = str(day.day) + '.' + str(day.month) + '.' + str(day.year)
 
 		else:
-			backfolder = str(v)+'/Backup/Random'
+
+			if sys.platform == 'win32':
+				backfolder = str(v) +'\\Random'
+			else:
+				backfolder = str(v) + '/Random'
 			day = datetime.now()
 			d = str(day.day) + '.' + str(day.month) + '.' + str(day.year)+'@'+str(day.hour)+'.'+\
 				str(day.minute)+'.'+str(day.second)
