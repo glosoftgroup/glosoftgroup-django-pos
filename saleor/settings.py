@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import ast
 import os
+import sys
 import os.path
 import datetime
 import dj_database_url
@@ -15,11 +16,19 @@ thisDate = dateToday.strftime('%d-%m-%Y')
 thisMonth = dateToday.strftime('%b')
 dayName = dateToday.strftime("%a")
 
-thisMonthDirectory = "C:\\Users\\Public\\PosServer\\logs\\"
-info_path = thisMonthDirectory+'\\'+thisDate+'_info.log'
-error_path = thisMonthDirectory+'\\'+thisDate+'_error.log'
-debug_path = thisMonthDirectory+'\\'+thisDate+'_debug.log'
-warning_path = thisMonthDirectory+'\\'+thisDate+'_warning.log'
+if sys.platform == 'win32':
+    thisMonthDirectory = "C:\\Users\\Public\\PosServer\\logs\\"
+    info_path = thisMonthDirectory + '\\' + thisDate + '_info.log'
+    error_path = thisMonthDirectory + '\\' + thisDate + '_error.log'
+    debug_path = thisMonthDirectory + '\\' + thisDate + '_debug.log'
+    warning_path = thisMonthDirectory + '\\' + thisDate + '_warning.log'
+else:
+    thisMonthDirectory = os.path.expanduser('~/PosServer/logs')
+    info_path = thisMonthDirectory + '/' + thisDate + '_info.log'
+    error_path = thisMonthDirectory + '/' + thisDate + '_error.log'
+    debug_path = thisMonthDirectory + '/' + thisDate + '_debug.log'
+    warning_path = thisMonthDirectory + '/' + thisDate + '_warning.log'
+
 
 if not os.path.exists(thisMonthDirectory):
     os.makedirs(thisMonthDirectory)

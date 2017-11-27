@@ -41,7 +41,12 @@ def import_db(request):
 def export_db(request):
 	daily = request.GET.get('daily')
 	try:
-		v = os.path.expanduser('~/Documents')
+
+		if sys.platform == 'win32':
+			v = "C:\\Users\\Public\\PosServer\\"
+		else:
+			v = os.path.expanduser('~/PosServer')
+
 		if daily:
 			backfolder = str(v)+'/Backup/'
 			try:
