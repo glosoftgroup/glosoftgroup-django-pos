@@ -43,7 +43,7 @@ def export_db(request):
 	try:
 
 		if sys.platform == 'win32':
-			v = "C:\\Users\\Public\\PosServer\\Backup\\"
+			v = "C:\\Users\\Public\\PosServer\\Backup"
 		else:
 			v = os.path.expanduser('~/PosServer/Backup')
 
