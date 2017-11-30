@@ -57,7 +57,12 @@
         <div class="content">
             {% csrf_token %} 
             <div class="panel bg-danger col-md-6 col-md-offset-3 animated bounceIn">
-              <p class="text-center" style="font-size:30px;font-weight:bold;padding:20px;">Oops! No such Page.</p>
+              <p class="text-center" style="font-size:30px;font-weight:bold;padding:20px;">Oops! Not Authorized.</p>
+              {% if request.META.HTTP_REFERER %}
+               <p class="text-center"><a class="btn btn-default text-center" href="{{ request.META.HTTP_REFERER }}">Back to Previous Page</a></p>
+               {% else %}
+               <p class="text-center"><a class="btn btn-default text-center" href="javascript:;" onClick="javascript:history.go(-1);">Back to Previous Page</a></p>
+               {% endif %}
             </div>
         </div>
         <!-- /content area -->
