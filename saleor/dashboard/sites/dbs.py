@@ -84,7 +84,8 @@ def export_db(request):
 			while os.path.exists(backfolder+"/"+d+"_db%s.json" % i,):
 				i += 1
 			sys.stdout = open(backfolder+"/"+d+"_db%s.json" % i, "w")
-		call_command('dumpdata', '--exclude', 'auth.permission', '--exclude', 'contenttypes', '--exclude', 'site.files')
+		# call_command('dumpdata', '--exclude', 'auth.permission', '--exclude', 'contenttypes', '--exclude', 'site.files')
+		call_command('dumpdata', '--exclude', 'auth.permission', '--exclude', 'contenttypes')
 		sys.stdout = sysout
 		info_logger.info('backup '+ d +' successful')
 		return HttpResponse('Database Backup Successful')
