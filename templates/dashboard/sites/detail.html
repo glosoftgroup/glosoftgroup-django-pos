@@ -132,9 +132,13 @@ $( document ).ready(function() {
                     success: function(data){
                         l.stop();
                         data == 'success' ? alertNotificatio(data, 'Success!', 'success') : alertNotificatio('Error Backing Up', 'Error!', 'danger');
+                        $('.db').val('');
+                        $('.filename').html(' ');
                     },error: function(){
                         l.stop();
                         alertNotificatio('Error Backing Up', 'Error!', 'danger');
+                        $('.db').val('');
+                        $('.filename').html(' ');
                     }
                 });
               }else{
