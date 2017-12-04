@@ -206,10 +206,13 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         if customer.exists():
             if not customer.get().creditable:
                 error_logger.error('Customer '+kwargs['name']+' is not creditable')
-                raise ParseError('Customer '+kwargs['name']+' is not creditable',code=400)
+                raise ParseError('Customer '+kwargs['name']+' is not creditable', code=400)
+
         if not customer.exists():
             kwargs['creditable'] = True
             customer = Customer.objects.create(**kwargs)
+        else:
+            customer = customer.first()
 
         # calculate loyalty_points
         if customer:
