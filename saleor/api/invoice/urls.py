@@ -7,10 +7,8 @@ from .views import (
 
 
 urlpatterns = [
-    url(r'^$', InvoiceListAPIView.as_view(),
-     name='list-invoices'),
-    url(r'^create-invoice/$', 
-    	InvoiceCreateAPIView.as_view(), name='create-invoice'),
+    url(r'^$', InvoiceListAPIView.as_view(), name='list-invoices'),
+    url(r'^create-invoice/$', InvoiceCreateAPIView.as_view(), name='create-invoice'),
     
 
 ]

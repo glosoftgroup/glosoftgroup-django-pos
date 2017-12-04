@@ -78,11 +78,14 @@ class InvoiceListSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
     invoiceitems = ItemsSerializer(many=True)
     cashier = SerializerMethodField()
+
     class Meta:
         model = Invoice
-        fields = ('id',
+        fields = (
+                 'id',
                  'user',
                  'invoice_number',
+                 'created',
                  'total_net',
                  'sub_total',                 
                  'url',

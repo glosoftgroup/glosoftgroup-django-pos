@@ -23,6 +23,7 @@ debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
 
+
 @api_view(['GET', 'POST'])
 def login(request):
     serializer = UserAuthorizationSerializer(data=request.data)
@@ -52,11 +53,13 @@ def login(request):
     elif request.method == 'GET':
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 def record_trail(loggedin,user,terminal):
     trail = str(user.name)+' '+\
             str(user.email)+' logged in Termial:'+\
             str(terminal)+'. Session active '+str(loggedin)
     user_trail(user,trail,'view')
+
 
 @api_view(['GET', 'POST'])
 def logout(request):
