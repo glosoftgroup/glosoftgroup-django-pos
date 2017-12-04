@@ -90,6 +90,7 @@ class CreditListSerializer(serializers.ModelSerializer):
                  'id',
                  'user',
                  'invoice_number',
+                 'created',
                  'total_net',
                  'sub_total',                 
                  'update_url',
