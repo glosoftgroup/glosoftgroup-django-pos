@@ -98,6 +98,7 @@ class Credit(models.Model):
     due_date = models.DateTimeField(
         pgettext_lazy('Credit field', 'due date'),
         null=False, default=now)
+    car_registration = models.CharField(max_length=100, null=True, blank=True)
     
     objects = CreditManager()
 
