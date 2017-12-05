@@ -107,6 +107,7 @@ class CreditListSerializer(serializers.ModelSerializer):
                  'discount_amount',
                  'due_date',
                  'debt',
+                 'car_registration'
                 )
 
     def get_cashier(self, obj):
@@ -139,6 +140,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                  'discount_amount',
                  'due_date',
                  'debt',
+                 'car_registration'
                 )
 
     def validate_total_net(self,value):
@@ -239,7 +241,8 @@ class CreateCreditSerializer(serializers.ModelSerializer):
                                      mobile=validated_data.get('mobile'),
                                      debt=validated_data.get('debt'),
                                      due_date=validated_data.get('due_date'),
-                                     customer_name=validated_data.get('customer_name'))
+                                     customer_name=validated_data.get('customer_name'),
+                                     car_registration=validated_data.get('car_registration'))
 
         # add credit history
         try:

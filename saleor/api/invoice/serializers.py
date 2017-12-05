@@ -97,6 +97,7 @@ class InvoiceListSerializer(serializers.ModelSerializer):
                  'mobile',
                  'customer_name',
                  'cashier',
+                 'car_registration'
                 )
 
     def get_cashier(self,obj):
@@ -125,6 +126,7 @@ class CreateInvoiceSerializer(serializers.ModelSerializer):
                  'mobile',
                  'customer_name',
                  'status',
+                 'car_registration'
                 )
 
     def validate_total_net(self,value):
@@ -191,7 +193,8 @@ class CreateInvoiceSerializer(serializers.ModelSerializer):
                                      amount_paid=validated_data.get('amount_paid'),
                                      customer=customer,
                                      mobile=validated_data.get('mobile'),
-                                     customer_name=validated_data.get('customer_name'))
+                                     customer_name=validated_data.get('customer_name'),
+                                     car_registration=validated_data.get('car_registration'))
         for solditem_data in solditems_data:
             InvoicedItem.objects.create(invoice=sales,**solditem_data)
             
