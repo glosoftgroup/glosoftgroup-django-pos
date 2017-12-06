@@ -52,7 +52,10 @@ class InvoiceListAPIView(generics.ListAPIView):
         query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(
-                Q(invoice_number__icontains=query)               
+                Q(invoice_number__icontains=query) |
+                Q(customer__name__icontains=query) |
+                Q(created__icontains=query) |
+                Q(customer__mobile__icontains=query)
                 ).distinct()
         return queryset_list
 
