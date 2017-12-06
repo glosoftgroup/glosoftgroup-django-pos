@@ -38,6 +38,18 @@
                      <p style="margin-bottom:0px;margin-top:2px;font-size:11px;">
                         RECEIPT: {{sale.invoice_number}}
                  </p>
+                 {% if sale.payment_options.all %}
+                     {% for i in sale.payment_options.all %}
+                        {% if i|lower == 'mpesa' %}
+                            {% if sale.transaction_code %}
+                              <p style="margin-bottom:0px;margin-top:2px;font-size:10px;">TRANSACTION CODE: {{sale.transaction_code}}</p>
+                            {% endif %}
+                        {% endif %}
+                     {% endfor %}
+                  {% endif %}
+                  {% if sale.car_registration %}
+                              <p style="margin-bottom:0px;margin-top:2px;font-size:10px;">CAR REGISTRATION: {{sale.car_registration}}</p>
+                  {% endif %}
                  <p style="margin-bottom:0px;margin-top:2px;font-size:10px;">
                         SERVED BY: {{sale.user.name | upper}}
                  </p>
