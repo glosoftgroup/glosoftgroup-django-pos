@@ -62,7 +62,7 @@ class CreditorsListAPIView(generics.ListAPIView):
                 queryset_list = queryset_list.filter(status='payment-pending').filter(
                     Q(invoice_number__icontains=query)|
                     Q(customer__name__icontains=query)|
-                    Q(customer__name__icontains=query)|
+                    Q(created__icontains=query) |
                     Q(customer__mobile__icontains=query)).distinct()
         except:
             print('nothing found')
