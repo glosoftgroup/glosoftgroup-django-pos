@@ -51,6 +51,9 @@
                                 {% endif %}
                              {% endfor %}
                           {% endif %}
+                          {% if sale.car_registration %}
+                                      <h6><span class="text-bold">Car Registration: </span>{{sale.car_registration}}</h6>
+                          {% endif %}
                           <h6><span class="text-bold"></span></h6>
                           <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
                       </div>
