@@ -90,7 +90,7 @@
                 <tbody id="tb">
                 {% if users %}
                   {% for user in users%}
-                  <tr class='clickable-row' id="{{user.stock.pk }}">
+                   <tr class='clickable-row' id="{{user.stock.pk }}">
 
                     <!-- invoice -->
                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
@@ -114,7 +114,7 @@
                       <!-- pay -->
                     <td class="tdx" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                         <!-- kebab-case in HTML -->
-                        <child balance="{% if user.stock.amount_paid.gross %}{{user.stock.amount_paid.gross}}{% endif %}" pk="{{user.stock.id}}"></child>
+                        <child balance="{{user.stock.amount_paid.gross}}" pk="{{user.stock.id}}"></child>
                     </td>
 
                       <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">

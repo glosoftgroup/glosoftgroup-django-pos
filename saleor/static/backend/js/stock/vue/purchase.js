@@ -38,7 +38,7 @@ new Vue({
     }
 
     // purchase stock update
-    $('.type-number').editable({
+    $('.type-numbercxx').editable({
         url: purchaseUrl,
         title: 'Amount settled',
         params: {
