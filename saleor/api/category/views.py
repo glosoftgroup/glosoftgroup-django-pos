@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.request import Request
 from django.contrib.auth import get_user_model
+from .pagination import PostLimitOffsetPagination
 
 from .serializers import (
     CategoryListSerializer,
@@ -14,6 +15,7 @@ User = get_user_model()
 class CategoryListAPIView(generics.ListAPIView):
     """ Serializer to list categories """
     serializer_class = CategoryListSerializer
+    pagination_class = PostLimitOffsetPagination
     queryset = Category.objects.all()
 
 
