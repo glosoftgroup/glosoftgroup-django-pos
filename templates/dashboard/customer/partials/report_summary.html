@@ -11,6 +11,8 @@
 					<span class="text-size-small text-muted">
 						<br>Last sale {{customer.customers.first.created|timesince}} ago
 					</span>
+					{% else %}
+					<br>&nbsp;<br>
 				   {% endif %}
 				</div>
 
@@ -29,11 +31,13 @@
 				<div class="media-body">
 					<h3 class="no-margin">{{customer.get_total_credit_amount|intcomma}}</h3>
 					<span class="text-uppercase text-size-mini">{{customer.get_credits}} Credit(s)</span>
-					{% if customer.customers.first.created %}
+					{% if customer.credit_customers.first.created %}
 					<span class="text-size-small text-muted">
 						<br>Last credit
 				{{customer.credit_customers.first.created|timesince}} ago
 					</span>
+				   {% else %}
+					<br>&nbsp;<br>
 				   {% endif %}
 				</div>
 

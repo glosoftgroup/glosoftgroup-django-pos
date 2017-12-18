@@ -1,5 +1,6 @@
 from datetime import date
 from decimal import Decimal
+from math import trunc
 import logging
 from rest_framework.serializers import (
                 ModelSerializer,
@@ -86,7 +87,8 @@ class SalesListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sales
-        fields = ('id',
+        fields = (
+                 'id',
                  'user',
                  'invoice_number',
                  'total_net',
@@ -240,27 +242,28 @@ class SalesSerializer(serializers.ModelSerializer):
         sales.discount_amount = validated_data.get('discount_amount')
         sales.customer_name = validated_data.get('customer_name')
         sales.save()
+
         # add payment options
         payment_data = validated_data.get('payment_data')        
         for option in payment_data:
             pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
+            sales.payment_options.add(pay_opt)
             if pay_opt.name == "Loyalty Points":
                 points_eq = pay_opt.loyalty_point_equiv
                 if points_eq == 0:
                     loyalty_points = 0
                 else:
                     loyalty_points = Decimal(option['value']) * Decimal(points_eq)
-                    Customer.objects.redeem_points(customer, int(loyalty_points))
+                    Customer.objects.redeem_points(customer, trunc(loyalty_points))
             else:
-                sales.payment_options.add(pay_opt)
                 points_eq = pay_opt.loyalty_point_equiv
                 if points_eq == 0:
                     loyalty_points = 0
                 else:
                     loyalty_points = Decimal(option['value'])/Decimal(points_eq)
-                try:                    
-                    if int(loyalty_points) != 0:
-                        Customer.objects.gain_points(customer,loyalty_points)
+                try:
+                    if trunc(loyalty_points) >= 0:
+                        Customer.objects.gain_points(customer, trunc(loyalty_points))
                 except Exception as e:
                     error_logger.error(e)
 

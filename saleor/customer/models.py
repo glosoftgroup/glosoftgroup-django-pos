@@ -105,10 +105,10 @@ class CustomerManager(BaseUserManager):
         return customer
 
     def redeem_points(self, customer, points):
-        customer.loyalty_points = F('loyalty_points') - points        
+        customer.loyalty_points = F('loyalty_points') - points
         customer.redeemed_loyalty_points = F('redeemed_loyalty_points') + points
         customer.save(update_fields=['loyalty_points', 'redeemed_loyalty_points'])
-    
+
     def gain_points(self, customer, points):
         customer.loyalty_points = F('loyalty_points') + points        
         customer.save(update_fields=['loyalty_points'])
