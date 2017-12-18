@@ -11,7 +11,7 @@ Vue.component('child', {
   },
   template: '<a v-bind:data-name="balance" class="type-number" id="type-number" data-type="number" data-inputclass="form-control" v-bind:data-pk="pk" data-title="Enter Amount">Pay</a>'
 });
-
+var purchaseUrl = $('.pageUrl').data('purchaseurl');
 new Vue({
     el:'#purchase-app',
     delimiters: ['${', '}'],
@@ -23,7 +23,7 @@ new Vue({
     data:{ name:'POS'},
     created: function () {
 
-        var purchaseUrl = "{% url 'dashboard:update-stock-purchase-data' %}";
+    //var purchaseUrl = "{% url 'dashboard:update-stock-purchase-data' %}";
     var csrf = $("[name=csrfmiddlewaretoken]").val();
     var oldBalance = 0;
     var amountPaid = 0;
@@ -38,7 +38,7 @@ new Vue({
     }
 
     // purchase stock update
-    $('.type-number').editable({
+    $('.type-numbercxx').editable({
         url: purchaseUrl,
         title: 'Amount settled',
         params: {

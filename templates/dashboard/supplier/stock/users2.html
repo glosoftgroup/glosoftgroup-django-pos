@@ -90,7 +90,7 @@
                 <tbody id="tb">
                 {% if users %}
                   {% for user in users%}
-                  <tr class='clickable-row' id="{{user.stock.pk }}">
+                   <tr class='clickable-row' id="{{user.stock.pk }}">
 
                     <!-- invoice -->
                    <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
@@ -208,6 +208,9 @@
    </div>
  </div>
  <div class="info"></div>
+<input type="hidden" class="pageUrls"
+    data-purchaseurl="{% url 'dashboard:update-stock-purchase-data' %}"
+>
  <!-- /blue modal -->
 {% endblock%}
 {% block custom_js %}
@@ -218,8 +221,10 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/stock/vue/purchase.js' %}"></script>
   {% csrf_token %}
+
   <script>
     var purchaseUrl = "{% url 'dashboard:update-stock-purchase-data' %}";
+    console.log(purchaseUrl)
     var csrf = $("[name=csrfmiddlewaretoken]").val();
     var oldBalance = 0;
     var amountPaid = 0;
