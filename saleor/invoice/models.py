@@ -83,7 +83,6 @@ class Invoice(models.Model):
     discount_name = models.CharField(
         verbose_name=pgettext_lazy('Invoice field', 'discount name'),
         max_length=255, default='', blank=True)
-    car_registration = models.CharField(max_length=100, null=True, blank=True)
     class Meta:
         ordering = ('-last_status_change',)
         verbose_name = pgettext_lazy('Invoice model', 'Invoice')

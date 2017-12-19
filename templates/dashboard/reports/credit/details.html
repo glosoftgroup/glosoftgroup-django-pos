@@ -44,9 +44,6 @@
 
                         <h6><span class="text-bold">Customer:</span> {% if sale.customer.name %} {{sale.customer.name}} {% else %} <span class="text-bold">-</span>{% endif %}</h6>
                           <h6 class=""><span class="text-bold">Receipt Number:</span> {{sale.invoice_number}}</h6>
-                          {% if sale.car_registration %}
-                                      <h6><span class="text-bold">Car Registration: </span>{{sale.car_registration}}</h6>
-                          {% endif %}
                           <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
 
                       </div>

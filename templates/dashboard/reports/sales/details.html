@@ -42,18 +42,6 @@
                <div>
                       <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
                          <h6><span class="text-bold">Customer:</span> {% if sale.customer.name %} {{sale.customer.name}} {% else %} <span class="text-bold">-</span>{% endif %}</h6> <h6 class=""><span class="text-bold">Receipt Number:</span> {{sale.invoice_number}}</h6>
-                          {% if sale.payment_options.all %}
-                             {% for i in sale.payment_options.all %}
-                                {% if i|lower == 'mpesa' %}
-                                    {% if sale.transaction_code %}
-                                      <h6><span class="text-bold">Transaction Code: </span>{{sale.transaction_code}}</h6>
-                                    {% endif %}
-                                {% endif %}
-                             {% endfor %}
-                          {% endif %}
-                          {% if sale.car_registration %}
-                                      <h6><span class="text-bold">Car Registration: </span>{{sale.car_registration}}</h6>
-                          {% endif %}
                           <h6><span class="text-bold"></span></h6>
                           <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
                       </div>
