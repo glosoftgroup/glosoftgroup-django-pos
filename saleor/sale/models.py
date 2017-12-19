@@ -170,8 +170,6 @@ class Sales(models.Model):
         verbose_name=pgettext_lazy('Sales field',
                                    'sales options'))
     payment_data = JSONField(null=True, blank=True)
-    transaction_code = models.CharField(max_length=100, null=True, blank=True)
-    car_registration = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         ordering = ('-last_status_change',)
