@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load materializecss %}
 {% load default_user_image %}
+{% load site_settings %}
 <div class="row">
       <div class="panel-body">
         <form id="form-category" name="form-category" enctype="multipart/form-data" novalidate>
@@ -45,11 +46,13 @@
                       <div class="row">
                       <div class="col-md-12">
                           <div class="form-group col-md-6">              
-                               <label for="loyalty_point_equiv">Loyalty points equivalency </label>
+                               <label for="loyalty_point_equiv">
+                                Points equivalent to 1 {{'DEFAULT_CURRENCY'|site_settings}}
+                               </label>
                             <input class="form-control" name="loyalty_point_equiv" id="loyalty_point_equiv" type="text" min="0"
                                    placeholder="{% if site.loyalty_point_equiv %} {{site.loyalty_point_equiv}} {% else %} 0 {% endif %}">
 
-                            <span class="help-block">Shillings per loyalty point</span>
+                            <span class="help-block">e.g 100 loyalty points is equal to 1 {{'DEFAULT_CURRENCY'|site_settings}}</span>
                           </div>
                           <div class="col-md-6">
                               <label for="loyalty_point_equiv" style="">Max Credit Expiration(days)  </label>

@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load site_settings %}
    <style type="text/css">
      .clickable-row td.td{
       cursor: pointer;
@@ -17,7 +18,10 @@
                       <tr class="bg-primary">
                         
                         <th>Name</th>
-                        <th>Points equivalency</th>
+                        <th>
+                            <span class="bold">{{'DEFAULT_CURRENCY'|site_settings}}</span>
+                            equivalent to 1 Point
+                        </th>
                         <th>Description</th>
                         {% if perms.sale.delete_paymentoption %}
                         <th class="text-center">Options</th>
@@ -30,9 +34,20 @@
                           <tr class='clickable-row' id="{{user.pk }}">
                             <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{ option.name }}</td>
                             <!-- loyalty -->
-                    <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.loyalty_point_equiv}}</td>
                             <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">
-                            {{ option.description }}</td>
+                                {{option.loyalty_point_equiv}}
+                                <span class="text-bold">
+                                    {{'DEFAULT_CURRENCY'|site_settings}}
+                                </span>
+                            </td>
+                            <!-- description -->
+                            <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.description}}" data-m="#pdetail">
+                                {{option.description}}
+                                <span class="text-muted">
+                                   1 point is equivalent to {{option.loyalty_point_equiv}}{{'DEFAULT_CURRENCY'|site_settings}}
+                                </span>
+                            </td>
+
                             {% if perms.sale.delete_paymentoption %}
                             <!-- actions -->
                             <td class="text-center">

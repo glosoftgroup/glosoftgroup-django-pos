@@ -25,6 +25,7 @@ from ...product.models import (
             Stock,
             )
 from ...customer.models import Customer
+from ...site.models import SiteSettings
 
 
 User = get_user_model()
@@ -255,7 +256,7 @@ class SalesSerializer(serializers.ModelSerializer):
             pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
             sales.payment_options.add(pay_opt)
             if pay_opt.name == "Loyalty Points":
-                points_eq = pay_opt.loyalty_point_equiv
+                points_eq = SiteSettings.objects.get(pk=1).loyalty_point_equiv
                 if points_eq == 0:
                     loyalty_points = 0
                 else:

@@ -1,8 +1,8 @@
-
 {% extends "dashboard/base.html" %}
 {% load staticfiles %}
 {% load i18n %}
 {% load prices_i18n %}
+{% load site_settings %}
 
 {% block title %}
   Payment Options
@@ -85,8 +85,13 @@
      <table class="table table-hover">
         <thead>
             <tr class="bg-primary">            
-            <th>Name</th> 
-            <th>Loyalty points equivalency </th>    
+            <th>Name</th>
+            <th>
+                <span class="text-bold">
+                    {{'DEFAULT_CURRENCY'|site_settings}}
+                </span>
+                    equivalent to 1 Point
+            </th>
             <th>Description</th>
             <th></th>
             </tr>
@@ -95,7 +100,7 @@
           <tr>        
 
           <td>
-            <input placeholder="name" class="form-control" id="name" required="" name="name" type="text" >           
+            <input placeholder="name e.g Cash, Mpesa.." class="form-control" id="name" required="" name="name" type="text" >
             </td>
             <td> 
             <input placeholder="100" class="form-control" id="loyalty_points" name="loyalty_points" value="0" type="number" >           
@@ -127,7 +132,10 @@
                 <thead>
                   <tr class="bg-primary">                  
                     <th>Name</th>
-                    <th>Points equivalency</th>
+                    <th>
+                        <span class="text-bold">{{'DEFAULT_CURRENCY'|site_settings}}</span>
+                        equivalent to 1 Point
+                    </th>
                     <th>Description</th>                   
                     {% if perms.sale.delete_paymentoption %}
                     <th class="text-center">Options</th>
@@ -141,10 +149,19 @@
                     <!-- name -->
                     <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.name}}</td>
                     <!-- loyalty -->
-                    <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">{{option.loyalty_point_equiv}}</td>
+                    <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.name}}" data-m="#pdetail">
+                        {{option.loyalty_point_equiv}}
+                        <span class="text-bold">
+                            {{'DEFAULT_CURRENCY'|site_settings}}
+                        </span>
+                    </td>
                     <!-- description -->
-                    <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.description}}" data-m="#pdetail">{{option.description}}</td>
-                    
+                    <td class="td" data-href="{% url 'dashboard:payment-option-detail' pk=option.pk %}" data-mtitle="{{option.description}}" data-m="#pdetail">
+                        {{option.description}}
+                        <span class="text-muted">
+                           1 point is equivalent to {{option.loyalty_point_equiv}} {{'DEFAULT_CURRENCY'|site_settings}}
+                        </span>
+                    </td>
                     
                     {% if perms.sale.delete_paymentoption %}
                     <!-- actions -->

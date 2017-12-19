@@ -20,8 +20,7 @@ error_logger = logging.getLogger('error_logger')
 @staff_member_required
 def payments_list(request): 
     try:
-        options = PaymentOption.objects.all().order_by('-id')
-        #expense_types = ExpenseType.objects.all()
+        options = PaymentOption.objects.all().exclude(name='Loyalty Points').order_by('-id')
         page = request.GET.get('page', 1)
         paginator = Paginator(options, 10)
         try:
@@ -224,7 +223,7 @@ def option_searchs(request):
             sz = list_sz
 
         if q is not None:
-            options = PaymentOption.objects.filter(
+            options = PaymentOption.objects.exclude(name='Loyalty Points').filter(
                 Q(name__icontains=q) |
                 Q(description__icontains=q)                
                 ).order_by('-id')
@@ -252,8 +251,7 @@ def options_paginate(request):
     p2_sz = request.GET.get('psize')
     select_sz = request.GET.get('select_size')
     if request.GET.get('gid'):
-        #type = ExpenseType.objects.get(pk=request.GET.get('gid'))
-        options = PaymentOption.objects.filter(expense_type=type.name)
+        options = PaymentOption.objects.exclude(name='Loyalty Points').filter(expense_type=type.name)
         if p2_sz:
             paginator = Paginator(options, int(p2_sz))
             options = paginator.page(page)
@@ -269,7 +267,7 @@ def options_paginate(request):
         return TemplateResponse(request,'dashboard/payment/options/p2.html',{'options':options, 'pn':paginator.num_pages,'sz':10,'gid':request.GET.get('gid')})
     else:
         try:
-            options = PaymentOption.objects.all().order_by('-id')
+            options = PaymentOption.objects.all().exclude(name='Loyalty Points').order_by('-id')
             if list_sz:
                 paginator = Paginator(options, int(list_sz))
                 options = paginator.page(page)

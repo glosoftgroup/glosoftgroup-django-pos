@@ -7,6 +7,7 @@ from rest_framework.serializers import (
 from django.contrib.auth import get_user_model
 from ...customer.models import Customer
 from ...sale.models import PaymentOption
+from ...site.models import SiteSettings
 from saleor.credit.models import Credit
 User = get_user_model()
 
@@ -29,11 +30,7 @@ class CustomerListSerializer(serializers.ModelSerializer):
                  )
 
     def get_cash_equivalency(self, obj):
-        points_eq = PaymentOption.objects.filter(name='Loyalty Points')
-        if not points_eq.exists():
-            points_eq = 0
-        else:
-            points_eq = points_eq.get().loyalty_point_equiv
+        points_eq = SiteSettings.objects.get(pk=1).loyalty_point_equiv
         if points_eq != 0:
                 return obj.loyalty_points/Decimal(points_eq)
         return 0

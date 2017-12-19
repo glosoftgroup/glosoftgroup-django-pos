@@ -21,13 +21,21 @@
 <div class="row">
   <div class="col-md-12" style="margin-bottom:10px;">
         <a class="btn btn-primary pull-left legitRipple" href="{% url 'dashboard:customers' %}"><i class="icon-arrow-left13 position-left"></i> Back to customers list</a>
-        <a class="btn btn-primary pull-right legitRipple" data-url="" href="{% url 'dashboard:customer-edit' pk=user.pk %}"><i class="fa fa-file-pdf-o position-left"></i> EDIT</a>
+        <a class="btn btn-primary ml-15 legitRipple" data-url="" href="{% url 'dashboard:customer-edit' pk=user.pk %}">
+          <i class="icon-pencil6 position-left"></i>
+          EDIT
+        </a>
+        <a class="btn btn-primary pull-right legitRipple" id="printBtn" data-url="" pk=user.pk %}">
+          <i class="fa fa-file-pdf-o position-left"></i> Print
+        </a>
   </div>
-  <div class="col-md-4">
-  {% include 'dashboard/customer/partials/profile.html' with customer=user %}
-  </div>
-  <div class="col-md-7">
-  {% include 'dashboard/customer/partials/report_summary.html' with customer=user %}
+  <div id="printme">
+    <div class="col-md-4">
+    {% include 'dashboard/customer/partials/profile.html' with customer=user %}
+    </div>
+    <div class="col-md-8">
+    {% include 'dashboard/customer/partials/report_summary.html' with customer=user %}
+    </div>
   </div>
   
 

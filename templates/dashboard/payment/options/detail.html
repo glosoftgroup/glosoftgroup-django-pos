@@ -1,21 +1,27 @@
 {% if option %}
+{% load site_settings %}
     <div class=" detail-column">
         
 
           <div class="form-group">            
-              <label class="text-left" style="font-weight:500">option name:</label>
+              <label class="text-left" style="font-weight:500">
+                  Option name:<span class="text-danger">*</span>
+              </label>
             
               <input type="text" value="{{option.name}}" {{disabled}} name="optname" id="optname" class="form-control">
             </div>
        
           <div class="form-group">            
-              <label class="text-left" style="font-weight:500">Loyalty points equiv:</label>            
+              <label class="text-left" style="font-weight:500"><span class="text-bold">{{'DEFAULT_CURRENCY'|site_settings}}</span>
+                        equivalent to 1 Point:
+                  <span class="text-danger">*</span>
+              </label>
               <input type="number" value="{{option.loyalty_point_equiv}}" name="loyalty_point_equiv" id="loyalty_point_equiv" class="form-control">
             
           </div>           
       
-        
-        <div class="col-md-12">
+
+        <div class="">
           <div class="form-group">
             <label style="font-weight:500">Description</label>
             <textarea name='optdescription' id="optdescription" class="form-control">{{option.description}}</textarea>
