@@ -62,7 +62,7 @@
       <!-- Header and footer fixed -->
       <div class="panel panel-flat">
           <div class="panel-body">
-            <div class="table-responsives">
+            <div class="tableresponsives">
               <table class="table table-striped table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;">
                     <thead>
                       <tr class="bg-primary">
@@ -217,6 +217,7 @@
 <script type="text/javascript">
   var paginateUrl = "{% url 'dashboard:customer-credit-paginate' %}";
   var searchUrl = "{% url 'dashboard:customer-credit-search' %}";
+  var csrfmiddlewaretoken  = jQuery("[name=csrfmiddlewaretoken]").val();
   $(document).ready(function() {    
         $('.bootpag-callback').bootpag({
             total: parseInt({{pn}}),
@@ -335,9 +336,14 @@
         .then(function (dataUrl) {
             var img = new Image();
             img.src = dataUrl;
-            console.log(img.src);
-            $.get("{% url 'dashboard:costomer_loyalty_points_pdf' %}",{image:dataUrl}, function(data){
-                      window.open("data:application/pdf," + escape(data));
+            $.post("{% url 'dashboard:costomer_loyalty_points_pdf' %}",{image:dataUrl, csrfmiddlewaretoken: csrfmiddlewaretoken}, function(data){
+                      //window.open("data:application/pdf," + escape(data));
+                     var file = new Blob([data], { type: 'application/pdf' });
+                     var fileURL = URL.createObjectURL(file);
+                     var win = window.open(name="_parent");
+
+                     win.document.write('<iframe src="' + fileURL + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>')
+
            });
         })
         .catch(function (error) {

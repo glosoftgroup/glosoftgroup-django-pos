@@ -1,25 +1,15 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
+
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Min, Sum, Avg, F, Q
 
-from ...core.utils import get_paginator_items
 from ..views import staff_member_required
-from ...userprofile.models import User, UserTrail
+
 from ...customer.models import Customer
-from ...sale.models import (Sales, SoldItem, DrawerCash)
+from ...sale.models import (Sales, SoldItem)
 from ...credit.models import Credit
 from ...utils import render_to_pdf, default_logo
 from datetime import date
@@ -442,11 +432,12 @@ def credit_pagination(request):
         users = paginator.page(paginator.num_pages)
     return TemplateResponse(request, 'dashboard/customer/pagination/credit_paginate.html', {"users":users})
 
+
 @staff_member_required
 def costomer_loyalty_points_pdf(request):
     try:
-        image = request.GET.get('image')
-        sales_date = request.GET.get('date')
+        image = request.POST.get('image')
+        sales_date = request.POST.get('date')
         if not sales_date:
             sales_date = None
 
@@ -459,6 +450,11 @@ def costomer_loyalty_points_pdf(request):
             'sales_date': sales_date
         }
         pdf = render_to_pdf('dashboard/customer/pdf/loyalty_points.html', data)
-        return HttpResponse(pdf, content_type='application/pdf')
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'filename=some_file.pdf'
+
+
+        return response
     except ObjectDoesNotExist as e:
+        print e
         error_logger.error(e)

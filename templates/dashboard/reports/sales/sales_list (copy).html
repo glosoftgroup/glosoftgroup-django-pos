@@ -28,7 +28,7 @@
 <div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
-
+     
         <div class="panel-body search-panel">
             <div class="col-md-4">
              <label>Search Sales (for date format: yyyy-mm-dd)</label>
@@ -44,7 +44,7 @@
               <div class="form-group">
                  <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="none">None</option>
-                     <option value="list">sales list</option>
+                     <option value="list">sales list</option>                      
                      <option value="category">category sales chart</option>
                      <option value="items">items sales chart</option>
                      <option value="discount">Items Discount Chart</option>
@@ -137,8 +137,8 @@
               </div>
               {% if sales %}
               <div class="my-paginate" style="margin-top:20px;">
-         <div class="row">
-         <div class="col-md-12">
+         <div class="row">   
+         <div class="col-md-12">               
           <div class="col-md-4">
            <div class="col-md-12">
             <div class="col-md-6 mt-10">
@@ -158,7 +158,7 @@
           </div>
           <div class="col-md-4">
            <div class="text-center bootpag-callback" style="">
-             <div class="my-paginate">
+             <div class="my-paginate"> 
              <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
              </div>
             </div>
@@ -169,7 +169,7 @@
              </div>
             </div>
           </div>
-         </div>
+         </div>                 
          <input type="hidden" id="page_size" val="">
               </div>
               {% endif %}
@@ -237,7 +237,7 @@ function convertDomToPng(url,date=null)
     .then(function (dataUrl) {
         var img = new Image();
         img.src = dataUrl;
-        $.post(url,{image:dataUrl, date:date, csrfmiddlewaretoken:csrfmiddlewaretoken}, function(data){
+        $.post(url,{image:dataUrl, date:date, csrfmiddlewaretoken: csrfmiddlewaretoken}, function(data){
             openPdf(data);
        });
     })
@@ -257,7 +257,7 @@ $(document).ready(function(){
         leaps: true,
         firstLastUse: true,
         first: 'First',
-        last: 'Last',
+        last: 'Last',       
         wrapClass: 'pagination',
         activeClass: 'active',
         disabledClass: 'disabled',
@@ -294,9 +294,9 @@ $(document).ready(function(){
                $.get("{% url 'dashboard:sales_product_chart' %}", {date:group_id},function(data){
                       $('#pagination-div').html(data)
                 });
-       }else if((categs == 'discount') || (categs == 'discount' && listSizeVal) || (categs == 'discount' && searchData) || (categs == 'discount' && listSizeVal && searchData) ){
-                 $.get("{% url 'dashboard:sales_discount_chart' %}", {date:group_id},function(data){
-                        $('#pagination-div').html(data)
+       }else if((categs == 'discount') || (categs == 'discount' && listSizeVal) || (categs == 'discount' && searchData) || (categs == 'discount' && listSizeVal && searchData) ){   
+                 $.get("{% url 'dashboard:sales_discount_chart' %}", {date:group_id},function(data){    
+                        $('#pagination-div').html(data)   
                   });
        }else if((categs == 'user') || (categs == 'user' && listSizeVal) || (categs == 'user' && searchData) || (categs == 'user' && listSizeVal && searchData) ){
                $.get("{% url 'dashboard:sales_user_chart' %}", {date:group_id},function(data){
@@ -426,15 +426,15 @@ $(document).ready(function(){
                       $('#pagination-div').html(data)
                       updateSelectListnSearch();
                 });
-        }else if(sv == 'discount' && date){
-              $.get("{% url 'dashboard:sales_discount_chart' %}", {date:date}, function(data){
-                        $('#pagination-div').html(data)
-                        updateSelectListnSearch();
-                  });
-          }else if(sv == 'discount'){
-              $.get("{% url 'dashboard:sales_discount_chart' %}", function(data){
-                        $('#pagination-div').html(data)
-                        updateSelectListnSearch();
+        }else if(sv == 'discount' && date){   
+              $.get("{% url 'dashboard:sales_discount_chart' %}", {date:date}, function(data){    
+                        $('#pagination-div').html(data)   
+                        updateSelectListnSearch();    
+                  });   
+          }else if(sv == 'discount'){   
+              $.get("{% url 'dashboard:sales_discount_chart' %}", function(data){   
+                        $('#pagination-div').html(data)   
+                        updateSelectListnSearch();    
                   });
         }else if(sv == 'user' && date){
             $.get("{% url 'dashboard:sales_user_chart' %}",{date:date}, function(data){
@@ -477,29 +477,144 @@ $(document).ready(function(){
             var scategory = $('.sales-category').find(":selected").val();
 
             if(date && (scategory == 'category')){
-                    convertDomToPng("{% url 'dashboard:reports_sales_category_pdf' %}",date);
+                    var url = "{% url 'dashboard:reports_sales_category_pdf' %}";
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.post(url,{image:dataUrl, date:date, csrfmiddlewaretoken: csrfmiddlewaretoken}, function(data){
+                            openPdf(data);
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
             }else if(scategory == 'category'){
-                    convertDomToPng("{% url 'dashboard:reports_sales_category_pdf' %}",date);
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_category_pdf' %}",{image:dataUrl}, function(data){
+                              openPdf(data);
+
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
             }else if(date && (scategory == 'items')){
-                    convertDomToPng("{% url 'dashboard:reports_sales_items_pdf' %}",date);
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_items_pdf' %}",{image:dataUrl, date:date}, function(data){
+                              openPdf(data);
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
             }else if(scategory == 'items'){
-                    convertDomToPng("{% url 'dashboard:reports_sales_items_pdf' %}",date);
+                    var url = "{% url 'dashboard:reports_sales_items_pdf' %}";
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.post(url,{image:dataUrl, date:date, csrfmiddlewaretoken: csrfmiddlewaretoken}, function(data){
+                            openPdf(data);
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
              }else if(date && (scategory == 'discount')){               }else if(date && (scategory == 'items')){
-                    convertDomToPng("{% url 'dashboard:reports_discount_items_pdf' %}",date);
+                      var node = document.getElementById('pagination-div')    
+                      domtoimage.toPng(node)    
+                      .then(function (dataUrl) {    
+                          var img = new Image();    
+                          img.src = dataUrl;    
+                          $.get("{% url 'dashboard:reports_discount_items_pdf' %}",{image:dataUrl, date:date}, function(data){    
+                                  openPdf(data);
 
-              }else if(scategory == 'discount'){
-                     convertDomToPng("{% url 'dashboard:reports_discount_items_pdf' %}",date);
+                         });    
+                      })    
+                      .catch(function (error) {   
+                          console.error('oops, something went wrong!', error);    
+                      });   
+              }else if(scategory == 'discount'){    
+                      var node = document.getElementById('pagination-div')    
+                      domtoimage.toPng(node)    
+                      .then(function (dataUrl) {    
+                          var img = new Image();    
+                          img.src = dataUrl;    
+                          $.get("{% url 'dashboard:reports_discount_items_pdf' %}",{image:dataUrl}, function(data){   
+                                  openPdf(data);
 
+                         });    
+                      })    
+                      .catch(function (error) {   
+                          console.error('oops, something went wrong!', error);    
+                      });
             }else if(date && (scategory == 'user')){
-                    convertDomToPng("{% url 'dashboard:reports_sales_user_pdf' %}",date);
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl, date:date}, function(data){
+                                 openPdf(data);
+
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
             }else if(scategory == 'user'){
-                    convertDomToPng("{% url 'dashboard:reports_sales_user_pdf' %}",date);
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl}, function(data){
+                              openPdf(data);
+
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
             }else if(date && (scategory == 'terminal')){
-                    convertDomToPng("{% url 'dashboard:reports_sales_tills_pdf' %}",date);
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_tills_pdf' %}",{image:dataUrl, date:date}, function(data){
+                              openPdf(data);
 
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
             }else if(scategory == 'terminal'){
-                    convertDomToPng("{% url 'dashboard:reports_sales_tills_pdf' %}",date);
+                    var node = document.getElementById('pagination-div')
+                    domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        $.get("{% url 'dashboard:reports_sales_tills_pdf' %}",{image:dataUrl}, function(data){
+                              openPdf(data);
 
+                       });
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
             }else if (searchData && date ){
                 $.get(url, {q:searchData, gid:date}, function(data){
                            openPdf(data);

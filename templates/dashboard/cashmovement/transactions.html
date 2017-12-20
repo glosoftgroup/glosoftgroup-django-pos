@@ -69,7 +69,6 @@
               <table class="table table-striped table-hover fixed_headers">
                     <thead style="border-top:1px solid #ddd;">
                       <tr class="bg-primary">
-                        <th>#ID</th>
                         <th>Till</th>
                         <th>Cashier</th>
                         <th>Supervisor</th>
@@ -83,7 +82,6 @@
                    {% if transactions %}
                       {% for transaction in transactions %}
                       <tr class='clickable-row' id="{{user.pk }}">
-                        <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{ forloop.counter }}</td>
 
                         <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">
                         {{transaction.terminal}}
@@ -187,7 +185,6 @@
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
 <script type="text/javascript">
-
   $(document).ready(function() {
         $(".td").click(function() {
             window.location = $(this).data("href");
@@ -202,7 +199,7 @@
 
     $('.bootpag-callback').bootpag({
         total: parseInt({{pn}}),
-        maxVisible: 5,
+        maxVisible: 4,
         leaps: true,
         firstLastUse: true,
         first: 'First',

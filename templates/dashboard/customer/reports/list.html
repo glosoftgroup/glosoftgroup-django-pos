@@ -205,6 +205,7 @@
      </div>
    </div>
  </div>
+{% csrf_token %}
  <input type="hidden" id="pageUrls" class="pageUrls" data-iscreditable="{% url 'dashboard:is_creditable' %}" >
  <!-- /blue modal -->
 {% endblock%}
@@ -220,6 +221,7 @@
 <script type="text/javascript">
   var paginateUrl = "{% url 'dashboard:customer-report-paginate' %}";
   var searchUrl = "{% url 'dashboard:customer-report-search' %}";
+  var csrfmiddlewaretoken  = jQuery("[name=csrfmiddlewaretoken]").val();
   $(document).ready(function() {    
         $('.bootpag-callback').bootpag({
             total: parseInt({{pn}}),
@@ -338,9 +340,15 @@
         .then(function (dataUrl) {
             var img = new Image();
             img.src = dataUrl;
-            console.log(img.src);
-            $.get("{% url 'dashboard:costomer_loyalty_points_pdf' %}",{image:dataUrl}, function(data){
-                      window.open("data:application/pdf," + escape(data));
+            //console.log(img.src);
+            $.post("{% url 'dashboard:costomer_loyalty_points_pdf' %}",
+            {image:dataUrl, csrfmiddlewaretoken: csrfmiddlewaretoken}, function(data){
+                     var file = new Blob([data], { type: 'application/pdf' });
+                     var fileURL = URL.createObjectURL(file);
+                     var win = window.open(name="_parent");
+
+                     win.document.write('<iframe src="' + fileURL + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>')
+
            });
         })
         .catch(function (error) {

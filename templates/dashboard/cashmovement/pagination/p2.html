@@ -11,7 +11,7 @@
           <table class="table  table-hover datatable-header-footer" style="border-bottom:1px solid #ddd;"> 
                 <thead>
                   <tr class="bg-primary">
-                    <th>#ID</th>
+
                         <th>Terminal</th>
                         <th>Cashier</th>
                         <th>Supervisor</th>
@@ -24,7 +24,7 @@
                 {% if transactions %}
                       {% for transaction in transactions %}
                       <tr class='clickable-row' id="{{user.pk }}">
-                        <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">{{ forloop.counter }}</td>
+
 
                         <td class="td" data-href="{% url 'dashboard:terminal-detail' pk=user.pk %}">
                         {{transaction.terminal}}
