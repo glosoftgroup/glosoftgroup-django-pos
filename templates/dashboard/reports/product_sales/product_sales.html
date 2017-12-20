@@ -195,6 +195,38 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript">
+
+//global variables
+var csrfmiddlewaretoken  = jQuery("[name=csrfmiddlewaretoken]").val();
+
+//open pdf on new window
+function openPdf(data){
+     var file = new Blob([data], { type: 'application/pdf' });
+     var fileURL = URL.createObjectURL(file);
+     var win = window.open(name="_parent");
+     win.document.write('<iframe src="' + fileURL + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>')
+
+}
+
+// convert dom to png
+function convertDomToPng(url,date=null)
+{
+    if(!date){
+        date = '';
+    }
+    var node = document.getElementById('pagination-div')
+    domtoimage.toPng(node)
+    .then(function (dataUrl) {
+        var img = new Image();
+        img.src = dataUrl;
+        $.post(url,{image:dataUrl, date:date, csrfmiddlewaretoken:csrfmiddlewaretoken}, function(data){
+            openPdf(data);
+       });
+    })
+    .catch(function (error) {
+        console.error('oops, something went wrong!', error);
+    });
+}
 $(document).ready(function(){
 
      $('.bootpag-callback').bootpag({
@@ -330,55 +362,7 @@ $(document).ready(function(){
                     }});
             }
         }
-        <!--}else if(sv == 'qlh' && date && listSizeVal && searchData){-->
-            <!--if(listSizeVal != '0'){-->
-               <!--$.ajax({ url: "{% url 'dashboard:product_sales_search' %}",type: 'GET',data: {order:sv, page:1, size:listSizeVal, gid:date, q:searchData}, async:false,success: function(data){-->
-                      <!--$('#pagination-div').html(data);-->
-                <!--}});-->
-            <!--}else{-->
-               <!--$.ajax({ url: "{% url 'dashboard:product_sales_search' %}",type: 'GET',data: {order:sv, page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){-->
-                      <!--$('#pagination-div').html(data);-->
-                <!--}});-->
-            <!--}-->
-        <!--}else if(sv == 'qlh' && listSizeVal && searchData){-->
-            <!--if(listSizeVal != '0'){-->
-               <!--$.ajax({ url: "{% url 'dashboard:product_sales_search' %}",type: 'GET',data: {order:sv, page:1, size:listSizeVal, q:searchData}, async:false,success: function(data){-->
-                      <!--$('#pagination-div').html(data);-->
-                <!--}});-->
-            <!--}else{-->
-               <!--$.ajax({ url: "{% url 'dashboard:product_sales_search' %}",type: 'GET',data: {order:sv, page:1, size:10, q:searchData}, async:false,success: function(data){-->
-                      <!--$('#pagination-div').html(data);-->
-                <!--}});-->
-            <!--}-->
-        <!--}else if(sv == 'qlh' && listSizeVal && date){-->
-            <!--if(listSizeVal != '0'){-->
-               <!--$.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {order:sv, page:1, size:listSizeVal, gid:date}, async:false,success: function(data){-->
-                      <!--$('#pagination-div').html(data);-->
-                <!--}});-->
-            <!--}else{-->
-               <!--$.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {order:sv, page:1, size:10, gid:date}, async:false,success: function(data){-->
-                      <!--$('#pagination-div').html(data);-->
-                <!--}});-->
-            <!--}-->
-        <!--}else if(sv == 'qlh' && date){-->
-         <!--$.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {order:sv, page:1, size:10, gid:date}, async:false,success: function(data){-->
-                  <!--$('#pagination-div').html(data);-->
-            <!--}});-->
-        <!--}else if(sv == 'qlh' && searchData){-->
-         <!--$.ajax({ url: "{% url 'dashboard:product_sales_search' %}",type: 'GET',data: {order:sv, page:1, size:10, gid:date,q:searchData}, async:false,success: function(data){-->
-                  <!--$('#pagination-div').html(data);-->
-            <!--}});-->
-        <!--}else if(sv == 'qlh' && listSizeVal){-->
-            <!--if(listSizeVal != '0'){-->
-                 <!--$.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {order:sv, page:1, size:listSizeVal}, async:false,success: function(data){-->
-                          <!--$('#pagination-div').html(data);-->
-                    <!--}});-->
-            <!--}else{-->
-            <!--$.ajax({ url: "{% url 'dashboard:product_sales_paginate' %}",type: 'GET',data: {order:sv, page:1, size:10}, async:false,success: function(data){-->
-                          <!--$('#pagination-div').html(data);-->
-                    <!--}});-->
-            <!--}-->
-        <!--}-->
+
   });
 
    $('.export-sz').selectpicker({
@@ -400,19 +384,19 @@ $(document).ready(function(){
 
             if (searchData && date ){
                 $.get(url, {q:searchData, gid:date, order:scategory}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else if (searchData){
                 $.get(url, {q:searchData, order:scategory}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                           openPdf(data);
                 });
             }else if (date){
                 $.get(url, {gid:date, order:scategory}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                           openPdf(data);
                 });
             }else{
                 $.get(url, {order:scategory},function(data){
-                          window.open("data:application/pdf," + escape(data));
+                           openPdf(data);
                });
             }
 
