@@ -106,9 +106,7 @@ class SalesListSerializer(serializers.ModelSerializer):
                  'payment_options',
                  'status',
                  'total_tax',
-                 'discount_amount',
-                 'transaction_code',
-                 'car_registration'
+                 'discount_amount'
                 )
 
     def get_cashier(self,obj):
@@ -140,9 +138,7 @@ class SalesSerializer(serializers.ModelSerializer):
                  'status',                
                  'payment_data',
                  'total_tax',
-                 'discount_amount',
-                 'car_registration',
-                 'transaction_code'
+                 'discount_amount'
                 )
 
     def validate_total_net(self, value):
@@ -246,8 +242,6 @@ class SalesSerializer(serializers.ModelSerializer):
         sales.mobile = validated_data.get('mobile')
         sales.discount_amount = validated_data.get('discount_amount')
         sales.customer_name = validated_data.get('customer_name')
-        sales.car_registration = validated_data.get('car_registration')
-        sales.transaction_code = validated_data.get('transaction_code')
         sales.save()
 
         # add payment options
