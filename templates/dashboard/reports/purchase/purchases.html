@@ -236,6 +236,15 @@ $(document).ready(function(){
         }
     });
 
+    //open pdf on new window
+function openPdf(data){
+     var file = new Blob([data], { type: 'application/pdf' });
+     var fileURL = URL.createObjectURL(file);
+     var win = window.open(name="_parent");
+     win.document.write('<iframe src="' + fileURL + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>')
+
+}
+
    $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
@@ -250,19 +259,19 @@ $(document).ready(function(){
           var url = "{% url 'dashboard:reports_purchase_pdf' %}";
           if(searchData && date){
               $.get(url, {q:searchData, gid:date}, function(data){
-                   window.open("data:application/pdf," + escape(data));
+                   openPdf(data);
               });
           }else if(searchData){
               $.get(url, {q:searchData}, function(data){
-                   window.open("data:application/pdf," + escape(data));
+                   openPdf(data);
               });
           }else if(date){
               $.get(url, {gid:date}, function(data){
-                   window.open("data:application/pdf," + escape(data));
+                   openPdf(data);
               });
           }else{
               $.get(url, function(data){
-                   window.open("data:application/pdf," + escape(data));
+                   openPdf(data);
               });
           }
 

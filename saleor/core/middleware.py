@@ -73,7 +73,6 @@ class SettingsMiddleware(object):
         fm = FetchMac()
 
         number = fm.getnumber()
-        print number
 
         if request.path.startswith(excluded_path):
             return None
