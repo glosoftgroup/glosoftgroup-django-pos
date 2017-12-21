@@ -259,6 +259,34 @@ var userChartUrl = "{% url 'dashboard:sales_user_chart' %}";
 var terminalChartUrl  ="{% url 'dashboard:sales_terminal_chart' %}";
 var dynamicData = {}
 
+//open pdf on new window
+function openPdf(data){
+     var file = new Blob([data], { type: 'application/pdf' });
+     var fileURL = URL.createObjectURL(file);
+     var win = window.open(name="_parent");
+     win.document.write('<iframe src="' + fileURL + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>')
+
+}
+
+// convert dom to png
+function convertDomToPng(url,date=null)
+{
+    if(!date){
+        date = '';
+    }
+    var node = document.getElementById('pagination-div')
+    domtoimage.toPng(node)
+    .then(function (dataUrl) {
+        var img = new Image();
+        img.src = dataUrl;
+        $.post(url,{image:dataUrl, date:date, csrfmiddlewaretoken:csrfmiddlewaretoken}, function(data){
+            openPdf(data);
+       });
+    })
+    .catch(function (error) {
+        console.error('oops, something went wrong!', error);
+    });
+}
 function paginationData(dynamicData,url,method){
   dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
   return $.ajax({
@@ -338,7 +366,8 @@ $(document).ready(function(){
         
             paginationData(dynamicData,url,'GET').
              done(function(data){
-                window.open("data:application/pdf," + escape(data));
+                //window.open("data:application/pdf," + escape(data));
+                openPdf(data);
              })
             .fail();
 

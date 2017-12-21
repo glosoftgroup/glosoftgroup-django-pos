@@ -401,6 +401,15 @@ $(document).ready(function(){
         }
   });
 
+  //open pdf on new window
+function openPdf(data){
+     var file = new Blob([data], { type: 'application/pdf' });
+     var fileURL = URL.createObjectURL(file);
+     var win = window.open(name="_parent");
+     win.document.write('<iframe src="' + fileURL + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>')
+
+}
+
    $('.export-sz').selectpicker({
           iconBase: 'fa',
           tickIcon: 'fa-dot-circle-o',
@@ -421,27 +430,27 @@ $(document).ready(function(){
 
             if(searchData && (scategory == 'items')){
                 $.get(url2, {q:searchData}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else if(scategory == 'items'){
                 $.get(url2, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else if((scategory == 'sales') && date && searchData){
                 $.get(url, {q:searchData, gid:date}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else if((scategory == 'sales') && date){
                 $.get(url, {gid:date}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else if((scategory == 'sales') && searchData){
                 $.get(url, {q:searchData}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else if(scategory == 'sales'){
                 $.get(url, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                });
             }else if(date && (scategory == 'user')){
                     var node = document.getElementById('pagination-div')
@@ -450,7 +459,7 @@ $(document).ready(function(){
                         var img = new Image();
                         img.src = dataUrl;
                         $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl, date:date}, function(data){
-                                  window.open("data:application/pdf," + escape(data));
+                                  openPdf(data);
                        });
                     })
                     .catch(function (error) {
@@ -458,19 +467,19 @@ $(document).ready(function(){
                     });
             }else if (searchData && date ){
                 $.get(url, {q:searchData, gid:date}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else if (searchData){
                 $.get(url, {q:searchData}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else if (date){
                 $.get(url, {gid:date}, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                 });
             }else{
                 $.get(url, function(data){
-                          window.open("data:application/pdf," + escape(data));
+                          openPdf(data);
                });
             }
 
