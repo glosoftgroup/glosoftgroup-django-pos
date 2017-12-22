@@ -223,6 +223,9 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+<script > var back_path = "{{request.path}}";</script>
+<script type="text/javascript" src="{% static 'backend/js/pdf/open-pdf.js' %}"></script>
+
 <script type="text/javascript">
 var creditPaginationUrl = "{% url 'dashboard:credit_paginate' %}";
 var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
@@ -311,7 +314,7 @@ $(document).ready(function(){
         
             paginationData(dynamicData,url,'GET').
              done(function(data){
-                window.open("data:application/pdf," + escape(data));
+                openPdf(data); //window.open("data:application/pdf," + escape(data));
              })
             .fail();
 

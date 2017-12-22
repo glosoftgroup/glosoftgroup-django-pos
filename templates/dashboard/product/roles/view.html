@@ -235,6 +235,8 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script > var back_path = "{{request.path}}";</script>
+<script type="text/javascript" src="{% static 'backend/js/pdf/open-pdf.js' %}"></script>
 
 
 
@@ -271,7 +273,9 @@ $(document).ready(function() {
         var ts = $(this).val();
         if(ts == 'pdf'){
           var url = "{% url 'dashboard:products_pdf' %}";
-          window.open(url, '_blank');
+          $.get(url,{}, function(data){
+               openPdf(data);
+          });
 
         }else if(ts=='excel'){
           window.location="{% url 'dashboard:products_export_csv' %}";
