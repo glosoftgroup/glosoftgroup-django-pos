@@ -250,6 +250,9 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+<script > var back_path = "{{request.path}}";</script>
+<script type="text/javascript" src="{% static 'backend/js/pdf/open-pdf.js' %}"></script>
+
 <script type="text/javascript">
 var creditPaginationUrl = "{% url 'dashboard:allocate_paginate' %}";
 var creditSearchUrl = "{% url 'dashboard:allocate_search' %}";
@@ -258,15 +261,6 @@ var productChartUrl = "{% url 'dashboard:sales_product_chart' %}";
 var userChartUrl = "{% url 'dashboard:sales_user_chart' %}";
 var terminalChartUrl  ="{% url 'dashboard:sales_terminal_chart' %}";
 var dynamicData = {}
-
-//open pdf on new window
-function openPdf(data){
-     var file = new Blob([data], { type: 'application/pdf' });
-     var fileURL = URL.createObjectURL(file);
-     var win = window.open(name="_parent");
-     win.document.write('<iframe src="' + fileURL + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>')
-
-}
 
 // convert dom to png
 function convertDomToPng(url,date=null)

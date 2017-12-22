@@ -6,13 +6,13 @@
 {% load humanize %}
 
 {% block title %}
-  Sales List Report
+  Sales Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:sales_tax_list' %}">Sales  Tax Report</a></li>
+     <li class="active"><a href="{% url 'dashboard:sales_list' %}">Sales Reports</a></li>
  {% endblock %}
 
-{% block menu_report_tax2_class %}active{% endblock %}
+{% block menu_report_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
    .highcharts-credits{display:none;}
@@ -28,7 +28,7 @@
 <div class="row animated fadeIn">
     <div class="col-md-12">
       <div class="panel panel-flat">
-     
+
         <div class="panel-body search-panel">
             <div class="col-md-4">
              <label>Search Sales (for date format: yyyy-mm-dd)</label>
@@ -39,16 +39,16 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-2" style="display:none;">
+            <div class="col-md-2">
                 <label>categories</label>
               <div class="form-group">
                  <select class="bootstrap-select sales-category" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="none">None</option>
                      <option value="list">sales list</option>
-                     <option value="summary">sales summary</option>
-                    <option value="category">category sales chart</option>
-                    <option value="items">items sales chart</option>
-                    <option value="user">user sales chart</option>
+                     <option value="category">category sales chart</option>
+                     <option value="items">items sales chart</option>
+                     <option value="discount">Items Discount Chart</option>
+                     <option value="user">user sales chart</option>
                      <option value="terminal">till sales chart</option>
                   </select>
               </div>
@@ -100,38 +100,45 @@
                         <tr class="bg-primary">
                           <th>Transaction Date</th>
                           <th>Receipt No</th>
-                          <th>Customer Name</th>
+                          <th>Customer</th>
+                          <th>Cashier</th>
+                          <th>Payment Mode</th>
                           <th>Quantity</th>
-                          <th class="text-center">Total Sales (KShs)</th>
-                          <th class="text-center">Total Tax (KShs)</th>
+                          <th>Total Sales</th>
+                            <th class="text-center">Total Tax</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
                         {% if sales %}
                         {% for sale in sales %}
                           <tr class='clickable-row' id="{{sale.pk }}">
-                            <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
-                              <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}">{% if sale.customer %}{{sale.customer}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.created|date:"d-m-Y H:i a"}}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.invoice_number }}</td>
+                              <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.customer_name %}{{sale.customer_name}}{% else %} Customer {% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{% if sale.user.name %}{{sale.user.name}}{% else %}{{sale.user.email}}{% endif %}</td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">
+
+                                {% if sale.payment_options %}
+                                  {{sale.payment_options.all|join:", "}}
+                                {% else %} ---
+                                {% endif %}
+                            </td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
-                            <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
+                            <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                               <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
-                         <tr><td colspan="6"><h2 class="text-center">No Sales Summary Available</h2></td></tr>
+                         <tr><td colspan="7"><h2 class="text-center">No Sales Summary Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
                  </table>
               </div>
               {% if sales %}
-              <div class="my-paginate">
-                 <style type="text/css">
-           .pagination{margin-bottom: 0px;}
-         </style> 
-         <div class="row">   
-         <div class="col-md-12">               
+              <div class="my-paginate" style="margin-top:20px;">
+         <div class="row">
+         <div class="col-md-12">
           <div class="col-md-4">
            <div class="col-md-12">
             <div class="col-md-6 mt-10">
@@ -151,7 +158,7 @@
           </div>
           <div class="col-md-4">
            <div class="text-center bootpag-callback" style="">
-             <div class="my-paginate"> 
+             <div class="my-paginate">
              <ul class="pagination bootpag pagination-flat pagination-sm" style="margin-bottom: 0px;"></ul>
              </div>
             </div>
@@ -162,7 +169,7 @@
              </div>
             </div>
           </div>
-         </div>                 
+         </div>
          <input type="hidden" id="page_size" val="">
               </div>
               {% endif %}
@@ -172,11 +179,15 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Total Sales: Kshs {{total_sales_amount.total_net__sum}}<br />
+                     Total Sales: Kshs {{total_sales_amount.total_net__sum}} <br>
                    Total Tax: Kshs {{ total_tax_amount.total_tax__sum}}
                  </p>
                   <p class="text-center"> Thank you for partnering with us.<br />
-                  <span>Report pullled by User</span></p>
+                  <span>Report pulled by  {% if request.user.name %}
+                        {{request.user.name}}
+                      {% else %}
+                      {{ request.user.email}}
+                      {% endif %}</span></p>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
 
@@ -190,7 +201,7 @@
 
 
 </div>
-
+{% csrf_token %}
 {% endblock%}
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
@@ -203,8 +214,32 @@
 <script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
 <script > var back_path = "{{request.path}}";</script>
 <script type="text/javascript" src="{% static 'backend/js/pdf/open-pdf.js' %}"></script>
-
 <script type="text/javascript">
+
+//global variables
+var csrfmiddlewaretoken  = jQuery("[name=csrfmiddlewaretoken]").val();
+
+
+
+// convert dom to png
+function convertDomToPng(url,date=null)
+{
+    if(!date){
+        date = '';
+    }
+    var node = document.getElementById('pagination-div')
+    domtoimage.toPng(node)
+    .then(function (dataUrl) {
+        var img = new Image();
+        img.src = dataUrl;
+        $.post(url,{image:dataUrl, date:date, csrfmiddlewaretoken:csrfmiddlewaretoken}, function(data){
+            openPdf(data);
+       });
+    })
+    .catch(function (error) {
+        console.error('oops, something went wrong!', error);
+    });
+}
 $(document).ready(function(){
 
     $(".td").click(function(){
@@ -217,7 +252,7 @@ $(document).ready(function(){
         leaps: true,
         firstLastUse: true,
         first: 'First',
-        last: 'Last',       
+        last: 'Last',
         wrapClass: 'pagination',
         activeClass: 'active',
         disabledClass: 'disabled',
@@ -226,8 +261,8 @@ $(document).ready(function(){
         lastClass: 'last',
         firstClass: 'first',
         }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+pagination_totalsize);
-            $.get("{% url 'dashboard:sales_tax_paginate' %}",{page:parseInt(num)},function(data){
+            $(".pages-nav").html("Page " + num +" of "+{{pn}});
+            $.get("{% url 'dashboard:sales_paginate' %}",{page:parseInt(num)},function(data){
                $('#tb').html(data);
             });
     }).children('.pagination').addClass('pagination-flat pagination-sm');
@@ -236,13 +271,14 @@ $(document).ready(function(){
         singleDatePicker: true,
         locale:{format: 'YYYY-MM-DD'},
         showDropdowns:true,
-        autoUpdateInput:false
+        autoUpdateInput:false,
+        maxDate: new Date()
     }, function(chosen_date) {
         $('.daterange-single').val(chosen_date.format('YYYY-MM-DD'));
         var group_id = $('.daterange-single').val();
         var searchData = $('.search_user').val();
         var listSizeVal = $('.list-sz').find(":selected").val();
-        var url = "{% url 'dashboard:sales_tax_search' %}";
+        var url = "{% url 'dashboard:sales_search' %}";
        var categs = $('.sales-category').find(":selected").val();
 
        if((categs == 'category') || (categs == 'category' && listSizeVal) || (categs == 'category' && searchData) || (categs == 'category' && listSizeVal && searchData) ){
@@ -253,6 +289,10 @@ $(document).ready(function(){
                $.get("{% url 'dashboard:sales_product_chart' %}", {date:group_id},function(data){
                       $('#pagination-div').html(data)
                 });
+       }else if((categs == 'discount') || (categs == 'discount' && listSizeVal) || (categs == 'discount' && searchData) || (categs == 'discount' && listSizeVal && searchData) ){
+                 $.get("{% url 'dashboard:sales_discount_chart' %}", {date:group_id},function(data){
+                        $('#pagination-div').html(data)
+                  });
        }else if((categs == 'user') || (categs == 'user' && listSizeVal) || (categs == 'user' && searchData) || (categs == 'user' && listSizeVal && searchData) ){
                $.get("{% url 'dashboard:sales_user_chart' %}", {date:group_id},function(data){
                       $('#pagination-div').html(data)
@@ -283,21 +323,21 @@ $(document).ready(function(){
            }
        }else if(listSizeVal && listSizeVal != '0'){
            if(!group_id){
-               $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.get("{% url 'dashboard:sales_tax_paginate' %}",{page:1,gid:group_id, size:listSizeVal},function(data){
+                $.get("{% url 'dashboard:sales_paginate' %}",{page:1,gid:group_id, size:listSizeVal},function(data){
                  $('#pagination-div').html(data);
                });
            }
        }else{
            if(!group_id){
-               $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.get("{% url 'dashboard:sales_tax_paginate' %}",{page:1,gid:group_id},function(data){
+                $.get("{% url 'dashboard:sales_paginate' %}",{page:1,gid:group_id},function(data){
                  $('#pagination-div').html(data);
                });
            }
@@ -313,55 +353,52 @@ $(document).ready(function(){
 
          if(sv == 'list' && date && listSizeVal && searchData){
             if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_tax_search' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date, q:searchData}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url: "{% url 'dashboard:sales_tax_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:10, gid:date, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }
         }else if(sv == 'list' && listSizeVal && searchData){
             if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_tax_search' %}",type: 'GET',data: {page:1, size:listSizeVal, q:searchData}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:listSizeVal, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url: "{% url 'dashboard:sales_tax_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:10, q:searchData}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }
         }else if(sv == 'list' && listSizeVal && date){
             if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal, gid:date}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
             }
         }else if(sv == 'list' && date){
-         $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
+         $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10, gid:date}, async:false,success: function(data){
                   $('#pagination-div').html(data);
             }});
         }else if(sv == 'list' && searchData){
-         $.ajax({ url: "{% url 'dashboard:sales_tax_search' %}",type: 'GET',data: {page:1, size:10, gid:date,q:searchData}, async:false,success: function(data){
+         $.ajax({ url: "{% url 'dashboard:sales_search' %}",type: 'GET',data: {page:1, size:10, gid:date,q:searchData}, async:false,success: function(data){
                   $('#pagination-div').html(data);
             }});
         }else if(sv == 'list' && listSizeVal){
             if(listSizeVal != '0'){
-                 $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+                 $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
             }else{
-            $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+            $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                           $('#pagination-div').html(data);
                     }});
             }
-        }else if(sv == 'summary'){
-            window.location = "{% url 'dashboard:sales_date_chart' %}";
-
         }else if(sv == 'category' && date){
             $.get("{% url 'dashboard:sales_category_chart' %}", {date:date},function(data){
                       $('#pagination-div').html(data)
@@ -384,6 +421,16 @@ $(document).ready(function(){
                       $('#pagination-div').html(data)
                       updateSelectListnSearch();
                 });
+        }else if(sv == 'discount' && date){
+              $.get("{% url 'dashboard:sales_discount_chart' %}", {date:date}, function(data){
+                        $('#pagination-div').html(data)
+                        updateSelectListnSearch();
+                  });
+          }else if(sv == 'discount'){
+              $.get("{% url 'dashboard:sales_discount_chart' %}", function(data){
+                        $('#pagination-div').html(data)
+                        updateSelectListnSearch();
+                  });
         }else if(sv == 'user' && date){
             $.get("{% url 'dashboard:sales_user_chart' %}",{date:date}, function(data){
                       $('#pagination-div').html(data)
@@ -421,128 +468,50 @@ $(document).ready(function(){
             var listSizeVal = $('.list-sz').find(":selected").val();
             var groupSizeVal = $('.group-sz').find(":selected").val();
             var date = $('.daterange-single').val();
-            var url = "{% url 'dashboard:reports_sales_tax_list_pdf' %}";
+            var url = "{% url 'dashboard:reports_sales_list_pdf' %}";
             var scategory = $('.sales-category').find(":selected").val();
 
             if(date && (scategory == 'category')){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_category_pdf' %}",{image:dataUrl, date:date}, function(data){
-                              openPdf(data);
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
+                    convertDomToPng("{% url 'dashboard:reports_sales_category_pdf' %}",date);
             }else if(scategory == 'category'){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_category_pdf' %}",{image:dataUrl}, function(data){
-                              openPdf(data);
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
+                    convertDomToPng("{% url 'dashboard:reports_sales_category_pdf' %}",date);
             }else if(date && (scategory == 'items')){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_items_pdf' %}",{image:dataUrl, date:date}, function(data){
-                             openPdf(data);
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
+                    convertDomToPng("{% url 'dashboard:reports_sales_items_pdf' %}",date);
             }else if(scategory == 'items'){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_items_pdf' %}",{image:dataUrl}, function(data){
-                               openPdf(data);
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
+                    convertDomToPng("{% url 'dashboard:reports_sales_items_pdf' %}",date);
+             }else if(date && (scategory == 'discount')){               }else if(date && (scategory == 'items')){
+                    convertDomToPng("{% url 'dashboard:reports_discount_items_pdf' %}",date);
+
+              }else if(scategory == 'discount'){
+                     convertDomToPng("{% url 'dashboard:reports_discount_items_pdf' %}",date);
+
             }else if(date && (scategory == 'user')){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl, date:date}, function(data){
-                             openPdf(data);
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
+                    convertDomToPng("{% url 'dashboard:reports_sales_user_pdf' %}",date);
             }else if(scategory == 'user'){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_user_pdf' %}",{image:dataUrl}, function(data){
-                             openPdf(data);
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
+                    convertDomToPng("{% url 'dashboard:reports_sales_user_pdf' %}",date);
             }else if(date && (scategory == 'terminal')){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_tills_pdf' %}",{image:dataUrl, date:date}, function(data){
-                             openPdf(data);
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
+                    convertDomToPng("{% url 'dashboard:reports_sales_tills_pdf' %}",date);
+
             }else if(scategory == 'terminal'){
-                    var node = document.getElementById('pagination-div')
-                    domtoimage.toPng(node)
-                    .then(function (dataUrl) {
-                        var img = new Image();
-                        img.src = dataUrl;
-                        $.get("{% url 'dashboard:reports_sales_tills_pdf' %}",{image:dataUrl}, function(data){
-                             openPdf(data);
-                       });
-                    })
-                    .catch(function (error) {
-                        console.error('oops, something went wrong!', error);
-                    });
+                    convertDomToPng("{% url 'dashboard:reports_sales_tills_pdf' %}",date);
+
             }else if (searchData && date ){
                 $.get(url, {q:searchData, gid:date}, function(data){
-                          openPdf(data);
+                           openPdf(data);
+
                 });
             }else if (searchData){
                 $.get(url, {q:searchData}, function(data){
-                          openPdf(data);
+                          //window.open("data:application/pdf," + escape(data));
+                          openPdf(data)
                 });
             }else if (date){
                 $.get(url, {gid:date}, function(data){
-                         openPdf(data);
+                           openPdf(data);
                 });
             }else{
                 $.get(url, function(data){
-                         openPdf(data);
+                           openPdf(data);
                });
             }
 
@@ -560,7 +529,7 @@ $(document).ready(function(){
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
         var date = $('.daterange-single').val();
-        var url = "{% url 'dashboard:sales_tax_search' %}";
+        var url = "{% url 'dashboard:sales_search' %}";
         var scategory = $('.sales-category').find(":selected").val();
 
         if((scategory == 'list' && date && searchData)){
@@ -585,11 +554,11 @@ $(document).ready(function(){
             }
         }else if(scategory == 'list' && date){
             if(listSizeVal != '0'){
-               $.ajax({ url:"{% url 'dashboard:sales_tax_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:"{% url 'dashboard:sales_tax_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }
@@ -617,21 +586,21 @@ $(document).ready(function(){
              }
         }else if(date){
             if(listSizeVal != '0'){
-               $.ajax({ url:"{% url 'dashboard:sales_tax_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_paginate' %}", type: 'GET',data: {page:1, size:listSizeVal, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
             }else{
-               $.ajax({ url:"{% url 'dashboard:sales_tax_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
+               $.ajax({ url:"{% url 'dashboard:sales_paginate' %}", type: 'GET',data: {page:1, size:10, gid:date},success: function(data){
                           $('#pagination-div').html(data);
                 }});
              }
         }else{
            if(listSizeVal != '0'){
-               $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
+               $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:listSizeVal}, async:false,success: function(data){
                   $('#pagination-div').html(data);
               }});
            }else{
-                $.ajax({ url: "{% url 'dashboard:sales_tax_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
+                $.ajax({ url: "{% url 'dashboard:sales_paginate' %}",type: 'GET',data: {page:1, size:10}, async:false,success: function(data){
                       $('#pagination-div').html(data);
                 }});
            }
@@ -663,7 +632,7 @@ $(document).ready(function(){
         var search_text = $(this).val();
         var date = $('.daterange-single').val();
         var listSizeVal = $('.list-sz').find(":selected").val();
-        var url = "{% url 'dashboard:sales_tax_search' %}";
+        var url = "{% url 'dashboard:sales_search' %}";
         var scategory = $('.sales-category').find(":selected").val();
 
         delay(function(){

@@ -166,7 +166,7 @@ def sales_list_pdf( request ):
 					quantity = CreditedItem.objects.filter(credit=sale).aggregate(c=Sum('quantity'))
 					setattr(sale, 'quantity', quantity['c'])
 					sales.append(sale)
-			total_sales_amount = all_sales.aggregate(Sum('total_net'))
+			total_sales_amount = all_sales.filter(created__icontains=date).aggregate(Sum('total_net'))
 
 		elif date:
 			csales = credits.filter(created__icontains=date)
