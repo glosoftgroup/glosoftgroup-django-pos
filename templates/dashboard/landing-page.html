@@ -26,7 +26,7 @@
   <div class="row">
       {% if perms.userprofile.view_user or perms.auth.view_group or perms.userprofile.view_usertrail %}
      <!-- user -->
-     <div class="col-md-3 hvr-float-shadow">
+     <div class="col-md-3 col-xs-6 hvr-float-shadow">
       <a href="{% url 'dashboard:index' %}">
       <div class="thumbnail no-padding">
             <div class="thumb bg-blue">
@@ -42,7 +42,7 @@
       {% endif %}
   {% if perms.userprofile.view_user or perms.auth.view_group or perms.userprofile.view_usertrail %}
  <!-- user -->
- <div class="col-md-3 hvr-float-shadow">
+ <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:users' %}">
   <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -58,7 +58,7 @@
   {% endif %}
   {% if perms.product.view_product or perms.product.view_stock or perms.product.view_category or perms.product.view_productclass or perms.product.view_productattribute or perms.product.view_stocklocation %}
   <!-- Inventory -->
-  <div class="col-md-3 hvr-float-shadow">
+  <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:product-list' %}">
   <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -74,7 +74,7 @@
   {% endif %}
   {% if perms.customer.view_customer %}
   <!-- customer management -->
-  <div class="col-md-3 hvr-float-shadow ">
+  <div class="col-md-3 col-xs-6 hvr-float-shadow ">
   <a href="{% url 'dashboard:customers' %}">
  <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -90,7 +90,7 @@
   {% endif %}
   {% if perms.supplier.view_supplier %}
   <!-- supplier management -->
-  <div class="col-md-3 hvr-float-shadow">
+  <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:supplier' %}">
   <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -106,7 +106,7 @@
   {% endif %}
   {% if perms.supplier.view_supplier %}
   <!-- supplier management -->
-  <div class="col-md-3 hvr-float-shadow">
+  <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:car-list' %}">
   <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -121,7 +121,7 @@
   <!-- ./supplier -->
   {% endif %}
   <!-- communication management -->
-  <div class="col-md-3 hvr-float-shadow">
+  <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:notification_list' %}">
  <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -136,7 +136,7 @@
   <!-- ./communication -->
   {% if perms.discount.add_voucher %}
   <!-- customer Reward -->
-  <div class="col-md-3 hvr-float-shadow">
+  <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:sale-list' %}">
   <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -152,7 +152,7 @@
   {% endif %}
   {% if perms.sale.view_terminal or perms.sale.view_paymentoption or perms.sale.view_drawercash %}
   <!-- Drawer cash -->
-  <div class="col-md-3 hvr-float-shadow">
+  <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:terminals' %}">
  <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -168,7 +168,7 @@
   {% endif %}
   {% if perms.accounts.view_expenses %}
   <!-- accounting -->
-   <div class="col-md-3 hvr-float-shadow">
+   <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'accounts:personal_expenses' %}">
   <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -184,7 +184,7 @@
   {% endif %}
   {% if perms.reports.view_sale_reports or perms.reports.view_products_reports or perms.reports.view_purchase_reports or perms.reports.view_balancesheet %}
   <!-- reports -->
-   <div class="col-md-3 hvr-float-shadow">
+   <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:sales_list' %}">
   <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
@@ -200,7 +200,7 @@
   {% endif %}
   {% if request.user.is_active %}
   <!-- configuration -->
-   <div class="col-md-3 hvr-float-shadow">
+   <div class="col-md-3 col-xs-6 hvr-float-shadow">
   <a href="{% url 'dashboard:site-index' %}">
   <div class="thumbnail no-padding">
         <div class="thumb bg-blue">
