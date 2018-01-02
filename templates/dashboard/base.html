@@ -19,9 +19,9 @@
       <meta http-equiv="refresh" content = "1200; url=/lock/?next={{request.path}}">
     {% endblock meta %}
 
-    {% include 'favicon.html' %}    
-   
-    
+    {% include 'favicon.html' %}
+
+
 
     <!-- Global stylesheets -->
   <!--<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">-->
@@ -35,9 +35,9 @@
   <link href="{% static 'backend/css/hover-min.css' %}" rel="stylesheet" type="text/css">
    <link href="{% static 'backend/css/extras/animate.min.css' %}" rel="stylesheet" type="text/css">
   <!--image preview -->
-  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css"> 
+  <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/js/plugins/ladda/ladda-themeless.min.css' %}" rel="stylesheet" type="text/css">
-  <script type="text/javascript" src="{% static 'backend/js/jquery-1.11.3.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'backend/js/jquery-1.11.3.min.js' %}"></script>
   <!-- /global stylesheets -->
   <style type="text/css">
     .search-panel{padding: 6px;}
@@ -88,19 +88,19 @@
       <ul class="nav navbar-nav navbar-right">
       <!-- notifications -->
       <ul class="nav navbar-nav">
-       
+
       <li class="">
             <a href="{% url 'dashboard:notification_list' %}">
             <i class="icon-bubbles4"></i>
             <span class="visible-xs-inline-block position-right">messages</span>
             <span class="badge status-mark22 bg-warning-400"></span>
           </a>
-            
-            
-          </li>         
-        
+
+
+          </li>
+
       </ul>
-      <!-- ./notifications --> 
+      <!-- ./notifications -->
     <li>
            {% if request.user.image %}
               <img src="{{request.user.image.url }}" alt="" class="img-circle img-sm" style="width: 20px;height: 20px;margin-top: 7px;" />
@@ -140,7 +140,7 @@
       <div class="sidebar sidebar-main sidebar-primary sidebar-fixed">
         <div class="sidebar-content">
 
-         
+
 
 
           <!-- Main navigation -->
@@ -153,14 +153,14 @@
 
                 <li>
                   <a href="{% url 'dashboard:index' %}">
-                    <i class="icon-home4"></i> 
+                    <i class="icon-home4"></i>
                     <span>Dashboard</span>
                   </a>
                 </li>
                 {% if perms.userprofile.view_user or perms.auth.view_group or perms.userprofile.view_usertrail %}
                 <li>
                   <a href="javascript:;">
-                    <i class="icon-users"></i> 
+                    <i class="icon-users"></i>
                     <span>User Management</span>
                   </a>
                   <ul>
@@ -278,7 +278,7 @@
                     Stock Payment option</a>
                     </li>
                     {% endif %}
-                    
+
                   </ul>
                 </li>
                   {% endif %}
@@ -292,7 +292,7 @@
                     <a href="{% url 'dashboard:customers' %}">
                     <i class="icon-users2"></i> Customers
                     </a>
-                    </li>                    
+                    </li>
                     <!-- credit -->
                     <li class="{% block menu_creditCustomer_class %}{% endblock %}">
                     <a href="{% url 'dashboard:customer_credit_list' %}">
@@ -345,7 +345,7 @@
                     <li
                     class="{% block menu_messages_class %}{% endblock %}"
                     ><a href="{% url 'dashboard:message_list' %}">
-                    <i class="icon-mobile2"></i>Messages</a></li>                    
+                    <i class="icon-mobile2"></i>Messages</a></li>
                   </ul>
                 </li>
                 <!-- ./communications -->
@@ -369,7 +369,7 @@
                    {% if perms.sale.view_terminal or perms.sale.view_paymentoption or perms.sale.view_drawercash %}
                  <li>
                   <a href="javascript:;">
-                    <i class="icon-wallet"></i> 
+                    <i class="icon-wallet"></i>
                     <span>Cash Drawer</span>
                   </a>
                   <ul>
@@ -443,7 +443,7 @@
                   {% if perms.reports.view_sale_reports or perms.reports.view_products_reports or perms.reports.view_purchase_reports or perms.reports.view_balancesheet %}
                 <li>
                   <a href="javascript:;">
-                    <i class="icon-notebook"></i> 
+                    <i class="icon-notebook"></i>
                     <span>Reports</span>
                   </a>
 
@@ -503,8 +503,8 @@
                {% endif %}
                {% if request.user.is_active %}
                  <li><a href="#"><i class="icon-cogs"></i> <span> {% trans "Configuration"  context "Dashboard configuration" %}</span></a>
-                  <ul>                 
-                    
+                  <ul>
+
                     <li class="{% block menu_settings_class %}{% endblock %}">
                     <a href="{% url 'dashboard:site-index' %}">
                         <i class=" icon-earth"></i>
@@ -531,11 +531,11 @@
           <div class="breadcrumb-line fix-breadcrumb" style="position: fixed;width: 100%;">
             <ul class="breadcrumb">
                <li><a href="{% url 'dashboard:index' %}"><span class="icon-home">
-                 
+
                <span data-popup="tooltip" tite='Edit product' data-placement="bottom" data-original-title="Back to dashboard"> Home</span></a></li>
                {% block breadcrumbs %}
               <li class="active">{% trans "Home" context "Dashboard homepage" %}</li>
-               {% endblock %}              
+               {% endblock %}
             </ul>
             <ul class="breadcrumb-elements">
               {% block header_extra %}
@@ -544,15 +544,15 @@
             <!--  -->
           <a class="breadcrumb-elements-toggle"><i class="icon-menu-open"></i></a></div>
         </div>
-      
+
 
 
         <!-- Content area -->
-        <div class="content" id="content" style="padding: 30px 20px 60px">   
+        <div class="content" id="content" style="padding: 30px 20px 60px">
 
                 {% block content %}{% endblock %}
-            
-          
+
+
           <!-- Footer -->
           <div class="footer text-muted" style="bottom:20px;z-index:0">
             &copy; . <a href="#">Glosoft Group</a> <a href="http://glosoftgroup.com" target="_blank"></a>
@@ -561,14 +561,14 @@
 
         </div>
         <!-- /content area -->
-        
+
     </div>
     <!-- end page content -->
   </div>
   <!-- end page container -->
 
-   
-   
+
+
     <div id="base-modal" class="modal"></div>
     <div id="base-modal-fixed" class="modal modal-fixed-footer"></div>
     <!-- Core JS files -->
@@ -585,7 +585,7 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/ui/ripple.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/ui/chart.js/chart.min.js' %}"></script>
   <!-- /theme JS files -->
- 
+
   <!-- form js -->
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/select2.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/uniform.min.js' %}"></script>
@@ -609,9 +609,9 @@
   <script type="text/javascript" src="{% static 'backend/js/pages/components_notifications_other.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/ladda/spin.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ladda/ladda.min.js' %}"></script>
-  
 
-  
+
+
     <!-- Core Scripts - Include with every page -->
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
@@ -628,14 +628,14 @@
 
     var selector = $('.fix-breadcrumb');
     $( "label" ).addClass( "text-bold" );
-   
-      });
- 
 
-  
+      });
+
+
+
   </script>
-   
-    
+
+
     {% include "dashboard/includes/_messages.html" %}
     <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
@@ -643,9 +643,9 @@
     <script type="text/javascript" src="{% static 'backend/js/plugins/printThis/printer.js' %}"></script>
 
     <script type="text/javascript">
-   
+
   function getNotification() {
-    var dynamicData = {};    
+    var dynamicData = {};
     return $.ajax({
       url: "{% url 'dashboard:unread_count'%}",
       type: "get",
@@ -654,7 +654,7 @@
   }
 
   function checkDueCredit() {
-    var dynamicData = {};    
+    var dynamicData = {};
     return $.ajax({
       url: "{% url 'dashboard:due_credit_notifier'%}",
       type: "get",
@@ -664,13 +664,13 @@
   checkDueCredit();
   getNotification().done(function (data) {
        $(".status-mark22").text(data);
-    }); 
+    });
 
   $(document).ready(function(){
     setInterval(function(){ getNotification().done(function (data) {
        $(".status-mark22").text(data);
-    }) }, 9920000);  
-    
+    }) }, 9920000);
+
     setInterval(function(){
         $.get("{% url 'dashboard:export_db' %}",{daily:'daily'}, function(data){
         }).fail(function(response) {
@@ -681,7 +681,7 @@
 
 
 
-  
+
   </script>
     {% block custom_js %}{% endblock %}
    </div>

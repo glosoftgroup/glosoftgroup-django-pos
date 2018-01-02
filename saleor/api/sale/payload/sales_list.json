@@ -1,0 +1,235 @@
+{
+    "count": 104,
+    "next": "http://127.0.0.1:8000/api/sale/?page=2",
+    "previous": null,
+    "results": [
+        {
+            "id": 135,
+            "user": 1,
+            "invoice_number": "RET#1F31-6",
+            "created": "2017-12-19T10:48:35.057161Z",
+            "total_net": "12.00",
+            "sub_total": "12.00",
+            "balance": "0.00",
+            "terminal": 1,
+            "amount_paid": "12.00",
+            "solditems": [
+                {
+                    "id": 184,
+                    "sku": "51-sdfeii1",
+                    "quantity": 1,
+                    "unit_cost": "12.00",
+                    "total_cost": "12.00",
+                    "product_name": "Wilson, Martinez and Simpson (51-sdfeii1)",
+                    "product_category": "Books",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                }
+            ],
+            "customer": 22,
+            "mobile": "231323323322",
+            "customer_name": "p8ul",
+            "payment_data": "[{u'payment_id': u'4', u'value': u'12.0'}]",
+            "status": "fully-paid",
+            "total_tax": "0.00",
+            "discount_amount": "0.00"
+        },
+        {
+            "id": 134,
+            "user": 1,
+            "invoice_number": "RET#17E9-8",
+            "created": "2017-12-19T10:47:32.848395Z",
+            "total_net": "15636.00",
+            "sub_total": "15636.00",
+            "balance": "4364.00",
+            "terminal": 1,
+            "amount_paid": "20000.00",
+            "solditems": [
+                {
+                    "id": 182,
+                    "sku": "51-sdfeii1",
+                    "quantity": 1160,
+                    "unit_cost": "12.00",
+                    "total_cost": "13920.00",
+                    "product_name": "Wilson, Martinez and Simpson (51-sdfeii1)",
+                    "product_category": "Books",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 183,
+                    "sku": "51-23dfesef",
+                    "quantity": 143,
+                    "unit_cost": "12.00",
+                    "total_cost": "1716.00",
+                    "product_name": "Wilson, Martinez and Simpson (51-23dfesef)",
+                    "product_category": "Books",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                }
+            ],
+            "customer": 22,
+            "mobile": "231323323322",
+            "customer_name": "p8ul",
+            "payment_data": "[{u'payment_id': u'1', u'value': u'15636.0'}]",
+            "status": "fully-paid",
+            "total_tax": "0.00",
+            "discount_amount": "0.00"
+        },
+        {
+            "id": 133,
+            "user": 1,
+            "invoice_number": "RET#18DA-10",
+            "created": "2017-12-19T10:45:02.232952Z",
+            "total_net": "1324.50",
+            "sub_total": "1324.50",
+            "balance": "675.50",
+            "terminal": 1,
+            "amount_paid": "2000.00",
+            "solditems": [
+                {
+                    "id": 170,
+                    "sku": "17-1337",
+                    "quantity": 1,
+                    "unit_cost": "82.76",
+                    "total_cost": "82.76",
+                    "product_name": "Hawkins and Sons (17-1337)",
+                    "product_category": "Accessories",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 171,
+                    "sku": "11-1337",
+                    "quantity": 1,
+                    "unit_cost": "18.22",
+                    "total_cost": "18.22",
+                    "product_name": "Gonzalez-Michael (11-1337)",
+                    "product_category": "Accessories",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 172,
+                    "sku": "12-1337",
+                    "quantity": 1,
+                    "unit_cost": "21.36",
+                    "total_cost": "21.36",
+                    "product_name": "Ramirez, Walker and Payne (12-1337)",
+                    "product_category": "Accessories",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 173,
+                    "sku": "15-1337",
+                    "quantity": 1,
+                    "unit_cost": "39.50",
+                    "total_cost": "39.50",
+                    "product_name": "Ritter-Hayden (15-1337)",
+                    "product_category": "Accessories",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 174,
+                    "sku": "18-1337",
+                    "quantity": 2,
+                    "unit_cost": "59.92",
+                    "total_cost": "119.84",
+                    "product_name": "Foster-Parker (18-1337)",
+                    "product_category": "Accessories",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 175,
+                    "sku": "1-1340",
+                    "quantity": 1,
+                    "unit_cost": "96.46",
+                    "total_cost": "96.46",
+                    "product_name": "Cooper-Craig ( 100g)",
+                    "product_category": "Groceries",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 176,
+                    "sku": "1-1337",
+                    "quantity": 1,
+                    "unit_cost": "171.55",
+                    "total_cost": "171.55",
+                    "product_name": "Cooper-Craig ( 1kg)",
+                    "product_category": "Groceries",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 177,
+                    "sku": "3-1337",
+                    "quantity": 1,
+                    "unit_cost": "113.89",
+                    "total_cost": "113.89",
+                    "product_name": "Black PLC ( 1kg)",
+                    "product_category": "Groceries",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 178,
+                    "sku": "1-1339",
+                    "quantity": 1,
+                    "unit_cost": "162.57",
+                    "total_cost": "162.57",
+                    "product_name": "Cooper-Craig ( 250g)",
+                    "product_category": "Groceries",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 179,
+                    "sku": "2-1338",
+                    "quantity": 1,
+                    "unit_cost": "40.15",
+                    "total_cost": "40.15",
+                    "product_name": "Erickson Inc ( 500g)",
+                    "product_category": "Groceries",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 180,
+                    "sku": "2-1337",
+                    "quantity": 2,
+                    "unit_cost": "61.85",
+                    "total_cost": "123.70",
+                    "product_name": "Erickson Inc ( 1kg)",
+                    "product_category": "Groceries",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                },
+                {
+                    "id": 181,
+                    "sku": "1-1338",
+                    "quantity": 2,
+                    "unit_cost": "167.25",
+                    "total_cost": "334.50",
+                    "product_name": "Cooper-Craig ( 500g)",
+                    "product_category": "Groceries",
+                    "tax": "0.00",
+                    "discount": "0.00"
+                }
+            ],
+            "customer": 22,
+            "mobile": "231323323322",
+            "customer_name": "p8ul",
+            "payment_data": "[{u'payment_id': u'1', u'value': u'1324.5'}]",
+            "status": "fully-paid",
+            "total_tax": "0.00",
+            "discount_amount": "0.00"
+        },
+      {
+        "id": 132,
+        "user": 1,
+      }
+      }]

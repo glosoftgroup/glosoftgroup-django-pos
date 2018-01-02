@@ -18,6 +18,7 @@ from .api.invoice.urls import urlpatterns as api_invoice_urls
 from .api.credit.urls import urlpatterns as api_credit_urls
 from .api.order_number.urls import urlpatterns as api_order_number_urls
 from .api.payment.urls import urlpatterns as api_payment_urls
+from .api.sale.urls import urlpatterns as api_sale_urls
 from .api.product.urls import urlpatterns as api_urls
 from .api.settings.urls import urlpatterns as api_settings_urls
 from .api.sms.urls import urlpatterns as api_sms_urls
@@ -57,6 +58,7 @@ urlpatterns = [
     url(r'^api/order_number/', include(api_order_number_urls, namespace='order_number-api')),
     url(r'^api/products/', include(api_urls, namespace='product-api')),
     url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),
+    url(r'^api/sale/', include(api_sale_urls, namespace='sale-api')),
     url(r'^api/settings/', include(api_settings_urls, namespace='settings-api')),
     url(r'^api/sms/', include(api_sms_urls, namespace='terminal-api')),
     url(r'^api/terminal/', include(api_terminal_urls, namespace='terminal-api')),
