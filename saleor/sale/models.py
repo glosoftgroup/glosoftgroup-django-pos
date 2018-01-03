@@ -202,6 +202,11 @@ class SoldItem(models.Model):
     discount = models.DecimalField(
         pgettext_lazy('SoldItem field', 'discount'), default=Decimal(0), max_digits=100, decimal_places=2)
     tax = models.DecimalField(default=Decimal(0), max_digits=100, decimal_places=2)
+    attributes = HStoreField(
+        pgettext_lazy('SoldItem field', 'attributes'), default={})
+    created = models.DateTimeField(
+        pgettext_lazy('SoldItem field', 'created'),
+        default=now, editable=False)
 
     class Meta:
         # unique_together = ('sales')

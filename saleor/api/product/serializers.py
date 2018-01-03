@@ -11,6 +11,7 @@ from rest_framework.serializers import (
                 )
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.db.models import Q, Sum, Count
 from ...decorators import user_trail
 from ...discount.models import Sale
 from ...discount.models import get_variant_discounts
@@ -22,6 +23,8 @@ from ...sale.models import (
 from ...product.models import (
             Product,
             ProductVariant,
+            ProductAttribute,
+            AttributeChoiceValue,
             Stock,
             )
 from ...customer.models import Customer
@@ -53,8 +56,10 @@ class TrackSerializer(serializers.ModelSerializer):
                 'product_name',
                 'product_category',
                 'tax',
+                'attributes',
                 'discount'
                  )
+
 
 class ItemsSerializer(serializers.ModelSerializer):
     available_stock = SerializerMethodField()
@@ -321,6 +326,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
     discount = SerializerMethodField()
     product_category = SerializerMethodField()
     min_price = SerializerMethodField()
+    attributes_list = SerializerMethodField()
 
     class Meta:        
         model = ProductVariant
@@ -333,8 +339,13 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             'tax',
             'discount',
             'quantity',
-            'product_category',            
+            'product_category',
+            'attributes_list'
             )
+
+    def get_attributes_list(self, obj):
+        return ProductVariant.objects.filter(pk=obj.pk).extra(select=dict(key="content_item.data -> 'attributes'"))\
+                          .values('attributes').order_by('attributes')
 
     def get_discount(self, obj):
         today = date.today()

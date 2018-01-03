@@ -6,7 +6,7 @@
   "customer_name": "dfghj",
   "terminal": "1",
   "total_tax": "0.00",
-  "invoice_number": "298377796",
+  "invoice_number": "298hh8377796",
   "total_net": "223.29",
   "payment_data": [
     {
@@ -16,31 +16,18 @@
   ],
   "solditems": [
     {
-      "quantity": 1,
+      "quantity": 11,
       "total_cost": "35.62",
       "unit_cost": "35.62",
-      "sku": "2-1340",
-      "product_name": "Davis-Wilson (Box Size: 100g)",
-      "product_category": "Groceries",
-      "order": "1"
-    },
-    {
-      "quantity": 1,
-      "total_cost": "87.79",
-      "unit_cost": "87.79",
-      "sku": "2-1338",
-      "product_name": "Davis-Wilson (Box Size: 500g)",
-      "product_category": "Groceries",
-      "order": "1"
-    },
-    {
-      "quantity": 1,
-      "total_cost": "99.88",
-      "unit_cost": "99.88",
-      "sku": "2-1337",
-      "product_name": "Davis-Wilson (Box Size: 1kg)",
-      "product_category": "Groceries",
-      "order": "1"
+      "sku": "G-001",
+      "product_name": "GAS ( 1kg,   Kgas)",
+      "product_category": "GAS",
+      "order": "1",
+      "attributes":
+        {
+          "13": "33"
+        }
+
     }
   ],
   "payment_options": [],
