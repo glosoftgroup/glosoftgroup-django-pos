@@ -1,0 +1,17 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 14,
+            "name": "GAS BRAND",
+            "list_url": "http://127.0.0.1:8000/api/sale/items/14/"
+        },
+        {
+            "id": 13,
+            "name": "GAS SIZE",
+            "list_url": "http://127.0.0.1:8000/api/sale/items/13/"
+        }
+    ]
+}

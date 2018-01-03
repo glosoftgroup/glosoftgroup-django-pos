@@ -2,14 +2,14 @@ from django.conf.urls import url
 
 from .views import (
     SaleListAPIView,
-    SaleItemsListAPIView
+    ItemListAPIView,
     )
 
 
 urlpatterns = [
     url(r'^$', SaleListAPIView.as_view(),
         name='list-sales'),
-    url(r'^items/$', SaleItemsListAPIView.as_view(),
+    url(r'^items/(?P<pk>[0-9]+)/$', ItemListAPIView.as_view(),
         name='list-sold-items'),
 ]
 

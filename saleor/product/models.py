@@ -311,8 +311,7 @@ class ProductVariant(models.Model, Item):
     def check_quantity(self, quantity):
         available_quantity = self.get_stock_quantity()
         if quantity > available_quantity:
-            raise InsufficientStock(self)    
-
+            raise InsufficientStock(self)
 
     def get_stock_pk(self):
         stock_pk = self.stock.all().values('pk')
