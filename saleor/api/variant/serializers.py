@@ -19,6 +19,7 @@ class VariantListSerializer(serializers.ModelSerializer):
     tax = SerializerMethodField()
     discount = SerializerMethodField()
     product_category = SerializerMethodField()
+    attributes_list = SerializerMethodField()
 
     class Meta:
         model = ProductVariant
@@ -31,7 +32,12 @@ class VariantListSerializer(serializers.ModelSerializer):
             'discount',
             'quantity',
             'product_category',
+            'attributes_list'
         )
+
+    def get_attributes_list(self, obj):
+        return ProductVariant.objects.filter(pk=obj.pk).extra(select=dict(key="content_item.data -> 'attributes'"))\
+                          .values('attributes').order_by('attributes')
 
     def get_discount(self, obj):
         today = date.today()
