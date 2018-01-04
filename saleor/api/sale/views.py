@@ -42,16 +42,16 @@ class ItemListAPIView(APIView):
         checker = []
         for i in summary:
             name = AttributeChoiceValue.objects.get(pk=int(i['attributes'][key])).name
-            temp2 = []
+            temp2 = {}
             temp = eval("Item.objects.values('product_name', 'attributes').filter(attributes__"+key+"="+i['attributes'][key]+").annotate(c=Count('attributes', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity'))")
             quantity = 0
             sum = 0
             for count in temp:
                 quantity += count['quantity__sum']
                 sum += count['total_cost__sum']
-            temp2.append({'quantity': quantity})
-            temp2.append({'sum': sum})
-            temp2.append({'attribute_value': name})
+            temp2['quantity'] = quantity
+            temp2['sum'] = sum
+            temp2['attribute_value'] = name
             if i['attributes'][key] not in checker:
                 report.append(temp2)
                 checker.append(i['attributes'][key])
