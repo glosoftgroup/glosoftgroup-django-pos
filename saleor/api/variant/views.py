@@ -10,7 +10,7 @@ User = get_user_model()
 
 class VariantCategoryListAPIView(generics.ListAPIView):
     serializer_class = VariantListSerializer
-    queryset = ProductVariant.objects.all()
+    queryset = ProductVariant.objects.get_in_stock()
 
     def list(self, request, pk=None):
         # Note the use of `get_queryset()` instead of `self.queryset`
