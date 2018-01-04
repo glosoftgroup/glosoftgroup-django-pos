@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 
 from ...sale.models import Sales as Table
 from ...sale.models import SoldItem as Item
+from ...product.models import AttributeChoiceValue
 
 from .serializers import (
     ItemListSerializer,
@@ -34,15 +35,28 @@ class ItemListAPIView(APIView):
             key = self.kwargs['pk']
         if self.request.GET.get('date'):
             date = self.request.GET.get('date')
-            summary = Item.objects.filter(created__icontains=date).values('product_name')\
-                .filter(attributes__has_key=key).annotate(
-                c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by(
-                '-quantity__sum')
+            summary = Item.objects.values('product_name', 'attributes').filter(created__icontains=date).filter(attributes__has_key=key)
         else:
-            summary = Item.objects.values('product_name').filter(attributes__has_key=key).annotate(
-                c=Count('product_name', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity')).order_by(
-                '-quantity__sum')
-        return Response(summary)
+            summary = Item.objects.values('product_name', 'attributes').filter(attributes__has_key=key)
+        report = []
+        checker = []
+        for i in summary:
+            name = AttributeChoiceValue.objects.get(pk=int(i['attributes'][key])).name
+            temp2 = []
+            temp = eval("Item.objects.values('product_name', 'attributes').filter(attributes__"+key+"="+i['attributes'][key]+").annotate(c=Count('attributes', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity'))")
+            quantity = 0
+            sum = 0
+            for count in temp:
+                quantity += count['quantity__sum']
+                sum += count['total_cost__sum']
+            temp2.append({'quantity': quantity})
+            temp2.append({'sum': sum})
+            temp2.append({'attribute_value': name})
+            if i['attributes'][key] not in checker:
+                report.append(temp2)
+                checker.append(i['attributes'][key])
+
+        return Response(report)
 
 
 class SaleListAPIView(generics.ListAPIView):
