@@ -268,6 +268,10 @@ class ProductVariantManager(models.Manager):
         today = datetime.date.today()
         return self.get_queryset().filter(stock__quantity__lte=F('low_stock_threshold'))
 
+    def get_in_stock(self):
+        today = datetime.date.today()
+        return self.get_queryset().filter(stock__quantity__gte=1)
+
 
 @python_2_unicode_compatible
 class ProductVariant(models.Model, Item):

@@ -132,7 +132,7 @@ class SearchSkuListAPIView(generics.ListAPIView):
     serializer_class = ProductStockListSerializer
 
     def get_queryset(self, *args, **kwargs):        
-        queryset_list = ProductVariant.objects.all().select_related()
+        queryset_list = ProductVariant.objects.get_in_stock().select_related()
         query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(
@@ -146,7 +146,7 @@ class ProductStockListAPIView(generics.ListAPIView):
     serializer_class = ProductStockListSerializer
 
     def get_queryset(self, *args, **kwargs):        
-        queryset_list = ProductVariant.objects.all().select_related()
+        queryset_list = ProductVariant.objects.get_in_stock().select_related()
         query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(
