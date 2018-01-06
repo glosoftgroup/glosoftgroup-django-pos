@@ -19,6 +19,7 @@ class VariantListSerializer(serializers.ModelSerializer):
     tax = SerializerMethodField()
     discount = SerializerMethodField()
     product_category = SerializerMethodField()
+    min_price = SerializerMethodField()
     attributes_list = SerializerMethodField()
 
     class Meta:
@@ -32,7 +33,9 @@ class VariantListSerializer(serializers.ModelSerializer):
             'discount',
             'quantity',
             'product_category',
-            'attributes_list'
+            'attributes_list',
+            'min_price',
+            'wholesale_override'
         )
 
     def get_attributes_list(self, obj):
@@ -53,6 +56,12 @@ class VariantListSerializer(serializers.ModelSerializer):
                 discount = discount.amount.gross
 
         return discount
+
+    def get_min_price(self, obj):
+        try:
+            return obj.get_min_price_per_item().gross
+        except Exception as e:
+            return 0
 
     def get_quantity(self, obj):
         quantity = obj.get_stock_quantity()
