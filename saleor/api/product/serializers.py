@@ -335,6 +335,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             'productName',
             'sku',
             'price',
+            'wholesale_override',
             'min_price',
             'tax',
             'discount',
@@ -418,4 +419,6 @@ class UserSerializer(serializers.ModelSerializer):
             permissions.append('credit_sale')
         if obj.has_perm('sales.credit_receive'):
             permissions.append('credit_receive')
+        if obj.has_perm('product.change_product'):
+            permissions.append('change_product')
         return permissions
