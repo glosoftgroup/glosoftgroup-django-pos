@@ -326,6 +326,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
     discount = SerializerMethodField()
     product_category = SerializerMethodField()
     min_price = SerializerMethodField()
+    wholesale_price = SerializerMethodField()
     attributes_list = SerializerMethodField()
 
     class Meta:        
@@ -335,7 +336,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             'productName',
             'sku',
             'price',
-            'wholesale_override',
+            'wholesale_price',
             'min_price',
             'tax',
             'discount',
@@ -374,6 +375,12 @@ class ProductStockListSerializer(serializers.ModelSerializer):
     def get_min_price(self, obj):
         try:
             return obj.get_min_price_per_item().gross
+        except Exception as e:
+            return 0
+
+    def get_wholesale_price(self, obj):
+        try:
+            return obj.wholesale_override.gross
         except Exception as e:
             return 0
 
