@@ -21,6 +21,7 @@ class VariantListSerializer(serializers.ModelSerializer):
     product_category = SerializerMethodField()
     min_price = SerializerMethodField()
     attributes_list = SerializerMethodField()
+    wholesale_price = SerializerMethodField()
 
     class Meta:
         model = ProductVariant
@@ -35,7 +36,7 @@ class VariantListSerializer(serializers.ModelSerializer):
             'product_category',
             'attributes_list',
             'min_price',
-            'wholesale_override'
+            'wholesale_price'
         )
 
     def get_attributes_list(self, obj):
@@ -60,6 +61,12 @@ class VariantListSerializer(serializers.ModelSerializer):
     def get_min_price(self, obj):
         try:
             return obj.get_min_price_per_item().gross
+        except Exception as e:
+            return 0
+
+    def get_wholesale_price(self, obj):
+        try:
+            return obj.wholesale_price.gross
         except Exception as e:
             return 0
 
