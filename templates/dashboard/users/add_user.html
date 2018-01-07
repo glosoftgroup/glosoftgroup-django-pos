@@ -65,24 +65,9 @@
                         </div>
                       </div>
 
-                    </div>
-                    <div class="col-md-8">
-                      <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-10">
                           <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" name="name" id="name" placeholder="Name">
-                          </div>
-                          <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control" name="password" id="password" placeholder="Password">
-                           </div>
-                           <div class="form-group">
-                            <label for="exampleInputPassword1">National ID No:</label>
-                            <input type="text" class="form-control" name="nid" id="nid" placeholder="Id No">
-                           </div>
-                           <div class="form-group">
-                            <label for="exampleInputPassword1">Select Group:</label>
+                            <label for="exampleInputPassword1">Select Permissions Group:</label>
                             <div class="multi-select-full">
                               <select class="multiselect-full-featured" multiple="multiple" style="display: none;" name="group" id="multiple" placeholder="select a group...">
                               {% if groups %}
@@ -97,18 +82,41 @@
                             <label id="group_name_error" class="select-error" for="user_select"></label>
                            </div>
                         </div>
+
+                    </div>
+                    <div class="col-md-8">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="name">Full Names</label>
+                            <input type="text" class="form-control" name="fullname" id="fullname" placeholder="Full Names">
+                          </div>
+                          <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Name">
+                          </div>
+                          <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                           </div>
+                           <div class="form-group">
+                            <label for="exampleInputPassword1">National ID No:</label>
+                            <input type="text" class="form-control" name="nid" id="nid" placeholder="Id No">
+                           </div>
+
+                        </div>
                         <div class="col-md-6">
                            <div class="form-group">
                               <label for="email">Email address</label>
                               <input type="email" class="form-control" name="email" id="email" placeholder="Email">
                            </div>
                            <div class="form-group">
-                            <label for="confirm_password">Confirm Password</label>
-                            <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="Confirm Password">
-                           </div>
-                           <div class="form-group">
                             <label for="mobile">Phone</label>
                             <input type="text" data-mask="(+254)-999-999-999" class="form-control" name="mobile" id="mobile" placeholder="Mobile">
+                           </div>
+                           <div class="form-group">
+                            <label for="confirm_password">Confirm Password</label>
+                            <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="Confirm Password">
                            </div>
                            <div class="form-group">
                               <label for="email">Job Title</label>
@@ -504,7 +512,7 @@
                       <div class="form-group">
                       <label class="display-block text-semibold">Payment Options</label>
                       {% for permission in permissions%}
-                       {% if permission.content_type.model ==  'paymentoption' %}
+                       {% if permission.content_type.model ==  'paymentoption' and permission.content_type.app_label == 'sale'%}
                           <div class="checkbox">
                             <label>
                               <input class="styled check" type="checkbox" value="{{permission.id}}">
@@ -723,6 +731,9 @@ $( ".check" ).on( "click", function(){
           required:true,
           minlength:3
         },
+        fullname: {
+          required:true
+        },
         email:{
           required: true,
           email:true
@@ -786,6 +797,7 @@ $( ".check" ).on( "click", function(){
                     contentType: false,
                     success:function(data){
                        console.log(data);
+                       $("#fullname").val('');
                        $("#name").val('');
                        $("#email").val('');
                        $("#password").val('');

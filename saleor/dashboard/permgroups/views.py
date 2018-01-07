@@ -293,7 +293,7 @@ def get_group_users(request):
 			user_dict = {}
 			user_dict['id'] = user.id
 			if user.name:
-				user_dict['name'] = user.name
+				user_dict['name'] = user.fullname
 			else:
 				user_dict['name'] = user.email
 			if user.image:

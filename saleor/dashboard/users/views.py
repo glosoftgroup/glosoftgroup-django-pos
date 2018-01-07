@@ -228,6 +228,7 @@ def user_process(request):
     user = User.objects.all()
     if request.method == 'POST':
         name = (request.POST.get('name')).lower()
+        fullname = request.POST.get('fullname')
         email = request.POST.get('email')
         password = request.POST.get('password')
         encr_password = make_password(password)
@@ -238,6 +239,7 @@ def user_process(request):
         job_title = request.POST.get('job_title')
         new_user = User(
             name=name,
+            fullname=fullname,
             email=email,
             password=encr_password,
             nid=nid,
@@ -312,6 +314,7 @@ def user_update(request, pk):
 
     if request.method == 'POST':
         name = (request.POST.get('user_name')).lower()
+        fullname = request.POST.get('user_fullname')
         email = request.POST.get('user_email')
         password = request.POST.get('user_password')
         nid = request.POST.get('user_nid')
@@ -326,6 +329,7 @@ def user_update(request, pk):
             encr_password = make_password(password)
         if image :
             user.name = name
+            user.fullname = fullname
             user.email = email
             user.password = encr_password
             user.nid = nid
@@ -351,6 +355,7 @@ def user_update(request, pk):
                     return HttpResponse("groups removed")
             return HttpResponse("success with image")
         else:
+            user.fullname = fullname
             user.name = name
             user.email = email
             user.password = encr_password
@@ -392,7 +397,7 @@ def user_assign_permission(request):
         if login_status == 'inactive':
             user.is_staff = False
             user.is_active = False
-            user.user_permissions.remove(*user_has_permissions)
+            # user.user_permissions.remove(*user_has_permissions)
             user.save()
             user_trail(request.user.name, 'deactivated and removed all permissions for user: '+ str(user.name), 'delete')
             info_logger.info('User: '+str(request.user.name)+' deactivated and removed all permissions for user: '+str(user.name))
@@ -435,6 +440,7 @@ def user_search( request ):
         if q is not None:
             users = User.objects.filter(
                 Q( name__icontains = q ) |
+                Q( fullname__icontains = q ) |
                 Q( email__icontains = q ) | Q( mobile__icontains = q ) ).order_by('-id' )
 
             if request.GET.get('gid'):

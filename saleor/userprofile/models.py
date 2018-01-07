@@ -111,6 +111,7 @@ class UserManager(BaseUserManager):
 
 class User(PermissionsMixin, AbstractBaseUser, index.Indexed):
     email = models.EmailField(pgettext_lazy('User field', 'email'), unique=True)
+    fullname = models.CharField(pgettext_lazy('User field', 'name'), unique=True, max_length=100, null=True, blank=True)
     name = models.CharField(pgettext_lazy('User field', 'name'), unique=True, max_length=100, null=True, blank=True)
     addresses = models.ManyToManyField(
         Address, blank=True,

@@ -17,8 +17,8 @@
                {% endif %}
             </td>
             <td class="tds" data-href="{% url 'dashboard:user-detail' pk=user.pk %}">
-             {% if user.name %}
-                {{user.name}}
+             {% if user.fullname %}
+                {{user.fullname}}
              {% else %}
                 {{user.email}}
              {% endif %}
