@@ -201,11 +201,11 @@
                   <select class="multiselect-full-featured" multiple="multiple" style="display: nones;" name="user_select" id="edit_users_multiple" placeholder="select a user...">
                   {% for usr in users %}
                     {% if usr.is_active == True and usr.is_superuser == False %}
-                       <option value="{{usr.id}}" data-name="{% if usr.name %}{{usr.name}}
+                       <option value="{{usr.id}}" data-name="{% if usr.fullname %}{{usr.fullname}}
                        {% else %}{{usr.email}}{% endif %}" data-image="{% if usr.image %}{{usr.image.url}}
                        {% else %}/static/images/user.png{% endif %}">
-                         {% if usr.name %}
-                            {{usr.name}}
+                         {% if usr.fullname %}
+                            {{usr.fullname}}
                          {% else %}
                             {{usr.email}}
                          {% endif %}
@@ -449,17 +449,6 @@ $('document').ready(function () {
               console.log(error);
             }
           });
-        <!--//*@ populate table-->
-        <!--var table_body = $('#group_user_table tbody');-->
-        <!--var parent = table_body.parent();-->
-        <!--table_body.detach().empty().each(function(i, val){-->
-            <!--for (var x = 0; x < remove_duplicates(names).length; x++){-->
-                <!--$(this).append('<tr id="guser-'+ remove_duplicates(names)[x].id +'"><td><img src="'+ remove_duplicates(names)[x].image +'" class="circle teal img-circle" style="width: 40px;height: 40px;">'+ '</td><td>'+ remove_duplicates(names)[x].name + '</td><td><a href="javascript:;" onClick="removeGroupUser('+ remove_duplicates(names)[x].id +')" class="modal-trigger btn btn-default btn-sm del_array_item"><i class="icon-trash" style="font-size: 11px;" data-toggle="modal"></i> delete</a></td></tr');-->
-                <!--if (x == remove_duplicates(names).length - 1){-->
-                    <!--$(this).appendTo(parent);-->
-                <!--}-->
-            <!--}-->
-        <!--});-->
 
     });
    // $('.bootstrap-select').selectpicker();

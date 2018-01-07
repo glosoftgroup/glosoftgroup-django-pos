@@ -12,8 +12,8 @@
     <tr class="animated fadeIn">
       <td>{{ forloop.counter }}</td>
       <td>
-      {% if user.name %}
-      {{ user.name}}
+      {% if user.fullname %}
+      {{ user.fullname}}
       {% else %}
       {{ user.email }}
       {% endif %}

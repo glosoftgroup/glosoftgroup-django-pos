@@ -64,8 +64,8 @@
                               {% for usr in users %}
                                 {% if usr.is_superuser == False %}
                                    <option value="{{usr.id}}"> 
-                                     {% if usr.name %}
-                                        {{usr.name}}
+                                     {% if usr.fullname %}
+                                        {{usr.fullname}}
                                      {% else %}
                                         {{usr.email}}
                                      {% endif %}
@@ -463,7 +463,7 @@
                       <div class="form-group">
                       <label class="display-block text-semibold">Payment Options</label>
                       {% for permission in permissions%}
-                       {% if permission.content_type.model ==  'paymentoption' %}
+                       {% if permission.content_type.model ==  'paymentoption' and permission.content_type.app_label == 'sale'%}
                           <div class="checkbox">
                             <label>
                               <input class="styled check" type="checkbox" value="{{permission.id}}">

@@ -78,25 +78,9 @@
                   </div>
                 </div>
               </div>
-
-            </div>
-            <div class="col-md-8">
-              <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-10">
                   <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" class="form-control" autocomplete='off' placeholder="User Name" name="name" id="name" value="{{ user.name}}">
-                  </div>
-                  <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" autocomplete='off' name="password" id="password" placeholder="*******" pas="{{ user.password}}">
-                   </div>
-                   <div class="form-group">
-                    <label for="exampleInputPassword1">National ID No:</label>
-                    <input type="text" class="form-control" autocomplete='off' name="nid" id="nid" value="{% if user.nid %}{{ user.nid}}{% else %}******{% endif %}">
-                   </div>
-                   <div class="form-group">
-                    <label>Click to Select Groups</label>
+                    <label>Select Permissions Groups</label>
                     <select multiple="" id="multiple"class="select-border-color border-warning select2-hidden-accessible" tabindex="-1" aria-hidden="true">
                         {% if groups %}
                           {% for group in groups %}
@@ -112,18 +96,39 @@
                     </select>
                   </div>
                 </div>
+            </div>
+            <div class="col-md-8">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="name">Full Names</label>
+                    <input type="text" class="form-control" autocomplete='off' placeholder="Full Names" name="fullname" id="fullname" value="{{ user.fullname}}">
+                  </div>
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" autocomplete='off' placeholder="User Name" name="name" id="name" value="{{ user.name}}">
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" autocomplete='off' name="password" id="password" placeholder="*******" pas="{{ user.password}}">
+                   </div>
+                   <div class="form-group">
+                    <label for="exampleInputPassword1">National ID No:</label>
+                    <input type="text" class="form-control" autocomplete='off' name="nid" id="nid" value="{% if user.nid %}{{ user.nid}}{% else %}******{% endif %}">
+                   </div>
+                </div>
                 <div class="col-md-6">
                    <div class="form-group">
                       <label for="email">Email address</label>
                       <input type="email" class="form-control" autocomplete='off' name="email" id="email" value="{{ user.email}}">
                    </div>
                    <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
-                    <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="*******">
-                   </div>
-                   <div class="form-group">
                     <label for="mobile">Phone</label>
                     <input type="text" class="form-control" name="mobile" data-mask="(+254)-999-999-999" id="mobile" value="{% if user.mobile %}{{ user.mobile}} {% else %} ****** {% endif %}">
+                   </div>
+                   <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="*******">
                    </div>
                    <div class="form-group">
                       <label for="email">Job Title</label>
@@ -155,7 +160,7 @@
                 <p> 
                   <label class="display-block text-semibold">System Permission Default</label>
                  
-                  {% if user.is_staff and user.is_active %}                          
+                  {% if user.is_active %}                          
                       <div class="checkbox">
                         <label>
                           <input class="styled" id="can-login" checked="checked" type="checkbox" value="active">
@@ -763,7 +768,7 @@
                     <div class="form-group">
                       <label class="display-block text-semibold">Payment Options</label>
                       {% for permission in permissions %}
-                       {% if permission.content_type.model ==  'paymentoption' %}
+                       {% if permission.content_type.model ==  'paymentoption' and permission.content_type.app_label == 'sale'%}
                             {% if permission in user_permissions %}
                                 <div class="checkbox">
                                   <label>
@@ -943,6 +948,9 @@ $(document).ready(function(){
                 required: true,
                 minlength: 3
             },
+            fullname: {
+              required:true
+            },
             email: {
                 required: true,
                 email: true
@@ -988,10 +996,11 @@ $(document).ready(function(){
                return $(this).val();
             }).get();
         var user_name, user_email, user_password, user_nid, user_mobile;
-        var name= $('#name').attr('placeholder'), email= $('#email').attr('placeholder'), nid= $('#nid').attr('placeholder'), mobile= $('#mobile').attr('placeholder'), password = $('#password').attr('pas');
-        var name_v = $('#name').val(), email_v = $('#email').val(), password_v = $('#password').val(), nid_v = $('#nid').val(), mobile_v = $('#mobile').val();
+        var fullname= $('#fullname').attr('placeholder'), name= $('#name').attr('placeholder'), email= $('#email').attr('placeholder'), nid= $('#nid').attr('placeholder'), mobile= $('#mobile').attr('placeholder'), password = $('#password').attr('pas');
+        var fullname_v = $('#fullname').val(), name_v = $('#name').val(), email_v = $('#email').val(), password_v = $('#password').val(), nid_v = $('#nid').val(), mobile_v = $('#mobile').val();
 
         user_name = !name_v ? name : name_v;
+        user_fullname = !fullname_v ? fullname : fullname_v;
         user_email = !email_v ? email : email_v;
         user_password = !password_v ? password : password_v;
         user_nid = !nid_v ? nid : nid_v;
@@ -1000,6 +1009,7 @@ $(document).ready(function(){
         var file = $('#image')[0].files[0];
         var f = document.getElementById('update-details');
         var formData = new FormData(f);
+        formData.append("user_fullname", user_fullname);
         formData.append("user_name", user_name);
         formData.append("user_email", user_email);
         formData.append("user_password", user_password);
