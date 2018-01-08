@@ -6,9 +6,9 @@ export default class PriceFilter extends Component {
 
   constructor(props) {
     super(props);
-      this.state = {
-        visibility: !isMobile()
-      };
+    this.state = {
+      visibility: !isMobile()
+    };
   }
 
   static propTypes = {
