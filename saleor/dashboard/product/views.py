@@ -859,6 +859,7 @@ def stock_edit(request, product_pk, stock_pk=None):
     product = get_object_or_404(Product, pk=product_pk)
     if stock_pk:
         stock = Stock.objects.get(pk=stock_pk)
+        stock_quantity = stock.quantity
     else:
         stock = Stock()
     form = forms.StockForm(request.POST or None, instance=stock,
@@ -878,7 +879,10 @@ def stock_edit(request, product_pk, stock_pk=None):
         if request.POST.getlist('payment_options[]'):
             for option in request.POST.getlist('payment_options[]'):
                 stock.payment_options.add(option)
-        purchase = PurchaseProduct()
+        if stock_pk:
+            purchase = PurchaseProduct.objects.filter(stock=stock_pk).filter(quantity=stock_quantity).latest('id')
+        else:
+            purchase = PurchaseProduct()
         purchase.variant = stock.variant
         purchase.stock = stock
         purchase.user = request.user
