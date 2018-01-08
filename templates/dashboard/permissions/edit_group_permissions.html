@@ -713,7 +713,7 @@
 					<div class="form-group">
 						<label class="display-block text-semibold">Payment Options</label>
 						{% for permission in permissions %}
-						 {% if permission.content_type.model ==  'paymentoption' %}
+						 {% if permission.content_type.model ==  'paymentoption' and permission.content_type.app_label == 'sale'%}
 							{% if permission in group_permissions %}
 											<div class="checkbox">
 												<label>
