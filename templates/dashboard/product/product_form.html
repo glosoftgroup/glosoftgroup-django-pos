@@ -904,12 +904,12 @@ $(document).ready(function(){
       var choices = getVariantChoice.val();
       if(!newattrName)
       {
-        alertUser('Variant name required','bg-danger','Variant name required');
+        alertUser('Variant name and choice required. Hit enter key','bg-danger','Variant name required');
         return false;
       }
       if(!choices)
       {
-        alertUser('Variant name required','bg-danger','Variant name required');
+        alertUser('Variant name and choice required','bg-danger','Variant name and choice required');
         return false;
       }
       var dynamicData = {};

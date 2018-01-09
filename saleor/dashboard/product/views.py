@@ -761,6 +761,11 @@ def add_stock_ajax(request):
                             quantity=diff,
                             supplier=supplier,
                             )
+        else:
+            purchase = PurchaseProduct.objects.filter(stock=stock).latest('id')
+            purchase.quantity += diff
+            if purchase.quantity:
+                purchase.save()
         try:
             stock_list = request.session['stock_list']
             if stock_pk in stock_list:
@@ -880,7 +885,10 @@ def stock_edit(request, product_pk, stock_pk=None):
             for option in request.POST.getlist('payment_options[]'):
                 stock.payment_options.add(option)
         if stock_pk:
-            purchase = PurchaseProduct.objects.filter(stock=stock_pk).filter(quantity=stock_quantity).latest('id')
+            try:
+                purchase = PurchaseProduct.objects.filter(stock=stock_pk).filter(quantity=stock_quantity).latest('id')
+            except Exception as e:
+                purchase = PurchaseProduct()
         else:
             purchase = PurchaseProduct()
         purchase.variant = stock.variant
@@ -900,10 +908,14 @@ def stock_edit(request, product_pk, stock_pk=None):
         else:
             purchase.balance = Decimal(request.POST.get('total_cost')) - Decimal(request.POST.get('amount_paid'))
         purchase.supplier = product.product_supplier
-        purchase.save()
-        if request.POST.getlist('payment_options[]'):
-            for option in request.POST.getlist('payment_options[]'):
-                purchase.payment_options.add(option)
+        if stock_pk:
+            if purchase.pk:
+                purchase.save()
+        if not stock_pk:
+            purchase.save()
+            if request.POST.getlist('payment_options[]'):
+                for option in request.POST.getlist('payment_options[]'):
+                    purchase.payment_options.add(option)
 
         messages.success(
             request, pgettext_lazy('Dashboard message', 'Saved stock'))
