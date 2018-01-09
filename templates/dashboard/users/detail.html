@@ -35,7 +35,7 @@
 
                     <div class="caption text-center">
             <h3 class="text-semibold no-margin">
-              {{user.name }} 
+              {{user.name|title }} - ({{user.job_title }})
             </h3>
             
           </div>
@@ -45,10 +45,11 @@
           <table class="table datatable-header-footer">
              <thead><tr><td colspan="2"><h5>Details</h5></td></tr></thead>
             <tbody>
+              <tr><td>Full Names:</td><td> {{user.fullname }}</td></tr>
               <tr><td>Email:</td><td> {{user.email }}</td></tr>
               <tr><td>National ID No:</td><td> {{user.nid }}</td></tr>
               <tr><td>Mobile No:</td><td> {{user.mobile }}</td></tr>
-              <tr><td>Can Login :</td><td>{% if user.is_staff == True %} <span class="text-success"> (granted)<span> {% else %} <span class="text-danger"> (denied)<span> {% endif %}</td></tr>
+              <tr><td>Can Login :</td><td>{% if user.is_active == True %} <span class="text-success"> (granted)<span> {% else %} <span class="text-danger"> (denied)<span> {% endif %}</td></tr>
               <tr><td>Status :</td><td>{% if user.is_active == True and user.is_staff == True %} 
                        <span class="text-success"> (active)<span> {% else %} <span class="text-danger"> (inactive)<span> {% endif %}</td>
               </tr>
