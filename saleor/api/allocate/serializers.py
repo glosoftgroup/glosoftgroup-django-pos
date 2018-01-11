@@ -1,5 +1,4 @@
-from django.conf import settings
-from datetime import date
+from django.utils.formats import localize
 from rest_framework.serializers import (
                 ModelSerializer,
                 HyperlinkedIdentityField,
@@ -79,6 +78,77 @@ class ItemsSerializer(serializers.ModelSerializer):
             return stock.get_stock_quantity()
         except:
             return 0
+
+
+class CarAllocateListSerializer(serializers.ModelSerializer):
+    update_url = HyperlinkedIdentityField(view_name='allocate-api:update-allocate')
+    allocated_items = ItemsSerializer(many=True)
+    allocate_status = SerializerMethodField()
+    cashier = SerializerMethodField()
+    car_name = SerializerMethodField()
+    date = SerializerMethodField()
+    total_allocated = SerializerMethodField()
+    total_sold = SerializerMethodField()
+    car_total_net = SerializerMethodField()
+    agent_name = SerializerMethodField()
+
+    class Meta:
+        model = Allocate
+        fields = (
+            'id',
+            'user',
+            'invoice_number',
+            'total_net',
+            'sub_total',
+            'update_url',
+            'balance',
+            'terminal',
+            'amount_paid',
+            'agent_name',
+            'car_name',
+            'mobile',
+            'customer_name',
+            'cashier',
+            'allocate_status',
+            'total_tax',
+            'discount_amount',
+            'due_date',
+            'date',
+            'allocated_items',
+            'total_allocated',
+            'total_sold',
+            'car_total_net'
+        )
+
+    def get_car_total_net(self, obj):
+        return "{:,}".format(Allocate.objects.car_total_net(obj))
+
+    def get_total_allocated(self, obj):
+        return "{:,}".format(Allocate.objects.total_allocated(obj,self.context['date']))
+
+    def get_total_sold(self, obj):
+        return "{:,}".format(Allocate.objects.total_sold(obj))
+
+    def get_date(self, obj):
+        return localize(obj.created)
+
+    def get_agent_name(self, obj):
+        return obj.agent.name
+
+    def get_car_name(self, obj):
+        try:
+            return obj.car.name
+        except Exception as e:
+            return ''
+
+    def get_allocate_status(self, obj):
+        if obj.status == 'payment-pending':
+            return '<span class="badge badge-flat border-warning text-warning-600" > Pending..</span>'
+        return '<span class ="text-success  icon-checkmark-circle" > <i> </i> </span>'
+
+    def get_cashier(self, obj):
+        name = User.objects.get(pk=obj.user.id)
+        return name.name
 
 
 class AllocateListSerializer(serializers.ModelSerializer):

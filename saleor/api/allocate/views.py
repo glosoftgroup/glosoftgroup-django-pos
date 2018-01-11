@@ -1,8 +1,10 @@
-from django.db.models import Q
+from django.db.models import Q, Count, Avg
 
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework import pagination
 
+from .pagination import PostLimitOffsetPagination
 from ...allocate.models import Allocate
 from ...sale.models import (
                             Sales, SoldItem,
@@ -15,11 +17,13 @@ from .serializers import (
     AllocateListSerializer,
     CreateAllocateSerializer,
     AllocateUpdateSerializer,
+    CarAllocateListSerializer
      )
 from rest_framework import generics
 from ...decorators import user_trail
 import logging
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -53,6 +57,45 @@ class AllocateListAPIView(generics.ListAPIView):
                 Q(invoice_number__icontains=query)
                 ).distinct()
         return queryset_list
+
+
+class CarListAPIView(generics.ListAPIView):
+    serializer_class = CarAllocateListSerializer
+    pagination_class = PostLimitOffsetPagination
+    #queryset = Allocate.objects.all()
+
+    def get_serializer_context(self):
+        if self.request.GET.get('date'):
+            return {"date": self.request.GET.get('date'), 'request': self.request}
+        return {"date": None, 'request': self.request}
+
+    def get_queryset(self, *args, **kwargs):
+        try:
+            if self.kwargs['pk']:
+                queryset_list = Allocate.objects.filter(customer__pk=self.kwargs['pk']).order_by('car').distinct('car').select_related()
+            else:
+                queryset_list = Allocate.objects.all.select_related()
+        except Exception as e:
+            queryset_list = Allocate.objects.distinct('car')
+            query = self.request.GET.get('q')
+        page_size = 'page_size'
+        if self.request.GET.get(page_size):
+            pagination.PageNumberPagination.page_size = self.request.GET.get(page_size)
+        else:
+            pagination.PageNumberPagination.page_size = 10
+        if self.request.GET.get('status'):
+            if self.request.GET.get('status') == 'True':
+                queryset_list = queryset_list.filter(active=True)
+            if self.request.GET.get('status') == 'False':
+                queryset_list = queryset_list.filter(active=False)
+        if self.request.GET.get('date'):
+            queryset_list = queryset_list.filter(created__icontains=self.request.GET.get('date'))
+        if query:
+            queryset_list = queryset_list.filter(
+                Q(invoice_number__icontains=query) |
+                Q(car__name__icontains=query)
+                ).distinct('car')
+        return queryset_list.order_by('car')
 
 
 class AllocateAgentListAPIView(generics.ListAPIView):
