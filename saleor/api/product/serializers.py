@@ -53,6 +53,8 @@ class TrackSerializer(serializers.ModelSerializer):
                 'quantity',
                 'unit_cost',
                 'total_cost',
+                'unit_purchase',
+                'total_purchase',
                 'product_name',
                 'product_category',
                 'tax',
@@ -63,6 +65,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
 class ItemsSerializer(serializers.ModelSerializer):
     available_stock = SerializerMethodField()
+
     class Meta:
         model = SoldItem
         fields = (
@@ -70,6 +73,8 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'sku',
                 'quantity',
                 'unit_cost',
+                'unit_purchase',
+                'total_purchase',
                 'total_cost',
                 'product_name',
                 'product_category',
@@ -321,6 +326,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 class ProductStockListSerializer(serializers.ModelSerializer):    
     productName = SerializerMethodField()
     price = SerializerMethodField()
+    cost_price = SerializerMethodField()
     quantity = SerializerMethodField()
     tax = SerializerMethodField()
     discount = SerializerMethodField()
@@ -336,6 +342,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             'productName',
             'sku',
             'price',
+            'cost_price',
             'wholesale_price',
             'min_price',
             'tax',
@@ -377,6 +384,9 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             return obj.get_min_price_per_item().gross
         except Exception as e:
             return 0
+
+    def get_cost_price(self, obj):
+        return obj.get_stock_cost_price()
 
     def get_wholesale_price(self, obj):
         try:

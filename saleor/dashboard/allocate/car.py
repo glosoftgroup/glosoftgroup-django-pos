@@ -1,44 +1,29 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Count, Min, Sum, Avg, F, Q
 from django.core import serializers
 import dateutil.relativedelta
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 import datetime
-from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
 
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf, image64, default_logo
+from ...utils import render_to_pdf, default_logo
 
 import csv
 import random
 from django.utils.encoding import smart_str
 from datetime import date
 
-from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ..notification.views import custom_notification
-from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, DrawerCash
 from ...allocate.models import Allocate, AllocatedItem
 from ...credit.models import Credit, CreditedItem, CreditHistoryEntry
 from ...product.models import Product, ProductVariant
-from ...purchase.models import PurchaseProduct
+from ...car.models import Car
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
 
@@ -84,12 +69,12 @@ def allocate_history(request, credit_pk=None):
         ctx = {
                'pn': paginator.num_pages,
                'sales': all_sales,
-               "credit":credit,
-               'total_amount':total_amount,
-               'total_balance':total_balance,
-               "total_sales_amount":total_sales_amount,
-               "total_tax_amount":total_tax_amount,
-               "date":last_date_of_sales
+               "credit": credit,
+               'total_amount': total_amount,
+               'total_balance': total_balance,
+               "total_sales_amount": total_sales_amount,
+               "total_tax_amount": total_tax_amount,
+               "date": last_date_of_sales
                }
         return TemplateResponse(request, 'dashboard/reports/history/sales_list.html',ctx)
     except ObjectDoesNotExist as e:
@@ -128,10 +113,19 @@ def allocate_list(request):
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
-def car_list(request):
+def car_list(request, pk=None):
     global table_name
+    if not pk:
+        return HttpResponse('Car pk required')
+    car_name = ''
+    try:
+        car_name = Allocate.objects.get(pk=pk).car.name
+    except Exception as e:
+        pass
     data = {
         "table_name": table_name,
+        "pk": pk,
+        "car_name": car_name
     }
     return TemplateResponse(request, 'dashboard/reports/' + table_name.lower() + '/car.html', data)
 
@@ -142,7 +136,7 @@ def allocate_detail(request, pk=None):
     try:
         sale = Allocate.objects.get(pk=pk)
         items = AllocatedItem.objects.filter(allocate=sale)
-        return TemplateResponse(request, 'dashboard/reports/allocate/details.html',{'items': items, "sale":sale})
+        return TemplateResponse(request, 'dashboard/reports/car/details.html',{'items': items, "sale": sale})
     except ObjectDoesNotExist as e:
         error_logger.error(e)
         return HttpResponse('No items found')

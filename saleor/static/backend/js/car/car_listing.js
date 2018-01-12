@@ -20,18 +20,8 @@ var parent = new Vue({
        date: 'Select date'
     },
     methods:{
-        deleteBooking: function(url,id){
-            /* open delete modal and populate dynamic form attributes */
-            $modal.modal();
-
-            /* set dynamic form data */
-            console.log(url);
-            var prompt_text = $(this).data('title');
-            $('.del').attr('data-id', id);
-            $('.del').attr('data-href', url);
-            $('.modal-title').html(prompt_text);
-            $modal.modal();
-            $('.delete_form').attr('action',url);
+        carTranfers: function(url){
+            window.location.href = url;
         },
         inputChangeEvent:function(){
             /* make api request on events filter */

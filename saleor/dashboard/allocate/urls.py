@@ -39,8 +39,10 @@ urlpatterns = [
         # car reports
         url(r'^car/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (car.allocate_list), name='car_allocate_list'),
-        url(r'^car/transfer/$', permission_required('reports.view_sale_reports', login_url='not_found')
-            (car.car_list), name='car_trasfer_list'),
+        url(r'^car/transfer/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (car.car_list), name='car_transfer_list'),
+        url(r'^car/transfer/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (car.allocate_detail), name='car-allocate-detail')
 
 ]
 

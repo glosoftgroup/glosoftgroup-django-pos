@@ -8,7 +8,7 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class="active"><a href="">{{ table_name }} </a></li>
+     <li class="active"><a href="{% url 'dashboard:car_allocate_list' %}">{{ table_name }} Stock Transfer </a></li>
  {% endblock %}
 
 
@@ -42,6 +42,8 @@
           display: none;
        }
     }
+
+    .td { cursor:pointer }
    </style>
  {% endblock %}
 
@@ -138,7 +140,7 @@
                 </template>
                 <!--listing template-->
                 <template v-for="item in items">
-                    <tr>
+                    <tr class="td animated fadeIn" @click="carTranfers(item.car_url)">
                         <td>
                             ${item.date}
                         </td>
