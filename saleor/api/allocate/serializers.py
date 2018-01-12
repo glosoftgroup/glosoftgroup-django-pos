@@ -82,6 +82,7 @@ class ItemsSerializer(serializers.ModelSerializer):
 
 class CarAllocateListSerializer(serializers.ModelSerializer):
     update_url = HyperlinkedIdentityField(view_name='allocate-api:update-allocate')
+    car_url = HyperlinkedIdentityField(view_name='dashboard:car_transfer_list')
     allocated_items = ItemsSerializer(many=True)
     allocate_status = SerializerMethodField()
     cashier = SerializerMethodField()
@@ -101,6 +102,7 @@ class CarAllocateListSerializer(serializers.ModelSerializer):
             'total_net',
             'sub_total',
             'update_url',
+            'car_url',
             'balance',
             'terminal',
             'amount_paid',
@@ -153,8 +155,14 @@ class CarAllocateListSerializer(serializers.ModelSerializer):
 
 class AllocateListSerializer(serializers.ModelSerializer):
     update_url = HyperlinkedIdentityField(view_name='allocate-api:update-allocate')
+    car_allocate_url = HyperlinkedIdentityField(view_name='dashboard:car-allocate-detail')
     allocated_items = ItemsSerializer(many=True)
     cashier = SerializerMethodField()
+    total_allocated = SerializerMethodField()
+    total_sold = SerializerMethodField()
+    agent_name = SerializerMethodField()
+    allocate_status = SerializerMethodField()
+    date = SerializerMethodField()
 
     class Meta:
         model = Allocate
@@ -165,10 +173,12 @@ class AllocateListSerializer(serializers.ModelSerializer):
                  'total_net',
                  'sub_total',                 
                  'update_url',
+                 'car_allocate_url',
                  'balance',
                  'terminal',
                  'amount_paid',
                  'agent',
+                 'agent_name',
                  'car',
                  'mobile',
                  'customer_name',
@@ -178,12 +188,33 @@ class AllocateListSerializer(serializers.ModelSerializer):
                  'discount_amount',
                  'due_date',
                  'debt',
-                 'allocated_items',
+                 'total_allocated',
+                 'total_sold',
+                 'allocate_status',
+                 'date',
+                 'allocated_items'
                 )
+
+    def get_date(self, obj):
+        return localize(obj.created)
+
+    def get_allocate_status(self, obj):
+        if obj.status == 'payment-pending':
+            return '<span class="badge badge-flat border-warning text-warning-600" > Pending..</span>'
+        return '<span class ="text-success  icon-checkmark-circle" > <i> </i> </span>'
 
     def get_cashier(self, obj):
         name = User.objects.get(pk=obj.user.id)
         return name.name
+
+    def get_total_allocated(self, obj):
+        return obj.total_allocated()
+
+    def get_total_sold(self, obj):
+        return obj.sold_items()
+
+    def get_agent_name(self, obj):
+        return obj.agent.name
 
 
 class CreateAllocateSerializer(serializers.ModelSerializer):

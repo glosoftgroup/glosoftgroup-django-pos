@@ -10,7 +10,8 @@
  Product Tranfer Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:allocate_list' %}">Product Transfer Report</a></li>
+      <li class=""><a href="{% url 'dashboard:car_allocate_list' %}">Cars Stock Transfer </a></li>
+     <li class="active"><a href="{% url 'dashboard:car_transfer_list' pk=sale.pk %}">{{ sale.car.name }}</a> </li>
      <li>Receipt</li>
  {% endblock %}
 
@@ -28,7 +29,7 @@
 <div class="col-md-12">
     <div class="row">
         <div class="col-md-12" style="margin-bottom:10px;">
-        <a class="btn btn-primary pull-left" href="{% url 'dashboard:allocate_list' %}"><i class="icon-arrow-left13 position-left"></i> Back To Product Transfer List</a>
+        <a class="btn btn-primary pull-left" href="{% url 'dashboard:car_transfer_list' pk=sale.pk %}"><i class="icon-arrow-left13 position-left"></i> Back To Product Transfer List</a>
         <a class="btn btn-primary pull-right printPdf" data-url="{% url 'dashboard:pdf-allocate-detail' pk=sale.pk%}" href="javascript:;"><i class="fa fa-file-pdf-o position-left"></i> Print</a>
         </div>
     </div>
@@ -45,6 +46,10 @@
                         <h6><span class="text-bold">Customer:</span> {% if sale.agent.name %} {{sale.agent.name}} {% else %} <span class="text-bold">--</span>{% endif %}</h6>
                           <h6 class=""><span class="text-bold">Receipt Number:</span> {{sale.invoice_number}}</h6>
                           <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
+                          <br>
+                          <h7>
+                              <span class="text-bold">Car:</span>{{sale.car.name}}
+                          </h7>
 
                       </div>
                     </div>
@@ -65,7 +70,7 @@
                       <tbody id="tb">
                         {% if items %}
                         {% for item in items %}
-                          <tr>
+                          <tr class="animated fadeIn">
                             <td>{{item.allocate.created|date:"d-m-Y H:i a"}}</td>
                             <td>{{item.product_name}}</td>
 

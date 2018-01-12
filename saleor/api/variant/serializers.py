@@ -15,6 +15,7 @@ User = get_user_model()
 class VariantListSerializer(serializers.ModelSerializer):
     product_name = SerializerMethodField()
     unit_cost = SerializerMethodField()
+    cost_price = SerializerMethodField()
     quantity = SerializerMethodField()
     tax = SerializerMethodField()
     discount = SerializerMethodField()
@@ -30,6 +31,7 @@ class VariantListSerializer(serializers.ModelSerializer):
             'product_name',
             'sku',
             'unit_cost',
+            'cost_price',
             'tax',
             'discount',
             'quantity',
@@ -38,6 +40,9 @@ class VariantListSerializer(serializers.ModelSerializer):
             'min_price',
             'wholesale_price'
         )
+
+    def get_cost_price(self, obj):
+        return obj.get_stock_cost_price()
 
     def get_attributes_list(self, obj):
         return ProductVariant.objects.filter(pk=obj.pk).extra(select=dict(key="content_item.data -> 'attributes'"))\

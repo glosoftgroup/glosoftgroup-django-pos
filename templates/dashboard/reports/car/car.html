@@ -8,7 +8,8 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class="active"><a href="">{{ table_name }} </a></li>
+     <li class=""><a href="{% url 'dashboard:car_allocate_list' %}">{{ table_name }}  Stock Transfer </a></li>
+     <li class="active">{{ car_name }} </li>
  {% endblock %}
 
 
@@ -42,6 +43,7 @@
           display: none;
        }
     }
+    .td { cursor: pointer }
    </style>
  {% endblock %}
 
@@ -102,14 +104,13 @@
       <div class="panel panel-flat" id="printme">
         <div class="panel-body">
             <div class="col-md-12">
-                <h5 class="text-center text-bold">Car Allocation Report</h5>
+                <h5 class="text-center text-bold">{{car_name}} Report</h5>
             </div>
         <div class="">
           <table class="table room-striped room-hover dataroom-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
                     <th>Date</th>
-                    <th>Car</th>
                     <th>Invoice</th>
                     <th>Status</th>
                     <th>Agent</th>
@@ -138,11 +139,10 @@
                 </template>
                 <!--listing template-->
                 <template v-for="item in items">
-                    <tr>
+                    <tr class="td animated fadeIn" @click="carTranfers(item.car_allocate_url)">
                         <td>
                             ${item.date}
                         </td>
-                        <td>${item.car_name}</td>
                         <td>
                             ${item.invoice_number}<br>
                             <span v-show="item.active"><mark>active</mark></span>
@@ -152,7 +152,7 @@
                         <td>${item.cashier}</td>
                         <td>${item.total_allocated}</td>
                         <td>${item.total_sold}</td>
-                        <td>${item.car_total_net}</td>
+                        <td>${item.total_net}</td>
 
                     </tr>
                 </template>
@@ -321,7 +321,7 @@
    </div>
  </div>
 <input type="hidden" class="pageUrls"
-  data-bookinglisturl="{% url 'allocate-api:api-car-report-list' %}"
+  data-bookinglisturl="{% url 'allocate-api:api-car-transfer-list' pk=pk %}"
 >
 </div>
 <!--charts     -->

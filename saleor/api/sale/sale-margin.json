@@ -1,0 +1,16 @@
+
+Sale Margin List Api
+
+GET /api/sale/margin/
+
+HTTP 200 OK
+Allow: GET, HEAD, OPTIONS
+Content-Type: application/json
+Vary: Accept
+
+{
+    "total_cost": 632.0,
+    "margin": 3925.48,
+    "total_sale": 4557.48
+}
+

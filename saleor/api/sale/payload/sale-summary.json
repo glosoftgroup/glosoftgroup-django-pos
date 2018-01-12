@@ -1,0 +1,26 @@
+
+
+GET /api/sale/?date=2018-01-12
+
+HTTP 200 OK
+Allow: GET, HEAD, OPTIONS
+Content-Type: application/json
+Vary: Accept
+
+[
+    {
+        "product_category": "Slack",
+        "c": 1,
+        "total_cost__sum": 71.24,
+        "product_name": "Slack (3-sd3459)",
+        "quantity__sum": 34
+    },
+    {
+        "product_category": "GAS",
+        "c": 1,
+        "total_cost__sum": 35.62,
+        "product_name": "Slack (3-sdfe)",
+        "quantity__sum": 11
+    }
+]
+

@@ -48,12 +48,19 @@ def add_stock_payment_options(sender, **kwargs):
         cash = Payment.objects.filter(name='Cash')
         if not cash.exists():
             Payment.objects.create(name="Cash")
+
+        cash = Payment.objects.filter(name='Cheque')
+        if not cash.exists():
+            Payment.objects.create(name="Cheque")
+
         visa = PaymentOption.objects.filter(name='Visa')
         if not visa.exists():
             Payment.objects.create(name="Visa")
+
         mpesa = Payment.objects.filter(name='Mpesa')
         if not mpesa.exists():
             Payment.objects.create(name="Mpesa")
+
         points = PaymentOption.objects.filter(name='Credit')
         if not points.exists():
             Payment.objects.create(name="Credit")
@@ -124,3 +131,4 @@ post_migrate.connect(add_view_permissions)
 post_migrate.connect(add_payment_options)
 post_migrate.connect(add_terminal)
 post_migrate.connect(add_stock_location)
+post_migrate.connect(add_stock_payment_options)
