@@ -1,40 +1,50 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal
-from uuid import uuid4
 
-import emailit.api
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
 from django_prices.models import PriceField
 
 from django.utils import timezone
-from payments import PaymentStatus, PurchasedItem
-from payments.models import BasePayment
-from prices import Price, FixedDiscount
-from django.db.models import F
-from satchless.item import ItemLine, ItemSet
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
-from ..discount.models import Voucher
-from ..product.models import Product
 from ..userprofile.models import Address
-from ..customer.models import Customer
 from ..site.models import SiteSettings
 from ..sale.models import Terminal, PaymentOption
 from ..car.models import Car
 
 from . import OrderStatus
-from . import TransactionStatus
 
 
 class AllocateManager(models.Manager):
+    def car_total_net(self, obj):
+        return self.get_queryset().filter(car=obj.car)\
+                          .aggregate(sum=models.Sum('total_net'))['sum']
+
+    def total_allocated(self, obj, date):
+        if date:
+            allocations = self.get_queryset().filter(
+                          models.Q(car=obj.car) &
+                          models.Q(created__icontains=date)
+            )
+        else:
+            allocations = self.get_queryset().filter(car=obj.car)
+        total = 0
+        for item in allocations:
+            total += item.allocated_items.aggregate(sum=models.Sum('allocated_quantity'))['sum']
+        return total
+
+    def total_sold(self, obj):
+        allocations = self.get_queryset().filter(car=obj.car)
+        total = 0
+        for item in allocations:
+            total += item.allocated_items.aggregate(sum=models.Sum('sold'))['sum']
+        return total
+
     def due_credits(self):        
         return self.get_queryset().filter(due_date__lte=timezone.now())
 
@@ -114,6 +124,7 @@ class Allocate(models.Model):
         null=False,default=now)
     
     objects = AllocateManager()
+
     class Meta:
         ordering = ('-last_status_change',)
         verbose_name = pgettext_lazy('Allocate model', 'Allocate')
