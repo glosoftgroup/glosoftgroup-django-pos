@@ -367,8 +367,11 @@ class ProductVariant(models.Model, Item):
         return self.product.product_class.is_shipping_required
 
     def get_stock_cost_price(self):
-        stock = Stock.objects.get(variant=self.id).cost_price.gross
-        return stock
+        try:
+            stock = Stock.objects.get(variant=self.id).cost_price.gross
+            return stock
+        except Exception as e:
+            return 0
 
     def is_in_stock(self):
         return any(
