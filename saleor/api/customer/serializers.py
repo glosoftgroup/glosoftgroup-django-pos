@@ -73,3 +73,5 @@ class CustomerUpdateSerializer(serializers.ModelSerializer):
         instance.redeemed_loyalty_points += Decimal(self.points)
         instance.save()
         return instance
+
+

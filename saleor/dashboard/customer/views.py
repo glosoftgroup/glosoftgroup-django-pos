@@ -341,12 +341,72 @@ def report_pagination(request):
         users = paginator.page(paginator.num_pages)
     return TemplateResponse(request, 'dashboard/customer/pagination/report_paginate.html', {"users":users})
 
+
 # credit views
+table_name = 'credit'
+
+
+@staff_member_required
+@permission_decorator('customer.view_customer')
+def credit_api(request):
+    global table_name
+    data = {
+        "table_name": table_name,
+    }
+    return TemplateResponse(request, 'dashboard/customer/' + table_name.lower() + '/list_api.html', data)
+
+
+@staff_member_required
+@permission_decorator('reports.view_sale_reports')
+def single_list(request, pk=None):
+    global table_name
+    if not pk:
+        return HttpResponse(table_name+' pk required')
+    name = ''
+    try:
+        name = Table.objects.get(pk=pk).supplier.name
+    except Exception as e:
+        pass
+    data = {
+        "table_name": table_name,
+        "pk": pk,
+        "name": name
+    }
+    return TemplateResponse(request, 'dashboard/customer/' + table_name.lower() + '/more.html', data)
+
+
+# credit views
+@staff_member_required
+@permission_decorator('customer.view_customer')
+def credit_distinct(request):
+    try:
+        users = Credit.objects.filter(~Q(customer=None)).distinct('customer').order_by('customer')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(users, 10)
+        try:
+            users = paginator.page(page)
+        except PageNotAnInteger:
+            users = paginator.page(1)
+        except InvalidPage:
+            users = paginator.page(1)
+        except EmptyPage:
+            users = paginator.page(paginator.num_pages)
+        user_trail(request.user.name, 'accessed customers page', 'view')
+        info_logger.info('User: ' + str(request.user.name) + 'view customers')
+        if request.GET.get('initial'):
+            return HttpResponse(paginator.num_pages)
+        else:
+            return TemplateResponse(request, 'dashboard/customer/credit/list_distinct.html',{'users': users, 'pn': paginator.num_pages})
+    except TypeError as e:
+        error_logger.error(e)
+        return TemplateResponse(request, 'dashboard/customer/credit/list_distinct.html', {'users': users, 'pn': paginator.num_pages})
+
+
 @staff_member_required
 @permission_decorator('customer.view_customer')
 def credit_report(request):
     try:
-        users =  Credit.objects.filter(~Q(customer=None)).order_by('-id')
+        users = Credit.objects.filter(~Q(customer=None)).order_by('-id')
         page = request.GET.get('page', 1)
         paginator = Paginator(users, 10)
         try:
@@ -366,6 +426,7 @@ def credit_report(request):
     except TypeError as e:
         error_logger.error(e)
         return TemplateResponse(request, 'dashboard/customer/credit/list.html', {'users': users, 'pn': paginator.num_pages})
+
 
 @staff_member_required
 def credit_search(request):

@@ -1,3 +1,4 @@
+from django.utils.formats import localize
 from rest_framework.serializers import (
                 ModelSerializer,
                 HyperlinkedIdentityField,
@@ -367,4 +368,36 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             error_logger.error(e)
         return instance
 
+
+class TableListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Credit
+        fields = (
+            'id',
+            'invoice_number',
+            'created',
+        )
+
+
+class DistinctTableListSerializer(serializers.ModelSerializer):
+    #purchase_url = HyperlinkedIdentityField(view_name='dashboard:sale_supplier_list')
+    date = SerializerMethodField()
+
+    class Meta:
+        model = Credit
+        fields = (
+                 'id',
+                 'invoice_number',
+                 'total_net',
+                 'sub_total',
+                 'balance',
+                 'terminal',
+                 'amount_paid',
+                 'date',
+                 )
+
+
+    def get_date(self, obj):
+        return localize(obj.created)
 

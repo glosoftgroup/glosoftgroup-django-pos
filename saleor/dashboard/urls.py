@@ -16,6 +16,7 @@ from .order.urls import urlpatterns as order_urls
 from .payment.urls import urlpatterns as payment_urls
 from .permgroups.urls import urlpatterns as group_urls
 from .product.urls import urlpatterns as product_urls
+from .purchase.urls import urlpatterns as purchase_urls
 from .variants.urls import urlpatterns as variants_urls
 from .reports.urls import urlpatterns as reports_urls
 
@@ -44,6 +45,7 @@ urlpatterns = [
     url(r'^messages/', include(messages_urls)),
     url(r'^notification/',include(notification_urls)),    
     url(r'^perms/', include(group_urls)),
+    url(r'^purchase/', include(purchase_urls)),
     url(r'^reports/', include(reports_urls)),
     url(r'^search/', include(search_urls)),
     url(r'^settings/', include(site_urls)),
