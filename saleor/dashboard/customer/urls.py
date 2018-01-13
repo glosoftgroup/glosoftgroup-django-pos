@@ -38,7 +38,9 @@ urlpatterns = [
         url(r'^reports/loyalty-points/pdf/$', views.costomer_loyalty_points_pdf, name='costomer_loyalty_points_pdf'),
         # credit urls        
         url(r'^credit-list/$', permission_required('customer.view_customer', login_url='not_found')
-            (views.credit_report), name='customer_credit_list'),        
+            (views.credit_report), name='customer_credit_list'),
+        url(r'^credit/$', permission_required('customer.view_customer', login_url='not_found')
+            (views.credit_api), name='customer-credit-list'),
         url(r'^credit/paginate/$', views.credit_pagination, name='customer-credit-paginate'),
         url(r'^credit/search/$', views.credit_search, name='customer-credit-search'),
 

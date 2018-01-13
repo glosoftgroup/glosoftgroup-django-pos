@@ -17,6 +17,7 @@ error_logger = logging.getLogger('error_logger')
 
 class CreditWorthyCustomerListAPIView(generics.ListAPIView):
     serializer_class = CreditWorthyCustomerSerializer
+
     def get_queryset(self, *args, **kwargs):        
         queryset_list = Customer.objects.filter(creditable=True)
         query = self.request.GET.get('q')
@@ -44,6 +45,7 @@ class CustomerListAPIView(generics.ListAPIView):
 class CustomerDetailAPIView(generics.RetrieveAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerListSerializer
+
 
 class CustomerUpdateAPIView(generics.RetrieveUpdateAPIView):    
     queryset = Customer.objects.all()

@@ -1,0 +1,32 @@
+{
+    "id": 42,
+    "invoice_number": "TestInvoice",
+    "total_net": "1000.00",
+    "sub_total": "1234.00",
+    "balance": "12345.00",
+    "terminal": 1,
+    "amount_paid": "120.00",
+    "mobile": "25499999000",
+    "customer_name": "Customer Name",
+    "status": "payment-pending",
+    "total_tax": "0.00",
+    "discount_amount": null,
+    "debt": "880.00",
+    "allocated_items": [
+        {
+            "id": 66,
+            "order": 1,
+            "sku": "57-1337",
+            "allocated_quantity": 10,
+            "quantity": 1,
+            "sold": 1,
+            "unsold": 9,
+            "unit_cost": "90.00",
+            "total_cost": "90.00",
+            "product_name": "Gray, Martinez and Perry (57-1337)",
+            "product_category": "Flour",
+            "tax": 16,
+            "discount": "200.00"
+        }
+    ]
+}

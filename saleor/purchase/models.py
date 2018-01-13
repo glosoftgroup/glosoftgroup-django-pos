@@ -24,6 +24,40 @@ from saleor.payment.models import PaymentOption
 from . import OrderStatus
 
 
+class PurchaseProductManager(models.Manager):
+
+    def total_quantity(self, obj, date=None):
+        if date:
+            allocations = self.get_queryset().filter(
+                models.Q(supplier=obj.supplier) &
+                models.Q(created__icontains=date)
+            )
+        else:
+            allocations = self.get_queryset().filter(supplier=obj.supplier)
+        total = 0
+        for item in allocations:
+            total += int(item.quantity)
+        return total
+
+    def total_cost(self, obj, date=None):
+        if date:
+            allocations = self.get_queryset().filter(
+                models.Q(supplier=obj.supplier) &
+                models.Q(created__icontains=date)
+            )
+        else:
+            allocations = self.get_queryset().filter(supplier=obj.supplier)
+        total = 0
+        for item in allocations:
+            try:
+                total += item.total_cost.gross
+            except Exception as e:
+                print(e)
+        return total
+
+
+
+
 @python_2_unicode_compatible
 class PurchaseProduct(models.Model):
     variant = models.ForeignKey(
@@ -69,6 +103,8 @@ class PurchaseProduct(models.Model):
     comment = models.CharField(
         pgettext_lazy('PurchaseProduct field', 'comment'),
         max_length=100, default='', blank=True)
+
+    objects = PurchaseProductManager()
 
     class Meta:
         verbose_name = pgettext_lazy('PurchaseProduct model', 'PurchaseProduct')

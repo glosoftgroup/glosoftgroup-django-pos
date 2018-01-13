@@ -4,16 +4,16 @@
 {% load prices_i18n %}
 
 {% block title %}
-  {{ table_name }}
+  {{ table_name }} - {{ name }}
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class=""><a href="{% url 'dashboard:car_allocate_list' %}">{{ table_name }}  Stock Transfer </a></li>
-     <li class="active">{{ car_name }} </li>
+     <li class=""><a href="{% url 'dashboard:sale_purchase_list' %}">{{ table_name }}  Product Purchase </a></li>
+     <li class="active">{{ name }} </li>
  {% endblock %}
 
 
-{% block menu_allocatereport_class %}active{% endblock %}
+{% block menu_purchase_report_class %}active{% endblock %}
  {% block custom_css %}
    <style type="text/css">
       .theme_xbox .pace_activity, .theme_xbox .pace_activity::after, .theme_xbox .pace_activity::before, .theme_xbox_sm .pace_activity, .theme_xbox_sm .pace_activity::after, .theme_xbox_sm .pace_activity::before, .theme_xbox_xs .pace_activity, .theme_xbox_xs .pace_activity::after, .theme_xbox_xs .pace_activity::before {
@@ -104,20 +104,17 @@
       <div class="panel panel-flat" id="printme">
         <div class="panel-body">
             <div class="col-md-12">
-                <h5 class="text-center text-bold">{{car_name}} Report</h5>
+                <h5 class="text-center text-bold">{{name}} Report</h5>
             </div>
         <div class="">
           <table class="table room-striped room-hover dataroom-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
                     <th>Date</th>
-                    <th>Invoice</th>
-                    <th>Status</th>
-                    <th>Agent</th>
-                    <th>Cashier</th>
-                    <th>Allocated</th>
-                    <th>Sold</th>
-                    <th>Total Sale</th>
+                    <th>Supplier</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Total Purchase</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -139,20 +136,14 @@
                 </template>
                 <!--listing template-->
                 <template v-for="item in items">
-                    <tr class="td animated fadeIn" @click="carTranfers(item.car_allocate_url)">
+                    <tr class="td animated fadeIn">
                         <td>
                             ${item.date}
                         </td>
-                        <td>
-                            ${item.invoice_number}<br>
-                            <span v-show="item.active"><mark>active</mark></span>
-                        </td>
-                        <td v-html="item.allocate_status"></td>
-                        <td>${item.agent_name}</td>
-                        <td>${item.cashier}</td>
-                        <td>${item.total_allocated}</td>
-                        <td>${item.total_sold}</td>
-                        <td>${item.total_net}</td>
+                        <td>${item.supplier_name}</td>
+                        <td>${item.product_name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.total_cost}</td>
 
                     </tr>
                 </template>
@@ -321,7 +312,7 @@
    </div>
  </div>
 <input type="hidden" class="pageUrls"
-  data-bookinglisturl="{% url 'allocate-api:api-car-transfer-list' pk=pk %}"
+  data-bookinglisturl="{% url 'purchase-api:api-list-purchase' pk=pk %}"
 >
 </div>
 <!--charts     -->
