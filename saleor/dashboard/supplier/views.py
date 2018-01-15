@@ -15,6 +15,7 @@ from ...userprofile.models import User, UserTrail
 from ...supplier.models import Supplier, AddressBook
 from ...purchase.models import PurchaseProduct
 from ...product.models import Stock
+from saleor.payment.models import PaymentOption
 
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, default_logo
@@ -647,11 +648,14 @@ def credit_stock_search(request,pk=None):
 #statement
 @staff_member_required
 def credit_statement(request, pk=None, stock_pk=None):
-    credit  = Stock.objects.get(pk=stock_pk)
+    credit = Stock.objects.get(pk=stock_pk)
     context_instance = Supplier.objects.get(pk=pk)
     sales = PurchaseProduct.objects.filter(stock=stock_pk).order_by('-id')
+    payment_options = PaymentOption.objects.all()
     return TemplateResponse(request, 'dashboard/supplier/stock/statement.html',
-                            {'sales': sales, 'context_instance': context_instance, 'credit': credit})
+                            {'sales': sales,
+                             'payment_options': payment_options,
+                             'context_instance': context_instance, 'credit': credit})
 
 
 @staff_member_required

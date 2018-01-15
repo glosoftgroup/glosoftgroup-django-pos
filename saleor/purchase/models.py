@@ -90,6 +90,8 @@ class PurchaseProduct(models.Model):
         verbose_name=pgettext_lazy('PurchaseProduct item field', 'supplier'), null=True, blank=True)
     invoice_number = models.CharField(
         pgettext_lazy('PurchaseProduct', 'invoice_number'), null=True, max_length=36,)
+    payment_number = models.CharField(
+        pgettext_lazy('PurchaseProduct field', 'payment_number'), null=True, max_length=36, )
     payment_options = models.ManyToManyField(
         PaymentOption, related_name='purchase_payment_option', blank=True,
         verbose_name=pgettext_lazy('PurchaseProduct item field',

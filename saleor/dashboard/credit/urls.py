@@ -6,21 +6,24 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
-
 urlpatterns = [
         url(r'^$', permission_required('reports.view_sale_reports', login_url='not_found')
             (views.credit_list), name='credit_list'),
-        url(r'^history/(?P<credit_pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
+        url(r'^history/(?P<credit_pk>[0-9]+)/dl/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (views.credit_history), name='credit_history'),
+
         url(r'^history/pdf/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (views.credit_detail_pdf), name='credit_history_pdf'),
         url(r'^credit/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (views.credit_reports), name='credit_reports'),
         url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (views.credit_detail), name='credit-detail'),
+        url(r'^detail/(?P<pk>[0-9]+)/ayt/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (views.credit_history_api), name='credit-detail2'),
 
-        url( r'^credit_search/$', views.credit_search, name = 'credit_search' ),
-        url( r'^credit_paginate/$', views.credit_paginate, name = 'credit_paginate'),
+
+        url(r'^credit_search/$', views.credit_search, name = 'credit_search' ),
+        url(r'^credit_paginate/$', views.credit_paginate, name = 'credit_paginate'),
 
 
         url(r'^reports/credit/list/pdf/$', pdfs.sales_list_pdf, name='reports_credit_list_pdf'),

@@ -361,10 +361,10 @@ def credit_api(request):
 def single_list(request, pk=None):
     global table_name
     if not pk:
-        return HttpResponse(table_name+' pk required')
+        return HttpResponse('Instance pk required')
     name = ''
     try:
-        name = Table.objects.get(pk=pk).supplier.name
+        name = Credit.objects.get(pk=pk).customer.name
     except Exception as e:
         pass
     data = {
@@ -462,6 +462,7 @@ def credit_search(request):
 
             return TemplateResponse(request, 'dashboard/customer/pagination/credit_search.html',
             {"users":users, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
 def credit_pagination(request):

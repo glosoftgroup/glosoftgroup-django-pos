@@ -83,7 +83,6 @@
                     <th>Amount Paid</th>
                     <th>Total</th>
                     <th>To pay</th>
-                    <th>Pay</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -112,10 +111,7 @@
                         <span class="stock-balance" data-balance="{{user.stock.get_balance}}">{{user.stock.get_balance}}</span>
                     </td>
                       <!-- pay -->
-                    <td class="tdx" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                        <!-- kebab-case in HTML -->
-                        <child balance="{{user.stock.amount_paid.gross}}" pk="{{user.stock.id}}"></child>
-                    </td>
+
 
                       <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                        <span class="stock-status">
@@ -224,7 +220,6 @@
 
   <script>
     var purchaseUrl = "{% url 'dashboard:update-stock-purchase-data' %}";
-    console.log(purchaseUrl)
     var csrf = $("[name=csrfmiddlewaretoken]").val();
     var oldBalance = 0;
     var amountPaid = 0;
@@ -238,6 +233,31 @@
             }
     }
 
+     // Initialize
+    $('.type-numberll').editable({
+        url: purchaseUrl,
+        showbuttons: 'bottom',
+        value: {
+            city: "Moscow",
+            street: "Lenina",
+            building: "12"
+        },
+        tpl: '<div class="editable-address form-group"><label>City: </label><input type="text" name="city" class="form-control"></div>'+
+        '<div class="editable-address form-group"><label>Street: </label><input type="text" name="street" class="form-control"></div>'+
+        '<div class="editable-address form-group"><label>Building: </label><input type="text" name="building" class="form-control"></div>',
+        validate: function(value) {
+            if(value.city == '') return 'city is required!';
+        },
+        display: function(value) {
+        if(!value) {
+            $(this).empty();
+            return;
+        }
+        var html = '<b>' + $('<div>').text(value.city).html() + '</b>, ' + $('<div>').text(value.street).html() + ' st., bld. ' + $('<div>').text(value.building).html();
+            $(this).html(html);
+        }
+    });
+
     // purchase stock update
     $('.type-number').editable({
         url: purchaseUrl,
@@ -245,6 +265,7 @@
         params: {
             csrfmiddlewaretoken: csrf
         },
+
         validate: function(value) {
             if($.trim(value) == '') {
                 return 'This field is required';

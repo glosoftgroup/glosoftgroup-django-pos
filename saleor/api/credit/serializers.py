@@ -370,34 +370,92 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
 
 
 class TableListSerializer(serializers.ModelSerializer):
+    detail_url = HyperlinkedIdentityField(view_name='dashboard:credit-detail2')
+    date = SerializerMethodField()
+    due_date = SerializerMethodField()
+    customer_name = SerializerMethodField()
+    customer_mobile = SerializerMethodField()
+    credit_status = SerializerMethodField()
+    is_due = SerializerMethodField()
+    credit_amount = SerializerMethodField()
 
     class Meta:
         model = Credit
         fields = (
             'id',
             'invoice_number',
-            'created',
+            'status',
+            'is_due',
+            'customer_name',
+            'customer_mobile',
+            'credit_status',
+            'credit_amount',
+            'detail_url',
+            'due_date',
+            'date',
         )
+
+    def get_is_due(self, obj):
+        if obj.is_fully_paid:
+            return '<span class ="text-success  icon-checkmark-circle"> <i> </i> </span>'
+        else:
+            return '<span class ="badge badge-flat border-warning text-warning-600" > Pending..</span>'
+
+    def get_credit_amount(self, obj):
+        try:
+            return "{:,}".format(obj.total_net)
+        except:
+            return 0
+
+    def get_credit_status(self, obj):
+        if obj.status == 'payment-pending':
+            return '<span class="badge badge-flat border-warning text-warning-600" > Pending..</span>'
+        return '<span class ="text-success  icon-checkmark-circle" > <i> </i> </span>'
+
+    def get_date(self, obj):
+        return localize(obj.created)
+
+    def get_due_date(self, obj):
+        return localize(obj.due_date)
+
+    def get_customer_name(self, obj):
+        return obj.customer.name
+
+    def get_customer_mobile(self, obj):
+        return obj.customer.mobile
 
 
 class DistinctTableListSerializer(serializers.ModelSerializer):
-    #purchase_url = HyperlinkedIdentityField(view_name='dashboard:sale_supplier_list')
+    single_url = HyperlinkedIdentityField(view_name='dashboard:single-credit-list')
     date = SerializerMethodField()
+    customer_name = SerializerMethodField()
+    customer_mobile = SerializerMethodField()
+    total_due = SerializerMethodField()
 
     class Meta:
         model = Credit
         fields = (
                  'id',
-                 'invoice_number',
-                 'total_net',
+                 'customer_name',
+                 'customer_mobile',
+                 'total_due',
                  'sub_total',
                  'balance',
                  'terminal',
                  'amount_paid',
+                 'single_url',
                  'date',
                  )
 
-
     def get_date(self, obj):
         return localize(obj.created)
+
+    def get_total_due(self, obj):
+        return Credit.objects.customer_credits(obj.customer)
+
+    def get_customer_name(self, obj):
+        return obj.customer.name
+
+    def get_customer_mobile(self, obj):
+        return obj.customer.mobile
 

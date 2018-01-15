@@ -8,7 +8,7 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:sale_purchase_list' %}">{{ table_name }} Stock Transfer </a></li>
+     <li class="active"><a href="{% url 'dashboard:customer-credit-list' %}">{{ table_name }} Credit Report </a></li>
  {% endblock %}
 
 
@@ -104,17 +104,16 @@
       <div class="panel panel-flat" id="printme">
         <div class="panel-body">
             <div class="col-md-12">
-                <h5 class="text-center text-bold">Product Purchase Report</h5>
+                <h5 class="text-center text-bold">Customer Credit Report</h5>
             </div>
         <div class="">
           <table class="table room-striped room-hover dataroom-header-footer" style="border-bottom:1px solid #ddd;">
                 <thead>
                   <tr class="bg-primary">
                     <th>Date</th>
-                    <th>Supplier</th>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Total Purchase</th>
+                    <th>Customer</th>
+                    <th>Contact</th>
+                    <th>Total</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -136,14 +135,15 @@
                 </template>
                 <!--listing template-->
                 <template v-for="item in items">
-                    <tr class="td animated fadeIn" @click="carTranfers(item.purchase_url)">
+                    <tr class="td animated fadeIn" @click="carTranfers(item.single_url)">
                         <td>
                             ${item.date}
                         </td>
-                        <td>${item.supplier_name}</td>
-                        <td>${item.product_name}</td>
-                        <td>${item.total_quantity}</td>
-                        <td>${item.total_cost}</td>
+                        <td>${item.customer_name}</td>
+                        <td>
+                            ${item.customer_mobile}
+                        </td>
+                        <td>${item.total_due}</td>
 
                     </tr>
                 </template>

@@ -827,13 +827,15 @@ def purchase_data(request):
     if request.POST.get('pk'):
         obj = Stock.objects.get(pk=request.POST.get('pk'))
         if request.POST.get('value'):
-            if Decimal(request.POST.get('name')) < obj.amount_paid.gross:
-                obj.amount_paid = Decimal(request.POST.get('name')) + Decimal(request.POST.get('value'))
-                # delete last inserted data
-                PurchaseProduct.objects.latest('id').delete()
-            else:
-                obj.amount_paid = obj.amount_paid.gross + Decimal(request.POST.get('value'))
+            # if Decimal(request.POST.get('name')) < obj.amount_paid.gross:
+            #     obj.amount_paid = Decimal(request.POST.get('name')) + Decimal(request.POST.get('value'))
+            #     # delete last inserted data
+            #     PurchaseProduct.objects.latest('id').delete()
+            # else:
+            obj.amount_paid = obj.amount_paid.gross + Decimal(request.POST.get('value'))
             amount_paid = request.POST.get('value')
+        else:
+            return HttpResponse('Amount Paid Required')
         if obj.amount_paid >= obj.total_cost:
             obj.status = 'fully-paid'
         else:
@@ -849,9 +851,19 @@ def purchase_data(request):
         purchase.quantity = obj.quantity
         purchase.amount_paid = amount_paid
         purchase.total_cost = obj.total_cost
-        purchase.balance = obj.total_cost.gross - obj.amount_paid.gross
+        try:
+            purchase.balance = obj.total_cost.gross - obj.amount_paid.gross
+        except:
+            pass
         purchase.supplier = obj.variant.product.product_supplier
+        if request.POST.get('payment_number'):
+            purchase.payment_number = request.POST.get('payment_number')
         purchase.save()
+
+        # add payment options
+        if request.POST.get('payment_option'):
+            options = PaymentOption.objects.get(pk=int(request.POST.get('payment_option')))
+            purchase.payment_options.add(options)
 
         return HttpResponse(json.dumps({'message': obj.pk, 'status':obj.status}), content_type='application/json')
     else:

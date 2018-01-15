@@ -24,11 +24,11 @@ urlpatterns = [
         url(r'^customer/paginate/$', views.customer_pagination, name='customer-paginate'),
         url(r'^customer/search/$', views.customer_search, name='customer-search'),
 
-        url( r'^customer/sales/paginate/customer-sales-detail$', sales.sales_paginate, name = 'customer_sales_paginate'),
-        url( r'^customer/sales/search/$', sales.sales_search, name = 'customer_sales_search'),
+        url(r'^customer/sales/paginate/customer-sales-detail$', sales.sales_paginate, name = 'customer_sales_paginate'),
+        url(r'^customer/sales/search/$', sales.sales_search, name = 'customer_sales_search'),
         url(r'^customer/sales/list/pdf/$', sales.sales_list_pdf, name='customers_sales_list_pdf'),
 
-        url( r'^customer/canbe/creditable/$', views.is_creditable, name = 'is_creditable'),
+        url(r'^customer/canbe/creditable/$', views.is_creditable, name = 'is_creditable'),
 
         # reports urls
         url(r'^reports/$', permission_required('customer.view_customer', login_url='not_found')
@@ -41,6 +41,8 @@ urlpatterns = [
             (views.credit_report), name='customer_credit_list'),
         url(r'^credit/$', permission_required('customer.view_customer', login_url='not_found')
             (views.credit_api), name='customer-credit-list'),
+        url(r'^credit/(?P<pk>[0-9]+)/detail/$', permission_required('customer.view_customer', login_url='not_found')
+            (views.single_list), name='single-credit-list'),
         url(r'^credit/paginate/$', views.credit_pagination, name='customer-credit-paginate'),
         url(r'^credit/search/$', views.credit_search, name='customer-credit-search'),
 
