@@ -176,7 +176,7 @@ urlpatterns = [
     url(r'attr_list/$',views.attr_list,name="attr_list"),
     url(r'attr_list/form32b/$',views.attr_list_f32b,name="attr_list_f32b"),
     url(r'attr_list/form32d/$',views.attr_list_f32d,name="attr_list_f32d"),
-    url(r'add-attributes/ajax/$',views.add_attributes,name="add-attributes"),
+    url(r'add-attributes/ajax/$', views.add_attributes,name="add-attributes"),
 
     url(r'attributes/ajax_add/$',
         views.attribute_add, name='product-attr-add'),

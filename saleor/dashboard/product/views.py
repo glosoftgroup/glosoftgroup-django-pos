@@ -659,6 +659,7 @@ def product_edit(request, pk,name=None):
             'images', 'variants'), pk=pk)
     product = Product.objects.get(pk=product.pk)
     payment_options = PaymentOption.objects.all()
+    suppliers = Supplier.objects.all()
     stock = Stock()
     stock_form = forms.StockForm(request.POST or None, instance=stock,
                            product=product)
@@ -694,6 +695,7 @@ def product_edit(request, pk,name=None):
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
            'payment_options': payment_options,
+           'suppliers': suppliers,
            'variant_form': variant_form}
     print payment_options
     if name:
@@ -1056,6 +1058,12 @@ def add_attributes(request):
             action = 'add'       
         if request.POST.get('sku'):
             product_variant.sku = request.POST.get('sku')
+        if request.POST.get('variant_supplier'):
+            try:
+                supplier = Supplier.objects.get(pk=int(request.POST.get('variant_supplier')))
+                product_variant.variant_supplier = supplier
+            except:
+                pass
         if request.POST.get('price'):
             product_variant.price_override = request.POST.get('price')
         if request.POST.get('minimum_price'):
@@ -1118,8 +1126,10 @@ def variant_edit(request, product_pk, variant_pk=None):
             return redirect(success_url)
     errors = attribute_form.errors
     form_errors = form.errors
-    ctx = {'attribute_form': attribute_form, 'form': form, 'product': product,
-           'variant': variant,'errors':errors,'form_errors':form_errors}
+    suppliers = Supplier.objects.all()
+    ctx = {'attribute_form': attribute_form, 'suppliers': suppliers,
+           'form': form, 'product': product,
+           'variant': variant, 'errors': errors, 'form_errors': form_errors}
     if request.is_ajax():
         return TemplateResponse(
         request, 'dashboard/product/partials/'+str(request.GET['template'])+'.html', ctx)

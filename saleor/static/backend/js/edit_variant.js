@@ -11,14 +11,16 @@
 
 $(function(){
   var EditRefreshDiv = $('#div-edit-variant');
-  var editButton = $('.editVariantBtn');
-  var editvariantBtn = $('#editvariantBtn');
+  var editForm = $('#edit-varaints-here');
+  var editButton = editForm.find('.editVariantBtn');
+  var editvariantBtn = editForm.find('#editvariantBtn');
   var url = '#';
-  var id_sku = $('#id_sku');
-  var rprice = $('#id_price_override');
-  var minimum_price = $('#id_minimum_price');
-  var wprice = $('#id_wholesale_override');
-  var dynamic_attrs = $('.dynamicxedit');
+  var id_sku = editForm.find('#id_sku');
+  var rprice = editForm.find('#id_price_override');
+  var minimum_price = editForm.find('#id_minimum_price');
+  var wprice = editForm.find('#id_wholesale_override');
+  var variantSupplier = editForm.find('#id_variant_supplier');
+  var dynamic_attrs = editForm.find('.dynamicxedit');
 
   
 
@@ -48,7 +50,7 @@ $(function(){
       //alertUser('Please Select variants','bg-danger','Varaints Required!');
       //return false;
     }
-    console.log(JSON.stringify(json));
+    // console.log(JSON.stringify(json));
     dynamicData['attributes'] = JSON.stringify(json);
     if(!id_sku.val()){
       alertUser('SKU field required','bg-warning','Variant SKU!');
@@ -58,6 +60,9 @@ $(function(){
     }
     if(wprice.val()){      
       dynamicData['wholesale'] = wprice.val();
+    }
+    if(variantSupplier.val()){
+      dynamicData['variant_supplier'] = variantSupplier.val();
     }
     if(!rprice.val()){
       alertUser('Retail Price field required','bg-warning','Field Error!');
