@@ -1,27 +1,14 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal
-from uuid import uuid4
-
-import emailit.api
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
-from django_prices.models import PriceField
-from payments import PaymentStatus, PurchasedItem
-from payments.models import BasePayment
-from prices import Price, FixedDiscount
 from jsonfield import JSONField
-from satchless.item import ItemLine, ItemSet
-from datetime import date
 from django.contrib.postgres.fields import HStoreField
-from ..discount.models import Voucher
-from ..product.models import Product
 from ..userprofile.models import Address
 from ..customer.models import Customer
 from ..site.models import SiteSettings

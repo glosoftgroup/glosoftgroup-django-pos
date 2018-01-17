@@ -105,3 +105,5 @@ class PaymentListAPIView(generics.ListAPIView):
         queryset = self.get_queryset().filter(stock__pk=pk)
         serializer = TableListSerializer(queryset, context=serializer_context, many=True)
         return Response(serializer.data)
+
+
