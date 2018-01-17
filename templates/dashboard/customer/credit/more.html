@@ -8,8 +8,8 @@
 {% endblock %}
 
  {% block breadcrumbs %}
-     <li class=""><a href="{% url 'dashboard:sale_purchase_list' %}">{{ table_name }}  Product Purchase </a></li>
-     <li class="active">{{ name }} </li>
+     <li class=""><a href="{% url 'dashboard:customer-credit-list' %}">{{ table_name }} Credit Report </a></li>
+     <li class="active">{{ name }} Credit</li>
  {% endblock %}
 
 
@@ -111,10 +111,10 @@
                 <thead>
                   <tr class="bg-primary">
                     <th>Date</th>
-                    <th>Supplier</th>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Total Purchase</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Is Due</th>
+                    <th>Total Credit</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -136,14 +136,14 @@
                 </template>
                 <!--listing template-->
                 <template v-for="item in items">
-                    <tr class="td animated fadeIn">
+                    <tr class="td animated fadeIn" @click="carTranfers(item.detail_url)">
                         <td>
                             ${item.date}
                         </td>
-                        <td>${item.supplier_name}</td>
-                        <td>${item.product_name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.total_cost}</td>
+                        <td v-html="item.credit_status"></td>
+                        <td>${item.due_date}</td>
+                        <td v-html="item.is_due"></td>
+                        <td>${item.credit_amount}</td>
 
                     </tr>
                 </template>
@@ -312,7 +312,7 @@
    </div>
  </div>
 <input type="hidden" class="pageUrls"
-  data-bookinglisturl="{% url 'purchase-api:api-list-purchase' pk=pk %}"
+  data-bookinglisturl="{% url 'credit-api:api-list-credit' pk=pk %}"
 >
 </div>
 <!--charts     -->

@@ -57,6 +57,7 @@ class Category(MPTTModel):
 
     def get_product_num(self):
         return len(self.products.all())
+
     def get_absolute_url(self, ancestors=None):
         return reverse('product:category',
                        kwargs={'path': self.get_full_path(ancestors),
@@ -292,6 +293,9 @@ class ProductVariant(models.Model, Item):
         pgettext_lazy('Product variant field', 'wholesale override'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
+    variant_supplier = models.ForeignKey(
+        Supplier, related_name='variant_supplier', blank=True, null=True,
+        verbose_name=pgettext_lazy('Product variant field', 'product variant supplier'))
     
     product = models.ForeignKey(Product, related_name='variants')
     attributes = HStoreField(
@@ -535,7 +539,7 @@ class Stock(models.Model):
 
     @property
     def varaintName(self):
-        return self.variant.price_override;
+        return self.variant.price_override
 
     @property
     def Access_pk(self):

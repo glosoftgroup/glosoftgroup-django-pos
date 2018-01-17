@@ -1,0 +1,143 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load prices_i18n %}
+{% load humanize %}
+{% load materializecss %}
+{% load staticfiles %}
+
+{% block title %}
+Add Stock- {{ block.super }}
+{% endblock %}
+{% block breadcrumbs %}
+
+<li class="active"><a href="{% url 'dashboard:purchase-list' %}">Add Stock</a></li>
+
+{% endblock %}
+
+{% block content %}
+<div class="row" id="vue-app">
+
+    <!--content area-->
+    <div class="row">
+        <!--product variant-->
+        <div class="col-md-6" style="border-right: 1px solid #373737;">
+            <!--search filter-->
+            <div class="navbar navbar-default navbar-xs navbar-component">
+        <ul class="nav navbar-nav no-border visible-xs-block">
+            <li><a class="text-center collapsed legitRipple" data-toggle="collapse" data-target="#navbar-filter"><i class="icon-menu7"></i></a></li>
+        </ul>
+
+        <div class="navbar-collapse collapse" id="navbar-filter">
+            <p class="navbar-text">Filter:</p>
+            <ul class="nav navbar-nav">
+                <li class="filter-item">
+                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                        <input class="form-control" placeholder="Search" name="search" type="text">
+                        <div class="form-control-feedback">
+                            <i class="icon-search4 text-size-base text-muted"></i>
+                        </div>
+                    </div>
+                </li>
+                <li class="filter-item mr-15">&nbsp;</li>
+                <li class="filter-item">
+                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                        <select title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
+                            <option value="">Choose Supplier</option>
+                            {% if suppliers %}
+                            {% for supplier in suppliers %}
+                                <option value="{{supplier.id}}">{{supplier}}</option>
+                            {% endfor %}
+                            {% endif %}
+                        </select>
+
+                    </div>
+                </li>
+            </ul>
+
+            <div class="navbar-right">
+                <p class="navbar-text hidden">View mode:</p>
+                <form class="navbar-form navbar-left" action="#">
+                    <div class="form-group">
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+            <!--./filter-->
+            <div class="panel panel-default">
+                <div class="panelbody">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th>Name</th>
+                                <th>SKU</th>
+                                <th>Purchase</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sugar (Mumia 1Kg)</td>
+                                <td>78-2133</td>
+                                <td>
+                                    <button class="btn btn-xs hvr-glow btn-primary legitRipple">Add</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--./variant-->
+        <!--cart-->
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panelbody">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="bgprimary">
+                                <th>Name</th>
+                                <th>SKU</th>
+                                <th>Cost</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sugar (Mumia 1Kg)</td>
+                                <td>78-2133</td>
+                                <td>
+                                    <input type="number" placeholder="amount" class="form-control">
+                                </td>
+                                <td>
+                                    <input type="number" placeholder="cost" class="form-control">
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfooter>
+                            <tr class="active text-right text-bold">
+                                <td colspan="4">Total: 6,900</td>
+                            </tr>
+                        </tfooter>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--./cart-->
+    </div>
+    <!--./content-->
+</div>
+
+{% endblock %}
+
+{% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+<script type="text/javascript">
+  // Basic select
+    $('.bootstrap-select').selectpicker();
+
+  $(document).ready(function(){
+    $('body').addClass('sidebar-xs');
+  });
+</script>
+{% endblock %}

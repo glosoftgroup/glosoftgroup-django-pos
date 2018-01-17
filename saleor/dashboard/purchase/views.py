@@ -6,6 +6,7 @@ import logging
 from ..views import staff_member_required
 from ...purchase.models import PurchaseProduct as Table
 from ...decorators import permission_decorator
+from ...supplier.models import Supplier
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -53,3 +54,15 @@ def allocate_detail(request, pk=None):
         error_logger.error(e)
         return HttpResponse('No items found')
 
+
+# purchase product
+@staff_member_required
+@permission_decorator('reports.view_sale_reports')
+def purchase(request):
+    global table_name
+    suppliers = Supplier.objects.all()
+    data = {
+        "table_name": table_name,
+        'suppliers': suppliers
+    }
+    return TemplateResponse(request, 'dashboard/purchase/form.html', data)

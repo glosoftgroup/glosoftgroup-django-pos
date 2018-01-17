@@ -5,8 +5,8 @@
       
       <!-- ./stock reorder limit -->
       <!-- supplier -->
-      <div class="col-md-3">
-        <div class="form-group" id="div_supplier">
+      <div class="col-md-3 hidden">
+        <div class="form-group hidden" id="div_supplier">
           <label>Supplier:</label>
            <div class="input-group supplier-refresh">
              {{ product_form.product_supplier }}
@@ -30,6 +30,8 @@
        {% endif %}
       </div>
       <div class="col-md-3">
+          {% if not product.product_class.has_variants %}
        <button class="btn btn-primary" style="margin-top: 28px !important;" id="updatestock" data-productpk="{{product.pk}}" data-stockurl="{% url 'dashboard:product-data' %}">Create</button>
+          {% endif %}
       </div>
      </div>

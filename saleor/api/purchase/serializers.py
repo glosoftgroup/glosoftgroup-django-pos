@@ -22,9 +22,12 @@ User = get_user_model()
 class TableListSerializer(serializers.ModelSerializer):
     unit_cost = SerializerMethodField()
     total_cost = SerializerMethodField()
+    paid = SerializerMethodField()
     supplier_name = SerializerMethodField()
     product_name = SerializerMethodField()
+    pay_option = SerializerMethodField()
     date = SerializerMethodField()
+    credit_balance = SerializerMethodField()
 
     class Meta:
         model = Table
@@ -36,15 +39,49 @@ class TableListSerializer(serializers.ModelSerializer):
             'quantity',
             'unit_cost',
             'total_cost',
+            'paid',
+            'credit_balance',
             'supplier_name',
+            'pay_option',
             'date',
         )
 
+    def get_pay_option(self, obj):
+        try:
+            options = obj.payment_options.first().name
+        except Exception as e:
+            print(e)
+            options = ''
+        try:
+            return options + '<br> ' + obj.payment_number
+        except:
+            return ''
+
+    def get_credit_balance(self, obj):
+        try:
+            return "{:,}".format(obj.balance.gross)
+        except Exception as e:
+            print(e)
+            return ''
+
+    def get_paid(self, obj):
+        try:
+            return "{:,}".format(obj.amount_paid.gross)
+        except Exception as e:
+            print(e)
+            return ''
+
     def get_product_name(self, obj):
-        return obj.stock.variant.display_product()
+        try:
+            return obj.stock.variant.display_product()
+        except:
+            return ''
 
     def get_supplier_name(self, obj):
-        return obj.supplier.name
+        try:
+            return obj.supplier.name
+        except:
+            return ''
 
     def get_date(self, obj):
         return localize(obj.created)

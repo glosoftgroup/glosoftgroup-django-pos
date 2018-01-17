@@ -40,15 +40,73 @@
  {% endblock %}
 
 {% block content %}
-<div class="row animated fadeIn">
+<div id="vue-app">
+<!--PAYMENT MODAL-->
+    <form id="pay-form">
+        {% csrf_token %}
+    <div id="payment-modal" class="modal fade">
+        <div class="modal-dialog modal-xs">
+
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title">Add Payment</h6>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="text-semibold">Date:<span class="text-danger">*</span></label>
+                        <input  v-model="date" name="date" id="date" class="form-control daterange-single" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label class="text-semibold">Amount:<span class="text-danger">*</span></label>
+                        <input  v-model.number="amount_paid" name="value" class="form-control" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label class="text-semibold">Method:<span class="text-danger">*</span></label>
+                        <select  v-model="payment_option" name="payment_option" class="form-control bootstrap-select" id="payment-method">
+                            {% if payment_options %}
+                            {% for option in payment_options %}
+                            <option value="{{option.id}}">{{option.name}}</option>
+                            {% endfor %}
+                            {% endif %}
+
+                        </select>
+                    </div>
+					<div class="form-group">
+                        <label class="text-semibold">Payment No.:<span class="text-danger">*</span></label>
+						<input  placeholder="Payment No. e.g Cheque Number" name="payment_number" id="payment_number" class="form-control" type="text">
+					</div>
+                    <div class="form-group">
+                        <label class="text-semibold">Description (optional):</label>
+                        <textarea  v-model="description" class="form-control" name="description" id="description"></textarea>
+                    </div>
+					<input type="hidden" name="pk" id="pk" value="{{credit.pk}}">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                    <button type="button" @click="addPayment" class="btn btn-primary hvr-glow btn-raised legitRipple">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	</form>
+
+    <!--./MODAL-->
+<div class="row animated fadeIn" >
 
 
 <div class="col-md-12">
+
    <div id="paginationdiv">
     <div class="panelpanel-flat">
       <div class="panelbody">
           <!--statement template-->
           <div class="panel panel-white">
+
 						<div class="panel-heading">
 							<h6 class="panel-title">Credit Purchase Statement<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
 							<div class="heading-elements">
@@ -109,38 +167,36 @@
 						<div class="table-responsive" style="padding:12px">
 						    <table class="table table-lg">
 						        <thead>
+									<tr class="active border-double">
+										<td colspan="4" class="text-semibold">PAYMENT DETAILS</td>
+									</tr>
 						            <tr class="bg-primary">
-						                <th>Comment</th>
                                         <th>Date</th>
+										<th>Payment Method</th>
 						                <th class="col-sm-1">Amount</th>
                                         <th class="col-sm-1">Balance</th>
 						            </tr>
 						        </thead>
 						        <tbody>
-                                {% if sales %}
-                                {% for sale in sales %}
-						            <tr>
-						                <td>
-						                	<h6 class="no-margin">{{ sale.comment }}</h6>
-						                	<span class="text-muted">
-                                                {{ sale.comment }}
-                                            <br>
-											Updated by {{ sale.user }}
-											</span>
-					                	</td>
-                                        <td>{{ sale.created }}</td>
-						                <td><span class="text-semibold">{{ sale.amount_paid.gross|intcomma }}</span></td>
-                                        <td>
-										 <span class="text-semibold">
-											{% if sale.balance.gross %}
-											  {{ sale.balance.gross|intcomma }}
-											{% endif %}
-										 </span>
+                                <template v-for="payment in payments">
+									<tr >
+										<td>${ payment.date }</td>
+										<td v-html="payment.pay_option">
 										</td>
+										<td>
+											${ payment.paid }
+										</td>
+										<td class="text-right">${ payment.credit_balance }</td>
+									</tr>
+								</template>
+								<tr class="active border-double">
+									<td colspan="4" class="text-center">
+										<button @click="openModal" onclick="return false;" class="btn btn-success hvr-glow btn-raised legitRipple" id="addPayment">
+										   Add Payment
+									   </button>
+									</td>
+								</tr>
 
-						            </tr>
-                                {% endfor %}
-                                {% endif %}
 						        </tbody>
 
 						    </table>
@@ -201,359 +257,26 @@
    </div><!--pagination div-->
   </div>
 
-
+</div>
 </div>
 
+<!--page urls-->
+<input type="hidden" class="pageUrls"
+       data-bookurl=""
+       data-payurl = "{% url 'dashboard:update-stock-purchase-data' %}"
+       data-paylisturl = "{% url 'purchase-api:api-list-stock-purchase' pk=credit.pk %}"
+      >
 {% endblock%}
 {% block custom_js %}
   <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/highcharts.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/exporting.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/Highcharts-5.0.14/code/modules/drilldown.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/ui/dom-to-image-master/dom-to-image.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/pickers/bootstrap_datepicker/js/bootstrap-datepicker.min.js' %}"></script>
-<script type="text/javascript">
-var creditPaginationUrl = "{% url 'dashboard:credit_paginate' %}";
-var creditSearchUrl = "{% url 'dashboard:credit_search' %}";
-var categoryChartUrl = "{% url 'dashboard:sales_category_chart' %}";
-var productChartUrl = "{% url 'dashboard:sales_product_chart' %}";
-var userChartUrl = "{% url 'dashboard:sales_user_chart' %}";
-var terminalChartUrl  ="{% url 'dashboard:sales_terminal_chart' %}";
-var dynamicData = {}
+<script type="text/javascript" src="{% static 'backend/js/plugins/pickers/datepicker.js' %}"></script>
 
-function paginationData(dynamicData,url,method){
-  dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
-  return $.ajax({
-      url: url,
-      type: method,
-      data: dynamicData
-    });
-}
+<script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/supplier/vue/invoice.js' %}"></script>
 
-$(document).ready(function(){
-
-    $(".td").click(function(){
-          window.location = $(this).data("href");
-      });
-
-     $('.bootpag-callback').bootpag({
-        total: parseInt('{{pn}}'),
-        maxVisible: 3,
-        leaps: true,
-        firstLastUse: true,
-        first: 'First',
-        last: 'Last',       
-        wrapClass: 'pagination',
-        activeClass: 'active',
-        disabledClass: 'disabled',
-        nextClass: 'next',
-        prevClass: 'prev',
-        lastClass: 'last',
-        firstClass: 'first',
-        }).on("page", function(event, num){
-            $(".pages-nav").html("Page " + num +" of "+'{{pn}}');
-            $.get(creditPaginationUrl,{page:parseInt(num)},function(data){
-               $('#tb').html(data);
-            });
-    }).children('.pagination').addClass('pagination-flat pagination-sm');
-
-   $('.export-sz').selectpicker({
-          iconBase: 'fa',
-          tickIcon: 'fa-dot-circle-o',
-          pdfIcon:'fa-file-pdf-o',
-          excelIcon:'fa-file-excel-o'
-    }).on('change', function(){
-
-        var ts = $(this).val();
-
-        if(ts == 'pdf'){
-            var searchData = $('.search_user').val();
-            var listSizeVal = $('.list-sz').find(":selected").val();
-            var date = $('.date-month').val();
-            var url = "{% url 'dashboard:reports_credit_list_pdf' %}";
-
-            var period = $('.period-sz').find(":selected").val();
-            var month = $('.hidden-month').val();
-            var year = $('.hidden-year').val();
-
-            if(!$('.hidden-format').val()){
-              $('.hidden-format').val('yyyy-mm-dd');
-            }
-
-            if($('.hidden-format').val() == 'yyyy-mm-dd'){
-               if(!date){
-                  date = null;
-               }
-            }else if($('.hidden-format').val() == 'yyyy'){
-                var date = null;
-                month = null;
-            }else{
-               var date = null;
-            }
-
-            dynamicData = {}
-            dynamicData['q'] = searchData;
-            dynamicData['gid'] = date;
-            dynamicData['period'] = period;
-            dynamicData['month'] = month;
-            dynamicData['year'] = year; 
-        
-            paginationData(dynamicData,url,'GET').
-             done(function(data){
-                window.open("data:application/pdf," + escape(data));
-             })
-            .fail();
-
-        }else if(ts=='excel'){
-          <!--window.location="{% url 'dashboard:users_export_csv' %}";-->
-
-        }else{
-          $(this).val('')
-        }
-    });
-
-
-    //**@ display size select
-     $('.list-sz').selectpicker().on('change', function(){
-        var listSizeVal = $(this).val();
-        var searchData = $('.search_user').val();
-        var date = $('.date-month').val();
-        var url = creditPaginationUrl;
-        var paginationUrl = creditPaginationUrl;
-
-        var period = $('.period-sz').find(":selected").val();
-        var month = $('.hidden-month').val();
-        var year = $('.hidden-year').val();
-
-        if(!$('.hidden-format').val()){
-          $('.hidden-format').val('yyyy-mm-dd');
-        }
-
-        if($('.hidden-format').val() == 'yyyy-mm-dd'){
-           if(!date){
-              date = null;
-           }
-        }else if($('.hidden-format').val() == 'yyyy'){
-            var date = null;
-            month = null;
-        }else{
-           var date = null;
-        }
-
-        dynamicData = {}
-        dynamicData['page'] = 1;
-        dynamicData['q'] = searchData;
-        dynamicData['gid'] = date;
-        dynamicData['period'] = period;
-        dynamicData['month'] = month;
-        dynamicData['year'] = year; 
-        if(listSizeVal == '0'){
-          dynamicData['size'] = '10';
-        }else{
-          dynamicData['size'] = listSizeVal;
-        } 
-        if(searchData){
-            paginationData(dynamicData,creditSearchUrl,'GET').
-             done(function(data){
-              $('#pagination-div').html(data);
-             })
-             .fail(); 
-
-        }else{
-            paginationData(dynamicData,url,'GET').
-             done(function(data){
-              $('#pagination-div').html(data);
-             })
-            .fail(); 
-
-        }
-               
-
-     });
-
-  function updateSelectListnSearch(){
-      $('.search_user').val('');
-      $('.list-sz').find(":selected").removeAttr('selected')
-      $(".list-sz option[value=0]").attr('selected', 'selected');
-      $(".list-sz").val(0);
-      $(".list-sz .filter-option").text('No:');
-      $(".list-sz ul.dropdown-menu li.active").removeClass('active');
-      $(".list-sz ul.dropdown-menu li[data-original-index='0']").addClass('active');
-  }
-
-    var delay = (function(){
-    var timer = 0;
-    return function(callback, ms){
-        clearTimeout (timer);
-        timer = setTimeout(callback, ms);
-      };
-    })();    
-
-
-    //** search
-    $('.search_user').keyup(function() {
-      var url = creditSearchUrl;
-      var search_text = $(this).val();     
-      var date = $('.date-month').val();
-      var listSizeVal = $('.list-sz').find(":selected").val();
-      var period = $('.period-sz').find(":selected").val();
-      var month = $('.hidden-month').val();
-      var year = $('.hidden-year').val();
-      dynamicData = {};
-
-      if(!$('.hidden-format').val()){
-        $('.hidden-format').val('yyyy-mm-dd');
-      }
-
-      if($('.hidden-format').val() == 'yyyy-mm-dd'){
-         if(!date){
-            date = null;
-         }
-      }else if($('.hidden-format').val() == 'yyyy'){
-          var date = null;
-          month = null;
-      }else{
-         var date = null;
-      }
-
-      delay(function(){         
-         dynamicData['']
-         dynamicData['page'] = 1;
-         dynamicData['q'] = search_text;
-         if(listSizeVal == '0'){
-          dynamicData['size'] = 10;
-         }else{
-          dynamicData['size'] = listSizeVal;
-         }         
-         dynamicData['gid'] = date;
-         dynamicData['period'] = period;
-         dynamicData['month'] = month;
-         dynamicData['year'] = year;        
-         paginationData(dynamicData,url,'GET').
-         done(function(data){
-          $('#pagination-div').html(data);
-         })
-         .fail();
-         
-      }, 500 );
-
-    });
-
-    
-$('.period-sz').selectpicker().on('change', function(){
-    var period = $(this).val();
-    var DateOptions = {
-            format: "yyyy-mm-dd",
-            autoclose: true,
-            endDate: 'now'
-    }
-    var MonthOptions = {
-        format: "MM/yyyy",
-        autoclose: true,
-        //startDate: '{{startMonth}}/{{startYear}}',
-        endDate: 'now',
-        minViewMode: 'months'
-    }
-    var YearOptions = {
-        format: "yyyy",
-        autoclose: true,
-        //startDate: '{{startMonth}}/{{startYear}}',
-        endDate: 'now',
-        minViewMode: 'years'
-    }
-    if(period == 'day'){
-      $(".date-month").val("");
-      $(".date-month").datepicker("destroy");
-      $(".date-month").datepicker(DateOptions);
-      $(".date-month").attr("placeholder", "yyyy-mm-dd");
-      $('.hidden-format').val('yyyy-mm-dd');
-    }else if(period == 'year'){
-      $(".date-month").val("");
-      $(".date-month").datepicker("destroy");
-      $(".date-month").datepicker(YearOptions);
-      $(".date-month").attr("placeholder", "yyyy");
-      $('.hidden-format').val('yyyy');
-    }else{
-      $(".date-month").val("");
-      $(".date-month").datepicker("destroy");
-      $(".date-month").datepicker(MonthOptions);
-      $(".date-month").attr("placeholder", "mm/yyyy");
-      $('.hidden-format').val('mm/yyyy');
-    }
-});
-
-
-$('.date-month').datepicker({
-    format: "yyyy-mm-dd",
-    autoclose: true,
-    endDate: 'now'})
-  .on('changeDate', function(e) {
-      var period = $('.period-sz').find(":selected").val();
-      var month = e.date.getMonth()+1;
-      var year = e.date.getFullYear();
-
-      $('.hidden-year').val(year);
-      $('.hidden-month').val(month);
-      
-
-      if(!$('.hidden-format').val()){
-        $('.hidden-format').val('yyyy-mm-dd');
-      }
-
-      if($('.hidden-format').val() == 'yyyy-mm-dd'){
-         var group_id = $(this).val();
-         if(!group_id){
-            group_id = null;
-         }
-      }else if($('.hidden-format').val() == 'yyyy'){
-          var group_id = null;
-          month = null;
-      }else{
-         var group_id = null;
-      }
-
-
-        
-        var dd = e.date.getFullYear() + '-'+e.date.getMonth()+'-'+e.date.getDate()
-        var searchData = $('.search_user').val();
-        var listSizeVal = $('.list-sz').find(":selected").val();
-        var url = creditPaginationUrl;
-
-        dynamicData = {}
-        dynamicData['page'] = 1;
-        dynamicData['q'] = searchData;
-        dynamicData['gid'] = group_id;
-        dynamicData['period'] = period;
-        dynamicData['month'] = month;
-        dynamicData['year'] = year; 
-        if(listSizeVal == '0'){
-          dynamicData['size'] = '10';
-        }else{
-          dynamicData['size'] = listSizeVal;
-        } 
-        if(searchData){
-            paginationData(dynamicData,creditSearchUrl,'GET').
-             done(function(data){
-              $('#pagination-div').html(data);
-             })
-             .fail(); 
-
-        }else{
-            paginationData(dynamicData,url,'GET').
-             done(function(data){
-              $('#pagination-div').html(data);
-             })
-            .fail(); 
-
-        }
-  });
-
-});
-
-</script>
 <script>
     $('.printPdf').on('click', function(){
       console.log('clickeds sdfdf');

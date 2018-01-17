@@ -659,6 +659,7 @@ def product_edit(request, pk,name=None):
             'images', 'variants'), pk=pk)
     product = Product.objects.get(pk=product.pk)
     payment_options = PaymentOption.objects.all()
+    suppliers = Supplier.objects.all()
     stock = Stock()
     stock_form = forms.StockForm(request.POST or None, instance=stock,
                            product=product)
@@ -694,6 +695,7 @@ def product_edit(request, pk,name=None):
            'stock_items': stock_items, 'variants': variants,
            'variants_delete_form': variants_delete_form,
            'payment_options': payment_options,
+           'suppliers': suppliers,
            'variant_form': variant_form}
     print payment_options
     if name:
@@ -827,13 +829,15 @@ def purchase_data(request):
     if request.POST.get('pk'):
         obj = Stock.objects.get(pk=request.POST.get('pk'))
         if request.POST.get('value'):
-            if Decimal(request.POST.get('name')) < obj.amount_paid.gross:
-                obj.amount_paid = Decimal(request.POST.get('name')) + Decimal(request.POST.get('value'))
-                # delete last inserted data
-                PurchaseProduct.objects.latest('id').delete()
-            else:
-                obj.amount_paid = obj.amount_paid.gross + Decimal(request.POST.get('value'))
+            # if Decimal(request.POST.get('name')) < obj.amount_paid.gross:
+            #     obj.amount_paid = Decimal(request.POST.get('name')) + Decimal(request.POST.get('value'))
+            #     # delete last inserted data
+            #     PurchaseProduct.objects.latest('id').delete()
+            # else:
+            obj.amount_paid = obj.amount_paid.gross + Decimal(request.POST.get('value'))
             amount_paid = request.POST.get('value')
+        else:
+            return HttpResponse('Amount Paid Required')
         if obj.amount_paid >= obj.total_cost:
             obj.status = 'fully-paid'
         else:
@@ -849,9 +853,19 @@ def purchase_data(request):
         purchase.quantity = obj.quantity
         purchase.amount_paid = amount_paid
         purchase.total_cost = obj.total_cost
-        purchase.balance = obj.total_cost.gross - obj.amount_paid.gross
+        try:
+            purchase.balance = obj.total_cost.gross - obj.amount_paid.gross
+        except:
+            pass
         purchase.supplier = obj.variant.product.product_supplier
+        if request.POST.get('payment_number'):
+            purchase.payment_number = request.POST.get('payment_number')
         purchase.save()
+
+        # add payment options
+        if request.POST.get('payment_option'):
+            options = PaymentOption.objects.get(pk=int(request.POST.get('payment_option')))
+            purchase.payment_options.add(options)
 
         return HttpResponse(json.dumps({'message': obj.pk, 'status':obj.status}), content_type='application/json')
     else:
@@ -1044,6 +1058,12 @@ def add_attributes(request):
             action = 'add'       
         if request.POST.get('sku'):
             product_variant.sku = request.POST.get('sku')
+        if request.POST.get('variant_supplier'):
+            try:
+                supplier = Supplier.objects.get(pk=int(request.POST.get('variant_supplier')))
+                product_variant.variant_supplier = supplier
+            except:
+                pass
         if request.POST.get('price'):
             product_variant.price_override = request.POST.get('price')
         if request.POST.get('minimum_price'):
@@ -1106,8 +1126,10 @@ def variant_edit(request, product_pk, variant_pk=None):
             return redirect(success_url)
     errors = attribute_form.errors
     form_errors = form.errors
-    ctx = {'attribute_form': attribute_form, 'form': form, 'product': product,
-           'variant': variant,'errors':errors,'form_errors':form_errors}
+    suppliers = Supplier.objects.all()
+    ctx = {'attribute_form': attribute_form, 'suppliers': suppliers,
+           'form': form, 'product': product,
+           'variant': variant, 'errors': errors, 'form_errors': form_errors}
     if request.is_ajax():
         return TemplateResponse(
         request, 'dashboard/product/partials/'+str(request.GET['template'])+'.html', ctx)

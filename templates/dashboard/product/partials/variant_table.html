@@ -25,7 +25,10 @@
           <th class="right-align">
             Wholesale Price
           </th>
-            <th>Minimum Price</th>
+          <th>Minimum Price</th>
+          <th>
+              Supplier
+          </th>
           <th class="text-center">Actions</th>
         </tr>
       </thead>
@@ -58,6 +61,13 @@
             {% if variant.minimum_price %}
             {% gross variant.minimum_price html=True %}
            {% endif %}
+            </td>
+            <td>
+                {% if variant.variant_supplier %}
+                {{variant.variant_supplier}}
+                {% else %}
+                 ---
+                {% endif %}
             </td>
              <!-- actions -->
                     <td class="text-center">

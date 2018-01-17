@@ -92,3 +92,16 @@ class PurchaseSupplierListAPIView(generics.ListAPIView):
                 Q(car__name__icontains=query)
                 ).distinct('supplier')
         return queryset_list.order_by('supplier')
+
+
+class PaymentListAPIView(generics.ListAPIView):
+    serializer_class = TableListSerializer
+    queryset = Table.objects.all()
+
+    def list(self, request, pk=None):
+        serializer_context = {
+            'request': Request(request),
+        }
+        queryset = self.get_queryset().filter(stock__pk=pk)
+        serializer = TableListSerializer(queryset, context=serializer_context, many=True)
+        return Response(serializer.data)

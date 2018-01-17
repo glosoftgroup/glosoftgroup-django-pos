@@ -165,12 +165,14 @@ function refreshStockVar(dynamicData={},url){
 }
 
 $(function() {
-  var addvariantBtn = $('#addvariantBtn');
-  var retailPriceId = $('#rprice');
-  var wholePriceId  = $('#wprice');
-  var minimumPrice  = $('#mprice');
-  var dynamicVariants = $('.dynamicvxx');
-  var newSkuId = $('#new-sku-td');
+  var variantForm = $('#toggleVariant');
+  var addvariantBtn = variantForm.find('#addvariantBtn');
+  var retailPriceId = variantForm.find('#rprice');
+  var wholePriceId  = variantForm.find('#wprice');
+  var minimumPrice  = variantForm.find('#mprice');
+  var variantSupplier = variantForm.find('#id_variant_supplier');
+  var dynamicVariants = variantForm.find('.dynamicvxx');
+  var newSkuId = variantForm.find('#new-sku-td');
   var reorder_levelId = $('#reorder_level');
   var refreshVaraintsContent = $('#refreshvaraintscontent');
   var refreshStockVariants = $('#refreshStockVariants');
@@ -234,6 +236,9 @@ $(function() {
     if(reorder_level){
       dynamicData['low_stock_threshold'] = reorder_level;
     }
+    if(variantSupplier.val()){
+        dynamicData['variant_supplier'] = variantSupplier.val();
+    }
     
     if ( json.length < 1) {      
       //alertUser('Please Select variants','bg-danger','Varaints Required!');
@@ -249,6 +254,7 @@ $(function() {
     dynamicData['pk'] = $(this).data('productpk');
     var method = 'post';
     var url = $(this).data('attrurl');
+    console.log(url);
     var refreshvurl = $(this).data('refreshvurl');
     addProductDetails(dynamicData,url,method)
     .done(function(data){

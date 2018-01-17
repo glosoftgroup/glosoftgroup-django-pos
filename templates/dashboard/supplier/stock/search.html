@@ -41,11 +41,7 @@
                     <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                         <span class="stock-balance" data-balance="{{user.stock.get_balance}}">{{user.stock.get_balance}}</span>
                     </td>
-                      <!-- pay -->
-                    <td class="tdx" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
-                        <!-- kebab-case in HTML -->
-                        <child balance="{{user.stock.amount_paid.gross}}" pk="{{user.stock.id}}"></child>
-                    </td>
+
 
                       <td class="td" data-href="{% url 'dashboard:supplier-credit-statement' pk=user.supplier.pk stock_pk=user.stock.pk %}">
                        <span class="stock-status">

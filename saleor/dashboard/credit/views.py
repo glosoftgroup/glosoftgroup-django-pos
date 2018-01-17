@@ -78,6 +78,55 @@ def credit_history(request, credit_pk=None):
 
 
 @staff_member_required
+@permission_decorator('reports.view_sale_reports')
+def credit_history_api(request, pk=None):
+    if pk:
+        credit = Credit.objects.get(pk=pk)
+        total_amount = CreditHistoryEntry.objects.aggregate(Sum('amount'))['amount__sum']
+        total_balance = CreditHistoryEntry.objects.aggregate(Sum('balance'))['balance__sum']
+    else:
+        credit = Credit()
+    try:
+        try:
+            last_sale = CreditHistoryEntry.objects.latest('id')
+            last_date_of_sales = DateFormat(last_sale.created).format('Y-m-d')
+        except:
+            last_date_of_sales = DateFormat(datetime.datetime.today()).format('Y-m-d')
+
+        all_sales = CreditHistoryEntry.objects.filter(credit=credit)
+        total_sales_amount = 0
+        total_tax_amount = 0
+        total_sales = []
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(total_sales, 10)
+        try:
+            total_sales = paginator.page(page)
+        except PageNotAnInteger:
+            total_sales = paginator.page(1)
+        except InvalidPage:
+            total_sales = paginator.page(1)
+        except EmptyPage:
+            total_sales = paginator.page(paginator.num_pages)
+        user_trail(request.user.name, 'accessed credit sales reports', 'view')
+        info_logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
+        ctx = {
+               'pn': paginator.num_pages,
+               'sales': all_sales,
+               "credit": credit,
+               'total_amount': total_amount,
+               'total_balance': total_balance,
+               "total_sales_amount": total_sales_amount,
+               "total_tax_amount": total_tax_amount,
+               "date": last_date_of_sales
+               }
+        return TemplateResponse(request, 'dashboard/reports/history/sales_list.html',ctx)
+    except ObjectDoesNotExist as e:
+        error_logger.error(e)
+
+
+
+@staff_member_required
 @permission_decorator('reports.view_sales_reports')
 def credit_detail_pdf(request, pk=None):
     try:

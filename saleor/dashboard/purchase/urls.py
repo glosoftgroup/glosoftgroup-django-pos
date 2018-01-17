@@ -12,8 +12,11 @@ urlpatterns = [
         url(r'^transfer/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (views.single_list), name='sale_supplier_list'),
         url(r'^transfer/detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
-            (views.allocate_detail), name='sale-purchase-detail')
+            (views.allocate_detail), name='sale-purchase-detail'),
 
+        # product purchase
+        url(r'^product/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (views.purchase), name='purchase-product'),
 ]
 
 if settings.DEBUG:	

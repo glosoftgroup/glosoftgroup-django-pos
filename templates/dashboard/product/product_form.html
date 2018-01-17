@@ -319,7 +319,8 @@
         {% endfor %}
         <th>Retail Price <span class="text-danger">*</span></th>
         <th>Wholesale Price</th>
-            <th>Minimum price <span class="text-danger">*</span></th>
+        <th>Minimum price <span class="text-danger">*</span></th>
+        <th width="12%">Supplier</th>
         <th></th>
         </tr>
         </thead>
@@ -348,9 +349,22 @@
               <input type="number" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
                 <span class="help-block text-danger"></span>
             </td>
-              <td>
+            <td>
               <input type="number" placeholder="Mininum Price" class="form-control" id="mprice" name='mprice'>
                   <span class="help-block text-danger"></span>
+            </td>
+            <td>
+                <div class="form-group">
+                    <label></label>
+                    <select name="variant_supplier" class="bootstrap-select" id="id_variant_supplier">
+                        {% if suppliers %}
+                            <option></option>
+                            {% for supplier in suppliers %}
+                            <option value="{{supplier.id}}">{{supplier}}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
             </td>
             <td>
               <button class="btn btn-xs btn-primary" id="addvariantBtn" data-refreshvurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
@@ -432,6 +446,9 @@
                       <th>
                           Minimum Price
                       </th>
+                      <th>
+                          Supplier
+                      </th>
                     <th class="text-center">Options</th>
                   </tr>
                 </thead>
@@ -467,6 +484,13 @@
                 {% gross variant.minimum_price html=True %}
                      {% endif %}
                       </td>
+                    <td>
+                        {% if variant.variant_supplier %}
+                        {{variant.variant_supplier}}
+                        {% else %}
+                        ---
+                        {% endif %}
+                    </td>
                       <!-- actions -->
                     <td class="text-center">
                       <div class="btn-group">
@@ -585,7 +609,8 @@
                 <th> Cost Price</th>
                 <th>
                   Retail Price
-                </th>                
+                </th>
+
                 <!-- <th class="wide">
                   {% trans "Location" context "Stock table header" %}
                 </th> -->
