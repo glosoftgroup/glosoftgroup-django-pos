@@ -206,10 +206,13 @@ Add Stock- {{ block.super }}
                             <tr class="active text-right text-bold">
                                 <template>
                                     <td>
-                                        <button type="button" class="btn bg-grey-800 btn-float btn-float-sm legitRipple"><i class="icon-wallet"></i> <span>Payment</span></button>
+                                        <button type="button" @click="openModal" class="btn bg-grey-800 btn-float btn-float-sm legitRipple">
+                                            <i class="icon-wallet"></i>
+                                            <span>Payment</span>
+                                        </button>
                                     </td>
                                     <td colspan="4">
-                                        <span style="font-size:24px;">Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
+                                        <span style="font-size:24px;">{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
                                     </td>
                                 </template>
                             </tr>
@@ -221,9 +224,126 @@ Add Stock- {{ block.super }}
         <!--./cart-->
     </div>
     <!--./content-->
+
+    <!--PAYMENT MODAL-->
+    <form id="pay-form">
+        {% csrf_token %}
+    <div id="payment-modal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title text-center">Purchase Payment</h6>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <!--purchase detail-->
+                        <div class="col-md-4" style="border-right: 1px solid #373737;">
+                            <div class="form-group">
+                                <h5 class="text-semibold text-center text-grey-800">Select Payment Method</h5>
+                                 <template >
+                                <span v-if="paymentOptions.length == 0" class="text-center">
+                                    <span colspan="8" class="text-bold animated zoomIn">
+                                        No payment options !
+                                    </span>
+                                </span>
+                                </template>
+                                <template v-for="item in paymentOptions">
+                                    <button @click="addPayment(item)" onclick="return false;" class="btn btn-default btn-block btn-lg" >${item.name}</button>
+                                </template>
+
+                            </div>
+                        </div>
+
+                        <!--payment detail-->
+                        <div class="col-md-8">
+                             <!--total-->
+                            <h4 class="text-center text-bold" style="font-size:34px;">
+                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}
+                            </h4>
+                            <!--payment table-->
+                             <table class="table table-hover">
+                                <thead>
+                                    <tr class="bg-grey-800">
+                                        <th>Due</th>
+                                        <th>Tendered</th>
+                                        <th>Number</th>
+                                        <th>Method</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <template >
+                                <tr v-if="paymentItems.length == 0" class="text-center">
+                                    <td colspan="8" class="text-bold animated zoomIn">
+                                        Select Payment
+                                    </td>
+                                </tr>
+                                </template>
+                                <!--listing template-->
+                                <template v-for="item in paymentItems">
+                                    <tr class="td animated fadeIn">
+                                        <td>
+                                            Due
+                                        </td>
+                                        <td>
+                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input v-model="item.transaction_number" style="width: 65px;" type="text" placeholder="transaction" class="form-control">
+                                        </td>
+
+                                        <td>${item.name}</td>
+
+                                        <td>
+                                            <span class="label label-white text-grey-800" @click="removePayment(item)">
+                                                <i class="icon-trash animated shake"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                                 <tfooter>
+                                    <tr class="active text-right text-bold">
+                                        <template>
+                                            <td>
+                                                <span class="text-warning" v-show="show_balance">Balance:</span>
+                                                <span class="text-success" v-show="show_change">Change:</span>
+                                                <span> {{'DEFAULT_CURRENCY'|site_settings}} ${getDue(Total,Tendered)| formatCurrency}</span>
+                                            </td>
+                                            <td colspan="4">
+                                                <span style="font-size:14px;">Tendered: {{'DEFAULT_CURRENCY'|site_settings}}  ${Tendered | formatCurrency}</span>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </tfooter>
+                             </table>
+                        </div>
+                    </div>
+
+					<input type="hidden" name="pk" id="pk" value="{{credit.pk}}">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                    <button v-show="show_change" type="button" @click="completePurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Complete</button>
+                    <button v-show="show_balance" type="button" @click="creditPurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Credit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	</form>
+
+    <!--./MODAL-->
+
 </div>
 <input type="hidden" class="pageUrls"
   data-listurl="{% url 'variant-api:variant-list' %}"
+  data-paymentlisturl="{% url 'purchase-api:list-payment-options' %}"
 >
 {% endblock %}
 

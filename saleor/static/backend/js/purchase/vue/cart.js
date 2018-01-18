@@ -2,6 +2,7 @@ $ = jQuery;
 var $pagination = $('.bootpag-callback');
 var $modal = $('#modal_instance');
 var date;
+var dynamicData = {};
 
 //global functions
 function formatNumber(n, c, d, t){
@@ -26,17 +27,56 @@ var parent = new Vue({
        'name':'Cart Listing',
        items:[],
        cartItems: [],
+       paymentItems: [],
+       paymentOptions: [],
        loader:true,
        totalPages:1,
        visiblePages:4,
        page_size:10,
        search:'',
        supplier:'',
+       show_balance: false,
+       show_change: false,
        status:'all',
        exportType:'none',
-       date: 'Select date'
+       date: 'Select date',
+       //  payment
+       amount_paid: 0,
+       payment_option: ''
     },
     methods:{
+        completePurchase: function(){
+           dynamicData = {};
+           dynamicData['amount_paid'] = parent.Tendered;
+           dynamicData['total_net'] = parent.Total;
+           dynamicData['balance'] = this.getDue(parent.Total, parent.Tendered);
+           dynamicData['purchased_item'] = this.cartItems;
+           dynamicData['purchase_history'] = this.paymentItems;
+           console.log(dynamicData);
+        },
+        creditPurchase: function(){},
+        openModal:function(){
+            /* open modal */
+            $('#payment-modal').modal();
+
+        },
+        addPayment: function(itemToAdd) {
+              var found = false;
+              // Check if the item was already added to cart
+              // If so them add it to the qty field
+              this.paymentItems.forEach(item => {
+                if (item.id === itemToAdd.id) {
+                  found = true;
+                  item.qty += parseInt(itemToAdd.qty);
+                }
+              });
+
+              if (found === false) {
+                this.paymentItems.push(Vue.util.extend({}, itemToAdd));
+              }
+
+           itemToAdd.qty = 1;
+        },
         inputChangeEvent:function(){
             /* make api request on events filter */
             var self = this;
@@ -73,6 +113,9 @@ var parent = new Vue({
 
            itemToAdd.qty = 1;
         },
+        removePayment(index) {
+          this.paymentItems.splice(index, 1)
+        },
         removeItem(index) {
           this.cartItems.splice(index, 1)
         },
@@ -95,6 +138,18 @@ var parent = new Vue({
                     formValues: true //preserve input/form values)
                 });
             }
+        },
+        getDue: function(total,tendered){
+            due = parseInt(total) - parseInt(tendered);
+            if(due < 0){
+                this.show_change = true;
+                this.show_balance = false;
+                due = parseInt(tendered) - parseInt(total);
+            }else{
+                this.show_balance = true;
+                this.show_change = false;
+            }
+            return due
         }
     },
     computed: {
@@ -104,10 +159,17 @@ var parent = new Vue({
             total += (item.cost_price * item.qty);
           });
           return total;
+        },
+        Tendered: function() {
+            var tendered = 0;
+            this.paymentItems.forEach(item=>{
+                tendered += parseInt(item.tendered);
+            });
+            return tendered;
         }
     },
     created:function(){
-    /* on page load populate items with api list response */
+        /* on page load populate items with api list response */
         this.$http.get($('.pageUrls').data('listurl'))
             .then(function(data){
                 data = JSON.parse(data.bodyText);
@@ -116,8 +178,15 @@ var parent = new Vue({
             }, function(error){
                 console.log(error.statusText);
         });
+        /* on load populate payment options with api list response */
+        this.$http.get($('.pageUrls').data('paymentlisturl'))
+            .then(function(data){
+                data = JSON.parse(data.bodyText);
+                this.paymentOptions = data.results;
+            }, function(error){
+                console.log(error.statusText);
+        });
     }
-
 
 });
 
