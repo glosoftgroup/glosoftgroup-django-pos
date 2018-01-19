@@ -174,7 +174,7 @@ class PurchaseVariantHistoryEntry(models.Model):
     purchase = models.ForeignKey(
         PurchaseVariant, related_name='purchase_history',
         verbose_name=pgettext_lazy('Purchase history entry field', 'order'))
-    amount = models.DecimalField(
+    tendered = models.DecimalField(
         pgettext_lazy('Purchase history entry field', 'amount cost'), default=Decimal(0), max_digits=100, decimal_places=2)
     balance = models.DecimalField(
         pgettext_lazy('Purchase history entry field', 'balance'), default=Decimal(0), max_digits=100,

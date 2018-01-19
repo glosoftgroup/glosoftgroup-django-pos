@@ -52,7 +52,7 @@ var parent = new Vue({
            dynamicData['balance'] = this.getDue(parent.Total, parent.Tendered);
            dynamicData['purchased_item'] = this.cartItems;
            dynamicData['purchase_history'] = this.paymentItems;
-           console.log(dynamicData);
+           console.log(dynamicData['purchase_history']);
         },
         creditPurchase: function(){},
         openModal:function(){
@@ -104,6 +104,7 @@ var parent = new Vue({
                 if (item.id === itemToAdd.id) {
                   found = true;
                   item.qty += parseInt(itemToAdd.qty);
+                  item.quantity = item.qty;
                 }
               });
 
@@ -156,6 +157,7 @@ var parent = new Vue({
         Total: function() {
           var total = 0;
           this.cartItems.forEach(item => {
+            item.total_cost = item.cost_price * item.qty;
             total += (item.cost_price * item.qty);
           });
           return total;

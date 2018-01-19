@@ -44,7 +44,7 @@ class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = HistoryEntry
         fields = (
-                'amount',
+                'tendered',
                 'balance',
                 'payment_name',
                 'transaction_number'
