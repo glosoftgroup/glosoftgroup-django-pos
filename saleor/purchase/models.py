@@ -59,31 +59,15 @@ class PurchaseVariantManager(models.Manager):
 
 @python_2_unicode_compatible
 class PurchaseVariant(models.Model):
-    variant = models.ForeignKey(
-        ProductVariant, related_name='s_purchase_variant',
-        verbose_name=pgettext_lazy('PurchaseVariant item field', 'variant'))
-    stock = models.ForeignKey(
-        Stock, related_name='purchase_variant_stock',
-        verbose_name=pgettext_lazy('PurchaseVariant item field', 'stock'))
     quantity = models.IntegerField(
         pgettext_lazy('PurchaseVariant item field', 'quantity'),
         validators=[MinValueValidator(0)], default=Decimal(1))
-    cost_price = PriceField(
-        pgettext_lazy('PurchaseVariant item field', 'cost price'),
-        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
-        blank=True, null=True)
-    amount_paid = PriceField(
-        pgettext_lazy('PurchaseVariant item field', 'amount paid'),
-        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
-        blank=True, null=True)
-    balance = PriceField(
-        pgettext_lazy('PurchaseVariant item field', 'balance price'),
-        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
-        blank=True, null=True)
-    total_cost = PriceField(
-        pgettext_lazy('PurchaseVariant item field', 'cost price'),
-        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
-        blank=True, null=True)
+    total_net = models.DecimalField(
+        pgettext_lazy('PurchaseVariant field', 'total net'), default=Decimal(0), max_digits=100, decimal_places=2)
+    amount_paid = models.DecimalField(
+        pgettext_lazy('PurchaseVariant field', 'amount paid'), default=Decimal(0), max_digits=100, decimal_places=2)
+    balance = models.DecimalField(
+        pgettext_lazy('PurchaseVariant field', 'balance'), default=Decimal(0), max_digits=100, decimal_places=2)
     supplier = models.ForeignKey(
         Supplier, related_name='purchase_variant_supplier',
         verbose_name=pgettext_lazy('PurchaseVariant item field', 'supplier'), null=True, blank=True)
@@ -104,29 +88,8 @@ class PurchaseVariant(models.Model):
     comment = models.CharField(
         pgettext_lazy('PurchaseVariant field', 'comment'),
         max_length=100, default='', blank=True)
-
-    language_code = models.CharField(max_length=35, default=settings.LANGUAGE_CODE)
-    billing_address = models.ForeignKey(
-        Address, related_name='+', editable=False, blank=True, null=True,
-        verbose_name=pgettext_lazy('PurchaseVariant field', 'billing address'))
-    user_email = models.EmailField(
-        pgettext_lazy('PurchaseVariant field', 'user email'),
-        blank=True, default='', editable=False)
-    total_net = models.DecimalField(
-        pgettext_lazy('PurchaseVariant field', 'total net'), default=Decimal(0), max_digits=100, decimal_places=2)
-    total_tax = models.DecimalField(
-        pgettext_lazy('PurchaseVariant field', 'total tax'), default=Decimal(0), max_digits=100, decimal_places=2)
-    sub_total = models.DecimalField(
-        pgettext_lazy('PurchaseVariant field', 'sub total'), default=Decimal(0), max_digits=100, decimal_places=2)
-
-    discount_amount = models.DecimalField(
-        pgettext_lazy('PurchaseVariant field', 'total discount'), default=Decimal(0), max_digits=100, decimal_places=2)
-
-    discount_name = models.CharField(
-        verbose_name=pgettext_lazy('PurchaseVariant field', 'discount name'),
-        max_length=255, default='', blank=True)
-    payment_data = JSONField(null=True, blank=True)
-
+    item = JSONField(null=True, blank=True)
+    history = JSONField(null=True, blank=True)
     objects = PurchaseVariantManager()
 
     class Meta:
@@ -134,7 +97,7 @@ class PurchaseVariant(models.Model):
         verbose_name_plural = pgettext_lazy('PurchaseVariant model', 'PurchaseVariants')
 
     def __str__(self):
-        return str(self.variant)+' '+str(self.stock)
+        return str(self.invoice_number)+' '+str(self.created)
 
     def get_balance(self):
         try:

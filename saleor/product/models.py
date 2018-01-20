@@ -483,7 +483,7 @@ class Stock(models.Model):
         pgettext_lazy('Stock item field', 'invoice_number'), null=True, max_length=36,)  
     low_stock_threshold = models.IntegerField(
         pgettext_lazy('Stock item field', 'low stock threshold'),
-        validators=[MinValueValidator(0)], null=True,blank=True, default=Decimal(10))
+        validators=[MinValueValidator(0)], null=True, blank=True, default=Decimal(10))
     
     quantity_allocated = models.IntegerField(
         pgettext_lazy('Stock item field', 'allocated quantity'),

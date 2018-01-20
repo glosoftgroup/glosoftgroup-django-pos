@@ -15,6 +15,15 @@ function formatNumber(n, c, d, t){
 	return s + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
 };
 
+function ajaxSky(dynamicData,url,method){
+  dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+  return $.ajax({
+      url: url,
+      type: method,
+      data: dynamicData
+    });
+}
+
 //vue filters
 Vue.filter('formatCurrency', function (value) {
   return formatNumber(value, 2, '.', ',');
@@ -47,12 +56,20 @@ var parent = new Vue({
     methods:{
         completePurchase: function(){
            dynamicData = {};
+           dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
            dynamicData['amount_paid'] = parent.Tendered;
            dynamicData['total_net'] = parent.Total;
+           dynamicData['supplier'] = this.supplier;
            dynamicData['balance'] = this.getDue(parent.Total, parent.Tendered);
-           dynamicData['purchased_item'] = this.cartItems;
-           dynamicData['purchase_history'] = this.paymentItems;
-           console.log(dynamicData['purchase_history']);
+           dynamicData['item'] = JSON.stringify(this.cartItems);
+           dynamicData['history'] = JSON.stringify(this.paymentItems);
+
+           // send purchase data
+           // *******************
+           // csrf token
+           ajaxSky(dynamicData,$('.pageUrls').data('createpurchase'),'POST')
+           .done(function(data){console.log(data);})
+           .fail(function(err){console.log(err);});
         },
         creditPurchase: function(){},
         openModal:function(){
@@ -142,7 +159,7 @@ var parent = new Vue({
         },
         getDue: function(total,tendered){
             due = parseInt(total) - parseInt(tendered);
-            if(due < 0){
+            if(due <= 0){
                 this.show_change = true;
                 this.show_balance = false;
                 due = parseInt(tendered) - parseInt(total);

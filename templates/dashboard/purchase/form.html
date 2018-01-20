@@ -341,9 +341,11 @@ Add Stock- {{ block.super }}
     <!--./MODAL-->
 
 </div>
+{% csrf_token %}
 <input type="hidden" class="pageUrls"
   data-listurl="{% url 'variant-api:variant-list' %}"
   data-paymentlisturl="{% url 'purchase-api:list-payment-options' %}"
+  data-createpurchase="{% url 'purchase-variant-api:create-variant-purchase' %}"
 >
 {% endblock %}
 

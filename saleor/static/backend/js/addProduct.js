@@ -19,8 +19,8 @@ function addProductDetails(dynamicData,url,method){
       type: method,
       data: dynamicData
     });
-
 }
+
 var dynamicData = {};
 
 $(function() {  
