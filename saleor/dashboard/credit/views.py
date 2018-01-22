@@ -188,7 +188,7 @@ def credit_detail(request, pk=None):
     try:
         sale = Credit.objects.get(pk=pk)
         items = CreditedItem.objects.filter(credit=sale)
-        return TemplateResponse(request, 'dashboard/reports/credit/details.html',{'items': items, "sale":sale})
+        return TemplateResponse(request, 'dashboard/reports/credit/details.html',{'items': items, "sale": sale, 'table_name':''})
     except ObjectDoesNotExist as e:
         error_logger.error(e)
         return HttpResponse('No items found')

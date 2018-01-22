@@ -358,7 +358,9 @@
                     <label></label>
                     <select name="variant_supplier" class="bootstrap-select" id="id_variant_supplier">
                         {% if suppliers %}
-                            <option></option>
+                            {% if supplier.name == 'Unknown' %}
+                            <option value="{{supplier.pk}}">{{supplier}}</option>
+                            {% endif %}
                             {% for supplier in suppliers %}
                             <option value="{{supplier.id}}">{{supplier}}</option>
                             {% endfor %}

@@ -3,21 +3,6 @@ var $pagination = $('.bootpag-callback');
 var $modal = $('#modal_instance');
 var date;
 
-// global functions
-function formatNumber(n, c, d, t){
-	var c = isNaN(c = Math.abs(c)) ? 2 : c,
-			d = d === undefined ? '.' : d,
-			t = t === undefined ? ',' : t,
-			s = n < 0 ? '-' : '',
-			i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
-			j = (j = i.length) > 3 ? j % 3 : 0;
-	return s + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
-};
-//vue filters
-Vue.filter('formatCurrency', function (value) {
-  return formatNumber(value, 2, '.', ',');
-})
-
 //vue
 var parent = new Vue({
     el:"#vue-app",
@@ -35,11 +20,18 @@ var parent = new Vue({
        date: 'Select date'
     },
     methods:{
-        redirect_func: function(url){
-            window.location.href = url;
-        },
-        carTranfers: function(url){
-            window.location.href = url;
+        deleteBooking: function(url,id){
+            /* open delete modal and populate dynamic form attributes */
+            $modal.modal();
+
+            /* set dynamic form data */
+            console.log(url);
+            var prompt_text = $(this).data('title');
+            $('.del').attr('data-id', id);
+            $('.del').attr('data-href', url);
+            $('.modal-title').html(prompt_text);
+            $modal.modal();
+            $('.delete_form').attr('action',url);
         },
         inputChangeEvent:function(){
             /* make api request on events filter */

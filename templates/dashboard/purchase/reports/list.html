@@ -1,0 +1,341 @@
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load prices_i18n %}
+
+{% block title %}
+  {{ table_name }} - Report
+{% endblock %}
+
+ {% block breadcrumbs %}
+     <li class="active"><a >Product Purchase Report </a></li>
+ {% endblock %}
+
+
+{% block menu_purchase_report_class %}active{% endblock %}
+ {% block custom_css %}
+   <style type="text/css">
+      .theme_xbox .pace_activity, .theme_xbox .pace_activity::after, .theme_xbox .pace_activity::before, .theme_xbox_sm .pace_activity, .theme_xbox_sm .pace_activity::after, .theme_xbox_sm .pace_activity::before, .theme_xbox_xs .pace_activity, .theme_xbox_xs .pace_activity::after, .theme_xbox_xs .pace_activity::before {
+        border-radius: 50%;
+        border: 1px solid transparent;
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-color: transparent;
+        border-top-color: #1649fc;
+    }
+    .pace-demo {
+        background-color:#fff;
+    }
+    @media print {
+       #printBtn {
+          display: none;
+       }
+       #addPayment {
+          display: none;
+       }
+       .media-none {
+          display: none;
+       }
+       #media-none {
+          display: none;
+       }
+    }
+
+    .td { cursor:pointer }
+   </style>
+ {% endblock %}
+
+{% block content %}
+ <div class="row animated " id="vue-app">
+   <div class="col-md-12">
+      <div class="panel panel-flat">
+        <div class="panel-body  search-panel">
+
+            <div class="col-md-4">
+             <label>Search {{ table_name }}</label>
+              <div class="form-group form-group-material has-feedback">
+                <input class="form-control" v-model="search" @keyup="inputChangeEvent" placeholder="Search ..." type="text">
+                <div class="form-control-feedback">
+                  <i class="icon-search4 text-size-base"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 hidden">
+              <div class="form-group">
+                 <label>Status</label>
+                 <select v-model="status" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="all" selected>All</option>
+                    <option value="True">Booked</option>
+                    <option value="False">Not Booked</option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label>pick a date</label>
+              <div class="form-group">
+                <div class="input-group">
+                    <span v-datepicker></span>
+                  <input v-model="date" id="date" hello="inputChangeEvent" hi="inputChangeEvent" class="form-control daterange-single" type="text" placeholder="yyyy-mm-dd">
+                  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+             <label>Export</label>
+              <div class="form-group">
+                 <select v-model="exportType" @change="exportItems" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="none" >Option</option>
+                    <option value="pdf" >export pdf</option>
+                    <option value="excel" >export excel</option>
+                  </select>
+              </div>
+            </div>
+
+      </div>
+   </div>
+
+<div class="row">
+
+  <div class="col-md-12">
+   <div id="pagination-div">
+      <!-- Header and footer fixed -->
+      <div class="panel panel-flat" id="printme">
+        <div class="panel-body">
+            <div class="col-md-12">
+                <h5 class="text-center text-bold">Product Purchase Report</h5>
+            </div>
+        <div class="">
+          <table class="table room-striped room-hover dataroom-header-footer" style="border-bottom:1px solid #ddd;">
+                <thead>
+                  <tr class="bg-primary">
+                    <th>Date</th>
+                    <th>Supplier</th>
+                    <th>Purchases</th>
+                    <th>Quantity</th>
+                    <th>Total Purchase</th>
+                  </tr>
+                </thead>
+                <tbody id="tb">
+                <!--loader-->
+                <tr v-if="loader" class="text-center">
+                    <td colspan="8">
+                        <div class="pace-demo">
+                            <div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
+                        </div>
+                    </td>
+                </tr>
+                <!--no data template-->
+                <template  v-else>
+                <tr v-if="items.length == 0" class="text-center">
+                    <td colspan="8" class="text-bold animated zoomIn">
+                        No Data Found !
+                    </td>
+                </tr>
+                </template>
+                <!--listing template-->
+                <template v-for="item in items">
+                    <tr class="td animated fadeIn" @click="carTranfers(item.single_url)">
+                        <td>
+                            ${item.date}
+                        </td>
+                        <td>${item.supplier_name}</td>
+                        <td>${item.total_purchases}</td>
+                        <td>${item.total_quantity}</td>
+                        <td>${item.total_cost}</td>
+
+                    </tr>
+                </template>
+
+
+                </tbody>
+           </table>
+
+        </div>
+        </div>
+
+         <style type="text/css">
+           .pagination{margin-bottom: 0px;}
+         </style>
+         <div class="row media-none">
+         <div class="col-md-12">
+          <div class="col-md-4">
+           <div class="col-md-12">
+            <div class="col-md-6 mt-10">
+             <label>display list size</label>
+            </div>
+            <div class="col-md-6 media-none">
+              <div class="form-group">
+                 <select v-model="page_size" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+                    <option value="10" selected>No:</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="col-md-4" id="media-none">
+              <div class="text-center bootpag-callback p2-pag" style="">
+            </div>
+           </div>
+            <div class="col-md-4">
+             <div class="col-md-12 mt-5">
+              <div class="pull-right pages-nav"></div>
+             </div>
+            </div>
+          </div>
+         </div>
+         <input type="hidden" id="page_size" val="">
+
+      </div>
+    </div><!-- pagination -->
+  </div>
+</div>
+</div>
+
+<!-- Blue modal -->
+ <div id="modal_instancje" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center">Delete Booking ?</h6>
+       </div>
+       <div class="modal-body">
+
+         <form action="" class="delete_form" method="post" id="delform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm delete !
+           </h5>
+           <input type="hidden" class="item-id" />
+        </div>
+
+
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del" data-id="" data-href="">Delete</button>
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+       </div>
+      </form>
+     </div>
+   </div>
+ </div>
+
+ <div class="info"></div>
+ <!-- /blue modal -->
+<!-- expense detail modal -->
+ <div id="pdetail" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"> Details</h6>
+       </div>
+       <div class="modal-body">
+
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default btn-link btn-xs" data-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-primary btn-xs" id="updateOption" onclick="return false;">Update</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ <!-- /expense detail modal-->
+<!-- edit modal -->
+ <div id="edit_modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <form action="" class="edit_form" method="post" id="editform" novalidate>
+           <div class="modal-body">
+            {% csrf_token %}
+                 <div class="form-group">
+                     <label class="cat_label"> </label>
+                     <input class="form-control edit_class" name=""/>
+                 </div>
+                  <input type="hidden" class="eitem-url"/>
+                  <input type="hidden" class="eitem-select"/>
+                 <input type="hidden" name="option" value="option"/>
+
+           </div>
+           <div class="modal-footer">
+               <button class="btn btn-primary waves-effect waves-light pull-right data_update"
+                       id='modal_edit' type="submit">
+                   Create
+                   <i class="icon-arrow-right14 position-right"></i>
+               </button>
+
+             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+           </div>
+       </form>
+     </div>
+   </div>
+ </div>
+ <!-- /edit modal -->
+
+ </div>
+ </div>
+
+ <div id="modal_instance" class="modal fade">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header bg-blue">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h6 class="modal-title text-white text-center"></h6>
+       </div>
+       <div class="modal-body">
+
+         <form action="" class="delete_form" method="post" id="delform" novalidate>
+         {% csrf_token %}
+         <div class="">
+           <h5 class="text-center">
+             Confirm delete !
+           </h5>
+           <input type="hidden" class="item-id" />
+        </div>
+
+
+       <div class="modal-footer">
+         <button type="submit" id='modal_delete' class="btn pull-right bg-danger del"  data-id="" data-href="">Delete</button>
+         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+       </div>
+      </form>
+     </div>
+   </div>
+ </div>
+<input type="hidden" class="pageUrls"
+  data-bookinglisturl="{% url 'purchase-variant-api:list-supplier-purchase' %}"
+>
+</div>
+<!--charts     -->
+<div id="chart-app">
+
+</div>
+
+{% endblock%}
+{% block custom_js %}
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/loaders/progressbar.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/car/listing.js' %}"></script>
+    <script type="text/javascript">
+  $(document).ready(function() {
+  $('.bootstrap-select').selectpicker();
+
+
+  });
+
+</script>
+{% endblock %}

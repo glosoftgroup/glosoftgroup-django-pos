@@ -4,7 +4,19 @@ var $modal = $('#modal_instance');
 var date;
 var dynamicData = {};
 
-//global functions
+function ajaxSky(dynamicData,url,method){
+  dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
+  return $.ajax({
+      url: url,
+      type: method,
+      data: dynamicData
+    });
+}
+// alertUser
+function alertUser(msg,status='bg-success',header='Well done!')
+{ $.jGrowl(msg,{header: header,theme: status}); }
+
+// global functions
 function formatNumber(n, c, d, t){
 	var c = isNaN(c = Math.abs(c)) ? 2 : c,
 			d = d === undefined ? '.' : d,
@@ -14,16 +26,6 @@ function formatNumber(n, c, d, t){
 			j = (j = i.length) > 3 ? j % 3 : 0;
 	return s + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
 };
-
-function ajaxSky(dynamicData,url,method){
-  dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
-  return $.ajax({
-      url: url,
-      type: method,
-      data: dynamicData
-    });
-}
-
 //vue filters
 Vue.filter('formatCurrency', function (value) {
   return formatNumber(value, 2, '.', ',');
@@ -51,6 +53,7 @@ var parent = new Vue({
        date: 'Select date',
        //  payment
        amount_paid: 0,
+       quantity:0,
        payment_option: ''
     },
     methods:{
@@ -60,6 +63,7 @@ var parent = new Vue({
            dynamicData['amount_paid'] = parent.Tendered;
            dynamicData['total_net'] = parent.Total;
            dynamicData['supplier'] = this.supplier;
+           dynamicData['quantity'] = parent.Quantity;
            dynamicData['balance'] = this.getDue(parent.Total, parent.Tendered);
            dynamicData['item'] = JSON.stringify(this.cartItems);
            dynamicData['history'] = JSON.stringify(this.paymentItems);
@@ -68,7 +72,16 @@ var parent = new Vue({
            // *******************
            // csrf token
            ajaxSky(dynamicData,$('.pageUrls').data('createpurchase'),'POST')
-           .done(function(data){console.log(data);})
+           .done(function(data){
+           // console.log(data);
+           // clear cart notify user
+           this.cartItems = [];
+           this.paymentItems = [];
+           alertUser('Purchase Made successfully');
+           window.locations.reload();
+
+
+           })
            .fail(function(err){console.log(err);});
         },
         creditPurchase: function(){},
@@ -179,6 +192,13 @@ var parent = new Vue({
           });
           return total;
         },
+        Quantity: function() {
+          var quantity = 0;
+          this.cartItems.forEach(item => {
+            quantity += parseInt(item.qty);
+          });
+          return quantity;
+        },
         Tendered: function() {
             var tendered = 0;
             this.paymentItems.forEach(item=>{
@@ -188,8 +208,11 @@ var parent = new Vue({
         }
     },
     created:function(){
+        // preset supplier
+        this.supplier = $('#variant_supplier').val();
+
         /* on page load populate items with api list response */
-        this.$http.get($('.pageUrls').data('listurl'))
+        this.$http.get($('.pageUrls').data('listurl')+'?supplier='+this.supplier)
             .then(function(data){
                 data = JSON.parse(data.bodyText);
                 this.items = data.results;

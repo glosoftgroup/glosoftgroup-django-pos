@@ -40,6 +40,17 @@ class PurchaseVariantManager(models.Manager):
             total += int(item.quantity)
         return total
 
+    def total_purchases(self, obj, date=None):
+        if date:
+            allocations = self.get_queryset().filter(
+                models.Q(supplier=obj.supplier) &
+                models.Q(created__icontains=date)
+            )
+        else:
+            allocations = self.get_queryset().filter(supplier=obj.supplier)
+
+        return allocations.count()
+
     def total_cost(self, obj, date=None):
         if date:
             allocations = self.get_queryset().filter(
@@ -51,7 +62,7 @@ class PurchaseVariantManager(models.Manager):
         total = 0
         for item in allocations:
             try:
-                total += item.total_cost.gross
+                total += item.total_net
             except Exception as e:
                 print(e)
         return total

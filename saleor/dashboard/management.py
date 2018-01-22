@@ -5,6 +5,7 @@ from ..sale.models import Terminal
 from saleor.payment.models import PaymentOption as Payment
 from saleor.sale.models import PaymentOption
 from ..product.models import StockLocation
+from saleor.supplier.models import Supplier
 
 
 def add_stock_location(sender,**kwargs):
@@ -12,6 +13,15 @@ def add_stock_location(sender,**kwargs):
         store = StockLocation.objects.filter(name='default')
         if not store.exists():
             StockLocation.objects.create(name="default")
+    except Exception as e:
+        print e
+
+
+def add_default_supplier(sender,**kwargs):
+    try:
+        store = Supplier.objects.filter(name='Unknown')
+        if not store.exists():
+            Supplier.objects.create(name="Unknown", mobile='Unknown')
     except Exception as e:
         print e
 
@@ -132,3 +142,4 @@ post_migrate.connect(add_payment_options)
 post_migrate.connect(add_terminal)
 post_migrate.connect(add_stock_location)
 post_migrate.connect(add_stock_payment_options)
+post_migrate.connect(add_default_supplier)

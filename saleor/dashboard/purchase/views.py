@@ -5,6 +5,9 @@ import logging
 
 from ..views import staff_member_required
 from ...purchase.models import PurchaseProduct as Table
+from ...purchase.models import PurchaseVariant
+from ...purchase.models import PurchasedItem as Item
+from ...purchase.models import PurchaseVariantHistoryEntry as History
 from ...decorators import permission_decorator
 from ...supplier.models import Supplier
 from saleor.payment.models import PaymentOption
@@ -57,6 +60,7 @@ def allocate_detail(request, pk=None):
 
 
 # purchase product
+# purchase form
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
 def purchase(request):
@@ -69,3 +73,45 @@ def purchase(request):
         'payment_options': payment_options
     }
     return TemplateResponse(request, 'dashboard/purchase/form.html', data)
+
+
+# report
+@staff_member_required
+@permission_decorator('reports.view_sale_reports')
+def report_list(request):
+    global table_name
+    data = {
+        "table_name": table_name,
+    }
+    return TemplateResponse(request, 'dashboard/purchase/reports/list.html', data)
+
+
+@staff_member_required
+@permission_decorator('reports.view_sale_reports')
+def report_single(request, pk=None):
+    global table_name
+    if not pk:
+        return HttpResponse(table_name+' pk required')
+    name = ''
+    try:
+        name = PurchaseVariant.objects.get(pk=pk).supplier.name
+    except Exception as e:
+        pass
+    data = {
+        "table_name": table_name,
+        "pk": pk,
+        "name": name
+    }
+    return TemplateResponse(request, 'dashboard/purchase/reports/more.html', data)
+
+
+@staff_member_required
+@permission_decorator('reports.view_sale_reports')
+def report_detail(request, pk=None):
+    try:
+        sale = PurchaseVariant.objects.get(pk=pk)
+        items = Item.objects.filter(purchase=sale)
+        history = History.objects.filter(purchase=sale)
+        return TemplateResponse(request, 'dashboard/purchase/reports/details.html',{'items': items, "sale":sale, 'history':history})
+    except ObjectDoesNotExist as e:
+        error_logger.error(e)

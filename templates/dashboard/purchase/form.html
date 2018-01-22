@@ -82,8 +82,11 @@ Add Stock- {{ block.super }}
                 <li class="filter-item">
                     <div style="margin-top:3px;" class="has-feedback has-feedback-left">
                         <select v-model="supplier" @change="clearCart" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
-                            <option>---</option>
+
                             {% if suppliers %}
+                            {% if supplier.name == 'Unknown' %}
+                            <option value="{{supplier.pk}}">{{supplier}}</option>
+                            {% endif %}
                             {% for supplier in suppliers %}
                                 <option value="{{supplier.id}}">{{supplier}}</option>
                             {% endfor %}
@@ -267,7 +270,7 @@ Add Stock- {{ block.super }}
                              <table class="table table-hover">
                                 <thead>
                                     <tr class="bg-grey-800">
-                                        <th>Due</th>
+
                                         <th>Tendered</th>
                                         <th>Number</th>
                                         <th>Method</th>
@@ -285,9 +288,7 @@ Add Stock- {{ block.super }}
                                 <!--listing template-->
                                 <template v-for="item in paymentItems">
                                     <tr class="td animated fadeIn">
-                                        <td>
-                                            Due
-                                        </td>
+
                                         <td>
                                             <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
                                         </td>
