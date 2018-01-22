@@ -4,14 +4,54 @@
 {% load humanize %}
 {% load materializecss %}
 {% load staticfiles %}
+{% load site_settings %}
 
 {% block title %}
 Add Stock- {{ block.super }}
 {% endblock %}
+
 {% block breadcrumbs %}
-
 <li class="active"><a href="{% url 'dashboard:purchase-list' %}">Add Stock</a></li>
+{% endblock %}
 
+{% block custom_css %}
+<style type="text/css">
+      .theme_xbox .pace_activity, .theme_xbox .pace_activity::after, .theme_xbox .pace_activity::before, .theme_xbox_sm .pace_activity, .theme_xbox_sm .pace_activity::after, .theme_xbox_sm .pace_activity::before, .theme_xbox_xs .pace_activity, .theme_xbox_xs .pace_activity::after, .theme_xbox_xs .pace_activity::before {
+        border-radius: 50%;
+        border: 1px solid transparent;
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-color: transparent;
+        border-top-color: #1649fc;
+    }
+    .pace-demo {
+        background-color:#fff;
+    }
+    @media print {
+       #printBtn {
+          display: none;
+       }
+       #addPayment {
+          display: none;
+       }
+       .media-none {
+          display: none;
+       }
+       #media-none {
+          display: none;
+       }
+    }
+
+    .td { cursor:pointer }
+   </style>
+
+<script>
+    $(document).ready(function(){
+    $('body').addClass('sidebar-xs');
+  });
+</script>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +62,7 @@ Add Stock- {{ block.super }}
         <!--product variant-->
         <div class="col-md-6" style="border-right: 1px solid #373737;">
             <!--search filter-->
-            <div class="navbar navbar-default navbar-xs navbar-component">
+            <div style="z-index: 1;" class="navbar navbar-default navbar-xs navbar-component">
         <ul class="nav navbar-nav no-border visible-xs-block">
             <li><a class="text-center collapsed legitRipple" data-toggle="collapse" data-target="#navbar-filter"><i class="icon-menu7"></i></a></li>
         </ul>
@@ -32,7 +72,7 @@ Add Stock- {{ block.super }}
             <ul class="nav navbar-nav">
                 <li class="filter-item">
                     <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                        <input class="form-control" placeholder="Search" name="search" type="text">
+                        <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
                         <div class="form-control-feedback">
                             <i class="icon-search4 text-size-base text-muted"></i>
                         </div>
@@ -41,8 +81,8 @@ Add Stock- {{ block.super }}
                 <li class="filter-item mr-15">&nbsp;</li>
                 <li class="filter-item">
                     <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                        <select title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
-                            <option value="">Choose Supplier</option>
+                        <select v-model="supplier" @change="clearCart" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
+                            <option>---</option>
                             {% if suppliers %}
                             {% for supplier in suppliers %}
                                 <option value="{{supplier.id}}">{{supplier}}</option>
@@ -70,20 +110,45 @@ Add Stock- {{ block.super }}
                     <table class="table table-hover">
                         <thead>
                             <tr class="bg-primary">
+                                <th>Supplier</th>
                                 <th>Name</th>
                                 <th>SKU</th>
                                 <th>Purchase</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>Sugar (Mumia 1Kg)</td>
-                                <td>78-2133</td>
-                                <td>
-                                    <button class="btn btn-xs hvr-glow btn-primary legitRipple">Add</button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tbody id="tb">
+                <!--loader-->
+                <tr v-if="loader" class="text-center">
+                    <td colspan="8">
+                        <div class="pace-demo">
+                            <div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
+                        </div>
+                    </td>
+                </tr>
+                <!--no data template-->
+                <template  v-else>
+                <tr v-if="items.length == 0" class="text-center">
+                    <td colspan="8" class="text-bold animated zoomIn">
+                        No Data Found !
+                    </td>
+                </tr>
+                </template>
+                <!--listing template-->
+                <template v-for="item in items">
+                    <tr class="td animated fadeIn">
+                        <td>${item.supplier_name}</td>
+                        <td>${item.product_name}</td>
+                        <td>${item.sku}</td>
+                        <td class="text-center">
+                            <span class="label label-primary" @click="addToCart(item)">
+                                Add
+                            </span>
+                        </td>
+                    </tr>
+                </template>
+
+
+                </tbody>
                     </table>
                 </div>
             </div>
@@ -93,30 +158,63 @@ Add Stock- {{ block.super }}
         <div class="col-md-6">
             <div class="panel panel-default">
                 <div class="panelbody">
+                    <table class="table">
+                        <tr class="active">
+                                <td class="text-center text-bold" colspan="5">
+                                    Purchase Cart
+                                </td>
+                            </tr>
+                    </table>
                     <table class="table table-hover">
                         <thead>
-                            <tr class="bgprimary">
+                            <tr class="bg-grey-800">
                                 <th>Name</th>
                                 <th>SKU</th>
-                                <th>Cost</th>
                                 <th>Quantity</th>
+                                <th>Cost Price</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Sugar (Mumia 1Kg)</td>
-                                <td>78-2133</td>
+                        <template >
+                        <tr v-if="cartItems.length == 0" class="text-center">
+                            <td colspan="8" class="text-bold animated zoomIn">
+                                Cart is empty !
+                            </td>
+                        </tr>
+                        </template>
+                        <!--listing template-->
+                        <template v-for="item in cartItems">
+                            <tr class="td animated fadeIn">
+                                <td>${item.product_name}</td>
+                                <td>${item.sku}</td>
                                 <td>
-                                    <input type="number" placeholder="amount" class="form-control">
+                                    <input v-model="item.qty" style="width: 65px;" type="number" placeholder="amount" class="form-control">
+                                </td>
+                                 <td>
+                                    <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
                                 </td>
                                 <td>
-                                    <input type="number" placeholder="cost" class="form-control">
+                                    <span class="label label-white text-grey-800" @click="removeItem(item)">
+                                        <i class="icon-trash animated shake"></i>
+                                    </span>
                                 </td>
                             </tr>
+                        </template>
                         </tbody>
                         <tfooter>
                             <tr class="active text-right text-bold">
-                                <td colspan="4">Total: 6,900</td>
+                                <template>
+                                    <td>
+                                        <button type="button" @click="openModal" class="btn bg-grey-800 btn-float btn-float-sm legitRipple">
+                                            <i class="icon-wallet"></i>
+                                            <span>Payment</span>
+                                        </button>
+                                    </td>
+                                    <td colspan="4">
+                                        <span style="font-size:24px;">{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
+                                    </td>
+                                </template>
                             </tr>
                         </tfooter>
                     </table>
@@ -126,18 +224,140 @@ Add Stock- {{ block.super }}
         <!--./cart-->
     </div>
     <!--./content-->
-</div>
 
+    <!--PAYMENT MODAL-->
+    <form id="pay-form">
+        {% csrf_token %}
+    <div id="payment-modal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title text-center">Purchase Payment</h6>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <!--purchase detail-->
+                        <div class="col-md-4" style="border-right: 1px solid #373737;">
+                            <div class="form-group">
+                                <h5 class="text-semibold text-center text-grey-800">Select Payment Method</h5>
+                                 <template >
+                                <span v-if="paymentOptions.length == 0" class="text-center">
+                                    <span colspan="8" class="text-bold animated zoomIn">
+                                        No payment options !
+                                    </span>
+                                </span>
+                                </template>
+                                <template v-for="item in paymentOptions">
+                                    <button @click="addPayment(item)" onclick="return false;" class="btn btn-default btn-block btn-lg" >${item.name}</button>
+                                </template>
+
+                            </div>
+                        </div>
+
+                        <!--payment detail-->
+                        <div class="col-md-8">
+                             <!--total-->
+                            <h4 class="text-center text-bold" style="font-size:34px;">
+                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}
+                            </h4>
+                            <!--payment table-->
+                             <table class="table table-hover">
+                                <thead>
+                                    <tr class="bg-grey-800">
+                                        <th>Due</th>
+                                        <th>Tendered</th>
+                                        <th>Number</th>
+                                        <th>Method</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <template >
+                                <tr v-if="paymentItems.length == 0" class="text-center">
+                                    <td colspan="8" class="text-bold animated zoomIn">
+                                        Select Payment
+                                    </td>
+                                </tr>
+                                </template>
+                                <!--listing template-->
+                                <template v-for="item in paymentItems">
+                                    <tr class="td animated fadeIn">
+                                        <td>
+                                            Due
+                                        </td>
+                                        <td>
+                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input v-model="item.transaction_number" style="width: 65px;" type="text" placeholder="transaction" class="form-control">
+                                        </td>
+
+                                        <td>${item.payment_name}</td>
+
+                                        <td>
+                                            <span class="label label-white text-grey-800" @click="removePayment(item)">
+                                                <i class="icon-trash animated shake"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                                 <tfooter>
+                                    <tr class="active text-right text-bold">
+                                        <template>
+                                            <td>
+                                                <span class="text-warning" v-show="show_balance">Balance:</span>
+                                                <span class="text-success" v-show="show_change">Change:</span>
+                                                <span> {{'DEFAULT_CURRENCY'|site_settings}} ${getDue(Total,Tendered)| formatCurrency}</span>
+                                            </td>
+                                            <td colspan="4">
+                                                <span style="font-size:14px;">Tendered: {{'DEFAULT_CURRENCY'|site_settings}}  ${Tendered | formatCurrency}</span>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </tfooter>
+                             </table>
+                        </div>
+                    </div>
+
+					<input type="hidden" name="pk" id="pk" value="{{credit.pk}}">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                    <button v-show="show_change" type="button" @click="completePurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Complete</button>
+                    <button v-show="show_balance" type="button" @click="creditPurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Credit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	</form>
+
+    <!--./MODAL-->
+
+</div>
+{% csrf_token %}
+<input type="hidden" class="pageUrls"
+  data-listurl="{% url 'variant-api:variant-list' %}"
+  data-paymentlisturl="{% url 'purchase-api:list-payment-options' %}"
+  data-createpurchase="{% url 'purchase-variant-api:create-variant-purchase' %}"
+>
 {% endblock %}
 
 {% block custom_js %}
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/purchase/vue/cart.js' %}"></script>
+
 <script type="text/javascript">
   // Basic select
     $('.bootstrap-select').selectpicker();
 
-  $(document).ready(function(){
-    $('body').addClass('sidebar-xs');
-  });
 </script>
 {% endblock %}

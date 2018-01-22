@@ -7,6 +7,7 @@ from ..views import staff_member_required
 from ...purchase.models import PurchaseProduct as Table
 from ...decorators import permission_decorator
 from ...supplier.models import Supplier
+from saleor.payment.models import PaymentOption
 
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -61,8 +62,10 @@ def allocate_detail(request, pk=None):
 def purchase(request):
     global table_name
     suppliers = Supplier.objects.all()
+    payment_options = PaymentOption.objects.all()
     data = {
         "table_name": table_name,
-        'suppliers': suppliers
+        'suppliers': suppliers,
+        'payment_options': payment_options
     }
     return TemplateResponse(request, 'dashboard/purchase/form.html', data)

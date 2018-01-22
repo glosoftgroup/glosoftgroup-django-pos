@@ -1,0 +1,36 @@
+{
+  "amount_paid": "0.00",
+  "balance": "223.29",
+  "sub_total": "223.29",
+  "mobile": "4215",
+  "customer_name": "dfghj",
+  "terminal": "1",
+  "total_tax": "0.00",
+  "invoice_number": "298hh8377796",
+  "total_net": "223.29",
+  "payment_data": [
+    {
+      "payment_id": 1,
+      "value": "100"
+    }
+  ],
+  "solditems": [
+    {
+      "quantity": 11,
+      "total_cost": "35.62",
+      "unit_cost": "35.62",
+      "sku": "G-001",
+      "product_name": "GAS ( 1kg,   Kgas)",
+      "product_category": "GAS",
+      "order": "1",
+      "attributes":
+        {
+          "13": "33"
+        }
+
+    }
+  ],
+  "payment_options": [],
+  "status": "fully-paid",
+  "discount_amount": 0
+}

@@ -1,0 +1,45 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 204,
+            "productName": "GAS ( 3kg,   Kgas)",
+            "sku": "G-001",
+            "price": 1000.0,
+            "min_price": 900.0,
+            "tax": 0,
+            "discount": 0,
+            "quantity": 68,
+            "product_category": "GAS",
+            "attributes_list": [
+                {
+                    "attributes": {
+                        "13": "32",
+                        "14": "39"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 205,
+            "productName": "GAS ( 6kg,   Kgas)",
+            "sku": "G-011",
+            "price": 2900.0,
+            "min_price": 900.0,
+            "tax": 0,
+            "discount": 0,
+            "quantity": 1200,
+            "product_category": "GAS",
+            "attributes_list": [
+                {
+                    "attributes": {
+                        "13": "33",
+                        "14": "39"
+                    }
+                }
+            ]
+        }
+    ]
+}

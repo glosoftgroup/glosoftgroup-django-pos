@@ -286,7 +286,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
                  'credititems',
                  )       
     
-    def validate_status(self,value):        
+    def validate_status(self, value):
         data = self.get_initial()
         status = str(data.get('status'))        
         if status == 'fully-paid' or status == 'payment-pending':

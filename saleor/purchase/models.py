@@ -8,6 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
 from django_prices.models import PriceField
+from jsonfield import JSONField
 
 from ..product.models import (
                             Product,
@@ -22,6 +23,152 @@ from ..supplier.models import Supplier
 from saleor.payment.models import PaymentOption
 
 from . import OrderStatus
+
+
+class PurchaseVariantManager(models.Manager):
+
+    def total_quantity(self, obj, date=None):
+        if date:
+            allocations = self.get_queryset().filter(
+                models.Q(supplier=obj.supplier) &
+                models.Q(created__icontains=date)
+            )
+        else:
+            allocations = self.get_queryset().filter(supplier=obj.supplier)
+        total = 0
+        for item in allocations:
+            total += int(item.quantity)
+        return total
+
+    def total_cost(self, obj, date=None):
+        if date:
+            allocations = self.get_queryset().filter(
+                models.Q(supplier=obj.supplier) &
+                models.Q(created__icontains=date)
+            )
+        else:
+            allocations = self.get_queryset().filter(supplier=obj.supplier)
+        total = 0
+        for item in allocations:
+            try:
+                total += item.total_cost.gross
+            except Exception as e:
+                print(e)
+        return total
+
+
+@python_2_unicode_compatible
+class PurchaseVariant(models.Model):
+    quantity = models.IntegerField(
+        pgettext_lazy('PurchaseVariant item field', 'quantity'),
+        validators=[MinValueValidator(0)], default=Decimal(1))
+    total_net = models.DecimalField(
+        pgettext_lazy('PurchaseVariant field', 'total net'), default=Decimal(0), max_digits=100, decimal_places=2)
+    amount_paid = models.DecimalField(
+        pgettext_lazy('PurchaseVariant field', 'amount paid'), default=Decimal(0), max_digits=100, decimal_places=2)
+    balance = models.DecimalField(
+        pgettext_lazy('PurchaseVariant field', 'balance'), default=Decimal(0), max_digits=100, decimal_places=2)
+    supplier = models.ForeignKey(
+        Supplier, related_name='purchase_variant_supplier',
+        verbose_name=pgettext_lazy('PurchaseVariant item field', 'supplier'), null=True, blank=True)
+    invoice_number = models.CharField(
+        pgettext_lazy('PurchaseVariant', 'invoice_number'), null=True, max_length=36,)
+    payment_number = models.CharField(
+        pgettext_lazy('PurchaseVariant field', 'payment_number'), null=True, max_length=36, )
+    payment_options = models.ManyToManyField(
+        PaymentOption, related_name='purchase_variant_payment_option', blank=True,
+        verbose_name=pgettext_lazy('PurchaseVariant item field',
+                                   'payment options'))
+    created = models.DateTimeField(
+        pgettext_lazy('PurchaseVariant field', 'created'),
+        default=now, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        verbose_name=pgettext_lazy('PurchaseVariant history entry field', 'user'))
+    comment = models.CharField(
+        pgettext_lazy('PurchaseVariant field', 'comment'),
+        max_length=100, default='', blank=True)
+    item = JSONField(null=True, blank=True)
+    history = JSONField(null=True, blank=True)
+    objects = PurchaseVariantManager()
+
+    class Meta:
+        verbose_name = pgettext_lazy('PurchaseVariant model', 'PurchaseVariant')
+        verbose_name_plural = pgettext_lazy('PurchaseVariant model', 'PurchaseVariants')
+
+    def __str__(self):
+        return str(self.invoice_number)+' '+str(self.created)
+
+    def get_balance(self):
+        try:
+            return self.total_cost.gross - self.amount_paid.gross
+        except:
+            return 0
+
+    def get_total_cost(self):
+        if not self.cost_price:
+            # return self.cost_price.gross * self.quantity
+            # return self.stock.variant.get_price_per_item().gross * self.quantity
+            return 0
+        return self.cost_price.gross * self.quantity
+
+    def get_cost_price(self):
+        if not self.cost_price:
+            # return self.stock.cost_price
+            return self.stock.variant.get_price_per_item().gross
+        return self.cost_price
+
+    def get_supplier_credit_balance(self):
+        return get_supplier_credit_balance(self.supplier)
+
+    def get_supplier_credit_total(self):
+        return get_supplier_credit_total(self.supplier)
+
+
+# history
+@python_2_unicode_compatible
+class PurchaseVariantHistoryEntry(models.Model):
+    date = models.DateTimeField(
+        pgettext_lazy('Purchase history entry field', 'last history change'),
+        default=now, editable=False)
+    created = models.DateTimeField(
+        pgettext_lazy('Purchase history entry field', 'created'),
+        default=now, editable=False)
+    purchase = models.ForeignKey(
+        PurchaseVariant, related_name='purchase_history',
+        verbose_name=pgettext_lazy('Purchase history entry field', 'order'))
+    tendered = models.DecimalField(
+        pgettext_lazy('Purchase history entry field', 'amount cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+    balance = models.DecimalField(
+        pgettext_lazy('Purchase history entry field', 'balance'), default=Decimal(0), max_digits=100,
+        decimal_places=2)
+    transaction_number = models.CharField(
+        pgettext_lazy('Purchase history entry field', 'transaction number'),
+        max_length=100, default='', blank=True)
+    payment_name = models.CharField(
+        pgettext_lazy('Purchase history entry field', 'payment option'),
+        max_length=100, default='', blank=True)
+    comment = models.CharField(
+        pgettext_lazy('Purchase history entry field', 'comment'),
+        max_length=100, default='', blank=True)
+    crud = models.CharField(
+        pgettext_lazy('Purchase history entry field', 'crud'),
+        max_length=30, default='', blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        verbose_name=pgettext_lazy('Purchase history entry field', 'user'))
+
+    class Meta:
+        ordering = ('date',)
+        verbose_name = pgettext_lazy(
+            'Purchase history entry model', 'Purchase history entry')
+        verbose_name_plural = pgettext_lazy(
+            'Purchase history entry model', 'Purchase history entries')
+
+    def __str__(self):
+        return pgettext_lazy(
+            'Purchase history entry str',
+            'PurchaseVariantHistoryEntry for terminal #%s') % self.purchase.invoice_number
 
 
 class PurchaseProductManager(models.Manager):
@@ -54,7 +201,6 @@ class PurchaseProductManager(models.Manager):
             except Exception as e:
                 print(e)
         return total
-
 
 
 
@@ -139,6 +285,42 @@ class PurchaseProduct(models.Model):
 
     def get_supplier_credit_total(self):
         return get_supplier_credit_total(self.supplier)
+
+
+class PurchasedItem(models.Model):
+    purchase = models.ForeignKey(PurchaseVariant, related_name='purchased_item', on_delete=models.CASCADE)
+    order = models.IntegerField(default=Decimal(1))
+    sku = models.CharField(
+        pgettext_lazy('PurchasedItem field', 'SKU'), max_length=32)
+    quantity = models.IntegerField(
+        pgettext_lazy('PurchasedItem field', 'quantity'),
+        validators=[MinValueValidator(0)], default=Decimal(1))
+    product_name = models.CharField(
+        pgettext_lazy('PurchasedItem field', 'product name'), max_length=128)
+    total_cost = models.DecimalField(
+        pgettext_lazy('PurchasedItem field', 'total cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+    unit_cost = models.DecimalField(
+        pgettext_lazy('PurchasedItem field', 'unit cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+    total_cost = models.DecimalField(
+        pgettext_lazy('PurchasedItem field', 'total cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+    unit_purchase = models.DecimalField(
+        pgettext_lazy('PurchasedItem field', 'unit purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
+    total_purchase = models.DecimalField(
+        pgettext_lazy('PurchasedItem field', 'total purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
+
+    created = models.DateTimeField(
+        pgettext_lazy('PurchasedItem field', 'created'),
+        default=now, editable=False)
+
+    class Meta:
+        # unique_together = ('sales')
+        ordering = ['order']
+
+    def __unicode__(self):
+        return '%d: %s' % (self.order, self.product_name)
+
+    def __str__(self):
+        return self.product_name
 
 
 @python_2_unicode_compatible

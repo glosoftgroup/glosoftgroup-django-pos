@@ -14,6 +14,7 @@ User = get_user_model()
 
 class VariantListSerializer(serializers.ModelSerializer):
     product_name = SerializerMethodField()
+    supplier_name = SerializerMethodField()
     unit_cost = SerializerMethodField()
     cost_price = SerializerMethodField()
     quantity = SerializerMethodField()
@@ -23,13 +24,16 @@ class VariantListSerializer(serializers.ModelSerializer):
     min_price = SerializerMethodField()
     attributes_list = SerializerMethodField()
     wholesale_price = SerializerMethodField()
+    qty = SerializerMethodField()
 
     class Meta:
         model = ProductVariant
         fields = (
             'id',
             'product_name',
+            'supplier_name',
             'sku',
+            'qty',
             'unit_cost',
             'cost_price',
             'tax',
@@ -40,6 +44,15 @@ class VariantListSerializer(serializers.ModelSerializer):
             'min_price',
             'wholesale_price'
         )
+
+    def get_qty(self, obj):
+        return 1
+
+    def get_supplier_name(self, obj):
+        try:
+            return obj.variant_supplier.name
+        except Exception as e:
+            return ''
 
     def get_cost_price(self, obj):
         return obj.get_stock_cost_price()

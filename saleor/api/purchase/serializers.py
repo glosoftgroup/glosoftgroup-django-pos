@@ -10,6 +10,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
 from ...purchase.models import PurchaseProduct as Table
+from saleor.payment.models import PaymentOption
 
 import logging
 
@@ -155,3 +156,29 @@ class DistinctTableListSerializer(serializers.ModelSerializer):
             return 0
 
 
+class PaymentOptionListSerializer(serializers.ModelSerializer):
+    tendered = SerializerMethodField()
+    transaction_number = SerializerMethodField()
+    payment_name = SerializerMethodField()
+
+    class Meta:
+        model = PaymentOption
+        fields = (
+                'id',
+                'name',
+                'transaction_number',
+                'payment_name',
+                'tendered'
+                )
+
+    def get_transaction_number(self, obj):
+        return ''
+
+    def get_tendered(self, obj):
+        return 0.00
+
+    def get_payment_name(self, obj):
+        try:
+            return obj.name
+        except:
+            return ''
