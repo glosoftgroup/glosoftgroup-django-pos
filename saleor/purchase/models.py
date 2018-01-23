@@ -70,6 +70,9 @@ class PurchaseVariantManager(models.Manager):
 
 @python_2_unicode_compatible
 class PurchaseVariant(models.Model):
+    status = models.CharField(
+        pgettext_lazy('PurchaseOrder field', 'purchase order status'),
+        max_length=32, choices=OrderStatus.CHOICES, default=OrderStatus.PENDING)
     quantity = models.IntegerField(
         pgettext_lazy('PurchaseVariant item field', 'quantity'),
         validators=[MinValueValidator(0)], default=Decimal(1))

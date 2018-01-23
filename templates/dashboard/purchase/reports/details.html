@@ -5,12 +5,14 @@
 {% load prices_i18n %}
 {% load prices_i18n %}
 {% load humanize %}
+{% load site_settings %}
 {% load default_user_image %}
 {% block title %}
   Sales Report
 {% endblock %}
 {% block breadcrumbs %}
-     <li class="active"><a href="{% url 'dashboard:purchase-variant' %}">Purchase Report</a></li>
+     <li class=""><a href="{% url 'dashboard:purchase-variant' %}">Purchase Report</a></li>
+     <li><a {% if sale.pk %} href="{% url 'dashboard:purchase-variant-single' pk=sale.pk %}" {% else %}href="{% url 'dashboard:purchase-variant' %}"{% endif %}>Back</a></li>
      <li>Receipt</li>
  {% endblock %}
 
@@ -22,9 +24,72 @@
     }
     .table{border:1px solid #ccc}
   </style>
+<style>
+    .ribbon-container {
+    width: 104px;
+    height: 106px;
+    overflow: hidden;
+    position: absolute;
+    top: -1px;
+    right: -1px;
+}
+.ribbon {
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.6666667;
+    font-weight: 500;
+    text-transform: uppercase;
+    position: relative;
+    padding: 5px 0;
+    left: -11px;
+    top: 25px;
+    width: 150px;
+    color: #fff;
+    letter-spacing: .25px;
+    z-index: 993;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+    -webkit-box-shadow: 0 4px 6px rgba(0,0,0,.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,.1);
+}
+</style>
+<style type="text/css">
+      .theme_xbox .pace_activity, .theme_xbox .pace_activity::after, .theme_xbox .pace_activity::before, .theme_xbox_sm .pace_activity, .theme_xbox_sm .pace_activity::after, .theme_xbox_sm .pace_activity::before, .theme_xbox_xs .pace_activity, .theme_xbox_xs .pace_activity::after, .theme_xbox_xs .pace_activity::before {
+        border-radius: 50%;
+        border: 1px solid transparent;
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-color: transparent;
+        border-top-color: #1649fc;
+    }
+    .pace-demo {
+        background-color:#fff;
+    }
+    @media print {
+       #printBtn {
+          display: none;
+       }
+       #addPayment {
+          display: none;
+       }
+       .media-none {
+          display: none;
+       }
+       #media-none {
+          display: none;
+       }
+    }
+    .td { cursor: pointer }
+   </style>
+
  {% endblock %}
 
 {% block content %}
+<div id="vue-app" >
 <div class="col-md-12">
     <div class="row">
         <div class="col-md-12" style="margin-bottom:10px;">
@@ -36,8 +101,19 @@
 <div class="col-md-12" id="printme">
    <div id="pagination-div">
     <div class="panel panel-flat">
+
       <div class="panel-body">
         <div class="row">
+            <template>
+                <div v-if="pending"  class="ribbon-container">
+                    <div class="ribbon bg-danger">Pending</div>
+                </div>
+
+                <div v-else class="ribbon-container">
+                    <div class="ribbon bg-success">Fully Paid</div>
+                </div>
+            </template>
+
           <div class="col-md-12">
                <div>
                       <div class="col-md-6 col-md-offset-3 text-center" style="color:#333;">
@@ -69,9 +145,15 @@
                             <td>{{item.product_name}}</td>
                             <td>{{item.unit_cost}}</td>
                             <td>{{item.quantity}}</td>
-                              <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
+                            <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
                           </tr>
                         {% endfor %}
+                           <tr class="active">
+
+                               <td class="text-bold text-right" colspan="5">
+                                   {{'DEFAULT_CURRENCY'|site_settings}} {{sale.total_net|intcomma}}
+                               </td>
+                           </tr>
                          {% else %}
                          <tr><td colspan="5"><h2 class="text-center">No Items Available</h2></td></tr>
                         {% endif %}
@@ -91,26 +173,57 @@
                             </td>
                         </tr>
                         <tr class="bg-primary">
-                          <th> Date</th>
+                          <th>Date</th>
                           <th>Method</th>
                           <th>Transaction No.</th>
                           <th>Tendered</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
-                        {% if items %}
-                        {% for item in history %}
+                        <!--loader-->
+                        <tr v-if="loader" class="text-center">
+                            <td colspan="8">
+                                <div class="pace-demo">
+                                    <div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <!--no data template-->
+                        <template  v-else>
+                        <tr v-if="paymentHistory.length == 0" class="text-center">
+                            <td colspan="8" class="text-bold animated zoomIn">
+                                No Data Found !
+                            </td>
+                        </tr>
+                        </template>
+                        <!--listing template-->
+                        <template v-for="item in paymentHistory">
+                            <tr class="td animated fadeIn">
+                                <td>
+                                    ${item.date}
+                                </td>
+                                <td>${item.payment_name}</td>
+                                <td>${item.transaction_number}</td>
+                                <td>${item.tendered|formatCurrency}</td>
+                            </tr>
+                        </template>
+                        <template>
                           <tr>
-                            <td>{{item.created|date:"d-m-Y H:i a"}}</td>
-                            <td>{{item.payment_name}}</td>
-                            <td>{{item.transaction_number}}</td>
-                            <td>{{item.tendered|intcomma}}</td>
+                               <td v-if="pending" class="text-bold text-center" colspan="5">
+                                   <button @click="openModal" class="btn btn-success hvr-glow btn-raised legitRipple" id="addPayment">
+                                       Settle Credit ({{'DEFAULT_CURRENCY'|site_settings}} ${balance})
+                                   </button>
+                               </td>
+                           </tr>
+                        </template>
+                        <template>
+                        <tr class="active">
+                               <td class="text-bold text-right" colspan="5">
+                                  {{'DEFAULT_CURRENCY'|site_settings}} {{ 'DEFAULT_CURRENCY'|site_settings}} ${paid|formatCurrency}
+                               </td>
+                        </tr>
+                        </template>
 
-                          </tr>
-                        {% endfor %}
-                         {% else %}
-                         <tr><td colspan="5"><h2 class="text-center">No Items Available</h2></td></tr>
-                        {% endif %}
                         </tbody>
 
                  </table>
@@ -123,9 +236,17 @@
               <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
                   <span>
                    Total Purchase: Kshs {{sale.total_net|intcomma}}<br />
+                 </span>
+                  <span>
+                   {% if sale.balance %}
+                   Total Paid: {{ 'DEFAULT_CURRENCY'|site_settings}} ${paid |formatCurrency}<br />
+                   Total Balance: {{ 'DEFAULT_CURRENCY'|site_settings}} ${balance |formatCurrency}
+                   {% else %}
+                      Fully Paid
+                   {% endif %}<hr />
                  </span><br>
                   <span> Thank you for partnering with us.<br />
-                  <span>Report pullled by {{request.user.name}}</span></span>
+                  <span>Report pulled by {{request.user.name}}</span></span>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
 
@@ -136,13 +257,134 @@
     </div>
    </div><!--pagination div-->
   </div>
-</div>
+      <!--PAYMENT MODAL-->
+    <form id="pay-form">
+        {% csrf_token %}
+    <div id="payment-modal" class="modal fade">
+        <div class="modal-dialog modal-lg">
 
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title text-center">Purchase Payment</h6>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <!--purchase detail-->
+                        <div class="col-md-4" style="border-right: 1px solid #373737;">
+                            <div class="form-group">
+                                <h5 class="text-semibold text-center text-grey-800">Select Payment Method</h5>
+                                 <template >
+                                <span v-if="paymentOptions.length == 0" class="text-center">
+                                    <span colspan="8" class="text-bold animated zoomIn">
+                                        No payment options !
+                                    </span>
+                                </span>
+                                </template>
+                                <template v-for="item in paymentOptions">
+                                    <button @click="addPayment(item)" onclick="return false;" class="btn btn-default btn-block btn-lg" >${item.name}</button>
+                                </template>
+
+                            </div>
+                        </div>
+
+                        <!--payment detail-->
+                        <div class="col-md-8">
+                             <!--total-->
+                            <h4 class="text-center text-bold" style="font-size:34px;">
+                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}
+                            </h4>
+                            <!--payment table-->
+                             <table class="table table-hover">
+                                <thead>
+                                    <tr class="bg-grey-800">
+
+                                        <th>Tendered</th>
+                                        <th>Number</th>
+                                        <th>Method</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <template >
+                                <tr v-if="paymentItems.length == 0" class="text-center">
+                                    <td colspan="8" class="text-bold animated zoomIn">
+                                        Select Payment
+                                    </td>
+                                </tr>
+                                </template>
+                                <!--listing template-->
+                                <template v-for="item in paymentItems">
+                                    <tr class="td animated fadeIn">
+
+                                        <td>
+                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input v-model="item.transaction_number" style="width: 65px;" type="text" placeholder="transaction" class="form-control">
+                                        </td>
+
+                                        <td>${item.payment_name}</td>
+
+                                        <td>
+                                            <span class="label label-white text-grey-800" @click="removePayment(item)">
+                                                <i class="icon-trash animated shake"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                                 <tfooter>
+                                    <tr class="active text-right text-bold">
+                                        <template>
+                                            <td>
+                                             </td>
+                                            <td colspan="4">
+                                                <span style="font-size:14px;">Tendered: {{'DEFAULT_CURRENCY'|site_settings}}  ${Tendered | formatCurrency}</span>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </tfooter>
+                             </table>
+                        </div>
+                    </div>
+
+					<input type="hidden" name="pk" id="pk" value="{{credit.pk}}">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                    <button type="button" @click="completePurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Pay</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+	</form>
+    <!--./MODAL-->
+</div>
+<input type="hidden" value="{{sale.balance}}" id="balance">
+<input type="hidden" value="{{sale.amount_paid}}" id="amount_paid">
+
+<input type="hidden" class="pageUrls"
+  data-listurl="{% url 'variant-api:variant-list' %}"
+  data-paymentlisturl="{% url 'purchase-api:list-payment-options' %}"
+  data-createpurchase="{% url 'purchase-variant-api:create-variant-purchase' %}"
+  data-updateurl="{% url 'dashboard:purchase-variant-update' pk=sale.pk %}"
+  data-historyurl="{% url 'purchase-variant-api:api-list-history' pk=sale.pk %}"
+>
+</div>
 
 {% endblock%}
 {% block custom_js %}
 <script > var back_path = "{{request.path}}";</script>
 <script type="text/javascript" src="{% static 'backend/js/pdf/open-pdf.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/purchase/vue/invoice.js' %}"></script>
 
 <script>
     $('.printPdf').on('click', function(){

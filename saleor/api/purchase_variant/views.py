@@ -4,9 +4,11 @@ from rest_framework import pagination
 
 from .pagination import PostLimitOffsetPagination
 from ...purchase.models import PurchaseVariant as Table
+from ...purchase.models import PurchaseVariantHistoryEntry as History
 from .serializers import (
     TableCreateSerializer,
-    TableListSerializer
+    TableListSerializer,
+    HistorySerializer
 )
 
 
@@ -70,8 +72,6 @@ class PurchaseListAPIView(generics.ListAPIView):
     pagination_class = PostLimitOffsetPagination
 
     def get_queryset(self, *args, **kwargs):
-        print self.kwargs['pk']
-        print '*'*12
         try:
             if self.kwargs['pk']:
                 pk = Table.objects.get(pk=self.kwargs['pk']).supplier.pk
@@ -97,4 +97,27 @@ class PurchaseListAPIView(generics.ListAPIView):
                 Q(invoice_number__icontains=query) |
                 Q(supplier__name__icontains=query)
                 ).distinct()
+        return queryset_list.order_by('-id')
+
+
+class PurchaseHistoryListAPIView(generics.ListAPIView):
+    """
+        list purchase payment history
+        :param pk purchase id
+    """
+    serializer_class = HistorySerializer
+    pagination_class = PostLimitOffsetPagination
+
+    def get_queryset(self, *args, **kwargs):
+        try:
+            if self.kwargs['pk']:
+                queryset_list = History.objects.filter(purchase__pk=self.kwargs['pk'])
+
+        except Exception as e:
+            queryset_list = History.objects.all().select_related()
+        page_size = 'page_size'
+        if self.request.GET.get(page_size):
+            pagination.PageNumberPagination.page_size = self.request.GET.get(page_size)
+        else:
+            pagination.PageNumberPagination.page_size = 10
         return queryset_list.order_by('-id')

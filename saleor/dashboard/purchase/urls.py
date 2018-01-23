@@ -25,6 +25,9 @@ urlpatterns = [
             (views.report_single), name='purchase-variant-single'),
         url(r'^report/(?P<pk>[0-9]+)/detail/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (views.report_detail), name='purchase-variant-detail'),
+        url(r'^report/update/(?P<pk>[0-9]+)/detail/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (views.update_detail), name='purchase-variant-update'),
+
 
 ]
 

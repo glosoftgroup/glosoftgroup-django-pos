@@ -115,6 +115,7 @@
                     <th>Supplier</th>
                     <th>Quantity</th>
                     <th>Total Purchase</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -144,7 +145,7 @@
                         <td>${item.supplier_name}</td>
                         <td>${item.quantity|formatCurrency}</td>
                         <td>${item.total_net|formatCurrency}</td>
-
+                        <td v-html="item.instance_status"></td>
                     </tr>
                 </template>
 

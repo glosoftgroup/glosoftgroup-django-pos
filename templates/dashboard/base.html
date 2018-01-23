@@ -226,7 +226,7 @@
                     {% endif %}
                     {% if perms.product.view_stock %}
                     <li class="{% block menu_purchase_list %}{% endblock %}">
-                    <a href="{% url 'dashboard:purchase-list' %}"><i class=' icon-coin-dollar'></i>
+                    <a href="{% url 'dashboard:purchase-product' %}"><i class=' icon-coin-dollar'></i>
                     Add Stock</a>
                     </li>
                     {% endif %}
@@ -490,7 +490,7 @@
                       {% endif %}
                       {% if perms.reports.view_purchase_reports %}
                         <li class="{% block menu_purchase_report_class %}{% endblock %}">
-                          <a href="{% url 'dashboard:sale_purchase_list' %}"><i class='icon-price-tag'></i>Purchases</a>
+                          <a href="{% url 'dashboard:purchase-variant' %}"><i class='icon-price-tag'></i>Purchases</a>
                         </li>
                       {% endif %}
                    {% if perms.reports.view_balancesheet %}

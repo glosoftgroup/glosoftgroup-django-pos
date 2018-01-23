@@ -9,7 +9,7 @@
 {% block title %}
 Add Stock- {{ block.super }}
 {% endblock %}
-
+{% block menu_purchase_list %}active{% endblock %}
 {% block breadcrumbs %}
 <li class="active"><a href="{% url 'dashboard:purchase-list' %}">Add Stock</a></li>
 {% endblock %}
@@ -331,14 +331,13 @@ Add Stock- {{ block.super }}
                 <div class="modal-footer">
                     <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
                     <button v-show="show_change" type="button" @click="completePurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Complete</button>
-                    <button v-show="show_balance" type="button" @click="creditPurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Credit</button>
+                    <button v-show="show_balance" type="button" @click="completePurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Credit</button>
                 </div>
             </div>
         </div>
     </div>
 
 	</form>
-
     <!--./MODAL-->
 
 </div>

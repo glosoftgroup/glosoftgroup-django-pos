@@ -159,7 +159,6 @@ def add_reorder_stock(request,pk=None):
                                                         user=request.user,)
 
                 items = json.loads(variants)
-                print purchase_order
                 for li in items:
                     var = ProductVariant.objects.get(pk=int(li['id']))
                     sku = var.sku
@@ -212,7 +211,6 @@ def re_order_form(request, pk):
         for q in qset:
             qset = q
             items = PurchaseItems.objects.filter(purchase_order=q)
-            print items
         ctx = {'items':items,'order':qset,"product":product,'suppliers':suppliers,'variants':variants,'attributes':attributes}
     else:
         ctx = {"product":product,'suppliers':suppliers,'variants':variants,'attributes':attributes}
@@ -579,7 +577,6 @@ def product_create(request):
         request.POST or None, product_classes=product_classes)
     if form_classes.is_valid():
         class_pk=form_classes.cleaned_data['product_cls']
-        print class_pk
     else:
         # check if classes are set else set a default
         if product_classes.exists():
@@ -697,7 +694,7 @@ def product_edit(request, pk,name=None):
            'payment_options': payment_options,
            'suppliers': suppliers,
            'variant_form': variant_form}
-    print payment_options
+
     if name:
         ctx['go'] = 'True'
     if request.is_ajax():
@@ -1077,7 +1074,6 @@ def add_attributes(request):
             attrs = {}
             for att in attr_list:
                 attrs[att['id']] =att['value']
-            print attrs
             product_variant.attributes = attrs
         if not request.POST.get('pk'): 
             product_variant.save()
@@ -1299,7 +1295,6 @@ def attribute_add(request,pk=None):
             attribute = get_object_or_404(ProductAttribute, pk=pk)
             name = request.POST.get("value")
             if name != '':
-                print name
                 AttributeChoiceValue.objects.create(attribute=attribute,slug=name,name=name);        
                 last_id = ProductAttribute.objects.latest('id')
                 choices = AttributeChoiceValue.objects.filter(attribute=attribute)
@@ -1689,8 +1684,6 @@ def stock_paginate(request):
         if list_sz:
             paginator = Paginator(product_results, int(list_sz))
             product_results = paginator.page(page)
-            print product_results
-            print 'sdflsdjflsdjf'
             return TemplateResponse(request,'dashboard/purchase/p2.html',{'product_results':product_results, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0})
         else:
             paginator = Paginator(product_results, 10)

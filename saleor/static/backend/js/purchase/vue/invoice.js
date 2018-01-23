@@ -40,6 +40,7 @@ var parent = new Vue({
        cartItems: [],
        paymentItems: [],
        paymentOptions: [],
+       paymentHistory:[],
        loader:true,
        totalPages:1,
        visiblePages:4,
@@ -48,15 +49,29 @@ var parent = new Vue({
        supplier:'',
        show_balance: false,
        show_change: false,
+       pending:false,
        status:'all',
        exportType:'none',
        date: 'Select date',
        //  payment
        amount_paid: 0,
        quantity:0,
-       payment_option: ''
+       payment_option: '',
+       balance:0,
+       paid:0
     },
     methods:{
+        getHistory: function(){
+            /* on load populate payment options with api list response */
+            this.$http.get($('.pageUrls').data('historyurl'))
+                .then(function(data){
+                    data = JSON.parse(data.bodyText);
+                    this.paymentHistory = data.results;
+                    this.loader = false;
+                }, function(error){
+                    console.log(error.statusText);
+            });
+        },
         completePurchase: function(){
            dynamicData = {};
            dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
@@ -71,17 +86,19 @@ var parent = new Vue({
            // send purchase data
            // *******************
            // csrf token
-           ajaxSky(dynamicData,$('.pageUrls').data('createpurchase'),'POST')
+           ajaxSky(dynamicData,$('.pageUrls').data('updateurl'),'POST')
            .done(function(data){
-           // console.log(data);
-           // clear cart notify user
-           parent.cartItems = [];
-           parent.paymentItems = [];
-           $('#payment-modal').modal('hide');
-           alertUser('Purchase Made successfully');
-           //window.location.reload();
+               data = JSON.parse(data);
+               parent.getHistory();
+               parent.paid = data.results.amount_paid;
+               parent.balance = data.results.balance;
+               parent.updateStatus();
+               // clear cart notify user
+               parent.paymentItems = [];
+               $('#payment-modal').modal('hide');
+               alertUser('Payment Made successfully');
 
-
+               //window.location.reload();
            })
            .fail(function(err){console.log(err);});
         },
@@ -182,15 +199,18 @@ var parent = new Vue({
                 this.show_change = false;
             }
             return due
+        },
+        updateStatus: function(){
+            if(parseInt(this.balance) > 0){
+                this.pending = true;
+            }else{
+                this.pending = false;
+            }
         }
     },
     computed: {
         Total: function() {
-          var total = 0;
-          this.cartItems.forEach(item => {
-            item.total_cost = item.cost_price * item.qty;
-            total += (item.cost_price * item.qty);
-          });
+          var total = $('#balance').val();
           return total;
         },
         Quantity: function() {
@@ -210,17 +230,12 @@ var parent = new Vue({
     },
     created:function(){
         // preset supplier
-        this.supplier = $('#variant_supplier').val();
+        this.balance = $('#balance').val();
+        this.paid = $('#amount_paid').val();
+        this.updateStatus();
 
         /* on page load populate items with api list response */
-        this.$http.get($('.pageUrls').data('listurl')+'?supplier='+this.supplier)
-            .then(function(data){
-                data = JSON.parse(data.bodyText);
-                this.items = data.results;
-                this.loader = false;
-            }, function(error){
-                console.log(error.statusText);
-        });
+        this.getHistory();
         /* on load populate payment options with api list response */
         this.$http.get($('.pageUrls').data('paymentlisturl'))
             .then(function(data){
