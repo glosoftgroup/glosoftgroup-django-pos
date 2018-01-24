@@ -892,42 +892,6 @@ def stock_edit(request, product_pk, stock_pk=None):
             amount_paid = request.POST.get('settle_payment')
         else:
             amount_paid = request.POST.get('amount_paid')
-        if request.POST.getlist('payment_options[]'):
-            for option in request.POST.getlist('payment_options[]'):
-                stock.payment_options.add(option)
-        if stock_pk:
-            try:
-                purchase = PurchaseProduct.objects.filter(stock=stock_pk).filter(quantity=stock_quantity).latest('id')
-            except Exception as e:
-                purchase = PurchaseProduct()
-        else:
-            purchase = PurchaseProduct()
-        purchase.variant = stock.variant
-        purchase.stock = stock
-        purchase.user = request.user
-        purchase.invoice_number = request.POST.get('invoice_number')
-        if request.POST.get('cost_price'):
-            purchase.cost_price = request.POST.get('cost_price')
-        if request.POST.get('quantity'):
-            purchase.quantity = request.POST.get('quantity')
-        if request.POST.get('amount_paid'):
-            purchase.amount_paid = amount_paid
-        if request.POST.get('total_cost'):
-            purchase.total_cost = request.POST.get('total_cost')
-        if request.POST.get('balance'):
-            purchase.balance = request.POST.get('balance')
-        else:
-            purchase.balance = Decimal(request.POST.get('total_cost')) - Decimal(request.POST.get('amount_paid'))
-        purchase.supplier = product.product_supplier
-        if stock_pk:
-            if purchase.pk:
-                purchase.save()
-        if not stock_pk:
-            purchase.save()
-            if request.POST.getlist('payment_options[]'):
-                for option in request.POST.getlist('payment_options[]'):
-                    purchase.payment_options.add(option)
-
         messages.success(
             request, pgettext_lazy('Dashboard message', 'Saved stock'))
         product_url = reverse(

@@ -70,12 +70,7 @@ $(function(){
     if(low_stock_threshold.val()){
       dynamicData['low_stock_threshold'] = low_stock_threshold.val();
     }   
-    if(!invoice_number.val()){
-      alertUser('Invoice number field required','bg-warning','Invoice Number!');
-      return false;
-    }else{
-      dynamicData['invoice_number'] = invoice_number.val();
-    }    
+      
     
     dynamicData['template'] = 'edit_stock';    
 

@@ -62,13 +62,13 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-2 hidden">
-              <div class="form-group">
+            <div class="col-md-2">
+              <div class="form-group hidden">
                  <label>Status</label>
                  <select v-model="status" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="all" selected>All</option>
-                    <option value="True">Booked</option>
-                    <option value="False">Not Booked</option>
+                    <option value="fully-paid">Fully Paid</option>
+                    <option value="payment-pending">Credit</option>
                   </select>
               </div>
             </div>
@@ -115,6 +115,7 @@
                     <th>Supplier</th>
                     <th>Quantity</th>
                     <th>Total Purchase</th>
+                    <th>Credit</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -145,6 +146,7 @@
                         <td>${item.supplier_name}</td>
                         <td>${item.quantity|formatCurrency}</td>
                         <td>${item.total_net|formatCurrency}</td>
+                        <td>${item.balance|formatCurrency}</td>
                         <td v-html="item.instance_status"></td>
                     </tr>
                 </template>

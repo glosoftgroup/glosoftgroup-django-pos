@@ -168,6 +168,7 @@ Add Stock- {{ block.super }}
                                 </td>
                             </tr>
                     </table>
+                    <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr class="bg-grey-800">
@@ -175,6 +176,7 @@ Add Stock- {{ block.super }}
                                 <th>SKU</th>
                                 <th>Quantity</th>
                                 <th>Cost Price</th>
+                                <th>Reorder Threshold</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -198,6 +200,9 @@ Add Stock- {{ block.super }}
                                     <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
                                 </td>
                                 <td>
+                                    <input v-model="item.low_stock_threshold" style="width: 65px;" type="number" placeholder="Reorder Thresholder" class="form-control">
+                                </td>
+                                <td>
                                     <span class="label label-white text-grey-800" @click="removeItem(item)">
                                         <i class="icon-trash animated shake"></i>
                                     </span>
@@ -214,13 +219,14 @@ Add Stock- {{ block.super }}
                                             <span>Payment</span>
                                         </button>
                                     </td>
-                                    <td colspan="4">
+                                    <td colspan="5">
                                         <span style="font-size:24px;">{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
                                     </td>
                                 </template>
                             </tr>
                         </tfooter>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -267,13 +273,13 @@ Add Stock- {{ block.super }}
                                 Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}
                             </h4>
                             <!--payment table-->
+                            <div class="table-responsive">
                              <table class="table table-hover">
                                 <thead>
                                     <tr class="bg-grey-800">
-
-                                        <th>Tendered</th>
-                                        <th>Number</th>
                                         <th>Method</th>
+                                        <th>Number</th>
+                                        <th>Tendered</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -289,15 +295,13 @@ Add Stock- {{ block.super }}
                                 <template v-for="item in paymentItems">
                                     <tr class="td animated fadeIn">
 
-                                        <td>
-                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
-                                        </td>
+                                        <td>${item.payment_name}</td>
                                         <td>
                                             <input v-model="item.transaction_number" style="width: 65px;" type="text" placeholder="transaction" class="form-control">
                                         </td>
-
-                                        <td>${item.payment_name}</td>
-
+                                        <td>
+                                            <input v-model="item.tendered" style="width: 105px;" type="number" placeholder="amount" class="form-control">
+                                        </td>
                                         <td>
                                             <span class="label label-white text-grey-800" @click="removePayment(item)">
                                                 <i class="icon-trash animated shake"></i>
@@ -321,6 +325,7 @@ Add Stock- {{ block.super }}
                                     </tr>
                                 </tfooter>
                              </table>
+                            </div>
                         </div>
                     </div>
 

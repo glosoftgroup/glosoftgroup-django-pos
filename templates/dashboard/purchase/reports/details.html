@@ -299,11 +299,10 @@
                              <table class="table table-hover">
                                 <thead>
                                     <tr class="bg-grey-800">
-
-                                        <th>Tendered</th>
-                                        <th>Number</th>
                                         <th>Method</th>
-                                        <th></th>
+                                        <th>Number</th>
+                                        <th>Tendered</th>
+                                        <th style="width:12px;"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -317,16 +316,13 @@
                                 <!--listing template-->
                                 <template v-for="item in paymentItems">
                                     <tr class="td animated fadeIn">
-
-                                        <td>
-                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
-                                        </td>
+                                        <td>${item.payment_name}</td>
                                         <td>
                                             <input v-model="item.transaction_number" style="width: 65px;" type="text" placeholder="transaction" class="form-control">
                                         </td>
-
-                                        <td>${item.payment_name}</td>
-
+                                         <td>
+                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
+                                        </td>
                                         <td>
                                             <span class="label label-white text-grey-800" @click="removePayment(item)">
                                                 <i class="icon-trash animated shake"></i>

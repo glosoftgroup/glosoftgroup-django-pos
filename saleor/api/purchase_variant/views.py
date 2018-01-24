@@ -81,7 +81,6 @@ class PurchaseListAPIView(generics.ListAPIView):
 
         except Exception as e:
             queryset_list = Table.objects.all().select_related()
-        query = self.request.GET.get('q')
         page_size = 'page_size'
         if self.request.GET.get(page_size):
             pagination.PageNumberPagination.page_size = self.request.GET.get(page_size)
@@ -92,6 +91,7 @@ class PurchaseListAPIView(generics.ListAPIView):
                 queryset_list = queryset_list.filter(active=True)
             if self.request.GET.get('status') == 'False':
                 queryset_list = queryset_list.filter(active=False)
+        query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(
                 Q(invoice_number__icontains=query) |

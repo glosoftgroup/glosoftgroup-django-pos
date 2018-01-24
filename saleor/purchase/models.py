@@ -67,6 +67,22 @@ class PurchaseVariantManager(models.Manager):
                 print(e)
         return total
 
+    def total_credit(self, obj, date=None):
+        if date:
+            allocations = self.get_queryset().filter(
+                models.Q(supplier=obj.supplier) &
+                models.Q(created__icontains=date)
+            )
+        else:
+            allocations = self.get_queryset().filter(supplier=obj.supplier)
+        total = 0
+        for item in allocations:
+            try:
+                total += item.balance
+            except Exception as e:
+                print(e)
+        return total
+
 
 @python_2_unicode_compatible
 class PurchaseVariant(models.Model):

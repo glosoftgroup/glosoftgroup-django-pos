@@ -1,6 +1,7 @@
 {% load materializecss %}
 {% load prices_i18n %}
 {% load static %}
+{% load site_settings %}
 <div class="mt-15">
     <button class="btn btn-primary" id="btntoggles">
       Add Stock
@@ -9,123 +10,293 @@
  <style type="text/css">
         #toggleStock{display:none;}
 </style>
-<div id="toggleStock" class="card-3 mb-10">
+
+    <div class="row mt-15" id="vue-app">
+<div id="toggleStock"  class="card-3 mb-10">
     <form id="add-product-stock-form">
-<!--form-->
-<div class="add-new-stock-form mt-10" id="product-app">
-    <div class="sidebar-category bg-primary">
-        <div class="category-title text-center text-semibold">
-            <span id="selected-number">Add Stock</span>
+    </form>
+     <!--product variant-->
+        <div class="col-md-6" style="border-right: 1px solid #373737;">
+            <!--search filter-->
+            <div style="z-index: 1;" class="navbar navbar-default navbar-xs navbar-component">
+        <ul class="nav navbar-nav no-border visible-xs-block">
+            <li><a class="text-center collapsed legitRipple" data-toggle="collapse" data-target="#navbar-filter"><i class="icon-menu7"></i></a></li>
+        </ul>
+
+        <div class="navbar-collapse collapse" id="navbar-filter">
+            <p class="navbar-text">Filter:</p>
+            <ul class="nav navbar-nav">
+                <li class="filter-item">
+                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                        <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
+                        <div class="form-control-feedback">
+                            <i class="icon-search4 text-size-base text-muted"></i>
+                        </div>
+                    </div>
+                </li>
+                <li class="filter-item mr-15">&nbsp;</li>
+                <li class="filter-item">
+                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                        <select v-model="supplier" @change="clearCart" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
+
+                            {% if suppliers %}
+                            {% if supplier.name == 'Unknown' %}
+                            <option value="{{supplier.pk}}">{{supplier}}</option>
+                            {% endif %}
+                            {% for supplier in suppliers %}
+                                <option value="{{supplier.id}}">{{supplier}}</option>
+                            {% endfor %}
+                            {% endif %}
+                        </select>
+
+                    </div>
+                </li>
+            </ul>
+
+            <div class="navbar-right">
+                <p class="navbar-text hidden">View mode:</p>
+                <form class="navbar-form navbar-left" action="#">
+                    <div class="form-group">
+
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+            <!--./filter-->
+            <div class="panel panel-default">
+                <div class="panelbody">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th>Supplier</th>
+                                <th>Name</th>
+                                <th>SKU</th>
+                                <th>Purchase</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb">
+                <!--loader-->
+                <tr v-if="loader" class="text-center">
+                    <td colspan="8">
+                        <div class="pace-demo">
+                            <div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
+                        </div>
+                    </td>
+                </tr>
+                <!--no data template-->
+                <template  v-else>
+                <tr v-if="items.length == 0" class="text-center">
+                    <td colspan="8" class="text-bold animated zoomIn">
+                        No Data Found ! <span class="text-warning">Please select supplier</span>
+                    </td>
+                </tr>
+                </template>
+                <!--listing template-->
+                <template v-for="item in items">
+                    <tr class="td animated fadeIn">
+                        <td>${item.supplier_name}</td>
+                        <td>${item.product_name}</td>
+                        <td>${item.sku}</td>
+                        <td class="text-center">
+                            <span class="label label-primary" @click="addToCart(item)">
+                                Add
+                            </span>
+                        </td>
+                    </tr>
+                </template>
 
-    <div class="col-md-12 bg-white ">
-     <div class="tab-pane fade has-padding active in">
-        <div class="panelpanel-flat">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <fieldset>
 
-                            <div class="form-group">
-                                <label>Invoice Number:<span class="text-danger">*</span></label>
-                                <input type="text" placeholder="Invoice Number" class="form-control has-warning" id="stockInvoiceNumber" name="stockInvoiceNumber">
-                                <span class="help-block"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Variant:<span class="text-danger">*</span></label>
-                                <div id="feditv">
-                                {{ stock_form.variant }}
-                                <span id="variant-help" class="help-block">required</span>
-                                </div>
-
-                            </div>
-                            <div class="form-group">
-                                <label>Payment option:<span class="text-danger">*</span></label>
-
-                                <select data-placeholder="Select options..." name="payment_options" id="payment_option" multiple="multiple" class="multiselect-select2">
-                                    {% for option in payment_options %}
-                                        <option value="{{option.id}}">{{option}}</option>
-                                    {% endfor %}
-                                </select>
-
-                            </div>
-                            <div class="hidden">
-                                {{ stock_form.location }}
-                                <input type="hidden" id="status" name="status" value="payment-pending">
-                            </div>
-
-
-                        </fieldset>
-                    </div>
-
-                    <div class="col-md-6">
-                        <fieldset>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Quantity:</label>
-                                        <input v-on:keyup="getTotal()"  v-model="quantity" type="number" placeholder="Quantity" class="form-control" id="stock_quantity" name="stock_quantity">
-                                        <span class="help-block"></span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Reorder Threshold:</label>
-                                        {{ stock_form.low_stock_threshold }}
-                                        <span class="help-block"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Unit cost price:</label>
-                                        <input v-model="amount" v-on:keyup="getTotal()" style="" type="number" placeholder="Unit price" class="form-control" id="stockcostprice" name="stockcostprice">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Total cost #:</label>
-                                        <input id="id_total_cost" name="total_cost" v-on:keyup="getAmount" v-model="total" step="any" value="{{stock.total_cost.gross}}" class="form-control" type="number">
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Amount paid:</label>
-                                        <input placeholder="Total amount" v-on:keyup="getBalance()" v-model="paid" name="amount_paid" id="amount_paid" class="form-control" type="number">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Balance:</label>
-                                        <input disabled="disabled" placeholder="Balance amount" v-model="balance" name="balance" id="balance" class="form-control" type="number">
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </div>
-                </div>
-
-                <div class="text-right">
-                    <button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-add' product_pk=product.pk %}" id='addnewStockBtn' class="btn btn-xs btn-primary">Add</button>
+                </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-     </div>
+        <!--./variant-->
+        <!--cart-->
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panelbody">
+                    <table class="table">
+                        <tr class="active">
+                                <td class="text-center text-bold" colspan="5">
+                                    Purchase Cart
+                                </td>
+                            </tr>
+                    </table>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="bg-grey-800">
+                                <th>Name</th>
+                                <th>SKU</th>
+                                <th>Quantity</th>
+                                <th>Cost Price</th>
+                                <th>Reorder Threshold</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <template >
+                        <tr v-if="cartItems.length == 0" class="text-center">
+                            <td colspan="8" class="text-bold animated zoomIn">
+                                Cart is empty !
+                            </td>
+                        </tr>
+                        </template>
+                        <!--listing template-->
+                        <template v-for="item in cartItems">
+                            <tr class="td animated fadeIn">
+                                <td>${item.product_name}</td>
+                                <td>${item.sku}</td>
+                                <td>
+                                    <input v-model="item.qty" style="width: 65px;" type="number" placeholder="amount" class="form-control">
+                                </td>
+                                 <td>
+                                    <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
+                                </td>
+                                <td>
+                                    <input v-model="item.low_stock_threshold" style="width: 65px;" type="number" placeholder="Reorder Thresholder" class="form-control">
+                                </td>
+                                <td>
+                                    <span class="label label-white text-grey-800" @click="removeItem(item)">
+                                        <i class="icon-trash animated shake"></i>
+                                    </span>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfooter>
+                            <tr class="active text-right text-bold">
+                                <template>
+                                    <td>
+                                        <button type="button" @click="openModal" class="btn bg-grey-800 btn-float btn-float-sm legitRipple">
+                                            <i class="icon-wallet"></i>
+                                            <span>Payment</span>
+                                        </button>
+                                    </td>
+                                    <td colspan="4">
+                                        <span style="font-size:24px;">{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
+                                    </td>
+                                </template>
+                            </tr>
+                        </tfooter>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--./cart-->
+
+    <!--PAYMENT MODAL-->
+    <form id="pay-form">
+        {% csrf_token %}
+    <div id="payment-modal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title text-center">Purchase Payment</h6>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <!--purchase detail-->
+                        <div class="col-md-4" style="border-right: 1px solid #373737;">
+                            <div class="form-group">
+                                <h5 class="text-semibold text-center text-grey-800">Select Payment Method</h5>
+                                 <template >
+                                <span v-if="paymentOptions.length == 0" class="text-center">
+                                    <span colspan="8" class="text-bold animated zoomIn">
+                                        No payment options !
+                                    </span>
+                                </span>
+                                </template>
+                                <template v-for="item in paymentOptions">
+                                    <button @click="addPayment(item)" onclick="return false;" class="btn btn-default btn-block btn-lg" >${item.name}</button>
+                                </template>
+
+                            </div>
+                        </div>
+
+                        <!--payment detail-->
+                        <div class="col-md-8">
+                             <!--total-->
+                            <h4 class="text-center text-bold" style="font-size:34px;">
+                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}
+                            </h4>
+                            <!--payment table-->
+                             <table class="table table-hover">
+                                <thead>
+                                    <tr class="bg-grey-800">
+
+                                        <th>Tendered</th>
+                                        <th>Number</th>
+                                        <th>Method</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <template >
+                                <tr v-if="paymentItems.length == 0" class="text-center">
+                                    <td colspan="8" class="text-bold animated zoomIn">
+                                        Select Payment
+                                    </td>
+                                </tr>
+                                </template>
+                                <!--listing template-->
+                                <template v-for="item in paymentItems">
+                                    <tr class="td animated fadeIn">
+
+                                        <td>
+                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input v-model="item.transaction_number" style="width: 65px;" type="text" placeholder="transaction" class="form-control">
+                                        </td>
+
+                                        <td>${item.payment_name}</td>
+
+                                        <td>
+                                            <span class="label label-white text-grey-800" @click="removePayment(item)">
+                                                <i class="icon-trash animated shake"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                                 <tfooter>
+                                    <tr class="active text-right text-bold">
+                                        <template>
+                                            <td>
+                                                <span class="text-warning" v-show="show_balance">Balance:</span>
+                                                <span class="text-success" v-show="show_change">Change:</span>
+                                                <span> {{'DEFAULT_CURRENCY'|site_settings}} ${getDue(Total,Tendered)| formatCurrency}</span>
+                                            </td>
+                                            <td colspan="4">
+                                                <span style="font-size:14px;">Tendered: {{'DEFAULT_CURRENCY'|site_settings}}  ${Tendered | formatCurrency}</span>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </tfooter>
+                             </table>
+                        </div>
+                    </div>
+
+					<input type="hidden" name="pk" id="pk" value="{{credit.pk}}">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                    <button v-show="show_change" type="button" @click="completePurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Complete</button>
+                    <button v-show="show_balance" type="button" @click="completePurchase" class="btn btn-primary hvr-glow btn-raised legitRipple">Credit</button>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-    <!--/form-->
 
-    </form>
+	</form>
+    <!--./MODAL-->
 </div>
 
+</div>

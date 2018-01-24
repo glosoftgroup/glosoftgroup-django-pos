@@ -150,6 +150,7 @@ class TableCreateSerializer(serializers.ModelSerializer):
                 stock.variant = ProductVariant.objects.get(sku=item['sku'])
                 stock.quantity = item['qty']
                 stock.cost_price = item['cost_price']
+                stock.low_stock_threshold = item['low_stock_threshold']
                 stock.save()
 
                 error_logger.error(e)
@@ -163,6 +164,7 @@ class TableListSerializer(serializers.ModelSerializer):
     purchase_history = HistorySerializer(many=True)
     supplier_name = serializers.SerializerMethodField()
     total_purchases = SerializerMethodField()
+    total_credit = SerializerMethodField()
     total_cost = SerializerMethodField()
     total_quantity = SerializerMethodField()
     date = serializers.SerializerMethodField()
@@ -183,6 +185,7 @@ class TableListSerializer(serializers.ModelSerializer):
                  'total_cost',
                  'total_quantity',
                  'total_purchases',
+                 'total_credit',
                  'single_url',
                  'detail_url',
                  'purchased_item',
@@ -205,6 +208,12 @@ class TableListSerializer(serializers.ModelSerializer):
     def get_total_purchases(self, obj):
         try:
             return "{:,}".format(Table.objects.total_purchases(obj))
+        except:
+            return 0
+
+    def get_total_credit(self, obj):
+        try:
+            return "{:,}".format(Table.objects.total_credit(obj))
         except:
             return 0
 
