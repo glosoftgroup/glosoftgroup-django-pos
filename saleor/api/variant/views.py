@@ -49,3 +49,33 @@ class VariantCategoryListAPIView(generics.ListAPIView):
         queryset = self.get_queryset().filter(product__categories__pk=pk)
         serializer = VariantListSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class VariantProductListAPIView(generics.ListAPIView):
+    """
+        list variant for a certain product
+        exclude variant with existing stock
+        :param pk product id
+    """
+    serializer_class = VariantListSerializer
+    queryset = ProductVariant.objects.all()
+
+    def get_queryset(self, *args, **kwargs):
+        queryset_list = ProductVariant.objects.all().select_related()
+
+        # pagination size
+        page_size = 'page_size'
+        if self.request.GET.get(page_size):
+            pagination.PageNumberPagination.page_size = self.request.GET.get(page_size)
+        else:
+            pagination.PageNumberPagination.page_size = 10
+        if self.request.GET.get('supplier'):
+            queryset_list = queryset_list.filter(variant_supplier__pk=int(self.request.GET.get('supplier')))
+
+        queryset_list = queryset_list.exclude(stock__quantity__gte=0).filter(product__pk=int(self.kwargs['pk']))
+        query = self.request.GET.get('q')
+        if query:
+            queryset_list = queryset_list.filter(
+                Q(sku__icontains=query)
+            ).distinct()
+        return queryset_list.order_by('-id')

@@ -17,6 +17,7 @@ class VariantListSerializer(serializers.ModelSerializer):
     supplier_name = SerializerMethodField()
     unit_cost = SerializerMethodField()
     cost_price = SerializerMethodField()
+    low_stock_threshold = SerializerMethodField()
     quantity = SerializerMethodField()
     tax = SerializerMethodField()
     discount = SerializerMethodField()
@@ -36,6 +37,7 @@ class VariantListSerializer(serializers.ModelSerializer):
             'qty',
             'unit_cost',
             'cost_price',
+            'low_stock_threshold',
             'tax',
             'discount',
             'quantity',
@@ -44,6 +46,9 @@ class VariantListSerializer(serializers.ModelSerializer):
             'min_price',
             'wholesale_price'
         )
+
+    def get_low_stock_threshold(self, obj):
+        return 10
 
     def get_qty(self, obj):
         return 1

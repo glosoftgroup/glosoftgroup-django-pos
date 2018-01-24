@@ -4,6 +4,7 @@
 {% load materializecss %}
 {% load staticfiles %}
 {% load attributes %}
+{% load site_settings %}
 
 
 {% block title %}
@@ -64,7 +65,7 @@
 {% block content %}
 
 <div id='results'></div>
-<div class="row">
+<div class="row" >
     <div class="col-md-12">
             <div class="panel panel-flat">
               
@@ -837,7 +838,17 @@
           </div>                
 
 </div>
-<input type="hidden" class="pageUrls" data-attributes="{% url 'dashboard:attr_list_f32b' %}" data-variantdetail="{% url 'dashboard:have-variants' %}" data-addattrurl="{% url 'dashboard:product-attr-add' %}" data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}" data-pk="{{product.pk}}" data-productdata="{% url 'dashboard:product-data' %}"  data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
+<input type="hidden" class="pageUrls"
+       data-attributes="{% url 'dashboard:attr_list_f32b' %}"
+       data-createpurchase="{% url 'purchase-variant-api:create-variant-purchase' %}"
+       data-variantdetail="{% url 'dashboard:have-variants' %}"
+       {% if product.pk %} data-listurl="{% url 'variant-api:api-product-list' pk=product.pk %}"{% endif %}
+       data-paymentlisturl="{% url 'purchase-api:list-payment-options' %}"
+       data-addattrurl="{% url 'dashboard:product-attr-add' %}"
+       data-addclassurlb="{% url 'dashboard:attr_list_f32d' %}"
+       data-pk="{{product.pk}}"
+       data-fullpath="{{ request.path }}"
+       data-productdata="{% url 'dashboard:product-data' %}"  data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %} 
@@ -890,6 +901,7 @@ $(document).ready(function(){
 <script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/deleteModal.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
+                  <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/product/vue/product.js' %}"></script>
 <script type="text/javascript">
  
@@ -1060,6 +1072,7 @@ $(document).ready(function(){
   });
   $('#btntoggles').on('click',function(){
     $('#toggleStock').slideToggle();
+    $('body').addClass('sidebar-xs');
   });
     
 

@@ -2,6 +2,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.template.response import TemplateResponse
 from django.http import HttpResponse, JsonResponse
 import logging
+import json
+from decimal import Decimal
 
 from ..views import staff_member_required
 from ...purchase.models import PurchaseProduct as Table
@@ -115,3 +117,42 @@ def report_detail(request, pk=None):
         return TemplateResponse(request, 'dashboard/purchase/reports/details.html',{'items': items, "sale":sale, 'history':history})
     except ObjectDoesNotExist as e:
         error_logger.error(e)
+
+
+@staff_member_required
+@permission_decorator('reports.view_sale_reports')
+def update_detail(request, pk=None):
+    if request.method == "POST":
+        if pk:
+            sale = PurchaseVariant.objects.get(pk=pk)
+        else:
+            return HttpResponse('PK required')
+        if request.POST.get('history'):
+            items = json.loads(request.POST.get('history'))
+            for item in items:
+                history = History()
+                history.purchase = sale
+                history.tendered = item['tendered']
+                history.transaction_number = item['transaction_number']
+                history.payment_name = item['payment_name']
+                history.save()
+                sale.amount_paid += Decimal(item['tendered'])
+                sale.balance -= Decimal(item['tendered'])
+            print sale.amount_paid
+            print sale.total_net
+            if sale.amount_paid < sale.total_net:
+                # credit sale
+                sale.status = 'payment-pending'
+            else:
+                sale.status = 'fully-paid'
+                sale.amount_paid = sale.total_net
+                sale.balance = 0
+            sale.save()
+            result = json.dumps({'results':{
+                                        'amount_paid': str(sale.amount_paid),
+                                        'balance': str(sale.balance)
+                                      }
+                                 })
+            return HttpResponse(result)
+        return HttpResponse('payment history expected')
+    return HttpResponse('Invalid method')

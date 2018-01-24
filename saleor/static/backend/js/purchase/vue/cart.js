@@ -75,10 +75,11 @@ var parent = new Vue({
            .done(function(data){
            // console.log(data);
            // clear cart notify user
-           this.cartItems = [];
-           this.paymentItems = [];
+           parent.cartItems = [];
+           parent.paymentItems = [];
+           $('#payment-modal').modal('hide');
            alertUser('Purchase Made successfully');
-           window.locations.reload();
+           //window.location.reload();
 
 
            })

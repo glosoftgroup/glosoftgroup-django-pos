@@ -70,10 +70,6 @@ def add_stock_payment_options(sender, **kwargs):
         mpesa = Payment.objects.filter(name='Mpesa')
         if not mpesa.exists():
             Payment.objects.create(name="Mpesa")
-
-        points = PaymentOption.objects.filter(name='Credit')
-        if not points.exists():
-            Payment.objects.create(name="Credit")
     except:
         print('Error creating payment options')
 
