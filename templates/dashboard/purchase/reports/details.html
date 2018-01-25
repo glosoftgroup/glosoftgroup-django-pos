@@ -134,7 +134,7 @@
                           <th>Item Name</th>
                           <th>Unit Cost</th>
                           <th>Quantity</th>
-                          <th>Total Purchase (KShs)</th>
+                          <th>Total Purchase ({{'DEFAULT_CURRENCY'|site_settings}})</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
@@ -151,7 +151,13 @@
                            <tr class="active">
 
                                <td class="text-bold text-right" colspan="5">
-                                   {{'DEFAULT_CURRENCY'|site_settings}} {{sale.total_net|intcomma}}
+                                   Total: {{'DEFAULT_CURRENCY'|site_settings}} {{sale.total_net|intcomma}}
+                               </td>
+                           </tr>
+                            <tr class="active">
+
+                               <td class="text-bold text-right" colspan="5">
+                                   Balance: {{'DEFAULT_CURRENCY'|site_settings}} ${balance |formatCurrency}
                                </td>
                            </tr>
                          {% else %}
@@ -163,7 +169,7 @@
               </div>
 
               <!--payment-->
-              <div class="table-responsives">
+              <div class="table-responsives mt-15">
                 <table class="table  datatable-header-footer">
 
                       <thead style="border-top:1px solid #ddd;">
@@ -211,7 +217,7 @@
                           <tr>
                                <td v-if="pending" class="text-bold text-center" colspan="5">
                                    <button @click="openModal" class="btn btn-success hvr-glow btn-raised legitRipple" id="addPayment">
-                                       Settle Credit ({{'DEFAULT_CURRENCY'|site_settings}} ${balance})
+                                       Settle Credit ({{'DEFAULT_CURRENCY'|site_settings}} ${balance|formatCurrency})
                                    </button>
                                </td>
                            </tr>
@@ -219,7 +225,7 @@
                         <template>
                         <tr class="active">
                                <td class="text-bold text-right" colspan="5">
-                                  {{'DEFAULT_CURRENCY'|site_settings}} {{ 'DEFAULT_CURRENCY'|site_settings}} ${paid|formatCurrency}
+                                Total Paid:  {{'DEFAULT_CURRENCY'|site_settings}} {{ 'DEFAULT_CURRENCY'|site_settings}} ${paid|formatCurrency}
                                </td>
                         </tr>
                         </template>
@@ -293,7 +299,7 @@
                         <div class="col-md-8">
                              <!--total-->
                             <h4 class="text-center text-bold" style="font-size:34px;">
-                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}
+                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${balance | formatCurrency}
                             </h4>
                             <!--payment table-->
                              <table class="table table-hover">

@@ -127,7 +127,7 @@
                return $(this).val();
             }).get();
       var groups = raw_groups.map(Number);
-      console.log(groups);
+
 
       if(file != ''){
           var f = document.getElementById('user-details');
@@ -138,7 +138,7 @@
           }
           // formData.append('groups[]', raw_groups);
           for (var pair of formData.entries()) {
-              console.log(pair[0]+ ', ' + pair[1]);
+              //console.log(pair[0]+ ', ' + pair[1]);
           }
           if (formData) {
                 $.ajax({
@@ -148,7 +148,6 @@
                     processData: false,
                     contentType: false,
                     success:function(data){
-                       console.log(data);
                        $("#name").val('');
                        $("#email").val('');
                        $("#code").val('');
@@ -182,9 +181,7 @@
       }
     }
   });
- //  $('#mobile').inputmask({
- //  mask: '(254)-000-000-000'
- // })
+
  var web = $("#website");
   web.on('focusin',function(){
     if(!web.val()){

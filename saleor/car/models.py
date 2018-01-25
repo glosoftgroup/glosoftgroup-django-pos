@@ -20,6 +20,6 @@ class Car(models.Model):
         verbose_name_plural = pgettext_lazy('Cars model', 'Cars')
 
     def __str__(self):
-        return str(self.name)
+        return str(self.name)+'-'+str(self.number)
 
 

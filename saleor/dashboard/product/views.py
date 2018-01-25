@@ -603,13 +603,19 @@ def product_create(request):
     ajax_sub = request.GET.get('ajax_subcategory')
     sub_category = request.GET.get('sub_category')
     sup= request.GET.get('supplier')
+    suppliers = None
+    if request.GET.get('supplier'):
+        suppliers = Supplier.objects.latest('id')
+        ctx = json.dumps({'supplier_id':suppliers.id,'supplier_name':suppliers.name})
+        return HttpResponse(ctx)
     tx = request.GET.get('tax')
     if ajax_sub:
         data = {
             'product_form': product_form,
-            'sub_category':sub_category,
-            'supplier':sup,
-            'tax':tx
+            'sub_category': sub_category,
+            'supplier': sup,
+            'suppliers': suppliers,
+            'tax': tx
         }
         return TemplateResponse(request, 'dashboard/product/subcategory/sub_refresh.html',
                                 data)
@@ -1024,7 +1030,11 @@ def add_attributes(request):
                 supplier = Supplier.objects.get(pk=int(request.POST.get('variant_supplier')))
                 product_variant.variant_supplier = supplier
             except:
-                pass
+                try:
+                    supplier = Supplier.objects.get(name='Unknown')
+                    product_variant.variant_supplier = supplier
+                except:
+                    pass
         if request.POST.get('price'):
             product_variant.price_override = request.POST.get('price')
         if request.POST.get('minimum_price'):
@@ -1049,7 +1059,7 @@ def add_attributes(request):
             product_variant.save()
             ctx = {'product': product,
                    'attributes': attributes,
-                   'variants':variants}
+                   'variants': variants}
             return TemplateResponse(request,'dashboard/product/partials/variant_table.html', ctx)
     return HttpResponse('Error!');
 

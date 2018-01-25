@@ -180,7 +180,7 @@ $(function() {
 
   function addItem(newitemnum, newitemdesc) {
    var selector = $('#id_variant');
-   console.log('we reresh soth**');
+
    selector.append('<option value="'+newitemnum+'">'+newitemdesc+'</option>');
    selector.selectpicker('refresh');
    selector.selectpicker('val', newitemnum);
@@ -266,6 +266,7 @@ $(function() {
       dynamic['template'] = 'select_variant';
       dynamic['get'] = 'variants';
       dynamic['track'] = 'refresh stock variant field';
+      parent.inputChangeEvent();
       refreshStockVar(dynamic,refreshvurl)
       .done(function(data){
         addItem(data['id'],data['value']);

@@ -1,3 +1,4 @@
+{% load static %}
 {% if sub_category %}
 <div class="input-group sub-refresh new">
         {{ product_form.product_class}}
@@ -11,18 +12,8 @@
       </div>
   </div>
 {% elif supplier %}
-<div class="input-group supplier-refresh snew">
-     {{ product_form.product_supplier }}
-     <span class="input-group-btn">
-     <a id="add-supplier" onclick="return false;" class="btn btn-icon bg-primary "
-        data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
-        href="#modal_attribute"  data-popup="tooltip"
-        data-original-title="Add New Supplier" data-title="Add New Supplier">
-      <i class=" icon-plus-circle2"></i>
-     </a>
-    </span>
-   </div>
 
+<span></span>
 {% elif tax %}
     <div class="input-group tax-refresh">
     {{ product_form.product_tax }}

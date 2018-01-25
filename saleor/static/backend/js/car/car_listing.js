@@ -48,7 +48,7 @@ var parent = new Vue({
                 date = '';
             }else{ date = this.date; }
             console.log(this.date);
-            this.$http.get($('.pageUrls').data('bookinglisturl')+'?page_size='+self.page_size+'&q='+this.search+'&status='+this.status+'&date='+date)
+            this.$http.get($('.pageUrls').data('bookinglisturl')+'?page_size='+self.page_size+'&q='+self.search+'&status='+this.status+'&date='+date)
                 .then(function(data){
                     data = JSON.parse(data.bodyText);
                     this.items = data.results;

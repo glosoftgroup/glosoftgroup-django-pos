@@ -135,11 +135,10 @@ def update_detail(request, pk=None):
                 history.tendered = item['tendered']
                 history.transaction_number = item['transaction_number']
                 history.payment_name = item['payment_name']
-                history.save()
-                sale.amount_paid += Decimal(item['tendered'])
-                sale.balance -= Decimal(item['tendered'])
-            print sale.amount_paid
-            print sale.total_net
+                if item['tendered']:
+                    history.save()
+                    sale.amount_paid += Decimal(item['tendered'])
+                    sale.balance -= Decimal(item['tendered'])
             if sale.amount_paid < sale.total_net:
                 # credit sale
                 sale.status = 'payment-pending'

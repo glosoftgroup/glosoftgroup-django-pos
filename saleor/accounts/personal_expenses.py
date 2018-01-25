@@ -64,7 +64,7 @@ def expenses(request):
             expenses = paginator.page(paginator.num_pages)
         data = {
             "expenses": expenses,
-            "expense_types":expense_types
+            "expense_types": expense_types
         }
         user_trail(request.user.name, 'accessed expenses', 'views')
         info_logger.info('User: ' + str(request.user.name) + 'accessed expenses page')

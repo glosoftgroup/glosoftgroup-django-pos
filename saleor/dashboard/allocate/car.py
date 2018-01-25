@@ -119,7 +119,8 @@ def car_list(request, pk=None):
         return HttpResponse('Car pk required')
     car_name = ''
     try:
-        car_name = Allocate.objects.get(pk=pk).car.name
+        car_name = Allocate.objects.get(pk=pk)
+        car_name = str(car_name.car.name)+' ('+str(car_name.car.number)+')'
     except Exception as e:
         pass
     data = {
