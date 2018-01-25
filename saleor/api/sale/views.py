@@ -16,7 +16,7 @@ from .serializers import (
     ItemListSerializer,
     ItemSerializer,
     ListSerializer,
-     )
+)
 
 User = get_user_model()
 
@@ -33,11 +33,14 @@ class ItemListAPIView(APIView):
         Return a list of all sales.
         """
         key = ''
+        date = ''
         if self.kwargs['pk']:
             key = self.kwargs['pk']
         if self.request.GET.get('date'):
             date = self.request.GET.get('date')
-            summary = Item.objects.values('product_name', 'attributes').filter(created__icontains=date).filter(attributes__has_key=key)
+            summary = Item.objects.values('created', 'product_name', 'attributes').filter(
+                created__icontains=date).filter(attributes__has_key=key)
+
         else:
             summary = Item.objects.values('product_name', 'attributes').filter(attributes__has_key=key)
         report = []
@@ -45,40 +48,10 @@ class ItemListAPIView(APIView):
         for i in summary:
             name = AttributeChoiceValue.objects.get(pk=int(i['attributes'][key])).name
             temp2 = {}
-            temp = eval("Item.objects.values('product_name', 'attributes').filter(attributes__"+key+"="+i['attributes'][key]+").annotate(c=Count('attributes', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity'))")
-            quantity = 0
-            sum = 0
-            for count in temp:
-                quantity += count['quantity__sum']
-                sum += count['total_cost__sum']
-            temp2['quantity'] = quantity
-            temp2['sum'] = sum
-            temp2['attribute_value'] = name
-            if i['attributes'][key] not in checker:
-                report.append(temp2)
-                checker.append(i['attributes'][key])
-        return Response(report)
-
-
-class ItemListAPIView(APIView):
-    def get(self, request, format=None, **kwargs):
-        """
-        Return a list of all sales.
-        """
-        key = ''
-        if self.kwargs['pk']:
-            key = self.kwargs['pk']
-        if self.request.GET.get('date'):
-            date = self.request.GET.get('date')
-            summary = Item.objects.values('product_name', 'attributes').filter(created__icontains=date).filter(attributes__has_key=key)
-        else:
-            summary = Item.objects.values('product_name', 'attributes').filter(attributes__has_key=key)
-        report = []
-        checker = []
-        for i in summary:
-            name = AttributeChoiceValue.objects.get(pk=int(i['attributes'][key])).name
-            temp2 = {}
-            temp = eval("Item.objects.values('product_name', 'attributes').filter(attributes__"+key+"="+i['attributes'][key]+").annotate(c=Count('attributes', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity'))")
+            temp = eval(
+                "Item.objects.values('created', 'product_name', 'total_cost', 'quantity', 'attributes').filter(created__icontains='" + date + "', attributes__" + key + "=" +
+                i['attributes'][
+                    key] + ").annotate(c=Count('attributes', distinct=True)).annotate(Sum('total_cost')).annotate(Sum('quantity'))")
             quantity = 0
             sum = 0
             for count in temp:
@@ -109,9 +82,9 @@ class SoldItemListAPIView(APIView):
         else:
             date = DateFormat(datetime.datetime.today()).format('Y-m-d')
             summary = Item.objects.filter(created__icontains=date).values('product_name', 'product_category').annotate(
-                            c=Count('product_name', distinct=True))\
-                            .annotate(Sum('total_cost'))\
-                            .annotate(Sum('quantity')).order_by('-quantity__sum')
+                c=Count('product_name', distinct=True)) \
+                .annotate(Sum('total_cost')) \
+                .annotate(Sum('quantity')).order_by('-quantity__sum')
 
         return Response(summary)
 
@@ -131,12 +104,12 @@ class SaleMarginListAPIView(APIView):
                 .annotate(Sum('quantity')).order_by('-quantity__sum')
         else:
             date = DateFormat(datetime.datetime.today()).format('Y-m-d')
-            summary = Item.objects.filter(created__icontains=date)\
-                            .values('product_name', 'product_category').annotate(
-                            c=Count('product_name', distinct=True)) \
-                            .annotate(Sum('total_cost')) \
-                            .annotate(Sum('total_purchase')) \
-                            .annotate(Sum('quantity')).order_by('-quantity__sum')
+            summary = Item.objects.filter(created__icontains=date) \
+                .values('product_name', 'product_category').annotate(
+                c=Count('product_name', distinct=True)) \
+                .annotate(Sum('total_cost')) \
+                .annotate(Sum('total_purchase')) \
+                .annotate(Sum('quantity')).order_by('-quantity__sum')
         total_sale = 0
         total_cost = 0
         result = {}
@@ -158,13 +131,13 @@ class SaleListAPIView(generics.ListAPIView):
     """
     serializer_class = ListSerializer
 
-    def get_queryset(self, *args, **kwargs):        
+    def get_queryset(self, *args, **kwargs):
         queryset_list = Table.objects.all()
         query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(
-                Q(invoice_number__icontains=query)               
-                ).distinct()
+                Q(invoice_number__icontains=query)
+            ).distinct()
         return queryset_list
 
 
@@ -182,6 +155,5 @@ class SaleItemsListAPIView(generics.ListAPIView):
         if query:
             queryset_list = queryset_list.filter(
                 Q(product_name__icontains=query)
-                ).distinct()
+            ).distinct()
         return queryset_list
-

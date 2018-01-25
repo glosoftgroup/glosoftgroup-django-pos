@@ -61,7 +61,6 @@ class PurchaseSupplierListAPIView(generics.ListAPIView):
             queryset_list = queryset_list.filter(created__icontains=self.request.GET.get('date'))
         if query:
             queryset_list = queryset_list.filter(
-                Q(invoice_number__icontains=query) |
                 Q(supplier__name__icontains=query)
             ).distinct('supplier')
         return queryset_list.order_by('supplier')
@@ -87,15 +86,15 @@ class PurchaseListAPIView(generics.ListAPIView):
         else:
             pagination.PageNumberPagination.page_size = 10
         if self.request.GET.get('status'):
-            if self.request.GET.get('status') == 'True':
-                queryset_list = queryset_list.filter(active=True)
-            if self.request.GET.get('status') == 'False':
-                queryset_list = queryset_list.filter(active=False)
+            if str(self.request.GET.get('status')) == 'all':
+                pass
+            else:
+                queryset_list = queryset_list.filter(status=str(self.request.GET.get('status')))
+
         query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(
-                Q(invoice_number__icontains=query) |
-                Q(supplier__name__icontains=query)
+                Q(invoice_number__icontains=query)
                 ).distinct()
         return queryset_list.order_by('-id')
 

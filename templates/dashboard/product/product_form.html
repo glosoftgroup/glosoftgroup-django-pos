@@ -357,7 +357,7 @@
             <td>
                 <div class="form-group">
                     <label></label>
-                    <select name="variant_supplier" class="bootstrap-select" id="id_variant_supplier">
+                    <select name="variant_supplier" class="select-supplier-variant " id="id_variant_supplier">
                         {% if suppliers %}
                             {% if supplier.name == 'Unknown' %}
                             <option value="{{supplier.pk}}">{{supplier}}</option>
@@ -365,6 +365,9 @@
                             {% for supplier in suppliers %}
                             <option value="{{supplier.id}}">{{supplier}}</option>
                             {% endfor %}
+                            <option value="add" id="add-supplier" data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
+                href="#modal_attribute" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add New Expense Type" data-select="#expense_types"
+                            data-cat="expense_type" data-label="Expense Type:"> add new </option>
                         {% endif %}
                     </select>
                 </div>
@@ -889,6 +892,17 @@ $(document).ready(function(){
      // Default initialization
     $(".styled, .multiselect-container input").uniform({
         radioClass: 'choice'
+    });
+
+    $('.select-supplier-variant').selectpicker({
+        iconBase: 'fa',
+        addIcon:'fa-plus-circle'
+    });
+    $('.select-supplier-variant').on('change',function(){
+        var sp = $(this).val();
+        if(sp == 'add'){
+            $( "#add-supplier" ).trigger( "click" );
+        }
     });
 
   });
@@ -1525,9 +1539,18 @@ $('#form-product').validate({
 
   function refresh_suppliers(){
     var url = "{% url 'dashboard:product-add' %}";
+    var selector = $('.select-supplier-variant');
+    var stock_selector = $('#variant_supplier');
     var posting = $.get( url, {'ajax_subcategory':'ajax_subcategory', 'supplier':'supplier'});
     posting.done(function(data) {
-       $('.supplier-refresh').replaceWith( data );
+        var data = JSON.parse(data);
+        var newitemnum = data.supplier_id;
+        var newitemdesc = data.supplier_name;
+        selector.append('<option value="'+newitemnum+'" selected="selected">'+newitemdesc+'</option>');
+        selector.selectpicker("refresh");
+        stock_selector.append('<option value="'+newitemnum+'" selected="selected">'+newitemdesc+'</option>');
+        stock_selector.selectpicker("refresh");
+        parent.supplier = newitemnum;
     });
   }
 

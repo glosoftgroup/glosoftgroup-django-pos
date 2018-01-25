@@ -139,7 +139,7 @@ class CarAllocateListSerializer(serializers.ModelSerializer):
 
     def get_car_name(self, obj):
         try:
-            return obj.car.name
+            return str(obj.car.name)+' ('+str(obj.car.number)+')'
         except Exception as e:
             return ''
 
