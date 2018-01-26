@@ -126,7 +126,7 @@ def send_to_sale(credit):
                         unit_cost=item.unit_cost,
                         product_category=item.product_category
                         )
-        print item
+
 
 
 # on
@@ -197,6 +197,6 @@ class CustomerDistinctListAPIView(generics.ListAPIView):
         if query:
             queryset_list = queryset_list.filter(
                 Q(invoice_number__icontains=query) |
-                Q(car__name__icontains=query)
+                Q(customer__name__icontains=query)
                 ).distinct('customer')
         return queryset_list.order_by('customer')

@@ -112,8 +112,6 @@
                   <tr class="bg-primary">
                     <th>Date</th>
                     <th>Car</th>
-                    <th>Invoice</th>
-                    <th>Status</th>
                     <th>Agent</th>
                     <th>Cashier</th>
                     <th>Allocated</th>
@@ -145,11 +143,6 @@
                             ${item.date}
                         </td>
                         <td>${item.car_name}</td>
-                        <td>
-                            ${item.invoice_number}<br>
-                            <span v-show="item.active"><mark>active</mark></span>
-                        </td>
-                        <td v-html="item.allocate_status"></td>
                         <td>${item.agent_name}</td>
                         <td>${item.cashier}</td>
                         <td>${item.total_allocated}</td>

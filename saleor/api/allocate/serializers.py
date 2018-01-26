@@ -342,7 +342,7 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
         return value
 
     def update(self, instance, validated_data):
-        terminal = Terminal.objects.get(pk=self.terminal_id)
+        terminal = Terminal.objects.get(pk=instance.terminal_id)
         for x in validated_data.get('allocated_items'):
             old = instance.item_detail(x['sku'])
             old.sold += x['quantity']

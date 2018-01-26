@@ -105,6 +105,7 @@ class Sales(models.Model):
     created = models.DateTimeField(
         pgettext_lazy('Sales field', 'created'),
         default=now, editable=False)
+    transfer = models.BooleanField(default=False, blank=False)
     last_status_change = models.DateTimeField(
         pgettext_lazy('Sales field', 'last status change'),
         default=now, editable=False)

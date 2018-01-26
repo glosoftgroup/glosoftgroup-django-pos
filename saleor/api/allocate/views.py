@@ -21,6 +21,7 @@ from .serializers import (
      )
 from rest_framework import generics
 from ...decorators import user_trail
+from ...site.models import SiteSettings
 import logging
 from django.contrib.auth import get_user_model
 
@@ -41,9 +42,12 @@ class AllocateCreateAPIView(generics.CreateAPIView):
     serializer_class = CreateAllocateSerializer
 
     def perform_create(self, serializer):              
-        instance = serializer.save(user=self.request.user)      
+        instance = serializer.save(user=self.request.user)
+        # show tranfer in sale
+        show_transfer = SiteSettings.objects.get(pk=1).show_transfer
         if instance.status == 'fully-paid':
-            send_to_sale(instance)
+            if show_transfer:
+                send_to_sale(instance)
 
 
 class AllocateListAPIView(generics.ListAPIView):
@@ -178,6 +182,7 @@ class AllocateListAPIView2(generics.ListAPIView):
             print('nothing found')
         return queryset_list
 
+
 class AllocateUpdateAPIView(generics.RetrieveUpdateAPIView):
     """
         update allocated products
@@ -192,8 +197,10 @@ class AllocateUpdateAPIView(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         instance = serializer.save(user=self.request.user)
+        show_transfer = SiteSettings.objects.get(pk=1).show_transfer
         if instance.amount_paid != 0.00:
-            send_to_sale(instance)
+            if show_transfer:
+                send_to_sale(instance)
         else:
             print('amount paid cannot be zero')
         user_trail(self.request.user.name,'made a allocated sale:#'+str(serializer.data['invoice_number'])+' credit sale worth: '+str(serializer.data['total_net']),'add')
@@ -220,6 +227,7 @@ class AllocateUpdateAPIView(generics.RetrieveUpdateAPIView):
 def send_to_sale(credit):
     sale = Sales()
     sale.user = credit.user
+    sale.transfer = True
     sale.total_net = credit.amount_paid
     sale.sub_total = credit.sub_total
     sale.balance = credit.balance

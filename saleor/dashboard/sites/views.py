@@ -55,7 +55,10 @@ def update_settings(request,site_id=None):
             site.name = request.POST.get('company_name')
         if request.POST.get('company_email'):
             site.email = request.POST.get('company_email')
-        
+        if request.POST.get('show_transfer'):
+            site.show_transfer = True
+        else:
+            site.show_transfer = False
         if request.POST.get('loyalty_point_equiv'):
             site.loyalty_point_equiv = request.POST.get('loyalty_point_equiv')
         if request.POST.get('opening_time'):

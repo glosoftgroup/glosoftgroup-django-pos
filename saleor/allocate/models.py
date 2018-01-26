@@ -121,7 +121,7 @@ class Allocate(models.Model):
 
     due_date = models.DateTimeField(
         pgettext_lazy('Allocate field', 'due date'),
-        null=False,default=now)
+        null=False, default=now)
     
     objects = AllocateManager()
 
@@ -201,7 +201,9 @@ class AllocatedItem(models.Model):
         pgettext_lazy('AllocatedItem field', 'product_category'), max_length=128, null=True)
     discount = models.DecimalField(
         pgettext_lazy('SoldItem field', 'discount'), default=Decimal(0), max_digits=100, decimal_places=2)
-    tax = models.IntegerField(default=Decimal(0))
+    tax = models.DecimalField(
+        pgettext_lazy('SoldItem field', 'tax'), default=Decimal(0), max_digits=100, decimal_places=2)
+
 
     class Meta:
         #unique_together = ('sales')

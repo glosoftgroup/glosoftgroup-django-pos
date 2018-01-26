@@ -11,7 +11,7 @@
 {% endblock %}
 {% block breadcrumbs %}
       <li class=""><a href="{% url 'dashboard:car_allocate_list' %}">Cars Stock Transfer </a></li>
-     <li class="active"><a href="{% url 'dashboard:car_transfer_list' pk=sale.pk %}">{{ sale.car.name }}</a> </li>
+     <li class="active"><a href="{% url 'dashboard:car_transfer_list' pk=sale.pk %}">{{ sale.car.name }} ({{ sale.car.number }})</a> </li>
      <li>Receipt</li>
  {% endblock %}
 
@@ -48,7 +48,7 @@
                           <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
                           <br>
                           <h7>
-                              <span class="text-bold">Car:</span>{{sale.car.name}}
+                              <span class="text-bold">Car:</span>{{sale.car.name}} ({{ sale.car.number }})
                           </h7>
 
                       </div>

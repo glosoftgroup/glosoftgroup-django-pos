@@ -150,9 +150,9 @@
                         <td v-html="item.allocate_status"></td>
                         <td>${item.agent_name}</td>
                         <td>${item.cashier}</td>
-                        <td>${item.total_allocated}</td>
-                        <td>${item.total_sold}</td>
-                        <td>${item.total_net}</td>
+                        <td>${item.total_allocated|formatCurrency}</td>
+                        <td>${item.total_sold|formatCurrency}</td>
+                        <td>${item.total_net|formatCurrency}</td>
 
                     </tr>
                 </template>
