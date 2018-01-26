@@ -21,6 +21,7 @@ class SiteSettings(models.Model):
     description = models.CharField(
         pgettext_lazy('Site field', 'site description'), max_length=500,
         blank=True)
+    show_transfer = models.BooleanField(default=True, blank=False)
     loyalty_point_equiv = models.DecimalField(
         pgettext_lazy('Site field', 'loyalty points'), default=Decimal(0), max_digits=100, decimal_places=2)
     max_credit_date = models.IntegerField(pgettext_lazy('Site field', 'Maximum credit sale expiration in days'),

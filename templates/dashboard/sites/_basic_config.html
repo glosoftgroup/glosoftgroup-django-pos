@@ -45,7 +45,7 @@
                       <div class="col-md-12"> <h6 style="font-weight:bold;">Sales Settings</h6></div>
                       <div class="row">
                       <div class="col-md-12">
-                          <div class="form-group col-md-6">              
+                          <div class="form-group col-md-4">
                                <label for="loyalty_point_equiv">
                                 Points equivalent to 1 {{'DEFAULT_CURRENCY'|site_settings}}
                                </label>
@@ -54,12 +54,19 @@
 
                             <span class="help-block">e.g 100 loyalty points is equal to 1 {{'DEFAULT_CURRENCY'|site_settings}}</span>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-4">
                               <label for="loyalty_point_equiv" style="">Max Credit Expiration(days)  </label>
                               {{form.max_credit_date}}
                               <!-- <input class="form-control" type="number" id="max_credit_date" name="max_credit_date"> -->
                               <span class="help-block">Maximum days before which credit sale should be paid</span>
                               
+                          </div>
+                          <div class="col-md-4">
+                              <label for="show_transfer" style="">Show transferred Sales</label>
+                              {{form.show_transfer}}
+                              <!-- <input class="form-control" type="number" id="max_credit_date" name="max_credit_date"> -->
+                              <span class="help-block">If checked transferred stock sales will be visible on reports</span>
+
                           </div>
                       </div>
                       </div>
