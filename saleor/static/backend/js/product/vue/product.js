@@ -68,6 +68,14 @@ var parent = new Vue({
            dynamicData['item'] = JSON.stringify(this.cartItems);
            dynamicData['history'] = JSON.stringify(this.paymentItems);
 
+           // cart details validation
+           $('.total-field').removeClass('animated shake');
+           if(!dynamicData['total_net']){
+                alertUser('Total Purchase Cost price required','bg-danger','Forgot to fill cost price?');
+                $('.total-field').addClass('animated shake');
+                return 0;
+           }
+
            // send purchase data
            // *******************
            // csrf token

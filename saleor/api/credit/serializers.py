@@ -215,33 +215,23 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             customer = Customer.objects.create(**kwargs)
         else:
             customer = customer.first()
-
-        # calculate loyalty_points
-        if customer:
-            total_net = validated_data.get('total_net')
-            points_eq = SiteSettings.objects.get(pk=1)      
-            points_eq = points_eq.loyalty_point_equiv
-            if points_eq == 0:
-                loyalty_points = 0
-            else:
-                loyalty_points = total_net/points_eq
                   
         solditems_data = validated_data.pop('credititems')        
-        credit = Credit.objects.create(
-                                     user=validated_data.get('user'),
-                                     invoice_number=validated_data.get('invoice_number'),
-                                     total_net=validated_data.get('total_net'),
-                                     sub_total=validated_data.get('sub_total'),
-                                     balance=validated_data.get('balance'),
-                                     terminal=validated_data.get('terminal'),
-                                     amount_paid=validated_data.get('amount_paid'),
-                                     customer=customer,
-                                     status='payment-pending',
-                                     mobile=validated_data.get('mobile'),
-                                     debt=validated_data.get('debt'),
-                                     due_date=validated_data.get('due_date'),
-                                     customer_name=validated_data.get('customer_name'))
-
+        credit = Credit()
+        credit.user = validated_data.get('user')
+        credit.invoice_number = validated_data.get('invoice_number')
+        credit.total_net = validated_data.get('total_net')
+        credit.sub_total = validated_data.get('sub_total')
+        credit.balance = validated_data.get('balance')
+        credit.terminal = validated_data.get('terminal')
+        credit.amount_paid = validated_data.get('amount_paid')
+        credit.customer = customer
+        credit.status = 'payment-pending'
+        credit.mobile = validated_data.get('mobile')
+        credit.debt = validated_data.get('debt')
+        credit.due_date = validated_data.get('due_date')
+        credit.customer_name = validated_data.get('customer_name')
+        credit.save()
         # add credit history
         try:
             history = CreditHistoryEntry()
@@ -349,7 +339,9 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         instance.debt = instance.debt-validated_data.get('amount_paid', instance.amount_paid)
         instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
         if instance.amount_paid >= instance.total_net:
-            instance.status = 'fully-paid'            
+            instance.status = 'fully-paid'
+            instance.amount_paid = instance.total_net
+            instance.debt = 0
         else:
             instance.status = validated_data.get('status', instance.status)
         instance.mobile = validated_data.get('mobile', instance.mobile)   

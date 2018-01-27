@@ -542,10 +542,13 @@ def product_data(request):
                 print('Error add supplier')
         if request.POST.get('sku'):
             try:
-                variant = ProductVariant.objects.get(product=product)
+                variant = ProductVariant.objects.get(sku=request.POST.get('sku'))
                 variant.name = request.POST.get('sku')
                 if request.POST.get('threshold'):
-                     variant.low_stock_threshold = request.POST.get('threshold')
+                    variant.low_stock_threshold = request.POST.get('threshold')
+                if request.POST.get('variant_supplier'):
+                    supplier = Supplier.objects.get(pk=int(request.POST.get('variant_supplier')))
+                    variant.variant_supplier = supplier
                 variant.save()
             except Exception as e:
                 print(e)

@@ -38,7 +38,8 @@ $(function() {
  // stock variables
  var thresholdId = $('#id_variant-low_stock_threshold');
  var supplierId  = $('#id_product_supplier');
- var skuId       = $('#id_variant-sku'); 
+ var skuId       = $('#id_variant-sku');
+ var variantSupplier = $('#id_variant-variant_supplier');
  var updateStockBtn = $('#updatestock');
  var id_name = $('#id_name');
  var id_categories = $('#id_categories');
@@ -112,17 +113,17 @@ $(function() {
 
  });
  updatePricing.on('click',function(){
-    console.log('update priceing');
     tax = tax_id.val();
     price = newPrice.val();
     wholesalePrice = wholesaleId.val();
     var threshold = thresholdId.val();
-    var sku = skuId.val();
+    var sku = $('#pricingDiv').find('#id_variant-sku').val();
     url = $(this).data('priceurl');
     pk  = $(this).data('productpk');
     if(minimum_price.val()){
        dynamicData['minimum_price'] = minimum_price.val();
     }
+
     dynamicData = {};
     dynamicData['pk'] = pk;
     dynamicData['price'] = price;
@@ -138,13 +139,18 @@ $(function() {
     if(wholesalePrice){
     dynamicData['wholesale_price'] =wholesalePrice;	
     }
+    if(variantSupplier.val()){
+        dynamicData['variant_supplier'] = variantSupplier.val();
+    }
     dynamicData['minimum_price'] = $('#id_minimum_price').val();
     dynamicData['track'] = 'add pricing x';
     method = 'post';
     addProductDetails(dynamicData,url,method)
     .done(function(data){
       alertUser('Data sent successfully');
-      $('#id_price').val(price);      
+      $('#id_price').val(price);
+      parent.supplier = variantSupplier.val();
+      parent.inputChangeEvent();
     }).fail(function(){
       alertUser('Error occured','bg-danger','Error!');
     });

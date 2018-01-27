@@ -22,14 +22,14 @@
           </div>
       </div>
       <!-- ./supplier -->     
-      <div class="col-md-3" id="hasVariantDiv">
+      <div class="col-md-3 hidden" id="hasVariantDiv">
         {% if not product.product_class.has_variants %}
-        <div class="row disablesku">   
+        <div class="row disablesku hidden">
          {{ variant_form.sku|materializecss }}
        </div>
        {% endif %}
       </div>
-      <div class="col-md-3">
+      <div class="col-md-3 hidden">
           {% if not product.product_class.has_variants %}
        <button class="btn btn-primary" style="margin-top: 28px !important;" id="updatestock" data-productpk="{{product.pk}}" data-stockurl="{% url 'dashboard:product-data' %}">Create</button>
           {% endif %}

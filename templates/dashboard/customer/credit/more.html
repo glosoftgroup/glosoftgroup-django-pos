@@ -111,6 +111,7 @@
                 <thead>
                   <tr class="bg-primary">
                     <th>Date</th>
+                    <th>Invoice</th>
                     <th>Status</th>
                     <th>Due Date</th>
                     <th>Is Due</th>
@@ -139,6 +140,9 @@
                     <tr class="td animated fadeIn" @click="carTranfers(item.detail_url)">
                         <td>
                             ${item.date}
+                        </td>
+                        <td>
+                            ${item.invoice_number}
                         </td>
                         <td v-html="item.credit_status"></td>
                         <td>${item.due_date}</td>
