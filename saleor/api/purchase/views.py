@@ -91,6 +91,7 @@ class PurchaseSupplierListAPIView(generics.ListAPIView):
         if query:
             queryset_list = queryset_list.filter(
                 Q(invoice_number__icontains=query) |
+                Q(car__number__icontains=query) |
                 Q(car__name__icontains=query)
                 ).distinct('supplier')
         return queryset_list.order_by('supplier')
