@@ -99,7 +99,7 @@ class PurchaseVariant(models.Model):
     balance = models.DecimalField(
         pgettext_lazy('PurchaseVariant field', 'balance'), default=Decimal(0), max_digits=100, decimal_places=2)
     supplier = models.ForeignKey(
-        Supplier, related_name='purchase_variant_supplier',
+        Supplier, related_name='purchase_variant_supplier', on_delete=models.SET_NULL,
         verbose_name=pgettext_lazy('PurchaseVariant item field', 'supplier'), null=True, blank=True)
     invoice_number = models.CharField(
         pgettext_lazy('PurchaseVariant', 'invoice_number'), null=True, max_length=36,)

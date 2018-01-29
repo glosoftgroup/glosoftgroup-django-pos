@@ -5,6 +5,7 @@
 {% load materializecss %}
 {% load staticfiles %}
 {% load site_settings %}
+{% load compress %}
 
 {% block title %}
 Add Stock- {{ block.super }}
@@ -355,11 +356,12 @@ Add Stock- {{ block.super }}
 {% endblock %}
 
 {% block custom_js %}
+    {% compress js inline %}
     <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/purchase/vue/cart.js' %}"></script>
-
+    {% endcompress %}
 <script type="text/javascript">
   // Basic select
     $('.bootstrap-select').selectpicker();

@@ -56,6 +56,7 @@ def index(request):
         items = top_items()
         low_stock_order = dashbord_get_low_stock_products()
 
+
         try:
             startYear = Sales.objects.all().first().created.year
             startMonth = Sales.objects.all().first().created.month
@@ -373,7 +374,7 @@ def styleguide(request):
     return TemplateResponse(request, 'dashboard/styleguide/index.html', {})
 
 def dashbord_get_low_stock_products():
-    products = Stock.objects.get_low_stock()
+    products = Stock.objects.get_low_stock().order_by('-id')
     paginator = Paginator(products, 10)
     try:
         low_stock = paginator.page(1)

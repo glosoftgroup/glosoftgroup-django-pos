@@ -5,6 +5,7 @@
 {% load default_user_image %}
 {% load business_name %}
 {% load business_logo %}
+{% load compress %}
 
 <html lang="{{ LANGUAGE_CODE }}" class="no-js">
   <head>
@@ -22,7 +23,7 @@
     {% include 'favicon.html' %}
 
 
-
+{% compress css %}
     <!-- Global stylesheets -->
   <!--<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">-->
   <link href="{% static 'backend/css/icons/icomoon/styles.css' %}" rel="stylesheet" type="text/css">
@@ -37,6 +38,9 @@
   <!--image preview -->
   <link href="{% static 'backend/js/plugins/ui/jasny-bootstrap/css/jasny-bootstrap.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'backend/js/plugins/ladda/ladda-themeless.min.css' %}" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="{% static 'backend/css/fixed_table_header.css' %}">
+      {% endcompress %}
+
   <script type="text/javascript" src="{% static 'backend/js/jquery-1.11.3.min.js' %}"></script>
   <!-- /global stylesheets -->
   <style type="text/css">
@@ -55,7 +59,7 @@
 
     </style>
     {% endblock %}
-    <link rel="stylesheet" type="text/css" href="{% static 'backend/css/fixed_table_header.css' %}">
+
   </head>
 
   <body class="{% block body_class %}{% endblock %} navbar-top">
@@ -576,7 +580,7 @@
   <script type="text/javascript" src="{% static 'backend/js/core/libraries/bootstrap.min.js' %}"></script>
   <!-- /core JS files -->
    <script src="{% static 'backend/js/plugins/ui/jquery-validation/jquery.validate.js' %} "></script>
-
+{% compress js  %}
   <!-- Theme JS files -->
   <script type="text/javascript" src="{% static 'backend/js/plugins/ui/moment/moment.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/core/app.js' %}"></script>
@@ -609,39 +613,35 @@
   <script type="text/javascript" src="{% static 'backend/js/pages/components_notifications_other.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/ladda/spin.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/ladda/ladda.min.js' %}"></script>
-
-
-
-    <!-- Core Scripts - Include with every page -->
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-      <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bootpag.min.js' %}"></script>
       <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
    <script type="text/javascript" src="{% static 'backend/js/fixed_breadcrumb.js' %}"></script>
            <script type="text/javascript" src="{% static 'backend/js/plugins/js-cookie/src/js.cookie.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/test-cookie.js' %}"></script>
-  <style type="text/css">
-    .toper{top:50px;}
-  </style>
-  <script type="text/javascript">
-  $( document ).ready(function() {
-
-    var selector = $('.fix-breadcrumb');
-    $( "label" ).addClass( "text-bold" );
-
-      });
 
 
 
-  </script>
+    <!-- Core Scripts - Include with every page -->
 
-
-    {% include "dashboard/includes/_messages.html" %}
     <script type="text/javascript" src="{% static 'backend/js/search.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/fixed_table_header.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/printThis/printThis.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/printThis/printer.js' %}"></script>
+    {% endcompress %}
 
+      {% include "dashboard/includes/_messages.html" %}
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    <style type="text/css">
+    .toper{top:50px;}
+  </style>
+  <script type="text/javascript">
+  $( document ).ready(function() {
+    var selector = $('.fix-breadcrumb');
+    $( "label" ).addClass( "text-bold" );
+
+      });
+  </script>
     <script type="text/javascript">
 
   function getNotification() {

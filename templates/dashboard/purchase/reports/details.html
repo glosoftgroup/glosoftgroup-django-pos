@@ -7,6 +7,7 @@
 {% load humanize %}
 {% load site_settings %}
 {% load default_user_image %}
+{% load compress %}
 {% block title %}
   Sales Report
 {% endblock %}
@@ -382,12 +383,13 @@
 
 {% endblock%}
 {% block custom_js %}
-<script > var back_path = "{{request.path}}";</script>
-<script type="text/javascript" src="{% static 'backend/js/pdf/open-pdf.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/purchase/vue/invoice.js' %}"></script>
-
+    {% compress js inline %}
+    <script > var back_path = "{{request.path}}";</script>
+    <script type="text/javascript" src="{% static 'backend/js/pdf/open-pdf.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/purchase/vue/invoice.js' %}"></script>
+    {% endcompress %}
 <script>
     $('.printPdf').on('click', function(){
        var url = $(this).data('url');

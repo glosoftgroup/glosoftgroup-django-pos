@@ -2,6 +2,7 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load prices_i18n %}
+{% load compress %}
 
 {% block title %}
   {{ table_name }} - Report
@@ -324,6 +325,8 @@
 
 {% endblock%}
 {% block custom_js %}
+  <!--compress js-->
+  {% compress js inline %}
     <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
@@ -332,6 +335,7 @@
     <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/car/listing.js' %}"></script>
+  {% endcompress %}
     <script type="text/javascript">
   $(document).ready(function() {
   $('.bootstrap-select').selectpicker();
