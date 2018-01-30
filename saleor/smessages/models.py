@@ -139,7 +139,6 @@ class SMessagesQuerySet(models.query.QuerySet):
         return qs.update(emailed=True)
 
 
-
 class SMessage(models.Model):   
     LEVELS = Choices('success', 'info', 'warning', 'error')
     TO = Choices('supplier', 'customer', 'user', 'anonymous')
@@ -155,11 +154,11 @@ class SMessage(models.Model):
     actor = GenericForeignKey('actor_content_type', 'actor_object_id')
 
     verb = models.CharField(max_length=255)
-    from_number = models.CharField(max_length=255,default='',blank=True,null=True)
-    to_number = models.CharField(max_length=255,default='',blank=True,null=True)
-    status = models.CharField(max_length=655,default='',blank=True,null=True)
-    external_id = models.CharField(max_length=655,default='',blank=True,null=True)
-    link_id = models.CharField(max_length=655,default='',blank=True,null=True)
+    from_number = models.CharField(max_length=255, default='',blank=True,null=True)
+    to_number = models.CharField(max_length=255, default='',blank=True,null=True)
+    status = models.CharField(max_length=655, default='',blank=True,null=True)
+    external_id = models.CharField(max_length=655, default='',blank=True,null=True)
+    link_id = models.CharField(max_length=655, default='',blank=True,null=True)
     description = models.TextField(blank=True, null=True)
 
     target_content_type = models.ForeignKey(ContentType, related_name='sms_target', blank=True, null=True)
@@ -225,6 +224,7 @@ class SMessage(models.Model):
         if not self.unread:
             self.unread = True
             self.save()
+
     def receipient_details(self):
         user = None
         if self.to == 'user':
@@ -295,6 +295,7 @@ def smessage_handler(verb, **kwargs):
         new_notifications.append(newnotify)
 
     return new_notifications
+
 
 class SmsTemplate(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)

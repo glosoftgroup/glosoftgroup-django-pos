@@ -1,39 +1,68 @@
 from django.db.models import Q
-
-from .pagination import PostLimitOffsetPagination, PostPageNumberPagination
-
-from django.contrib.auth import get_user_model
-User = get_user_model()
-
-from ...payment.models import MpesaPayment
-from ...smessages.models import SMessage as Notification
-
-from .serializers import (
-     SmsCallBackSerializer,
-     MessagesListSerializer ,    
-     )
-from rest_framework import generics 
+from rest_framework import generics
 from rest_framework.response import Response
-from django.contrib import auth
-from ...decorators import user_trail
-from ...sale.models import Terminal
-import logging
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')     
+from django.contrib.auth import get_user_model
 from rest_framework.decorators import api_view
 from rest_framework import status
-from ...smessages.models import SMessage
 from rest_framework.views import APIView
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from rest_framework import pagination
+
+from ...smessages.models import SMessage as Notification
+from .pagination import PostLimitOffsetPagination
+from .serializers import (
+     SmsCallBackSerializer,
+     MessagesListSerializer,
+     )
+from ...decorators import user_trail
+import logging
+
+User = get_user_model()
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
 
 
 class MessagesListAPIView(generics.ListAPIView):
-    queryset = SMessage.objects.all()
     serializer_class = MessagesListSerializer
+    pagination_class = PostLimitOffsetPagination
+
+    def get_serializer_context(self):
+        if self.request.GET.get('date'):
+            return {"date": self.request.GET.get('date'), 'request': self.request}
+        return {"date": None, 'request': self.request}
+
+    def get_queryset(self, *args, **kwargs):
+        try:
+            if self.kwargs['pk']:
+                queryset_list = Notification.objects.filter(user__pk=self.kwargs['pk']).select_related()
+            else:
+                queryset_list = Notification.objects.all.select_related()
+        except Exception as e:
+            queryset_list = Notification.objects.all()
+            query = self.request.GET.get('q')
+        page_size = 'page_size'
+        if self.request.GET.get(page_size):
+            pagination.PageNumberPagination.page_size = self.request.GET.get(page_size)
+        else:
+            pagination.PageNumberPagination.page_size = 10
+        if self.request.GET.get('status'):
+            if self.request.GET.get('status') == 'all':
+                pass
+            elif self.request.GET.get('status') == 'Success':
+                queryset_list = queryset_list.filter(status=self.request.GET.get('status'))
+            else:
+                queryset_list = queryset_list.exclude(status='Success')
+        if self.request.GET.get('date'):
+            queryset_list = queryset_list.filter(timestamp__icontains=self.request.GET.get('date'))
+        if query:
+            queryset_list = queryset_list.filter(
+                Q(verb__icontains=query) |
+                Q(description__icontains=query) |
+                Q(to_number__icontains=query)
+                )
+        return queryset_list.order_by('-id')
 
 
-#@csrf_exempt
 class callback(APIView):
     '''     
     from: The number that sent the message

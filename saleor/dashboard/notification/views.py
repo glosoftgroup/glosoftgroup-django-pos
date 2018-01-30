@@ -4,7 +4,6 @@ from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from ..views import staff_member_required
 from django.db.models import Q
-from ...decorators import permission_decorator, user_trail
 import logging
 import json
 

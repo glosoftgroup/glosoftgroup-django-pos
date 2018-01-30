@@ -217,6 +217,7 @@
 <input type="hidden" class="pageUrls" data-contacts="{% url 'dashboard:message-contacts' %}" data-aurl="{% url 'dashboard:get-sms-template' %}"  data-compose="{% url 'dashboard:compose_message' %}" data-redirecturl="{% url 'dashboard:message_list_slug' status='sent' %}" data-turl="{% url 'dashboard:add-sms-template' %}" id="pageUrls" name="pageUrls">
 {% endblock %}
 {% block custom_js %}
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/tokenize/tokenize2.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/compose_message.js' %}"></script>
@@ -249,7 +250,9 @@ function alertUser(msg,status,header='Well done!')
       url = $(this).data('href');
       spk = $(this).data('tid'); 
       appendTemplate(spk,'select',url).done(function(data){
-          $('#body').val(data);
+          var data = JSON.parse(data);
+          $('#body').val(data.content);
+          console.log('selecting template');
           alertUser('Template selected','bg-success');
           $('#accordion-group1').removeClass('in');
         }); 
@@ -283,6 +286,7 @@ function alertUser(msg,status,header='Well done!')
     // ajax
     function appendTemplate(pk,template=false) {
         var dynamicData = {};
+        dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
         dynamicData['pk']=pk;
         if(template){
             dynamicData['template'] = template;

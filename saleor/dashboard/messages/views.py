@@ -1,5 +1,3 @@
-import emailit.api
-from django.conf import settings
 from africastalking.AfricasTalkingGateway import (
         AfricasTalkingGateway, 
         AfricasTalkingGatewayException)
@@ -7,41 +5,41 @@ from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from ..views import staff_member_required
-from ...decorators import permission_decorator, user_trail
+from ...decorators import user_trail
 import logging
 import json
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
-
-
-debug_logger = logging.getLogger('debug_logger')
-info_logger  = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
-
-from django.contrib.auth import get_user_model
 from ...userprofile.models import User
 from ...supplier.models import Supplier
 from ...customer.models import Customer
-from ...smessages.signals import sms as notify
 from ...smessages.models import SMessage as Notification, SmsTemplate
 from ...product.models import Product, ProductVariant
 from ...site.models import SiteSettings
 
+debug_logger = logging.getLogger('debug_logger')
+info_logger = logging.getLogger('info_logger')
+error_logger = logging.getLogger('error_logger')
+table_name = 'Messages'
 
 @staff_member_required
-def get_template(request,pk=None):
+def get_template(request, pk=None):
     if request.method == 'GET':
         if request.is_ajax():
             if request.GET.get('pk'):
-                stemplate = get_object_or_404(SmsTemplate,pk=(int(request.GET.get('pk'))))
+                stemplate = SmsTemplate.objects.get(pk=(int(request.GET.get('pk'))))
                 ctx = {'template': stemplate}
-                if request.GET.get('template'):                
-                    template = request.GET.get('template')
-                    return HttpResponse(request, 'dashboard/messages/includes/'+template+'.html', ctx)
+                if request.GET.get('template'):
+                    if request.GET.get('template') == 'select':
+                        ctx = {'message': stemplate.name, 'content': stemplate.content}
+                        return HttpResponse(json.dumps(ctx))
+                    else:
+                        template = request.GET.get('template')
+                        return TemplateResponse(request, 'dashboard/messages/includes/' + template + '.html', ctx)
 
                 return TemplateResponse(request, 'dashboard/messages/includes/single-template.html', ctx)
         sms_templates = SmsTemplate.objects.all().order_by('-id')
-        ctx = {'sms_templates':sms_templates}
+        ctx = {'sms_templates': sms_templates}
         return TemplateResponse(request, 'dashboard/messages/includes/templates.html', ctx)
 
 @staff_member_required
@@ -409,8 +407,9 @@ def message_searchs(request):
             return TemplateResponse(request, 'dashboard/messages/payment/search.html',
                                     ctx)
 
+
 @staff_member_required
-def list_messages(request,status=None):
+def list_messages(request, status=None):
     # read users messages
     mark_read = True
     title = 'Inbox'
@@ -448,7 +447,8 @@ def list_messages(request,status=None):
     else:
         messages = Notification.objects.filter(to='user',to_number=str(request.user.mobile))
     ctx = {
-        'title':title,
+        'title': title,
+        'table_name': table_name,
         'delete_permanently': delete_permanently,
         'mark_read': mark_read,
         'status': status,
@@ -570,25 +570,33 @@ def write(request):
             to = []
             for mobile in user_contacts:
                 to.append(mobile.replace('(','').replace(')','').replace('-',''))
-            to_csv = ",".join(to)                                               
-            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='user')                    
-            print sms_response
-        if  to_customers:
+            to_csv = ",".join(to)
+            try:
+                sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='user')
+            except:
+                pass
+        if to_customers:
             print('to customers')
             to = []
             for mobile in to_customers:
                 to.append(mobile.replace('(','').replace(')','').replace('-',''))
-            to_csv = ",".join(to)                                               
-            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='customer')                    
+            to_csv = ",".join(to)
+            try:
+                sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='customer')
+            except:
+                pass
             
         if to_suppliers:
             print('to suppliers')
             to = []
             for mobile in to_suppliers:
                 to.append(mobile.replace('(','').replace(')','').replace('-',''))
-            to_csv = ",".join(to)                                               
-            sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='supplier')                    
-            print sms_response
+            to_csv = ",".join(to)
+            try:
+                sms_response = sendSms(to_csv,body,subject,actor=request.user,tag='supplier')
+            except:
+                pass
+
     ctx = {'users':User.objects.all().order_by('-id'),
            'templates':SmsTemplate.objects.all().order_by('-id')}
     
@@ -663,11 +671,12 @@ def contacts(request):
         l.append(contact)
     return HttpResponse(json.dumps(l), content_type='application/json')
 
+
 def sendSms(to,message,subject,actor,tag='user',message_id=None):
     # Specify your login credentials
     site = SiteSettings.objects.get(pk=1)
-    username = site.sms_gateway_username 
-    apikey   = site.sms_gateway_apikey 
+    username = site.sms_gateway_username.strip()
+    apikey = site.sms_gateway_apikey.strip()
         
     gateway = AfricasTalkingGateway(username, str(apikey), "sandbox")
     report = []
@@ -689,7 +698,7 @@ def sendSms(to,message,subject,actor,tag='user',message_id=None):
             if not message_id:
                 send_notification(recipient['number'],actor,tag,message,subject,recipient['status'])
             else:
-                update_message(message_id,recipient['status'])
+                update_message(message_id, recipient['status'])
     except AfricasTalkingGatewayException, e:
         print 'Encountered an error while sending: %s' % str(e)
         return None
@@ -777,5 +786,3 @@ def send_notification(number=None,actor=None,tag='user',body=None,subject=None,s
                             status=status)
         print notif.status
     print 'message saved on db'
-    #print status
-        

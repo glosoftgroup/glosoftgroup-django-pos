@@ -18,6 +18,11 @@ Vue.filter('formatCurrency', function (value) {
   return formatNumber(value, 2, '.', ',');
 })
 
+Vue.filter('strLimiter', function (value) {
+  if (!value) return ''
+  value = value.toString()
+  return value.slice(0, 55)+'...';
+})
 //vue
 var parent = new Vue({
     el:"#vue-app",
@@ -35,6 +40,9 @@ var parent = new Vue({
        date: 'Select date'
     },
     methods:{
+        showMore: function(id,text){
+            $('#'+id).html(text);
+        },
         carTranfers: function(url){
             window.location.href = url;
         },
@@ -44,7 +52,6 @@ var parent = new Vue({
             if(this.date == 'Select date'){
                 date = '';
             }else{ date = this.date; }
-            console.log(this.date);
             this.$http.get($('.pageUrls').data('bookinglisturl')+'?page_size='+self.page_size+'&q='+this.search+'&status='+this.status+'&date='+date)
                 .then(function(data){
                     data = JSON.parse(data.bodyText);

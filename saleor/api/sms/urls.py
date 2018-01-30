@@ -7,11 +7,7 @@ from .views import (
 
 
 urlpatterns = [
-    url(r'^$', 
-    	callback.as_view(),
-    	name='message-callback-url'), 
-    url(r'^list/messages/',
-    	MessagesListAPIView.as_view(),
-    	name='list-messages'),    
+    url(r'^$', callback.as_view(), name='message-callback-url'),
+    url(r'^list/messages/', MessagesListAPIView.as_view(), name='list-messages'),
 ]
 
