@@ -28,176 +28,264 @@
 {% endblock %}
 
 {% block custom_css %}
+<style type="text/css">
+      .theme_xbox .pace_activity, .theme_xbox .pace_activity::after, .theme_xbox .pace_activity::before, .theme_xbox_sm .pace_activity, .theme_xbox_sm .pace_activity::after, .theme_xbox_sm .pace_activity::before, .theme_xbox_xs .pace_activity, .theme_xbox_xs .pace_activity::after, .theme_xbox_xs .pace_activity::before {
+        border-radius: 50%;
+        border: 1px solid transparent;
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-color: transparent;
+        border-top-color: #1649fc;
+    }
+    .pace-demo {
+        background-color:#fff;
+    }
+    @media print {
+       #printBtn {
+          display: none;
+       }
+       #addPayment {
+          display: none;
+       }
+       .media-none {
+          display: none;
+       }
+       #media-none {
+          display: none;
+       }
+    }
 
+    .td { cursor:pointer }
+   </style>
+ 
 {% endblock %}
 {% block content %}
 <!-- Secondary sidebar -->
-			<div class="sidebar sidebar-secondary sidebar-default">
-				<div class="sidebar-content">
+<div class="sidebar sidebar-secondary sidebar-default">
+	<div class="sidebar-content">
 
-					<!-- Actions -->
-					<div class="sidebar-category">
-						<div class="category-title">
-							<span>Actions</span>
-							<ul class="icons-list">
-								<li><a href="#" data-action="collapse"></a></li>
-							</ul>
-						</div>
-
-						<div class="category-content">
-							<a href="{% url 'dashboard:write' %}" class="btn  hvr-glow bg-indigo-400 btn-block">Compose mail</a>
-						</div>
-					</div>
-					<!-- /actions -->
-
-
-					<!-- Sub navigation -->
-					<div class="sidebar-category">
-						<div class="category-title">
-							<span>Navigation</span>
-							<ul class="icons-list">
-								<li><a href="#" data-action="collapse"></a></li>
-							</ul>
-						</div>
-
-						<div class="category-content no-padding">
-							<ul class="navigation navigation-alt navigation-accordion no-padding-bottom">
-								<li class="navigation-header">Mails</li>
-								<li class="active"><a href="{% url 'dashboard:notification_list' %}"><i class="icon-drawer-in"></i> Inbox <span class="badge badge-success">{{total_notifications}}</span></a></li>
-								
-								<li><a href="{% url 'dashboard:notification_list_slug' 'sent' %}"><i class="icon-drawer-out"></i> Sent </a></li>
-								<li><a href="{% url 'dashboard:notification_list_slug' 'emailed' %}"><i class="icon-drawer-out"></i> Sent email</a></li>
-								
-								<li class="navigation-divider"></li>
-								<li><a href="{% url 'dashboard:notification_list_slug' 'unread' %}"><i class="icon-envelope"></i> Unread <span class="badge badge-success"></span></a></li>
-								<li><a href="{% url 'dashboard:notification_list_slug' 'read' %}"><i class="icon-mail-read"></i> Read <span class="badge badge-success"></span></a></li>
-								<li><a href="{% url 'dashboard:notification_list_slug' 'trash' %}"><i class="icon-bin"></i> Trash<span class="badge badge-warning">{{deleted}}</span></a></li>
-							</ul>
-						</div>
-					</div>
-					<!-- /sub navigation -->
-				</div>
+		<!-- Actions -->
+		<div class="sidebar-category">
+			<div class="category-title">
+				<span>Actions</span>
+				<ul class="icons-list">
+					<li><a href="#" data-action="collapse"></a></li>
+				</ul>
 			</div>
-			<!-- /secondary sidebar -->
+
+			<div class="category-content">
+				<a href="{% url 'dashboard:write' %}" class="btn  hvr-glow bg-indigo-400 btn-block">Compose mail</a>
+			</div>
+		</div>
+		<!-- /actions -->
+
+		<!-- Sub navigation -->
+		<div class="sidebar-category">
+			<div class="category-title">
+				<span>Navigation</span>
+				<ul class="icons-list">
+					<li><a href="#" data-action="collapse"></a></li>
+				</ul>
+			</div>
+
+			<div class="category-content no-padding">
+				<ul class="navigation navigation-alt navigation-accordion no-padding-bottom">
+					<li class="navigation-header">Mails</li>
+					<li class="active"><a href="{% url 'dashboard:notification_list' %}"><i class="icon-drawer-in"></i> Inbox <span class="badge badge-success">{{total_notifications}}</span></a></li>
+
+
+				</ul>
+			</div>
+		</div>
+		<!-- /sub navigation -->
+	</div>
+</div>
+<!-- /secondary sidebar -->
 
 {% notifications_unread as unread_count %}
 
-			<!-- Main content -->
-			<div class="content-wrapper no-margin-top">
+<!-- Main content -->
+<div class="content-wrapper no-margin-top">
+	<!-- Content area -->
+	<div class="content no-margin-top" style="padding-top:0px">
+		<!--vuetified-->
+		<div class="row animated " id="vue-app">
+		   <div class="col-md-12">
+			  <div class="panel panel-flat">
+				<div class="panel-body  search-panel">
 
-
-				<!-- Content area -->
-				<div class="content no-margin-top" style="padding-top:0px">
-
-					<!-- Multiple lines -->
-					<div class="panel panel-white">
-						<div class="panel-heading">
-							<h6 class="panel-title">
-							{% if status %}
-						        {{status|capfirst}}
-						    {% else %}
-						        My Inbox
-						     {% endif %}
-						     </h6>
-
-							<div class="heading-elements not-collapsible">
-								<span class="label bg-blue heading-text">{{unread_count}} new </span>
-		                	</div>
+					<div class="col-md-4">
+					 <label>Search</label>
+					  <div class="form-group form-group-material has-feedback">
+						<input class="form-control" v-model="search" @keyup="inputChangeEvent" placeholder="Search ..." type="text">
+						<div class="form-control-feedback">
+						  <i class="icon-search4 text-size-base"></i>
 						</div>
+					  </div>
+					</div>
+					<div class="col-md-2">
+					  <div class="form-group">
+						 <label>Status</label>
+						 <select v-model="status" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+							 <option value="all" selected>All</option>
+							 <option value="read">Read</option>
+							 <option value="unread">Unread</option>
+							 <option value="emailed">Sent to Mail</option>
+							 <option value="trash">Trash</option>
+						  </select>
+					  </div>
+					</div>
+					<div class="col-md-2">
+					  <label>pick a date</label>
+					  <div class="form-group">
+						<div class="input-group">
+							<span v-datepicker></span>
+						  <input v-model="date" id="date" hello="inputChangeEvent" hi="inputChangeEvent" class="form-control daterange-single" type="text" placeholder="yyyy-mm-dd">
+						  <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+						</div>
+					  </div>
+					</div>
+					<div class="col-md-2">
+					 <label>Export</label>
+					  <div class="form-group">
+						 <select v-model="exportType" @change="exportItems" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+							<option value="none" >Option</option>
+							<option value="pdf" >export pdf</option>
+							<option value="excel" >export excel</option>
+						  </select>
+					  </div>
+					</div>
 
-						<div class="panel-toolbar panel-toolbar-inbox">
-							<div class="navbar navbar-default" style="z-index: 0;">
-								<ul class="nav navbar-nav visible-xs-block no-border">
-									<li>
-										<a class="text-center collapsed" data-toggle="collapse" data-target="#inbox-toolbar-toggle-multiple">
-											<i class="icon-circle-down2"></i>
-										</a>
-									</li>
-								</ul>
-
-								<div class="navbar-collapse collapse" id="inbox-toolbar-toggle-multiple">
-
-
-									<div class="btn-group navbar-btn">
-
-										<a href="{% url 'dashboard:write' %}" type="button" class="btn btn-default  hvr-glow"><i class="icon-pencil7"></i> <span class="hidden-xs position-right">Compose</span></a>
-										
-				                    	
-									</div>
-
-									<div class="navbar-right">
-										<p class="navbar-text"><span class="text-semibold">{{total_notifications}}</span></p>
-
-
-
-									</div>
-								</div>
+			  </div>
+			   </div>
+				  <div class="row">
+				   <div class="col-md-12">
+				   <div id="pagination-div">
+					  <!-- Header and footer fixed -->
+					  <div class="panel panel-flat" id="printme">
+						<div class="panel-body">
+							<div class="col-md-12">
+								<h5 class="text-center text-bold">Notifications</h5>
 							</div>
+						<div class="">
+						  <table class="table room-striped room-hover dataroom-header-footer" style="border-bottom:1px solid #ddd;">
+								<thead>
+								  <tr class="bg-primary">
+									<th>Status</th>
+									<th>Date</th>
+									<th>Recipient</th>
+									<th>Subject</th>
+									<th>Content</th>
+								  </tr>
+								</thead>
+								<tbody id="tb">
+								<!--loader-->
+								<tr v-if="loader" class="text-center">
+									<td colspan="8">
+										<div class="pace-demo">
+											<div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
+										</div>
+									</td>
+								</tr>
+								<!--no data template-->
+								<template  v-else>
+								<tr v-if="items.length == 0" class="text-center">
+									<td colspan="8" class="text-bold animated zoomIn">
+										No Data Found !
+									</td>
+								</tr>
+								</template>
+								<!--listing template-->
+								<template v-for="item in items">
+									<tr style="pointer:cursor" class="td animated fadeIn" @click="redirectFunc(item.read_url)">
+										<td v-html="item.status"></td>
+										<td>${item.date}</td>
+										<td>${item.recipient_name}</td>
+										<td>${item.verb}</td>
+										<td :id="item.id" @click="showMore(item.id,item.description)">
+											${item.description|strLimiter}
+											<span class="text-primary">Read more</span>
+										</td>
+									</tr>
+								</template>
+
+
+								</tbody>
+						   </table>
+
+						</div>
 						</div>
 
-	<div class="table-responsive">
-		<table class="table table-inbox">
-			<tbody data-link="row" class="rowlink">
-			{% for notification in  notifications %}
-				<tr class="unread">
-					
-					<td class="table-inbox-star rowlink-skip">
-					{% if mark_read %}
-					<a href="{% url 'dashboard:read-notification' notification.id%}">
-					{% else %}
-					<a href='#'>
-					{% endif %}
-						
-						{% if notification.unread %}
-						<i class="icon-mail5 text-success"></i>
-						{% else %}
-						<i class="icon-mail-read text-muted"></i>
-						{% endif %}
-							
-						
-						</a>
-					</td>
-					<td class="table-inbox-image">
-						
-					</td>
-					<td class="table-inbox-name">
-						<a href="#">
-							<div class="letter-icon-title text-default">{{notification.verb}}
-						</div>
-						</a>
-					</td>
-					<td class="table-inbox-message">
-						<div class="table-inbox-subject">{{ notification.verb}}</div>
-						{{notification.description |safe |slice:":50"}}
-					</td>
-					<td class="table-inbox-attachment">
-						
-					</td>
-					<td class="table-inbox-time">
-						{{notification.timestamp}}
-					</td>
-				</tr>
-			{% endfor %}
+						 <style type="text/css">
+						   .pagination{margin-bottom: 0px;}
+						 </style>
+						 <div class="row media-none">
+						 <div class="">
+						  <div class="col-md-3">
+						   <div class="">
+							<div class="col-md-6 mt-10">
+							 <label>list size</label>
+							</div>
+							<div class="col-md-6 media-none">
+							  <div class="form-group">
+								 <select v-model="page_size" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+									<option value="10" selected>No:</option>
+									<option value="5">5</option>
+									<option value="10">10</option>
+									<option value="20">20</option>
+								  </select>
+							  </div>
+							</div>
+						  </div>
+						  </div>
+						  <div class="col-md-6" id="media-none">
+							  <div class="text-center bootpag-callback p2-pag" style="">
+							</div>
+						   </div>
+							<div class="col-md-3">
+							 <div class="col-md-12 mt-5">
+							  <div class="pull-right pages-nav"></div>
+							 </div>
+							</div>
+						  </div>
+						 </div>
+						 <input type="hidden" id="page_size" val="">
 
-			</tbody>
-		</table>
+					  </div>
+					</div><!-- pagination -->
+				  </div>
+				  </div>
+			   </div>
+		</div>
+		<!--./vuetified-->
 	</div>
-</div>
-<!-- /multiple lines -->
-
-</div>
-<!-- /content area -->
+	<!-- /content area -->
 
 </div>
 <!-- /main content -->
+<input type="hidden" class="pageUrls"
+  data-bookinglisturl="{% url 'notification-api:list-messages' %}"
+>
 {% endblock %}
 {% block custom_js %}
-
+<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switch.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
+ <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
+ <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
+ <script type="text/javascript" src="{% static 'backend/js/car/listing.js' %}"></script>
+
 <!--  <script type="text/javascript" src="{% static 'backend/js/pages/mail_list.js' %}"></script> -->
 
 
 <script type="text/javascript">
+$(document).ready(function() {
+  $('.bootstrap-select').selectpicker();
+
+
+  });
 // IIFE - Immediately Invoked Function Expression
   (function($, window, document) {
 

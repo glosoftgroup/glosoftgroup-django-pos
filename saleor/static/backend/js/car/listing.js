@@ -43,6 +43,9 @@ var parent = new Vue({
         showMore: function(id,text){
             $('#'+id).html(text);
         },
+        redirectFunc: function(url){
+            window.location.href = url;
+        },
         carTranfers: function(url){
             window.location.href = url;
         },

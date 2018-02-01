@@ -81,8 +81,8 @@
                 <td style="width: 50px"><label>To:</label></td>
                 <td style="width: 100%" class="text-left">
                 <div class="col-md-6">
-                {% if product.product_supplier.mobile %}
-                   <input type="text" class="form-control" value="{{ product.product_supplier.mobile}}" name="single" id="single">
+                {% if product.variant_supplier.mobile %}
+                   <input type="text" class="form-control" value="{{ product.variant_supplier.mobile}}" name="single" id="single">
                 {% else %}
                 <input type="text" class="form-control" value="" name="single" id="single">
                 {% endif %}
@@ -244,7 +244,8 @@ function alertUser(msg,status,header='Well done!')
       url = $(this).data('href');
       spk = $(this).data('tid'); 
       appendTemplate(spk,'select',url).done(function(data){
-          $('#body').val(data); 
+          data = JSON.parse(data);
+          $('#body').val(data.content);
           alertUser('Template selected','bg-success');
           $('#accordion-group1').removeClass('in');
         }); 

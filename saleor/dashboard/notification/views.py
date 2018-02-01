@@ -221,9 +221,9 @@ def write(request):
             try:
                 product = ProductVariant.objects.get(pk=int(request.GET.get('pk')))
                 ctx = {
-                        'product':product,
-                        'users':User.objects.all().order_by('-id'),
-                        'templates':EmailTemplate.objects.all().order_by('-id')
+                        'product': product,
+                        'users': User.objects.all().order_by('-id'),
+                        'templates': EmailTemplate.objects.all().order_by('-id')
                         }
                 return TemplateResponse(request,
                                 'dashboard/notification/write_single.html',
