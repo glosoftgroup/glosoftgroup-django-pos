@@ -273,10 +273,12 @@ var userEmails = $('#useremails');
 var pageUrls   = $('.pageUrls');
 var url = pageUrls.data('contacts');
 var sendspinnerId = $('#sendspinner');
+
 // tokenize
 userEmails.on('tokenize:select', function(container){
   $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
 });
+
 // user contacts
 userEmails.tokenize2({
     placeholder: 'Select user(s)',

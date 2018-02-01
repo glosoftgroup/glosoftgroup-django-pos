@@ -17,6 +17,7 @@ from .api.customer.urls import urlpatterns as api_customer_urls
 from .api.discount.urls import urlpatterns as api_discount_urls
 from .api.invoice.urls import urlpatterns as api_invoice_urls
 from .api.credit.urls import urlpatterns as api_credit_urls
+from .api.notification.urls import urlpatterns as api_notification_urls
 from .api.order_number.urls import urlpatterns as api_order_number_urls
 from .api.payment.urls import urlpatterns as api_payment_urls
 from .api.product.urls import urlpatterns as api_urls
@@ -59,6 +60,7 @@ urlpatterns = [
     url(r'^api/customer/', include(api_customer_urls, namespace='customer-api')),
     url(r'^api/discount/', include(api_discount_urls, namespace='discount-api')),
     url(r'^api/invoice/', include(api_invoice_urls, namespace='invoice-api')),
+    url(r'^api/notification/', include(api_notification_urls, namespace='notification-api')),
     url(r'^api/order_number/', include(api_order_number_urls, namespace='order_number-api')),
     url(r'^api/payment/', include(api_payment_urls, namespace='payment-api')),
     url(r'^api/products/', include(api_urls, namespace='product-api')),

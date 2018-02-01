@@ -77,8 +77,8 @@
                 <td style="width: 50px">To:</td>
                 <td style="width: 100%" class="text-left">
                 <div class="col-md-6">
-                {% if product.product_supplier %}
-                    <input type="text" id="useremails" value="{{product.product_supplier.email}}" data-role="tagsinput"  placeholder="Enter mail(s)" class="form-control">
+                {% if product.variant_supplier %}
+                    <input type="text" id="useremails" value="{{product.variant_supplier.email}}" data-role="tagsinput"  placeholder="Enter mail(s)" class="form-control">
                 {% else %}
                     <input name='useremails' id="useremails" class="useremails">
                    <!--  <input type="text" value="" data-role="tagsinput"  placeholder="Enter mail(s)" class="tagsinput-typeahead"> -->

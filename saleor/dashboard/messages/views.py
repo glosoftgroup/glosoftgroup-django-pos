@@ -625,7 +625,7 @@ def write_single(request):
            'templates':SmsTemplate.objects.all().order_by('-id')}
     
     if request.GET.get('pk'):
-            product = get_object_or_404(Product, pk=int(request.GET.get('pk')))
+            product = get_object_or_404(ProductVariant, pk=int(request.GET.get('pk')))
             ctx = {'product':product, 'users':User.objects.all().order_by('-id'),
            'templates':SmsTemplate.objects.all().order_by('-id')}
             return TemplateResponse(request,
