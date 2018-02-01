@@ -958,6 +958,7 @@ $(document).ready(function(){
       if(!newattrName)
       {
         alertUser('Variant name and choice required. Hit enter key','bg-danger','Variant name required');
+        $('#help-variant-choice').html('To add variant choice Hit <span class="label label-warning">Enter</span> key to add a choice');
         return false;
       }
       if(!choices)
@@ -989,6 +990,7 @@ $(document).ready(function(){
          
         getVariantChoice.parents('div').find('li.token').remove();
         $(".selectVariantChoice option[data-type='custom']").remove();
+        $('.collapse').removeClass('in');
         $('#newvName').val('');        
       })
       .fail(function(){
