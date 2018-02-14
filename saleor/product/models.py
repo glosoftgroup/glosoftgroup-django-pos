@@ -516,7 +516,7 @@ class Stock(models.Model):
 
     class Meta:
         app_label = 'product'
-        unique_together = ('variant', 'location')
+        # unique_together = ('variant', 'location')
 
     def __str__(self):
         return '%s - %s' % (self.variant.name, self.pk)

@@ -128,7 +128,24 @@ class TableCreateSerializer(serializers.ModelSerializer):
             items = validated_data['item']
         except Exception as e:
             raise ValidationError(e)
+
+        def create_variant_stock(item, variant):
+            variant.pk = None
+            variant.price_override = item['unit_cost']
+            # combine last id with sku
+            variant.sku = str(variant.sku) + str(ProductVariant.objects.latest('id').id)
+            variant.save()
+
+            # new stock
+            stock = Stock()
+            stock.variant = variant
+            stock.quantity = item['qty']
+            stock.cost_price = item['cost_price']
+            stock.low_stock_threshold = item['low_stock_threshold']
+            stock.save()
+
         for item in items:
+            new_created = False
             # create purchased items
             single_item = Item()
             single_item.purchase = instance
@@ -140,18 +157,38 @@ class TableCreateSerializer(serializers.ModelSerializer):
             single_item.order = 1
             single_item.save()
 
-            # Item.objects.create(purchase=instance, **item)
+            # check if product variant exist
+            try:
+                variant = ProductVariant.objects.get(sku=item['sku'])
+                if variant.price_override.gross != item['unit_cost']:
+                    # ('create a new  variant')
+                    create_variant_stock(item, variant)
+                    new_created = True
+                else:
+                    print('dont create new variant')
+            except Exception as e:
+                print(e)
             try:
                 stock = Stock.objects.get(variant__sku=item['sku'])
-                Stock.objects.increase_stock(stock, item['qty'])
+                if stock.cost_price.gross != item['cost_price']:
+                    if not new_created:
+                        # ('create a new  variant')
+                        variant = ProductVariant.objects.get(sku=item['sku'])
+                        create_variant_stock(item, variant)
+                        new_created = True
+                else:
+                    print('dont create new variant')
+                if not new_created:
+                    Stock.objects.increase_stock(stock, item['qty'])
             except Exception as e:
                 # create new stock
-                stock = Stock()
-                stock.variant = ProductVariant.objects.get(sku=item['sku'])
-                stock.quantity = item['qty']
-                stock.cost_price = item['cost_price']
-                stock.low_stock_threshold = item['low_stock_threshold']
-                stock.save()
+                if not new_created:
+                    stock = Stock()
+                    stock.variant = ProductVariant.objects.get(sku=item['sku'])
+                    stock.quantity = item['qty']
+                    stock.cost_price = item['cost_price']
+                    stock.low_stock_threshold = item['low_stock_threshold']
+                    stock.save()
 
                 error_logger.error(e)
         return instance

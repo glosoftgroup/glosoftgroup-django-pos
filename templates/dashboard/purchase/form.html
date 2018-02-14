@@ -177,6 +177,7 @@ Add Stock- {{ block.super }}
                                 <th>SKU</th>
                                 <th>Quantity</th>
                                 <th>Cost Price</th>
+                                <th>Retail Price</th>
                                 <th>Reorder Threshold</th>
                                 <th></th>
                             </tr>
@@ -199,6 +200,9 @@ Add Stock- {{ block.super }}
                                 </td>
                                  <td>
                                     <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
+                                </td>
+                                <td>
+                                    <input v-model="item.unit_cost" style="width: 65px;" type="number" placeholder="Reorder Thresholder" class="form-control">
                                 </td>
                                 <td>
                                     <input v-model="item.low_stock_threshold" style="width: 65px;" type="number" placeholder="Reorder Thresholder" class="form-control">
