@@ -21,7 +21,6 @@ $(function(){
   var wprice = editForm.find('#id_wholesale_override');
   var variantSupplier = editForm.find('#id_variant_supplier');
   var dynamic_attrs = editForm.find('.dynamicxedit');
-
   
 
   editvariantBtn.on('click',function(){    
@@ -58,24 +57,11 @@ $(function(){
     }else{
       dynamicData['sku'] = id_sku.val();
     }
-    if(wprice.val()){      
-      dynamicData['wholesale'] = wprice.val();
-    }
+
     if(variantSupplier.val()){
       dynamicData['variant_supplier'] = variantSupplier.val();
     }
-    if(!rprice.val()){
-      alertUser('Retail Price field required','bg-warning','Field Error!');
-      return false;
-    }else{
-      dynamicData['price'] = rprice.val();
-    }
-    if(!minimum_price.val()){
-      alertUser('Minimum Price field required','bg-warning','Field Error!');
-      return false;
-    }else{
-      dynamicData['minimum_price'] = minimum_price.val();
-    }
+
     dynamicData['template'] = 'edit_variant';
     dynamicData['track'] = 'edit variant'
 

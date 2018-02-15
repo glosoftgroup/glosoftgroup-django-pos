@@ -318,9 +318,7 @@
         {% for v in pc %} 
          <th>{{v}}</th>       
         {% endfor %}
-        <th>Retail Price <span class="text-danger">*</span></th>
-        <th>Wholesale Price</th>
-        <th>Minimum price <span class="text-danger">*</span></th>
+
         <th width="12%">Supplier</th>
         <th></th>
         </tr>
@@ -342,18 +340,7 @@
             </select>
             </td>            
           {% endfor %}
-           <td>
-            <input type="number" placeholder="Retail price" class="form-control" id="rprice" name='rprice'>
-               <span class="help-block text-danger"></span>
-            </td>
-            <td>
-              <input type="number" placeholder="Wholesale Price" class="form-control" id="wprice" name='wprice'>
-                <span class="help-block text-danger"></span>
-            </td>
-            <td>
-              <input type="number" placeholder="Mininum Price" class="form-control" id="mprice" name='mprice'>
-                  <span class="help-block text-danger"></span>
-            </td>
+
             <td>
                 <div class="form-group">
                     <label></label>
@@ -441,17 +428,9 @@
                       <th>
                         {{ attribute.name|capfirst }}
                       </th>
-                    {% endfor %}                  
+                    {% endfor %}
                     
-                    <th class="right-align">
-                      Retail Price
-                    </th>
-                    <th class="right-align">
-                      Wholesale Price
-                    </th>
-                      <th>
-                          Minimum Price
-                      </th>
+
                       <th>
                           Supplier
                       </th>
@@ -473,23 +452,8 @@
                           {{ attr_display }}
                         </td>
                       {% endfor %}
-                     
-                      <!-- retail price -->
-                      <td class="right-align">
-                {% gross variant.get_price_per_item html=True %}
-                      </td>
-                      <!-- wholesale price -->
-                      <td class="right-align">
-                      {% if variant.get_wholesale_price_per_item %}
-                {% gross variant.get_wholesale_price_per_item html=True %}
-                     {% endif %}
-                      </td>
-                   <!--minimum price-->
-                  <td class="right-align">
-                      {% if variant.minimum_price %}
-                {% gross variant.minimum_price html=True %}
-                     {% endif %}
-                      </td>
+
+
                     <td>
                         {% if variant.variant_supplier %}
                         {{variant.variant_supplier}}
@@ -616,6 +580,8 @@
                 <th>
                   Retail Price
                 </th>
+                <th> Wholesale Price</th>
+                <th> Minimum Price</th>
 
                 <!-- <th class="wide">
                   {% trans "Location" context "Stock table header" %}
@@ -626,9 +592,7 @@
                 <th>
                   Reorder Threshold
                 </th>
-                <th class="right-align">
-                  {% trans "Allocated" context "Stock table header" %}
-                </th>
+
                 <th>Options</th>
               </tr>
             </thead>
@@ -648,8 +612,20 @@
                     {% endif %}   
                   </td>
                   <!-- sales price -->
-                  <td> 
-                  {% gross item.variant.get_price_per_item html=True %}
+                  <td>
+                      {% if item.price_override %}
+                  {% gross item.price_override html=True %}
+                      {% endif %}
+                  </td>
+                 <td>
+                     {% if item.wholesale_override %}
+                  {% gross item.wholesale_override html=True %}
+                     {% endif %}
+                  </td>
+                  <td>
+                      {% if item.minimum_price %}
+                  {% gross item.minimum_price html=True %}
+                      {% endif %}
                   </td>
                   
                   
@@ -659,9 +635,7 @@
                   <td>
                     {{item.low_stock_threshold}}
                   </td>
-                  <td class="right-align">
-                    {{ item.quantity_allocated }}
-                  </td>
+
                   <td>
                   <div class="btn-group">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

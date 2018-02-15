@@ -68,7 +68,10 @@ class VariantListSerializer(serializers.ModelSerializer):
 
     def get_discount(self, obj):
         today = date.today()
-        price = obj.get_price_per_item().gross
+        try:
+            price = obj.get_price_per_item().gross
+        except:
+            price = 0
         discounts = Sale.objects.filter(start_date__lte=today).filter(end_date__gte=today)
         discount = 0
         discount_list = get_variant_discounts(obj, discounts)
@@ -102,8 +105,11 @@ class VariantListSerializer(serializers.ModelSerializer):
         return product_name
 
     def get_unit_cost(self, obj):
-        price = obj.get_price_per_item().gross
-        return price
+        try:
+            price = obj.get_price_per_item().gross
+            return price
+        except:
+            return 0
 
     def get_tax(self, obj):
         if obj.product.product_tax:

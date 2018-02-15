@@ -72,7 +72,8 @@ class VariantProductListAPIView(generics.ListAPIView):
         if self.request.GET.get('supplier'):
             queryset_list = queryset_list.filter(variant_supplier__pk=int(self.request.GET.get('supplier')))
 
-        queryset_list = queryset_list.exclude(stock__quantity__gte=0).filter(product__pk=int(self.kwargs['pk']))
+        # queryset_list = queryset_list.exclude(stock__quantity__gte=0).filter(product__pk=int(self.kwargs['pk']))
+        queryset_list = queryset_list.filter(product__pk=int(self.kwargs['pk']))
         query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(

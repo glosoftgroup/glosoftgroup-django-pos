@@ -76,9 +76,6 @@ class StockForm(forms.ModelForm):
         field = self.fields['location'] 
         field.widget.attrs['class'] = 'form-control select'
 
-        field = self.fields['payment_options']
-        field.widget.attrs['class'] = 'form-control multiselect'
-
 
 class ProductClassForm(forms.ModelForm):
     class Meta:
