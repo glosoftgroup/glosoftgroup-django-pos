@@ -130,18 +130,22 @@ class TableCreateSerializer(serializers.ModelSerializer):
             raise ValidationError(e)
 
         def create_variant_stock(item, variant):
-            variant.pk = None
-            variant.price_override = item['unit_cost']
-            # combine last id with sku
-            variant.sku = str(variant.sku) + str(ProductVariant.objects.latest('id').id)
-            variant.save()
+            # variant.pk = None
+            # variant.price_override = item['unit_cost']
+            # # combine last id with sku
+            # variant.sku = str(variant.sku) + str(ProductVariant.objects.latest('id').id)
+            # variant.save()
 
             # new stock
             stock = Stock()
             stock.variant = variant
             stock.quantity = item['qty']
             stock.cost_price = item['cost_price']
+            stock.price_override = item['price_override']
+            stock.minimum_price = item['minimum_price']
+            stock.wholesale_override = item['wholesale_override']
             stock.low_stock_threshold = item['low_stock_threshold']
+
             stock.save()
 
         for item in items:
@@ -176,6 +180,12 @@ class TableCreateSerializer(serializers.ModelSerializer):
                         variant = ProductVariant.objects.get(sku=item['sku'])
                         create_variant_stock(item, variant)
                         new_created = True
+                if stock.price_override != item['price_override']:
+                    if not new_created:
+                        # ('create a new  variant')
+                        variant = ProductVariant.objects.get(sku=item['sku'])
+                        create_variant_stock(item, variant)
+                        new_created = True
                 else:
                     print('dont create new variant')
                 if not new_created:
@@ -187,6 +197,9 @@ class TableCreateSerializer(serializers.ModelSerializer):
                     stock.variant = ProductVariant.objects.get(sku=item['sku'])
                     stock.quantity = item['qty']
                     stock.cost_price = item['cost_price']
+                    stock.price_override = item['price_override']
+                    stock.minimum_price = item['minimum_price']
+                    stock.wholesale_override = item['wholesale_override']
                     stock.low_stock_threshold = item['low_stock_threshold']
                     stock.save()
 

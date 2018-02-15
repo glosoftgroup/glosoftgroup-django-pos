@@ -201,10 +201,8 @@ $(function() {
       }
       return $(this).data('pk');
     }).get();  
-    // ./mapping    
-    
-    wholePrice  = wholePriceId.val();
-    retailPrice = retailPriceId.val();
+    // ./mapping
+
     newSku      = newSkuId.val();
     reorder_level = reorder_levelId.val();
 
@@ -216,29 +214,9 @@ $(function() {
         return false;
     }
     //validate retail price
-    retailPriceId.on('focusin',function(){
-      $(this).nextAll('.help-block:first').addClass('text-danger').html('');
-    });
-    if(!retailPriceId.val()){
-        retailPriceId.nextAll('.help-block:first').addClass('text-danger').html('Retail price');
-        return false;
-    }
-    //validate minimum price
-    minimumPrice.on('focusin',function(){
-      $(this).nextAll('.help-block:first').addClass('text-danger').html('');
-    });
-    if(!minimumPrice.val()){
-        minimumPrice.nextAll('.help-block:first').addClass('text-danger').html('Fill minimum price');
-        return false;
-    }
-    if(!retailPrice || !newSku || !minimumPrice.val()){
-      alertUser('Retail Price, Minimum price & SKU required','bg-danger','Fill required fields!');
-      return false;
-    }
+
     dynamicData = {};
-    if(wholePrice){
-      dynamicData['wholesale'] = wholePrice;
-    }
+
     if(reorder_level){
       dynamicData['low_stock_threshold'] = reorder_level;
     }
@@ -251,8 +229,6 @@ $(function() {
       //return false;
     }  
     
-    dynamicData['price'] = retailPrice;
-    dynamicData['minimum_price'] = minimumPrice.val();
 
     dynamicData['sku'] = newSku;
     dynamicData['attributes'] = JSON.stringify(json);

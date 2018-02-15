@@ -24,9 +24,6 @@
              <th>{{attribute_field.label}}</th>
              {% endfor %}
             {% endif %}
-            <th>Retail Price</th>
-            <th>Wholesale Price</th>
-            <th>Minimum Price</th>
             <th>Supplier</th>
             <th></th>
         </tr>
@@ -45,15 +42,7 @@
                   {% endfor %}
           {% endif %}
           
-           <td>
-            {{form.price_override}}
-            </td>
-            <td>
-              {{form.wholesale_override}}
-            </td>
-              <td>
-                  {{form.minimum_price}}
-              </td>
+
             <!--supplier  -->
             <td>
                 {{form.variant_supplier}}

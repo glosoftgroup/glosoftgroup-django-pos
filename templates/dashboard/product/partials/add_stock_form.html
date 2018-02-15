@@ -16,7 +16,7 @@
     <form id="add-product-stock-form">
     </form>
      <!--product variant-->
-        <div class="col-md-6" style="border-right: 1px solid #373737;">
+        <div class="col-md-4" style="border-right: 1px solid #373737;">
             <!--search filter-->
             <div style="z-index: 1;" class="navbar navbar-default navbar-xs navbar-component">
         <ul class="nav navbar-nav no-border visible-xs-block">
@@ -71,7 +71,6 @@
                             <tr class="bg-primary">
                                 <th>Supplier</th>
                                 <th>Name</th>
-                                <th>SKU</th>
                                 <th>Purchase</th>
                             </tr>
                         </thead>
@@ -96,10 +95,9 @@
                 <template v-for="item in items">
                     <tr class="td animated fadeIn">
                         <td>${item.supplier_name}</td>
-                        <td>${item.product_name}</td>
-                        <td>${item.sku}</td>
+                        <td>${item.product_name}<br>${item.sku}</td>
                         <td class="text-center">
-                            <span class="label label-primary" @click="addToCart(item)">
+                            <span class="label label-primary cursor-pointer" @click="addToCart(item)">
                                 Add
                             </span>
                         </td>
@@ -114,12 +112,12 @@
         </div>
         <!--./variant-->
         <!--cart-->
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="panel panel-default">
                 <div class="panelbody table-responsive">
                     <table class="table">
                         <tr class="active">
-                                <td class="text-center text-bold" colspan="5">
+                                <td class="text-center text-bold" colspan="11">
                                     Purchase Cart
                                 </td>
                             </tr>
@@ -128,10 +126,12 @@
                         <thead>
                             <tr class="bg-grey-800">
                                 <th>Name</th>
-                                <th>SKU</th>
                                 <th>Quantity</th>
-                                <th>Cost Price</th>
                                 <th>Reorder Threshold</th>
+                                <th>Cost Price</th>
+                                <th>Retail Price</th>
+                                <th>Wholesale Price</th>
+                                <th>Minimum Price</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -146,17 +146,30 @@
                         <!--listing template-->
                         <template v-for="item in cartItems">
                             <tr class="td animated fadeIn">
-                                <td>${item.product_name}</td>
-                                <td>${item.sku}</td>
+                                <td>${item.product_name}<br>${item.sku}</td>
                                 <td>
                                     <input v-model="item.qty" style="width: 65px;" type="number" placeholder="amount" class="form-control">
-                                </td>
-                                 <td>
-                                    <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
                                 </td>
                                 <td>
                                     <input v-model="item.low_stock_threshold" style="width: 65px;" type="number" placeholder="Reorder Thresholder" class="form-control">
                                 </td>
+                                <!--cost price-->
+                                <td>
+                                    <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
+                                </td>
+                                <!--retail price-->
+                                <td>
+                                    <input v-model="item.price_override" style="width: 65px;" type="number" placeholder="price_override" class="form-control">
+                                </td>
+                                <!--wholesale price-->
+                                <td>
+                                    <input v-model="item.wholesale_override" style="width: 65px;" type="number" placeholder="wholesale price" class="form-control">
+                                </td>
+                                <!--minimum price-->
+                                <td>
+                                    <input v-model="item.minimum_price" style="width: 65px;" type="number" placeholder="minimum_price" class="form-control">
+                                </td>
+                                <!--options-->
                                 <td>
                                     <span class="label label-white text-grey-800" @click="removeItem(item)">
                                         <i class="icon-trash animated shake"></i>
@@ -174,7 +187,7 @@
                                             <span>Payment</span>
                                         </button>
                                     </td>
-                                    <td colspan="4">
+                                    <td colspan="9">
                                         <span style="font-size:24px;">{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
                                     </td>
                                 </template>

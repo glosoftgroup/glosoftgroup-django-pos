@@ -281,13 +281,14 @@ class SalesSerializer(serializers.ModelSerializer):
         for solditem_data in solditems_data:
             SoldItem.objects.create(sales=sales,**solditem_data)
             try:
-                stock = Stock.objects.get(variant__sku=solditem_data['sku'])
+                stock = Stock.objects.filter(variant__sku=solditem_data['sku']).first()
                 if stock:                
                     Stock.objects.decrease_stock(stock,solditem_data['quantity'])                                    
                 else: 
                     print('stock not found')
             except Exception as e:
                 print('Error reducing stock!')
+                print e
                 error_logger.error(e)
         return sales
         
@@ -358,9 +359,12 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 
     def get_discount(self, obj):
         today = date.today()
-        price = obj.get_price_per_item().gross      
+        try:
+            price = obj.get_price_per_item().gross
+        except:
+            price = 0
         discounts = Sale.objects.filter(start_date__lte=today).filter(end_date__gte=today)
-        discount  = 0
+        discount = 0
         discount_list = get_variant_discounts(obj, discounts)
         for discount in discount_list:
             try:
@@ -395,8 +399,11 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             return 0
 
     def get_price(self, obj):
-        price = obj.get_price_per_item().gross
-        return price
+        try:
+            price = obj.get_price_per_item().gross
+            return price
+        except Exception as e:
+            return ''
 
     def get_tax(self, obj):
         if obj.product.product_tax:
