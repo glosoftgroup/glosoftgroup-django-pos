@@ -19,13 +19,7 @@
             </th>
           {% endfor %}                  
           
-          <th class="right-align">
-            Retail Price
-          </th>
-          <th class="right-align">
-            Wholesale Price
-          </th>
-          <th>Minimum Price</th>
+
           <th>
               Supplier
           </th>
@@ -46,22 +40,7 @@
               </td>
             {% endfor %}
            
-            <!-- retail price -->
-            <td class="right-align">
-      {% gross variant.get_price_per_item html=True %}
-            </td>
-            <!-- wholesale price -->
-            <td class="right-align">
-            {% if variant.get_wholesale_price_per_item %}
-      {% gross variant.get_wholesale_price_per_item html=True %}
-           {% endif %}
-            </td>
-             <!-- minimum price -->
-            <td class="right-align">
-            {% if variant.minimum_price %}
-            {% gross variant.minimum_price html=True %}
-           {% endif %}
-            </td>
+
             <td>
                 {% if variant.variant_supplier %}
                 {{variant.variant_supplier}}

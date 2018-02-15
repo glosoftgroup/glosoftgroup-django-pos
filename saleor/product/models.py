@@ -331,18 +331,47 @@ class ProductVariant(models.Model, Item):
         return stock_pk
 
     def get_stock_quantity(self):
-        if not len(self.stock.all()):
-            return 0
-        return max([stock.quantity_available for stock in self.stock.all()])
+        # if not len(self.stock.all()):
+        #     return 0
+        # return max([stock.quantity_available for stock in self.stock.all()])
+        checker = True
+        quantity = 0
+        try:
+            while checker:
+                stock = self.stock.all().first().quantity
+                if stock > 0:
+                    quantity = self.stock.all().first().quantity
+                    checker = False
+                else:
+                    self.stock.all().first().delete()
+            return quantity
+        except:
+            return quantity
 
     def get_min_price_per_item(self):
         return self.minimum_price or self.product.minimum_price
 
     def get_price_per_item(self, discounts=None, **kwargs):
-        price = self.price_override or self.product.price
-        price = calculate_discounted_price(self.product, price, discounts,
-                                           **kwargs)
-        return price
+        checker = True
+        price = 0
+        try:
+            while checker:
+                stock = self.stock.all().first().quantity
+                if stock > 0:
+                    price = self.stock.all().first().price_override
+                    checker = False
+                else:
+                    self.stock.all().first().delete()
+            return price
+        except Exception as e:
+            return price
+
+
+    # def get_price_per_item(self, discounts=None, **kwargs):
+    #     price = self.price_override or self.product.price
+    #     price = calculate_discounted_price(self.product, price, discounts,
+    #                                        **kwargs)
+    #     return price
 
     def get_wholesale_price_per_item(self, discounts=None, **kwargs):
         price = self.wholesale_override or self.product.wholesale_price
@@ -498,10 +527,19 @@ class Stock(models.Model):
         pgettext_lazy('Stock item field', 'total cost price'),
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
-    payment_options = models.ManyToManyField(
-        PaymentOption, related_name='stock_payment_option', blank=True,
-        verbose_name=pgettext_lazy('Stock item field',
-                                   'payment options'))
+    price_override = PriceField(
+        pgettext_lazy('Stock item field', 'price override'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
+    minimum_price = PriceField(
+        pgettext_lazy('Stock item field', 'minimum price'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
+    wholesale_override = PriceField(
+        pgettext_lazy('Stock item field', 'wholesale override'),
+        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
+        blank=True, null=True)
+
     created = models.DateTimeField(
         pgettext_lazy('Stock field', 'created'),
         default=now, editable=False)

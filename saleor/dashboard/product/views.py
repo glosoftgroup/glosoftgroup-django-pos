@@ -673,9 +673,9 @@ def product_edit(request, pk,name=None):
     attributes = product.product_class.variant_attributes.prefetch_related(
         'values')
     images = product.images.all()
-    variants = product.variants.all()
+    variants = product.variants.all().order_by('-id')
     stock_items = Stock.objects.filter(
-        variant__in=variants).select_related('variant', 'location')
+        variant__in=variants).select_related('variant', 'location').order_by('-id')
 
     form = forms.ProductForm(request.POST or None, instance=product)
     variants_delete_form = forms.VariantBulkDeleteForm()
@@ -1038,12 +1038,6 @@ def add_attributes(request):
                     product_variant.variant_supplier = supplier
                 except:
                     pass
-        if request.POST.get('price'):
-            product_variant.price_override = request.POST.get('price')
-        if request.POST.get('minimum_price'):
-            product_variant.minimum_price = request.POST.get('minimum_price')
-        if request.POST.get('wholesale'):
-            product_variant.wholesale_override = request.POST.get('wholesale')
         if request.POST.get('low_stock_threshold'):
             product_variant.low_stock_threshold = int(request.POST.get('low_stock_threshold'))
         if request.POST.get('attributes'):
@@ -1058,7 +1052,7 @@ def add_attributes(request):
             product = Product.objects.get(pk=int(request.POST.get('pk')))
             product_variant.product = product
             attributes = product.product_class.variant_attributes.prefetch_related('values')    
-            variants = product.variants.all()
+            variants = product.variants.all().order_by('-id')
             product_variant.save()
             ctx = {'product': product,
                    'attributes': attributes,
