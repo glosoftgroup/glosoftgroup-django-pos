@@ -89,6 +89,16 @@ def sales_detail(request, pk=None):
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
+def sales_revert(request, pk=None):
+    try:
+        sale = Sales.objects.get(pk=pk)
+        items = SoldItem.objects.filter(sales=sale)
+        return TemplateResponse(request, 'dashboard/reports/sales/details.html',{'items': items, "sale":sale})
+    except ObjectDoesNotExist as e:
+        error_logger.error(e)
+
+@staff_member_required
+@permission_decorator('reports.view_sale_reports')
 def sales_reports(request):
     try:
         today = datetime.date.today()

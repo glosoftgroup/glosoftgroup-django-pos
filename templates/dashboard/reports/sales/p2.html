@@ -19,6 +19,7 @@
                           <th>Quantity</th>
                           <th>Total Sales</th>
                             <th class="text-center">Total Tax</th>
+                            <th></th>
                         </tr>
                       </thead>
                       <tbody id="p-tb">
@@ -38,10 +39,11 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                               <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
+                              <td> <a class="btn btn-primary" href="{% url 'dashboard:sale-revert' pk=sale.pk %}">REVERT</a></td>
                           </tr>
                         {% endfor %}
                          {% else %}
-                         <tr><td colspan="7"><h2 class="text-center">No Sales Reports Available</h2></td></tr>
+                         <tr><td colspan="8"><h2 class="text-center">No Sales Reports Available</h2></td></tr>
                         {% endif %}
                         </tbody>
 
