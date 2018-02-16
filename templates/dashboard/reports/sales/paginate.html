@@ -17,6 +17,11 @@
         <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
         <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
           <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
+          <td>
+              <a data-ta="#modal_instance" data-title="Revert sale {{ sale.invoice_number }} ?" data-href="{% url 'dashboard:sale-revert' pk=sale.pk %}" data-name="{{ sale.invoice_number }}" data-id="{{ sale.pk }}"
+             class="btn btn-primary modal-trigger"> REVERT
+             </a>
+          </td>
       </tr>
         <script type="text/javascript">
         $(document).ready(function(){
@@ -28,5 +33,5 @@
         </script>
     {% endfor %}
     {% else %}
-     <tr><td colspan="7"><h2 class="text-center">no sales available</h2></td></tr>
+     <tr><td colspan="8"><h2 class="text-center">no sales available</h2></td></tr>
     {% endif %}
