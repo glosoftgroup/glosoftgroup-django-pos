@@ -1,17 +1,6 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Count, Min, Sum, Avg, F, Q
 from django.core import serializers
 # from django.template.defaultfilters import date
@@ -32,7 +21,7 @@ from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, DrawerCash
-from ...product.models import Product, ProductVariant
+from ...product.models import Product, ProductVariant, Stock
 from ...purchase.models import PurchaseProduct
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
@@ -93,9 +82,36 @@ def sales_revert(request, pk=None):
     try:
         sale = Sales.objects.get(pk=pk)
         items = SoldItem.objects.filter(sales=sale)
-        return TemplateResponse(request, 'dashboard/reports/sales/details.html',{'items': items, "sale":sale})
+
+        for solditem in items:
+            try:
+                st = Stock.objects.get(variant__sku=solditem.sku,
+                                       price_override=solditem.unit_cost,
+                                       cost_price=solditem.unit_purchase)
+                st.quantity = st.quantity + solditem.quantity
+                st.save()
+                sale.delete()
+            except Exception as e:
+                variant = ProductVariant.objects.get(sku=solditem.sku)
+                Stock.objects.create(
+                    variant=variant,
+                    price_override=solditem.unit_cost,
+                    cost_price=solditem.unit_purchase,
+                    quantity=solditem.quantity)
+                sale.delete()
+
+        data = {
+            'message': 'success',
+            'status': 200
+        }
+        return JsonResponse(data)
     except ObjectDoesNotExist as e:
         error_logger.error(e)
+        data = {
+            'message': str("Error Reverting Sale"),
+            'status': 400
+        }
+        return JsonResponse(data)
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')

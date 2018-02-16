@@ -39,7 +39,11 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                               <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
-                              <td> <a class="btn btn-primary" href="{% url 'dashboard:sale-revert' pk=sale.pk %}">REVERT</a></td>
+                              <td>
+                                  <a data-ta="#modal_instance" data-title="Revert sale {{ sale.invoice_number }} ?" data-href="{% url 'dashboard:sale-revert' pk=sale.pk %}" data-name="{{ sale.invoice_number }}" data-id="{{ sale.pk }}"
+                                 class="btn btn-primary modal-trigger"> REVERT
+                                 </a>
+                              </td>
                           </tr>
                         {% endfor %}
                          {% else %}
@@ -131,53 +135,7 @@
                     });
                 }
 
-        }).children('.pagination').addClass('pagination-flat pagination-sm')
-
-
-      $('.modal-trigger').on('click', function (e) {
-
-         var url = $(this).data('href')
-         var prompt_text = $(this).data('title');
-         var username = $(this).data('name');
-         var modal = $(this).data('ta');
-         var id = $(this).data('id');
-         $('.del').attr('data-id', id);
-         $('.del').attr('data-href', url);
-         $('.modal-title').html(prompt_text);
-         $(modal).modal();
-         $('.delete_form').attr('action',url);
-      });
-
-        /* clicked the submit button */
-        $('.del').on('click', function (e) {
-                var f = document.getElementById('delform');
-                var formData = new FormData(f);
-                var id = $(this).data('id');
-                var url = $(this).data('href');
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success:function(data){        
-                      $('#modal_instance').modal('hide');
-                      $('#tb #'+id).remove();            
-                      $.jGrowl('User deleted successfully', {
-                        header: 'Well done!',
-                        theme: 'bg-success'
-                      });
-                      window.location.reload();
-                    },
-                    error:function(error){
-                      console.log(error);
-                      $.jGrowl('Error deleting Staff', {
-                          header: 'Oh snap!',
-                          theme: 'bg-danger'
-                      });
-                    }
-                });
-            });
+        }).children('.pagination').addClass('pagination-flat pagination-sm');
 
    });
    //**@ display size select
