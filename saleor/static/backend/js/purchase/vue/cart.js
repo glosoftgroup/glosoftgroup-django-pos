@@ -36,7 +36,7 @@ var parent = new Vue({
     delimiters: ['${', '}'],
     data:{
        'name':'Cart Listing',
-       items:[],
+       'items':[],
        cartItems: [],
        paymentItems: [],
        paymentOptions: [],
@@ -58,6 +58,7 @@ var parent = new Vue({
     },
     methods:{
         completePurchase: function(){
+           // populate post details
            dynamicData = {};
            dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
            dynamicData['amount_paid'] = parent.Tendered;
@@ -76,6 +77,22 @@ var parent = new Vue({
                 return 0;
            }
 
+           // retail price required
+           this.cartItems.forEach(item => {
+                if(!item.price_override){
+                    alertUser('Retail price required','bg-danger','Forgot to fill retail price?');
+                    $('.error-alert').html('Retail price required','bg-danger','Forgot to fill retail price?');
+                    $('.alert-danger').removeClass('hidden');
+                    $('.price_override').addClass('animated shake');
+                    window.setTimeout( function(){
+                     $('#payment-modal').modal('hide');
+                     }, 5000 );
+
+                    return 0;
+                }
+
+           });
+
            // send purchase data
            // *******************
            // csrf token
@@ -87,16 +104,16 @@ var parent = new Vue({
            parent.paymentItems = [];
            $('#payment-modal').modal('hide');
            alertUser('Purchase Made successfully');
-           //window.location.reload();
-
 
            })
            .fail(function(err){console.log(err);});
         },
         creditPurchase: function(){},
         openModal:function(){
+            // hide error alerts
+            $('.alert-danger').addClass('hidden');
             /* open modal */
-            $('#payment-modal').modal();
+            $('#payment-modal').appendTo("body").modal('show');
 
         },
         addPayment: function(itemToAdd) {
@@ -219,12 +236,14 @@ var parent = new Vue({
     created:function(){
         // preset supplier
         this.supplier = $('#variant_supplier').val();
+        console.log(this.supplier);
 
         /* on page load populate items with api list response */
         this.$http.get($('.pageUrls').data('listurl')+'?supplier='+this.supplier)
             .then(function(data){
                 data = JSON.parse(data.bodyText);
                 this.items = data.results;
+                console.log(this.items);
                 this.loader = false;
             }, function(error){
                 console.log(error.statusText);
@@ -234,6 +253,7 @@ var parent = new Vue({
             .then(function(data){
                 data = JSON.parse(data.bodyText);
                 this.paymentOptions = data.results;
+                console.log(this.paymentOptions);
             }, function(error){
                 console.log(error.statusText);
         });

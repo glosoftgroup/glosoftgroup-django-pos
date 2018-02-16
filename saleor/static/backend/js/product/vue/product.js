@@ -58,6 +58,7 @@ var parent = new Vue({
     },
     methods:{
         completePurchase: function(){
+           // populate post details
            dynamicData = {};
            dynamicData["csrfmiddlewaretoken"]  = jQuery("[name=csrfmiddlewaretoken]").val();
            dynamicData['amount_paid'] = parent.Tendered;
@@ -76,6 +77,22 @@ var parent = new Vue({
                 return 0;
            }
 
+           // retail price required
+           this.cartItems.forEach(item => {
+                if(!item.price_override){
+                    alertUser('Retail price required','bg-danger','Forgot to fill retail price?');
+                    $('.error-alert').html('Retail price required','bg-danger','Forgot to fill retail price?');
+                    $('.alert-danger').removeClass('hidden');
+                    $('.price_override').addClass('animated shake');
+                    window.setTimeout( function(){
+                     $('#payment-modal').modal('hide');
+                     }, 5000 );
+
+                    return 0;
+                }
+
+           });
+
            // send purchase data
            // *******************
            // csrf token
@@ -85,7 +102,6 @@ var parent = new Vue({
            // clear cart notify user
            parent.cartItems = [];
            parent.paymentItems = [];
-           $('#payment-modal').modal('hide');
            alertUser('Purchase Made successfully');
            window.location.href = $('.pageUrls').data('fullpath')+'?tab=stock';
 
@@ -95,6 +111,8 @@ var parent = new Vue({
         },
         creditPurchase: function(){},
         openModal:function(){
+            // hide error alerts
+            $('.alert-danger').addClass('hidden');
             /* open modal */
             $('#payment-modal').appendTo("body").modal('show');
 

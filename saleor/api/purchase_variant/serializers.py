@@ -130,21 +130,21 @@ class TableCreateSerializer(serializers.ModelSerializer):
             raise ValidationError(e)
 
         def create_variant_stock(item, variant):
-            # variant.pk = None
-            # variant.price_override = item['unit_cost']
-            # # combine last id with sku
-            # variant.sku = str(variant.sku) + str(ProductVariant.objects.latest('id').id)
-            # variant.save()
-
-            # new stock
             stock = Stock()
             stock.variant = variant
             stock.quantity = item['qty']
             stock.cost_price = item['cost_price']
             stock.price_override = item['price_override']
-            stock.minimum_price = item['minimum_price']
-            stock.wholesale_override = item['wholesale_override']
-            stock.low_stock_threshold = item['low_stock_threshold']
+            try:
+                stock.minimum_price = item['minimum_price']
+            except:
+                stock.minimum_price = 0
+            try:
+                stock.wholesale_override = item['wholesale_override']
+            except:
+                stock.wholesale_override = item['price_override']
+            if item['low_stock_threshold']:
+                stock.low_stock_threshold = item['low_stock_threshold']
 
             stock.save()
 
@@ -198,9 +198,16 @@ class TableCreateSerializer(serializers.ModelSerializer):
                     stock.quantity = item['qty']
                     stock.cost_price = item['cost_price']
                     stock.price_override = item['price_override']
-                    stock.minimum_price = item['minimum_price']
-                    stock.wholesale_override = item['wholesale_override']
-                    stock.low_stock_threshold = item['low_stock_threshold']
+                    try:
+                        stock.minimum_price = item['minimum_price']
+                    except:
+                        stock.minimum_price = 0
+                    try:
+                        stock.wholesale_override = item['wholesale_override']
+                    except:
+                        stock.wholesale_override = item['price_override']
+                    if item['low_stock_threshold']:
+                        stock.low_stock_threshold = item['low_stock_threshold']
                     stock.save()
 
                 error_logger.error(e)
