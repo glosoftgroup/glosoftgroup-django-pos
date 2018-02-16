@@ -92,7 +92,7 @@ class VariantListSerializer(serializers.ModelSerializer):
 
     def get_wholesale_price(self, obj):
         try:
-            return obj.wholesale_override.gross
+            return obj.get_wholesale_price_per_item().gross
         except Exception as e:
             return 0
 

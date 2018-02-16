@@ -30,7 +30,7 @@
             <div class="panel-body">
                 <div class="row">
                     <form id="edit-product-stock">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                            <div class="form-group">
                                 <label>Variant:<span class="text-danger">*</span></label>
                                 <div id="feditv">
@@ -45,7 +45,7 @@
                                  <input type="hidden" id="status" name="status" value="payment-pending">
                              </div>
                         </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Quantity:</label>
                                     <input id="id_quantity" v-on:keyup="getTotal()"  v-model="quantity" name="quantity" value="{{stock.quantity}}" required="required" class="form-control" type="number">
@@ -53,7 +53,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Reorder Threshold:</label>
                                     <input type="number" class="form-control" id="reorder-threshold" placeholder="Reorder Threshold" value="{{ form.low_stock_threshold.value|default_if_none:''}}" name="reorder-threshold">
@@ -61,10 +61,28 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Unit cost price:</label>
                                     <input id="id_cost_price" v-model="amount" v-on:keyup="getTotal()" name="cost_price" step="any" value="{{stock.cost_price.gross}}" class="form-control" type="number">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Retail price:</label>
+                                    <input id="id_price_override" v-model="price_override" name="price_override" step="any" value="{{stock.price_override.gross}}" class="form-control" type="number">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Wholesale price:</label>
+                                    <input id="id_wholesale_override" v-model="wholesale_override" name="wholesale_override" step="any" value="{{stock.wholesale_override.gross}}" class="form-control" type="number">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Minimum price:</label>
+                                    <input id="id_minimum_price" v-model="minimum_price" name="minimum_price" step="any" value="{{stock.minimum_price.gross}}" class="form-control" type="number">
                                 </div>
                             </div>
 

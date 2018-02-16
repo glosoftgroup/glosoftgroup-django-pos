@@ -279,7 +279,7 @@ class SalesSerializer(serializers.ModelSerializer):
                     error_logger.error(e)
 
         for solditem_data in solditems_data:
-            SoldItem.objects.create(sales=sales,**solditem_data)
+            SoldItem.objects.create(sales=sales, **solditem_data)
             try:
                 stock = Stock.objects.filter(variant__sku=solditem_data['sku']).first()
                 if stock:                
@@ -394,7 +394,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
 
     def get_wholesale_price(self, obj):
         try:
-            return obj.wholesale_override.gross
+            return obj.get_wholesale_price_per_item().gross
         except Exception as e:
             return 0
 
@@ -403,7 +403,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             price = obj.get_price_per_item().gross
             return price
         except Exception as e:
-            return ''
+            return 0
 
     def get_tax(self, obj):
         if obj.product.product_tax:

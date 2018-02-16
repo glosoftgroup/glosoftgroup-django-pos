@@ -61,53 +61,42 @@ Add Stock- {{ block.super }}
     <!--content area-->
     <div class="row">
         <!--product variant-->
-        <div class="col-md-6" style="border-right: 1px solid #373737;">
+        <div class="col-md-4" style="border-right: 1px solid #373737;">
             <!--search filter-->
-            <div style="z-index: 1;" class="navbar navbar-default navbar-xs navbar-component">
-        <ul class="nav navbar-nav no-border visible-xs-block">
-            <li><a class="text-center collapsed legitRipple" data-toggle="collapse" data-target="#navbar-filter"><i class="icon-menu7"></i></a></li>
-        </ul>
 
-        <div class="navbar-collapse collapse" id="navbar-filter">
-            <p class="navbar-text">Filter:</p>
-            <ul class="nav navbar-nav">
-                <li class="filter-item">
-                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                        <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
-                        <div class="form-control-feedback">
-                            <i class="icon-search4 text-size-base text-muted"></i>
+            <div style="z-index: 1;" class="navbar navbar-default navbar-xs navbar-component">
+                <div class="row">
+                <div class="col-md-6">
+                    <div class="filter-item">
+                        <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                            <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
+                            <div class="form-control-feedback">
+                                <i class="icon-search4 text-size-base text-muted"></i>
+                            </div>
                         </div>
                     </div>
-                </li>
-                <li class="filter-item mr-15">&nbsp;</li>
-                <li class="filter-item">
-                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                        <select v-model="supplier" @change="clearCart" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
+                </div>
+                <!--select-->
+                <div class="col-md-6">
+                    <div class="filter-item">
+                        <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                            <select v-model="supplier" @change="clearCart" data-width="100%" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
 
-                            {% if suppliers %}
-                            {% if supplier.name == 'Unknown' %}
-                            <option value="{{supplier.pk}}">{{supplier}}</option>
-                            {% endif %}
-                            {% for supplier in suppliers %}
-                                <option value="{{supplier.id}}">{{supplier}}</option>
-                            {% endfor %}
-                            {% endif %}
-                        </select>
+                                {% if suppliers %}
+                                {% if supplier.name == 'Unknown' %}
+                                <option value="{{supplier.pk}}">{{supplier}}</option>
+                                {% endif %}
+                                {% for supplier in suppliers %}
+                                    <option value="{{supplier.id}}">{{supplier}}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
 
+                        </div>
                     </div>
-                </li>
-            </ul>
-
-            <div class="navbar-right">
-                <p class="navbar-text hidden">View mode:</p>
-                <form class="navbar-form navbar-left" action="#">
-                    <div class="form-group">
-
-                    </div>
-                </form>
+                </div>
             </div>
-        </div>
-    </div>
+            </div>
             <!--./filter-->
             <div class="panel panel-default">
                 <div class="panelbody">
@@ -116,7 +105,6 @@ Add Stock- {{ block.super }}
                             <tr class="bg-primary">
                                 <th>Supplier</th>
                                 <th>Name</th>
-                                <th>SKU</th>
                                 <th>Purchase</th>
                             </tr>
                         </thead>
@@ -142,9 +130,8 @@ Add Stock- {{ block.super }}
                     <tr class="td animated fadeIn">
                         <td>${item.supplier_name}</td>
                         <td>${item.product_name}</td>
-                        <td>${item.sku}</td>
                         <td class="text-center">
-                            <span class="label label-primary" @click="addToCart(item)">
+                            <span class="label cursor-pointer label-primary" @click="addToCart(item)">
                                 Add
                             </span>
                         </td>
@@ -159,27 +146,35 @@ Add Stock- {{ block.super }}
         </div>
         <!--./variant-->
         <!--cart-->
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="panel panel-default">
                 <div class="panelbody">
                     <table class="table">
                         <tr class="active">
-                                <td class="text-center text-bold" colspan="5">
-                                    Purchase Cart
-                                </td>
-                            </tr>
+                            <td class="text-center text-bold" colspan="12">
+                                Purchase Cart (<span >{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>)
+                                <!--alert-->
+                                <div class="col-md-12">
+                                    <div class="alert alert-danger no-border text-center animated shake hidden">
+                                        <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                                        <span class="text-semibold">Oh snap!</span> <span class="error-alert"></span>
+                                    </div>
+                                </div>
+                                <!--./alert-->
+                            </td>
+                        </tr>
                     </table>
                     <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr class="bg-grey-800">
                                 <th>Name</th>
-                                <th>SKU</th>
                                 <th>Quantity</th>
+                                <th>Reorder Threshold</th>
                                 <th>Cost Price</th>
                                 <th>Retail Price</th>
-                                <th>Reorder Threshold</th>
-                                <th></th>
+                                <th>Wholesale Price</th>
+                                <th>Minimum Price</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -193,25 +188,35 @@ Add Stock- {{ block.super }}
                         <!--listing template-->
                         <template v-for="item in cartItems">
                             <tr class="td animated fadeIn">
-                                <td>${item.product_name}</td>
-                                <td>${item.sku}</td>
+                                <td>
+                                    <span title="Remove from cart" class="label label-white text-grey-800" @click="removeItem(item)">
+                                        <i class="icon-trash animated shake"></i>
+                                    </span><br>
+                                    ${item.product_name}
+                                </td>
                                 <td>
                                     <input v-model="item.qty" style="width: 65px;" type="number" placeholder="amount" class="form-control">
-                                </td>
-                                 <td>
-                                    <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
-                                </td>
-                                <td>
-                                    <input v-model="item.unit_cost" style="width: 65px;" type="number" placeholder="Reorder Thresholder" class="form-control">
                                 </td>
                                 <td>
                                     <input v-model="item.low_stock_threshold" style="width: 65px;" type="number" placeholder="Reorder Thresholder" class="form-control">
                                 </td>
+                                <!--cost price-->
                                 <td>
-                                    <span class="label label-white text-grey-800" @click="removeItem(item)">
-                                        <i class="icon-trash animated shake"></i>
-                                    </span>
+                                    <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
                                 </td>
+                                <!--retail price-->
+                                <td>
+                                    <input v-model="item.price_override" style="width: 65px;" type="number" placeholder="price_override" class="form-control price_override">
+                                </td>
+                                <!--wholesale price-->
+                                <td>
+                                    <input v-model="item.wholesale_override" style="width: 65px;" type="number" placeholder="wholesale price" class="form-control">
+                                </td>
+                                <!--minimum price-->
+                                <td>
+                                    <input v-model="item.minimum_price" style="width: 65px;" type="number" placeholder="minimum_price" class="form-control">
+                                </td>
+
                             </tr>
                         </template>
                         </tbody>
@@ -226,6 +231,9 @@ Add Stock- {{ block.super }}
                                     </td>
                                     <td colspan="5">
                                         <span style="font-size:24px;">{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
+                                    </td>
+                                    <td colspan="3">
+
                                     </td>
                                 </template>
                             </tr>
@@ -253,6 +261,14 @@ Add Stock- {{ block.super }}
 
                 <div class="modal-body">
                     <div class="row">
+                        <!--alert-->
+                        <div class="col-md-12">
+                            <div class="alert alert-danger no-border text-center animated shake hidden">
+                                <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                                <span class="text-semibold">Oh snap!</span> <span class="error-alert"></span>
+                            </div>
+                        </div>
+                        <!--./alert-->
                         <!--purchase detail-->
                         <div class="col-md-4" style="border-right: 1px solid #373737;">
                             <div class="form-group">

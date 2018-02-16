@@ -338,8 +338,8 @@ class ProductVariant(models.Model, Item):
         quantity = 0
         try:
             while checker:
-                stock = self.stock.all().first().quantity
-                if stock > 0:
+                quantity = self.stock.all().first().quantity
+                if quantity > 0:
                     quantity = self.stock.all().first().quantity
                     checker = False
                 else:
@@ -349,7 +349,20 @@ class ProductVariant(models.Model, Item):
             return quantity
 
     def get_min_price_per_item(self):
-        return self.minimum_price or self.product.minimum_price
+        # return self.minimum_price or self.product.minimum_price
+        checker = True
+        price = 0
+        try:
+            while checker:
+                stock = self.stock.all().first().quantity
+                if stock > 0:
+                    price = self.stock.all().first().minimum_price
+                    checker = False
+                else:
+                    self.stock.all().first().delete()
+            return price
+        except Exception as e:
+            return price
 
     def get_price_per_item(self, discounts=None, **kwargs):
         checker = True
@@ -362,22 +375,28 @@ class ProductVariant(models.Model, Item):
                     checker = False
                 else:
                     self.stock.all().first().delete()
+            price = calculate_discounted_price(self.product, price, discounts,
+                                               **kwargs)
             return price
         except Exception as e:
             return price
 
-
-    # def get_price_per_item(self, discounts=None, **kwargs):
-    #     price = self.price_override or self.product.price
-    #     price = calculate_discounted_price(self.product, price, discounts,
-    #                                        **kwargs)
-    #     return price
-
     def get_wholesale_price_per_item(self, discounts=None, **kwargs):
-        price = self.wholesale_override or self.product.wholesale_price
-        price = calculate_discounted_price(self.product, price, discounts,
-                                           **kwargs)
-        return price
+        checker = True
+        price = 0
+        try:
+            while checker:
+                quantity = self.stock.all().first().quantity
+                if quantity > 0:
+                    price = self.stock.all().first().wholesale_override
+                    checker = False
+                else:
+                    self.stock.all().first().delete()
+            price = calculate_discounted_price(self.product, price, discounts,
+                                               **kwargs)
+            return price
+        except Exception as e:
+            return price
 
     def get_total_price_cost(self):
         cost = self.get_cost_price() * self.get_stock_quantity()
@@ -454,8 +473,11 @@ class ProductVariant(models.Model, Item):
             return 0
 
     def product_category(self):
-        category = self.product.categories.first().name
-        return category
+        try:
+            category = self.product.categories.first().name
+            return category
+        except:
+            return ''
 
 
 @python_2_unicode_compatible

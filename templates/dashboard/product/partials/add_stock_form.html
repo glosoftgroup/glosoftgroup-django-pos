@@ -26,18 +26,9 @@
         <div class="navbar-collapse collapse" id="navbar-filter">
             <p class="navbar-text">Filter:</p>
             <ul class="nav navbar-nav">
-                <li class="filter-item">
+                <li class="filter-item col-md-12">
                     <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                        <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
-                        <div class="form-control-feedback">
-                            <i class="icon-search4 text-size-base text-muted"></i>
-                        </div>
-                    </div>
-                </li>
-                <li class="filter-item mr-15">&nbsp;</li>
-                <li class="filter-item">
-                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                        <select v-model="supplier" @change="clearCart" title="Select Supplier" name="variant_supplier" class="bootstrap-select hij" data-live-search="true" id="variant_supplier">
+                        <select v-model="supplier" @change="clearCart" title="Select Supplier" name="variant_supplier" class="bootstrap-select hij" data-width="100%" data-live-search="true" id="variant_supplier">
 
                             {% if suppliers %}
                             {% if supplier.name == 'Unknown' %}
@@ -49,6 +40,15 @@
                             {% endif %}
                         </select>
 
+                    </div>
+                </li>
+                <li class="filter-item mr-15">&nbsp;</li>
+                <li class="filter-item col-md-12">
+                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                        <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
+                        <div class="form-control-feedback">
+                            <i class="icon-search4 text-size-base text-muted"></i>
+                        </div>
                     </div>
                 </li>
             </ul>
@@ -117,8 +117,16 @@
                 <div class="panelbody table-responsive">
                     <table class="table">
                         <tr class="active">
-                                <td class="text-center text-bold" colspan="11">
-                                    Purchase Cart
+                                <td class="text-center text-bold" colspan="12">
+                                    Purchase Cart (<span >{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>)
+                                    <!--alert-->
+                                    <div class="col-md-12">
+                                        <div class="alert alert-danger no-border text-center animated shake hidden">
+                                            <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                                            <span class="text-semibold">Oh snap!</span> <span class="error-alert"></span>
+                                        </div>
+                                    </div>
+                                    <!--./alert-->
                                 </td>
                             </tr>
                     </table>
@@ -146,7 +154,7 @@
                         <!--listing template-->
                         <template v-for="item in cartItems">
                             <tr class="td animated fadeIn">
-                                <td>${item.product_name}<br>${item.sku}</td>
+                                <td>${item.product_name}</td>
                                 <td>
                                     <input v-model="item.qty" style="width: 65px;" type="number" placeholder="amount" class="form-control">
                                 </td>
@@ -159,7 +167,7 @@
                                 </td>
                                 <!--retail price-->
                                 <td>
-                                    <input v-model="item.price_override" style="width: 65px;" type="number" placeholder="price_override" class="form-control">
+                                    <input v-model="item.price_override" style="width: 65px;" type="number" placeholder="price_override" class="form-control price_override">
                                 </td>
                                 <!--wholesale price-->
                                 <td>
@@ -213,6 +221,14 @@
 
                 <div class="modal-body">
                     <div class="row">
+                        <!--alert-->
+                        <div class="col-md-12">
+                            <div class="alert alert-danger no-border text-center animated shake hidden">
+                                <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                                <span class="text-semibold">Oh snap!</span> <span class="error-alert"></span>
+                            </div>
+                        </div>
+                        <!--./alert-->
                         <!--purchase detail-->
                         <div class="col-md-4" style="border-right: 1px solid #373737;">
                             <div class="form-group">

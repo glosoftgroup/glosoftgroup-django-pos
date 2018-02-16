@@ -19,6 +19,9 @@ $(function(){
   var variant = editForm.find('#id_variant');
   var status = editForm.find('#status');
   var cost_price = editForm.find('#id_cost_price');
+  var price_override = editForm.find('#id_price_override');
+  var wholesale_override = editForm.find('#id_wholesale_override');
+  var minimum_price = editForm.find('#id_minimum_price');
   var location = editForm.find('#id_location');
   var quantity = editForm.find('#id_quantity');
   var editStockAmountPaid = editForm.find('#id_amount_paid');
@@ -28,8 +31,7 @@ $(function(){
   var settlePayment = editForm.find('#settle_payment');
   var balance = editForm.find('#balance_e');
 
-  console.log(status.val());
-  editStockBtn.on('click',function(){   
+  editStockBtn.on('click',function(){
     var url = $(this).data('contenturl');
     var refreshUrl = $(this).data('refreshstockurl')+"?tab=stock";
     
@@ -52,8 +54,18 @@ $(function(){
       dynamicData['total_cost'] = editStockTotalCost.val();
     }
     dynamicData['location'] = location.val();
+
     if(cost_price.val()){
       dynamicData['cost_price'] = cost_price.val();
+    }
+    if(price_override.val()){
+      dynamicData['price_override'] = price_override.val();
+    }
+    if(wholesale_override.val()){
+      dynamicData['wholesale_override'] = wholesale_override.val();
+    }
+    if(minimum_price.val()){
+      dynamicData['minimum_price'] = minimum_price.val();
     }
     if(!variant.val()){
       alertUser('Variant field required','bg-warning','Variant required!');
