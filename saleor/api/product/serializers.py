@@ -279,17 +279,45 @@ class SalesSerializer(serializers.ModelSerializer):
                     error_logger.error(e)
 
         for solditem_data in solditems_data:
-            SoldItem.objects.create(sales=sales, **solditem_data)
-            try:
+            item_temp = SoldItem.objects.create(sales=sales, **solditem_data)
+            item = item_temp
+            item_temp.delete()
+            carry = int(solditem_data['quantity'])
+            checker = True
+            # try:
+            while checker:
                 stock = Stock.objects.filter(variant__sku=solditem_data['sku']).first()
-                if stock:                
-                    Stock.objects.decrease_stock(stock,solditem_data['quantity'])                                    
-                else: 
+                if stock:
+                    item.id = None
+                    if stock.quantity > 0:
+                        if carry >= stock.quantity:
+                            item.unit_purchase = stock.cost_price.gross
+                            item.total_purchase = stock.cost_price.gross * Decimal(stock.quantity)
+                            item.save()
+                            carry -= stock.quantity
+                            stock.delete()
+                            if carry <= 0:
+                                checker = False
+                        else:
+                            # Stock.objects.decrease_stock(stock, carry)
+                            stock.quantity -= carry
+                            stock.save()
+                            item.unit_purchase = stock.cost_price.gross
+                            item.total_purchase = stock.cost_price.gross * Decimal(carry)
+                            item.save()
+
+                            checker = False
+                    else:
+                        stock.delete()
+                        checker = False
+                else:
                     print('stock not found')
-            except Exception as e:
-                print('Error reducing stock!')
-                print e
-                error_logger.error(e)
+                    checker = False
+
+            # except Exception as e:
+            #     print('Error reducing stock!')
+            #     print e
+            #     error_logger.error(e)
         return sales
         
 
