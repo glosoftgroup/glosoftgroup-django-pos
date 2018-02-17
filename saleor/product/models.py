@@ -429,7 +429,7 @@ class ProductVariant(models.Model, Item):
             while checker:
                 quantity = self.stock.all().first().quantity
                 if quantity > 0:
-                    price = self.stock.all().first().cost_price
+                    price = self.stock.all().first().cost_price.gross
                     checker = False
                 else:
                     self.stock.all().first().delete()
