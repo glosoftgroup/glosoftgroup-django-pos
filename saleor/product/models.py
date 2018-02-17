@@ -331,6 +331,10 @@ class ProductVariant(models.Model, Item):
         return stock_pk
 
     def get_stock_quantity(self):
+        quantity = self.stock.filter(quantity__gte=1).aggregate(Sum('quantity'))['quantity__sum']
+        return quantity
+
+    def get_stock_quantity_single(self):
         # if not len(self.stock.all()):
         #     return 0
         # return max([stock.quantity_available for stock in self.stock.all()])
@@ -419,11 +423,20 @@ class ProductVariant(models.Model, Item):
         return self.product.product_class.is_shipping_required
 
     def get_stock_cost_price(self):
+        checker = True
+        price = 0
         try:
-            stock = Stock.objects.get(variant=self.id).cost_price.gross
-            return stock
+            while checker:
+                quantity = self.stock.all().first().quantity
+                if quantity > 0:
+                    price = self.stock.all().first().cost_price
+                    checker = False
+                else:
+                    self.stock.all().first().delete()
+            return price
         except Exception as e:
-            return 0
+            return price
+
 
     def is_in_stock(self):
         return any(
