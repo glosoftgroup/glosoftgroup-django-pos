@@ -19,6 +19,8 @@ urlpatterns = [
         url( r'^sales/prs/pdf/$', product_sales.sales_list_pdf, name = 'product_sales_list_pdf' ),
         url(r'^detail/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
             (views.sales_detail), name='sale-detail'),
+        url(r'^revert/(?P<pk>[0-9]+)/$', permission_required('reports.view_sale_reports', login_url='not_found')
+            (views.sales_revert), name='sale-revert'),
 
         # Sales Tax
         url(r'^tx/$', permission_required('reports.view_sale_reports', login_url='not_found')
