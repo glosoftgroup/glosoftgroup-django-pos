@@ -133,7 +133,11 @@
                       <!-- variants -->
                       <td href="#modal_instance_lg" class="modal-trigger-ajax" data-title="Product Details" data-href="{% url 'dashboard:product-update' pk=product.pk %}">
 
-                      <span class="semi-bold">{{ product.get_variants_count }}</span>
+                      <span class="semi-bold">
+                          {% if product.get_variants_count %}
+                          {{ product.get_variants_count }}
+                          {% endif %}
+                      </span>
                       <span class='superscript'> in</span><span class="semi-bold"> {{ product.total_variants}} </span>
                       <span class="superscript"> variant(s)</span>
 

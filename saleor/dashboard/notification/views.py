@@ -219,7 +219,7 @@ def write(request):
     if request.method == 'GET':
         if request.GET.get('pk'):
             try:
-                product = ProductVariant.objects.get(pk=int(request.GET.get('pk')))
+                product = ProductVariant.objects.get(stock__pk=int(request.GET.get('pk')))
                 ctx = {
                         'product': product,
                         'users': User.objects.all().order_by('-id'),

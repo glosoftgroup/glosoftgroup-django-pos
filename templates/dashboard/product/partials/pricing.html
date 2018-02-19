@@ -41,10 +41,7 @@
 <table class="table table-hover">
   <thead>
    <tr class="bg-primary">  
-    <th>SKU</th>  
-    <th>Retail Price</th>
-    <th>Wholesale Price</th>   
-    <th>Minimum Price</th>
+    <th>SKU</th>
     <th>Supplier</th>
     <th>&nbsp; </th>
    </tr>
@@ -55,20 +52,6 @@
         <div class="row disablesku">   
          {{ variant_form.sku }}
        </div>
-      </td>
-      <td>
-      <div class="col-md-9">
-       <input type="number" placeholder="Retail Price" class="form-control" value="{{ product.price.gross }}" id="tabprice" name="tabprice"> 
-      </div>
-      <div class="col-md-3">
-       <span>KES</span>
-      </div>
-      </td>
-      <td>
-        {{ product_form.wholesale_price }}
-      </td>
-      <td>
-        {{ product_form.minimum_price }}
       </td>
       <td>
           {{ variant_form.variant_supplier }}
