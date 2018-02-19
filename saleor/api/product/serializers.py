@@ -63,6 +63,48 @@ class TrackSerializer(serializers.ModelSerializer):
                  )
 
 
+class StockSerializer(serializers.ModelSerializer):
+    price = SerializerMethodField()
+    minimum = SerializerMethodField()
+    wholesale = SerializerMethodField()
+    cost = SerializerMethodField()
+
+    class Meta:
+        model = Stock
+        fields = (
+                'variant',
+                'quantity',
+                'price',
+                'minimum',
+                'wholesale',
+                'cost',
+                 )
+
+    def get_price(self, obj):
+        try:
+            return obj.price_override.gross
+        except:
+            return 0
+
+    def get_minimum(self, obj):
+        try:
+            return obj.minimum_price.gross
+        except:
+            return 0
+
+    def get_wholesale(self, obj):
+        try:
+            return obj.wholesale_override.gross
+        except:
+            return 0
+
+    def get_cost(self, obj):
+        try:
+            return obj.cost_price.gross
+        except:
+            return 0
+
+
 class ItemsSerializer(serializers.ModelSerializer):
     available_stock = SerializerMethodField()
 
@@ -291,8 +333,17 @@ class SalesSerializer(serializers.ModelSerializer):
                     item.id = None
                     if stock.quantity > 0:
                         if carry >= stock.quantity:
-                            item.unit_purchase = stock.cost_price.gross
-                            item.total_purchase = stock.cost_price.gross * Decimal(stock.quantity)
+                            try:
+                                item.unit_purchase = stock.cost_price.gross
+                            except:
+                                pass
+                            try:
+                                item.total_purchase = stock.cost_price.gross * Decimal(stock.quantity)
+                            except:
+                                pass
+                            item.quantity = stock.quantity
+                            item.unit_cost = stock.price_override.gross
+                            item.total_cost = stock.price_override.gross * stock.quantity
                             item.save()
                             carry -= stock.quantity
                             stock.delete()
@@ -302,8 +353,18 @@ class SalesSerializer(serializers.ModelSerializer):
                             # Stock.objects.decrease_stock(stock, carry)
                             stock.quantity -= carry
                             stock.save()
-                            item.unit_purchase = stock.cost_price.gross
-                            item.total_purchase = stock.cost_price.gross * Decimal(carry)
+                            try:
+                                item.unit_purchase = stock.cost_price.gross
+                            except:
+                                pass
+                            try:
+                                item.total_purchase = stock.cost_price.gross * Decimal(carry)
+                            except:
+                                pass
+                            item.quantity = carry
+                            item.unit_cost = stock.price_override.gross
+                            item.total_cost = stock.price_override.gross * carry
+
                             item.save()
 
                             checker = False
@@ -363,6 +424,7 @@ class ProductStockListSerializer(serializers.ModelSerializer):
     min_price = SerializerMethodField()
     wholesale_price = SerializerMethodField()
     attributes_list = SerializerMethodField()
+    stock = StockSerializer(many=True)
 
     class Meta:        
         model = ProductVariant
@@ -378,7 +440,8 @@ class ProductStockListSerializer(serializers.ModelSerializer):
             'discount',
             'quantity',
             'product_category',
-            'attributes_list'
+            'attributes_list',
+            'stock'
             )
 
     def get_attributes_list(self, obj):

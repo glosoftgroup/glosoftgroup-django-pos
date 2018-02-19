@@ -18,51 +18,40 @@
      <!--product variant-->
         <div class="col-md-4" style="border-right: 1px solid #373737;">
             <!--search filter-->
+
             <div style="z-index: 1;" class="navbar navbar-default navbar-xs navbar-component">
-        <ul class="nav navbar-nav no-border visible-xs-block">
-            <li><a class="text-center collapsed legitRipple" data-toggle="collapse" data-target="#navbar-filter"><i class="icon-menu7"></i></a></li>
-        </ul>
-
-        <div class="navbar-collapse collapse" id="navbar-filter">
-            <p class="navbar-text">Filter:</p>
-            <ul class="nav navbar-nav">
-                <li class="filter-item col-md-12">
-                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                        <select v-model="supplier" @change="clearCart" title="Select Supplier" name="variant_supplier" class="bootstrap-select hij" data-width="100%" data-live-search="true" id="variant_supplier">
-
-                            {% if suppliers %}
-                            {% if supplier.name == 'Unknown' %}
-                            <option value="{{supplier.pk}}">{{supplier}}</option>
-                            {% endif %}
-                            {% for supplier in suppliers %}
-                                <option value="{{supplier.id}}">{{supplier}}</option>
-                            {% endfor %}
-                            {% endif %}
-                        </select>
-
-                    </div>
-                </li>
-                <li class="filter-item mr-15">&nbsp;</li>
-                <li class="filter-item col-md-12">
-                    <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                        <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
-                        <div class="form-control-feedback">
-                            <i class="icon-search4 text-size-base text-muted"></i>
+                <div class="row">
+                <div class="col-md-6">
+                    <div class="filter-item">
+                        <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                            <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
+                            <div class="form-control-feedback">
+                                <i class="icon-search4 text-size-base text-muted"></i>
+                            </div>
                         </div>
                     </div>
-                </li>
-            </ul>
+                </div>
+                <!--select-->
+                <div class="col-md-6">
+                    <div class="filter-item">
+                        <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                            <select v-model="supplier" @change="clearCart" data-width="100%" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
 
-            <div class="navbar-right">
-                <p class="navbar-text hidden">View mode:</p>
-                <form class="navbar-form navbar-left" action="#">
-                    <div class="form-group">
+                                {% if suppliers %}
+                                {% if supplier.name == 'Unknown' %}
+                                <option value="{{supplier.pk}}">{{supplier}}</option>
+                                {% endif %}
+                                {% for supplier in suppliers %}
+                                    <option value="{{supplier.id}}">{{supplier}}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
 
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
-    </div>
+            </div>
             <!--./filter-->
             <div class="panel panel-default">
                 <div class="panelbody">

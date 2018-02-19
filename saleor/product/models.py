@@ -332,7 +332,10 @@ class ProductVariant(models.Model, Item):
 
     def get_stock_quantity(self):
         quantity = self.stock.filter(quantity__gte=1).aggregate(Sum('quantity'))['quantity__sum']
-        return quantity
+        if quantity:
+            return quantity
+        else:
+            return 0
 
     def get_stock_quantity_single(self):
         # if not len(self.stock.all()):

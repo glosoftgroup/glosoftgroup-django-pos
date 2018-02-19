@@ -3,13 +3,56 @@ from datetime import date
 from decimal import Decimal
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from ...product.models import ProductVariant
+from ...product.models import ProductVariant, Stock
 from ...discount.models import Sale
 from ...discount.models import get_variant_discounts
 from rest_framework.serializers import (
                 SerializerMethodField,
                 )
 User = get_user_model()
+
+
+class StockSerializer(serializers.ModelSerializer):
+    price = SerializerMethodField()
+    minimum = SerializerMethodField()
+    wholesale = SerializerMethodField()
+    cost = SerializerMethodField()
+
+    class Meta:
+        model = Stock
+        fields = (
+                'variant',
+                'quantity',
+                'price',
+                'minimum',
+                'wholesale',
+                'cost',
+                 )
+
+    def get_price(self, obj):
+        try:
+            return obj.price_override.gross
+        except:
+            return 0
+
+    def get_minimum(self, obj):
+        try:
+            return obj.minimum_price.gross
+        except:
+            return 0
+
+    def get_wholesale(self, obj):
+        try:
+            return obj.wholesale_override.gross
+        except:
+            return 0
+
+    def get_cost(self, obj):
+        try:
+            return obj.cost_price.gross
+        except:
+            return 0
+
 
 
 class VariantListSerializer(serializers.ModelSerializer):
@@ -26,6 +69,7 @@ class VariantListSerializer(serializers.ModelSerializer):
     attributes_list = SerializerMethodField()
     wholesale_price = SerializerMethodField()
     qty = SerializerMethodField()
+    stock = StockSerializer(many=True)
 
     class Meta:
         model = ProductVariant
@@ -44,7 +88,8 @@ class VariantListSerializer(serializers.ModelSerializer):
             'product_category',
             'attributes_list',
             'min_price',
-            'wholesale_price'
+            'wholesale_price',
+            'stock'
         )
 
     def get_low_stock_threshold(self, obj):
