@@ -241,16 +241,62 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             history.save()
         except Exception as e:
             error_logger.error(e)
+
         for solditem_data in solditems_data:
-            try:
-                CreditedItem.objects.create(credit=credit, **solditem_data)
-                stock = Stock.objects.get(variant__sku=solditem_data['sku'])
+            item_temp = CreditedItem.objects.create(credit=credit, **solditem_data)
+            item = item_temp
+            item_temp.delete()
+            carry = int(solditem_data['quantity'])
+            checker = True
+            # try:
+            while checker:
+                stock = Stock.objects.filter(variant__sku=solditem_data['sku']).first()
                 if stock:
-                    Stock.objects.decrease_stock(stock, solditem_data['quantity'])
+                    item.id = None
+                    if stock.quantity > 0:
+                        if carry >= stock.quantity:
+                            try:
+                                item.unit_purchase = stock.cost_price.gross
+                            except:
+                                pass
+                            try:
+                                item.total_purchase = stock.cost_price.gross * Decimal(stock.quantity)
+                            except:
+                                pass
+                            item.quantity = stock.quantity
+                            item.unit_cost = stock.price_override.gross
+                            item.total_cost = stock.price_override.gross * stock.quantity
+                            item.save()
+                            carry -= stock.quantity
+                            stock.delete()
+                            if carry <= 0:
+                                checker = False
+                        else:
+                            # Stock.objects.decrease_stock(stock, carry)
+                            stock.quantity -= carry
+                            stock.save()
+                            try:
+                                item.unit_purchase = stock.cost_price.gross
+                            except:
+                                pass
+                            try:
+                                item.total_purchase = stock.cost_price.gross * Decimal(carry)
+                            except:
+                                pass
+                            item.quantity = carry
+                            item.unit_cost = stock.price_override.gross
+                            item.total_cost = stock.price_override.gross * carry
+
+                            item.save()
+
+                            checker = False
+                    else:
+                        stock.delete()
+                        checker = False
                 else:
-                    print 'stock not found'
-            except Exception as e:
-                error_logger.error(e)
+                    print('stock not found')
+                    checker = False
+
         return credit
 
 
