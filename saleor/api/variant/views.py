@@ -45,7 +45,6 @@ class VariantCategoryListAPIView(generics.ListAPIView):
     queryset = ProductVariant.objects.get_in_stock()
 
     def list(self, request, pk=None):
-        # Note the use of `get_queryset()` instead of `self.queryset`
         queryset = self.get_queryset().filter(product__categories__pk=pk).distinct('sku')
         serializer = VariantListSerializer(queryset, many=True)
         return Response(serializer.data)
