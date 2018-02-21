@@ -54,7 +54,6 @@ class StockSerializer(serializers.ModelSerializer):
             return 0
 
 
-
 class VariantListSerializer(serializers.ModelSerializer):
     product_name = SerializerMethodField()
     supplier_name = SerializerMethodField()
@@ -66,6 +65,7 @@ class VariantListSerializer(serializers.ModelSerializer):
     discount = SerializerMethodField()
     product_category = SerializerMethodField()
     min_price = SerializerMethodField()
+    price_override = SerializerMethodField()
     attributes_list = SerializerMethodField()
     wholesale_price = SerializerMethodField()
     qty = SerializerMethodField()
@@ -88,6 +88,7 @@ class VariantListSerializer(serializers.ModelSerializer):
             'product_category',
             'attributes_list',
             'min_price',
+            'price_override',
             'wholesale_price',
             'stock'
         )
@@ -106,6 +107,12 @@ class VariantListSerializer(serializers.ModelSerializer):
 
     def get_cost_price(self, obj):
         return obj.get_stock_cost_price()
+
+    def get_price_override(self, obj):
+        try:
+            return obj.get_price_per_item().gross
+        except:
+            return 0
 
     def get_attributes_list(self, obj):
         return ProductVariant.objects.filter(pk=obj.pk).extra(select=dict(key="content_item.data -> 'attributes'"))\

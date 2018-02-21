@@ -341,7 +341,11 @@ class SalesSerializer(serializers.ModelSerializer):
                                 item.total_purchase = stock.cost_price.gross * Decimal(stock.quantity)
                             except:
                                 pass
+                            item.stock_id = stock.pk
                             item.quantity = stock.quantity
+                            item.minimum_price = stock.minimum_price.gross
+                            item.wholesale_override = stock.wholesale_override.gross
+                            item.low_stock_threshold = stock.low_stock_threshold
                             item.unit_cost = stock.price_override.gross
                             item.total_cost = stock.price_override.gross * stock.quantity
                             item.save()
@@ -361,7 +365,11 @@ class SalesSerializer(serializers.ModelSerializer):
                                 item.total_purchase = stock.cost_price.gross * Decimal(carry)
                             except:
                                 pass
+                            item.stock_id = stock.pk
                             item.quantity = carry
+                            item.minimum_price = stock.minimum_price.gross
+                            item.wholesale_override = stock.wholesale_override.gross
+                            item.low_stock_threshold = stock.low_stock_threshold
                             item.unit_cost = stock.price_override.gross
                             item.total_cost = stock.price_override.gross * carry
 

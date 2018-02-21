@@ -85,20 +85,23 @@ def sales_revert(request, pk=None):
 
         for solditem in items:
             try:
-                st = Stock.objects.get(variant__sku=solditem.sku,
-                                       price_override=solditem.unit_cost,
-                                       cost_price=solditem.unit_purchase)
+                st = Stock.objects.get(pk=solditem.stock_id)
                 st.quantity = st.quantity + solditem.quantity
                 st.save()
-                sale.delete()
+                solditem.delete()
             except Exception as e:
                 variant = ProductVariant.objects.get(sku=solditem.sku)
                 Stock.objects.create(
                     variant=variant,
                     price_override=solditem.unit_cost,
+                    wholesale_override=solditem.wholesale_override,
+                    minimum_price=solditem.minimum_price,
+                    low_stock_threshold=solditem.low_stock_threshold,
                     cost_price=solditem.unit_purchase,
                     quantity=solditem.quantity)
-                sale.delete()
+                solditem.delete()
+
+        sale.delete()
 
         data = {
             'message': 'success',

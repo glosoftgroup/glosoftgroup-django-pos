@@ -129,6 +129,9 @@ class TableCreateSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise ValidationError(e)
 
+        def update_all_stock_price_override(variant, price_override):
+            variant.stock.all().update(price_override=price_override)
+
         def create_variant_stock(item, variant):
             stock = Stock()
             stock.variant = variant
@@ -161,7 +164,7 @@ class TableCreateSerializer(serializers.ModelSerializer):
             single_item.order = 1
             single_item.save()
 
-            # check if product variant exist
+            # deprecated delete it
             try:
                 variant = ProductVariant.objects.get(sku=item['sku'])
                 if variant.price_override.gross != item['unit_cost']:
@@ -181,9 +184,11 @@ class TableCreateSerializer(serializers.ModelSerializer):
                         create_variant_stock(item, variant)
                         new_created = True
                 if stock.price_override != item['price_override']:
+                    # each stock should have similar price
+                    variant = ProductVariant.objects.get(sku=item['sku'])
+                    update_all_stock_price_override(variant, item['price_override'])
                     if not new_created:
                         # ('create a new  variant')
-                        variant = ProductVariant.objects.get(sku=item['sku'])
                         create_variant_stock(item, variant)
                         new_created = True
                 else:
@@ -209,6 +214,7 @@ class TableCreateSerializer(serializers.ModelSerializer):
                     if item['low_stock_threshold']:
                         stock.low_stock_threshold = item['low_stock_threshold']
                     stock.save()
+                    update_all_stock_price_override(variant, item['price_override'])
 
                 error_logger.error(e)
         return instance
