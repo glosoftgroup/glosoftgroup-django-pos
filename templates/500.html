@@ -57,7 +57,12 @@
         <div class="content">
             {% csrf_token %} 
                <div class="panel bg-danger col-md-6 col-md-offset-3 animated bounceIn">
-              <p class="text-center" style="font-size:30px;font-weight:bold;padding:20px;">Oops! No such Page.</p>
+              <p class="text-center" style="font-size:30px;font-weight:bold;padding:20px;">Oops! No such Page. Server Error</p>
+              <p class="text-center">
+               <a class="btn btn-default text-center" href="{% url 'account_logout' %}">
+                  Go To Login Page
+                </a>
+              </p>
             </div>
         </div>
         <!-- /content area -->

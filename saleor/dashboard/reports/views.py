@@ -311,13 +311,13 @@ def sales_search(request):
 @permission_decorator('reports.view_products_reports')
 def product_reports(request):
     try:
-        items = ProductVariant.objects.all().order_by('-id')
+        items = Stock.objects.all().order_by('-id')
         total_cost = 0
         for i in items:
             try:
-                total_cost+=i.get_total_price_cost().gross
-            except:
-                total_cost+=i.get_total_price_cost()
+                total_cost+=i.get_total_cost()
+            except Exception as e:
+                total_cost+=0
         page = request.GET.get('page', 1)
         paginator = Paginator(items, 10)
         try:
@@ -346,11 +346,11 @@ def products_paginate(request):
     p2_sz = request.GET.get('psize')
     select_sz = request.GET.get('select_size')
     gid = request.GET.get('gid')
-    items = ProductVariant.objects.all().order_by('-id')
+    items = Stock.objects.all().order_by('-id')
     if request.GET.get('sth'):
         if action:
             try:
-                items = ProductVariant.objects.filter(date=date).order_by('-id')
+                items = Stock.objects.all().order_by('-id')
                 if p2_sz and gid:
                     paginator = Paginator(items, int(p2_sz))
                     items = paginator.page(page)
@@ -398,10 +398,10 @@ def products_search(request):
             sz = list_sz
 
         if q is not None:
-            items = ProductVariant.objects.filter(
-                Q( sku__icontains = q ) |
-                Q( product__name__icontains = q ) |
-                Q(product__product_class__name__icontains = q) ).order_by( '-id' )
+            items = Stock.objects.filter(
+                Q( variant__sku__icontains = q ) |
+                Q( variant__product__name__icontains = q ) |
+                Q(variant__product__product_class__name__icontains = q) ).order_by( '-id' )
 
             if p2_sz:
                 paginator = Paginator(items, int(p2_sz))
@@ -530,10 +530,10 @@ def products_pdf(request):
             gid = None
 
         if q is not None:
-            items = ProductVariant.objects.filter(
-                Q(sku__icontains=q) |
-                Q(product__name__icontains=q) |
-                Q(product__product_class__name__icontains=q)).order_by('-id')
+            items = Stock.objects.filter(
+                Q(variant__sku__icontains=q) |
+                Q(variant__product__name__icontains=q) |
+                Q(variant__product__product_class__name__icontains=q)).order_by('-id')
 
             data = {
                 'today': date.today(),

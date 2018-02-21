@@ -595,7 +595,7 @@ class Stock(models.Model):
 
     def get_balance(self):
         try:
-            return self.total_cost.gross - self.amount_paid.gross
+            return self.cost_price.gross - self.amount_paid.gross
         except:
             return 0
 
@@ -609,6 +609,12 @@ class Stock(models.Model):
 
     def get_total_credit(self):
         return Stock.objects.get_total_credit()
+
+    def get_total_cost(self):
+        try:
+            return (self.cost_price.gross * self.quantity)
+        except:
+            return 0
 
 
 @python_2_unicode_compatible
