@@ -20,7 +20,7 @@ from ..views import staff_member_required
 from ..notification.views import custom_notification
 from ...sale.models import Sales, SoldItem, DrawerCash
 from ...credit.models import Credit, CreditedItem, CreditHistoryEntry
-from ...product.models import Product, ProductVariant
+from ...product.models import Product, ProductVariant, Stock
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
 
@@ -1004,7 +1004,7 @@ def reorder_export_csv(request):
 def due_credit_notifier(request):
     due_credits = Credit.objects.due_credits().filter(notified=False)
     for credit in due_credits:
-        subject = 'NOTIFICATION OF OVERDUE CREDIT: '+\
+        subject = 'OVERDUE CREDIT: '+\
                   str(credit.invoice_number)+\
                   ' ('+str(DateFormat(credit.created).format('Y-m-d'))+\
                   ')'
@@ -1015,7 +1015,26 @@ def due_credit_notifier(request):
                   '<br><b>Due Date:</b>'+str(DateFormat(credit.due_date).format('Y-m-d'))+\
                   '<br><b>Invoice Number:</b>'+str(credit.invoice_number)+\
                   '<br><b>Amount:</b>'+str(credit.total_net)
-        custom_notification(request.user,body,subject)
+        custom_notification(request.user, body, subject)
         credit.notified=True
         credit.save()
+
+    stocks = Stock.objects.get_low_stock(False)
+    for stock in stocks:
+        subject = ' Low Stock: ' + \
+                  str(stock.variant.display_product()) + \
+                  ' - ' + str(stock.variant.sku) + \
+                  ''
+        body = "Hi,<br>: Low Stock Notification<br>" + \
+               '<table class="table table-xxs"><thead><tr class="bg-primary">' + \
+               '<th>Name</th><th>SKU</th><th>Quantity</th><th>Threshold</th></tr></thead><tbody><tr>' + \
+               '<td>'+str(stock.variant.display_product())+'</td>' + \
+               '<td>' + str(stock.variant.sku) + '</td>' + \
+               '<td>' + str(stock.quantity) + '</td>' + \
+               '<td>' + str(stock.low_stock_threshold) + '</td>' + \
+               '</tr></tbody>'
+
+        custom_notification(request.user, body, subject)
+        stock.notified = True
+        stock.save()
     return HttpResponse(len(due_credits))

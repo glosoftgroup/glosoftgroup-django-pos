@@ -512,8 +512,13 @@ class StockManager(models.Manager):
         stock.quantity = F('quantity') + quantity
         stock.save(update_fields=['quantity', 'quantity_allocated'])
 
-    def get_low_stock(self):
-        return self.get_queryset().filter(quantity__lte=F('low_stock_threshold'))
+    def get_low_stock(self, all_low_stock=True):
+        """ all low stock of filter non notified stock only"""
+        if all_low_stock:
+            return self.get_queryset().filter(quantity__lte=F('low_stock_threshold'))
+        else:
+            return self.get_queryset().filter(quantity__lte=F('low_stock_threshold'))\
+                .filter(notified=False)
 
     def get_credit_balance(self, supplier):
         return self.get_queryset().filter(variant__product__product_supplier=supplier).aggregate(total=Sum(F('total_cost') - F('amount_paid')))['total']
@@ -575,6 +580,7 @@ class Stock(models.Model):
     comment = models.CharField(
         pgettext_lazy('Stock entry field', 'comment'),
         max_length=100, default='', blank=True)
+    notified = models.BooleanField(default=False, blank=False)
 
     objects = StockManager()
 

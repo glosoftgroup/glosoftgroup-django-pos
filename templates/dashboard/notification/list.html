@@ -170,14 +170,13 @@
 								<h5 class="text-center text-bold">Notifications</h5>
 							</div>
 						<div class="">
-						  <table class="table room-striped room-hover dataroom-header-footer" style="border-bottom:1px solid #ddd;">
+						  <table class="table table-xxs room-striped room-hover dataroom-header-footer" style="border-bottom:1px solid #ddd;">
 								<thead>
 								  <tr class="bg-primary">
 									<th>Status</th>
 									<th>Date</th>
 									<th>Recipient</th>
 									<th>Subject</th>
-									<th>Content</th>
 								  </tr>
 								</thead>
 								<tbody id="tb">
@@ -203,11 +202,7 @@
 										<td v-html="item.status"></td>
 										<td>${item.date}</td>
 										<td>${item.recipient_name}</td>
-										<td>${item.verb}</td>
-										<td :id="item.id" @click="showMore(item.id,item.description)">
-											${item.description|strLimiter}
-											<span class="text-primary">Read more</span>
-										</td>
+										<td v-html="item.verb"></td>
 									</tr>
 								</template>
 
