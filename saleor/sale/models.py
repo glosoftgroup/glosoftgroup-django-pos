@@ -173,6 +173,7 @@ class Sales(models.Model):
 
 class SoldItem(models.Model):
     sales = models.ForeignKey(Sales, related_name='solditems', on_delete=models.CASCADE)
+    stock_id = models.IntegerField(default=Decimal(0))
     order = models.IntegerField(default=Decimal(1))
     sku = models.CharField(
         pgettext_lazy('SoldItem field', 'SKU'), max_length=32)
@@ -185,15 +186,26 @@ class SoldItem(models.Model):
         pgettext_lazy('SoldItem field', 'total cost'), default=Decimal(0), max_digits=100, decimal_places=2)
     unit_cost = models.DecimalField(
         pgettext_lazy('SoldItem field', 'unit cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+
+    minimum_price = models.DecimalField(
+        pgettext_lazy('SoldItem field', 'minimum price'), default=Decimal(0), max_digits=100, decimal_places=2)
+    wholesale_override = models.DecimalField(
+        pgettext_lazy('SoldItem field', 'wholesale price'), default=Decimal(0), max_digits=100, decimal_places=2)
+
     unit_purchase = models.DecimalField(
         pgettext_lazy('SoldItem field', 'unit purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
     total_purchase = models.DecimalField(
         pgettext_lazy('SoldItem field', 'total purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
 
+    low_stock_threshold = models.IntegerField(
+        pgettext_lazy('SoldItem field', 'low stock threshold'),
+        validators=[MinValueValidator(0)], null=True, blank=True, default=Decimal(10))
+
     product_category = models.CharField(
         pgettext_lazy('SoldItem field', 'product_category'), max_length=128, null=True)
     discount = models.DecimalField(
         pgettext_lazy('SoldItem field', 'discount'), default=Decimal(0), max_digits=100, decimal_places=2)
+
     tax = models.DecimalField(default=Decimal(0), max_digits=100, decimal_places=2)
     attributes = HStoreField(
         pgettext_lazy('SoldItem field', 'attributes'), default={})

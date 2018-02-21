@@ -572,7 +572,7 @@
             
             <thead>
               <tr class='bg-primary'>
-                <th>Name</th>
+                <th width="15%">Name</th>
                 <th> Cost Price</th>
                 <th>
                   Retail Price
@@ -598,7 +598,7 @@
            
               {% for item in stock_items %}
                 <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
-                  <td>{{ item.variant.display_product }}</td>
+                  <td>{{ item.variant.display_product }}<br>{{item.variant.sku}}</td>
 
                   <!-- cost price -->
                   <td>

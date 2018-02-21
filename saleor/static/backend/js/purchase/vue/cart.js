@@ -159,7 +159,7 @@ var parent = new Vue({
               this.cartItems.forEach(item => {
                 if (item.id === itemToAdd.id) {
                   found = true;
-                  item.qty += parseInt(itemToAdd.qty);
+                  item.qty = parseInt(item.qty) + parseInt(itemToAdd.qty);
                   item.quantity = item.qty;
                 }
               });

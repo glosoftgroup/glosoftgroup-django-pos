@@ -281,18 +281,6 @@ class ProductVariant(models.Model, Item):
     name = models.CharField(
         pgettext_lazy('Product variant field', 'variant name'), max_length=100,
         blank=True)
-    price_override = PriceField(
-        pgettext_lazy('Product variant field', 'price override'),
-        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
-        blank=True, null=True)
-    minimum_price = PriceField(
-        pgettext_lazy('Product variant field', 'minimum price'),
-        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
-        blank=True, null=True)
-    wholesale_override = PriceField(
-        pgettext_lazy('Product variant field', 'wholesale override'),
-        currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
-        blank=True, null=True)
     variant_supplier = models.ForeignKey(
         Supplier, related_name='variant_supplier', blank=True, null=True,
         verbose_name=pgettext_lazy('Product variant field', 'product variant supplier'))
