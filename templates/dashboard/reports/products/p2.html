@@ -25,19 +25,19 @@
                       {% if items %}
                         {% for item in items %}
                           <tr>
-                            <td class="text-center">{{item.sku}}</td>
-                            <td class="text-center">{{item.display_product}}</td>
-                            <td class="text-center">{{item.product.get_first_category}}</td>
-                            <td class="text-center">{{item.product.product_class.name}}</td>
-                            <td class="text-center">{{item.product.low_stock_threshold}}</td>
-                            
-                            <td class="text-center">{{item.get_stock_quantity}}</td>
-                              <td><span class="pull-right"> {% if item.get_cost_price%}{{item.get_cost_price.gross|intcomma }}{% else %} 0.00{% endif %}</span></td>
-                              <td><span class="pull-right"> {% if item.get_total_price_cost %}{{item.get_total_price_cost.gross|intcomma }} {% else %} 0.00 {% endif %}</span></td>
+                            <td class="text-center">{{item.variant.sku}}</td>
+                            <td class="text-center">{{item.variant.display_product}}</td>
+                            <td class="text-center">{{item.variant.product.get_first_category}}</td>
+                            <td class="text-center">{{item.variant.product.product_class.name}}</td>
+                            <td class="text-center">{{item.low_stock_threshold}}</td>
+
+                            <td class="text-center">{{item.quantity}}</td>
+                              <td><span class="pull-right">{% if item.cost_price %}{{item.cost_price.gross|intcomma }}{% else %} 0.00{% endif %}</span></td>
+                              <td><span class="pull-right">{% if item.get_total_cost %}{{ item.get_total_cost|intcomma }} {% else %} 0.00 {% endif %}</span></td>
                           </tr>
                         {% endfor %}
                         {% else %}
-                         <tr><td colspan="8" class="text-center"><h2 class="text-center">No Products Reports Available</h2></td></tr>
+                         <tr><td colspan="8"><h2 class="text-center">No Stock Reports available</h2></td></tr>
                         {% endif %}
                         </tbody>
 

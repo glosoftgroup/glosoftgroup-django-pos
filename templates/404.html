@@ -63,6 +63,11 @@
                <p class="text-center"><a class="btn btn-default text-center" href="{{ request.META.HTTP_REFERER }}">Back to Previous Page</a></p>
                {% else %}
                <p class="text-center"><a class="btn btn-default text-center" href="javascript:;" onClick="javascript:history.go(-1);">Back to Previous Page</a></p>
+               <p class="text-center">
+               <a class="btn btn-default text-center" href="{% url 'account_logout' %}">
+                  Go To Login Page
+                </a>
+              </p>
                {% endif %}
             </div>
             </div>
