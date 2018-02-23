@@ -89,7 +89,6 @@ def add_view_permissions(sender, **kwargs):
             Permission.objects.create(content_type=content_type,
                                       codename=codename,
                                       name="Can view %s" % content_type.name)
-            print "Added view permission for %s" % content_type.name
     
     """ Make a sale permission"""
     if not ContentType.objects.filter(model='unused') \

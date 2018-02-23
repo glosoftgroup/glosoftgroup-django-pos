@@ -10,6 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
 from django_prices.models import PriceField
+from django.contrib.postgres.fields import HStoreField
 
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -160,9 +161,11 @@ class CreditedItem(models.Model):
     product_category = models.CharField(
         pgettext_lazy('CreditedItem field', 'product_category'), max_length=128, null=True)
     discount = models.DecimalField(
-        pgettext_lazy('SoldItem field', 'discount'), default=Decimal(0), max_digits=100, decimal_places=2)
+        pgettext_lazy('CreditedItem field', 'discount'), default=Decimal(0), max_digits=100, decimal_places=2)
     tax = models.DecimalField(
-        pgettext_lazy('SoldItem field', 'tax'), default=Decimal(0), max_digits=100, decimal_places=2)
+        pgettext_lazy('CreditedItem field', 'tax'), default=Decimal(0), max_digits=100, decimal_places=2)
+    attributes = HStoreField(
+        pgettext_lazy('CreditedItem field', 'attributes'), default={})
 
     class Meta:
         #unique_together = ('sales')
