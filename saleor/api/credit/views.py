@@ -124,7 +124,8 @@ def send_to_sale(credit):
                         product_name=item.product_name,
                         total_cost=item.total_cost,
                         unit_cost=item.unit_cost,
-                        product_category=item.product_category
+                        product_category=item.product_category,
+                        attributes=item.attributes
                         )
 
 
