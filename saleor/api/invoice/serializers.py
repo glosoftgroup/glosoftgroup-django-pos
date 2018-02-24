@@ -43,7 +43,8 @@ class TrackSerializer(serializers.ModelSerializer):
                 'product_name',
                 'product_category',
                 'tax',
-                'discount'
+                'discount',
+                'attributes'
                  )
 
 class ItemsSerializer(serializers.ModelSerializer):
@@ -64,6 +65,7 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'item_pk',
                 'tax',
                 'discount',
+                'attributes'
                  )
     def get_item_pk(self,obj):
         return obj.pk
