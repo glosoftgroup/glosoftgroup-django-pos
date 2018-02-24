@@ -1574,19 +1574,23 @@ $('#form-product').validate({
 <script type="text/javascript" src="{% static 'backend/js/plugins/media/fancybox.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/gallery.js' %}"></script>
   {% if go %}
-   <script type="text/javascript">
-   $.when( $.ready ).then(function() {     
-       $('.bordered-tab1').removeClass('active');
-       $('#bordered-tab1').removeClass('active');
-       //activate pricing tab
-       $('.bordered-tab2').addClass('active');
-       $('#bordered-tab2').addClass('active');
-
-       // disable sub category
-       $('#bordered-tab2').addClass('disable');              
-    });
+    {% if request.GET.tab  %}
+    {% else %}
+         <script type="text/javascript">
+           $.when( $.ready ).then(function() {
+               $('.bordered-tab1').removeClass('active');
+               $('#bordered-tab1').removeClass('active');
+               //activate pricing tab
+               $('.bordered-tab2').addClass('active');
+               $('#bordered-tab2').addClass('active');
+        
+               // disable sub category
+               $('#bordered-tab2').addClass('disable');
+            });
      //console.log("{{go}}");
    </script>
+    {% endif %}
+   
   {% endif %}
 {% endif %}
 

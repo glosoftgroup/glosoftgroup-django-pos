@@ -234,11 +234,6 @@ class ProductVariantForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ProductVariantForm, self).__init__(*args, **kwargs)
-        if self.instance.product.pk:
-            self.fields['price_override'].widget.attrs[
-                'placeholder'] = self.instance.product.price.gross
-            self.fields['wholesale_override'].widget.attrs[
-                'placeholder'] = self.instance.product.price.gross
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
