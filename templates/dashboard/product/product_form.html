@@ -314,9 +314,9 @@
       <table class="table table-hover">
         <thead>
         <tr class="bg-primary">  
-        <th>SKU <span class="text-danger">*</span></th>
+        <th width="18%">SKU <span class="text-danger">*</span></th>
         {% for v in pc %} 
-         <th>{{v}}</th>       
+         <th width="18%">{{v}}</th>
         {% endfor %}
 
         <th width="12%">Supplier</th>
@@ -331,7 +331,7 @@
           </td>
           {% for v in pc%}
           <td>
-           <select placeholder="{{v}}" data-pk={{v.pk}} name="{{v}}" class="bootstrap-select form-control dynamicvxx">
+           <select dropupAuto="false" data-live-search="true" placeholder="{{v}}" data-pk={{v.pk}} name="{{v}}" class="bootstrap-select form-control dynamicvxx">
             <option></option>         
             
               {% for value in v.values.all %} 
@@ -1033,8 +1033,8 @@ $(document).ready(function(){
 
  $.when( $.ready ).then(function() {
   $('#id_categories').removeAttr('multiple');
-  $('#id_categories').selectpicker();
-  $('.select-variant').selectpicker();
+  $('#id_categories').selectpicker({dropupAuto:false});
+  $('.select-variant').selectpicker({dropupAuto:false});
  });
 
  {% if product.pk %}
@@ -1206,7 +1206,7 @@ $(document).ready(function(){
     });
 
     // Basic select
-    $('.bootstrap-select').selectpicker();
+    $('.bootstrap-select').selectpicker({dropupAuto:false});
 
   </script>
   <script>
@@ -1574,19 +1574,23 @@ $('#form-product').validate({
 <script type="text/javascript" src="{% static 'backend/js/plugins/media/fancybox.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/pages/gallery.js' %}"></script>
   {% if go %}
-   <script type="text/javascript">
-   $.when( $.ready ).then(function() {     
-       $('.bordered-tab1').removeClass('active');
-       $('#bordered-tab1').removeClass('active');
-       //activate pricing tab
-       $('.bordered-tab2').addClass('active');
-       $('#bordered-tab2').addClass('active');
-
-       // disable sub category
-       $('#bordered-tab2').addClass('disable');              
-    });
+    {% if request.GET.tab  %}
+    {% else %}
+         <script type="text/javascript">
+           $.when( $.ready ).then(function() {
+               $('.bordered-tab1').removeClass('active');
+               $('#bordered-tab1').removeClass('active');
+               //activate pricing tab
+               $('.bordered-tab2').addClass('active');
+               $('#bordered-tab2').addClass('active');
+        
+               // disable sub category
+               $('#bordered-tab2').addClass('disable');
+            });
      //console.log("{{go}}");
    </script>
+    {% endif %}
+   
   {% endif %}
 {% endif %}
 
