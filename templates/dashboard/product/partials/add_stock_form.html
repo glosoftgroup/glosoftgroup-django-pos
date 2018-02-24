@@ -35,7 +35,7 @@
                 <div class="col-md-6">
                     <div class="filter-item">
                         <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                            <select v-model="supplier" @change="clearCart" data-width="100%" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
+                            <select v-model="supplier" @change="clearCart" data-width="100%" data-live-search="true" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
 
                                 {% if suppliers %}
                                 {% if supplier.name == 'Unknown' %}
