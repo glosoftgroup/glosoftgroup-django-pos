@@ -109,8 +109,6 @@ class ProductClassForm(forms.ModelForm):
         field.widget.attrs['class'] = 'form-control multiselect'
         field.widget.attrs['multiple'] = 'multiple'
 
-
-
     def clean(self):
         data = super(ProductClassForm, self).clean()
         product_attr = set(self.cleaned_data['product_attributes'])
@@ -188,6 +186,7 @@ class ProductForm(forms.ModelForm):
 
         field = self.fields['product_tax']
         field.widget.attrs['class'] = 'form-control bootstrap-select'
+        field.widget.attrs['data-live-search'] = 'true'
         product_class = self.instance.product_class
         self.product_attributes = product_class.product_attributes.all()
         self.product_attributes = self.product_attributes.prefetch_related(
@@ -234,6 +233,9 @@ class ProductVariantForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ProductVariantForm, self).__init__(*args, **kwargs)
+        if self.instance.product.pk:
+            self.fields['variant_supplier'].widget.attrs[
+                'data-live-search'] = 'true'
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
@@ -278,6 +280,7 @@ class VariantAttributeForm(forms.ModelForm):
         i = 0
         for field_name, field in self.fields.items():            
             field.widget.attrs['class'] = 'form-control bootstrap-select dynamicxedit'
+            field.widget.attrs['data-live-search'] = 'true'
             field.widget.attrs['data-pk'] = ats[i]
             i+=1
 
