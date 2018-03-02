@@ -146,14 +146,14 @@ class AllocateAgentListAPIView(generics.ListAPIView):
         payload Json: /payload/agents_allocations.json
     """
     serializer_class = AllocateListSerializer
-    queryset = Allocate.objects.all()
+    #queryset = Allocate.objects.all()
 
     def list(self, request, pk=None):
         serializer_context = {
             'request': Request(request),
         }
         queryset = self.get_queryset().filter(
-            Q(agent__pk=pk) and
+            Q(agent__pk=pk) &
             Q(status='payment-pending')
         )
         serializer = AllocateListSerializer(queryset, many=True, context=serializer_context)
