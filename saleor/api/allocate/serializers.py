@@ -32,6 +32,7 @@ class TrackSerializer(serializers.ModelSerializer):
                 'id',
                 'order',
                 'sku',
+                'stock_id',
                 'allocated_quantity',
                 'quantity',
                 'sold',
@@ -55,6 +56,7 @@ class ItemsSerializer(serializers.ModelSerializer):
                 'id',
                 'order',
                 'sku',
+                'stock_id',
                 'quantity',
                 'sold',
                 'unsold',
@@ -282,16 +284,75 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
                                      debt=validated_data.get('total_net'),
                                      customer_name=validated_data.get('customer_name'))
         for solditem_data in solditems_data:
-            AllocatedItem.objects.create(allocate=credit, **solditem_data)
-            try:
-                stock = Stock.objects.get(variant__sku=solditem_data['sku'])
-                if stock:                
-                    Stock.objects.decrease_stock(stock,solditem_data['allocated_quantity'])
-                    print stock.quantity
-                else: 
+            item_temp = AllocatedItem.objects.create(allocate=credit, **solditem_data)
+            item = item_temp
+            item_temp.delete()
+            carry = int(solditem_data['allocated_quantity'])
+            checker = True
+            while checker:
+                stock = Stock.objects.filter(variant__sku=solditem_data['sku']).first()
+                if stock:
+                    item.id = None
+                    if stock.quantity > 0:
+                        if carry >= stock.quantity:
+                            try:
+                                item.unit_purchase = stock.cost_price.gross
+                            except:
+                                pass
+                            try:
+                                item.total_purchase = stock.cost_price.gross * Decimal(stock.quantity)
+                            except:
+                                pass
+                            item.stock_id = stock.pk
+                            item.allocated_quantity = stock.quantity
+                            item.minimum_price = stock.minimum_price.gross
+                            item.wholesale_override = stock.wholesale_override.gross
+                            item.low_stock_threshold = stock.low_stock_threshold
+                            item.unit_cost = stock.price_override.gross
+                            item.total_cost = stock.price_override.gross * stock.quantity
+                            item.save()
+                            carry -= stock.quantity
+                            stock.delete()
+                            if carry <= 0:
+                                checker = False
+                        else:
+                            # Stock.objects.decrease_stock(stock, carry)
+                            stock.quantity -= carry
+                            stock.save()
+                            try:
+                                item.unit_purchase = stock.cost_price.gross
+                            except:
+                                pass
+                            try:
+                                item.total_purchase = stock.cost_price.gross * Decimal(carry)
+                            except:
+                                pass
+                            item.stock_id = stock.pk
+                            item.allocated_quantity = carry
+                            item.minimum_price = stock.minimum_price.gross
+                            item.wholesale_override = stock.wholesale_override.gross
+                            item.low_stock_threshold = stock.low_stock_threshold
+                            item.unit_cost = stock.price_override.gross
+                            item.total_cost = stock.price_override.gross * carry
+
+                            item.save()
+
+                            checker = False
+                    else:
+                        stock.delete()
+                        checker = False
+                else:
                     print('stock not found')
-            except Exception as e:
-                error_logger.error(e)
+                    checker = False
+            # try:
+            #     stock = Stock.objects.get(variant__sku=solditem_data['sku'])
+            #     if stock:
+            #         Stock.objects.decrease_stock(stock,solditem_data['allocated_quantity'])
+            #         print stock.quantity
+            #     else:
+            #         print('stock not found')
+            # except Exception as e:
+            #     error_logger.error(e)
                 
         return credit
 
@@ -325,7 +386,7 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
         except:
             raise ValidationError('Total Net should be a decimal/integer')
 
-    def validate_debt(self,value):
+    def validate_debt(self, value):
         data = self.get_initial()        
         try:
             debt = Decimal(data.get('debt'))
@@ -344,21 +405,32 @@ class AllocateUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         terminal = Terminal.objects.get(pk=instance.terminal_id)
         for x in validated_data.get('allocated_items'):
-            old = instance.item_detail(x['sku'])
+            # get old stock
+            old = instance.item_detail(x['stock_id'])
             old.sold += x['quantity']
             old.quantity = x['quantity']
             old.total_cost = x['total_cost']
             unsold = old.allocated_quantity - old.sold
             old.unsold = unsold
-            stock = Stock.objects.get(variant__sku=x['sku'])
 
             # handle return unsold product to stock
             if validated_data.get('status', instance.status) == 'fully-paid':
-                if stock:
-                    Stock.objects.increase_stock(stock, unsold)
-                    print stock.quantity
-                else:
-                    print 'stock not found'
+                try:
+                    stock = Stock.objects.get(pk=x['stock_id'])
+                    stock.quantity += unsold
+                    stock.save()
+                except Exception as e:
+                    if unsold > 0:
+                        variant = ProductVariant.objects.get(sku=x['sku'])
+                        Stock.objects.create(
+                            variant=variant,
+                            price_override=old.unit_cost,
+                            wholesale_override=old.wholesale_override,
+                            minimum_price=old.minimum_price,
+                            low_stock_threshold=old.low_stock_threshold,
+                            cost_price=old.unit_purchase,
+                            quantity=unsold)
+                    print('stock not found. Recreated new stock')
             old.save()
 
         terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))       

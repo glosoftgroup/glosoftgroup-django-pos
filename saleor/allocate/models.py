@@ -154,8 +154,8 @@ class Allocate(models.Model):
         total = self.allocated_items.aggregate(sum=models.Sum('allocated_quantity'))
         return total['sum']
 
-    def item_detail(self,sku):
-        return self.allocated_items.get(sku=sku)
+    def item_detail(self, stock_id):
+        return self.allocated_items.get(stock_id=stock_id)
 
     def is_fully_paid(self):
         if self.status == 'fully-paid':
@@ -179,6 +179,7 @@ class Allocate(models.Model):
 class AllocatedItem(models.Model):
     allocate = models.ForeignKey(Allocate,related_name='allocated_items',on_delete=models.CASCADE)
     order = models.IntegerField(default=Decimal(1))
+    stock_id = models.IntegerField(default=Decimal(0))
     sku = models.CharField(
         pgettext_lazy('AllocatedItem field', 'SKU'), max_length=32)    
     quantity = models.IntegerField(
@@ -197,6 +198,17 @@ class AllocatedItem(models.Model):
         pgettext_lazy('AllocatedItem field', 'total cost'), default=Decimal(0), max_digits=100, decimal_places=2)
     unit_cost = models.DecimalField(
         pgettext_lazy('AllocatedItem field', 'unit cost'), default=Decimal(0), max_digits=100, decimal_places=2)
+    minimum_price = models.DecimalField(
+        pgettext_lazy('AllocatedItem field', 'minimum price'), default=Decimal(0), max_digits=100, decimal_places=2)
+    wholesale_override = models.DecimalField(
+        pgettext_lazy('AllocatedItem field', 'wholesale price'), default=Decimal(0), max_digits=100, decimal_places=2)
+    low_stock_threshold = models.IntegerField(
+        pgettext_lazy('AllocatedItem field', 'low stock threshold'),
+        validators=[MinValueValidator(0)], null=True, blank=True, default=Decimal(10))
+
+    unit_purchase = models.DecimalField(
+        pgettext_lazy('AllocatedItem field', 'unit purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
+
     product_category = models.CharField(
         pgettext_lazy('AllocatedItem field', 'product_category'), max_length=128, null=True)
     discount = models.DecimalField(
