@@ -53,6 +53,8 @@ def update_settings(request,site_id=None):
             print site.sms_gateway_apikey
         if request.POST.get('company_name'):
             site.name = request.POST.get('company_name')
+        if request.POST.get('wholesale_name'):
+            site.wholesale_name = request.POST.get('wholesale_name')
         if request.POST.get('company_email'):
             site.email = request.POST.get('company_email')
         if request.POST.get('show_transfer'):

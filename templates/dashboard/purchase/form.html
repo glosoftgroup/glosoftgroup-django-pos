@@ -5,6 +5,7 @@
 {% load materializecss %}
 {% load staticfiles %}
 {% load site_settings %}
+{% load model_settings %}
 {% load compress %}
 
 {% block title %}
@@ -173,7 +174,7 @@ Add Stock- {{ block.super }}
                                 <th>Reorder Threshold</th>
                                 <th>Cost Price</th>
                                 <th>Retail Price</th>
-                                <th>Transfer Price</th>
+                                <th>{{'wholesale_name'|model_settings}} Price</th>
                                 <th>Minimum Price</th>
                             </tr>
                         </thead>

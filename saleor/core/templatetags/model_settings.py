@@ -6,6 +6,6 @@ register = template.Library()
 
 
 @register.filter
-def site_settings(value):
-    currency = eval('settings.'+str(value))
-    return currency
+def model_settings(value):
+    value = eval('SiteSettings.objects.get(pk=1).'+str(value))
+    return value

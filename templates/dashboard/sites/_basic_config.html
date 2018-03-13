@@ -2,6 +2,7 @@
 {% load materializecss %}
 {% load default_user_image %}
 {% load site_settings %}
+{% load model_settings %}
 <div class="row">
       <div class="panel-body">
         <form id="form-category" name="form-category" enctype="multipart/form-data" novalidate>
@@ -55,10 +56,10 @@
                             <span class="help-block">e.g 100 loyalty points is equal to 1 {{'DEFAULT_CURRENCY'|site_settings}}</span>
                           </div>
                           <div class="col-md-4">
-                              <label for="loyalty_point_equiv" style="">Max Credit Expiration(days)  </label>
-                              {{form.max_credit_date}}
+                              <label for="loyalty_point_equiv" style="">Wholesale Name  </label>
+                              {{form.wholesale_name}}
                               <!-- <input class="form-control" type="number" id="max_credit_date" name="max_credit_date"> -->
-                              <span class="help-block">Maximum days before which credit sale should be paid</span>
+                              <span class="help-block"></span>
                               
                           </div>
                           <div class="col-md-4">
