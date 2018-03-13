@@ -2,6 +2,7 @@
 {% load prices_i18n %}
 {% load static %}
 {% load site_settings %}
+{% load model_settings %}
 <div class="mt-15">
     <button class="btn btn-primary" id="btntoggles">
       Add Stock
@@ -127,7 +128,7 @@
                                 <th>Reorder Threshold</th>
                                 <th>Cost Price</th>
                                 <th>Retail Price</th>
-                                <th>Transfer Price</th>
+                                <th>{{'wholesale_name'|model_settings}} Price</th>
                                 <th>Minimum Price</th>
                                 <th></th>
                             </tr>
@@ -160,7 +161,7 @@
                                 </td>
                                 <!--wholesale price-->
                                 <td>
-                                    <input v-model="item.wholesale_override" style="width: 65px;" type="number" placeholder="Transfer price" class="form-control">
+                                    <input v-model="item.wholesale_override" style="width: 65px;" type="number" placeholder="{{'wholesale_name'|model_settings}} price" class="form-control">
                                 </td>
                                 <!--minimum price-->
                                 <td>

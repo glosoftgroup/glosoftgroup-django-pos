@@ -5,6 +5,7 @@
 {% load staticfiles %}
 {% load attributes %}
 {% load site_settings %}
+{% load model_settings %}
 
 
 {% block title %}
@@ -577,7 +578,7 @@
                 <th>
                   Retail Price
                 </th>
-                <th> Transfer Price</th>
+                <th> {{'wholesale_name'|model_settings}} Price</th>
                 <th> Minimum Price</th>
 
                 <!-- <th class="wide">

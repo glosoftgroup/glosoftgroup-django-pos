@@ -18,6 +18,8 @@ class SiteSettings(models.Model):
     email = models.EmailField(pgettext_lazy('Site field', 'email'), max_length=50,blank=True, null=True)
     header_text = models.CharField(
         pgettext_lazy('Site field', 'header text'), max_length=200, blank=True)
+    wholesale_name = models.CharField(
+        pgettext_lazy('Site field', 'wholesale field name'), max_length=200, default='Wholesale', blank=True)
     description = models.CharField(
         pgettext_lazy('Site field', 'site description'), max_length=500,
         blank=True)

@@ -74,24 +74,27 @@ var parent = new Vue({
            if(!dynamicData['total_net']){
                 alertUser('Total Purchase Cost price required','bg-danger','Forgot to fill cost price?');
                 $('.total-field').addClass('animated shake');
-                return 0;
+                return false;
            }
 
            // retail price required
+           var checker = true;
            this.cartItems.forEach(item => {
                 if(!item.price_override){
                     alertUser('Retail price required','bg-danger','Forgot to fill retail price?');
                     $('.error-alert').html('Retail price required','bg-danger','Forgot to fill retail price?');
+                    checker = false;
                     $('.alert-danger').removeClass('hidden');
                     $('.price_override').addClass('animated shake');
                     window.setTimeout( function(){
                      $('#payment-modal').modal('hide');
                      }, 5000 );
-
-                    return 0;
                 }
-
            });
+
+           if(!checker){
+                return false
+           }
 
            // send purchase data
            // *******************

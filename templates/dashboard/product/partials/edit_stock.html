@@ -1,6 +1,7 @@
 {% load materializecss %}
 {% load prices_i18n %}
 {% load static %}
+{% load model_settings %}
 <script type="text/javascript" src="{% static 'backend/js/product/vue/edit_stock.js' %}"></script>
 <style type="text/css">
 .hvr-pulsew {
@@ -75,8 +76,8 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Transfer price:</label>
-                                    <input id="id_wholesale_override" v-model="wholesale_override" name="wholesale_override" step="any" value="{{stock.wholesale_override.gross}}" class="form-control" type="number">
+                                    <label>{{'wholesale_name'|model_settings}} price:</label>
+                                    <input id="id_wholesale_override" v-model="{{'wholesale_name'|model_settings}}" name="wholesale_override" step="any" value="{{stock.wholesale_override.gross}}" class="form-control" type="number">
                                 </div>
                             </div>
                             <div class="col-md-2">
