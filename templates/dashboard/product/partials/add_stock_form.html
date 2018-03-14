@@ -22,17 +22,7 @@
 
             <div style="z-index: 1;" class="navbar navbar-default navbar-xs navbar-component">
                 <div class="row">
-                <div class="col-md-6">
-                    <div class="filter-item">
-                        <div style="margin-top:3px;" class="has-feedback has-feedback-left">
-                            <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
-                            <div class="form-control-feedback">
-                                <i class="icon-search4 text-size-base text-muted"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--select-->
+                     <!--select-->
                 <div class="col-md-6">
                     <div class="filter-item">
                         <div style="margin-top:3px;" class="has-feedback has-feedback-left">
@@ -51,7 +41,18 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                    <div class="col-md-6">
+                        <div class="filter-item">
+                            <div style="margin-top:3px;" class="has-feedback has-feedback-left">
+                                <input class="form-control" @keyup="inputChangeEvent" v-model="search" placeholder="Search .." name="search" type="text">
+                                <div class="form-control-feedback">
+                                    <i class="icon-search4 text-size-base text-muted"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
             </div>
             <!--./filter-->
             <div class="panel panel-default">

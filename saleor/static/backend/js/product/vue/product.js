@@ -50,6 +50,7 @@ var parent = new Vue({
        show_change: false,
        status:'all',
        exportType:'none',
+       Wholesale:'',
        date: 'Select date',
        //  payment
        amount_paid: 0,

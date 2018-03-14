@@ -164,26 +164,15 @@ class TableCreateSerializer(serializers.ModelSerializer):
             single_item.order = 1
             single_item.save()
 
-            # deprecated delete it
             try:
-                variant = ProductVariant.objects.get(sku=item['sku'])
-                if variant.price_override.gross != item['unit_cost']:
-                    # ('create a new  variant')
-                    create_variant_stock(item, variant)
-                    new_created = True
-                else:
-                    print('dont create new variant')
-            except Exception as e:
-                print(e)
-            try:
-                stock = Stock.objects.get(variant__sku=item['sku'])
+                stock = Stock.objects.filter(variant__sku=item['sku']).last()
                 if stock.cost_price.gross != item['cost_price']:
                     if not new_created:
                         # ('create a new  variant')
                         variant = ProductVariant.objects.get(sku=item['sku'])
                         create_variant_stock(item, variant)
                         new_created = True
-                if stock.price_override != item['price_override']:
+                if stock.price_override.gross != item['price_override']:
                     # each stock should have similar price
                     variant = ProductVariant.objects.get(sku=item['sku'])
                     update_all_stock_price_override(variant, item['price_override'])
@@ -192,10 +181,11 @@ class TableCreateSerializer(serializers.ModelSerializer):
                         create_variant_stock(item, variant)
                         new_created = True
                 else:
-                    print('dont create new variant')
+                    print('do not create new variant')
                 if not new_created:
                     Stock.objects.increase_stock(stock, item['qty'])
             except Exception as e:
+                print(e)
                 # create new stock
                 if not new_created:
                     stock = Stock()
@@ -214,7 +204,7 @@ class TableCreateSerializer(serializers.ModelSerializer):
                     if item['low_stock_threshold']:
                         stock.low_stock_threshold = item['low_stock_threshold']
                     stock.save()
-                    update_all_stock_price_override(variant, item['price_override'])
+                    update_all_stock_price_override(stock.variant, item['price_override'])
 
                 error_logger.error(e)
         return instance
