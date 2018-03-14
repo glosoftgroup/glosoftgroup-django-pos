@@ -18,6 +18,7 @@ new Vue({
         temp_paid:0,
         price_override:0,
         wholesale_override: 0,
+        Wholesale:'',
         minimum_price: 0
     },
     created: function () {
@@ -25,8 +26,8 @@ new Vue({
         this.reorder = $('#reorder-threshold').val();
         this.total   = $('#id_total_cost').val();
         this.amount  = $('#id_cost_price').val();
-        this.price_override  = $('#id_price_override').val();
-        this.wholesale_override  = $('#id_wholesale_override').val();
+        this.price_override = $('#id_price_override').val();
+        this.wholesale_override = $('#id_wholesale_override').val();
         this.quantity = $('#id_quantity').val();
         this.paid    = $('#id_amount_paid').val();
         this.temp_paid   = $('#id_amount_paid').val();
