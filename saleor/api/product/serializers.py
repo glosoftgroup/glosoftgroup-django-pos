@@ -346,8 +346,8 @@ class SalesSerializer(serializers.ModelSerializer):
                             item.minimum_price = stock.minimum_price.gross
                             item.wholesale_override = stock.wholesale_override.gross
                             item.low_stock_threshold = stock.low_stock_threshold
-                            item.unit_cost = stock.price_override.gross
-                            item.total_cost = stock.price_override.gross * stock.quantity
+                            # item.unit_cost = stock.price_override.gross
+                            # item.total_cost = stock.price_override.gross * stock.quantity
                             item.save()
                             carry -= stock.quantity
                             stock.delete()
@@ -370,8 +370,8 @@ class SalesSerializer(serializers.ModelSerializer):
                             item.minimum_price = stock.minimum_price.gross
                             item.wholesale_override = stock.wholesale_override.gross
                             item.low_stock_threshold = stock.low_stock_threshold
-                            item.unit_cost = stock.price_override.gross
-                            item.total_cost = stock.price_override.gross * carry
+                            # item.unit_cost = stock.price_override.gross
+                            # item.total_cost = stock.price_override.gross * carry
 
                             item.save()
 
