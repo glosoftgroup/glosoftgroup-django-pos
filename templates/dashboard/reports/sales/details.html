@@ -55,6 +55,7 @@
                           <th>Item Name</th>
                           <th>Unit Cost</th>
                           <th>Quantity</th>
+                          <th>Discount</th>
                           <th>Total Sales (KShs)</th>
                         </tr>
                       </thead>
@@ -66,7 +67,8 @@
                             <td>{{item.product_name}}</td>
                             <td>{{item.unit_cost}}</td>
                             <td>{{item.quantity}}</td>
-                              <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
+                            <td>{{item.discount}}</td>
+                            <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
                           </tr>
                         {% endfor %}
                          {% else %}
