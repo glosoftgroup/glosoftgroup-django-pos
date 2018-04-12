@@ -90,7 +90,19 @@
                           <ul class="list list-unstyled">
                           {% if all_permissions %}
                              {% for permission in all_permissions %}
-                             <li>{{ permission.name }}</li>
+                             <li>
+                                {% if permission.name == 'Can add Payment' %}
+                                        Can add Payment Options
+                                      {% elif permission.name == 'Can change Payment' %}
+                                      Can change Payment Options
+                                      {% elif permission.name == 'Can delete Payment' %}
+                                      Can delete Payment Options
+                                      {% elif permission.name == 'Can view Payment' %}
+                                      Can view Payment Options
+                                      {% else %}
+                                      {{ permission.name }}
+                                      {% endif %}
+                             </li>
                              {% endfor %}
                           {% else %}
                               <li><span class="text-semibold"> No permissions assigned</span></li>

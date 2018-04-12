@@ -534,26 +534,17 @@ def products_pdf(request):
                 Q(variant__sku__icontains=q) |
                 Q(variant__product__name__icontains=q) |
                 Q(variant__product__product_class__name__icontains=q)).order_by('-id')
-
-            data = {
-                'today': date.today(),
-                'items': items,
-                'puller': request.user,
-                'gid':gid
-            }
-            pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
-            return HttpResponse(pdf, content_type='application/pdf')
         else:
-            items = ProductVariant.objects.all().order_by('-id')
+            items = Stock.objects.all().order_by('-id')
 
-            data = {
-                'today': date.today(),
-                'items': items,
-                'puller': request.user,
-                'gid': gid
-            }
-            pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
-            return HttpResponse(pdf, content_type='application/pdf')
+        data = {
+            'today': date.today(),
+            'items': items,
+            'puller': request.user,
+            'gid': gid
+        }
+        pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
+        return HttpResponse(pdf, content_type='application/pdf')
 
 @staff_member_required
 def products_export_csv(request):
