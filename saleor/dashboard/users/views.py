@@ -280,7 +280,7 @@ def user_detail(request, pk):
     else:
         user_trail(request.user.name, 'viewed '+str(user.name)+ '`s profile','view')
         info_logger.info('User: '+str(request.user.name)+' viewed '+str(user.name)+'`s profile')
-    return TemplateResponse(request, 'dashboard/users/detail.html', {'user':user,'all_permissions':all_permissions,'groups':groups})
+    return TemplateResponse(request, 'dashboard/users/detail.html', {'user':user,'all_permissions':user_permissions,'groups':groups})
 
 @staff_member_required
 @permission_decorator('userprofile.delete_user')
