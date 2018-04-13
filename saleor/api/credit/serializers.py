@@ -2,6 +2,7 @@ from django.utils.formats import localize
 from rest_framework.serializers import (
                 ModelSerializer,
                 HyperlinkedIdentityField,
+                JSONField,
                 SerializerMethodField,
                 ValidationError
                 )
@@ -10,7 +11,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from ...sale.models import Terminal
+from ...sale.models import Terminal, PaymentOption
 from ...credit.models import (
             Credit,
             CreditedItem,
@@ -304,6 +305,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
 
 class CreditUpdateSerializer(serializers.ModelSerializer):      
     credititems = TrackSerializer(many=True)
+    payment_data = JSONField()
 
     class Meta:
         model = Credit
@@ -322,6 +324,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
                  'discount_amount',
                  'debt',
                  'credititems',
+                 'payment_data',
                  )       
     
     def validate_status(self, value):
@@ -379,6 +382,11 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         # except:
         #     raise ValidationError('Terminal specified does not exist')
 
+    def validate_payment_data(self,value):
+        data = self.get_initial()
+        dictionary_value = dict(data.get('payment_data'))
+        return value
+
     def update(self, instance, validated_data):
         terminal = Terminal.objects.get(pk=self.terminal_id)    
 
@@ -386,10 +394,20 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         terminal.save()        
         instance.debt = instance.debt-validated_data.get('amount_paid', instance.amount_paid)
         instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
+        instance.payment_data = validated_data.get('payment_data')
         if instance.amount_paid >= instance.total_net:
             instance.status = 'fully-paid'
             instance.amount_paid = instance.total_net
             instance.debt = 0
+
+            payment_data = validated_data.get('payment_data')        
+            for option in payment_data:
+                pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
+                print option
+                print '------'
+                print pay_opt
+                instance.payment_options.add(pay_opt)
+
         else:
             instance.status = validated_data.get('status', instance.status)
         instance.mobile = validated_data.get('mobile', instance.mobile)   

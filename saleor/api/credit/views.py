@@ -9,7 +9,8 @@ from ...sale.models import (
                             Sales, SoldItem,
                             Terminal, 
                             TerminalHistoryEntry,
-                            DrawerCash
+                            DrawerCash,
+                            PaymentOption
                             )
 from .pagination import PostLimitOffsetPagination
 from .serializers import (
@@ -115,8 +116,16 @@ def send_to_sale(credit):
                          status=credit.status,
                          total_tax=credit.total_tax,
                          mobile=credit.mobile,
-                         customer_name=credit.customer_name
+                         customer_name=credit.customer_name,
+                         payment_data=credit.payment_data
                          )
+    payment_data = sale.payment_data
+    if payment_data:
+        for option in payment_data:
+                    pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
+                    sale.payment_options.add(pay_opt)
+        sale.save()
+        
     for item in credit.items():
         item = SoldItem.objects.create(sales=sale,
                         sku=item.sku,
@@ -125,7 +134,9 @@ def send_to_sale(credit):
                         total_cost=item.total_cost,
                         unit_cost=item.unit_cost,
                         product_category=item.product_category,
-                        attributes=item.attributes
+                        attributes=item.attributes,
+                        unit_purchase=item.unit_purchase,
+                        total_purchase=item.total_purchase
                         )
 
 
