@@ -168,7 +168,7 @@ class Sales(models.Model):
         return self.invoice_number
 
     def __unicode__(self):
-        return unicode(self.invoice_number)
+        return unicode(self.invoice_number) 
 
 
 class SoldItem(models.Model):

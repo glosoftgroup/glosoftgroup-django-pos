@@ -10,6 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
 from django_prices.models import PriceField
+from jsonfield import JSONField
 from django.contrib.postgres.fields import HStoreField
 
 from django.utils import timezone
@@ -92,13 +93,14 @@ class Credit(models.Model):
         max_length=255, default='', blank=True)
     payment_options = models.ManyToManyField(
         PaymentOption, related_name='credit_payment_option', blank=True,
-        verbose_name=pgettext_lazy('Sales field',
-                                   'sales options'))
+        verbose_name=pgettext_lazy('Credit field',
+                                   'credit options'))
     notified = models.BooleanField(default=False, blank=False)
 
     due_date = models.DateTimeField(
         pgettext_lazy('Credit field', 'due date'),
         null=False, default=now)
+    payment_data = JSONField(null=True, blank=True)
     
     objects = CreditManager()
 
@@ -166,6 +168,11 @@ class CreditedItem(models.Model):
         pgettext_lazy('CreditedItem field', 'tax'), default=Decimal(0), max_digits=100, decimal_places=2)
     attributes = HStoreField(
         pgettext_lazy('CreditedItem field', 'attributes'), default={})
+
+    unit_purchase = models.DecimalField(
+        pgettext_lazy('SoldItem field', 'unit purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
+    total_purchase = models.DecimalField(
+        pgettext_lazy('SoldItem field', 'total purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
 
     class Meta:
         #unique_together = ('sales')
