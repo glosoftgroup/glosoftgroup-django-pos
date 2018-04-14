@@ -10,6 +10,8 @@
   Credit Sales History Report
 {% endblock %}
 {% block breadcrumbs %}
+     <li class=""><a href="{% url 'dashboard:customer-credit-list' %}">Credit Report </a></li>
+     <li class="active"><a href="{% url 'dashboard:single-credit-list' pk=credit.pk %}">{{ credit.customer }}</a></li>
      <li class="active"><a href="{% url 'dashboard:credit_list' %}">Credit Sales History Reports</a></li>
  {% endblock %}
 
