@@ -92,9 +92,11 @@ def sales_period_results(year, month=None):
 	for i in soldItems:
 		product = ProductVariant.objects.get(sku=i.sku)
 		try:
-			quantity = product.get_cost_price().gross
+			# quantity = product.get_cost_price().gross
+			quantity = i.total_purchase
 		except ValueError, e:
-			quantity = product.get_cost_price()
+			# quantity = product.get_cost_price()
+			quantity = 0
 		except:
 			quantity = 0
 		costPrice.append(quantity)
@@ -133,9 +135,11 @@ def sales_year_results(lastyear, thisyear, month=None):
 	for i in soldItems:
 		product = ProductVariant.objects.get(sku=i.sku)
 		try:
-			quantity = product.get_cost_price().gross
+			# quantity = product.get_cost_price().gross
+			quantity = i.total_purchase
 		except ValueError, e:
-			quantity = product.get_cost_price()
+			# quantity = product.get_cost_price()
+			quantity = 0
 		except:
 			quantity = 0
 		costPrice.append(quantity)
