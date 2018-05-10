@@ -268,7 +268,7 @@ class SalesSerializer(serializers.ModelSerializer):
             name = validated_data.get('customer_name')
             if validated_data.get('mobile'):
                 mobile = validated_data.get('mobile')
-                customer = Customer.objects.create(name=name, mobile=mobile)
+                customer = Customer.objects.create(name=name, mobile=mobile, creditable=True)
                 sales.customer = customer
             else:
                 pass

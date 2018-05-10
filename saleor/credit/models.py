@@ -145,6 +145,9 @@ class Credit(models.Model):
     def total_balance(self):
         return self.credit_history.aggregate(Sum('balance'))['balance__sum']
 
+    def total_debt(self):
+        return Credit.objects.filter(customer=self.customer).aggregate(Sum('debt'))['debt__sum']
+
                                 
 class CreditedItem(models.Model):
     credit = models.ForeignKey(Credit,related_name='credititems',on_delete=models.CASCADE)

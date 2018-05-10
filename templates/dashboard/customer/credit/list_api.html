@@ -85,7 +85,7 @@
             <div class="col-md-2">
              <label>Export</label>
               <div class="form-group">
-                 <select v-model="exportType" @change="exportItems" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+                 <select v-model="exportType" class="export-sz" style="display: none;" data-width="100%" tabindex="-98">
                     <option value="none" >Option</option>
                     <option value="pdf" >export pdf</option>
                     <option value="excel" >export excel</option>
@@ -330,10 +330,34 @@
     <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/car/listing.js' %}"></script>
+
+    <script > var back_path = "{{request.path}}";</script>
+    <script type="text/javascript" src="{% static 'backend/js/pdf/open-pdf.js' %}"></script>
     <script type="text/javascript">
   $(document).ready(function() {
-  $('.bootstrap-select').selectpicker();
+    $('.bootstrap-select').selectpicker();
+    $('.export-sz').selectpicker({
+          iconBase: 'fa',
+          tickIcon: 'fa-dot-circle-o',
+          pdfIcon:'fa-file-pdf-o',
+          excelIcon:'fa-file-excel-o'
+    }).on('change', function(){
 
+        var ts = $(this).val();
+        if(ts == 'pdf'){
+            
+            var url = "{% url 'dashboard:customer-credit-pdf' %}";
+            $.get(url, function(data){
+                openPdf(data);
+            });
+
+        }else if(ts=='excel'){
+          // window.location="{% url 'dashboard:users_export_csv' %}";
+
+        }else{
+          $(this).val('')
+        }
+    });
 
   });
 
