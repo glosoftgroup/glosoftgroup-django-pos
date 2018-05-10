@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 
-from . import views, sales
+from . import views, sales, pdf
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -45,6 +45,9 @@ urlpatterns = [
             (views.single_list), name='single-credit-list'),
         url(r'^credit/paginate/$', views.credit_pagination, name='customer-credit-paginate'),
         url(r'^credit/search/$', views.credit_search, name='customer-credit-search'),
+
+        #pdf 
+        url(r'^credit/pdf/$', pdf.pdf, name='customer-credit-pdf'),
 
 
         
