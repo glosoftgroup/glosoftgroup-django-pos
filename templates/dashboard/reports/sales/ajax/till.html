@@ -1,5 +1,7 @@
 
 {% load staticfiles i18n %}
+{% load prices_i18n %}
+{% load humanize %}
 {% if sales_by_category %}
 <div class="row">
     <div class="col-md-12 animated fadeIn" id="containers">
@@ -25,10 +27,10 @@
                                    {{sales.terminal__terminal_name}}
                                 </td>
                                   <td class="td">
-                                         <div>{{sales.solditems__quantity__sum}}<span style="font-size: 0.8em;"> ({% if sales.quantity__sum is 1%} item {% else %} items {% endif %} )</span></div>
+                                         <div>{{sales.solditems__quantity__sum|intcomma}}<span style="font-size: 0.8em;"> ({% if sales.quantity__sum is 1%} item {% else %} items {% endif %} )</span></div>
                                     </td>
                                 <td class="td">
-                                     <div><span style="font-size: 0.7em;">Ksh.</span>{{sales.total_net__sum}}</div>
+                                     <div>{{sales.total_net__sum|intcomma}}</div>
                                 </td>
                               </tr>
                               {% endfor %}
@@ -54,7 +56,7 @@
                         <tr class="bg-primary">
                           <th>Till Name</th>
                           <th>No. of Items</th>
-                          <th class="text-center">Total Sales (KShs)</th>
+                          <th class="text-center">Total Sales</th>
                         </tr>
                       </thead>
                       <tbody id="p-tb">
@@ -180,7 +182,7 @@ Highcharts.chart('container', {
     },
     yAxis: {
         title: {
-            text: 'Sales Amount in KShs.'
+            text: 'Sales Amount.'
         }
 
     },
@@ -200,7 +202,7 @@ Highcharts.chart('container', {
 
     tooltip: {
         headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>KShs. {point.y:.2f}</b><br/>'
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}</b><br/>'
     },
 
     series: [{

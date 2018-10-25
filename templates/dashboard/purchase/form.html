@@ -105,45 +105,69 @@ Add Stock- {{ block.super }}
                     <table class="table table-hover">
                         <thead>
                             <tr class="bg-primary">
-                                <th>Supplier</th>
+                                <th class="hidden">Supplier</th>
                                 <th>Name</th>
                                 <th>Purchase</th>
                             </tr>
                         </thead>
                         <tbody id="tb">
-                <!--loader-->
-                <tr v-if="loader" class="text-center">
-                    <td colspan="8">
-                        <div class="pace-demo">
-                            <div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
-                        </div>
-                    </td>
-                </tr>
-                <!--no data template-->
-                <template  v-else>
-                <tr v-if="items.length == 0" class="text-center">
-                    <td colspan="8" class="text-bold animated zoomIn">
-                        No Data Found !
-                    </td>
-                </tr>
-                </template>
-                <!--listing template-->
-                <template v-for="item in items">
-                    <tr class="td animated fadeIn">
-                        <td>${item.supplier_name}</td>
-                        <td>${item.product_name}</td>
-                        <td class="text-center">
-                            <span class="label cursor-pointer label-primary" @click="addToCart(item)">
-                                Add
-                            </span>
-                        </td>
-                    </tr>
-                </template>
+                            <!--loader-->
+                            <tr v-if="loader" class="text-center">
+                                <td colspan="8">
+                                    <div class="pace-demo">
+                                        <div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--no data template-->
+                            <template  v-else>
+                            <tr v-if="items.length == 0" class="text-center">
+                                <td colspan="8" class="text-bold animated zoomIn">
+                                    No Data Found !
+                                </td>
+                            </tr>
+                            </template>
+                            <!--listing template-->
+                            <template v-for="item in items">
+                                <tr class="td animated fadeIn">
+                                    <td class="hidden">${item.supplier_name}</td>
+                                    <td>${item.product_name} - ${item.sku}</td>
+                                    <td class="text-center">
+                                        <span class="label cursor-pointer label-primary" @click="addToCart(item)">
+                                            Add
+                                        </span>
+                                    </td>
+                                </tr>
+                            </template>
 
 
-                </tbody>
+                            </tbody>
                     </table>
-                </div>
+                    <!-- pagination -->
+                    <div class="row media-none">
+                         <div class="col-md-12">
+
+                          <div class="col-md-3">
+                              <div class="col-md-12 form-group">
+                                 <select v-model="page_size" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+                                    <option value="10" selected>No:</option>
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                  </select>
+                              </div>
+                          </div>
+
+                          <div class="col-md-9" id="media-none">
+                              <div class="text-center bootpag-callback p2-pag" style="">
+                              </div>
+                          </div>
+
+                          </div>
+                         </div>
+                         <input type="hidden" id="page_size" val="">
+                    </div>
+                <!-- end pagination -->
             </div>
         </div>
         <!--./variant-->
@@ -154,7 +178,7 @@ Add Stock- {{ block.super }}
                     <table class="table">
                         <tr class="active">
                             <td class="text-center text-bold" colspan="12">
-                                Purchase Cart (<span >{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>)
+                                Purchase Cart (<span > ${Total | formatCurrency}</span>)
                                 <!--alert-->
                                 <div class="col-md-12">
                                     <div class="alert alert-danger no-border text-center animated shake hidden">
@@ -232,7 +256,7 @@ Add Stock- {{ block.super }}
                                         </button>
                                     </td>
                                     <td colspan="5">
-                                        <span style="font-size:24px;">{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
+                                        <span style="font-size:24px;"> ${Total | formatCurrency}</span>
                                     </td>
                                     <td colspan="3">
 
@@ -293,7 +317,7 @@ Add Stock- {{ block.super }}
                         <div class="col-md-8">
                              <!--total-->
                             <h4 class="text-center text-bold total-field" style="font-size:34px;">
-                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}
+                                Total: ${Total | formatCurrency}
                             </h4>
                             <!--payment table-->
                             <div class="table-responsive">
@@ -339,10 +363,10 @@ Add Stock- {{ block.super }}
                                             <td>
                                                 <span class="text-warning" v-show="show_balance">Balance:</span>
                                                 <span class="text-success" v-show="show_change">Change:</span>
-                                                <span> {{'DEFAULT_CURRENCY'|site_settings}} ${getDue(Total,Tendered)| formatCurrency}</span>
+                                                <span> ${getDue(Total,Tendered)| formatCurrency}</span>
                                             </td>
                                             <td colspan="4">
-                                                <span style="font-size:14px;">Tendered: {{'DEFAULT_CURRENCY'|site_settings}}  ${Tendered | formatCurrency}</span>
+                                                <span style="font-size:14px;">Tendered: ${Tendered | formatCurrency}</span>
                                             </td>
                                         </template>
                                     </tr>
@@ -379,6 +403,7 @@ Add Stock- {{ block.super }}
 
 {% block custom_js %}
     {% compress js inline %}
+    <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>

@@ -318,6 +318,8 @@ def product_reports(request):
                 total_cost+=i.get_total_cost()
             except Exception as e:
                 total_cost+=0
+
+        total_cost = "{:,.2f}".format(total_cost)
         page = request.GET.get('page', 1)
         paginator = Paginator(items, 10)
         try:
