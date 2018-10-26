@@ -9,12 +9,12 @@
 
 
 {% block title %}
-  {% if product.pk %}
-    {{ product }}
-  {% else %}
-    {% trans "Add new product" context "Product form page title" %}
-  {% endif %}
-   - {% trans "Products" context "Dashboard products list" %} - {{ block.super }}
+    {% if product.pk %}
+        {{ product }}
+    {% else %}
+        {% trans "Add new product" context "Product form page title" %}
+    {% endif %}
+    - {% trans "Products" context "Dashboard products list" %} - {{ block.super }}
 {% endblock %}
 
 {% block body_class %}body-products{% endblock %}
@@ -22,797 +22,865 @@
 {% block menu_products_class %}active{% endblock %}
 
 {% block custom_css %}
-<link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'backend/js/plugins/tokenize/tokenize2.css' %}" rel="stylesheet" type="text/css">
     <style>
-    /* The first modal translateZ value*/
-    .container {
-      margin: 5em auto;
-    }
+        /* The first modal translateZ value*/
+        .container {
+            margin: 5em auto;
+        }
 
+        .tab-content > .has-padding {
+            padding: 10px 0px 0px 10px!important;
+        }
     </style>
 {% endblock %}
+
 {% block header_menu %}
-  {% url "dashboard:product-list" as url %}
-  {% include "dashboard/includes/_back-link.html" with url=url %}
+    {% url "dashboard:product-list" as url %}
+    {% include "dashboard/includes/_back-link.html" with url=url %}
 {% endblock %}
 
 {% block breadcrumbs %}
-
     <li>
-      <a href="{% url 'dashboard:product-list' %}" >
-        {% trans "Products" context "Dashboard products list" %}
-      </a>
+        <a href="{% url 'dashboard:product-list' %}" >
+            {% trans "Products" context "Dashboard products list" %}
+        </a>
     </li>
 
     <li class="active">
-
         {% if product.pk %}
-          {{ product }}
+            {{ product }}
         {% else %}
-          {% trans "Add new product" context "Product form breadcrumbs" %}
+            {% trans "Add new product" context "Product form breadcrumbs" %}
         {% endif %}
-
     </li>
-
 {% endblock %}
 
-{% block header_extra %}
+{% block header_extra %} {% endblock %}
 
-{% endblock %}
-
-{% block menu_catalogue_class %} active{% endblock %}
-
+{% block menu_catalogue_class %} active {% endblock %}
 
 {% block content %}
 
 <div id='results'></div>
 <div class="row" >
     <div class="col-md-12">
-            <div class="panel panel-flat">
-
-              <div class="panel-body animated fadeIn">
+        <div class="panel panel-flat">
+            <div class="panel-body animated fadeIn">
                 <div class="tabbable ">
 
-                  <ul class="nav nav-tabs nav-tabs-highlight">
-                  <!-- general settings tab -->
-                   {% if request.GET.tab %}
-                     <li>
-                    {% else %}
-                      <li class="active bordered-tab1">
-                    {% endif %}
-                        <a href="#bordered-tab1" data-toggle="tab">Product Name</a>
-                      </li>
+                    <ul class="nav nav-tabs nav-tabs-highlight">
+                      <!-- general product tab -->
+                        <li class="{% if not request.GET.tab %}
+                        active bordered-tab1 {% endif %} ">
+                            <a href="#bordered-tab1" data-toggle="tab">Product Name</a>
+                        </li>
+
+                        <!-- variant tab -->
+                        <li class="{% if request.GET.tab == 'variants' %}
+                        active {% else %} bordered-tab2 {% endif %} ">
+                            <a href="#bordered-tab2" class="tabProductAdded" data-toggle="tab">Variant</a>
+                        </li>
+
+                        <!-- tax tab -->
+                        <li class="{% if request.GET.tab == 'tax' %}
+                        active {% else %} tax-tab {% endif %}">
+                            <a href="#tax-tab" class="tabProductAdded" data-toggle="tab">Product Tax</a>
+                        </li>
+
+                        <!-- stock tab -->
+                        <li class="{% if request.GET.tab == 'stock' %} active {% endif %}">
+                            <a href="#stock-tab" class="tabProductAdded" data-toggle="tab">Stock/Pricing</a>
+                        </li>
+
+                        <!-- images tab -->
+                        <li class="{% if request.GET.tab == 'images' %} active {% endif %}">
+                            <a href="#images-tab" class="tabProductAdded" data-toggle="tab">Images</a>
+                        </li>
+                        <!-- endif %} -->
+
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- product name-category-subcategory tab content -->
+                        <div class="tab-pane has-padding {% if not request.GET.tab %} active {% endif %}" id="bordered-tab1">
+
+                            <!-- post/update form -->
+                            <form method="post" class="form-horizontals" id="form-product" enctype="multipart/form-data" novalidate>
+                                {% csrf_token %}
+                                <div class="panelpanel-flat">
+                                    <div class="panel-bodys">
+
+                                        {% if errors %}
+                                        <div class="alert alert-danger alert-styled-left">
+                                            {{errors}}
+                                        </div>
+                                        {% endif %}
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+
+                                                <!-- product name -->
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Product Name:<i class='text-danger'> *</i></label>
+                                                        {{ product_form.name}}
+                                                    </div>
+                                                </div>
+
+                                                <!-- product category -->
+                                                <div class="col-md-4">
+                                                    <div class="form-group" >
+                                                        <label>Product Category:<i class='text-danger'> *</i> </label>
+                                                        <div class="input-group">
+
+                                                            <div class=" input-group-btn" id='category_field' >
+                                                                <!--{{ product_form.categories }}-->
+                                                                <select style="display:none" class="form-control" id="id_categories" name="categories" required>
+                                                                    {% if product.pk %}
+                                                                        {% with product.get_first_category as category %}
+                                                                            {% if category %}
+                                                                                <option value="{{category.id}}">{{ category }}</option>
+                                                                            {% endif %}
+                                                                        {% endwith %}
+                                                                    {% else %}
+                                                                        <option value="">---</option>
+                                                                    {% endif %}
+
+                                                                    {% for cat in categories %}
+                                                                        <option value="{{cat.pk}}">{{cat}}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="input-group-btn">
+                                                                <button type="button"
+                                                                        class="btn bg-primary btn-icon legitRipple edit_modal-trigger"
+                                                                        data-popup="tooltip"
+                                                                        data-original-title="Add New category"
+                                                                        href="#modal_add_category" id="add-new-category"
+                                                                        data-title="Add New category"
+                                                                        data-href='{% url "dashboard:category-add32" %}'
+                                                                        data-csrf="{% csrf_token %}"
+                                                                        onclick='return false;'>
+                                                                    <i class="icon-plus-circle2"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <label class="error"></label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- product subcategory -->
+                                                <div class="col-md-4">
+                                                    <div class="form-group" id='productType'>
+                                                        <label>Product Sub-Category:<i class='text-danger'> *</i> </label>
+                                                        <div class="input-group sub-refresh">
+                                                            {{ product_form.product_class}}
+
+                                                            <div class="input-group-btn">
+                                                                <button type="button"  id="add-new-class"
+                                                                        data-modal="#addProductClass"
+                                                                        href="#addProductClass" class="btn bg-primary btn-icon "
+                                                                        data-title="Add New SubCategory"
+                                                                        data-href='{% url "dashboard:product-class-add-new" 12 %}'
+                                                                        data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip"
+                                                                        data-original-title="Add New Sub-Category">
+                                                                    <i class="icon-plus-circle2"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- product attributes -->
+                                            <div class="col-md-12">
+                                                <!-- Product attributes -->
+                                                <div class="col-md-12 hidden">
+                                                    <div class="form-group">
+                                                        <label> Product Attributes</label>
+                                                        <button type="button" class="btn btn-flat btn-sm"
+                                                                data-popup="popover" data-placement="bottom"
+                                                                title="Product Type" data-trigger="hover"
+                                                                data-content="– it’s a characteristic of a product,
+                                                                shared with all product variants.
+                                                                Example: Manufacturer - all flour variants(1kg,2kg)
+                                                                are published by same company">
+                                                            <i class="icon-info22 position-right"></i>
+                                                        </button>
+                                                        <span>
+                                                            <a href="">
+                                                                <input type="hidden" value='{% url "dashboard:product-attr-add-value" 1 %}'
+                                                                       id="link-pk" name="link-pk">
+                                                                <button id="add-new-classd" onclick="return false;"
+                                                                        class="btn bg-primary btn-icon  text-bold btn- btn-lg"
+                                                                        data-refresh="{% url 'dashboard:product-class-add' %}"
+                                                                        data-href='{% url "dashboard:product-attr-add-value" 1 %}'
+                                                                        href="#modal_attribute"  data-popup="tooltip"
+                                                                        data-original-title="Add attributes"
+                                                                        data-title="Add attributes">
+                                                                    <i class="icon-plus-circle2"></i>
+                                                                </button>
+                                                            </a>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- product attribute -->
+                                                <div class="col-md-12 hidden" style="margin-bottom:20px;">
+                                                    <!-- add id='div_attributes' below div -->
+                                                    <div class="form-group" >
+                                                        {% for attribute_field in product_form.iter_attribute_fields %}
+                                                            <div class="col-md-4">
+                                                                <label>{{ attribute_field.label }}</label>
+                                                                {{ attribute_field }}
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
 
 
-                    <!-- variant tab -->
-                    {% if request.GET.tab == 'variants'  %}
-                     <li class="active">
-                    {% else %}
-                      <li class="bordered-tab2">
-                    {% endif %}
-                    <a href="#bordered-tab2" class="tabProductAdded" data-toggle="tab">Variant</a></li>
-                    <!-- stock tab -->
-                   {% if request.GET.tab == 'stock'  %}
-                     <li class="active">
-                    {% else %}
-                      <li>
-                    {% endif %}
-                    <a href="#stock-tab" class="tabProductAdded" data-toggle="tab">Stock/Pricing</a></li>
-                    <!-- images tab -->
-                    {% if request.GET.tab == 'images'  %}
-                     <li class="active">
-                    {% else %}
-                      <li >
-                    {% endif %}
-
-                    <a href="#images-tab" class="tabProductAdded" data-toggle="tab">Images</a>
-                    </li>
-                     <!-- endif %} -->
-
-                  </ul>
-
-                  <div class="tab-content">
-                  {% if request.GET.tab %}
-                     <div class="tab-pane has-padding" id="bordered-tab1">
-                    {% else %}
-                      <div class="tab-pane has-padding active" id="bordered-tab1">
-                    {% endif %}
-
-                       <!-- 2 columns form -->
-        <form method="post" class="form-horizontals" id="form-product" enctype="multipart/form-data" novalidate>
-          {% csrf_token %}
-            <div class="panelpanel-flat">
-
-              <div class="panel-body">
-
-                {% if errors %}
-                <div class="alert alert-danger alert-styled-left">
-                  {{errors}}
-                  </div>
-                {% endif %}
-
-  <!-- panel -->
-
-    <!-- body -->
-    <div class="row">
-
-     <div class="col-md-12">
-       <!-- Product Details -->
-        <div class="col-md-4">
-            <div class="form-group">
-                <label>Product Name:<i class='text-danger'> *</i></label>
-                {{ product_form.name}}
-            </div>
-         </div>
-        <div class="col-md-4">
-          <div class="form-group" >
-            <label>Product Category:<i class='text-danger'> *</i> </label>
-            <div class="input-group">
-
-                  <div class=" input-group-btn" id='category_field' >
-                    <!--{{ product_form.categories }}-->
-
-                      <select style="display:none" class="form-control" id="id_categories" name="categories" required>
-                          {% if product.pk %}
-                          {% with product.get_first_category as category %}
-                          {% if category %}
-                          <option value="{{category.id}}">{{ category }}</option>
-                          {% endif %}
-                          {% endwith %}
-                          {% else %}
-                          <option value="">---</option>
-                          {% endif %}
-
-                          {% for cat in categories %}
-                          <option value="{{cat.pk}}">{{cat}}</option>
-                          {% endfor %}
-                      </select>
-
-                  </div>
-
-              <div class="input-group-btn">
-                 <button type="button" class="btn bg-primary btn-icon legitRipple edit_modal-trigger" data-popup="tooltip"
-                data-original-title="Add New category"
-                href="#modal_add_category" id="add-new-category" data-title="Add New category" data-href='{% url "dashboard:category-add32" %}' data-csrf="{% csrf_token %}" onclick='return false;'>
-                   <i class="icon-plus-circle2"></i>
-                 </button>
-               </div>
-             </div>
-              <br>
-                      <label class="error"></label>
-
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="form-group" id='productType'>
-            <label>Product Sub-Category:<i class='text-danger'> *</i> </label>
-            <div class="input-group sub-refresh">
-                {{ product_form.product_class}}
-
-             <div class="input-group-btn">
-                <button type="button"  id="add-new-class" data-modal="#addProductClass" href="#addProductClass" class="btn bg-primary btn-icon "
-                data-title="Add New SubCategory" data-href='{% url "dashboard:product-class-add-new" 12 %}'
-                        data-csrf="{% csrf_token %}" onclick='return false;'  data-popup="tooltip"
-                        data-original-title="Add New Sub-Category">
-               <i class="icon-plus-circle2"></i>
-                </button>
-              </div>
-          </div>
-          </div>
-        </div>
+                                                <div class="hidden">
+                                                    {% if product.pk %}
+                                                        {{ product_form.price }}
+                                                        {% if not product.product_class.has_variants %}
+                                                            <div class="row">
+                                                                {{ variant_form.sku|materializecss }}
+                                                            </div>
+                                                        {% endif %}
+                                                    {% else %}
+                                                    <div class="col-md-9">
+                                                        <input class="form-control" id="idprice" name="price"
+                                                               value="0" required="" type="number">
+                                                        <input class="form-control validate" id="idvariant-sku"
+                                                               maxlength="32" name="variant-sku" value="EN000-1"
+                                                               required="required" type="text">
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
 
 
-     </div>
+                                            </div>
 
-     <!-- product attributes -->
-     <div class="col-md-12">
-       <!-- Product attributes -->
-        <div class="col-md-12 hidden">
+                                        </div>
 
-         <div class="form-group">
-          <label> Product Attributes</label>
-          <button type="button" class="btn btn-flat btn-sm" data-popup="popover" data-placement="bottom" title="Product Type" data-trigger="hover" data-content="– it’s a characteristic of a product, shared with all product variants. Example: Manufacturer - all flour variants(1kg,2kg) are published by same company"> <i class="icon-info22 position-right"></i></button>
-           <span>
-            <a href="">
-              <input type="hidden" value='{% url "dashboard:product-attr-add-value" 1 %}' id="link-pk" name="link-pk">
-              <button id="add-new-classd" onclick="return false;" class="btn bg-primary btn-icon  text-bold btn- btn-lg" data-refresh="{% url 'dashboard:product-class-add' %}" data-href='{% url "dashboard:product-attr-add-value" 1 %}'
-                      href="#modal_attribute"  data-popup="tooltip"
-            data-original-title="Add attributes" data-title="Add attributes">
-            <i class="icon-plus-circle2"></i>
-            </button>
-            </a>
-          </span>
-          </div>
-        </div>
-      <!-- product attribute -->
-      <div class="col-md-12 hidden" style="margin-bottom:20px;">
-        <!-- product attributes -->
-        <!-- add id='div_attributes' below div -->
-        <div class="form-group" >
-           {% for attribute_field in product_form.iter_attribute_fields %}
-          <div class="col-md-4">
-           <label>{{ attribute_field.label }}</label>
-            {{ attribute_field }}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <!-- ./product attribute -->
-  <div class="hidden">
-   {% if product.pk %}
-   {{ product_form.price }}
-    {% if not product.product_class.has_variants %}
-        <div class="row">
-         {{ variant_form.sku|materializecss }}
-       </div>
-       {% endif %}
-   {% else %}
-    <div class="col-md-9">
-    <input class="form-control" id="idprice" name="price" value="0" required="" type="number">
-    <input class="form-control validate" id="idvariant-sku" maxlength="32" name="variant-sku" value="EN000-1" required="required" type="text">
-    </div>
-    {% endif %}
+                                        <div class="col-md-6 col-md-offset-3 text-center p-10" style="margin-top:20px;">
+                                            {% if product.pk %}
+                                                <a href="{% url 'dashboard:product-list' %}"
+                                                   class="btn btn-default pull-left">
+                                                    {% trans "Cancel" context "Dashboard cancel action" %}
+                                                </a>
+                                                <button onclick="return false;" data-pk="{{product.pk}}"
+                                                        data-href="{% url 'dashboard:product-data' %}"
+                                                        id="update_product_btn" type="submit"
+                                                        class="btn btn-primary waves-effect waves-light pull-right">
+                                                    {% trans "Update" context "Dashboard update action" %}
+                                                </button>
+                                            {% else %}
+                                                <a href="{% url 'dashboard:product-list' %}"
+                                                   class="btn btn-default pull-left">
+                                                    {% trans "Cancel" context "Dashboard cancel action" %}
+                                                </a>
+                                                <button type="submit" class="btn btn-primary waves-effect waves-light pull-right">
+                                                    {% trans "Create" context "Dashboard create action" %}
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- ./end product name-category-subcategory tab content-->
 
-  </div>
+                        <!-- product tax tab content -->
+                        <div class="tab-pane has-padding mt-10 {% if request.GET.tab == 'tax'  %} active {% endif %}"
+                             id="tax-tab">
+                            <div class="col-md-4">
+                                <div class="form-group" id='tax_field'>
+                                    <label>Tax: % </label>
+                                    <div class="input-group tax-refresh">
+                                        {{ product_form.product_tax }}
+                                        <div class="input-group-btn">
+                                            <a id="add-new-tax" onclick="return false;" class="btn btn-icon bg-primary "
+                                            href="#modal_attributes"  data-title="Add New Tax">
+                                                <i class=" icon-plus-circle2"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-
-     </div>
-
-    </div>
-    <!-- ./body -->
-
-  <!-- ./panel -->
-
-
-
-                <div class="col-md-6 col-md-offset-3 text-center p-10" style="margin-top:20px;">
-                  {% if product.pk %}
-              <a href="{% url 'dashboard:product-list' %}" class="btn btn-default pull-left">
-                {% trans "Cancel" context "Dashboard cancel action" %}
-              </a>
-              <button onclick="return false;" data-pk="{{product.pk}}" data-href="{% url 'dashboard:product-data' %}" id="update_product_btn" type="submit" class="btn btn-primary waves-effect waves-light pull-right">
-                {% trans "Update" context "Dashboard update action" %}
-              </button>
-            {% else %}
-              <a href="{% url 'dashboard:product-list' %}" class="btn btn-default pull-left">
-                {% trans "Cancel" context "Dashboard cancel action" %}
-              </a>
-              <button type="submit" class="btn btn-primary waves-effect waves-light pull-right">
-                {% trans "Create" context "Dashboard create action" %}
-              </button>
-            {% endif %}
-                </div>
-              </div>
-            </div>
-          </form>
-          <!-- /2 columns form -->
-                    </div>
-  <!-- panel product pricing -->
-
-  <!-- ./end produc pricing -->
-                    <!-- panel product variant -->
-                    {% if request.GET.tab == 'variants'  %}
-                     <div class="tab-pane has-padding active" id="bordered-tab2">
-                    {% else %}
-                      <div class="tab-pane has-padding" id="bordered-tab2">
-                    {% endif %}
-
-                    {% include "dashboard/product/partials/pricing.html" with product=product %}
-
-                    {% if product.pk %}
-
-                      {% if product.product_class.has_variants %}
-      <!-- CODE V -->
-      <div id="variants" class="">
-      <div id="div-edit-variant" class="mb-20"></div>
-      <div class="mb-15">
-        <button class="btn btn-primary" id="btntogglev">
-          Add variant
-        </button>
-      </div>
-      <style type="text/css">
-        #toggleVariant{display:none;}
-      </style>
-      <div id="toggleVariant" class="card-3">
-      <table class="table table-hover">
-        <thead>
-        <tr class="bg-primary">
-        <th width="18%">SKU <span class="text-danger">*</span></th>
-        {% for v in pc %}
-         <th width="18%">{{v}}</th>
-        {% endfor %}
-
-        <th width="12%">Supplier</th>
-        <th></th>
-        </tr>
-        </thead>
-        <tbody>
-          <tr>
-          <td>
-            <input type="text" id="new-sku-td" placeholder="Enter SKU" class="form-control" name='new-sku-td'>
-              <span class="help-block text-danger"></span>
-          </td>
-          {% for v in pc%}
-          <td>
-           <select dropupAuto="false" data-live-search="true" placeholder="{{v}}" data-pk={{v.pk}} name="{{v}}" class="bootstrap-select form-control dynamicvxx">
-            <option></option>
-
-              {% for value in v.values.all %}
-                <option value="{{value.pk}}">{{ value }}</option>
-              {% endfor %}
-            </select>
-            </td>
-          {% endfor %}
-
-            <td>
-                <div class="form-group">
-                    <label></label>
-                    <select name="variant_supplier" class="select-supplier-variant " id="id_variant_supplier">
-                        {% if suppliers %}
-                            {% if supplier.name == 'Unknown' %}
-                            <option value="{{supplier.pk}}">{{supplier}}</option>
+                            {% if product.product_class.has_variants %}
+                                <span >
+                                    <a style="margin-top: 28px;" class="btn hvr-glow btn-primary"
+                                       data-productpk="{{product.pk}}"
+                                       data-priceurl="{% url 'dashboard:product-data' %}"
+                                       id="updatePricing">Save</a>
+                                </span>
                             {% endif %}
-                            {% for supplier in suppliers %}
-                            <option value="{{supplier.id}}">{{supplier}}</option>
-                            {% endfor %}
-                            <option value="add" id="add-supplier" data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
-                href="#modal_attribute" data-icon="fa-plus-circle" data-ta="#edit_modal_instance" data-title="Add Supplier" data-select="#expense_types"
-                            data-cat="expense_type" data-label="Expense Type:"> add new </option>
-                        {% endif %}
-                    </select>
-                </div>
-            </td>
-            <td>
-              <button class="btn btn-xs btn-primary" id="addvariantBtn" data-refreshvurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}" data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">Add</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
 
-      <!-- <button class="btn btn-primary" id="addNewvaraints">New variant</button> -->
-        <form method="post" action="{% url 'dashboard:variant-bulk-delete' product_pk=product.pk %}" novalidate>
-          {% csrf_token %}
-          <div class="data-table-header-action" style="padding:8px;">
+                        </div>
+                        <!-- ./end product tax tab content-->
 
-          <!-- code add/edit -->
-            <a href="{% url 'dashboard:variant-add' product_pk=product.pk %}" class="btn-data-table btn-show-when-unchecked btn btn-primary hidden">
-              {% trans "Add" context "Dashboard add action" %}
-            </a>
-            <a href="#modal-product-variant-delete" class=" btn-data-table btn-show-when-checked btn btn-danger" id="modal-product-variant-delete-btn" style="display:none" hidden>
-              {% trans "Delete" context "Dashboard delete action" %}
-            </a>
+                        <!-- product variant tab content -->
+                        <div class="tab-pane has-padding {% if request.GET.tab == 'variants'  %} active {% endif %}"
+                             id="bordered-tab2">
 
-            <div class="modal fade" id="modal-product-variant-delete">
-            <div class="modal-dialog">
-              <div class="modal-content">
-              <div class="modal-header bg-blue">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h6 class="modal-title text-white">Delete Variant(s)</h6>
-              </div>
-              <div class="modal-body">
-                <h5>
-                  {% trans "Are you sure?" context "Dashboard confirmation modal" %}
-                </h5>
-                <p>
-                  {% blocktrans trimmed context "Modal delete variant from product text" %}
-                    You are about to delete variants of this product.
-                  {% endblocktrans %}
-                </p>
-                </div>
-                <!-- add footer -->
-                <div class="modal-footer">
-                <button type="submit" class="btn btn-danger modal-action ">
-                  {% trans "Delete" context "Dashboard delete action" %}
-                </button>
-                <a href="#!" data-dismiss="modal" class="modal-action btn btn-link ">
-                  {% trans "Cancel" context "Dashboard cancel action" %}
-                </a>
-              </div>
-                <!-- end footer -->
-              </div>
-              </div>
+                            {% include "dashboard/product/partials/pricing.html" with product=product %}
 
-            </div>
-          </div>
-          <div class="data-table-container" id="refreshvaraintscontent">
+                            {% if product.pk %}
+                                {% if product.product_class.has_variants %}
 
-            <table class="table  datatable-header-footer">
-              {% if variants %}
-                <thead>
+                                    <div id="variants" class="">
 
-                  <tr class="bg-primary">
+                                        <div id="div-edit-variant" class="mb-20">
+                                        </div>
 
-                    <th>
-                      {% trans "SKU" context "Product variant table header" %}
-                    </th>
-                    <!-- <th>Re-order Threshold</th> -->
-                    {% for attribute in attributes %}
-                      <th>
-                        {{ attribute.name|capfirst }}
-                      </th>
-                    {% endfor %}
+                                        <div class="mb-15">
+                                            <button class="btn btn-primary" id="btntogglev">
+                                                Add variant
+                                            </button>
+                                        </div>
+                                        <!-- TODO: shift it to the top -->
+                                        <style type="text/css">
+                                        #toggleVariant{display:none;}
+                                        </style>
 
+                                        <div id="toggleVariant" class="card-3">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr class="bg-primary">
+                                                        <th width="18%">SKU <span class="text-danger">*</span></th>
+                                                        {% for v in pc %}
+                                                        <th width="18%">{{v}}</th>
+                                                        {% endfor %}
 
-                      <th>
-                          Supplier
-                      </th>
-                    <th class="text-center">Options</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for variant in variants %}
-                    <tr id="variant-row{{variant.pk}}" data-action-go="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}" title="{% trans "Edit variant" context "Product variant table link title" %}">
+                                                        <th width="12%">Supplier</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="text" id="new-sku-td" placeholder="Enter SKU"
+                                                                   class="form-control" name='new-sku-td'>
+                                                            <span class="help-block text-danger"></span>
+                                                        </td>
+                                                        {% for v in pc%}
+                                                        <td>
+                                                            <select dropupAuto="false" data-live-search="true" placeholder="{{v}}"
+                                                                    data-pk={{v.pk}} name="{{v}}" class="bootstrap-select form-control dynamicvxx">
+                                                            <option></option>
+                                                            {% for value in v.values.all %}
+                                                                <option value="{{value.pk}}">{{ value }}</option>
+                                                            {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                        {% endfor %}
 
-                      <td>
-                        {{ variant.sku }}
-                      </td>
-                     <!--  <td>
-                        {{variant.low_stock_threshold}}
-                      </td> -->
-                      {% for attr_display in variant|attributes_values_with_empty:attributes %}
-                        <td>
-                          {{ attr_display }}
-                        </td>
-                      {% endfor %}
+                                                        <td>
+                                                            <div class="form-group">
+                                                                <label></label>
+                                                                <select name="variant_supplier" class="select-supplier-variant " id="id_variant_supplier">
+                                                                    {% if suppliers %}
+                                                                        {% if supplier.name == 'Unknown' %}
+                                                                            <option value="{{supplier.pk}}">{{supplier}}</option>
+                                                                        {% endif %}
 
+                                                                        {% for supplier in suppliers %}
+                                                                            <option value="{{supplier.id}}">{{supplier}}</option>
+                                                                        {% endfor %}
+                                                                        <option value="add" id="add-supplier"
+                                                                                data-href="{% url 'dashboard:supplier-ajax-add-modal' %}"
+                                                                                href="#modal_attribute" data-icon="fa-plus-circle"
+                                                                                data-ta="#edit_modal_instance" data-title="Add Supplier"
+                                                                                data-select="#expense_types"
+                                                                                data-cat="expense_type" data-label="Expense Type:">
+                                                                            add new
+                                                                        </option>
+                                                                    {% endif %}
+                                                                </select>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-xs btn-primary" id="addvariantBtn"
+                                                                    data-refreshvurl="{% url 'dashboard:refresh-stock-table' product_pk=product.pk %}"
+                                                                    data-productpk="{{product.pk}}" data-attrurl="{% url 'dashboard:add-attributes' %}">
+                                                                Add
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
 
-                    <td>
-                        {% if variant.variant_supplier %}
-                        {{variant.variant_supplier}}
-                        {% else %}
-                        ---
-                        {% endif %}
-                    </td>
-                      <!-- actions -->
-                    <td class="text-center">
-                      <div class="btn-group">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        action <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu edit-dropdown">
-                        <li><a onclick="return false;" class="editVariantBtn" data-pk="{{variant.pk}}" data-href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"><i class="icon-pencil7"></i> EDIT</a></li>
+                                        <!-- <button class="btn btn-primary" id="addNewvaraints">New variant</button> -->
+                                        <form method="post" action="{% url 'dashboard:variant-bulk-delete' product_pk=product.pk %}" novalidate>
+                                            {% csrf_token %}
+                                            <div class="data-table-header-action" style="padding:8px;">
 
-                        <li>
-                          <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?" data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}" data-tabname='?tab=variants'
-                         data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ variant.name }}" data-id="{{ variant.pk }}"
-                       class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
-                       </a>
-                        </li>
+                                                <!-- code add/edit -->
+                                                <a href="{% url 'dashboard:variant-add' product_pk=product.pk %}"
+                                                   class="btn-data-table btn-show-when-unchecked btn btn-primary hidden">
+                                                    {% trans "Add" context "Dashboard add action" %}
+                                                </a>
+                                                <a href="#modal-product-variant-delete"
+                                                   class=" btn-data-table btn-show-when-checked btn btn-danger"
+                                                   id="modal-product-variant-delete-btn" style="display:none" hidden>
+                                                    {% trans "Delete" context "Dashboard delete action" %}
+                                                </a>
 
-                        </ul>
+                                                <div class="modal fade" id="modal-product-variant-delete">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-blue">
+                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                <h6 class="modal-title text-white">Delete Variant(s)</h6>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <h5>
+                                                                {% trans "Are you sure?" context "Dashboard confirmation modal" %}
+                                                                </h5>
+                                                                <p>
+                                                                    {% blocktrans trimmed context "Modal delete variant from product text" %}
+                                                                        You are about to delete variants of this product.
+                                                                    {% endblocktrans %}
+                                                                </p>
+                                                            </div>
+                                                            <!-- add footer -->
+                                                            <div class="modal-footer">
+                                                                <button type="submit" class="btn btn-danger modal-action ">
+                                                                    {% trans "Delete" context "Dashboard delete action" %}
+                                                                </button>
+                                                                <a href="#!" data-dismiss="modal" class="modal-action btn btn-link ">
+                                                                    {% trans "Cancel" context "Dashboard cancel action" %}
+                                                                </a>
+                                                            </div>
+                                                            <!-- end footer -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="data-table-container" id="refreshvaraintscontent">
+
+                                                <table class="table  datatable-header-footer">
+                                                    {% if variants %}
+                                                        <thead>
+                                                            <tr class="bg-primary">
+                                                                <th>
+                                                                    {% trans "SKU" context "Product variant table header" %}
+                                                                </th>
+                                                                <!-- <th>Re-order Threshold</th> -->
+                                                                {% for attribute in attributes %}
+                                                                    <th>
+                                                                        {{ attribute.name|capfirst }}
+                                                                    </th>
+                                                                {% endfor %}
+                                                                <th>
+                                                                    Supplier
+                                                                </th>
+                                                                <th class="text-center">Options</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for variant in variants %}
+                                                                <tr id="variant-row{{variant.pk}}"
+                                                                    data-action-go="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}"
+                                                                    title="{% trans "Edit variant" context "Product variant table link title" %}">
+
+                                                                    <td> {{ variant.sku }} </td>
+                                                                    <!--  <td>
+                                                                    {{variant.low_stock_threshold}}
+                                                                    </td> -->
+                                                                    {% for attr_display in variant|attributes_values_with_empty:attributes %}
+                                                                        <td>
+                                                                            {{ attr_display }}
+                                                                        </td>
+                                                                    {% endfor %}
+
+                                                                    <td>
+                                                                        {% if variant.variant_supplier %}
+                                                                            {{variant.variant_supplier}}
+                                                                        {% else %}
+                                                                            ---
+                                                                        {% endif %}
+                                                                    </td>
+
+                                                                    <!-- actions -->
+                                                                    <td class="text-center">
+                                                                        <div class="btn-group">
+                                                                            <button type="button" class="btn btn-default dropdown-toggle"
+                                                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                                action <span class="caret"></span>
+                                                                            </button>
+                                                                            <ul class="dropdown-menu edit-dropdown">
+                                                                                <li>
+                                                                                    <a onclick="return false;" class="editVariantBtn"
+                                                                                       data-pk="{{variant.pk}}"
+                                                                                       data-href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}">
+                                                                                        <i class="icon-pencil7"></i>
+                                                                                        EDIT
+                                                                                    </a>
+                                                                                </li>
+
+                                                                                <li>
+                                                                                    <a data-ta="#modal_delete_instance" data-title="Delete {{variant}}?"
+                                                                                       data-href="{% url 'dashboard:single-variant-delete' product_pk=product.pk variant_pk=variant.pk %}"
+                                                                                       data-tabname='?tab=variants' data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}"
+                                                                                       data-name="{{ variant.name }}" data-id="{{ variant.pk }}"
+                                                                                       class="modal-trigger-delete">
+                                                                                        <i class="icon-trash" href="#modal_delete_instance"
+                                                                                           data-toggle="modal"></i>
+                                                                                        DELETE
+                                                                                    </a>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    {% else %}
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <span>
+                                                                    {% trans "There are no variants for this product" context "Empty product variant table message" %}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    {% endif %}
+                                                </table>
+                                            </div>
+                                            <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=variants">
+                                        </form>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        <p>This product has no varaints</p>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <!-- ./end product variant tab content -->
+
+                        <!-- product stock tab content -->
+                        <div class="tab-pane has-padding {% if request.GET.tab == 'stock'  %} active {% endif %}" id="stock-tab">
+
+                            {% if product.pk %}
+                                <!-- STOCK DETAILS -->
+                                <div id="div-edit-stock" class="mb-20"></div>
+                                {% include "dashboard/product/partials/stock_details.html" with product=product %}
+                                <!--include 'dashboard/product/partials/stock_table_form.html' with product=product %}-->
+                                {% include "dashboard/product/partials/add_stock_form.html" with product=product %}
+                                <div id="stock" class="">
+                                    <form method="post" action="{% url 'dashboard:stock-bulk-delete' product_pk=product.pk %}" novalidate>
+                                        {% csrf_token %}
+                                        <div class="data-table-header-action" style="padding: 8px;">
+                                            <a href="#" data-contenturl="{% url 'dashboard:product-stock-add-form' product_pk=product.pk %}"
+                                               onclick="return false" id="addNewStockBtn"
+                                               class="btn-data-table btn-show-when-unchecked hidden btn btn-primary">
+                                                {% trans "Add" context "Product form stock tab table action" %}
+                                            </a>
+                                            <a href="#modal-product-stock-delete" class=" btn-data-table btn-show-when-checked btn btn-danger"
+                                               data-toggle="modal"  data-target="#modal-product-stock-delete"  style="display:none" hidden>
+                                                {% trans "Delete" context "Dashboard delete action" %}
+                                            </a>
+                                            <div class="modal fade" id="modal-product-stock-delete">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-blue">
+                                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                            <h6 class="modal-title text-white">Delete Stock</h6>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <h5>
+                                                                {% trans "Are you sure?" context "Dashboard confirmation modal" %}
+                                                            </h5>
+                                                            <p>
+                                                                {% blocktrans trimmed context "Modal delete stock from variant text" %}
+                                                                    You are about to delete stock for this product variant.
+                                                                {% endblocktrans %}
+                                                            </p>
+                                                        </div>
+                                                        <!-- end modal body -->
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="modal-action btn btn-danger">
+                                                                {% trans "Delete" context "Dashboard delete action" %}
+                                                            </button>
+                                                            <a href="#!" data-dismiss="modal" class="modal-action modal-close  btn btn-link ">
+                                                                {% trans "Cancel" context "Dashboard cancel action" %}
+                                                            </a>
+                                                        </div>
+                                                        <!-- end footer -->
+                                                    </div>
+                                                </div>
+                                                <!-- end dialog -->
+                                            </div>
+                                            <!-- end modal -->
+                                        </div>
+
+                                        <div class="data-table-container">
+                                            <table class="table  datatable-header-footer responsive data-table">
+
+                                                <thead>
+                                                    <tr class='bg-primary'>
+                                                        <th width="15%"> Name </th>
+                                                        <th> Cost Price </th>
+                                                        <th> Retail Price </th>
+                                                        <th> {{'wholesale_name'|model_settings}} Price</th>
+                                                        <th> Minimum Price</th>
+                                                        <!-- <th class="wide">
+                                                        {% trans "Location" context "Stock table header" %}
+                                                        </th> -->
+                                                        <th class="right-align">
+                                                            {% trans "Quantity" context "Stock table header" %}
+                                                        </th>
+                                                        <th> Reorder Threshold </th>
+                                                        <th>Options</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="refreshStockitems">
+                                                    {% if stock_items %}
+
+                                                        {% for item in stock_items %}
+                                                        <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"
+                                                            title="{% trans "Edit variant" context "Stock table action" %}">
+                                                            <td>{{ item.variant.display_product }}<br>{{item.variant.sku}}</td>
+
+                                                            <!-- cost price -->
+                                                            <td>
+                                                                {% if item.cost_price %}
+                                                                    {% gross item.cost_price %}
+                                                                {% endif %}
+                                                            </td>
+                                                            <!-- sales price -->
+                                                            <td>
+                                                                {% if item.price_override %}
+                                                                    {% gross item.price_override html=True %}
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {% if item.wholesale_override %}
+                                                                    {% gross item.wholesale_override html=True %}
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {% if item.minimum_price %}
+                                                                    {% gross item.minimum_price html=True %}
+                                                                {% endif %}
+                                                            </td>
+                                                            <td class="right-align">
+                                                                {{ item.quantity }}
+                                                            </td>
+                                                            <td>
+                                                                {{item.low_stock_threshold}}
+                                                            </td>
+                                                            <td>
+                                                                <div class="btn-group">
+                                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        action <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu edit-dropdown">
+                                                                        <li>
+                                                                            <a onclick="return false;"
+                                                                               data-href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"
+                                                                               class="edit-stock-Btn">
+                                                                                <i class="icon-pencil7"></i>
+                                                                                EDIT
+                                                                            </a>
+                                                                        </li>
+                                                                        <li>
+                                                                            <a data-ta="#modal_delete_instance" data-title="Delete {{item.variant.sku}}?"
+                                                                               data-href="{% url 'dashboard:single-stock-delete' product_pk=product.pk stock_pk=item.pk %}"
+                                                                               data-tabname='?tab=stock' data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}"
+                                                                               data-name="{{ item.variant.sku }}" data-id="{{ item.pk }}"
+                                                                               class="modal-trigger-delete">
+                                                                                <i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i>
+                                                                                DELETE
+                                                                            </a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <tr>
+                                                            <td colspan="8">
+                                                                <span class="text-center alert alert-warning">
+                                                                    {% trans "There is no stock for this product." context "Empty stock table message" %}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <input type="hidden" name="success_url"
+                                               value="{% url 'dashboard:product-update' pk=product.pk %}?tab=stock">
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- ./end product stock -->
+
+                        <!-- product image tab content  -->
+                        <div class="tab-pane has-padding {% if request.GET.tab == 'images'  %} active {% endif %}" id="images-tab">
+                            {% if product.pk %}
+                             <div id="images" class="">
+                                 <form action="{% url 'dashboard:product-images-upload' product_pk=product.pk %}" class="" id="product-image-form" novalidate>
+                                     <div class="dz-message"></div>
+                                     {% csrf_token %}
+                                     <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=images">
+
+                                     <div class="row">
+                                         <div class="col-md-12">
+                                             <div class="col-md-4">
+                                                 <div class="text-left" style="margin-bottom: 8px;">
+                                                     <a class="btn btn-primary  waves-effect waves-light images-bt"
+                                                        id="images-bt" onclick="return false;"
+                                                        data-href="{% url 'dashboard:product-image-add' product_pk=product.pk %}"
+                                                        title="">
+                                                         Add Image
+                                                     </a>
+                                                 </div>
+                                             </div>
+
+                                             <div  class='col-md-8 hidden' id="myloader">
+                                                 <div class="cs-loader mt-15">
+                                                     <div class="cs-loader-inner text-primary">
+                                                         <label> ●</label>
+                                                         <label> ●</label>
+                                                         <label> ●</label>
+                                                         <label> ●</label>
+                                                         <label> ●</label>
+                                                         <label> ●</label>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+
+                                         <div class="col-md-12" id="add-image-form-div"></div>
+                                         <br>
+
+                                         {% if images %}
+                                             {% for image in images %}
+                                                 <div class="col-lg-3 col-sm-6">
+                                                     <div class="thumbnail">
+                                                         <div class="thumb">
+                                                             <img class="" src="{{ image.image.crop.255x255 }}"
+                                                                  srcset="{{ image.image.crop.255x255 }} 1x, {{ image.image.crop.510x510 }} 2x"
+                                                                  alt="">
+                                                             <div class="caption-overflow">
+                                                                 <span>
+                                                                     <a href="{{ image.image.crop.255x255 }}"
+                                                                        data-popup="lightbox" class="btn border-white text-white btn-flat btn-icon btn-rounded">
+                                                                         <i class="icon-plus3"></i>
+                                                                     </a>
+                                                                     <a href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=image.pk %}"
+                                                                        class="btn border-white text-white btn-flat btn-icon btn-rounded ">
+                                                                         <i class="icon-pencil7"></i>
+                                                                     </a>
+                                                                 </span>
+                                                             </div>
+                                                         </div>
+
+                                                         <div class="caption">
+                                                             <h6 class="no-margin-top text-semibold">
+                                                                 <a href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=image.pk %}"
+                                                                    class="text-muted">
+                                                                     <i class="icon-pencil pull-right"></i>
+                                                                 </a>
+                                                             </h6>
+                                                             {% if image.alt %}
+                                                                 {{ image.alt }}
+                                                             {% else %}
+                                                                 <span class="">
+                                                                     {% trans "No description" context "Image card text" %}
+                                                                 </span>
+                                                             {% endif %}
+                                                             <div class="card-action">
+                                                                 <a class="btn btn-flat" href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=image.pk %}">
+                                                                     {% trans "Edit" context "Dashboard edit action" %}
+                                                                 </a>
+                                                                 <a href="#modal_instance" class="btn btn-flat modal-trigger " data-title='Delete Image' data-href="{% url 'dashboard:product-image-delete' product_pk=product.pk img_pk=image.pk %}">
+                                                                     {% trans "Delete" context "Dashboard delete action" %}
+                                                                 </a>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             {% endfor %}
+
+                                         {% else %}
+                                             <p class="no-images">
+                                                 {% trans "This product has no images yet." context "Empty image gallery message" %}
+                                             </p>
+                                         {% endif %}
+
+                                         {% if images|length > 4 %}
+                                             <div class="col-md-12">
+                                                 <div class="text-right">
+                                                     <a class="btn btn-primary  waves-effect waves-light images-bt"
+                                                        id="images-bt2" onclick="return false;"
+                                                        data-href="{% url 'dashboard:product-image-add' product_pk=product.pk %}"
+                                                        title="">
+                                                         Add Image
+                                                     </a>
+                                                 </div>
+                                             </div>
+                                         {% endif %}
+                                     </div>
+                                 </form>
+
+                                 <script type="application/template" id="template">
+                                     <li class='col s6 m3 product-gallery-item dz-preview dz-file-preview' data-id="{{ image.pk }}">
+                                         <div class="row">
+                                             <div class="card">
+                                                 <div class="card-image product-gallery-item-image">
+                                                     <img data-dz-thumbnail />
+                                                 </div>
+                                                 <div class="dz-progress">
+                                                     <span class="dz-upload" data-dz-uploadprogress></span>
+                                                 </div>
+                                                 <div class="card-content">
+                                                     <span class="product-gallery-item-title card-title black-text">
+                                                         <span class="grey-text">
+                                                             {% trans "No description" context "Empty image gallery message" %}
+                                                         </span>
+                                                     </span>
+                                                 </div>
+                                                 <div class="sortable__drag-area"></div>
+                                                 <div class="card-action">
+                                                     <a class="card-action-edit" href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=0 %}">
+                                                         {% trans "Edit" context "Dashboard edit action" %}
+                                                     </a>
+                                                     <a href="#base-modal" class="card-action-delete modal-trigger-custom"
+                                                         data-href="{% url 'dashboard:product-image-delete' product_pk=product.pk img_pk=0 %}">
+                                                         {% trans "Delete" context "Dashboard delete action" %}
+                                                     </a>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </li>
+                                 </script>
+                             </div>
+                             {% endif %}
+                        </div>
+                        <!-- ./product image tab content -->
                     </div>
-
-                    </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              {% else %}
-                  <tbody>
-                    <tr>
-                      <td>
-                        <span>
-                          {% trans "There are no variants for this product" context "Empty product variant table message" %}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-              {% endif %}
-            </table>
-          </div>
-          <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=variants">
-        </form>
-      </div>
-    {% else %}
-     <div class="alert alert-warning">
-      <p>This product has no varaints</p>
-     </div>
-    {% endif %}
-    {% endif %}
-
-    </div>
-    <!-- end product variant -->
-    <!-- product stock -->
-    {% if request.GET.tab == 'stock'  %}
-     <div class="tab-pane has-padding active" id="stock-tab">
-    {% else %}
-     <div class="tab-pane has-padding" id="stock-tab">
-    {% endif %}
-
-     {% if product.pk %}
-  <!-- CODE S -->
-      <!-- STOCK DETAILS -->
-      <div id="div-edit-stock" class="mb-20"></div>
-      {% include "dashboard/product/partials/stock_details.html" with product=product %}
-       <!--include 'dashboard/product/partials/stock_table_form.html' with product=product %}-->
-        {% include "dashboard/product/partials/add_stock_form.html" with product=product %}
-     <div id="stock" class="">
-      <form method="post" action="{% url 'dashboard:stock-bulk-delete' product_pk=product.pk %}" novalidate>
-        {% csrf_token %}
-        <div class="data-table-header-action" style="padding: 8px;">
-          <a href="#" data-contenturl="{% url 'dashboard:product-stock-add-form' product_pk=product.pk %}" onclick="return false" id="addNewStockBtn" class="btn-data-table btn-show-when-unchecked hidden btn btn-primary">
-            {% trans "Add" context "Product form stock tab table action" %}
-          </a>
-          <a href="#modal-product-stock-delete" class=" btn-data-table btn-show-when-checked btn btn-danger" data-toggle="modal"  data-target="#modal-product-stock-delete"  style="display:none" hidden>
-            {% trans "Delete" context "Dashboard delete action" %}
-          </a>
-          <div class="modal fade" id="modal-product-stock-delete">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header bg-blue">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h6 class="modal-title text-white">Delete Stock</h6>
-              </div>
-            <div class="modal-body">
-              <h5>
-                {% trans "Are you sure?" context "Dashboard confirmation modal" %}
-              </h5>
-              <p>
-                {% blocktrans trimmed context "Modal delete stock from variant text" %}
-                  You are about to delete stock for this product variant.
-                {% endblocktrans %}
-              </p>
+                </div>
             </div>
-            <!-- end modal body -->
-              <div class="modal-footer">
-                <button type="submit" class="modal-action btn btn-danger">
-                  {% trans "Delete" context "Dashboard delete action" %}
-                </button>
-                <a href="#!" data-dismiss="modal" class="modal-action modal-close  btn btn-link ">
-                  {% trans "Cancel" context "Dashboard cancel action" %}
-                </a>
-              </div>
-            <!-- end footer -->
-            </div>
-            </div>
-            <!-- end dialog -->
-          </div>
-          <!-- end modal -->
         </div>
-
-        <div class="data-table-container">
-          <table class="table  datatable-header-footer responsive data-table">
-
-            <thead>
-              <tr class='bg-primary'>
-                <th width="15%">Name</th>
-                <th> Cost Price</th>
-                <th>
-                  Retail Price
-                </th>
-                <th> {{'wholesale_name'|model_settings}} Price</th>
-                <th> Minimum Price</th>
-
-                <!-- <th class="wide">
-                  {% trans "Location" context "Stock table header" %}
-                </th> -->
-                <th class="right-align">
-                  {% trans "Quantity" context "Stock table header" %}
-                </th>
-                <th>
-                  Reorder Threshold
-                </th>
-
-                <th>Options</th>
-              </tr>
-            </thead>
-             <tbody id="refreshStockitems">
-            {% if stock_items %}
-
-              {% for item in stock_items %}
-                <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" title="{% trans "Edit variant" context "Stock table action" %}">
-                  <td>{{ item.variant.display_product }}<br>{{item.variant.sku}}</td>
-
-                  <!-- cost price -->
-                  <td>
-                    {% if item.cost_price %}
-                     {% gross item.cost_price %}
-                    {% endif %}
-                  </td>
-                  <!-- sales price -->
-                  <td>
-                      {% if item.price_override %}
-                  {% gross item.price_override html=True %}
-                      {% endif %}
-                  </td>
-                 <td>
-                     {% if item.wholesale_override %}
-                  {% gross item.wholesale_override html=True %}
-                     {% endif %}
-                  </td>
-                  <td>
-                      {% if item.minimum_price %}
-                  {% gross item.minimum_price html=True %}
-                      {% endif %}
-                  </td>
-
-
-                  <td class="right-align">
-                    {{ item.quantity }}
-                  </td>
-                  <td>
-                    {{item.low_stock_threshold}}
-                  </td>
-
-                  <td>
-                  <div class="btn-group">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        action <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu edit-dropdown">
-                        <li><a onclick="return false;" data-href="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}" class="edit-stock-Btn"><i class="icon-pencil7"></i> EDIT</a></li>
-
-                        <li>
-                          <a data-ta="#modal_delete_instance" data-title="Delete {{item.variant.sku}}?" data-href="{% url 'dashboard:single-stock-delete' product_pk=product.pk stock_pk=item.pk %}" data-tabname='?tab=stock'
-                         data-successurl="{% url 'dashboard:product-update' pk=product.pk  %}" data-name="{{ item.variant.sku }}" data-id="{{ item.pk }}"
-                       class="modal-trigger-delete"><i class="icon-trash" href="#modal_delete_instance" data-toggle="modal"></i> DELETE
-                       </a>
-                        </li>
-
-                        </ul>
-                    </div>
-
-                  </td>
-                </tr>
-              {% endfor %}
-            {% else %}
-                <tr>
-                  <td colspan="8">
-                    <span class="text-center alert alert-warning">
-                      {% trans "There is no stock for this product." context "Empty stock table message" %}
-
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            {% endif %}
-          </table>
-        </div>
-        <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=stock">
-      </form>
-    </div>
-    {% endif %}
-                    </div>
-                    <!-- end product stock -->
-                    <!-- IMAGES tAB -->
-                    {% if request.GET.tab == 'images'  %}
-                     <div class="tab-pane has-padding active" id="images-tab">
-                    {% else %}
-                      <div class="tab-pane has-padding" id="images-tab">
-                    {% endif %}
-
-                     {% if product.pk %}
-                         <div id="images" class="">
-      <form action="{% url 'dashboard:product-images-upload' product_pk=product.pk %}" class="" id="product-image-form" novalidate>
-        <div class="dz-message"></div>
-        {% csrf_token %}
-        <input type="hidden" name="success_url" value="{% url 'dashboard:product-update' pk=product.pk %}?tab=images">
-
-        <div class="row">
-          <div class="col-md-12">
-            <div class="col-md-4">
-            <div class="text-left" style="margin-bottom: 8px;">
-              <a class="btn btn-primary  waves-effect waves-light images-bt" id="images-bt" onclick="return false;" data-href="{% url 'dashboard:product-image-add' product_pk=product.pk %}" title=""> Add Image
-                 </a>
-            </div>
-
-          </div>
-
-          <div  class='col-md-8 hidden' id="myloader">
-            <div class="cs-loader mt-15">
-              <div class="cs-loader-inner text-primary">
-                <label> ●</label>
-                <label> ●</label>
-                <label> ●</label>
-                <label> ●</label>
-                <label> ●</label>
-                <label> ●</label>
-              </div>
-            </div>
-          </div>
-          </div>
-          <div class="col-md-12" id="add-image-form-div"></div>
-          <br>
-          {% if images %}
-
-              {% for image in images %}
-              <div class="col-lg-3 col-sm-6">
-              <div class="thumbnail">
-                <div class="thumb">
-                  <img class=""
-                             src="{{ image.image.crop.255x255 }}"
-                             srcset="{{ image.image.crop.255x255 }} 1x, {{ image.image.crop.510x510 }} 2x"
-                             alt="">
-                  <div class="caption-overflow">
-                    <span>
-                      <a href="{{ image.image.crop.255x255 }}" data-popup="lightbox" class="btn border-white text-white btn-flat btn-icon btn-rounded"><i class="icon-plus3"></i></a>
-                      <a href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=image.pk %}" class="btn border-white text-white btn-flat btn-icon btn-rounded "><i class="icon-pencil7"></i></a>
-                    </span>
-                  </div>
-                </div>
-
-                <div class="caption">
-                  <h6 class="no-margin-top text-semibold"> <a href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=image.pk %}" class="text-muted"><i class="icon-pencil pull-right"></i></a></h6>
-                  {% if image.alt %}
-                            {{ image.alt }}
-                          {% else %}
-                            <span class="">
-                              {% trans "No description" context "Image card text" %}
-                            </span>
-                          {% endif %}
-                <div class="card-action">
-                        <a class="btn btn-flat" href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=image.pk %}">
-                          {% trans "Edit" context "Dashboard edit action" %}
-                        </a>
-                        <a href="#modal_instance" class="btn btn-flat modal-trigger " data-title='Delete Image' data-href="{% url 'dashboard:product-image-delete' product_pk=product.pk img_pk=image.pk %}">
-                          {% trans "Delete" context "Dashboard delete action" %}
-                        </a>
-                      </div>
-                </div>
-              </div>
-            </div>
-
-              {% endfor %}
-
-        {% else %}
-          <p class="no-images">
-            {% trans "This product has no images yet." context "Empty image gallery message" %}
-          </p>
-        {% endif %}
-            {% if images|length > 4 %}
-        <div class="col-md-12">
-          <div class="text-right">
-            <a class="btn btn-primary  waves-effect waves-light images-bt" id="images-bt2" onclick="return false;" data-href="{% url 'dashboard:product-image-add' product_pk=product.pk %}" title=""> Add Image
-               </a>
-          </div>
-          </div>
-            {% endif %}
-      </div>
-      </form>
-      <script type="application/template" id="template">
-        <li class='col s6 m3 product-gallery-item dz-preview dz-file-preview' data-id="{{ image.pk }}">
-          <div class="row">
-            <div class="card">
-              <div class="card-image product-gallery-item-image">
-                <img data-dz-thumbnail />
-              </div>
-              <div class="dz-progress">
-                <span class="dz-upload" data-dz-uploadprogress></span>
-              </div>
-              <div class="card-content">
-                <span class="product-gallery-item-title card-title black-text">
-                  <span class="grey-text">
-                    {% trans "No description" context "Empty image gallery message" %}
-                  </span>
-                </span>
-              </div>
-              <div class="sortable__drag-area"></div>
-              <div class="card-action">
-                <a class="card-action-edit" href="{% url 'dashboard:product-image-update' product_pk=product.pk img_pk=0 %}">
-                  {% trans "Edit" context "Dashboard edit action" %}
-                </a>
-                <a href="#base-modal" class="card-action-delete modal-trigger-custom"
-                data-href="{% url 'dashboard:product-image-delete' product_pk=product.pk img_pk=0 %}">
-                  {% trans "Delete" context "Dashboard delete action" %}
-                </a>
-              </div>
-            </div>
-          </div>
-        </li>
-      </script>
-    </div>
-    {% endif %}
-                     </div>
-                    <!-- END IMAGES TAB -->
-
-
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+  </div>
 </div>
+
 <input type="hidden" class="pageUrls"
        data-attributes="{% url 'dashboard:attr_list_f32b' %}"
        data-createpurchase="{% url 'purchase-variant-api:create-variant-purchase' %}"
@@ -824,6 +892,7 @@
        data-pk="{{product.pk}}"
        data-fullpath="{{ request.path }}"
        data-productdata="{% url 'dashboard:product-data' %}"  data-addclassurl="{% url 'dashboard:product-class-form32b' %}">
+
  {% include "dashboard/includes/_modal_images.html"  %}
  {% include "dashboard/includes/_modal_add_category.html"  %}
  {% include "dashboard/includes/_modal_add_tax.html"  %}
@@ -835,54 +904,56 @@
  {% include "dashboard/includes/_modal_add_stocks.html"  %}
  {% include "dashboard/includes/_modal_subcategory.html"  %}
  {% include "dashboard/includes/_modal_delete_instance.html"  %}
+
 {% endblock %}
 
- {% block custom_js %}
+{% block custom_js %}
 
- {% if not product.pk %}
- <script type="text/javascript" src="{% static 'backend/js/tabs_toggle.js' %}"></script>
- {% endif %}
-<script type="text/javascript" src="{% static 'backend/js/addProduct.js' %}"></script>
+    {% if not product.pk %}
+        <script type="text/javascript" src="{% static 'backend/js/tabs_toggle.js' %}"></script>
+    {% endif %}
 
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switch.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/addProduct.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switch.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/core/libraries/jquery_ui/core.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switchery.min.js' %}"></script>
 
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/pages/form_multiselect.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/bootstrap_select.min.js' %}"></script>
-  <script type="text/javascript" src="{% static 'backend/js/core/libraries/jquery_ui/core.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/selects/selectboxit.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'backend/js/plugins/forms/styling/switchery.min.js' %}"></script>
-<script>
+    <script>
+        $(document).ready(function(){
+            // Basic initialization
+            $('.multiselect').multiselect({
+                onChange: function() {
+                    $.uniform.update();
+                }
+            });
 
-$(document).ready(function(){
-     // Basic initialization
-    $('.multiselect').multiselect({
-        onChange: function() {
-            $.uniform.update();
-        }
-    });
-     // Default initialization
-    $(".styled, .multiselect-container input").uniform({
-        radioClass: 'choice'
-    });
+            // Default initialization
+            $(".styled, .multiselect-container input").uniform({
+                radioClass: 'choice'
+            });
 
-    $('.select-supplier-variant').selectpicker({
-        iconBase: 'fa',
-        addIcon:'fa-plus-circle'
-    });
-    $('.select-supplier-variant').on('change',function(){
-        var sp = $(this).val();
-        if(sp == 'add'){
-            $( "#add-supplier" ).trigger( "click" );
-        }
-    });
+            $('.select-supplier-variant').selectpicker({
+                iconBase: 'fa',
+                addIcon:'fa-plus-circle'
+            });
 
-  });
-</script>
-                  <!-- additional js -->
+            $('.select-supplier-variant').on('change',function(){
+                var sp = $(this).val();
+                if(sp == 'add'){
+                    $( "#add-supplier" ).trigger( "click" );
+                }
+            });
+
+        });
+    </script>
+
+<!-- additional js -->
 <script type="text/javascript" src="{% static 'backend/js/category.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/productclass.js' %}"></script>
-
 <script type="text/javascript" src="{% static 'backend/js/productattribute.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/supplier.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/deleteModal.js' %}"></script>
@@ -890,8 +961,8 @@ $(document).ready(function(){
 <script type="text/javascript" src="{% static 'backend/js/plugins/vue/vue-resource.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.twbsPagination.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'backend/js/product/vue/product.js' %}"></script>
-<script type="text/javascript">
 
+<script type="text/javascript">
   $( document ).ready(function() {
 
    // Custom results color
@@ -1032,7 +1103,8 @@ $(document).ready(function(){
           }
     });
   });
-  </script>
+</script>
+
 <script type="text/javascript">
 
  $.when( $.ready ).then(function() {

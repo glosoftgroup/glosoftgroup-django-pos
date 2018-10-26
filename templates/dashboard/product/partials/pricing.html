@@ -2,34 +2,13 @@
 {% load prices_i18n %}  
   <!-- price area -->  
         <!-- Product Pricing Details -->      
-        <div class="col-md-12">
+        <div class="col-md-12 mb-20">
           <div class="row">
           {% if product.product_class.has_variants %}
-            <div class="col-md-2" style="padding:0px;margin-top: 25px;margin-right: 0px;margin-left: 0px;">
-            <button data-attributes="{% url 'dashboard:attr_list_f32b' %}" class="btn btn-primary" id="addNewvaraints">New attribute</button>
+            <div class="col-md-2" style="padding:0px;margin-top: 15px;margin-right: 0px;margin-left: 0px;">
+                <button data-attributes="{% url 'dashboard:attr_list_f32b' %}" class="btn btn-primary" id="addNewvaraints">Add New attribute</button>
             </div>
           {% endif %}
-            <div class="col-md-4">
-              <div class="form-group" id='tax_field'>
-                <label>Tax: % </label>
-                <div class="input-group tax-refresh">
-                {{ product_form.product_tax }}
-                  <div class="input-group-btn">
-                      <a id="add-new-tax" onclick="return false;" class="btn btn-icon bg-primary "
-                        href="#modal_attributes"  data-title="Add New Tax">
-                      <i class=" icon-plus-circle2"></i>
-                     </a>
-                  </div>
-                 </div>
-              </div>
-            </div>
-             {% if product.product_class.has_variants %}
-            <!-- no variant -->
-            <span >
-             <a style="margin-top: 28px;" class="btn hvr-glow btn-primary" data-productpk="{{product.pk}}" data-priceurl="{% url 'dashboard:product-data' %}" id="updatePricing">Save</a>
-            </span>
-            {% endif %}
-            <!-- ./no varaint -->
           </div>     
 
         </div>
