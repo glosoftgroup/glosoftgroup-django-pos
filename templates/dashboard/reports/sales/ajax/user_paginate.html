@@ -5,8 +5,8 @@
    {% for sales in sales_by_category %}
   <tr class='clickable-row'>
     <td class="td">{{sales.user__name}}</td>
-    <td class="td">{{sales.solditems__quantity__sum}}</td>
-      <td class="td"><span class="pull-right">{{sales.total_net__sum}}</span></td>
+    <td class="td">{{sales.solditems__quantity__sum|intcomma}}</td>
+      <td class="td"><span class="pull-right">{{sales.total_net__sum|intcomma}}</span></td>
   </tr>
 {% endfor %}
  {% else %}

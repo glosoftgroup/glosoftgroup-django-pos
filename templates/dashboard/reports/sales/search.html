@@ -16,9 +16,11 @@
                           <th>Cashier</th>
                           <th>Payment Mode</th>
                           <th>Quantity</th>
-                           <th>Total Sales</th>
-                            <th class="text-center">Total Tax</th>
+                          <th>Total Sales</th>
+                          <th class="text-center">Total Tax</th>
+                          {% if perms.sales.can_revert_sale %}
                             <th></th>
+                          {% endif %}
                         </tr>
                       </thead>
                       <tbody id="p-tb">
@@ -38,11 +40,13 @@
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}">{{sale.quantity}}</td>
                             <td class="td" data-href="{% url 'dashboard:sale-detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_net|intcomma }}</span></td>
                               <td class="td" data-href="{% url 'dashboard:sale_tax_detail' pk=sale.pk %}"><span class="pull-right">{{sale.total_tax|intcomma }}</span></td>
+                              {% if perms.sales.can_revert_sale %}
                               <td>
                                   <a data-ta="#modal_instance" data-title="Revert sale {{ sale.invoice_number }} ?" data-href="{% url 'dashboard:sale-revert' pk=sale.pk %}" data-name="{{ sale.invoice_number }}" data-id="{{ sale.pk }}"
                                  class="btn btn-primary modal-trigger"> REVERT
                                  </a>
                               </td>
+                              {% endif %}
                           </tr>
                         {% endfor %}
                          {% else %}
@@ -99,14 +103,13 @@
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/bs_pagination.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'backend/js/plugins/pagination/jquery.bootpag.js' %}"></script>
  <script type="text/javascript">
-   $(document).ready(function(){
 
-       $(".td").click(function(){
+        $(".td").click(function(){
           window.location = $(this).data("href");
-      });
+        });
 
-        $('.p2-pag').bootpag({
-            total: parseInt('{{pn}}'),
+        $(".p2-pag").bootpag({
+            total: parseInt("{{pn}}"),
             maxVisible: 3,
             leaps: true,
             firstLastUse: true,
@@ -137,7 +140,7 @@
 
 
 
-   //**@ display size select
+     /* display size select */
      $('.list-sz').selectpicker().on('change', function(){
         var listSizeVal = $(this).val();
         var searchData = $('.search_user').val();
@@ -220,10 +223,11 @@
        }
 
      });
-{% if sz %}
-   $.when( $.ready ).then(function() {     
-       $('.bootstrap-select').selectpicker();
-       $('.list-sz').selectpicker('val', ["{{sz}}"]);              
-    });
+
+    {% if sz %}
+       $.when( $.ready ).then(function() {
+           $('.bootstrap-select').selectpicker();
+           $('.list-sz').selectpicker('val', ["{{sz}}"]);
+       });
    {% endif %}
  </script>

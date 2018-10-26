@@ -60,7 +60,7 @@
                     <table class="table table-hover">
                         <thead>
                             <tr class="bg-primary">
-                                <th>Supplier</th>
+                                <th class="hidden">Supplier</th>
                                 <th>Name</th>
                                 <th>Purchase</th>
                             </tr>
@@ -85,8 +85,8 @@
                 <!--listing template-->
                 <template v-for="item in items">
                     <tr class="td animated fadeIn">
-                        <td>${item.supplier_name}</td>
-                        <td>${item.product_name}<br>${item.sku}</td>
+                        <td class="hidden">${item.supplier_name}</td>
+                        <td>${item.product_name} - ${item.sku}</td>
                         <td class="text-center">
                             <span class="label label-primary cursor-pointer" @click="addToCart(item)">
                                 Add
@@ -98,6 +98,28 @@
 
                 </tbody>
                     </table>
+                    <div class="row media-none">
+                         <div class="col-md-12">
+
+                          <div class="col-md-3">
+                              <div class="col-md-12 form-group">
+                                 <select v-model="page_size" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+                                    <option value="10" selected>No:</option>
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                  </select>
+                              </div>
+                          </div>
+
+                          <div class="col-md-9" id="media-none">
+                              <div class="text-center bootpag-callback p2-pag" style="">
+                              </div>
+                          </div>
+
+                          </div>
+                         </div>
+                         <input type="hidden" id="page_size" val="">
                 </div>
             </div>
         </div>
@@ -109,7 +131,7 @@
                     <table class="table">
                         <tr class="active">
                                 <td class="text-center text-bold" colspan="12">
-                                    Purchase Cart (<span >{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>)
+                                    Purchase Cart (<span > ${Total | formatCurrency}</span>)
                                     <!--alert-->
                                     <div class="col-md-12">
                                         <div class="alert alert-danger no-border text-center animated shake hidden">
@@ -187,7 +209,7 @@
                                         </button>
                                     </td>
                                     <td colspan="9">
-                                        <span style="font-size:24px;">{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}</span>
+                                        <span style="font-size:24px;"> ${Total | formatCurrency}</span>
                                     </td>
                                 </template>
                             </tr>
@@ -242,7 +264,7 @@
                         <div class="col-md-8">
                              <!--total-->
                             <h4 class="text-center text-bold" style="font-size:34px;">
-                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${Total | formatCurrency}
+                                Total: ${Total | formatCurrency}
                             </h4>
                             <!--payment table-->
                             <div class="table-responsive">
@@ -289,10 +311,10 @@
                                             <td>
                                                 <span class="text-warning" v-show="show_balance">Balance:</span>
                                                 <span class="text-success" v-show="show_change">Change:</span>
-                                                <span> {{'DEFAULT_CURRENCY'|site_settings}} ${getDue(Total,Tendered)| formatCurrency}</span>
+                                                <span> ${getDue(Total,Tendered)| formatCurrency}</span>
                                             </td>
                                             <td colspan="4">
-                                                <span style="font-size:14px;">Tendered: {{'DEFAULT_CURRENCY'|site_settings}}  ${Tendered | formatCurrency}</span>
+                                                <span style="font-size:14px;">Tendered: ${Tendered | formatCurrency}</span>
                                             </td>
                                         </template>
                                     </tr>

@@ -88,8 +88,8 @@
                           <th>Sub-Category</th>
                           <th>Reorder-level</th>
                           <th>Current Quantity <span style="font-size:.9em;">(units)</span></th>
-                          <th>Unit Cost (KShs)</th>
-                          <th>Total Cost (KShs)</th>
+                          <th>Unit Cost</th>
+                          <th>Total Cost</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
@@ -129,9 +129,9 @@
             <div class="row">
               <div class="col-md-10 col-md-offset-1">
                  <p class="text-center" style="margin: 20px 0px;">
-                   Total Stock Valuation: Kshs {{total_cost}}<br />
+                   Total Stock Valuation: {{total_cost}}<br />
                  </p>
-                  <p class="text-center"> Thank you for partnering with us.<br />
+                  <p class="text-center">
                   <span>Report pulled by  {% if request.user.name %}
                         {{request.user.name}}
                       {% else %}

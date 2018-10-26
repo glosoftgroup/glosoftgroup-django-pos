@@ -5,9 +5,9 @@
    {% for sales in sales_by_category %}
   <tr class='clickable-row'>
     <td class="td">{{sales.product_name}}</td>
-    <td class="td">{{sales.discount}}</td>
-    <td class="td">{{sales.quantity__sum}}</td>
-      <td class="td"><span class="pull-right">{{sales.total_cost__sum}}</span></td>
+    <td class="td">{{sales.discount|intcomma}}</td>
+    <td class="td">{{sales.quantity__sum|intcomma}}</td>
+      <td class="td"><span class="pull-right">{{sales.total_cost__sum|intcomma}}</span></td>
   </tr>
 {% endfor %}
  {% else %}

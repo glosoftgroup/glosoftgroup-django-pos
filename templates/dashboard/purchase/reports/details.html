@@ -9,7 +9,7 @@
 {% load default_user_image %}
 {% load compress %}
 {% block title %}
-  Sales Report
+  Purchase Detail Report
 {% endblock %}
 {% block breadcrumbs %}
      <li class=""><a href="{% url 'dashboard:purchase-variant' %}">Purchase Report</a></li>
@@ -135,7 +135,7 @@
                           <th>Item Name</th>
                           <th>Unit Cost</th>
                           <th>Quantity</th>
-                          <th>Total Purchase ({{'DEFAULT_CURRENCY'|site_settings}})</th>
+                          <th class="pull-right">Total Purchase</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
@@ -144,7 +144,7 @@
                           <tr>
                             <td>{{item.created|date:"d-m-Y H:i a"}}</td>
                             <td>{{item.product_name}}</td>
-                            <td>{{item.unit_cost}}</td>
+                            <td>{{item.unit_cost|intcomma}}</td>
                             <td>{{item.quantity}}</td>
                             <td><span class="pull-right">{{item.total_cost|intcomma}}</span></td>
                           </tr>
@@ -152,13 +152,13 @@
                            <tr class="active">
 
                                <td class="text-bold text-right" colspan="5">
-                                   Total: {{'DEFAULT_CURRENCY'|site_settings}} {{sale.total_net|intcomma}}
+                                   Total: {{sale.total_net|intcomma}}
                                </td>
                            </tr>
                             <tr class="active">
 
                                <td class="text-bold text-right" colspan="5">
-                                   Balance: {{'DEFAULT_CURRENCY'|site_settings}} ${balance |formatCurrency}
+                                   Balance: ${balance |formatCurrency}
                                </td>
                            </tr>
                          {% else %}
@@ -183,7 +183,7 @@
                           <th>Date</th>
                           <th>Method</th>
                           <th>Transaction No.</th>
-                          <th>Tendered</th>
+                          <th class="pull-right">Tendered</th>
                         </tr>
                       </thead>
                       <tbody id="tb">
@@ -211,14 +211,14 @@
                                 </td>
                                 <td>${item.payment_name}</td>
                                 <td>${item.transaction_number}</td>
-                                <td>${item.tendered|formatCurrency}</td>
+                                <td class="pull-right">${item.tendered|formatCurrency}</td>
                             </tr>
                         </template>
                         <template>
                           <tr>
                                <td v-if="pending" class="text-bold text-center" colspan="5">
                                    <button @click="openModal" class="btn btn-success hvr-glow btn-raised legitRipple" id="addPayment">
-                                       Settle Credit ({{'DEFAULT_CURRENCY'|site_settings}} ${balance|formatCurrency})
+                                       Settle Credit (${balance|formatCurrency})
                                    </button>
                                </td>
                            </tr>
@@ -226,7 +226,7 @@
                         <template>
                         <tr class="active">
                                <td class="text-bold text-right" colspan="5">
-                                Total Paid:  {{'DEFAULT_CURRENCY'|site_settings}} {{ 'DEFAULT_CURRENCY'|site_settings}} ${paid|formatCurrency}
+                                Total Paid: ${paid|formatCurrency}
                                </td>
                         </tr>
                         </template>
@@ -241,19 +241,7 @@
           {% if items %}
             <div class="row">
               <div class="col-md-6 col-md-offset-3 text-center" style="margin-top: 20px;">
-                  <span>
-                   Total Purchase: Kshs {{sale.total_net|intcomma}}<br />
-                 </span>
-                  <span>
-                   {% if sale.balance %}
-                   Total Paid: {{ 'DEFAULT_CURRENCY'|site_settings}} ${paid |formatCurrency}<br />
-                   Total Balance: {{ 'DEFAULT_CURRENCY'|site_settings}} ${balance |formatCurrency}
-                   {% else %}
-                      Fully Paid
-                   {% endif %}<hr />
-                 </span><br>
-                  <span> Thank you for partnering with us.<br />
-                  <span>Report pulled by {{request.user.name}}</span></span>
+                  <span>Report pulled by {{request.user.name}}</span>
                   <input type="hidden" class="setValue">
                   <input type="hidden" class="setName">
 
@@ -300,7 +288,7 @@
                         <div class="col-md-8">
                              <!--total-->
                             <h4 class="text-center text-bold" style="font-size:34px;">
-                                Total:{{'DEFAULT_CURRENCY'|site_settings}}  ${balance | formatCurrency}
+                                Total: ${balance | formatCurrency}
                             </h4>
                             <!--payment table-->
                              <table class="table table-hover">
@@ -344,7 +332,7 @@
                                             <td>
                                              </td>
                                             <td colspan="4">
-                                                <span style="font-size:14px;">Tendered: {{'DEFAULT_CURRENCY'|site_settings}}  ${Tendered | formatCurrency}</span>
+                                                <span style="font-size:14px;">Tendered: ${Tendered | formatCurrency}</span>
                                             </td>
                                         </template>
                                     </tr>
