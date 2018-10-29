@@ -448,6 +448,8 @@ class TableListSerializer(serializers.ModelSerializer):
             'customer_mobile',
             'credit_status',
             'credit_amount',
+            'amount_paid',
+            'debt',
             'detail_url',
             'due_date',
             'date',

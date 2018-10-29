@@ -116,6 +116,8 @@
                     <th>Due Date</th>
                     <th>Is Due</th>
                     <th>Total Credit</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
                   </tr>
                 </thead>
                 <tbody id="tb">
@@ -148,6 +150,8 @@
                         <td>${item.due_date}</td>
                         <td v-html="item.is_due"></td>
                         <td>${item.credit_amount}</td>
+                        <td>${item.amount_paid}</td>
+                        <td>${item.debt}</td>
 
                     </tr>
                 </template>
