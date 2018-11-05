@@ -29,6 +29,7 @@ from ...product.models import (
             )
 from ...customer.models import Customer
 from ...site.models import SiteSettings
+from ..credit.utilities import clear_old_debts_using_change
 
 
 User = get_user_model()
@@ -170,6 +171,7 @@ class SalesSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='product-api:sales-details')
     solditems = TrackSerializer(many=True)
     payment_data = JSONField()
+    apply_to_pending = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = Sales
@@ -190,7 +192,8 @@ class SalesSerializer(serializers.ModelSerializer):
                  'status',                
                  'payment_data',
                  'total_tax',
-                 'discount_amount'
+                 'discount_amount',
+                 'apply_to_pending',
                 )
 
     def validate_total_net(self, value):
@@ -382,6 +385,14 @@ class SalesSerializer(serializers.ModelSerializer):
                 else:
                     print('stock not found')
                     checker = False
+
+            if validated_data.get('apply_to_pending'):
+                print(' clearing old debts ')
+                """ get the first credit entry and clear it """
+                change = validated_data.get('balance')
+                if change < 0:
+                    change = change * -1
+                clear_old_debts_using_change(change, sales)
 
             # except Exception as e:
             #     print('Error reducing stock!')

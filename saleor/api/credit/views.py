@@ -6,12 +6,12 @@ from rest_framework import generics
 from ...decorators import user_trail
 from ...credit.models import Credit
 from ...sale.models import (
-                            Sales, SoldItem,
-                            Terminal, 
-                            TerminalHistoryEntry,
-                            DrawerCash,
-                            PaymentOption
-                            )
+    Sales, SoldItem,
+    Terminal,
+    TerminalHistoryEntry,
+    DrawerCash,
+    PaymentOption
+)
 from .pagination import PostLimitOffsetPagination
 from .serializers import (
     CreditListSerializer,
@@ -19,9 +19,10 @@ from .serializers import (
     CreditUpdateSerializer,
     DistinctTableListSerializer,
     TableListSerializer
-     )
+)
 
 import logging
+
 User = get_user_model()
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
@@ -37,8 +38,8 @@ class CreditCreateAPIView(generics.CreateAPIView):
     queryset = Credit.objects.all()
     serializer_class = CreateCreditSerializer
 
-    def perform_create(self, serializer):              
-        instance = serializer.save(user=self.request.user)      
+    def perform_create(self, serializer):
+        instance = serializer.save(user=self.request.user)
         if instance.status == 'fully-paid':
             send_to_sale(instance)
 
@@ -46,27 +47,27 @@ class CreditCreateAPIView(generics.CreateAPIView):
 class CreditListAPIView(generics.ListAPIView):
     serializer_class = CreditListSerializer
 
-    def get_queryset(self, *args, **kwargs):        
+    def get_queryset(self, *args, **kwargs):
         queryset_list = Credit.objects.all()
         query = self.request.GET.get('q')
         if query:
             queryset_list = queryset_list.filter(
-                Q(invoice_number__icontains=query)               
-                ).distinct()
+                Q(invoice_number__icontains=query)
+            ).distinct()
         return queryset_list
 
 
-class CreditorsListAPIView(generics.ListAPIView):    
+class CreditorsListAPIView(generics.ListAPIView):
     serializer_class = CreditListSerializer
 
-    def get_queryset(self, *args, **kwargs):        
+    def get_queryset(self, *args, **kwargs):
         queryset_list = Credit.objects.filter(status='payment-pending')
         query = self.request.GET.get('q')
         try:
             if query:
                 queryset_list = queryset_list.filter(status='payment-pending').filter(
-                    Q(invoice_number__icontains=query)|
-                    Q(customer__name__icontains=query)|
+                    Q(invoice_number__icontains=query) |
+                    Q(customer__name__icontains=query) |
                     Q(created__icontains=query) |
                     Q(customer__mobile__icontains=query)).distinct()
         except:
@@ -74,7 +75,7 @@ class CreditorsListAPIView(generics.ListAPIView):
         return queryset_list
 
 
-class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):    
+class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):
     queryset = Credit.objects.all()
     serializer_class = CreditUpdateSerializer
 
@@ -82,63 +83,65 @@ class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):
         instance = serializer.save(user=self.request.user)
         if instance.status == 'fully-paid':
             send_to_sale(instance)
-        user_trail(self.request.user.name, 'made a credit sale:#'+str(serializer.data['invoice_number'])+' credit sale worth: '+str(serializer.data['total_net']),'add')
-        info_logger.info('User: '+str(self.request.user)+' made a credit sale:'+str(serializer.data['invoice_number']))
+        user_trail(self.request.user.name,
+                   'made a credit sale:#' + str(serializer.data['invoice_number']) + ' credit sale worth: ' + str(
+                       serializer.data['total_net']), 'add')
+        info_logger.info(
+            'User: ' + str(self.request.user) + ' made a credit sale:' + str(serializer.data['invoice_number']))
         terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
-        trail = 'User: '+str(self.request.user)+\
-                ' updated a credited sale :'+str(serializer.data['invoice_number'])+\
-                ' Net#: '+str(serializer.data['total_net'])+\
-                ' Amount paid#:'+str(serializer.data['amount_paid'])
+        trail = 'User: ' + str(self.request.user) + \
+                ' updated a credited sale :' + str(serializer.data['invoice_number']) + \
+                ' Net#: ' + str(serializer.data['total_net']) + \
+                ' Amount paid#:' + str(serializer.data['amount_paid'])
 
         TerminalHistoryEntry.objects.create(
-                            terminal=terminal,
-                            comment=trail,
-                            crud='deposit',
-                            user=self.request.user
-                        )
-        drawer = DrawerCash.objects.create(manager=self.request.user,                                        
+            terminal=terminal,
+            comment=trail,
+            crud='deposit',
+            user=self.request.user
+        )
+        drawer = DrawerCash.objects.create(manager=self.request.user,
                                            user=self.request.user,
                                            terminal=terminal,
                                            amount=serializer.data['amount_paid'],
                                            trans_type='credit paid')
-        
+
 
 def send_to_sale(credit):
     sale = Sales.objects.create(
-                         user=credit.user,
-                         invoice_number=credit.invoice_number,
-                         total_net=credit.total_net,
-                         sub_total=credit.sub_total,
-                         balance=credit.balance,
-                         terminal=credit.terminal,
-                         amount_paid=credit.amount_paid,
-                         customer=credit.customer,
-                         status=credit.status,
-                         total_tax=credit.total_tax,
-                         mobile=credit.mobile,
-                         customer_name=credit.customer_name,
-                         payment_data=credit.payment_data
-                         )
+        user=credit.user,
+        invoice_number=credit.invoice_number,
+        total_net=credit.total_net,
+        sub_total=credit.sub_total,
+        balance=credit.balance,
+        terminal=credit.terminal,
+        amount_paid=credit.amount_paid,
+        customer=credit.customer,
+        status=credit.status,
+        total_tax=credit.total_tax,
+        mobile=credit.mobile,
+        customer_name=credit.customer_name,
+        payment_data=credit.payment_data
+    )
     payment_data = sale.payment_data
     if payment_data:
         for option in payment_data:
-                    pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
-                    sale.payment_options.add(pay_opt)
+            pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
+            sale.payment_options.add(pay_opt)
         sale.save()
-        
+
     for item in credit.items():
         item = SoldItem.objects.create(sales=sale,
-                        sku=item.sku,
-                        quantity=item.quantity,
-                        product_name=item.product_name,
-                        total_cost=item.total_cost,
-                        unit_cost=item.unit_cost,
-                        product_category=item.product_category,
-                        attributes=item.attributes,
-                        unit_purchase=item.unit_purchase,
-                        total_purchase=item.total_purchase
-                        )
-
+                                       sku=item.sku,
+                                       quantity=item.quantity,
+                                       product_name=item.product_name,
+                                       total_cost=item.total_cost,
+                                       unit_cost=item.unit_cost,
+                                       product_category=item.product_category,
+                                       attributes=item.attributes,
+                                       unit_purchase=item.unit_purchase,
+                                       total_purchase=item.total_purchase
+                                       )
 
 
 # on
@@ -172,7 +175,7 @@ class CustomerCreditListAPIView(generics.ListAPIView):
             queryset_list = queryset_list.filter(
                 Q(invoice_number__icontains=query) |
                 Q(customer__name__icontains=query)
-                ).distinct()
+            ).distinct()
         return queryset_list.order_by('-id')
 
 
@@ -188,7 +191,8 @@ class CustomerDistinctListAPIView(generics.ListAPIView):
     def get_queryset(self, *args, **kwargs):
         try:
             if self.kwargs['pk']:
-                queryset_list = Credit.objects.filter(customer__pk=self.kwargs['pk']).order_by('car').distinct('car').select_related()
+                queryset_list = Credit.objects.filter(customer__pk=self.kwargs['pk']).order_by('car').distinct(
+                    'car').select_related()
             else:
                 queryset_list = Credit.objects.all.select_related()
         except Exception as e:
@@ -210,5 +214,5 @@ class CustomerDistinctListAPIView(generics.ListAPIView):
             queryset_list = queryset_list.filter(
                 Q(invoice_number__icontains=query) |
                 Q(customer__name__icontains=query)
-                ).distinct('customer')
+            ).distinct('customer')
         return queryset_list.order_by('customer')
