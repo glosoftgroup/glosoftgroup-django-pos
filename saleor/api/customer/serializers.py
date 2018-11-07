@@ -26,7 +26,8 @@ class CustomerListSerializer(serializers.ModelSerializer):
                  'loyalty_points',
                  'redeemed_loyalty_points',
                  'total_credit',
-                 'cash_equivalency'
+                 'cash_equivalency',
+                 'creditable'
                  )
 
     def get_cash_equivalency(self, obj):

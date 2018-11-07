@@ -1,11 +1,10 @@
 from django.utils.formats import localize
 from rest_framework.serializers import (
-                ModelSerializer,
-                HyperlinkedIdentityField,
-                JSONField,
-                SerializerMethodField,
-                ValidationError
-                )
+    HyperlinkedIdentityField,
+    JSONField,
+    SerializerMethodField,
+    ValidationError
+)
 from rest_framework.exceptions import ParseError
 
 from rest_framework import serializers
@@ -13,19 +12,19 @@ from django.contrib.auth import get_user_model
 
 from ...sale.models import Terminal, PaymentOption
 from ...credit.models import (
-            Credit,
-            CreditedItem,
-            CreditHistoryEntry
-            )
-from ...site.models import SiteSettings
+    Credit,
+    CreditedItem,
+    CreditHistoryEntry
+)
 from ...product.models import (
-            Product,
-            ProductVariant,
-            Stock,
-            )
+    ProductVariant,
+    Stock,
+)
 from decimal import Decimal
 from ...customer.models import Customer
+from .utilities import clear_old_debts_using_change
 import logging
+
 debug_logger = logging.getLogger('debug_logger')
 info_logger = logging.getLogger('info_logger')
 error_logger = logging.getLogger('error_logger')
@@ -36,18 +35,18 @@ class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditedItem
         fields = (
-                'id',
-                'order',
-                'sku',
-                'quantity',
-                'unit_cost',
-                'total_cost',
-                'product_name',
-                'product_category',
-                'tax',
-                'discount',
-                'attributes',
-                 )
+            'id',
+            'order',
+            'sku',
+            'quantity',
+            'unit_cost',
+            'total_cost',
+            'product_name',
+            'product_category',
+            'tax',
+            'discount',
+            'attributes',
+        )
 
 
 class ItemsSerializer(serializers.ModelSerializer):
@@ -57,25 +56,25 @@ class ItemsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditedItem
         fields = (
-                'id',
-                'order',
-                'sku',
-                'quantity',
-                'unit_cost',
-                'total_cost',
-                'product_name',
-                'product_category',
-                'available_stock',
-                'item_pk',
-                'tax',
-                'discount',
-                'attributes',
-                 )
+            'id',
+            'order',
+            'sku',
+            'quantity',
+            'unit_cost',
+            'total_cost',
+            'product_name',
+            'product_category',
+            'available_stock',
+            'item_pk',
+            'tax',
+            'discount',
+            'attributes',
+        )
 
-    def get_item_pk(self,obj):
+    def get_item_pk(self, obj):
         return obj.pk
 
-    def get_available_stock(self,obj):
+    def get_available_stock(self, obj):
         try:
             stock = ProductVariant.objects.get(sku=obj.sku)
             return stock.get_stock_quantity()
@@ -91,27 +90,27 @@ class CreditListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Credit
         fields = (
-                 'id',
-                 'user',
-                 'invoice_number',
-                 'created',
-                 'total_net',
-                 'sub_total',                 
-                 'update_url',
-                 'balance',
-                 'terminal',
-                 'amount_paid',
-                 'credititems',
-                 'customer',
-                 'mobile',
-                 'customer_name',
-                 'cashier',
-                 'status',
-                 'total_tax',
-                 'discount_amount',
-                 'due_date',
-                 'debt'
-                )
+            'id',
+            'user',
+            'invoice_number',
+            'created',
+            'total_net',
+            'sub_total',
+            'update_url',
+            'balance',
+            'terminal',
+            'amount_paid',
+            'credititems',
+            'customer',
+            'mobile',
+            'customer_name',
+            'cashier',
+            'status',
+            'total_tax',
+            'discount_amount',
+            'due_date',
+            'debt'
+        )
 
     def get_cashier(self, obj):
         name = User.objects.get(pk=obj.user.id)
@@ -125,28 +124,28 @@ class CreateCreditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Credit
         fields = (
-                 'id',
-                 'user',
-                 'invoice_number',
-                 'total_net',
-                 'sub_total',                 
-                 'update_url',
-                 'balance',
-                 'terminal',
-                 'amount_paid',
-                 'credititems',
-                 'customer',
-                 'mobile',
-                 'customer_name',
-                 'status',
-                 'total_tax',
-                 'discount_amount',
-                 'due_date',
-                 'debt'
-                )
+            'id',
+            'user',
+            'invoice_number',
+            'total_net',
+            'sub_total',
+            'update_url',
+            'balance',
+            'terminal',
+            'amount_paid',
+            'credititems',
+            'customer',
+            'mobile',
+            'customer_name',
+            'status',
+            'total_tax',
+            'discount_amount',
+            'due_date',
+            'debt'
+        )
 
-    def validate_total_net(self,value):
-        data = self.get_initial()        
+    def validate_total_net(self, value):
+        data = self.get_initial()
         try:
             self.total_net = Decimal(data.get('total_net'))
         except:
@@ -180,25 +179,25 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         except Exception as e:
             error_logger.error(e)
         return value
-        
+
     def validate_terminal(self, value):
         data = self.get_initial()
         self.terminal_id = int(data.get('terminal'))
-        self.l=[]
+        self.l = []
         terminals = Terminal.objects.all()
         for term in terminals:
             self.l.append(term.pk)
         if not self.terminal_id in self.l:
             error_logger.error('Terminal specified does not exist')
             raise ValidationError('Terminal specified does not exist')
-        return value    
+        return value
 
     def create(self, validated_data):
         kwargs = {}
         try:
-           total_net = Decimal(validated_data.get('total_net'))
+            total_net = Decimal(validated_data.get('total_net'))
         except:
-           total_net = Decimal(0)
+            total_net = Decimal(0)
         # validate customer name and mobile number
         if validated_data.get('mobile') and validated_data.get('customer_name'):
             kwargs['name'] = validated_data.get('customer_name')
@@ -210,16 +209,16 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         customer = Customer.objects.filter(**kwargs)
         if customer.exists():
             if not customer.get().creditable:
-                error_logger.error('Customer '+kwargs['name']+' is not creditable')
-                raise ParseError('Customer '+kwargs['name']+' is not creditable', code=400)
+                error_logger.error('Customer ' + kwargs['name'] + ' is not creditable')
+                raise ParseError('Customer ' + kwargs['name'] + ' is not creditable', code=400)
 
         if not customer.exists():
             kwargs['creditable'] = True
             customer = Customer.objects.create(**kwargs)
         else:
             customer = customer.first()
-                  
-        solditems_data = validated_data.pop('credititems')        
+
+        solditems_data = validated_data.pop('credititems')
         credit = Credit()
         credit.user = validated_data.get('user')
         credit.invoice_number = validated_data.get('invoice_number')
@@ -303,39 +302,41 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         return credit
 
 
-class CreditUpdateSerializer(serializers.ModelSerializer):      
+class CreditUpdateSerializer(serializers.ModelSerializer):
     credititems = TrackSerializer(many=True)
     payment_data = JSONField()
+    apply_to_pending = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = Credit
         fields = (
-                 'id',
-                 'invoice_number',
-                 'total_net',
-                 'sub_total',                
-                 'balance',
-                 'terminal',
-                 'amount_paid',                 
-                 'mobile',
-                 'customer_name',
-                 'status',
-                 'total_tax',
-                 'discount_amount',
-                 'debt',
-                 'credititems',
-                 'payment_data',
-                 )       
-    
+            'id',
+            'invoice_number',
+            'total_net',
+            'sub_total',
+            'balance',
+            'terminal',
+            'amount_paid',
+            'mobile',
+            'customer_name',
+            'status',
+            'total_tax',
+            'discount_amount',
+            'debt',
+            'credititems',
+            'payment_data',
+            'apply_to_pending',
+        )
+
     def validate_status(self, value):
         data = self.get_initial()
-        status = str(data.get('status'))        
+        status = str(data.get('status'))
         if status == 'fully-paid' or status == 'payment-pending':
-            status = status 
-            invoice_number = data.get('invoice_number')      
+            status = status
+            invoice_number = data.get('invoice_number')
             amount_paid = Decimal(data.get('amount_paid'))
             total_net = Decimal(data.get('total_net'))
-            balance = Decimal(data.get('balance'))            
+            balance = Decimal(data.get('balance'))
             sale = Credit.objects.get(invoice_number=str(invoice_number))
             if status == 'fully-paid' and sale.balance > amount_paid:
                 error_logger.error("Status error. Amount paid is less than balance.")
@@ -344,26 +345,34 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
                 return value
         else:
             error_logger.error('Enter correct Status. Expecting either fully-paid/payment-pending')
-            raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')        
+            raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')
 
     def validate_total_net(self, value):
-        data = self.get_initial()        
+        data = self.get_initial()
         try:
             total_net = Decimal(data.get('total_net'))
         except:
             error_logger.error('Total Net should be a decimal/integer')
             raise ValidationError('Total Net should be a decimal/integer')
 
-    def validate_debt(self,value):
-        data = self.get_initial()        
+    def validate_debt(self, value):
+        data = self.get_initial()
         try:
             debt = Decimal(data.get('debt'))
         except:
             raise ValidationError('Debt should be a decimal/integer')
         return value
 
-    def validate_amout_paid(self,value):
-        data = self.get_initial()        
+    def validate_balance(self, value):
+        data = self.get_initial()
+        try:
+            balance = Decimal(data.get('balance'))
+        except:
+            raise ValidationError('Debt should be a decimal/integer')
+        return value
+
+    def validate_amout_paid(self, value):
+        data = self.get_initial()
         try:
             amount_paid = Decimal(data.get('amount_paid'))
         except:
@@ -373,7 +382,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
     def validate_terminal(self, value):
         data = self.get_initial()
         self.terminal_id = int(data.get('terminal'))
-        #try:
+        # try:
         terminal = Terminal.objects.filter(pk=self.terminal_id)
         if terminal:
             return value
@@ -382,38 +391,46 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         # except:
         #     raise ValidationError('Terminal specified does not exist')
 
-    def validate_payment_data(self,value):
+    def validate_payment_data(self, value):
         data = self.get_initial()
         dictionary_value = dict(data.get('payment_data'))
         return value
 
     def update(self, instance, validated_data):
-        terminal = Terminal.objects.get(pk=self.terminal_id)    
+        terminal = Terminal.objects.get(pk=self.terminal_id)
 
-        terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))       
-        terminal.save()        
-        instance.debt = instance.debt-validated_data.get('amount_paid', instance.amount_paid)
-        instance.amount_paid = instance.amount_paid+validated_data.get('amount_paid', instance.amount_paid)
+        terminal.amount += Decimal(validated_data.get('amount_paid', instance.amount_paid))
+        terminal.save()
+        instance.debt = instance.debt - validated_data.get('amount_paid', instance.amount_paid)
+        instance.amount_paid = instance.amount_paid + validated_data.get('amount_paid', instance.amount_paid)
         instance.payment_data = validated_data.get('payment_data')
+
         if instance.amount_paid >= instance.total_net:
             instance.status = 'fully-paid'
             instance.amount_paid = instance.total_net
             instance.debt = 0
 
-            payment_data = validated_data.get('payment_data')        
+            payment_data = validated_data.get('payment_data')
             for option in payment_data:
                 pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
-                print option
-                print '------'
-                print pay_opt
                 instance.payment_options.add(pay_opt)
 
         else:
             instance.status = validated_data.get('status', instance.status)
-        instance.mobile = validated_data.get('mobile', instance.mobile)   
-        
+        instance.mobile = validated_data.get('mobile', instance.mobile)
+
         instance.customer_name = validated_data.get('customer_name', instance.customer_name)
         instance.save()
+
+        if validated_data.get('apply_to_pending'):
+
+            info_logger.info('clearing old debts')
+
+            """ handle the balance as a positive """
+            change = validated_data.get('balance')
+            if change < 0:
+                change = change * -1
+            clear_old_debts_using_change(change, instance)
 
         # add credit history
         try:
@@ -453,6 +470,7 @@ class TableListSerializer(serializers.ModelSerializer):
             'detail_url',
             'due_date',
             'date',
+            'balance'
         )
 
     def get_is_due(self, obj):
@@ -495,17 +513,17 @@ class DistinctTableListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Credit
         fields = (
-                 'id',
-                 'customer_name',
-                 'customer_mobile',
-                 'total_due',
-                 'sub_total',
-                 'balance',
-                 'terminal',
-                 'amount_paid',
-                 'single_url',
-                 'date',
-                 )
+            'id',
+            'customer_name',
+            'customer_mobile',
+            'total_due',
+            'sub_total',
+            'balance',
+            'terminal',
+            'amount_paid',
+            'single_url',
+            'date',
+        )
 
     def get_date(self, obj):
         return localize(obj.created)
@@ -518,4 +536,5 @@ class DistinctTableListSerializer(serializers.ModelSerializer):
 
     def get_customer_mobile(self, obj):
         return obj.customer.mobile
+
 
