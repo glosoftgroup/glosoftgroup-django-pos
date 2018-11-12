@@ -13,9 +13,9 @@ from ...product.models import ProductVariant
 from ...decorators import permission_decorator, user_trail
 from ...utils import render_to_pdf, default_logo
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -42,12 +42,12 @@ def sales_list(request):
         except EmptyPage:
             total_sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed sales reports', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view product sales report page')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view product sales report page')
         return TemplateResponse(request, 'dashboard/reports/product_sales/product_sales.html',
                                 {'pn': paginator.num_pages, 'sales': total_sales,
                                  'date': datetime.datetime.strptime(last_date_of_sales, '%Y-%m-%d').strftime('%b %d, %Y')})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 
 

@@ -1,9 +1,8 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.template.response import TemplateResponse
-from django.http import HttpResponse, JsonResponse
-import logging
 import json
 from decimal import Decimal
+from django.core.exceptions import ObjectDoesNotExist
+from django.template.response import TemplateResponse
+from django.http import HttpResponse
 
 from ..views import staff_member_required
 from ...purchase.models import PurchaseProduct as Table
@@ -14,9 +13,10 @@ from ...decorators import permission_decorator
 from ...supplier.models import Supplier
 from saleor.payment.models import PaymentOption
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
+
 table_name = 'Purchases'
 
 
@@ -57,7 +57,7 @@ def allocate_detail(request, pk=None):
         items = {} #AllocatedItem.objects.filter(allocate=sale)
         return TemplateResponse(request, 'dashboard/reports/car/details.html', {'items': items, "sale": sale})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('No items found')
 
 
@@ -116,7 +116,7 @@ def report_detail(request, pk=None):
         history = History.objects.filter(purchase=sale)
         return TemplateResponse(request, 'dashboard/purchase/reports/details.html',{'items': items, "sale":sale, 'history':history})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 
 @staff_member_required

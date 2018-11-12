@@ -7,12 +7,11 @@ from django.db.models import Q
 from ..views import staff_member_required
 from ...banking.models import Bank
 from ...decorators import user_trail
-import logging
 import json
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -34,13 +33,13 @@ def list(request):
             "pn": paginator.num_pages
         }
         user_trail(request.user.name, 'accessed Banks List', 'views')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed Banks List Page')
+        logger.info('User: ' + str(request.user.name) + 'accessed Banks List Page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/banking/list.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing payment options')
 
 
@@ -66,11 +65,11 @@ def delete(request, pk=None):
             else:
                 option.delete()
                 user_trail(request.user.name, 'deleted payment option : '+ str(option.name),'delete')
-                info_logger.info('deleted payment option: '+ str(option.name))
+                logger.info('deleted payment option: '+ str(option.name))
                 return HttpResponse('success')
             return HttpResponse(json.dumps({'error':"Loyalty Points is not deletable"}),content_type='application/json')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -84,12 +83,12 @@ def edit(request, pk=None):
                     option.name = request.POST.get('name')
                 option.save()
                 user_trail(request.user.name, 'updated payment option : '+ str(option.name),'delete')
-                info_logger.info('updated payment option: '+ str(option.name))
+                logger.info('updated payment option: '+ str(option.name))
                 return HttpResponse('success')
             else:
                 return HttpResponse('invalid response')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -100,10 +99,10 @@ def detail(request, pk=None):
             option = get_object_or_404(Bank, pk=pk)
             ctx = {'option': option}
             user_trail(request.user.name, 'access bank details of: ' + str(option.name)+' ','view')
-            info_logger.info('access banking details of: ' + str(option.name)+'  ')
+            logger.info('access banking details of: ' + str(option.name)+'  ')
             return TemplateResponse(request, 'dashboard/banking/detail.html', ctx)
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return TemplateResponse(request, 'dashboard/banking/detail.html', {'error': e})
 
 

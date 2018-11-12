@@ -34,9 +34,9 @@ from ...decorators import permission_decorator, user_trail
 import logging
 import json
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -56,7 +56,7 @@ def re_order(request):
             queryset_list = paginator.page(paginator.num_pages)
         low_stock = queryset_list
         user_trail(request.user.name, 'accessed reorder page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed reorder page')
+        logger.info('User: ' + str(request.user.name) + ' accessed reorder page')
 
         data ={
             "low_stock": low_stock,
@@ -68,7 +68,7 @@ def re_order(request):
         else:
             return TemplateResponse(request, 'dashboard/re_order/re_order.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/re_order/re_order.html', data)
 
 
@@ -176,7 +176,7 @@ def add_reorder_stock(request,pk=None):
         variant = ProductVariant.objects.get(pk=int(variant_id))
         ctx = {"variant":variant}
         user_trail(request.user.name, 'added reorder level', 'add')
-        info_logger.info('User: ' + str(request.user.name) + ' added reorder level')
+        logger.info('User: ' + str(request.user.name) + ' added reorder level')
         return TemplateResponse(request, 'dashboard/re_order/_order.html', ctx)    
 
 
@@ -255,7 +255,7 @@ def class_list_view(request):
              pc.variant_attributes.all())
             for pc in product_results.object_list]
         user_trail(request.user.name, 'accessed the roles page','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the roles page page')
+        logger.info('User: '+str(request.user.name)+' accessed the roles page page')
 
         data ={
             'classes':product_results,
@@ -266,7 +266,7 @@ def class_list_view(request):
         else:
             return TemplateResponse(request, 'dashboard/product/subcategory/view.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
 
 def paginate_class_list(request):
@@ -443,7 +443,7 @@ def product_list(request):
     ctx = {'form': form, 'products': products,
            'product_classes': product_classes}
     user_trail(request.user.name, 'accessed the products page', 'view')
-    info_logger.info('User: '+str(request.user.name)+' accessed the products page')
+    logger.info('User: '+str(request.user.name)+' accessed the products page')
     return TemplateResponse(request, 'dashboard/product/list.html', ctx)
 
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -787,13 +787,13 @@ def add_stock_ajax(request):
             trail = str(productName)+' Stock '+crud+': quantity '+str(diff).replace('-','')+': Total stock '+str(quantity)                     
        
         user_trail(request.user.name, trail,'add')
-        info_logger.info('User: '+str(request.user.name)+trail)
+        logger.info('User: '+str(request.user.name)+trail)
         stock.quantity = int(quantity)   
         stock.save()
         StockHistoryEntry.objects.create(stock=stock,comment=trail,crud=crud,user=request.user)
         message = "Stock for "+str(productName)+\
                  " updated successfully"+" current stock is "+quantity
-        info_logger.error(message)
+        logger.error(message)
         return HttpResponse(message)
 
 
@@ -1162,7 +1162,7 @@ def view_attr(request):
             queryset_list = paginator.page(paginator.num_pages)
         product_results = queryset_list
         user_trail(request.user.name, 'accessed the roles page','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the roles page page')
+        logger.info('User: '+str(request.user.name)+' accessed the roles page page')
 
         data ={
             'attributes': product_results,
@@ -1173,7 +1173,7 @@ def view_attr(request):
         else:
             return TemplateResponse(request, 'dashboard/product/attributes/pagination/view.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
 
 def paginate_attr(request):
@@ -1344,11 +1344,11 @@ def stock_location_list(request):
         except EmptyPage:
             stock_locations = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed stock_locations', 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed transaction:')
+        logger.info('User: ' + str(request.user.name) + 'accessed transaction:')
         return TemplateResponse(request, 'dashboard/product/stock_locations/list.html',
                                 {'locations': stock_locations, 'pn': paginator.num_pages})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/product/stock_locations/list.html', {})
 
 def stock_location_pagination(request):
@@ -1630,7 +1630,7 @@ def stocks(request):
         else:
             return TemplateResponse(request, 'dashboard/purchase/purchase_list.html', {'product_results':product_results,'categories':categories,'pn':paginator.num_pages})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
 
 @staff_member_required

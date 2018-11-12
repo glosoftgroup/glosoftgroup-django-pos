@@ -1,8 +1,5 @@
-import logging
-import random
 from calendar import monthrange
 import calendar
-import re
 from django.template.response import TemplateResponse
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Count, Sum
@@ -12,20 +9,22 @@ from django.db.models import Q
 from datetime import *
 from django.utils.dateformat import DateFormat
 from django.core.exceptions import ObjectDoesNotExist
+import random
+import re
 
-from ..views import staff_member_required
 from ...credit.models import Credit
-from ...sale.models import *
-from ...product.models import Category
 from ...decorators import permission_decorator
+from .hours_chart import (
+    get_item_results, get_terminal_results, get_user_results, get_hours_results,
+    get_date_results_range, get_category_results)
+from ...product.models import Category
+from ...sale.models import *
 from ...utils import render_to_pdf
+from ..views import staff_member_required
 
-from .hours_chart import get_item_results, get_terminal_results, get_user_results, get_hours_results, \
-    get_hours_results_range, get_date_results_range, get_date_results, get_category_results
+from structlog import get_logger
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+logger = get_logger(__name__)
 
 
 @staff_member_required

@@ -3,21 +3,19 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import FieldError
 from django.db import DatabaseError
 from django.views.decorators.csrf import csrf_exempt
-from ...decorators import permission_decorator, user_trail
-from .forms import AuthorizationKeyFormSet, SiteSettingForm
+from .forms import SiteSettingForm
 from ..views import staff_member_required
 from ...site.models import AuthorizationKey, SiteSettings, Files
 from ...site.utils import get_site_settings_from_request
-from django.views.decorators.csrf import csrf_protect
-import logging
 import json
+import socket
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
+
 
 @staff_member_required
 # @permission_decorator('site.view_sitesettings')
@@ -34,15 +32,17 @@ def update(request, site_id=None):
     authorization_qs = AuthorizationKey.objects.filter(site_settings=site)
     if all([form.is_valid()]):
         site = form.save()
-        
+
         messages.success(request, _('Updated site %s') % site)
         return redirect('dashboard:site-update', site_id=site.id)
-    ctx = {'site': site, 'form': form}
+    ip_address, server_ip = get_ip_address()
+    ctx = {'site': site, 'form': form, 'ip_address': ip_address}
     return TemplateResponse(request, 'dashboard/sites/detail.html', ctx)
+
 
 @staff_member_required
 # @permission_decorator('site.change_sitesettings')
-def update_settings(request,site_id=None):
+def update_settings(request, site_id=None):
     if request.method == 'POST':
         site = get_object_or_404(SiteSettings, pk=site_id)
         if request.POST.get('sms_username'):
@@ -70,10 +70,11 @@ def update_settings(request,site_id=None):
         if request.FILES.get('image'):
             site.image = request.FILES.get('image')
         if request.POST.get('max_credit_date'):
-            site.max_credit_date = request.POST.get('max_credit_date')        
+            site.max_credit_date = request.POST.get('max_credit_date')
         site.save()
         return HttpResponse('success')
     return HttpResponse('Invalid method')
+
 
 @csrf_exempt
 def add_sitekeys(request):
@@ -88,12 +89,12 @@ def add_sitekeys(request):
                 check = check.replace('\r', '').replace('\n', '')
 
             except Exception as e:
-                result = json.dumps({'message':'Invalid License Key', 'status':500})
+                result = json.dumps({'message': 'Invalid License Key', 'status': 500})
                 return HttpResponse(result, content_type="application/json")
             try:
                 Files.objects.all().delete()
             except DatabaseError, BaseException:
-                result = json.dumps({'message': 'Failed to Add license', 'status':500})
+                result = json.dumps({'message': 'Failed to Add license', 'status': 500})
                 return HttpResponse(result, content_type="application/json")
 
             new_key = Files.objects.create(
@@ -101,14 +102,14 @@ def add_sitekeys(request):
                 check=check
             )
         else:
-            error_logger.info('License Key is empty ')
+            logger.info('License Key is empty ')
             result = json.dumps({'message': 'Empty Key license', 'status': 500})
             return HttpResponse(result, content_type="application/json")
 
         try:
             new_key.save()
-        except DatabaseError, BaseException :
-            error_logger.info('Error when saving ')
+        except DatabaseError, BaseException:
+            logger.info('Error when saving ')
 
         if new_key.id:
             result = json.dumps({'message': 'success', 'status': 200})
@@ -130,3 +131,18 @@ def removenewline(data):
 def test(request):
     print ('testKeys')
     return HttpResponse('success 123')
+
+
+def get_ip_address():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+
+        ip_address = "http://"+str(s.getsockname()[0])+":8000"
+        server_ip = str(s.getsockname()[0])
+        s.close()
+    except Exception as e:
+        ip_address = "http://127.0.0.1:8000"
+        server_ip = "http://127.0.0.1"
+
+    return ip_address, server_ip

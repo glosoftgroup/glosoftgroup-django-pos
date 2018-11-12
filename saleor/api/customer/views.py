@@ -7,13 +7,9 @@ from .serializers import (
 from rest_framework import generics, status, serializers
 from ...customer.models import Customer
 import re
-import logging
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 class CreditWorthyCustomerListAPIView(generics.ListAPIView):

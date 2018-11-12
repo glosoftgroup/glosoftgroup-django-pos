@@ -1,51 +1,20 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max
-from django.core import serializers
-from django.template.defaultfilters import date
+from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
 import datetime
-from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
-import random
-import csv
-from django.utils.encoding import smart_str
 from decimal import Decimal
-from calendar import monthrange
-import calendar
-from django_xhtml2pdf.utils import generate_pdf
-
-import re
-import base64
-
-from ..core.utils import get_paginator_items
 from ..dashboard.views import staff_member_required
-from ..userprofile.models import User, Staff
-from ..supplier.models import Supplier
-from ..customer.models import Customer
-from ..sale.models import Sales, SoldItem, Terminal
-from ..product.models import Product, ProductVariant, Category
-from ..decorators import permission_decorator, user_trail
-from ..utils import render_to_pdf, convert_html_to_pdf
-from ..site.models import Bank, BankBranch, UserRole, Department
+from ..userprofile.models import User
+from ..decorators import user_trail
 from .models import ExpenseType, Expenses, PettyCash
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 def expenses(request):
@@ -64,18 +33,19 @@ def expenses(request):
             expenses = paginator.page(paginator.num_pages)
         data = {
             "expenses": expenses,
-            "expense_types":expense_types,
+            "expense_types": expense_types,
             "pn": paginator.num_pages
         }
         user_trail(request.user.name, 'accessed expenses', 'views')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed expenses page')
+        logger.info('User: ' + str(request.user.name) + 'accessed expenses page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/accounts/expenses/list.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing expenses')
+
 
 @staff_member_required
 def expenses_paginate(request):
@@ -89,16 +59,20 @@ def expenses_paginate(request):
         if p2_sz:
             paginator = Paginator(expenses, int(p2_sz))
             expenses = paginator.page(page)
-            return TemplateResponse(request,'dashboard/accounts/expenses/paginate.html',{'expenses':expenses})
+            return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', {'expenses': expenses})
 
         if list_sz:
             paginator = Paginator(expenses, int(list_sz))
             expenses = paginator.page(page)
-            return TemplateResponse(request,'dashboard/accounts/expenses/p2.html',{'expenses':expenses, 'pn':paginator.num_pages,'sz':list_sz, 'gid':request.GET.get('gid')})
+            return TemplateResponse(request, 'dashboard/accounts/expenses/p2.html',
+                                    {'expenses': expenses, 'pn': paginator.num_pages, 'sz': list_sz,
+                                     'gid': request.GET.get('gid')})
 
         paginator = Paginator(expenses, 10)
         expenses = paginator.page(page)
-        return TemplateResponse(request,'dashboard/accounts/expenses/p2.html',{'expenses':expenses, 'pn':paginator.num_pages,'sz':10,'gid':request.GET.get('gid')})
+        return TemplateResponse(request, 'dashboard/accounts/expenses/p2.html',
+                                {'expenses': expenses, 'pn': paginator.num_pages, 'sz': 10,
+                                 'gid': request.GET.get('gid')})
     else:
         try:
             expenses = Expenses.objects.all().order_by('-id')
@@ -132,22 +106,25 @@ def expenses_paginate(request):
                 expenses = paginator.page(paginator.num_pages)
             return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', {"expenses": expenses})
         except Exception, e:
-            return  HttpResponse()
+            return HttpResponse()
+
 
 def detail(request):
     status = 'read'
     return TemplateResponse(request, 'dashboard/accounts/expenses/expenses.html', {})
 
+
 def add(request):
-    expense_types =ExpenseType.objects.all()
+    expense_types = ExpenseType.objects.all()
     staff = User.objects.all()
     data = {
-        "expense_types":expense_types,
-        "staff":staff
+        "expense_types": expense_types,
+        "staff": staff
     }
     user_trail(request.user.name, 'viewed add expenses page', 'view')
-    info_logger.info('User: ' + str(request.user.name) + 'viewed add expenses page')
+    logger.info('User: ' + str(request.user.name) + 'viewed add expenses page')
     return TemplateResponse(request, 'dashboard/accounts/expenses/expenses.html', data)
+
 
 def add_process(request):
     # voucher = request.POST.get('voucher')
@@ -161,7 +138,7 @@ def add_process(request):
     else:
         authorized_by = request.user.email
 
-    paid_to  = request.POST.get('paid_to')
+    paid_to = request.POST.get('paid_to')
     # received_by = request.POST.get('received_by')
     # phone = request.POST.get('phone')
     description = request.POST.get('description')
@@ -173,53 +150,59 @@ def add_process(request):
                            amount=amount, authorized_by=authorized_by, paid_to=paid_to,
                            description=description)
 
-
     petty_cash = PettyCash.objects.latest('id')
     petty_cash_amount = petty_cash.closing
     try:
         petty_cash_amount -= Decimal(amount)
         petty_cash.closing = petty_cash_amount
         petty_cash.save()
-        user_trail(request.user.name,'spent KShs. '+ str(amount) +'on '+ str(expense_type) +' from petty cash, balance is: ' + str(petty_cash.closing))
+        user_trail(request.user.name,
+                   'spent KShs. ' + str(amount) + 'on ' + str(expense_type) + ' from petty cash, balance is: ' + str(
+                       petty_cash.closing))
     except Exception, e:
-        error_logger.error(e)
+        logger.error(e)
 
     try:
         new_expense.save()
         user_trail(request.user.name, 'created expense type : ' + str(expense_type), 'add')
-        info_logger.info('User: ' + str(request.user.name) + 'created expense type:' + str(expense_type))
+        logger.info('User: ' + str(request.user.name) + 'created expense type:' + str(expense_type))
         return HttpResponse('success')
     except Exception as e:
-        error_logger.info('Error when saving ')
-        error_logger.error('Error when saving ')
+        logger.info('Error when saving ')
+        logger.error('Error when saving ')
         return HttpResponse(e)
+
 
 def edit(request, pk=None):
     return TemplateResponse(request, 'dashboard/accounts/expenses/edit_expense.html', {})
+
 
 def delete(request, pk=None):
     expense = get_object_or_404(Expenses, pk=pk)
     if request.method == 'POST':
         try:
             expense.delete()
-            user_trail(request.user.name, 'deleted expense: '+ str(expense.expense_type),'delete')
-            info_logger.info('deleted expense: '+ str(expense.expense_type))
+            user_trail(request.user.name, 'deleted expense: ' + str(expense.expense_type), 'delete')
+            logger.info('deleted expense: ' + str(expense.expense_type))
             return HttpResponse('success')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
-def detail(request, pk=None):
 
+def detail(request, pk=None):
     if request.method == 'GET':
         try:
             expense = get_object_or_404(Expenses, pk=pk)
-            user_trail(request.user.name, 'access expense details of: '+ str(expense.expense_type)+' on '+str(expense.expense_date),'view')
-            info_logger.info('access expense details of: '+ str(expense.expense_type)+' on '+str(expense.expense_date))
-            return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense':expense})
-        except Exception, e:
-            error_logger.error(e)
+            user_trail(request.user.name,
+                       'access expense details of: ' + str(expense.expense_type) + ' on ' + str(expense.expense_date),
+                       'view')
+            logger.info('access expense details of: ' + str(expense.expense_type) + ' on ' + str(expense.expense_date))
             return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense': expense})
+        except Exception, e:
+            logger.error(e)
+            return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense': expense})
+
 
 def expenses_searchs(request):
     if request.is_ajax():
@@ -251,21 +234,20 @@ def expenses_searchs(request):
                 return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', {'expenses': expenses})
 
             return TemplateResponse(request, 'dashboard/accounts/expenses/search.html',
-{'expenses': expenses, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+                                    {'expenses': expenses, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
-def expenses_search( request ):
-
+def expenses_search(request):
     if request.is_ajax():
         page = request.GET.get('page', 1)
         list_sz = request.GET.get('size')
         p2_sz = request.GET.get('psize')
-        q = request.GET.get( 'q' )
+        q = request.GET.get('q')
         if list_sz == 0 or list_sz is None:
             sz = 10
         else:
             sz = list_sz
-
 
         if q is not None:
             expenses = Expenses.objects.filter(
@@ -285,7 +267,8 @@ def expenses_search( request ):
                     paginator = Paginator(expenses, int(list_sz))
                     expenses = paginator.page(page)
                     return TemplateResponse(request, 'dashboard/accounts/expenses/search.html',
-                                            {'expenses': expenses, 'pn': paginator.num_pages, 'sz': list_sz, 'gid':request.GET.get('gid'),'q':q})
+                                            {'expenses': expenses, 'pn': paginator.num_pages, 'sz': list_sz,
+                                             'gid': request.GET.get('gid'), 'q': q})
 
                 paginator = Paginator(expenses, 10)
                 expenses = paginator.page(page)
@@ -298,12 +281,14 @@ def expenses_search( request ):
                     paginator = Paginator(expenses, int(list_sz))
                     expenses = paginator.page(page)
                     return TemplateResponse(request, 'dashboard/accounts/expenses/search.html',
-                                            {'expenses': expenses, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,'q':q})
+                                            {'expenses': expenses, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,
+                                             'q': q})
 
                 if p2_sz:
                     paginator = Paginator(expenses, int(p2_sz))
                     expenses = paginator.page(page)
-                    return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html', {'expenses': expenses})
+                    return TemplateResponse(request, 'dashboard/accounts/expenses/paginate.html',
+                                            {'expenses': expenses})
 
                 paginator = Paginator(expenses, 10)
                 try:
@@ -314,4 +299,5 @@ def expenses_search( request ):
                     expenses = paginator.page(1)
                 except EmptyPage:
                     expenses = paginator.page(paginator.num_pages)
-                return TemplateResponse(request, 'dashboard/accounts/expenses/search.html', {'expenses':expenses, 'pn':paginator.num_pages,'sz':sz,'q':q})
+                return TemplateResponse(request, 'dashboard/accounts/expenses/search.html',
+                                        {'expenses': expenses, 'pn': paginator.num_pages, 'sz': sz, 'q': q})

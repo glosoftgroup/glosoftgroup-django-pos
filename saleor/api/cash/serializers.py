@@ -1,6 +1,5 @@
 # Payment rest api serializers
 from decimal import Decimal
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import (
@@ -9,13 +8,11 @@ from rest_framework.serializers import (
                 )
 from django.contrib.auth import get_user_model
 from ...sale.models import DrawerCash, Terminal, TerminalHistoryEntry
-import logging
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 User = get_user_model()
-
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 class TerminalListSerializer(serializers.ModelSerializer):
@@ -48,7 +45,7 @@ class UserAuthorizationSerializer(serializers.Serializer):
             self.user = User.objects.get(pk=int(user))
             return value
         except Exception as e:
-            error_logger.error(e)
+            logger.error(e)
             raise ValidationError('User does not exist')
 
     def validate_terminal(self,value):
@@ -56,7 +53,7 @@ class UserAuthorizationSerializer(serializers.Serializer):
         try:
             Terminal.objects.get(pk=int(data.get('terminal')))
         except Exception as e:
-            error_logger.error(e)
+            logger.error(e)
             raise ValidationError('Terminal specified does not extist')
         return value
 
@@ -86,10 +83,10 @@ class UserTransactionSerializer(serializers.ModelSerializer):
                 self.terminal = terminal
                 return value
             else:
-                error_logger.error('Terminal specified does not exist')
+                logger.error('Terminal specified does not exist')
                 raise ValidationError('Terminal specified does not exist')
         except:
-            error_logger.error('Terminal specified does not exist')
+            logger.error('Terminal specified does not exist')
             raise ValidationError('Terminal specified does not exist')
         return value
 
@@ -99,10 +96,10 @@ class UserTransactionSerializer(serializers.ModelSerializer):
             if data.get('note'):
                 return value
             else:
-                error_logger.error('Add a note!')
+                logger.error('Add a note!')
                 raise ValidationError('Add a note!')
         except:
-            error_logger.error('Add a note!')
+            logger.error('Add a note!')
             raise ValidationError('Add a note!')
 
 
@@ -116,12 +113,12 @@ class UserTransactionSerializer(serializers.ModelSerializer):
         try:
             user = get_user_model().objects.get(**kwargs)
             if not user:
-                error_logger.error('Username/email error Authentication Failed!')
+                logger.error('Username/email error Authentication Failed!')
                 raise PermissionDenied('Username/email error Authentication Failed!')
             else:
                 return value
         except Exception as e:
-            error_logger.error(e)
+            logger.error(e)
             raise PermissionDenied('Username/email Failed!')
         return value
 

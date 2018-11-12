@@ -9,12 +9,11 @@ from .serializers import (
      MessagesListSerializer,
      )
 
-import logging
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 User = get_user_model()
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 class MessagesListAPIView(generics.ListAPIView):

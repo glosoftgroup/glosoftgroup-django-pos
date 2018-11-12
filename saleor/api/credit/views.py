@@ -21,12 +21,11 @@ from .serializers import (
     TableListSerializer
 )
 
-import logging
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 User = get_user_model()
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 class CreditDetailAPIView(generics.RetrieveAPIView):
@@ -86,7 +85,7 @@ class CreditUpdateAPIView(generics.RetrieveUpdateAPIView):
         user_trail(self.request.user.name,
                    'made a credit sale:#' + str(serializer.data['invoice_number']) + ' credit sale worth: ' + str(
                        serializer.data['total_net']), 'add')
-        info_logger.info(
+        logger.info(
             'User: ' + str(self.request.user) + ' made a credit sale:' + str(serializer.data['invoice_number']))
         terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
         trail = 'User: ' + str(self.request.user) + \

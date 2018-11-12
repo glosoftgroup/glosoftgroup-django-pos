@@ -1,39 +1,18 @@
 from __future__ import unicode_literals
 
-import emailit.api
-from django.conf import settings
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.contrib.postgres.search import SearchVector
 
 from . import forms
-from ...core.utils import get_paginator_items
-from ...purchase.models import (
-                                PurchaseOrder,
-                                PurchaseItems,
-                                PurchaseProduct
-                                )
-from ...supplier.models import Supplier
-from ...product.models import (Product, ProductAttribute, Category,
-                               ProductClass, AttributeChoiceValue,
-                               ProductImage, ProductVariant, Stock,
-                               StockLocation, ProductTax, StockHistoryEntry)
+from ...product.models import (Product, ProductClass)
 from ..views import staff_member_required
-from ..views import get_low_stock_products
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from ...decorators import permission_decorator, user_trail
-import logging
+from ...decorators import user_trail
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -52,8 +31,8 @@ def view(request, pk):
         except EmptyPage:
             queryset_list = paginator.page(paginator.num_pages)
         product_results = queryset_list
-        user_trail(request.user.name, 'accessed the subcategory products page','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the subcategory products page page')
+        user_trail(request.user.name, 'accessed the subcategory products page', 'view')
+        logger.info('User: ' + str(request.user.name) + ' accessed the subcategory products page page')
         product_classes = ProductClass.objects.all()
 
         product_class = ProductClass()
@@ -74,7 +53,7 @@ def view(request, pk):
         else:
             return TemplateResponse(request, 'dashboard/product/subcategory/products/view.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse(e)
 
 
@@ -162,7 +141,9 @@ def search(request):
             product_results = queryset_list
             if p2_sz:
                 queryset_list = paginator.page(page)
-                return TemplateResponse(request, 'dashboard/product/subcategory/products/paginate.html', {'product_results': product_results, "product_pk": pk})
+                return TemplateResponse(request, 'dashboard/product/subcategory/products/paginate.html',
+                                        {'product_results': product_results, "product_pk": pk})
 
             return TemplateResponse(request, 'dashboard/product/subcategory/products/search.html',
-                                    {'product_pk': pk, 'product_results': product_results, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+                                    {'product_pk': pk, 'product_results': product_results, 'pn': paginator.num_pages,
+                                     'sz': sz, 'q': q})

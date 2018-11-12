@@ -1,3 +1,7 @@
+import csv
+import random
+import json
+from datetime import date
 from django.contrib.auth.models import Group, Permission
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,24 +14,19 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.utils.encoding import smart_str
 from django.core.urlresolvers import reverse
+
+from ...decorators import permission_decorator, user_trail
 from ..views import staff_member_required
-from ...userprofile.models import User, UserTrail
 from ...supplier.models import Supplier, AddressBook
 from ...purchase.models import PurchaseProduct
 from ...product.models import Stock
 from saleor.payment.models import PaymentOption
-
-from ...decorators import permission_decorator, user_trail
+from ...userprofile.models import User, UserTrail
 from ...utils import render_to_pdf, default_logo
-import csv
-import random
-import logging
-import json
-from datetime import date
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @permission_decorator('supplier.view_supplier')
@@ -45,14 +44,14 @@ def users(request):
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed suppliers list page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view users page')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view users page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             ctx = {'users': users, 'pn': paginator.num_pages}
             return TemplateResponse(request, 'dashboard/supplier/pagination/users2.html', ctx)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
 
 
@@ -141,11 +140,11 @@ def user_add(request):
         permissions = Permission.objects.all()
         groups = Group.objects.all()
         user_trail(request.user.name, 'accessed add supplier page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed supplier create page')
+        logger.info('User: ' + str(request.user.name) + ' accessed supplier create page')
         return TemplateResponse(request, 'dashboard/supplier/add_user.html',
                                 {'permissions': permissions, 'groups': groups})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing add users page')
 
 
@@ -154,7 +153,7 @@ def supplier_add_modal(request):
     try:
         return TemplateResponse(request, 'dashboard/supplier/_modal_add_supplier.html', {})
     except Exception as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing add suppliers page')
 
 
@@ -164,7 +163,7 @@ def supplier_add(request):
     try:
         return TemplateResponse(request, 'dashboard/supplier/add_supplier.html', {})
     except Exception as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing add suppliers page')
 
 
@@ -207,11 +206,11 @@ def user_process(request):
         try:
             new_user.save()
         except:
-            error_logger.info('Error when saving ')
+            logger.info('Error when saving ')
         last_id = Supplier.objects.latest('id')
 
         user_trail(request.user.name, 'created supplier: ' + str(name), 'add')
-        info_logger.info('User: ' + str(request.user.name) + ' created supplier:' + str(name))
+        logger.info('User: ' + str(request.user.name) + ' created supplier:' + str(name))
         success_url = reverse(
             'dashboard:supplier-edit', kwargs={'pk': last_id.pk})
 
@@ -239,7 +238,7 @@ def user_edit(request, pk):
     # addresses = user.get_address()
     ctx = {'user': user}
     user_trail(request.user.name, 'accessed edit page for supplier ' + str(user.name), 'update')
-    info_logger.info('User: ' + str(request.user.name) + ' accessed edit page for supplier: ' + str(user.name))
+    logger.info('User: ' + str(request.user.name) + ' accessed edit page for supplier: ' + str(user.name))
     return TemplateResponse(request, 'dashboard/supplier/edit_user.html', ctx)
 
 
@@ -271,7 +270,7 @@ def user_update(request, pk):
             user.description = description
             user.save()
             user_trail(request.user.name, 'updated supplier: ' + str(user.name))
-            info_logger.info('User: ' + str(request.user.name) + ' updated supplier: ' + str(user.name))
+            logger.info('User: ' + str(request.user.name) + ' updated supplier: ' + str(user.name))
             return HttpResponse("success with image")
         else:
             user.name = name
@@ -286,7 +285,7 @@ def user_update(request, pk):
             user.description = description
             user.save()
             user_trail(request.user.name, 'updated supplier: ' + str(user.name))
-            info_logger.info('User: ' + str(request.user.name) + ' updated supplier: ' + str(user.name))
+            logger.info('User: ' + str(request.user.name) + ' updated supplier: ' + str(user.name))
             return HttpResponse("success without image")
 
 
@@ -304,7 +303,7 @@ def user_assign_permission(request):
             user.user_permissions.remove(*user_has_permissions)
             user.save()
             user_trail(request.user.name, 'deactivated and removed all permissions for user: ' + str(user.name))
-            info_logger.info(
+            logger.info(
                 'User: ' + str(request.user.name) + ' deactivated and removed all permissions for user: ' + str(
                     user.name))
             return HttpResponse('deactivated')
@@ -316,7 +315,7 @@ def user_assign_permission(request):
                 user.user_permissions.add(*not_in_user_permissions)
                 user.save()
                 user_trail(request.user.name, 'assigned permissions for user: ' + str(user.name))
-                info_logger.info('User: ' + str(request.user) + ' assigned permissions for user: ' + str(user.name))
+                logger.info('User: ' + str(request.user) + ' assigned permissions for user: ' + str(user.name))
                 return HttpResponse('permissions added')
             else:
                 not_in_user_permissions = list(set(permission_list) - set(user_has_permissions))
@@ -326,7 +325,7 @@ def user_assign_permission(request):
                 user.user_permissions.add(*not_in_user_permissions)
                 user.save()
                 user_trail(request.user.name, 'assigned permissions for user: ' + str(user.name))
-                info_logger.info(
+                logger.info(
                     'User: ' + str(request.user.name) + ' assigned permissions for user: ' + str(user.name))
                 return HttpResponse('permissions updated')
 
@@ -399,7 +398,7 @@ def contact_delete(request, pk):
 def user_trails(request):
     users = UserTrail.objects.all().order_by('id')
     user_trail(request.user.name, 'accessed user trail page')
-    info_logger.info('User: ' + str(request.user.name) + ' accessed the user trail page')
+    logger.info('User: ' + str(request.user.name) + ' accessed the user trail page')
     return TemplateResponse(request, 'dashboard/users/trail.html', {'users': users})
 
 
@@ -457,14 +456,14 @@ def credit(request):
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed suppliers list page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view users page')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view users page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             ctx = {'users': users, 'pn': paginator.num_pages}
             return TemplateResponse(request, 'dashboard/supplier/credit/users2.html', ctx)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
 
 
@@ -558,14 +557,14 @@ def credit_stock(request, pk=None):
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed suppliers credited list page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view supplier credit stock page')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view supplier credit stock page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             ctx = {"context_instance": context_instance, 'users': users, 'pn': paginator.num_pages}
             return TemplateResponse(request, 'dashboard/supplier/stock/users2.html', ctx)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
 
 
@@ -675,4 +674,4 @@ def credit_detail_pdf(request, pk=None):
         pdf = render_to_pdf('dashboard/supplier/stock/pdf/pdf.html', data)
         return HttpResponse(pdf, content_type='application/pdf')
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)

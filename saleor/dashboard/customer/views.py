@@ -1,10 +1,10 @@
 
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count, Min, Sum, Avg, F, Q
+from django.db.models import Count, Sum, Q
 
 from ..views import staff_member_required
 
@@ -14,12 +14,12 @@ from ...credit.models import Credit
 from ...utils import render_to_pdf, default_logo
 from datetime import date
 from ...decorators import permission_decorator, user_trail
-import logging
 import json
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
+
 
 @staff_member_required
 @permission_decorator('customer.view_customer')
@@ -37,13 +37,13 @@ def users(request):
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed customers page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'view customers')
+        logger.info('User: ' + str(request.user.name) + 'view customers')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/customer/users.html',{'users': users, 'pn': paginator.num_pages})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/customer/users.html', {'users': users, 'pn': paginator.num_pages})
 
 @staff_member_required
@@ -51,10 +51,10 @@ def users(request):
 def user_add(request):
     try:
         user_trail(request.user.name, 'accessed add customer page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed add customer page')
+        logger.info('User: ' + str(request.user.name) + 'accessed add customer page')
         return TemplateResponse(request, 'dashboard/customer/add_user.html',{'permissions':"permissions", 'groups':"groups"})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing add users page')
 
 @staff_member_required
@@ -72,16 +72,16 @@ def user_process(request):
         try:
             new_user.save()
         except:
-            error_logger.info('Error when saving ')
+            logger.info('Error when saving ')
         last_id = Customer.objects.latest('id')
         user_trail(request.user.name, 'created customer: '+str(new_user.name),'add')
-        info_logger.info('User: '+str(request.user.name)+' created customer:'+str(new_user.name))
+        logger.info('User: '+str(request.user.name)+' created customer:'+str(new_user.name))
         return HttpResponse(last_id.id)
 
 def user_detail(request, pk):
     user = get_object_or_404(Customer, pk=pk)
     user_trail(request.user.name, 'accessed detail page to view customer: ' + str(user.name), 'view')
-    info_logger.info('User: ' + str(request.user.name) + ' accessed detail page to view customer:' + str(user.name))
+    logger.info('User: ' + str(request.user.name) + ' accessed detail page to view customer:' + str(user.name))
     return TemplateResponse(request, 'dashboard/customer/detail.html', {'user':user})
 
 def sales_detail(request, pk):
@@ -107,7 +107,7 @@ def sales_detail(request, pk):
         except EmptyPage:
             total_sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed sales details for customer'+str(customer.name), 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed sales details for customer'+str(customer.name))
+        logger.info('User: ' + str(request.user.name) + 'accessed sales details for customer'+str(customer.name))
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
@@ -120,7 +120,7 @@ def sales_detail(request, pk):
             }
             return TemplateResponse(request, 'dashboard/customer/sales/sales_list.html',data)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 def sales_items_detail(request, pk=None, ck=None):
     try:
@@ -129,7 +129,7 @@ def sales_items_detail(request, pk=None, ck=None):
         items = SoldItem.objects.filter(sales=sale)
         return TemplateResponse(request, 'dashboard/customer/sales/details.html',{'items': items, "sale":sale, "customer":customer})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 @permission_decorator('customer.delete_customer')
 def user_delete(request, pk):
@@ -144,7 +144,7 @@ def user_edit(request, pk):
     user = get_object_or_404(Customer, pk=pk)
     ctx = {'user': user}
     user_trail(request.user.name, 'accessed edit page for customer '+ str(user.name),'update')
-    info_logger.info('User: '+str(request.user.name)+' accessed edit page for customer: '+str(user.name))
+    logger.info('User: '+str(request.user.name)+' accessed edit page for customer: '+str(user.name))
     return TemplateResponse(request, 'dashboard/customer/edit_user.html', ctx)
 
 def user_update(request, pk):
@@ -164,7 +164,7 @@ def user_update(request, pk):
         user.mobile = mobile
         user.save()
         user_trail(request.user.name, 'updated customer: '+ str(user.name))
-        info_logger.info('User: '+str(request.user.name)+' updated customer: '+str(user.name))
+        logger.info('User: '+str(request.user.name)+' updated customer: '+str(user.name))
         return HttpResponse("success")
 
 @staff_member_required
@@ -266,13 +266,13 @@ def customer_report(request):
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed customers page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'view customers')
+        logger.info('User: ' + str(request.user.name) + 'view customers')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/customer/reports/list.html',{'users': users, 'pn': paginator.num_pages})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/customer/reports/list.html', {'users': users, 'pn': paginator.num_pages})
 
 @staff_member_required
@@ -392,13 +392,13 @@ def credit_distinct(request):
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed customers page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'view customers')
+        logger.info('User: ' + str(request.user.name) + 'view customers')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/customer/credit/list_distinct.html',{'users': users, 'pn': paginator.num_pages})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/customer/credit/list_distinct.html', {'users': users, 'pn': paginator.num_pages})
 
 
@@ -418,13 +418,13 @@ def credit_report(request):
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed customers page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'view customers')
+        logger.info('User: ' + str(request.user.name) + 'view customers')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/customer/credit/list.html',{'users': users, 'pn': paginator.num_pages})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/customer/credit/list.html', {'users': users, 'pn': paginator.num_pages})
 
 
@@ -519,4 +519,4 @@ def costomer_loyalty_points_pdf(request):
         return response
     except ObjectDoesNotExist as e:
         print e
-        error_logger.error(e)
+        logger.error(e)

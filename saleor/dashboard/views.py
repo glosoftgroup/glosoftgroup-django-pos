@@ -9,20 +9,18 @@ from ..product.models import Category, Stock
 from ..credit.models import Credit
 from django.db.models import Count, Sum
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-from django.core.exceptions import ObjectDoesNotExist
 from .reports.hours_chart import get_item_results, get_category_results
 from django.utils.dateformat import DateFormat
 from decimal import Decimal
 import datetime
-import logging
 import random
 import calendar
 import dateutil.relativedelta
 
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 def staff_member_required(f):
@@ -226,7 +224,7 @@ def top_categories(month=None, year=None, period=None):
         }
         return data
     except Exception,e:
-        error_logger.error(e)
+        logger.error(e)
         data = {
             "sales_by_category": None,
             "categs": None,
@@ -355,7 +353,7 @@ def top_items(month=None, year=None, period=None):
         }
         return data
     except IndexError as e:
-        error_logger.error(e)
+        logger.error(e)
         data = {
             "sales_by_item": None,
             "items": None,

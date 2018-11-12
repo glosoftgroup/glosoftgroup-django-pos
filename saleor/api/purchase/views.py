@@ -14,14 +14,9 @@ from .serializers import (
     PaymentOptionListSerializer
      )
 from rest_framework import generics
-
-import logging
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 class PurchaseListAPIView(generics.ListAPIView):

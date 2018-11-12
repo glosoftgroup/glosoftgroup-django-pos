@@ -92,6 +92,36 @@ $( document ).ready(function() {
 <script type="text/javascript" src="{% static 'backend/js/site-settings.js' %}"></script>
 <script type="text/javascript">
   // Editable input
+  function copy_address(){
+        /* Get the code node by Id */
+        var copyText = document.getElementById("ip_address");
+
+        var range = document.createRange();
+        range.selectNode(copyText);
+        window.getSelection().addRange(range);
+
+        try {
+            // Now that we've selected the anchor text, execute the copy command
+
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'copied the text: ' + copyText.innerHTML : 'error copying text';
+            var theme = successful ? 'bg-primary' : 'bg-danger';
+
+            $.jGrowl(msg, {
+                header: null,
+                theme: theme
+            });
+
+        } catch(err) {
+            console.log('Oops, unable to copy');
+        }
+
+          // Remove the selections - NOTE: Should use
+          // removeRange(range) when it is supported
+          window.getSelection().removeAllRanges();
+
+    }
+
    
     $('.octime').pickatime({
         editable: true,

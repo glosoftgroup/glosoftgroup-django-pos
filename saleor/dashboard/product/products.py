@@ -11,12 +11,11 @@ from ...utils import render_to_pdf, default_logo
 import csv
 import random
 from django.utils.encoding import smart_str
-import logging
 from datetime import date
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -34,28 +33,29 @@ def view(request):
         except EmptyPage:
             queryset_list = paginator.page(paginator.num_pages)
         product_results = queryset_list
-        user_trail(request.user.name, 'accessed the roles page','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the roles page page')
+        user_trail(request.user.name, 'accessed the roles page', 'view')
+        logger.info('User: ' + str(request.user.name) + ' accessed the roles page page')
         product_classes = ProductClass.objects.all()
 
         product_class = ProductClass()
         form = forms.ProductClassForm(request.POST or None,
                                       instance=product_class)
         data = {
-            'product_classes':product_classes,
+            'product_classes': product_classes,
             'product_results': product_results,
-            'totalp':paginator.num_pages,
-            'form':form,
-            'product_class':product_class,
-            'hello':'hello'
+            'totalp': paginator.num_pages,
+            'form': form,
+            'product_class': product_class,
+            'hello': 'hello'
         }
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/product/roles/view.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
+
 
 def paginate(request):
     page = int(request.GET.get('page', 1))
@@ -84,7 +84,7 @@ def paginate(request):
             product_results = queryset_list
             data = {
                 'product_results': product_results,
-                'sz':p2_sz
+                'sz': p2_sz
             }
             return TemplateResponse(request, 'dashboard/product/roles/paginate.html', data)
 
@@ -97,24 +97,25 @@ def paginate(request):
         except EmptyPage:
             queryset_list = paginator.page(paginator.num_pages)
         product_results = queryset_list
-        return TemplateResponse(request, 'dashboard/product/roles/paginate.html', {'product_results': product_results,'sz':p2_sz})
+        return TemplateResponse(request, 'dashboard/product/roles/paginate.html',
+                                {'product_results': product_results, 'sz': p2_sz})
     except Exception, e:
-        return  HttpResponse()
+        return HttpResponse()
 
 
 @staff_member_required
 def product_filter(request):
     queryset_list = Product.objects.all().order_by('-id')
-    #paginator = Paginator(queryset_list, 10)
-    page = request.GET.get('page',1)
-    size = request.GET.get('size',10)
-    search = request.GET.get('search_text','')
+    # paginator = Paginator(queryset_list, 10)
+    page = request.GET.get('page', 1)
+    size = request.GET.get('size', 10)
+    search = request.GET.get('search_text', '')
     if search != '' and search != None:
         queryset_list = Product.objects.filter(
-           Q(name__icontains=search)|
-           Q(variants__sku__icontains=search)|
-           Q(categories__name__icontains=search)
-            ).order_by('-id').distinct()
+            Q(name__icontains=search) |
+            Q(variants__sku__icontains=search) |
+            Q(categories__name__icontains=search)
+        ).order_by('-id').distinct()
     paginator = Paginator(queryset_list, int(size))
     products_count = len(queryset_list)
     try:
@@ -126,10 +127,10 @@ def product_filter(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         queryset = paginator.page(paginator.num_pages)
     product_results = queryset
-    ctx = {'products_count': products_count,'product_results': product_results,'search_count':len(product_results)}
+    ctx = {'products_count': products_count, 'product_results': product_results, 'search_count': len(product_results)}
     return TemplateResponse(
-    request, 'dashboard/includes/product_search_results.html',
-    ctx)
+        request, 'dashboard/includes/product_search_results.html',
+        ctx)
 
 
 @staff_member_required
@@ -162,10 +163,12 @@ def search(request):
             product_results = queryset_list
             if p2_sz:
                 queryset_list = paginator.page(page)
-                return TemplateResponse(request, 'dashboard/product/roles/paginate.html', {'product_results': product_results})
+                return TemplateResponse(request, 'dashboard/product/roles/paginate.html',
+                                        {'product_results': product_results})
 
             return TemplateResponse(request, 'dashboard/product/roles/search.html',
-                                    {'product_results':product_results, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+                                    {'product_results': product_results, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
 def products_pdf(request):
@@ -180,14 +183,15 @@ def products_pdf(request):
     pdf = render_to_pdf('dashboard/product/roles/pdf/pdf.html', data)
     return HttpResponse(pdf, content_type='application/pdf')
 
+
 @staff_member_required
 def products_export_csv(request):
-    pdfname = 'products'+str(random.random())
+    pdfname = 'products' + str(random.random())
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+    response['Content-Disposition'] = 'attachment; filename="' + pdfname + '.csv"'
     qs = Product.objects.all()
     writer = csv.writer(response, csv.excel)
-    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+    response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
     writer.writerow([
         smart_str(u"ID"),
         smart_str(u"Product Name"),

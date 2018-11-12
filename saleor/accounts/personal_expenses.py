@@ -1,51 +1,17 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, Max
-from django.core import serializers
-from django.template.defaultfilters import date
+from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-import datetime
-from datetime import date, timedelta
-from django.utils.dateformat import DateFormat
 import logging
-import random
-import csv
-from django.utils.encoding import smart_str
-from decimal import Decimal
-from calendar import monthrange
-import calendar
-from django_xhtml2pdf.utils import generate_pdf
-
-import re
-import base64
-
-from ..core.utils import get_paginator_items
 from ..dashboard.views import staff_member_required
-from ..userprofile.models import User, Staff
-from ..supplier.models import Supplier
-from ..customer.models import Customer
-from ..sale.models import Sales, SoldItem, Terminal
-from ..product.models import Product, ProductVariant, Category
-from ..decorators import permission_decorator, user_trail
-from ..utils import render_to_pdf, convert_html_to_pdf
-from ..site.models import Bank, BankBranch, UserRole, Department
-from .models import ExpenseType, Expenses, PettyCash, PersonalExpenses
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from ..userprofile.models import User
+from ..decorators import user_trail
+from .models import ExpenseType, PersonalExpenses
+
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 def expenses(request):
@@ -67,13 +33,13 @@ def expenses(request):
             "expense_types": expense_types
         }
         user_trail(request.user.name, 'accessed expenses', 'views')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed expenses page')
+        logger.info('User: ' + str(request.user.name) + 'accessed expenses page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/accounts/personal_expenses/list.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
 
 @staff_member_required
@@ -140,7 +106,7 @@ def add(request):
         "staff":staff
     }
     user_trail(request.user.name, 'viewed add expenses page', 'view')
-    info_logger.info('User: ' + str(request.user.name) + 'viewed add expenses page')
+    logger.info('User: ' + str(request.user.name) + 'viewed add expenses page')
     return TemplateResponse(request, 'dashboard/accounts/personal_expenses/expenses.html', data)
 
 def add_process(request):
@@ -161,11 +127,11 @@ def add_process(request):
     try:
         new_expense.save()
         user_trail(request.user.name, 'added an expense : ' + str(expense_type)+' with amount:'+str(amount), 'add')
-        info_logger.info('User: ' + str(request.user.name) + 'created expense type:' + str(expense_type))
+        logger.info('User: ' + str(request.user.name) + 'created expense type:' + str(expense_type))
         return HttpResponse('success')
     except Exception as e:
-        error_logger.info('Error when saving ')
-        error_logger.error('Error when saving ')
+        logger.info('Error when saving ')
+        logger.error('Error when saving ')
         return HttpResponse(e)
 
 def edit(request, pk=None):
@@ -177,10 +143,10 @@ def delete(request, pk=None):
         try:
             expense.delete()
             user_trail(request.user.name, 'deleted expense: '+ str(expense.expense_type),'delete')
-            info_logger.info('deleted expense: '+ str(expense.expense_type))
+            logger.info('deleted expense: '+ str(expense.expense_type))
             return HttpResponse('success')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -223,9 +189,9 @@ def detail(request, pk=None):
             expense = get_object_or_404(PersonalExpenses, pk=pk)
             user_trail(request.user.name, 'access expense details of: ' + str(expense.expense_type) + ' on ' + str(
                 expense.expense_date), 'view')
-            info_logger.info(
+            logger.info(
                 'access expense details of: ' + str(expense.expense_type) + ' on ' + str(expense.expense_date))
             return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense': expense})
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return TemplateResponse(request, 'dashboard/accounts/expenses/detail.html', {'expense': expense})

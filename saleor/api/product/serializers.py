@@ -11,7 +11,6 @@ from rest_framework.serializers import (
                 )
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from django.db.models import Q, Sum, Count
 from ...decorators import user_trail
 from ...discount.models import Sale
 from ...discount.models import get_variant_discounts
@@ -23,20 +22,16 @@ from ...sale.models import (
 from ...product.models import (
             Product,
             ProductVariant,
-            ProductAttribute,
-            AttributeChoiceValue,
             Stock,
             )
 from ...customer.models import Customer
 from ...site.models import SiteSettings
 from ..credit.utilities import clear_old_debts_using_change
 
+from structlog import get_logger
 
+logger = get_logger(__name__)
 User = get_user_model()
-
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 class CreateStockSerializer(ModelSerializer):
@@ -321,7 +316,7 @@ class SalesSerializer(serializers.ModelSerializer):
                     if trunc(loyalty_points) >= 0:
                         Customer.objects.gain_points(customer, trunc(loyalty_points))
                 except Exception as e:
-                    error_logger.error(e)
+                    logger.error(e)
 
         for solditem_data in solditems_data:
             item_temp = SoldItem.objects.create(sales=sales, **solditem_data)
@@ -397,7 +392,7 @@ class SalesSerializer(serializers.ModelSerializer):
             # except Exception as e:
             #     print('Error reducing stock!')
             #     print e
-            #     error_logger.error(e)
+            #     logger.error(e)
         return sales
         
 
@@ -541,7 +536,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id','email','name','permissions']
 
     def get_permissions(self, obj):
-        info_logger.info('User: '+str(obj.name)+' '+str(obj.email)+' logged in via api')
+        logger.info('User: '+str(obj.name)+' '+str(obj.email)+' logged in via api')
         user_trail(obj.name, 'logged in via api','view')
         
         permissions = []

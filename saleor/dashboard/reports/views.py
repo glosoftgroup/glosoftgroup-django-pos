@@ -1,34 +1,26 @@
+import csv
+import datetime
+from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.response import TemplateResponse
 from django.http import HttpResponse, JsonResponse
-from django.db.models import Count, Min, Sum, Avg, F, Q
+from django.db.models import Count, Sum, Q
 from django.core import serializers
-# from django.template.defaultfilters import date
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-import datetime
-from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
-import logging
-
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf
-import csv
-import random
 from django.utils.encoding import smart_str
-from datetime import date
+import random
 
-from ...core.utils import get_paginator_items
 from ..views import staff_member_required
-from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, DrawerCash
-from ...product.models import Product, ProductVariant, Stock
-from ...purchase.models import PurchaseProduct
+from ...product.models import ProductVariant, Stock
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
+from ...utils import render_to_pdf
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -61,10 +53,14 @@ def sales_list(request):
         except EmptyPage:
             total_sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed sales reports', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view sales report page')
-        return TemplateResponse(request, 'dashboard/reports/sales/sales_list.html',{'pn': paginator.num_pages, 'sales': total_sales, "total_sales_amount":total_sales_amount, "total_tax_amount":total_tax_amount,"date":last_date_of_sales})
+        logger.info('User: ' + str(request.user.name) + ' accessed the view sales report page')
+        return TemplateResponse(request, 'dashboard/reports/sales/sales_list.html',
+                                {'pn': paginator.num_pages, 'sales': total_sales,
+                                 "total_sales_amount": total_sales_amount, "total_tax_amount": total_tax_amount,
+                                 "date": last_date_of_sales})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
+
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
@@ -72,9 +68,10 @@ def sales_detail(request, pk=None):
     try:
         sale = Sales.objects.get(pk=pk)
         items = SoldItem.objects.filter(sales=sale)
-        return TemplateResponse(request, 'dashboard/reports/sales/details.html',{'items': items, "sale":sale})
+        return TemplateResponse(request, 'dashboard/reports/sales/details.html', {'items': items, "sale": sale})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
+
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
@@ -109,12 +106,13 @@ def sales_revert(request, pk=None):
         }
         return JsonResponse(data)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
         data = {
             'message': str("Error Reverting Sale"),
             'status': 400
         }
         return JsonResponse(data)
+
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
@@ -136,15 +134,18 @@ def sales_reports(request):
             items = paginator.page(1)
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
-        user_trail(request.user.name, 'accessed sales reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
+        user_trail(request.user.name, 'accessed sales reports', 'view')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view sales report page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
-            return TemplateResponse(request, 'dashboard/reports/sales/sales.html', {'items':items, 'total_sales':total_sales,'total_tax':total_tax, 'ts':ts, 'tsum':tsum})
+            return TemplateResponse(request, 'dashboard/reports/sales/sales.html',
+                                    {'items': items, 'total_sales': total_sales, 'total_tax': total_tax, 'ts': ts,
+                                     'tsum': tsum})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing sales reports')
+
 
 @staff_member_required
 def sales_paginate(request):
@@ -161,7 +162,6 @@ def sales_paginate(request):
     total_sales = Sales.objects.aggregate(Sum('total_net'))
     total_tax = Sales.objects.aggregate(Sum('total_tax'))
 
-
     if date:
         try:
             all_salesd = Sales.objects.filter(created__icontains=date).order_by('-id')
@@ -175,17 +175,17 @@ def sales_paginate(request):
             if p2_sz and date:
                 paginator = Paginator(sales, int(p2_sz))
                 sales = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/sales/paginate.html',{'sales':sales, 'gid':date})
+                return TemplateResponse(request, 'dashboard/reports/sales/paginate.html', {'sales': sales, 'gid': date})
 
             paginator = Paginator(sales, 10)
             sales = paginator.page(page)
-            return TemplateResponse(request,'dashboard/reports/sales/p2.html',
-                {'sales':sales, 'pn':paginator.num_pages,'sz':10,'gid':date,
-                'total_sales':total_sales,'total_tax':total_tax,'tsum':tsum,
-                'that_date_sum':that_date_sum, 'date':date, 'today':today})
+            return TemplateResponse(request, 'dashboard/reports/sales/p2.html',
+                                    {'sales': sales, 'pn': paginator.num_pages, 'sz': 10, 'gid': date,
+                                     'total_sales': total_sales, 'total_tax': total_tax, 'tsum': tsum,
+                                     'that_date_sum': that_date_sum, 'date': date, 'today': today})
 
         except ObjectDoesNotExist as e:
-            return TemplateResponse(request, 'dashboard/reports/sales/p2.html',{'date': date})
+            return TemplateResponse(request, 'dashboard/reports/sales/p2.html', {'date': date})
 
     else:
         try:
@@ -203,13 +203,15 @@ def sales_paginate(request):
             if list_sz:
                 paginator = Paginator(sales, int(list_sz))
                 sales = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/sales/p2.html',{'sales':sales, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0, 'total_sales':total_sales,'total_tax':total_tax, 'tsum':tsum})
+                return TemplateResponse(request, 'dashboard/reports/sales/p2.html',
+                                        {'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,
+                                         'total_sales': total_sales, 'total_tax': total_tax, 'tsum': tsum})
             else:
                 paginator = Paginator(sales, 10)
             if p2_sz:
                 paginator = Paginator(sales, int(p2_sz))
                 sales = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/sales/paginate.html',{'sales':sales})
+                return TemplateResponse(request, 'dashboard/reports/sales/paginate.html', {'sales': sales})
 
             try:
                 sales = paginator.page(page)
@@ -219,9 +221,10 @@ def sales_paginate(request):
                 sales = paginator.page(1)
             except EmptyPage:
                 sales = paginator.page(1)
-            return TemplateResponse(request,'dashboard/reports/sales/paginate.html',{'sales':sales})
+            return TemplateResponse(request, 'dashboard/reports/sales/paginate.html', {'sales': sales})
         except ObjectDoesNotExist as e:
             return TemplateResponse(request, 'dashboard/reports/sales/p2.html', {'date': date})
+
 
 @staff_member_required
 def sales_search(request):
@@ -229,7 +232,7 @@ def sales_search(request):
         page = int(request.GET.get('page', 1))
         list_sz = request.GET.get('size')
         p2_sz = request.GET.get('psize')
-        q = request.GET.get( 'q' )
+        q = request.GET.get('q')
         if list_sz is None:
             sz = 10
         else:
@@ -237,13 +240,13 @@ def sales_search(request):
 
         if q is not None:
             all_sales = Sales.objects.filter(
-                Q( invoice_number__icontains = q ) |
-                Q( terminal__terminal_name__icontains = q ) |
+                Q(invoice_number__icontains=q) |
+                Q(terminal__terminal_name__icontains=q) |
                 Q(created__icontains=q) |
                 Q(customer__name__icontains=q) | Q(customer__mobile__icontains=q) |
                 Q(solditems__product_name__icontains=q) |
                 Q(user__email__icontains=q) |
-                Q(user__name__icontains=q)).order_by( 'id' ).distinct()
+                Q(user__name__icontains=q)).order_by('id').distinct()
             sales = []
 
             if request.GET.get('gid'):
@@ -307,6 +310,7 @@ def sales_search(request):
                 return TemplateResponse(request, 'dashboard/reports/sales/search.html',
                                         {'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
+
 @staff_member_required
 @permission_decorator('reports.view_products_reports')
 def product_reports(request):
@@ -315,9 +319,9 @@ def product_reports(request):
         total_cost = 0
         for i in items:
             try:
-                total_cost+=i.get_total_cost()
+                total_cost += i.get_total_cost()
             except Exception as e:
-                total_cost+=0
+                total_cost += 0
 
         total_cost = "{:,.2f}".format(total_cost)
         page = request.GET.get('page', 1)
@@ -330,11 +334,12 @@ def product_reports(request):
             items = paginator.page(1)
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
-        user_trail(request.user.name, 'accessed products reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
-        return TemplateResponse(request, 'dashboard/reports/products/products.html', {'pn':paginator.num_pages,'items':items, 'total_cost':total_cost})
+        user_trail(request.user.name, 'accessed products reports', 'view')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view sales report page')
+        return TemplateResponse(request, 'dashboard/reports/products/products.html',
+                                {'pn': paginator.num_pages, 'items': items, 'total_cost': total_cost})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         print (e)
         return HttpResponse('error accessing products reports')
 
@@ -356,11 +361,13 @@ def products_paginate(request):
                 if p2_sz and gid:
                     paginator = Paginator(items, int(p2_sz))
                     items = paginator.page(page)
-                    return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items, 'gid':action})
+                    return TemplateResponse(request, 'dashboard/reports/products/paginate.html',
+                                            {'items': items, 'gid': action})
 
                 paginator = Paginator(items, 10)
                 items = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/products/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':action})
+                return TemplateResponse(request, 'dashboard/reports/products/p2.html',
+                                        {'items': items, 'pn': paginator.num_pages, 'sz': 10, 'gid': action})
 
             except ValueError as e:
                 return HttpResponse(e)
@@ -369,13 +376,14 @@ def products_paginate(request):
         if list_sz:
             paginator = Paginator(items, int(list_sz))
             items = paginator.page(page)
-            return TemplateResponse(request,'dashboard/reports/products/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0})
+            return TemplateResponse(request, 'dashboard/reports/products/p2.html',
+                                    {'items': items, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
         else:
             paginator = Paginator(items, 10)
         if p2_sz:
             paginator = Paginator(items, int(p2_sz))
             items = paginator.page(page)
-            return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items})
+            return TemplateResponse(request, 'dashboard/reports/products/paginate.html', {'items': items})
 
         try:
             items = paginator.page(page)
@@ -385,7 +393,8 @@ def products_paginate(request):
             items = paginator.page(1)
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
-        return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items})
+        return TemplateResponse(request, 'dashboard/reports/products/paginate.html', {'items': items})
+
 
 @staff_member_required
 def products_search(request):
@@ -393,7 +402,7 @@ def products_search(request):
         page = request.GET.get('page', 1)
         list_sz = request.GET.get('size')
         p2_sz = request.GET.get('psize')
-        q = request.GET.get( 'q' )
+        q = request.GET.get('q')
         if list_sz is None:
             sz = 10
         else:
@@ -401,9 +410,9 @@ def products_search(request):
 
         if q is not None:
             items = Stock.objects.filter(
-                Q( variant__sku__icontains = q ) |
-                Q( variant__product__name__icontains = q ) |
-                Q(variant__product__product_class__name__icontains = q) ).order_by( '-id' )
+                Q(variant__sku__icontains=q) |
+                Q(variant__product__name__icontains=q) |
+                Q(variant__product__product_class__name__icontains=q)).order_by('-id')
 
             if p2_sz:
                 paginator = Paginator(items, int(p2_sz))
@@ -428,9 +437,11 @@ def products_search(request):
                 items = paginator.page(paginator.num_pages)
             if p2_sz:
                 items = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items})
+                return TemplateResponse(request, 'dashboard/reports/products/paginate.html', {'items': items})
 
-            return TemplateResponse(request, 'dashboard/reports/products/search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
+            return TemplateResponse(request, 'dashboard/reports/products/search.html',
+                                    {'items': items, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
 def products_reorder_search(request):
@@ -438,7 +449,7 @@ def products_reorder_search(request):
         page = request.GET.get('page', 1)
         list_sz = request.GET.get('size')
         p2_sz = request.GET.get('psize')
-        q = request.GET.get( 'q' )
+        q = request.GET.get('q')
         if list_sz is None:
             sz = 10
         else:
@@ -460,7 +471,7 @@ def products_reorder_search(request):
                 items = paginator.page(paginator.num_pages)
             if p2_sz:
                 items = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/products/reorder_paginate.html',{'items':items})
+                return TemplateResponse(request, 'dashboard/reports/products/reorder_paginate.html', {'items': items})
 
             if list_sz:
                 paginator = Paginator(items, int(list_sz))
@@ -469,14 +480,15 @@ def products_reorder_search(request):
                                         {'items': items, 'pn': paginator.num_pages, 'sz': list_sz,
                                          'gid': request.GET.get('gid'), 'q': q})
 
-            return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
+            return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html',
+                                    {'items': items, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 
 @staff_member_required
 def sales_list_export_csv(request):
-    pdfname = 'sales'+str(random.random())
+    pdfname = 'sales' + str(random.random())
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+    response['Content-Disposition'] = 'attachment; filename="' + pdfname + '.csv"'
 
     try:
         last_sale = Sales.objects.latest('id')
@@ -497,7 +509,7 @@ def sales_list_export_csv(request):
 
     qs = total_sales
     writer = csv.writer(response, csv.excel)
-    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+    response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
     writer.writerow([
         smart_str(u"Transaction Date"),
         smart_str(u"Receipt No"),
@@ -547,6 +559,7 @@ def products_pdf(request):
         }
         pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
         return HttpResponse(pdf, content_type='application/pdf')
+
 
 @staff_member_required
 def products_export_csv(request):
@@ -615,7 +628,8 @@ def balancesheet_reports(request):
         petty_cash = 30000
         try:
             ds = DrawerCash.objects.latest('id')
-            drawer = ds.objects.annotate(c=Count('terminal', distinct=True)).aggregate(total_amount=Sum('amount'))['total_amount']
+            drawer = ds.objects.annotate(c=Count('terminal', distinct=True)).aggregate(total_amount=Sum('amount'))[
+                'total_amount']
         except:
             drawer = 0
         # stock = 23000 #from purchases
@@ -636,24 +650,25 @@ def balancesheet_reports(request):
         # expenses = 1233
         credit_total = accounts_payable + notes_payable + revenues
         data = {
-            "petty_cash":petty_cash,
-            "cash_in_hand":cash_in_hand,
-            "stock":stock,
-            "debit_total":debit_total,
+            "petty_cash": petty_cash,
+            "cash_in_hand": cash_in_hand,
+            "stock": stock,
+            "debit_total": debit_total,
 
-            "accounts_payable":accounts_payable,
-            "notes_payable":notes_payable,
-            "revenues":revenues,
-            "credit_total":credit_total,
-            "status":True
+            "accounts_payable": accounts_payable,
+            "notes_payable": notes_payable,
+            "revenues": revenues,
+            "credit_total": credit_total,
+            "status": True
         }
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html', data)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html')
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html')
+
 
 @staff_member_required
 def get_dashboard_data(request):
@@ -667,13 +682,14 @@ def get_dashboard_data(request):
 
     ''' get lowest product '''
     data = {
-         "label":label,
-         "default":default,
-         "users":10,
-         "net":serializers.serialize('json', total_sales),
-         "todays_sales": serializers.serialize('json', todays_sales),
+        "label": label,
+        "default": default,
+        "users": 10,
+        "net": serializers.serialize('json', total_sales),
+        "todays_sales": serializers.serialize('json', todays_sales),
     }
     return JsonResponse(data)
+
 
 @staff_member_required
 @permission_decorator('reports.view_products_reports')
@@ -690,15 +706,16 @@ def product_reorder(request):
             low_stock = paginator.page(1)
         except EmptyPage:
             low_stock = paginator.page(paginator.num_pages)
-        user_trail(request.user.name, 'accessed products reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
+        user_trail(request.user.name, 'accessed products reports', 'view')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view sales report page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
-            return TemplateResponse(request, 'dashboard/reports/products/reorder.html', {'low_stock':low_stock})
+            return TemplateResponse(request, 'dashboard/reports/products/reorder.html', {'low_stock': low_stock})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing products reports')
+
 
 @staff_member_required
 def products_reorder_paginate(request):
@@ -753,6 +770,7 @@ def products_reorder_paginate(request):
             items = paginator.page(paginator.num_pages)
         return TemplateResponse(request, 'dashboard/reports/products/reorder_paginate.html', {'items': items})
 
+
 @staff_member_required
 def reorder_pdf(request):
     if request.is_ajax():
@@ -774,7 +792,7 @@ def reorder_pdf(request):
                 'today': date.today(),
                 'items': items,
                 'puller': request.user,
-                'gid':gid
+                'gid': gid
             }
             pdf = render_to_pdf('dashboard/reports/products/pdf/reorder_pdf.html', data)
             return HttpResponse(pdf, content_type='application/pdf')
@@ -808,13 +826,13 @@ def reorder_export_csv(request):
         else:
             items = get_low_stock_products()
 
-        pdfname = 'low stock products-'+str(random.random())
+        pdfname = 'low stock products-' + str(random.random())
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+        response['Content-Disposition'] = 'attachment; filename="' + pdfname + '.csv"'
         # qs = PurchaseProduct.objects.all().order_by('id')
         qs = items
         writer = csv.writer(response, csv.excel)
-        response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+        response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
         writer.writerow([
             smart_str(u"Product name"),
             smart_str(u"Stock left"),

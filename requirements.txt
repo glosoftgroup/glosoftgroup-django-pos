@@ -100,6 +100,7 @@ six==1.10.0
 social-auth-app-django==1.1.0
 social-auth-core==1.2.0
 stripe==1.46.0
+structlog=18.2.0
 suds-jurko==0.6
 text-unidecode==1.0
 typing==3.5.2.2

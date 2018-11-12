@@ -1,27 +1,23 @@
-import logging
-import base64
-import json
 from datetime import datetime, timedelta
-import hashlib
-from ast import literal_eval
 from django.utils.translation import get_language
 from django_countries.fields import Country
+from django.conf import settings
+from django.template.response import TemplateResponse
+from django.urls import reverse
+import hashlib
+import json
+from structlog import get_logger
 
 from . import analytics
 from ..discount.models import Sale
 from ..site.models import Files
 from .utils import get_client_ip, get_country_by_ip, get_currency_for_country
-from django.conf import settings
-from django.template.response import TemplateResponse
-from django.urls import reverse
-from django.http import QueryDict, HttpResponse
-from saleor.dashboard.sites.views import add_sitekeys
 from ..core.encryptor import Encryptor
 from ..core.readmac import FetchMac
-from ..core.utils import replace_last
 
-logger = logging.getLogger(__name__)
-info_logger = logging.getLogger('info_logger')
+
+logger = get_logger(__name__)
+
 
 class GoogleAnalytics(object):
     def process_request(self, request):
@@ -34,7 +30,7 @@ class GoogleAnalytics(object):
             analytics.report_view(client_id, path=path, language=language,
                                   headers=headers)
         except Exception:
-            logger.exception('Unable to update analytics')
+            logger.error('Unable to update analytics')
 
 
 class DiscountMiddleware(object):
@@ -103,16 +99,15 @@ class SettingsMiddleware(object):
                 version = data["Version"]
                 dateobj = datetime.strptime(version, '%Y-%m-%d')
                 exp = dateobj - datetime.utcnow()
-                info_logger.info('expiry date: ' + str(exp))
+                logger.info('expiry date: ' + str(exp))
 
                 if exp < timedelta(seconds=0):
                     return TemplateResponse(request, 'lockdown/form.html', {'days': exp, 'machine': number})
                 else:
-                    info_logger.info('No issue on expiry date')
+                    logger.info('No issue on expiry date')
                     return None
             else:
                 return TemplateResponse(request, 'lockdown/form.html', {'days':'unknown', 'machine': number})
-
 
     def is_json(self, myjson):
         try:

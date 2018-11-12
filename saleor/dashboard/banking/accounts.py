@@ -7,12 +7,11 @@ from django.db.models import Q
 from ..views import staff_member_required
 from ...banking.models import Bank, Account
 from ...decorators import user_trail
-import logging
 import json
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -36,13 +35,13 @@ def list(request):
             "banks":banks
         }
         user_trail(request.user.name, 'accessed bank accounts', 'views')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed bank accounts page')
+        logger.info('User: ' + str(request.user.name) + 'accessed bank accounts page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/banking/accounts/list.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing bank accounts')
 
 
@@ -75,10 +74,10 @@ def delete(request, pk=None):
         try:
             account.delete()
             user_trail(request.user.name, 'deleted bank account : '+ str(account.name),'delete')
-            info_logger.info('deleted bank account: '+ str(account.name))
+            logger.info('deleted bank account: '+ str(account.name))
             return HttpResponse('success')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -93,10 +92,10 @@ def edit(request, pk=None):
         try:
             account.save()
             user_trail(request.user.name, 'updated bank account : '+ str(account.name),'update')
-            info_logger.info('updated bank account: '+ str(account.name))
+            logger.info('updated bank account: '+ str(account.name))
             return HttpResponse('success')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -107,10 +106,10 @@ def detail(request, pk=None):
             account = get_object_or_404(Account, pk=pk)
             ctx = {'option': account}
             user_trail(request.user.name, 'access bank account details of: ' + str(account.name)+' ','view')
-            info_logger.info('access banking account details of: ' + str(account.name)+'  ')
+            logger.info('access banking account details of: ' + str(account.name)+'  ')
             return TemplateResponse(request, 'dashboard/banking/accounts/detail.html', ctx)
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return TemplateResponse(request, 'dashboard/banking/accounts/detail.html', {'error': e})
 
 

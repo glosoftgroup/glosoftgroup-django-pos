@@ -1,10 +1,8 @@
-import logging
 from ...credit.models import Credit
 from ...sale.models import PaymentOption
+from structlog import get_logger
 
-
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+logger = get_logger(__name__)
 
 
 def clear_old_debts_using_change(change, instance):
@@ -49,11 +47,11 @@ def clear_old_debts_using_change(change, instance):
                     pay_opt = PaymentOption.objects.get(pk=int(option['payment_id']))
                     credit.payment_options.add(pay_opt)
                 except Exception as e:
-                    error_logger.error("error adding the Payment Option " + str(e))
+                    logger.error("error adding the Payment Option " + str(e))
 
             credit.save()
 
-            info_logger.info(
+            logger.info(
                 "credit of id: " + str(credit.pk) + ", balance: " + str(credit.debt) + ", status: " + str(
                     credit.status))
 

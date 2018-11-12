@@ -1,10 +1,8 @@
 from django.db.models import Q
 
-from .pagination import PostLimitOffsetPagination, PostPageNumberPagination
+from .pagination import PostLimitOffsetPagination
 
 from django.contrib.auth import get_user_model
-
-from ...payment.models import MpesaPayment
 from .serializers import (
      UserTransactionSerializer,
      UserAuthorizationSerializer,
@@ -18,10 +16,11 @@ from ...sale.models import Terminal
 import logging
 from rest_framework.decorators import api_view
 from rest_framework import status
+from structlog import get_logger
+
+logger = get_logger(__name__)
+
 User = get_user_model()
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 @api_view(['GET', 'POST'])
@@ -79,7 +78,7 @@ class UserTransactionAPIView(generics.CreateAPIView,):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
         user_trail(self.request.user, 'Drawer Cash:#'+str(serializer.data['amount'])+' added ','add')
-        info_logger.info('User: '+str(self.request.user)+' Drawer Cash:'+str(serializer.data['amount']))
+        logger.info('User: '+str(self.request.user)+' Drawer Cash:'+str(serializer.data['amount']))
 
 
 class TerminalListAPIView(generics.ListAPIView):
