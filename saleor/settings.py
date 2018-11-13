@@ -467,14 +467,10 @@ if sys.platform == 'win32':
     log_directory = "C:\\Users\\Public\\PosServer\\logs\\"
     info_path = log_directory + '\\' + this_date + '_info.log'
     error_path = log_directory + '\\' + this_date + '_error.log'
-    debug_path = log_directory + '\\' + this_date + '_debug.log'
-    warning_path = log_directory + '\\' + this_date + '_warning.log'
 else:
     log_directory = os.path.expanduser('~/PosServer/logs')
     info_path = log_directory + '/' + this_date + '_info.log'
     error_path = log_directory + '/' + this_date + '_error.log'
-    debug_path = log_directory + '/' + this_date + '_debug.log'
-    warning_path = log_directory + '/' + this_date + '_warning.log'
 
 if not os.path.exists(log_directory):
     os.makedirs(log_directory)
