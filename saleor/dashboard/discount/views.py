@@ -11,13 +11,12 @@ import json
 
 from ...discount.models import Sale, Voucher
 from ...product.models import ProductVariant
-from ...decorators import permission_decorator, user_trail
+from ...decorators import user_trail
 from . import forms
-import logging
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 @staff_member_required
 def sale_list(request):
@@ -34,12 +33,12 @@ def sale_list(request):
         except EmptyPage:
             sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed discount page', 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed discount page')
+        logger.info('User: ' + str(request.user.name) + 'accessed discount page')
 
         return TemplateResponse(request, 'dashboard/discount/sale_list.html',
                                     {'sales': sales, 'pn': paginator.num_pages})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/discount/sale_list.html', {})
 
 def disc_paginate(request):
@@ -126,13 +125,13 @@ def discount_detail(request,pk=None):
                 except EmptyPage:
                     products = paginator.page(paginator.num_pages)
                 user_trail(request.user.name, 'accessed discount detail page for ' + str(instance.name), 'view')
-                info_logger.info(
+                logger.info(
                     'User: ' + str(request.user.name) + 'accessed discount detail page for ' + str(instance.name))
 
                 return TemplateResponse(request, 'dashboard/discount/discount_detail.html',
                                         {'product_results':products,'discount':instance, 'pn': paginator.num_pages, 'pk':pk})
             except TypeError as e:
-                error_logger.error(e)
+                logger.error(e)
                 return TemplateResponse(request, 'dashboard/customer/discount_detail.html', {})
 
 def disc_products_paginate(request):
@@ -220,7 +219,7 @@ def sale_edit(request, pk=None):
                 'Sale (discount) message', 'Added sale')
         messages.success(request, msg)
         user_trail(request.user.name, 'updated discount : ' + str(instance.name), 'update')
-        info_logger.info('User: ' + str(request.user.name) + ' updated discount:' + str(instance.name))
+        logger.info('User: ' + str(request.user.name) + ' updated discount:' + str(instance.name))
         return redirect('dashboard:sale-update', pk=instance.pk)
     ctx = {'sale': instance, 'form': form}
     return TemplateResponse(request, 'dashboard/discount/sale_form.html', ctx)
@@ -266,7 +265,7 @@ def sale_delete(request, pk):
             request,
             pgettext_lazy('Sale (discount) message', 'Deleted sale %s') % (instance.name,))
         user_trail(request.user.name, 'deleted discount : ' + str(instance.name), 'delete')
-        info_logger.info('User: ' + str(request.user.name) + ' deleted discount:' + str(instance.name))
+        logger.info('User: ' + str(request.user.name) + ' deleted discount:' + str(instance.name))
         return redirect('dashboard:sale-list')
     ctx = {'sale': instance}
     return TemplateResponse(

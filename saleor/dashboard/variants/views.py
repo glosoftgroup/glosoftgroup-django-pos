@@ -1,38 +1,17 @@
 from __future__ import unicode_literals
 
-import emailit.api
-from django.conf import settings
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.contrib.postgres.search import SearchVector
-
-from ...core.utils import get_paginator_items
-from ...purchase.models import (
-                                PurchaseOrder,
-                                PurchaseItems,
-                                PurchaseProduct
-                                )
-from ...supplier.models import Supplier
-from ...product.models import (Product, ProductAttribute, Category,
-                               ProductClass, AttributeChoiceValue,
-                               ProductImage, ProductVariant, Stock,
-                               StockLocation, ProductTax, StockHistoryEntry)
-from ..views import staff_member_required
-from ..views import get_low_stock_products
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from ...decorators import permission_decorator, user_trail
-import logging
+from structlog import get_logger
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from ...product.models import (Product, Category, ProductVariant)
+from ..views import staff_member_required
+
+
+logger = get_logger(__name__)
+
 
 @staff_member_required
 def stock_pages(request):
@@ -84,7 +63,7 @@ def variant_list(request,pk=None):
                         'product':product
                         })
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing users')
 
 @staff_member_required
@@ -183,7 +162,6 @@ def variant_search( request,pk=None ):
 @staff_member_required
 def stock_filter(request):
     queryset_list = ProductVariant.objects.all()
-    #paginator = Paginator(queryset_list, 10)
     page = request.GET.get('page',1)
     size = request.GET.get('size',10)
     search = request.GET.get('search_text','')

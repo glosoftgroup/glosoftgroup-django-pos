@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
@@ -9,12 +9,11 @@ from ...sale.models import PaymentOption
 from saleor.payment.models import PaymentOption as Table
 from ...sale.models import DrawerCash
 from ...decorators import user_trail
-import logging
 import json
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -36,13 +35,13 @@ def payments_list(request):
             "pn": paginator.num_pages
         }
         user_trail(request.user.name, 'accessed payment option', 'views')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed payment option page')
+        logger.info('User: ' + str(request.user.name) + 'accessed payment option page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/payment/options/list.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing payment options')
 
 
@@ -92,11 +91,11 @@ def delete(request, pk=None):
             else:
                 option.delete()
                 user_trail(request.user.name, 'deleted payment option : '+ str(option.name),'delete')
-                info_logger.info('deleted payment option: '+ str(option.name))
+                logger.info('deleted payment option: '+ str(option.name))
                 return HttpResponse('success')
             return HttpResponse(json.dumps({'error':"Loyalty Points is not deletable"}),content_type='application/json')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -110,12 +109,12 @@ def stock_delete(request, pk=None):
             else:
                 option.delete()
                 user_trail(request.user.name, 'deleted stock payment option : '+ str(option.name),'delete')
-                info_logger.info('deleted stock payment option: '+ str(option.name))
+                logger.info('deleted stock payment option: '+ str(option.name))
                 return HttpResponse('success')
             return HttpResponse(json.dumps({'error': "You cannot delete Credit"}),
                                 content_type='application/json')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -133,12 +132,12 @@ def edit(request, pk=None):
                     option.loyalty_point_equiv = request.POST.get('loyalty_point_equiv')                
                 option.save()
                 user_trail(request.user.name, 'updated payment option : '+ str(option.name),'delete')
-                info_logger.info('updated payment option: '+ str(option.name))
+                logger.info('updated payment option: '+ str(option.name))
                 return HttpResponse('success')
             else:
                 return HttpResponse('invalid response')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -153,10 +152,10 @@ def detail(request, pk=None):
             else:
                 ctx['disabled'] = ''
             user_trail(request.user.name, 'access payment option details of: '+ str(option.name)+' ','view')
-            info_logger.info('access payment option details of: '+ str(option.name)+'  ')
+            logger.info('access payment option details of: '+ str(option.name)+'  ')
             return TemplateResponse(request, 'dashboard/payment/options/detail.html', ctx)
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return TemplateResponse(request, 'dashboard/payment/options/detail.html', {'error': e})
 
 @staff_member_required
@@ -174,10 +173,10 @@ def transactions(request):
         except EmptyPage:
             transactions = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed transaction', 'view')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed transaction:')
+        logger.info('User: ' + str(request.user.name) + 'accessed transaction:')
         return TemplateResponse(request, 'dashboard/cashmovement/transactions.html',{'transactions':transactions, 'pn': paginator.num_pages})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/cashmovement/transactions.html', {'transactions':transactions, 'pn': paginator.num_pages})
 
 
@@ -321,13 +320,13 @@ def payments_stock_list(request):
             "pn": paginator.num_pages
         }
         user_trail(request.user.name, 'accessed stock payment option', 'views')
-        info_logger.info('User: ' + str(request.user.name) + 'accessed stock payment option page')
+        logger.info('User: ' + str(request.user.name) + 'accessed stock payment option page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/payment/stock/list.html', data)
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing stock payment options')
 
 
@@ -345,12 +344,12 @@ def stock_edit(request, pk=None):
                     option.loyalty_point_equiv = request.POST.get('loyalty_point_equiv')
                 option.save()
                 user_trail(request.user.name, 'updated stock payment option : '+ str(option.name),'delete')
-                info_logger.info('updated stock payment option: '+ str(option.name))
+                logger.info('updated stock payment option: '+ str(option.name))
                 return HttpResponse('success')
             else:
                 return HttpResponse('invalid response')
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return HttpResponse(e)
 
 
@@ -365,10 +364,10 @@ def stock_detail(request, pk=None):
             else:
                 ctx['disabled'] = ''
             user_trail(request.user.name, 'access payment option details of: '+ str(option.name)+' ','view')
-            info_logger.info('access payment option details of: '+ str(option.name)+'  ')
+            logger.info('access payment option details of: '+ str(option.name)+'  ')
             return TemplateResponse(request, 'dashboard/payment/stock/detail.html', ctx)
         except Exception, e:
-            error_logger.error(e)
+            logger.error(e)
             return TemplateResponse(request, 'dashboard/payment/stock/detail.html', {'error': e})
 
 

@@ -17,7 +17,6 @@ from ...sale.models import (Sales,
                             Terminal,
                             TerminalHistoryEntry,
                             DrawerCash)
-from ...customer.models import Customer
 from .serializers import (
     CreateStockSerializer,
     ProductStockListSerializer,
@@ -28,11 +27,10 @@ from .serializers import (
 from rest_framework import generics
 
 from ...decorators import user_trail
-import logging
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 class CreateStockAPIView(CreateAPIView):
@@ -59,7 +57,7 @@ class SalesCreateAPIView(generics.CreateAPIView):
         user_trail(self.request.user.name,
                    'made a sale:#' + str(serializer.data['invoice_number']) + ' sale worth: ' + str(
                        serializer.data['total_net']), 'add')
-        info_logger.info('User: ' + str(self.request.user) + ' made a sale:' + str(serializer.data['invoice_number']))
+        logger.info('User: ' + str(self.request.user) + ' made a sale:' + str(serializer.data['invoice_number']))
         terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
         trail = 'User: ' + str(self.request.user) + \
                 ' made a sale:' + str(serializer.data['invoice_number']) + \
@@ -78,7 +76,7 @@ class SalesCreateAPIView(generics.CreateAPIView):
         user_trail(self.request.user.name,
                    'made a sale:#' + str(serializer.data['invoice_number']) + ' sale worth: ' + str(
                        serializer.data['total_net']), 'add')
-        info_logger.info('User: ' + str(self.request.user) + ' made a sale:' + str(serializer.data['invoice_number']))
+        logger.info('User: ' + str(self.request.user) + ' made a sale:' + str(serializer.data['invoice_number']))
 
 
 class SalesListAPIView(generics.ListAPIView):

@@ -9,29 +9,8 @@ import dj_database_url
 import dj_email_url
 from django.contrib.messages import constants as messages
 import django_cache_url
+import structlog
 from django.utils.dateformat import DateFormat
-
-dateToday = datetime.datetime.now()
-thisDate = dateToday.strftime('%d-%m-%Y')
-thisMonth = dateToday.strftime('%b')
-dayName = dateToday.strftime("%a")
-
-if sys.platform == 'win32':
-    thisMonthDirectory = "C:\\Users\\Public\\PosServer\\logs\\"
-    info_path = thisMonthDirectory + '\\' + thisDate + '_info.log'
-    error_path = thisMonthDirectory + '\\' + thisDate + '_error.log'
-    debug_path = thisMonthDirectory + '\\' + thisDate + '_debug.log'
-    warning_path = thisMonthDirectory + '\\' + thisDate + '_warning.log'
-else:
-    thisMonthDirectory = os.path.expanduser('~/PosServer/logs')
-    info_path = thisMonthDirectory + '/' + thisDate + '_info.log'
-    error_path = thisMonthDirectory + '/' + thisDate + '_error.log'
-    debug_path = thisMonthDirectory + '/' + thisDate + '_debug.log'
-    warning_path = thisMonthDirectory + '/' + thisDate + '_warning.log'
-
-
-if not os.path.exists(thisMonthDirectory):
-    os.makedirs(thisMonthDirectory)
 
 DEBUG = ast.literal_eval(os.environ.get('DEBUG', 'True'))
 
@@ -40,6 +19,8 @@ SITE_ID = 1
 PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
 
 ROOT_URLCONF = 'saleor.urls'
+
+ENV_NAME = os.environ.get("ENV_NAME", "development")
 
 WSGI_APPLICATION = 'saleor.wsgi.application'
 
@@ -196,7 +177,7 @@ INSTALLED_APPS = [
     'saleor.car',
     'saleor.userprofile',
     'saleor.discount',
-    'saleor.product',    
+    'saleor.product',
     'saleor.cart',
     'saleor.checkout',
     'saleor.core',
@@ -240,121 +221,6 @@ INSTALLED_APPS = [
     # 'chartjs',
 ]
 
-U_LOGFILE_SIZE = 5 * 1024 * 1024
-U_LOGFILE_COUNT = 10
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        },
-        'standard': {
-            'format': '[%(asctime)s] %(levelname)s %(name)s: %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        },
-        'simple': {
-            'format': '[%(asctime)s] %(levelname)s %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        },
-    },
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue'
-        }
-    },
-    'handlers': {
-        'null': {
-                'class': 'logging.NullHandler',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'filters': ['require_debug_true'],
-            'formatter': 'simple'
-        },
-        'debug_logfile': {
-            'level': 'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename':debug_path,
-            'maxBytes': U_LOGFILE_SIZE,
-            'backupCount': U_LOGFILE_COUNT,
-            'formatter': 'standard'
-        },
-        'error_logfile': {
-            'level': 'ERROR',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename':error_path,
-            'maxBytes': U_LOGFILE_SIZE,
-            'backupCount': U_LOGFILE_COUNT,
-            'formatter': 'standard'
-        },
-        'warning_logfile': {
-            'level': 'WARNING',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename':warning_path,
-            'maxBytes': U_LOGFILE_SIZE,
-            'backupCount': U_LOGFILE_COUNT,
-            'formatter': 'standard'
-        },
-        'info_logfile': {
-            'level': 'INFO',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename':info_path,
-            'maxBytes': U_LOGFILE_SIZE,
-            'backupCount': U_LOGFILE_COUNT,
-            'formatter': 'standard'
-        },
-    },
-    'loggers': {
-        'django.security.*': {
-                'handlers': ['error_logfile','null'],
-                'level': 'ERROR',
-                'propagate': True
-        },
-        'django.security.csrf': {
-                'handlers': ['warning_logfile'],
-                'level': 'WARNING',
-                'propagate': True
-        },
-        'django.request': {
-            'handlers': ['warning_logfile'], #['error_logfile'], #['mail_admins'],
-            # 'level': 'WARNING', #''ERROR',
-            'propagate': True
-        },
-        'saleor': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True
-        },
-        'debug_logger': {
-            'handlers': ['debug_logfile'],
-            'level': 'DEBUG',
-            'propagate': True
-        },
-        'error_logger': {
-            'handlers': ['error_logfile'],
-            'level': 'DEBUG',
-            'propagate': True
-        },
-        'info_logger': {
-            'handlers': ['info_logfile'],
-            'level': 'DEBUG',
-            'propagate': True
-        }
-    }
-}
-
 CSRF_FAILURE_VIEW = 'saleor.decorators.friendly_csrf_failure_view'
 AUTH_USER_MODEL = 'userprofile.User'
 
@@ -378,6 +244,7 @@ GOOGLE_ANALYTICS_TRACKING_ID = os.environ.get('GOOGLE_ANALYTICS_TRACKING_ID')
 def get_host():
     from saleor.site.utils import get_domain
     return get_domain()
+
 
 PAYMENT_HOST = get_host
 
@@ -466,9 +333,7 @@ WEBPACK_LOADER = {
             r'.+\.hot-update\.js',
             r'.+\.map']}}
 
-
 LOGOUT_ON_PASSWORD_CHANGE = False
-
 
 ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
 SEARCHBOX_URL = os.environ.get('SEARCHBOX_URL')
@@ -493,7 +358,6 @@ if ES_URL:
     }
 else:
     SEARCH_BACKENDS = {}
-
 
 GRAPHENE = {
     'MIDDLEWARE': [
@@ -544,7 +408,7 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 '''
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'saleor.jwt_payload.custom_exception_handler',
-    'DEFAULT_RENDERER_CLASSES':(
+    'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
@@ -555,7 +419,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
-'DEFAULT_PERMISSION_CLASSES': (
+    'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     )
 
@@ -568,21 +432,21 @@ from datetime import timedelta
 
 JWT_AUTH = {
     'JWT_ENCODE_HANDLER':
-    'rest_framework_jwt.utils.jwt_encode_handler',
+        'rest_framework_jwt.utils.jwt_encode_handler',
 
     'JWT_DECODE_HANDLER':
-    'rest_framework_jwt.utils.jwt_decode_handler',
+        'rest_framework_jwt.utils.jwt_decode_handler',
 
     'JWT_PAYLOAD_HANDLER':
-    'rest_framework_jwt.utils.jwt_payload_handler',
+        'rest_framework_jwt.utils.jwt_payload_handler',
 
     'JWT_PAYLOAD_GET_USER_ID_HANDLER':
-    'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
+        'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
 
     'JWT_RESPONSE_PAYLOAD_HANDLER':
-    'saleor.jwt_payload.jwt_response_payload_handler',
+        'saleor.jwt_payload.jwt_response_payload_handler',
     'JWT_EXPIRATION_DELTA':
-     timedelta(days=2),
+        timedelta(days=2),
 
 }
 
@@ -594,3 +458,140 @@ NOTIFICATIONS_SOFT_DELETE = True
 
 # smessages
 MESSAGES_SOFT_DELETE = True
+
+# Logging configuration
+date_today = datetime.datetime.now()
+this_date = date_today.strftime('%d-%m-%Y')
+
+if sys.platform == 'win32':
+    log_directory = "C:\\Users\\Public\\PosServer\\logs\\"
+    info_path = log_directory + '\\' + this_date + '_info.log'
+    error_path = log_directory + '\\' + this_date + '_error.log'
+else:
+    log_directory = os.path.expanduser('~/PosServer/logs')
+    info_path = log_directory + '/' + this_date + '_info.log'
+    error_path = log_directory + '/' + this_date + '_error.log'
+
+if not os.path.exists(log_directory):
+    os.makedirs(log_directory)
+
+U_LOGFILE_SIZE = 5 * 1024 * 1024
+U_LOGFILE_COUNT = 10
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue'
+        },
+        "environment": {
+            "()": "saleor.CustomFilter"
+        }
+    },
+    'formatters': {
+        "verbose": {
+            "format": "[%(asctime)s] %(levelname)s module=%(module)s, "
+                      "process_id=%(process)d, path=%(pathname)s, "
+                      "environment=%(environment)s, line=%(lineno)d, "
+                      "%(message)s"
+        },
+        'standard': {
+            'format': '[%(asctime)s] %(levelname)s %(name)s: %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'simple': {
+            'format': '[%(asctime)s] %(levelname)s %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
+    'handlers': {
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'filters': ['require_debug_true'],
+            'formatter': 'simple'
+        },
+        'error': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': error_path,
+            'maxBytes': U_LOGFILE_SIZE,
+            'backupCount': U_LOGFILE_COUNT,
+            'formatter': 'verbose',
+            'filters': ["environment"],
+        },
+        'info': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': info_path,
+            'maxBytes': U_LOGFILE_SIZE,
+            'backupCount': U_LOGFILE_COUNT,
+            'formatter': 'verbose',
+            'filters': ["environment"],
+        },
+    },
+    'loggers': {
+        'django.security.*': {
+            'handlers': ['error', 'null'],
+            'level': 'ERROR',
+            'propagate': True
+        },
+        'django.security.csrf': {
+            'handlers': ['info'],
+            'level': 'WARNING',
+            'propagate': True
+        },
+        'django.request': {
+            'handlers': ['info'],
+            'propagate': True
+        },
+        'saleor': {
+            'handlers': ['info', 'error'],
+            'level': 'INFO',
+            'propagate': True
+        }
+    }
+}
+
+
+def configure_structlog(environment):
+
+    structlog_processors = list([
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+    ])
+
+    # uncomment in production for different environments
+    # if environment == "development":
+    #     structlog_processors.append(structlog.dev.ConsoleRenderer())
+    # else:
+    #     structlog_processors.append(structlog.processors.JSONRenderer())
+
+    structlog_processors.append(structlog.processors.JSONRenderer())
+
+    # this formatter should come last
+    structlog_processors.append(structlog.stdlib.ProcessorFormatter.wrap_for_formatter)
+
+    structlog.configure(
+        processors=structlog_processors,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
+    )
+
+
+configure_structlog(ENV_NAME)

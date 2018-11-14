@@ -23,11 +23,10 @@ from ...product.models import (
 from decimal import Decimal
 from ...customer.models import Customer
 from .utilities import clear_old_debts_using_change
-import logging
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 User = get_user_model()
 
 
@@ -149,7 +148,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         try:
             self.total_net = Decimal(data.get('total_net'))
         except:
-            error_logger.error('Total Net should be a decimal/integer')
+            logger.error('Total Net should be a decimal/integer')
             raise ValidationError('Total Net should be a decimal/integer')
         return value
 
@@ -158,12 +157,12 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         try:
             customer = Customer.objects.get(pk=data.get("customer"))
         except:
-            error_logger.error('Incorrect customer details')
+            logger.error('Incorrect customer details')
             raise ValidationError('Incorrect customer details')
         if customer.creditable:
             print 'creditable'
         else:
-            error_logger.error("Customer is not creditable")
+            logger.error("Customer is not creditable")
             raise ValidationError('Customer is not creditable')
         return value
 
@@ -174,10 +173,10 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             if customer.creditable:
                 pass
             else:
-                error_logger.error('Customer is not creditable: code 400')
+                logger.error('Customer is not creditable: code 400')
                 raise ParseError('Customer is not creditable', code=400)
         except Exception as e:
-            error_logger.error(e)
+            logger.error(e)
         return value
 
     def validate_terminal(self, value):
@@ -188,7 +187,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
         for term in terminals:
             self.l.append(term.pk)
         if not self.terminal_id in self.l:
-            error_logger.error('Terminal specified does not exist')
+            logger.error('Terminal specified does not exist')
             raise ValidationError('Terminal specified does not exist')
         return value
 
@@ -203,13 +202,13 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             kwargs['name'] = validated_data.get('customer_name')
             kwargs['mobile'] = validated_data.get('mobile')
         else:
-            error_logger.error('customer details provided do not meet adding customer criteria')
+            logger.error('customer details provided do not meet adding customer criteria')
             raise ParseError('customer details provided do not meet adding customer criteria')
 
         customer = Customer.objects.filter(**kwargs)
         if customer.exists():
             if not customer.get().creditable:
-                error_logger.error('Customer ' + kwargs['name'] + ' is not creditable')
+                logger.error('Customer ' + kwargs['name'] + ' is not creditable')
                 raise ParseError('Customer ' + kwargs['name'] + ' is not creditable', code=400)
 
         if not customer.exists():
@@ -242,7 +241,7 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             history.amount = validated_data.get('amount_paid')
             history.save()
         except Exception as e:
-            error_logger.error(e)
+            logger.error(e)
 
         for solditem_data in solditems_data:
             item_temp = CreditedItem.objects.create(credit=credit, **solditem_data)
@@ -339,12 +338,12 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             balance = Decimal(data.get('balance'))
             sale = Credit.objects.get(invoice_number=str(invoice_number))
             if status == 'fully-paid' and sale.balance > amount_paid:
-                error_logger.error("Status error. Amount paid is less than balance.")
+                logger.error("Status error. Amount paid is less than balance.")
                 raise ValidationError("Status error. Amount paid is less than balance.")
             else:
                 return value
         else:
-            error_logger.error('Enter correct Status. Expecting either fully-paid/payment-pending')
+            logger.error('Enter correct Status. Expecting either fully-paid/payment-pending')
             raise ValidationError('Enter correct Status. Expecting either fully-paid/payment-pending')
 
     def validate_total_net(self, value):
@@ -352,7 +351,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
         try:
             total_net = Decimal(data.get('total_net'))
         except:
-            error_logger.error('Total Net should be a decimal/integer')
+            logger.error('Total Net should be a decimal/integer')
             raise ValidationError('Total Net should be a decimal/integer')
 
     def validate_debt(self, value):
@@ -424,7 +423,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
 
         if validated_data.get('apply_to_pending'):
 
-            info_logger.info('clearing old debts')
+            logger.info('clearing old debts')
 
             """ handle the balance as a positive """
             change = validated_data.get('balance')
@@ -440,7 +439,7 @@ class CreditUpdateSerializer(serializers.ModelSerializer):
             history.balance = instance.total_net - instance.amount_paid
             history.save()
         except Exception as e:
-            error_logger.error(e)
+            logger.error(e)
         return instance
 
 

@@ -1,17 +1,15 @@
 import emailit.api
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
-from ..views import staff_member_required
 from django.db.models import Q
-import logging
 import json
+from structlog import get_logger
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger  = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
-from django.contrib.auth import get_user_model
+from ..views import staff_member_required
+
+
 from ...userprofile.models import User
 from ...supplier.models import Supplier
 from ...customer.models import Customer
@@ -19,6 +17,8 @@ from ...product.models import Product, ProductVariant
 from ...smessages.models import EmailTemplate
 from notifications.signals import notify
 from notifications.models import Notification
+
+info_logger = get_logger(__name__)
 
 
 @staff_member_required

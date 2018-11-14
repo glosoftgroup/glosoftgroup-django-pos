@@ -1,6 +1,5 @@
 from django.utils.formats import localize
 from rest_framework.serializers import (
-                ModelSerializer,
                 HyperlinkedIdentityField,
                 SerializerMethodField,
                 ValidationError,
@@ -17,11 +16,9 @@ from ...product.models import (
             Stock,
             )
 from decimal import Decimal
-import logging
+from structlog import get_logger
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+logger = get_logger(__name__)
 User = get_user_model()
 
 
@@ -352,7 +349,7 @@ class CreateAllocateSerializer(serializers.ModelSerializer):
             #     else:
             #         print('stock not found')
             # except Exception as e:
-            #     error_logger.error(e)
+            #     logger.error(e)
                 
         return credit
 

@@ -12,11 +12,10 @@ from django.contrib.auth import get_user_model
 from ...purchase.models import PurchaseProduct as Table
 from saleor.payment.models import PaymentOption
 
-import logging
+from structlog import get_logger
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+logger = get_logger(__name__)
+
 User = get_user_model()
 
 

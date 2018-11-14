@@ -2,7 +2,6 @@ from django.utils.formats import localize
 import logging
 import random
 from rest_framework.serializers import (
-                ModelSerializer,
                 HyperlinkedIdentityField,
                 SerializerMethodField,
                 ValidationError,
@@ -18,13 +17,11 @@ from ...product.models import (
             Stock,
             ProductVariant
             )
+from structlog import get_logger
 
+logger = get_logger(__name__)
 
 User = get_user_model()
-
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -206,7 +203,7 @@ class TableCreateSerializer(serializers.ModelSerializer):
                     stock.save()
                     update_all_stock_price_override(stock.variant, item['price_override'])
 
-                error_logger.error(e)
+                logger.error(e)
         return instance
 
 

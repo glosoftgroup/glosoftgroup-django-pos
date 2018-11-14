@@ -1,50 +1,30 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect, render_to_response
-from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import pgettext_lazy
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count, Min, Sum, Avg, F, Q
-from django.core import serializers
-import dateutil.relativedelta
-
-from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-import datetime
-from datetime import date, timedelta
-from django.utils.dateformat import DateFormat
-import logging
-
-from ...decorators import permission_decorator, user_trail
-from ...utils import render_to_pdf, convert_html_to_pdf, image64, default_logo
-
 import csv
-import random
-from django.utils.encoding import smart_str
+import datetime
 from datetime import date
+import dateutil.relativedelta
+from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
+from django.db.models import Count, Sum, F, Q
+from django.http import HttpResponse, JsonResponse
+from django.template.response import TemplateResponse
+from django.utils.dateformat import DateFormat
+from django.utils.encoding import smart_str
+import random
 
-from ...core.utils import get_paginator_items
 from ..views import staff_member_required
 from ..notification.views import custom_notification
-from ...userprofile.models import User
 from ...sale.models import Sales, SoldItem, DrawerCash
 from ...allocate.models import Allocate, AllocatedItem
 from ...credit.models import Credit, CreditedItem, CreditHistoryEntry
 from ...product.models import Product, ProductVariant
-from ...purchase.models import PurchaseProduct
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
+from ...utils import render_to_pdf, default_logo
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -80,7 +60,7 @@ def allocate_history(request, credit_pk=None):
         except EmptyPage:
             total_sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed credit sales reports', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
         ctx = {
                'pn': paginator.num_pages,
                'sales': all_sales,
@@ -93,7 +73,7 @@ def allocate_history(request, credit_pk=None):
                }
         return TemplateResponse(request, 'dashboard/reports/history/sales_list.html',ctx)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 
 @staff_member_required
@@ -113,7 +93,7 @@ def allocate_detail_pdf(request, pk=None):
         pdf = render_to_pdf('dashboard/reports/allocate/pdf/pdf.html',data)
         return HttpResponse(pdf, content_type='application/pdf')
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 
 @staff_member_required
@@ -148,7 +128,7 @@ def allocate_list(request):
         except EmptyPage:
             total_sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed allocated sales reports', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
         ctx = {'pn': paginator.num_pages,
                'sales': total_sales,
                "total_sales_amount":total_sales_amount,
@@ -157,7 +137,7 @@ def allocate_list(request):
                }
         return TemplateResponse(request, 'dashboard/reports/allocate/sales_list.html',ctx)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 
 @staff_member_required
@@ -168,7 +148,7 @@ def allocate_detail(request, pk=None):
         items = AllocatedItem.objects.filter(allocate=sale)
         return TemplateResponse(request, 'dashboard/reports/allocate/details.html',{'items': items, "sale":sale})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('No items found')
 
 @staff_member_required
@@ -192,13 +172,13 @@ def allocate_reports(request):
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed allocate sales reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view allocate sales report page')
+        logger.info('User: '+str(request.user.name)+' accessed the view allocate sales report page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/reports/allocate/credit.html', {'items':items, 'total_sales':total_sales,'total_tax':total_tax, 'ts':ts, 'tsum':tsum})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing sales reports')
 
 @staff_member_required
@@ -479,10 +459,10 @@ def product_reports(request):
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed products reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
+        logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
         return TemplateResponse(request, 'dashboard/reports/products/products.html', {'pn':paginator.num_pages,'items':items, 'total_cost':total_cost})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing products reports')
 
 
@@ -805,10 +785,10 @@ def balancesheet_reports(request):
         }
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html', data)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html')
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html')
 
 @staff_member_required
@@ -847,13 +827,13 @@ def product_reorder(request):
         except EmptyPage:
             low_stock = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed products reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
+        logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
             return TemplateResponse(request, 'dashboard/reports/products/reorder.html', {'low_stock':low_stock})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing products reports')
 
 @staff_member_required

@@ -7,7 +7,6 @@ import dateutil.relativedelta
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 import datetime
-from datetime import date, timedelta
 from django.utils.dateformat import DateFormat
 import logging
 from ...utils import render_to_pdf, default_logo
@@ -24,9 +23,9 @@ from ...product.models import Product, ProductVariant, Stock
 from ...decorators import permission_decorator, user_trail
 from ...dashboard.views import get_low_stock_products
 
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+from structlog import get_logger
+
+logger = get_logger(__name__)
 
 
 @staff_member_required
@@ -61,20 +60,20 @@ def credit_history(request, credit_pk=None):
         except EmptyPage:
             total_sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed credit sales reports', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
         ctx = {
-               'pn': paginator.num_pages,
-               'sales': all_sales,
-               "credit": credit,
-               'total_amount': total_amount,
-               'total_balance': total_balance,
-               "total_sales_amount": total_sales_amount,
-               "total_tax_amount": total_tax_amount,
-               "date":last_date_of_sales
-               }
-        return TemplateResponse(request, 'dashboard/reports/history/sales_list.html',ctx)
+            'pn': paginator.num_pages,
+            'sales': all_sales,
+            "credit": credit,
+            'total_amount': total_amount,
+            'total_balance': total_balance,
+            "total_sales_amount": total_sales_amount,
+            "total_tax_amount": total_tax_amount,
+            "date": last_date_of_sales
+        }
+        return TemplateResponse(request, 'dashboard/reports/history/sales_list.html', ctx)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 
 @staff_member_required
@@ -109,21 +108,20 @@ def credit_history_api(request, pk=None):
         except EmptyPage:
             total_sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed credit sales reports', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
         ctx = {
-               'pn': paginator.num_pages,
-               'sales': all_sales,
-               "credit": credit,
-               'total_amount': total_amount,
-               'total_balance': total_balance,
-               "total_sales_amount": total_sales_amount,
-               "total_tax_amount": total_tax_amount,
-               "date": last_date_of_sales
-               }
-        return TemplateResponse(request, 'dashboard/reports/history/sales_list.html',ctx)
+            'pn': paginator.num_pages,
+            'sales': all_sales,
+            "credit": credit,
+            'total_amount': total_amount,
+            'total_balance': total_balance,
+            "total_sales_amount": total_sales_amount,
+            "total_tax_amount": total_tax_amount,
+            "date": last_date_of_sales
+        }
+        return TemplateResponse(request, 'dashboard/reports/history/sales_list.html', ctx)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
-
+        logger.error(e)
 
 
 @staff_member_required
@@ -140,10 +138,10 @@ def credit_detail_pdf(request, pk=None):
             'puller': request.user,
             'image': img
         }
-        pdf = render_to_pdf('dashboard/reports/history/pdf/pdf.html',data)
+        pdf = render_to_pdf('dashboard/reports/history/pdf/pdf.html', data)
         return HttpResponse(pdf, content_type='application/pdf')
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 
 @staff_member_required
@@ -176,10 +174,13 @@ def credit_list(request):
         except EmptyPage:
             total_sales = paginator.page(paginator.num_pages)
         user_trail(request.user.name, 'accessed credit sales reports', 'view')
-        info_logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
-        return TemplateResponse(request, 'dashboard/reports/credit/sales_list.html',{'pn': paginator.num_pages, 'sales': total_sales, "total_sales_amount":total_sales_amount, "total_tax_amount":total_tax_amount,"date":last_date_of_sales})
+        logger.info('User: ' + str(request.user.name) + ' accessed the view credit sales report page')
+        return TemplateResponse(request, 'dashboard/reports/credit/sales_list.html',
+                                {'pn': paginator.num_pages, 'sales': total_sales,
+                                 "total_sales_amount": total_sales_amount, "total_tax_amount": total_tax_amount,
+                                 "date": last_date_of_sales})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
 
 
 @staff_member_required
@@ -188,10 +189,12 @@ def credit_detail(request, pk=None):
     try:
         sale = Credit.objects.get(pk=pk)
         items = CreditedItem.objects.filter(credit=sale)
-        return TemplateResponse(request, 'dashboard/reports/credit/details.html',{'items': items, "sale": sale, 'table_name':''})
+        return TemplateResponse(request, 'dashboard/reports/credit/details.html',
+                                {'items': items, "sale": sale, 'table_name': ''})
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('No items found')
+
 
 @staff_member_required
 @permission_decorator('reports.view_sale_reports')
@@ -213,15 +216,18 @@ def credit_reports(request):
             items = paginator.page(1)
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
-        user_trail(request.user.name, 'accessed sales reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
+        user_trail(request.user.name, 'accessed sales reports', 'view')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view sales report page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
-            return TemplateResponse(request, 'dashboard/reports/credit/credit.html', {'items':items, 'total_sales':total_sales,'total_tax':total_tax, 'ts':ts, 'tsum':tsum})
+            return TemplateResponse(request, 'dashboard/reports/credit/credit.html',
+                                    {'items': items, 'total_sales': total_sales, 'total_tax': total_tax, 'ts': ts,
+                                     'tsum': tsum})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing sales reports')
+
 
 @staff_member_required
 def credit_paginate(request):
@@ -258,15 +264,17 @@ def credit_paginate(request):
         lastyear = d - dateutil.relativedelta.relativedelta(years=1)
         y = str(lastyear.strftime("%Y"))
         credits = Credit.objects.filter(created__year__range=[y, year])
-        date_period = str(lastyear.strftime("%Y"))+' - '+str(datetime.datetime.now().strftime("%m"))+'/'+ str(year)
+        date_period = str(lastyear.strftime("%Y")) + ' - ' + str(datetime.datetime.now().strftime("%m")) + '/' + str(
+            year)
     elif period == 'month':
         credits = Credit.objects.filter(created__year=str(d.strftime("%Y")), created__month=str(d.strftime("%m")))
-        date_period = str(datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(datetime.datetime.strptime(year, "%Y").strftime("%Y"))
+        date_period = str(datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(
+            datetime.datetime.strptime(year, "%Y").strftime("%Y"))
     elif period == 'quarter':
         p = d - dateutil.relativedelta.relativedelta(months=3)
         month = str(datetime.datetime.strptime(month, "%m").strftime("%m"))
         credits = Credit.objects.filter(created__year=str(p.strftime("%Y")),
-                                                    created__month__range=[str(p.strftime("%m")), month])
+                                        created__month__range=[str(p.strftime("%m")), month])
         date_period = str(p.strftime("%B")) + '/' + str(p.strftime("%Y")) + ' - ' + str(
             datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(year)
     else:
@@ -290,18 +298,19 @@ def credit_paginate(request):
             if p2_sz and date:
                 paginator = Paginator(sales, int(p2_sz))
                 sales = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/credit/paginate.html',{'sales':sales, 'gid':date})
+                return TemplateResponse(request, 'dashboard/reports/credit/paginate.html',
+                                        {'sales': sales, 'gid': date})
 
             paginator = Paginator(sales, 10)
             sales = paginator.page(page)
-            return TemplateResponse(request,'dashboard/reports/credit/p2.html',
-                {'sales':sales, 'pn':paginator.num_pages,'sz':10,'gid':date,
-                'total_sales':total_sales,'total_tax':total_tax,'tsum':tsum,
-                "total_sales_amount":total_sales_amount, 'date':date, 'today':today,
-                'month':month, 'year':year, 'period':period,'date_period':date_period})
+            return TemplateResponse(request, 'dashboard/reports/credit/p2.html',
+                                    {'sales': sales, 'pn': paginator.num_pages, 'sz': 10, 'gid': date,
+                                     'total_sales': total_sales, 'total_tax': total_tax, 'tsum': tsum,
+                                     "total_sales_amount": total_sales_amount, 'date': date, 'today': today,
+                                     'month': month, 'year': year, 'period': period, 'date_period': date_period})
 
         except ObjectDoesNotExist as e:
-            return TemplateResponse(request, 'dashboard/reports/credit/p2.html',{'date': date})
+            return TemplateResponse(request, 'dashboard/reports/credit/p2.html', {'date': date})
 
     else:
         try:
@@ -319,16 +328,17 @@ def credit_paginate(request):
             if list_sz:
                 paginator = Paginator(sales, int(list_sz))
                 sales = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/credit/p2.html',
-                                {'sales':sales, 'pn':paginator.num_pages,'sz':list_sz,
-                                'gid':0, 'total_sales':total_sales, "total_sales_amount":total_sales_amount,
-                                 'tsum':tsum, 'month':month, 'year':year, 'period':period,'date_period':date_period})
+                return TemplateResponse(request, 'dashboard/reports/credit/p2.html',
+                                        {'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz,
+                                         'gid': 0, 'total_sales': total_sales, "total_sales_amount": total_sales_amount,
+                                         'tsum': tsum, 'month': month, 'year': year, 'period': period,
+                                         'date_period': date_period})
             else:
                 paginator = Paginator(sales, 10)
             if p2_sz:
                 paginator = Paginator(sales, int(p2_sz))
                 sales = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/credit/paginate.html',{'sales':sales})
+                return TemplateResponse(request, 'dashboard/reports/credit/paginate.html', {'sales': sales})
 
             try:
                 sales = paginator.page(page)
@@ -338,9 +348,10 @@ def credit_paginate(request):
                 sales = paginator.page(1)
             except EmptyPage:
                 sales = paginator.page(1)
-            return TemplateResponse(request,'dashboard/reports/credit/paginate.html',{'sales':sales})
+            return TemplateResponse(request, 'dashboard/reports/credit/paginate.html', {'sales': sales})
         except ObjectDoesNotExist as e:
             return TemplateResponse(request, 'dashboard/reports/credit/p2.html', {'date': date})
+
 
 @staff_member_required
 def credit_search(request):
@@ -348,7 +359,7 @@ def credit_search(request):
         page = int(request.GET.get('page', 1))
         list_sz = request.GET.get('size')
         p2_sz = request.GET.get('psize')
-        q = request.GET.get( 'q' )
+        q = request.GET.get('q')
         date = request.GET.get('gid')
         if list_sz is None:
             sz = 10
@@ -375,19 +386,21 @@ def credit_search(request):
             lastyear = d - dateutil.relativedelta.relativedelta(years=1)
             y = str(lastyear.strftime("%Y"))
             credits = Credit.objects.filter(created__year__range=[y, year])
-            date_period = str(lastyear.strftime("%Y"))+' - '+str(datetime.datetime.now().strftime("%m"))+'/'+ str(year)
+            date_period = str(lastyear.strftime("%Y")) + ' - ' + str(
+                datetime.datetime.now().strftime("%m")) + '/' + str(year)
 
         elif period == 'month':
             credits = Credit.objects.filter(created__year=str(d.strftime("%Y")), created__month=str(d.strftime("%m")))
-            date_period = str(datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(datetime.datetime.strptime(year, "%Y").strftime("%Y"))
+            date_period = str(datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(
+                datetime.datetime.strptime(year, "%Y").strftime("%Y"))
 
         elif period == 'quarter':
             p = d - dateutil.relativedelta.relativedelta(months=3)
             month = str(datetime.datetime.strptime(month, "%m").strftime("%m"))
             credits = Credit.objects.filter(created__year=str(p.strftime("%Y")),
-                                                        created__month__range=[str(p.strftime("%m")), month])
+                                            created__month__range=[str(p.strftime("%m")), month])
             date_period = str(p.strftime("%B")) + '/' + str(p.strftime("%Y")) + ' - ' + str(
-            datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(year)
+                datetime.datetime.strptime(month, "%m").strftime("%B")) + '/' + str(year)
         else:
             credits = Credit.objects.all()
             if not date:
@@ -396,13 +409,13 @@ def credit_search(request):
 
         if q is not None:
             all_sales = credits.filter(
-                Q( invoice_number__icontains = q ) |
-                Q( terminal__terminal_name__icontains = q ) |
+                Q(invoice_number__icontains=q) |
+                Q(terminal__terminal_name__icontains=q) |
                 Q(created__icontains=q) |
                 Q(customer__name__icontains=q) | Q(customer__mobile__icontains=q) |
                 Q(credititems__product_name__icontains=q) |
                 Q(user__email__icontains=q) |
-                Q(user__name__icontains=q)).order_by( 'id' ).distinct()
+                Q(user__name__icontains=q)).order_by('id').distinct()
             sales = []
 
             if date:
@@ -423,17 +436,17 @@ def credit_search(request):
                     sales = paginator.page(page)
                     return TemplateResponse(request, 'dashboard/reports/credit/search.html',
                                             {'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz,
-                                             'gid': date, 'q': q, 'month':month, 'year':year,
-                                             'period':period,'date_period':date_period,
-                                             "total_sales_amount":total_sales_amount})
+                                             'gid': date, 'q': q, 'month': month, 'year': year,
+                                             'period': period, 'date_period': date_period,
+                                             "total_sales_amount": total_sales_amount})
 
                 paginator = Paginator(sales, 10)
                 sales = paginator.page(page)
                 return TemplateResponse(request, 'dashboard/reports/credit/search.html',
                                         {'sales': sales, 'pn': paginator.num_pages, 'sz': sz,
-                                         'gid': request.GET.get('gid'), 'month':month, 'year':year,
-                                         'period':period,'date_period':date_period,
-                                         "total_sales_amount":total_sales_amount})
+                                         'gid': request.GET.get('gid'), 'month': month, 'year': year,
+                                         'period': period, 'date_period': date_period,
+                                         "total_sales_amount": total_sales_amount})
 
             else:
                 for sale in all_sales:
@@ -447,7 +460,8 @@ def credit_search(request):
                     sales = paginator.page(page)
                     return TemplateResponse(request, 'dashboard/reports/credit/search.html',
                                             {'sales': sales, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0,
-                                             'q': q, 'month':month, 'year':year, 'period':period,'date_period':date_period,
+                                             'q': q, 'month': month, 'year': year, 'period': period,
+                                             'date_period': date_period,
                                              "total_sales_amount": total_sales_amount})
 
                 if p2_sz:
@@ -469,9 +483,10 @@ def credit_search(request):
                     return TemplateResponse(request, 'dashboard/reports/credit/paginate.html', {'sales': sales})
 
                 return TemplateResponse(request, 'dashboard/reports/credit/search.html',
-                                        {'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q, 'month':month,
-                                        'year':year, 'period':period,'date_period':date_period,
+                                        {'sales': sales, 'pn': paginator.num_pages, 'sz': sz, 'q': q, 'month': month,
+                                         'year': year, 'period': period, 'date_period': date_period,
                                          "total_sales_amount": total_sales_amount})
+
 
 @staff_member_required
 @permission_decorator('reports.view_products_reports')
@@ -480,7 +495,7 @@ def product_reports(request):
         items = ProductVariant.objects.all().order_by('-id')
         total_cost = 0
         for i in items:
-            total_cost+=i.get_total_price_cost()
+            total_cost += i.get_total_price_cost()
         page = request.GET.get('page', 1)
         paginator = Paginator(items, 10)
         try:
@@ -491,11 +506,12 @@ def product_reports(request):
             items = paginator.page(1)
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
-        user_trail(request.user.name, 'accessed products reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
-        return TemplateResponse(request, 'dashboard/reports/products/products.html', {'pn':paginator.num_pages,'items':items, 'total_cost':total_cost})
+        user_trail(request.user.name, 'accessed products reports', 'view')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view sales report page')
+        return TemplateResponse(request, 'dashboard/reports/products/products.html',
+                                {'pn': paginator.num_pages, 'items': items, 'total_cost': total_cost})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing products reports')
 
 
@@ -516,11 +532,13 @@ def products_paginate(request):
                 if p2_sz and gid:
                     paginator = Paginator(items, int(p2_sz))
                     items = paginator.page(page)
-                    return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items, 'gid':action})
+                    return TemplateResponse(request, 'dashboard/reports/products/paginate.html',
+                                            {'items': items, 'gid': action})
 
                 paginator = Paginator(items, 10)
                 items = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/products/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':10,'gid':action})
+                return TemplateResponse(request, 'dashboard/reports/products/p2.html',
+                                        {'items': items, 'pn': paginator.num_pages, 'sz': 10, 'gid': action})
 
             except ValueError as e:
                 return HttpResponse(e)
@@ -529,13 +547,14 @@ def products_paginate(request):
         if list_sz:
             paginator = Paginator(items, int(list_sz))
             items = paginator.page(page)
-            return TemplateResponse(request,'dashboard/reports/products/p2.html',{'items':items, 'pn':paginator.num_pages,'sz':list_sz, 'gid':0})
+            return TemplateResponse(request, 'dashboard/reports/products/p2.html',
+                                    {'items': items, 'pn': paginator.num_pages, 'sz': list_sz, 'gid': 0})
         else:
             paginator = Paginator(items, 10)
         if p2_sz:
             paginator = Paginator(items, int(p2_sz))
             items = paginator.page(page)
-            return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items})
+            return TemplateResponse(request, 'dashboard/reports/products/paginate.html', {'items': items})
 
         try:
             items = paginator.page(page)
@@ -545,7 +564,8 @@ def products_paginate(request):
             items = paginator.page(1)
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
-        return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items})
+        return TemplateResponse(request, 'dashboard/reports/products/paginate.html', {'items': items})
+
 
 @staff_member_required
 def products_search(request):
@@ -553,7 +573,7 @@ def products_search(request):
         page = request.GET.get('page', 1)
         list_sz = request.GET.get('size')
         p2_sz = request.GET.get('psize')
-        q = request.GET.get( 'q' )
+        q = request.GET.get('q')
         if list_sz is None:
             sz = 10
         else:
@@ -561,9 +581,9 @@ def products_search(request):
 
         if q is not None:
             items = ProductVariant.objects.filter(
-                Q( sku__icontains = q ) |
-                Q( product__name__icontains = q ) |
-                Q(product__product_class__name__icontains = q) ).order_by( '-id' )
+                Q(sku__icontains=q) |
+                Q(product__name__icontains=q) |
+                Q(product__product_class__name__icontains=q)).order_by('-id')
 
             if p2_sz:
                 paginator = Paginator(items, int(p2_sz))
@@ -588,9 +608,11 @@ def products_search(request):
                 items = paginator.page(paginator.num_pages)
             if p2_sz:
                 items = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/products/paginate.html',{'items':items})
+                return TemplateResponse(request, 'dashboard/reports/products/paginate.html', {'items': items})
 
-            return TemplateResponse(request, 'dashboard/reports/products/search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
+            return TemplateResponse(request, 'dashboard/reports/products/search.html',
+                                    {'items': items, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
+
 
 @staff_member_required
 def products_reorder_search(request):
@@ -598,7 +620,7 @@ def products_reorder_search(request):
         page = request.GET.get('page', 1)
         list_sz = request.GET.get('size')
         p2_sz = request.GET.get('psize')
-        q = request.GET.get( 'q' )
+        q = request.GET.get('q')
         if list_sz is None:
             sz = 10
         else:
@@ -608,7 +630,7 @@ def products_reorder_search(request):
             products = Product.objects.annotate(
                 total_stock=Sum('variants__stock__quantity'))
             products2 = products.filter(total_stock__lte=F('low_stock_threshold')).distinct()
-            items = products2.filter(name__icontains = q).order_by( '-id' )
+            items = products2.filter(name__icontains=q).order_by('-id')
             paginator = Paginator(items, 10)
             try:
                 items = paginator.page(page)
@@ -620,7 +642,7 @@ def products_reorder_search(request):
                 items = paginator.page(paginator.num_pages)
             if p2_sz:
                 items = paginator.page(page)
-                return TemplateResponse(request,'dashboard/reports/products/reorder_paginate.html',{'items':items})
+                return TemplateResponse(request, 'dashboard/reports/products/reorder_paginate.html', {'items': items})
 
             if list_sz:
                 paginator = Paginator(items, int(list_sz))
@@ -629,14 +651,15 @@ def products_reorder_search(request):
                                         {'items': items, 'pn': paginator.num_pages, 'sz': list_sz,
                                          'gid': request.GET.get('gid'), 'q': q})
 
-            return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html', {'items':items, 'pn':paginator.num_pages,'sz':sz,'q':q})
+            return TemplateResponse(request, 'dashboard/reports/products/reorder_search.html',
+                                    {'items': items, 'pn': paginator.num_pages, 'sz': sz, 'q': q})
 
 
 @staff_member_required
 def sales_list_export_csv(request):
-    pdfname = 'sales'+str(random.random())
+    pdfname = 'sales' + str(random.random())
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+    response['Content-Disposition'] = 'attachment; filename="' + pdfname + '.csv"'
 
     try:
         last_sale = Sales.objects.latest('id')
@@ -657,7 +680,7 @@ def sales_list_export_csv(request):
 
     qs = total_sales
     writer = csv.writer(response, csv.excel)
-    response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+    response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
     writer.writerow([
         smart_str(u"Transaction Date"),
         smart_str(u"Receipt No"),
@@ -701,7 +724,7 @@ def products_pdf(request):
                 'today': date.today(),
                 'items': items,
                 'puller': request.user,
-                'gid':gid
+                'gid': gid
             }
             pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
             return HttpResponse(pdf, content_type='application/pdf')
@@ -716,6 +739,7 @@ def products_pdf(request):
             }
             pdf = render_to_pdf('dashboard/reports/products/pdf/pdf.html', data)
             return HttpResponse(pdf, content_type='application/pdf')
+
 
 @staff_member_required
 def products_export_csv(request):
@@ -784,7 +808,8 @@ def balancesheet_reports(request):
         petty_cash = 30000
         try:
             ds = DrawerCash.objects.latest('id')
-            drawer = ds.objects.annotate(c=Count('terminal', distinct=True)).aggregate(total_amount=Sum('amount'))['total_amount']
+            drawer = ds.objects.annotate(c=Count('terminal', distinct=True)).aggregate(total_amount=Sum('amount'))[
+                'total_amount']
         except:
             drawer = 0
         # stock = 23000 #from purchases
@@ -805,24 +830,25 @@ def balancesheet_reports(request):
         # expenses = 1233
         credit_total = accounts_payable + notes_payable + revenues
         data = {
-            "petty_cash":petty_cash,
-            "cash_in_hand":cash_in_hand,
-            "stock":stock,
-            "debit_total":debit_total,
+            "petty_cash": petty_cash,
+            "cash_in_hand": cash_in_hand,
+            "stock": stock,
+            "debit_total": debit_total,
 
-            "accounts_payable":accounts_payable,
-            "notes_payable":notes_payable,
-            "revenues":revenues,
-            "credit_total":credit_total,
-            "status":True
+            "accounts_payable": accounts_payable,
+            "notes_payable": notes_payable,
+            "revenues": revenues,
+            "credit_total": credit_total,
+            "status": True
         }
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html', data)
     except ObjectDoesNotExist as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html')
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return TemplateResponse(request, 'dashboard/reports/balancesheet/balancesheet.html')
+
 
 @staff_member_required
 def get_dashboard_data(request):
@@ -836,13 +862,14 @@ def get_dashboard_data(request):
 
     ''' get lowest product '''
     data = {
-         "label":label,
-         "default":default,
-         "users":10,
-         "net":serializers.serialize('json', total_sales),
-         "todays_sales": serializers.serialize('json', todays_sales),
+        "label": label,
+        "default": default,
+        "users": 10,
+        "net": serializers.serialize('json', total_sales),
+        "todays_sales": serializers.serialize('json', todays_sales),
     }
     return JsonResponse(data)
+
 
 @staff_member_required
 @permission_decorator('reports.view_products_reports')
@@ -859,15 +886,16 @@ def product_reorder(request):
             low_stock = paginator.page(1)
         except EmptyPage:
             low_stock = paginator.page(paginator.num_pages)
-        user_trail(request.user.name, 'accessed products reports','view')
-        info_logger.info('User: '+str(request.user.name)+' accessed the view sales report page')
+        user_trail(request.user.name, 'accessed products reports', 'view')
+        logger.info('User: ' + str(request.user.name) + ' accessed the view sales report page')
         if request.GET.get('initial'):
             return HttpResponse(paginator.num_pages)
         else:
-            return TemplateResponse(request, 'dashboard/reports/products/reorder.html', {'low_stock':low_stock})
+            return TemplateResponse(request, 'dashboard/reports/products/reorder.html', {'low_stock': low_stock})
     except TypeError as e:
-        error_logger.error(e)
+        logger.error(e)
         return HttpResponse('error accessing products reports')
+
 
 @staff_member_required
 def products_reorder_paginate(request):
@@ -921,6 +949,7 @@ def products_reorder_paginate(request):
             items = paginator.page(paginator.num_pages)
         return TemplateResponse(request, 'dashboard/reports/products/reorder_paginate.html', {'items': items})
 
+
 @staff_member_required
 def reorder_pdf(request):
     return HttpResponse(pdf, content_type='application/pdf')
@@ -943,7 +972,7 @@ def reorder_pdf(request):
                 'today': date.today(),
                 'items': items,
                 'puller': request.user,
-                'gid':gid
+                'gid': gid
             }
             pdf = render_to_pdf('dashboard/reports/products/pdf/reorder_pdf.html', data)
             return HttpResponse(pdf, content_type='application/pdf')
@@ -979,13 +1008,13 @@ def reorder_export_csv(request):
         else:
             items = get_low_stock_products()
 
-        pdfname = 'low stock products-'+str(random.random())
+        pdfname = 'low stock products-' + str(random.random())
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="'+pdfname+'.csv"'
+        response['Content-Disposition'] = 'attachment; filename="' + pdfname + '.csv"'
         # qs = PurchaseProduct.objects.all().order_by('id')
         qs = items
         writer = csv.writer(response, csv.excel)
-        response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+        response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
         writer.writerow([
             smart_str(u"Product name"),
             smart_str(u"Stock left"),
@@ -1000,23 +1029,24 @@ def reorder_export_csv(request):
             ])
         return response
 
+
 @staff_member_required
 def due_credit_notifier(request):
     due_credits = Credit.objects.due_credits().filter(notified=False)
     for credit in due_credits:
-        subject = 'OVERDUE CREDIT: '+\
-                  str(credit.invoice_number)+\
-                  ' ('+str(DateFormat(credit.created).format('Y-m-d'))+\
+        subject = 'OVERDUE CREDIT: ' + \
+                  str(credit.invoice_number) + \
+                  ' (' + str(DateFormat(credit.created).format('Y-m-d')) + \
                   ')'
-        body = "Hi,<br>Customer:"+\
-               str(credit.customer.name)+\
-                  '('+str(credit.customer.mobile)+\
-                  ')<br><b>Credit date:</b>'+str(DateFormat(credit.created).format('Y-m-d'))+\
-                  '<br><b>Due Date:</b>'+str(DateFormat(credit.due_date).format('Y-m-d'))+\
-                  '<br><b>Invoice Number:</b>'+str(credit.invoice_number)+\
-                  '<br><b>Amount:</b>'+str(credit.total_net)
+        body = "Hi,<br>Customer:" + \
+               str(credit.customer.name) + \
+               '(' + str(credit.customer.mobile) + \
+               ')<br><b>Credit date:</b>' + str(DateFormat(credit.created).format('Y-m-d')) + \
+               '<br><b>Due Date:</b>' + str(DateFormat(credit.due_date).format('Y-m-d')) + \
+               '<br><b>Invoice Number:</b>' + str(credit.invoice_number) + \
+               '<br><b>Amount:</b>' + str(credit.total_net)
         custom_notification(request.user, body, subject)
-        credit.notified=True
+        credit.notified = True
         credit.save()
 
     stocks = Stock.objects.get_low_stock(False)
@@ -1028,7 +1058,7 @@ def due_credit_notifier(request):
         body = "Hi,<br>: Low Stock Notification<br>" + \
                '<table class="table table-xxs"><thead><tr class="bg-primary">' + \
                '<th>Name</th><th>SKU</th><th>Quantity</th><th>Threshold</th></tr></thead><tbody><tr>' + \
-               '<td>'+str(stock.variant.display_product())+'</td>' + \
+               '<td>' + str(stock.variant.display_product()) + '</td>' + \
                '<td>' + str(stock.variant.sku) + '</td>' + \
                '<td>' + str(stock.quantity) + '</td>' + \
                '<td>' + str(stock.low_stock_threshold) + '</td>' + \

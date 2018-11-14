@@ -1,34 +1,10 @@
 from django.db.models import Q
-from .pagination import PostLimitOffsetPagination
-from rest_framework.generics import (ListAPIView,
-                                     CreateAPIView,
-                                     RetrieveAPIView,
-                                     DestroyAPIView,
-                                    )
-from django.contrib.auth import get_user_model
-User = get_user_model()
-from ...product.models import (
-    Product,
-    ProductVariant,
-    Stock,
-    )
 from ...invoice.models import Invoice
-from ...sale.models import (
-                            Terminal, 
-                            TerminalHistoryEntry,
-                            )
-from ...customer.models import Customer
 from .serializers import (
     InvoiceListSerializer,
     CreateInvoiceSerializer,
      )
 from rest_framework import generics
-
-from ...decorators import user_trail
-import logging
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
 
 
 class InvoiceDetailAPIView(generics.RetrieveAPIView):

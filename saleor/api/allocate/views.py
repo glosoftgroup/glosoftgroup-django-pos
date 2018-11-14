@@ -1,4 +1,4 @@
-from django.db.models import Q, Count, Avg
+from django.db.models import Q
 
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -22,13 +22,14 @@ from .serializers import (
 from rest_framework import generics
 from ...decorators import user_trail
 from ...site.models import SiteSettings
-import logging
 from django.contrib.auth import get_user_model
 
+from structlog import get_logger
+
+logger = get_logger(__name__)
+
 User = get_user_model()
-debug_logger = logging.getLogger('debug_logger')
-info_logger = logging.getLogger('info_logger')
-error_logger = logging.getLogger('error_logger')
+
 
 
 class AllocateDetailAPIView(generics.RetrieveAPIView):
@@ -207,7 +208,7 @@ class AllocateUpdateAPIView(generics.RetrieveUpdateAPIView):
         else:
             print('amount paid cannot be zero')
         user_trail(self.request.user.name,'made a allocated sale:#'+str(serializer.data['invoice_number'])+' credit sale worth: '+str(serializer.data['total_net']),'add')
-        info_logger.info('User: '+str(self.request.user)+' made a allocated sale:'+str(serializer.data['invoice_number']))
+        logger.info('User: '+str(self.request.user)+' made a allocated sale:'+str(serializer.data['invoice_number']))
         terminal = Terminal.objects.get(pk=int(serializer.data['terminal']))
         trail = 'User: '+str(self.request.user)+\
                 ' updated a allocated sale :'+str(serializer.data['invoice_number'])+\
