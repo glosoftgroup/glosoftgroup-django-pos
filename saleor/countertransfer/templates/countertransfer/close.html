@@ -1,0 +1,72 @@
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load render_bundle from webpack_loader %}
+{% load i18n %}
+
+{% block title %}
+   Transfer Closing
+{% endblock %}
+
+ {% block breadcrumbs %}
+     <li><a href="/counter/">Shop Management</a></li>
+     <li class="active"><a href="#"> Close Shop Stock</a></li>
+
+ {% endblock %}
+
+
+ {% block menu_close_counter_class %}active{% endblock %}
+ {% block custom_css %}
+ {% render_bundle 'transfer_close' 'css' %}
+<style>
+          .theme_xbox .pace_activity, .theme_xbox .pace_activity::after, .theme_xbox .pace_activity::before, .theme_xbox_sm .pace_activity, .theme_xbox_sm .pace_activity::after, .theme_xbox_sm .pace_activity::before, .theme_xbox_xs .pace_activity, .theme_xbox_xs .pace_activity::after, .theme_xbox_xs .pace_activity::before {
+        border-radius: 50%;
+        border: 1px solid transparent;
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-color: transparent;
+        border-top-color: #1649fc;
+    }
+    .pace-demo {
+        background-color:#fff;
+    }
+    @media print {
+       #printBtn {
+          display: none;
+       }
+       #addPayment {
+          display: none;
+       }
+       .media-none {
+          display: none;
+       }
+       #media-none {
+          display: none;
+       }
+    }
+
+</style>
+ {% endblock %}
+
+{% block content %}
+
+ <div class="row animated " id="root">
+
+ </div>
+
+{% endblock%}
+{% block custom_js %}
+<script>
+    var counter;
+    {% if object.id %}
+      var pk = "{{object.id}}";
+    {% else %}
+      var pk= false;
+    {% endif %}
+</script>
+<!--<script src="https://../popper.js/1.12.3/umd/popper.min.js"></script>-->
+<!--<script src="https://../bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>-->
+{% render_bundle 'vendor' 'js' %}
+{% render_bundle 'transfer_close' 'js' %}
+{% endblock %}

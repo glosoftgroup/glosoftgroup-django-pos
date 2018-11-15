@@ -286,6 +286,38 @@
                   </ul>
                 </li>
                   {% endif %}
+
+                {% if perms.product.view_product or perms.product.view_stock or perms.product.view_category or perms.product.view_productclass or perms.product.view_productattribute or perms.product.view_stocklocation %}
+                    <li id="first3">
+                      <a href="{% url 'dashboard:product-list' %}">
+                          <i class="icon-chart"></i>
+                          <span> Shops Management</span>
+                      </a>
+                      <ul>
+                       {% if perms.product.view_product %}
+                        <li class="{% block menu_bar_class %}{% endblock %}">
+                            <a href="{% url 'counter:index' %}">
+                                <i class='icon-stairs'></i>
+                                Shops
+                            </a>
+                        </li>
+                        <li class="{% block menu_release_counter_class %}{% endblock %}">
+                            <a href="{% url 'countertransfer:index' %}">
+                                <i class='icon-move-up2'></i>
+                                Shop Stock
+                            </a>
+                        </li>
+                        <li class="{% block menu_close_counter_class %}{% endblock %}">
+                            <a href="{% url 'countertransfer:close' %}">
+                                <i class='icon-lock'></i>
+                                Close Shop Stock
+                            </a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </li>
+                {% endif %}
+
                    {% if perms.customer.view_customer %}
                 <li >
                   <a href="{% url 'dashboard:customers' %}"><i class="icon-theater"></i> <span>
@@ -492,6 +524,19 @@
                           <a href="{% url 'dashboard:products_reports' %}"><i class='icon-drawer3'></i>Stock</a>
                         </li>
                       {% endif %}
+                      <li>
+                        <a href="javascript:;">
+                            <i class="icon-align-center-vertical"></i>
+                            Transfers
+                        </a>
+                        <ul>
+                            <li class="{% block menu_transfer_report_class %}{% endblock %}">
+                                <a href="{% url 'counter_transfer_report:index' %}">
+                                &nbsp; Shop Transfer
+                                </a>
+                            </li>
+                        </ul>
+                      </li>
                       {% if perms.reports.view_purchase_reports %}
                         <li class="{% block menu_purchase_report_class %}{% endblock %}">
                           <a href="{% url 'dashboard:purchase-variant' %}"><i class='icon-price-tag'></i>Purchases</a>
