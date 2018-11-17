@@ -1,0 +1,110 @@
+
+.panel-custom{
+  padding:5px;
+}
+.panel-body{
+  padding: 0px;
+}
+.panel-heading {
+padding-top: 10px;
+padding-bottom: 10px;
+}
+
+label {
+font-weight: 700;
+}
+
+// modal
+
+.modal-body{
+padding: 0px;
+}
+
+.modal-header{
+border-width: 1px;
+border-color: grey;
+}
+
+// pagination
+.page-of {
+font-size: 10px;
+}
+// product list
+.product-list-view {
+padding: 8px !important;
+margin-left: 12px;
+margin-right: 12px;
+}
+.transfer-cart-wrapper{
+background-color: white;
+border-right-style: solid;
+border-right-width: 3px;
+border-right-color: #787878;
+min-height: 300px;
+}
+
+.transfer-products-wrapper{
+background-color: #EEEDED;
+border-right-style: solid;
+border-right-width: 2px;
+border-right-color: #787878;
+padding: 0px;
+min-height: 300px;
+.search-form-group{
+  margin-bottom: 0px;
+}
+}
+
+.breadcrumb-line-component {
+border-radius: 0px;
+padding-left: 0;
+padding-right: 0;
+}
+
+// cart
+.product-cart-panel {
+margin-top: 12px;
+}
+
+.counter-panel {
+padding: 0px;
+}
+
+.transfer-to-padding {
+margin-top: 10px;
+}
+
+.order-empty{
+text-align: center;
+margin: 48px;
+color: #DDD;
+margin-top: 37%;
+font-size: 20px;
+}
+
+.transfer-section {
+border-top-style: solid;
+padding: 12px;
+}
+
+.table-responsive {
+max-height: 350px;
+min-height: 350px;
+}
+
+// input
+input {
+padding-left: 0;
+padding-right: 0;
+border-width: 1px 0;
+border-color: transparent transparent #ddd;
+border-radius: 0;
+-webkit-box-shadow: none;
+box-shadow: none;
+width: 100%;
+height: 38px;
+padding: 8px 16px;
+padding-right: 16px;
+padding-left: 16px;
+background-color: transparent;
+}

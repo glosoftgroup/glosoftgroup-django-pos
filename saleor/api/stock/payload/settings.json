@@ -1,0 +1,9 @@
+//GET /api/setting/
+
+[
+    {
+        "id": 1,
+        "name": "  Sidai Bar & Restaurant  ",
+        "image": "http://192.168.0.16:8000/media/employee/setting.png"
+    }
+]

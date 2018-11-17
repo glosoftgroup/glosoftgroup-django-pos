@@ -1,0 +1,29 @@
+/* default tooltip styles */
+$light: white;
+$red: #ee0c4b;
+$dark: #000;
+
+.react-tooltip-lite {
+    background: $light;
+    color: $dark;
+    border-width: 0;
+    -webkit-box-shadow: 0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
+    box-shadow: 0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
+
+  }
+  
+  .react-tooltip-lite-up-arrow {
+    border-top: 10px solid $light;
+  }
+  
+  .react-tooltip-lite-down-arrow {
+    border-bottom: 10px solid #333;
+  }
+  
+  .react-tooltip-lite-right-arrow {
+    border-right: 10px solid #333;
+  }
+  
+  .react-tooltip-lite-left-arrow {
+    border-left: 10px solid #333;
+  }

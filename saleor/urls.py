@@ -26,6 +26,7 @@ from .api.purchase_variant.urls import urlpatterns as api_purchase_variant_urls
 from .api.sale.urls import urlpatterns as api_sale_urls
 from .api.settings.urls import urlpatterns as api_settings_urls
 from .api.sms.urls import urlpatterns as api_sms_urls
+from .api.stock.urls import urlpatterns as api_stock_urls
 from .api.terminal.urls import urlpatterns as api_terminal_urls
 from .api.user.urls import urlpatterns as api_user_urls
 from .api.variant.urls import urlpatterns as api_variant_urls
@@ -33,6 +34,9 @@ from .cart.urls import urlpatterns as cart_urls
 from .checkout.urls import urlpatterns as checkout_urls
 from .core.sitemaps import sitemaps
 from .core.urls import urlpatterns as core_urls
+from .counter.urls import urlpatterns as counter_urls
+from .countertransfer.urls import urlpatterns as countertransfer_urls
+from .counter_transfer_report.urls import urlpatterns as counter_transfer_report_urls
 from .dashboard.urls import urlpatterns as dashboard_urls
 from .data_feeds.urls import urlpatterns as feed_urls
 from .order.urls import urlpatterns as order_urls
@@ -69,11 +73,15 @@ urlpatterns = [
     url(r'^api/sale/', include(api_sale_urls, namespace='sale-api')),
     url(r'^api/settings/', include(api_settings_urls, namespace='settings-api')),
     url(r'^api/sms/', include(api_sms_urls, namespace='sms-api')),
+    url(r'^api/stock/', include(api_stock_urls, namespace='api-stock')),
     url(r'^api/terminal/', include(api_terminal_urls, namespace='terminal-api')),
     url(r'^api/user/', include(api_user_urls, namespace='user-api')),
     url(r'^api/variant/', include(api_variant_urls, namespace='variant-api')),
     url(r'^cart/', include(cart_urls, namespace='cart')),
     url(r'^checkout/', include(checkout_urls, namespace='checkout')),
+    url(r'^counter/', include(counter_urls, namespace='counter')),
+    url(r'^counter/transfer/', include(countertransfer_urls, namespace='countertransfer')),
+    url(r'^counter/transfer/report/', include(counter_transfer_report_urls, namespace='counter_transfer_report')),
     url(r'^dashboard/', include(dashboard_urls, namespace='dashboard')),
     url(r'^graphql', GraphQLView.as_view(graphiql=settings.DEBUG)),
     url(r'^jsi18n/$', javascript_catalog, name='javascript-catalog'),

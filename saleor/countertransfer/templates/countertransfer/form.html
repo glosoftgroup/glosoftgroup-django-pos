@@ -1,0 +1,45 @@
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}
+    {% if not object.id %}
+        Transfer Stock
+    {% else %}
+        Edit {{object.name}}
+    {% endif %}
+{% endblock %}
+
+ {% block breadcrumbs %}
+     <li><a href="/counter/">Shop Management</a></li>
+     <li class=""><a href="/counter/transfer/" >Shop Stock</a></li>
+     <li class="active">Transfer Stock</li>
+ {% endblock %}
+
+
+{% block menu_release_counter_class %}active{% endblock %}
+
+{% block custom_css %}
+{% render_bundle 'transfer' 'css' %}
+
+<link rel="stylesheet" href="{% static 'js/plugins/react/react-datepicker.min.css">
+{% endblock %}
+{% block content %}
+ <!--house details-->
+
+<div class="panel panel-flat animated fadeIn" id="vue-app">
+    <div class="panel-body">
+        <div class="row">
+            {% csrf_token %}
+           <div id="root"></div>
+        </div>
+    </div>
+</div>
+<!--./house details-->
+{% endblock %}
+
+{% block custom_js %}
+{% render_bundle 'vendor' 'js' %}
+{% render_bundle 'transfer' 'js' %}
+{% endblock %}

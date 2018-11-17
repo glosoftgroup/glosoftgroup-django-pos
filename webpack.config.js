@@ -62,10 +62,19 @@ var faviconsWebpackPlugin = new FaviconsWebpackPlugin({
 
 var config = {
   entry: {
-    
+
     category: './saleor/static/js/category.js',
     dashboard: './saleor/static/dashboard/js/dashboard.js',
     storefront: './saleor/static/js/storefront.js',
+    transfer: './saleor/static/backend/js/transfer/create/index.js',
+    transfer_close: './saleor/static/backend/js/transfer_close/list/index.js',
+    transfer_list: './saleor/static/backend/js/transfer/list/index.js',
+    transfer_report: './saleor/static/backend/js/transfer_report/list/index.js',
+    transfer_report_item: './saleor/static/backend/js/transfer_report/items_view/index.js',
+    transferred_items_close: './saleor/static/backend/js/transfer_close/items/index.js',
+    transferred_items_close_view: './saleor/static/backend/js/transfer_close/items_view/index.js',
+    transferred_items: './saleor/static/backend/js/transfer/items/index.js',
+    transferred_items_view: './saleor/static/backend/js/transfer/items_view/index.js',
     vendor: [
       'babel-es6-polyfill',
       'bootstrap',
