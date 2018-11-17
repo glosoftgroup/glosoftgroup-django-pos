@@ -130,7 +130,7 @@ def send_to_sale(credit):
         sale.save()
 
     for item in credit.items():
-        item = SoldItem.objects.create(sales=sale,
+        credit_item = SoldItem.objects.create(sales=sale,
                                        sku=item.sku,
                                        quantity=item.quantity,
                                        product_name=item.product_name,
@@ -141,6 +141,11 @@ def send_to_sale(credit):
                                        unit_purchase=item.unit_purchase,
                                        total_purchase=item.total_purchase
                                        )
+        if item.stock_id and item.transfer_id and item.counter:
+            credit_item.stock_id = item.stock_id
+            credit_item.transfer_id = item.transfer_id
+            credit_item.counter = item.counter
+            credit_item.save()
 
 
 # on

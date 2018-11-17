@@ -10,6 +10,7 @@ from django.utils.translation import pgettext_lazy
 from jsonfield import JSONField
 from django.contrib.postgres.fields import HStoreField
 from ..userprofile.models import Address
+from ..counter.models import Counter
 from ..customer.models import Customer
 from ..site.models import SiteSettings
 
@@ -174,6 +175,7 @@ class Sales(models.Model):
 class SoldItem(models.Model):
     sales = models.ForeignKey(Sales, related_name='solditems', on_delete=models.CASCADE)
     stock_id = models.IntegerField(default=Decimal(0))
+    transfer_id = models.IntegerField(default=Decimal(0))
     order = models.IntegerField(default=Decimal(1))
     sku = models.CharField(
         pgettext_lazy('SoldItem field', 'SKU'), max_length=32)
@@ -212,6 +214,9 @@ class SoldItem(models.Model):
     created = models.DateTimeField(
         pgettext_lazy('SoldItem field', 'created'),
         default=now, editable=False)
+    counter = models.ForeignKey(
+        Counter, related_name='sold_item_counter', blank=True, null=True, default='',
+        verbose_name=pgettext_lazy('SoldItem field', 'Counter'))
 
     class Meta:
         # unique_together = ('sales')

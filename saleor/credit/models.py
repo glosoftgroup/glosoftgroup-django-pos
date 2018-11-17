@@ -16,6 +16,7 @@ from django.contrib.postgres.fields import HStoreField
 from django.utils import timezone
 from datetime import datetime, timedelta
 from ..userprofile.models import Address
+from ..counter.models import Counter
 from ..customer.models import Customer
 from ..site.models import SiteSettings
 from ..sale.models import Terminal, PaymentOption
@@ -152,6 +153,8 @@ class Credit(models.Model):
 class CreditedItem(models.Model):
     credit = models.ForeignKey(Credit,related_name='credititems',on_delete=models.CASCADE)
     order = models.IntegerField(default=Decimal(1))
+    stock_id = models.IntegerField(default=Decimal(0))
+    transfer_id = models.IntegerField(default=Decimal(0))
     sku = models.CharField(
         pgettext_lazy('CreditedItem field', 'SKU'), max_length=32)    
     quantity = models.IntegerField(
@@ -176,6 +179,9 @@ class CreditedItem(models.Model):
         pgettext_lazy('SoldItem field', 'unit purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
     total_purchase = models.DecimalField(
         pgettext_lazy('SoldItem field', 'total purchase'), default=Decimal(0), max_digits=100, decimal_places=2)
+    counter = models.ForeignKey(
+        Counter, related_name='credit_item_counter', blank=True, null=True, default='',
+        verbose_name=pgettext_lazy('CreditItem field', 'Counter'))
 
     class Meta:
         #unique_together = ('sales')
