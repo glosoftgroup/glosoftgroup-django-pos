@@ -339,7 +339,7 @@ class SalesSerializer(serializers.ModelSerializer):
                 try:
                     stock_item = CounterTransferItems.objects.get(pk=solditem_data['transfer_id'])
                     if stock_item:
-                        CounterTransferItems.objects.decrease_stock(item, solditem_data['quantity'])
+                        CounterTransferItems.objects.decrease_stock(stock_item, solditem_data['quantity'])
                     else:
                         logger.info('stock item not found in shop', shop_available=True, shop_id=solditem_data.get('counter'), item_id=solditem_data['transfer_id'])
                 except Exception as ex:
