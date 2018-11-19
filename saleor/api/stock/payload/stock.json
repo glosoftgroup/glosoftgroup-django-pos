@@ -1,0 +1,27 @@
+//GET /api/stock/
+
+{
+    "count": 1,
+    "total_pages": 1,
+    "results": [
+        {
+            "id": 4,
+            "variant": 3,
+            "quantity": 87,
+            "cost_price": 250.0,
+            "price_override": 450.0,
+            "productName": "Beer ( small,  Tusker)",
+            "price": 450.0,
+            "tax": 0,
+            "discount": 0,
+            "product_category": "Beer",
+            "qty": 1,
+            "stock": 4,
+            "sku": "BeT01"
+        }
+    ],
+    "links": {
+        "previous": null,
+        "next": null
+    }
+}

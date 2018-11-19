@@ -23,6 +23,7 @@ from ...product.models import (
 from decimal import Decimal
 from ...customer.models import Customer
 from .utilities import clear_old_debts_using_change
+from saleor.countertransfer.models import CounterTransferItems
 
 from structlog import get_logger
 
@@ -45,6 +46,9 @@ class TrackSerializer(serializers.ModelSerializer):
             'tax',
             'discount',
             'attributes',
+            'transfer_id',
+            'stock_id',
+            'counter'
         )
 
 
@@ -244,59 +248,82 @@ class CreateCreditSerializer(serializers.ModelSerializer):
             logger.error(e)
 
         for solditem_data in solditems_data:
-            item_temp = CreditedItem.objects.create(credit=credit, **solditem_data)
-            item = item_temp
-            item_temp.delete()
-            carry = int(solditem_data['quantity'])
-            checker = True
-            # try:
-            while checker:
-                stock = Stock.objects.filter(variant__sku=solditem_data['sku']).first()
-                if stock:
-                    item.id = None
-                    if stock.quantity > 0:
-                        if carry >= stock.quantity:
-                            try:
-                                item.unit_purchase = stock.cost_price.gross
-                            except:
-                                pass
-                            try:
-                                item.total_purchase = stock.cost_price.gross * Decimal(stock.quantity)
-                            except:
-                                pass
-                            item.quantity = stock.quantity
-                            item.unit_cost = stock.price_override.gross
-                            item.total_cost = stock.price_override.gross * stock.quantity
-                            item.save()
-                            carry -= stock.quantity
-                            stock.delete()
-                            if carry <= 0:
+            try:
+                item_temp = CreditedItem.objects.create(credit=credit, **solditem_data)
+                item = item_temp
+                item_temp.delete()
+            except Exception as ex:
+                logger.error('error create credit items', exception=ex)
+
+            # reduce stock based on the existence of shop or not
+            if solditem_data.get('counter'):
+                logger.info('reduce stock for shop ', shop_available=True, shop_id=solditem_data.get('counter'))
+                # if shop is found then reduce from CounterTransferItems
+                try:
+                    stock_item = CounterTransferItems.objects.get(pk=solditem_data['transfer_id'])
+                    if stock_item:
+                        CounterTransferItems.objects.decrease_stock(stock_item, solditem_data['quantity'])
+                    else:
+                        logger.info('stock item not found in shop', shop_available=True, shop_id=solditem_data.get('counter'), item_id=solditem_data['transfer_id'])
+                except Exception as ex:
+                    logger.error('Error reducting shop stock', exception=ex, shop_available=True)
+
+                if item:
+                    item.save()
+            else:
+                # reduce from the main stock
+                logger.info('no shop details', shop_available=False)
+
+                carry = int(solditem_data['quantity'])
+                checker = True
+                # try:
+                while checker:
+                    stock = Stock.objects.filter(variant__sku=solditem_data['sku']).first()
+                    if stock:
+                        item.id = None
+                        if stock.quantity > 0:
+                            if carry >= stock.quantity:
+                                try:
+                                    item.unit_purchase = stock.cost_price.gross
+                                except:
+                                    pass
+                                try:
+                                    item.total_purchase = stock.cost_price.gross * Decimal(stock.quantity)
+                                except:
+                                    pass
+                                item.quantity = stock.quantity
+                                item.unit_cost = stock.price_override.gross
+                                item.total_cost = stock.price_override.gross * stock.quantity
+                                item.save()
+                                carry -= stock.quantity
+                                stock.delete()
+                                if carry <= 0:
+                                    checker = False
+                            else:
+                                # Stock.objects.decrease_stock(stock, carry)
+                                stock.quantity -= carry
+                                stock.save()
+                                try:
+                                    item.unit_purchase = stock.cost_price.gross
+                                except:
+                                    pass
+                                try:
+                                    item.total_purchase = stock.cost_price.gross * Decimal(carry)
+                                except:
+                                    pass
+                                item.quantity = carry
+                                item.unit_cost = stock.price_override.gross
+                                item.total_cost = stock.price_override.gross * carry
+
+                                item.save()
+
                                 checker = False
                         else:
-                            # Stock.objects.decrease_stock(stock, carry)
-                            stock.quantity -= carry
-                            stock.save()
-                            try:
-                                item.unit_purchase = stock.cost_price.gross
-                            except:
-                                pass
-                            try:
-                                item.total_purchase = stock.cost_price.gross * Decimal(carry)
-                            except:
-                                pass
-                            item.quantity = carry
-                            item.unit_cost = stock.price_override.gross
-                            item.total_cost = stock.price_override.gross * carry
-
-                            item.save()
-
+                            stock.delete()
                             checker = False
                     else:
-                        stock.delete()
+                        print('stock not found')
                         checker = False
-                else:
-                    print('stock not found')
-                    checker = False
 
         return credit
 

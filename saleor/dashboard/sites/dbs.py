@@ -87,6 +87,6 @@ def export_db(request):
         sys.stdout = sysout
         logger.info('backup ' + d + ' successful')
         return HttpResponse('Database Backup Successful')
-    except Exception as e:
-        logger.error(e)
-        return HttpResponse(e)
+    except Exception as ex:
+        logger.error('database backup error', exception=ex)
+        return HttpResponse(ex)

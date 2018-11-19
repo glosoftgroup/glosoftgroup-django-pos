@@ -200,13 +200,23 @@ class ListStockAPIView(generics.ListAPIView):
                 Q(transfer__date=yesterday)
             ).distinct('stock')
 
-        page_size = 'page_size'
-        if self.request.GET.get(page_size):
-            pagination.PageNumberPagination.page_size = self.request.GET.get(page_size)
+        page_size = self.request.GET.get('page_size')
+        if page_size:
+            pagination.PageNumberPagination.page_size = page_size
         else:
             pagination.PageNumberPagination.page_size = 10
-        if self.request.GET.get('date'):
-            queryset_list = queryset_list.filter(transfer__date__icontains=self.request.GET.get('date'))
+
+        transfer_date = self.request.GET.get('date')
+        if transfer_date:
+            queryset_list = queryset_list.filter(transfer__date__icontains=transfer_date)
+
+        shop_id = self.request.GET.get('counter')
+        if shop_id:
+            queryset_list = queryset_list.filter(counter=int(shop_id))
+
+        quantity_check = self.request.GET.get('quantity_check')
+        if quantity_check:
+            queryset_list = queryset_list.exclude(qty=0)
 
         query = self.request.GET.get('q')
         if query:
