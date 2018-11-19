@@ -29,12 +29,12 @@
                             <select v-model="supplier" @change="clearCart" data-width="100%" data-live-search="true" title="Select Supplier" name="variant_supplier" class="bootstrap-select" id="variant_supplier">
 
                                 {% if suppliers %}
-                                {% if supplier.name == 'Unknown' %}
-                                <option value="{{supplier.pk}}">{{supplier}}</option>
-                                {% endif %}
-                                {% for supplier in suppliers %}
-                                    <option value="{{supplier.id}}">{{supplier}}</option>
-                                {% endfor %}
+                                    {% if supplier.name == 'Unknown' %}
+                                    <option value="{{supplier.pk}}">{{supplier}}</option>
+                                    {% endif %}
+                                    {% for supplier in suppliers %}
+                                        <option value="{{supplier.id}}">{{supplier}}</option>
+                                    {% endfor %}
                                 {% endif %}
                             </select>
 
@@ -66,60 +66,57 @@
                             </tr>
                         </thead>
                         <tbody id="tb">
-                <!--loader-->
-                <tr v-if="loader" class="text-center">
-                    <td colspan="8">
-                        <div class="pace-demo">
-                            <div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
-                        </div>
-                    </td>
-                </tr>
-                <!--no data template-->
-                <template  v-else>
-                <tr v-if="items.length == 0" class="text-center">
-                    <td colspan="8" class="text-bold animated zoomIn">
-                        No Data Found ! <span class="text-warning">Please select supplier</span>
-                    </td>
-                </tr>
-                </template>
-                <!--listing template-->
-                <template v-for="item in items">
-                    <tr class="td animated fadeIn">
-                        <td class="hidden">${item.supplier_name}</td>
-                        <td>${item.product_name} - ${item.sku}</td>
-                        <td class="text-center">
-                            <span class="label label-primary cursor-pointer" @click="addToCart(item)">
-                                Add
-                            </span>
-                        </td>
-                    </tr>
-                </template>
-
-
-                </tbody>
+                            <!--loader-->
+                            <tr v-if="loader" class="text-center">
+                                <td colspan="8">
+                                    <div class="pace-demo">
+                                        <div class="theme_xbox"><div class="pace_progress" data-progress-text="60%" data-progress="60"></div><div class="pace_activity"></div></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--no data template-->
+                            <template  v-else>
+                            <tr v-if="items.length == 0" class="text-center">
+                                <td colspan="8" class="text-bold animated zoomIn">
+                                    No Data Found ! <span class="text-warning">Please select supplier</span>
+                                </td>
+                            </tr>
+                            </template>
+                            <!--listing template-->
+                            <template v-for="item in items">
+                                <tr class="td animated fadeIn">
+                                    <td class="hidden">${item.supplier_name}</td>
+                                    <td>${item.product_name} - ${item.sku}</td>
+                                    <td class="text-center">
+                                        <span class="label label-primary cursor-pointer" @click="addToCart(item)">
+                                            Add
+                                        </span>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
                     </table>
                     <div class="row media-none">
-                         <div class="col-md-12">
+                        <div class="col-md-12">
+                            <div class="col-md-3">
+                                <div class="col-md-12 form-group">
+                                    <select v-model="page_size" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
+                                        <option value="10" selected>No:</option>
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                          <div class="col-md-3">
-                              <div class="col-md-12 form-group">
-                                 <select v-model="page_size" @change="inputChangeEvent" class="bootstrap-select" style="display: none;" data-width="100%" tabindex="-98">
-                                    <option value="10" selected>No:</option>
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                  </select>
-                              </div>
-                          </div>
+                            <div class="col-md-9" id="media-none">
+                                <div class="text-center bootpag-callback p2-pag" style="">
+                                </div>
+                            </div>
 
-                          <div class="col-md-9" id="media-none">
-                              <div class="text-center bootpag-callback p2-pag" style="">
-                              </div>
-                          </div>
-
-                          </div>
-                         </div>
-                         <input type="hidden" id="page_size" val="">
+                        </div>
+                    </div>
+                    <input type="hidden" id="page_size" val="">
                 </div>
             </div>
         </div>
@@ -176,19 +173,23 @@
                                 </td>
                                 <!--cost price-->
                                 <td>
-                                    <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control">
+                                    <input v-model="item.cost_price" style="width: 65px;" type="number" placeholder="cost" class="form-control"
+                                    onfocus="this.value == 0 ? this.value='' : null" >
                                 </td>
                                 <!--retail price-->
                                 <td>
-                                    <input v-model="item.price_override" style="width: 65px;" type="number" placeholder="price_override" class="form-control price_override">
+                                    <input v-model="item.price_override" style="width: 65px;" type="number" placeholder="price_override" class="form-control price_override"
+                                    onfocus="this.value == 0 ? this.value='' : null" >
                                 </td>
                                 <!--wholesale price-->
                                 <td>
-                                    <input v-model="item.wholesale_override" style="width: 65px;" type="number" placeholder="{{'wholesale_name'|model_settings}} price" class="form-control">
+                                    <input v-model="item.wholesale_price" style="width: 65px;" type="number" placeholder="{{'wholesale_name'|model_settings}} price" class="form-control"
+                                    onfocus="this.value == 0 ? this.value='' : null" >
                                 </td>
                                 <!--minimum price-->
                                 <td>
-                                    <input v-model="item.minimum_price" style="width: 65px;" type="number" placeholder="minimum_price" class="form-control">
+                                    <input v-model="item.min_price" style="width: 65px;" type="number" placeholder="minimum_price" class="form-control"
+                                    onfocus="this.value == 0 ? this.value='' : null" >
                                 </td>
                                 <!--options-->
                                 <td>
@@ -294,7 +295,8 @@
                                             <input v-model="item.transaction_number" style="width: 65px;" type="text" placeholder="transaction" class="form-control">
                                         </td>
                                         <td>
-                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control">
+                                            <input v-model="item.tendered" style="width: 65px;" type="number" placeholder="amount" class="form-control"
+                                            onfocus="this.value == 0 ? this.value='' : null" >
                                         </td>
 
                                         <td>

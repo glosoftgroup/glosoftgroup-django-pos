@@ -141,6 +141,11 @@ var parent = new Vue({
         inputChangeEvent:function(){
             /* make api request on events filter */
             var self = this;
+            /* set supplier on recently added supplier during new variant addition */
+            var supplierSelectVal = $('#variant_supplier').val();
+            if(self.supplier == '' && supplierSelectVal != ''){
+                self.supplier = supplierSelectVal;
+            }
             this.$http.get($('.pageUrls').data('listurl')+'?page_size='+self.page_size+'&q='+this.search+'&supplier='+this.supplier)
                 .then(function(data){
                     data = JSON.parse(data.bodyText);
@@ -275,14 +280,12 @@ var parent = new Vue({
     created:function(){
         // preset supplier
         this.supplier = $('#variant_supplier').val();
-        console.log(this.supplier);
 
         /* on page load populate items with api list response */
         this.$http.get($('.pageUrls').data('listurl')+'?supplier='+this.supplier)
             .then(function(data){
                 data = JSON.parse(data.bodyText);
                 this.items = data.results;
-                console.log(this.items);
                 this.loader = false;
 
                 this.totalPages = data.total_pages == 0 ? 1 : data.total_pages;

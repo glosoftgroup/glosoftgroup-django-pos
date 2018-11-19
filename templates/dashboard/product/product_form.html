@@ -650,7 +650,7 @@
 
                                                         {% for item in stock_items %}
                                                         <tr data-action-go="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=item.pk %}"
-                                                            title="{% trans "Edit variant" context "Stock table action" %}">
+                                                            title="{% trans 'Edit variant' context 'Stock table action' %}">
                                                             <td>{{ item.variant.display_product }}<br>{{item.variant.sku}}</td>
 
                                                             <!-- cost price -->

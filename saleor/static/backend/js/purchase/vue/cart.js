@@ -279,7 +279,6 @@ var parent = new Vue({
             .then(function(data){
                 data = JSON.parse(data.bodyText);
                 this.items = data.results;
-                console.log(this.items);
                 this.loader = false;
 
                 this.totalPages = data.total_pages == 0 ? 1 : data.total_pages;

@@ -684,7 +684,7 @@ $(function(){
   var editStockRefreshDiv = $('#div-edit-stock');
   var editSelectOption = $('.edit-stock-Btn');
   var toggleStock = $('#toggleStock');
-  var url = '#';  
+  var url = '#';
 
   editSelectOption.on('click',function(){
     editStockRefreshDiv.html('Processing form ...');
