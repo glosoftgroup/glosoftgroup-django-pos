@@ -454,7 +454,7 @@
                 </li> -->
                   {#{% endif %}#}
                    {% if perms.accounts.view_expenses %}
-                <li><a href="#"><i class="icon-coins"></i> <span>Accounting</span></a>
+                <li><a href="#"><i class="icon-coins"></i> <span>Expenses</span></a>
                   <ul>
                     <li class="{% block menu_personal_expenses_class %}{% endblock %}">
                         <a href="{% url 'accounts:personal_expenses' %}">

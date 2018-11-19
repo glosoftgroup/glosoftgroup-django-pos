@@ -91,7 +91,17 @@
                 </div>
 
                 <div class="text-right">
-                    <button type="submit" onclick="return false;" data-refreshstockurl="{% url 'dashboard:product-update' pk=product.pk %}" data-contenturl="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=stock.pk %}" id='editStockBtn' class="btn btn-xs btn-primary hvr-pulsew">Edit</button>
+                    <button type="submit" onclick="return false;"
+                            data-refreshstockurl="{% url 'dashboard:product-update' pk=product.pk %}"
+                            data-contenturl="{% url 'dashboard:product-stock-update' product_pk=product.pk stock_pk=stock.pk %}"
+                            id='editStockBtn'
+                            class="btn btn-xs btn-primary hvr-pulsew pull-right ml-20">
+                        Edit
+                    </button>
+                    <button type="submit" onclick="return false;"  id='cancelStockBtn'
+                            class="btn btn-xs btn-default hvr-pulsews pull-right mr-20">
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>

@@ -12,6 +12,7 @@
 $(function(){
   var editStockRefreshDiv = $('#div-edit-stock');  
   var editStockBtn = $('#editStockBtn');
+  var cancelStockBtn = $('#cancelStockBtn');
   var url = '#';
   var editArea = $('#edit-area');
   var editForm  = editArea.find('form');
@@ -30,6 +31,10 @@ $(function(){
   var low_stock_threshold = editForm.find('#reorder-threshold');
   var settlePayment = editForm.find('#settle_payment');
   var balance = editForm.find('#balance_e');
+
+  cancelStockBtn.on('click', function(){
+    $('html, body').find('#div-edit-stock').html('');
+  });
 
   editStockBtn.on('click',function(){
     var url = $(this).data('contenturl');

@@ -236,11 +236,11 @@ Add Stock- {{ block.super }}
                                 </td>
                                 <!--wholesale price-->
                                 <td>
-                                    <input v-model="item.wholesale_override" style="width: 65px;" type="number" placeholder="wholesale price" class="form-control">
+                                    <input v-model="item.wholesale_price" style="width: 65px;" type="number" placeholder="wholesale price" class="form-control">
                                 </td>
                                 <!--minimum price-->
                                 <td>
-                                    <input v-model="item.minimum_price" style="width: 65px;" type="number" placeholder="minimum_price" class="form-control">
+                                    <input v-model="item.min_price" style="width: 65px;" type="number" placeholder="minimum_price" class="form-control">
                                 </td>
 
                             </tr>
@@ -344,10 +344,13 @@ Add Stock- {{ block.super }}
 
                                         <td>${item.payment_name}</td>
                                         <td>
-                                            <input v-model="item.transaction_number" style="width: 65px;" type="text" placeholder="transaction" class="form-control">
+                                            <input v-model="item.transaction_number" style="width: 65px;" type="text"
+                                                   placeholder="transaction" class="form-control">
                                         </td>
                                         <td>
-                                            <input v-model="item.tendered" style="width: 105px;" type="number" placeholder="amount" class="form-control">
+                                            <input v-model="item.tendered" style="width: 105px;" type="number"
+                                                   placeholder="amount" class="form-control"
+                                                   onfocus="this.value == 0 ? this.value='' : null">
                                         </td>
                                         <td>
                                             <span class="label label-white text-grey-800" @click="removePayment(item)">
