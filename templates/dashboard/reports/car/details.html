@@ -10,8 +10,18 @@
  Product Tranfer Report
 {% endblock %}
 {% block breadcrumbs %}
-      <li class=""><a href="{% url 'dashboard:car_allocate_list' %}">Cars Stock Transfer </a></li>
-     <li class="active"><a href="{% url 'dashboard:car_transfer_list' pk=sale.pk %}">{{ sale.car.name }} ({{ sale.car.number }})</a> </li>
+      <li class="">
+          <a href="{% url 'dashboard:car_allocate_list' %}">
+              Cars Stock Transfer
+          </a>
+      </li>
+     {% if sale.car %}
+        <li class="active">
+            <a href="{% url 'dashboard:car_transfer_list' pk=sale.pk %}">
+                {{ sale.car.name }} ({{ sale.car.number }})
+            </a>
+        </li>
+     {% endif %}
      <li>Receipt</li>
  {% endblock %}
 
@@ -47,9 +57,11 @@
                           <h6 class=""><span class="text-bold">Receipt Number:</span> {{sale.invoice_number}}</h6>
                           <h7 class=""><span class="text-bold">Serverd by:</span> {{sale.user.name}}</h7>
                           <br>
-                          <h7>
-                              <span class="text-bold">Car:</span>{{sale.car.name}} ({{ sale.car.number }})
-                          </h7>
+                          {% if sale.car %}
+                              <h7>
+                                  <span class="text-bold">Car:</span>{{sale.car.name}} ({{ sale.car.number }})
+                              </h7>
+                          {% endif %}
 
                       </div>
                     </div>
