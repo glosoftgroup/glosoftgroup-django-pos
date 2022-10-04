@@ -24,7 +24,7 @@
     "classnames": "^2.2.5",
     "deep-extend": "^0.5.1",
     "dropzone": "^4.2.0",
-    "favicons-webpack-plugin": "0.0.9",
+    "favicons-webpack-plugin": "6.0.0-alpha.1",
     "glamor": "^2.20.40",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
